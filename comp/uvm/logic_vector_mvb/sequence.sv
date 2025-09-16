@@ -40,6 +40,30 @@ class sequence_simple_rx_base #(
         return $sformatf("uvm_logic_vector_mvb::sequence_simple_rx_base #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
+    function tr_init(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH) tr);
+        case (cfg.generate_invalid)
+            config_sequence::INVALID_ZERO  :
+                begin
+                    for (int unsigned it = 0; it < ITEMS; it++) begin
+                        tr.data[it]    = '0;
+                        tr.vld[it]    = '0;
+                    end
+                    tr.src_rdy = 0;
+                end
+            config_sequence::INVALID_UNDEF :
+                begin
+                    for (int unsigned it = 0; it < ITEMS; it++) begin
+                        tr.data[it] = 'x;
+                        tr.vld[it]  = 'x;
+                    end
+                    tr.src_rdy = 0;
+                end
+            config_sequence::INVALID_RAND  :
+                assert(tr.randomize() with {tr.src_rdy == 0;});
+        endcase
+
+    endfunction
+
     // Generates transactions
     task body;
 
@@ -126,12 +150,13 @@ class sequence_rand_rx #(
     endfunction
 
     virtual task create_sequence_item();
+        logic src_rdy;
         logic [ITEMS-1 : 0] vld;
 
-        if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
+        tr_init(gen);
 
-        vld         = 0;
-        gen.src_rdy = 1'b0;
+        vld     = 0;
+        src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
             if (hl_transactions != 0) begin
@@ -141,8 +166,7 @@ class sequence_rand_rx #(
                         vld[i]  = 1'b1;
 
                         gen.data[i] = frame.data;
-                        gen.vld = vld;
-                        gen.src_rdy = 1'b1;
+                        src_rdy = 1'b1;
                         hi_sqr.item_done();
                         frame = null;
                         hl_transactions--;
@@ -154,6 +178,11 @@ class sequence_rand_rx #(
                     space--;
                 end
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.vld     = vld;
         end
     endtask
 
@@ -208,12 +237,13 @@ class sequence_burst_rx #(
     endfunction
 
     virtual task create_sequence_item();
+        logic src_rdy;
         logic [ITEMS-1 : 0] vld;
 
-        if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
+        tr_init(gen);
 
-        vld = 0;
-        gen.src_rdy = 1'b0;
+        vld     = 0;
+        src_rdy = 1'b0;
 
         if (burst_length == 0) begin
             unique case (burst_mode)
@@ -242,8 +272,7 @@ class sequence_burst_rx #(
                             vld[i] = 1'b1;
 
                             gen.data[i] = frame.data;
-                            gen.vld     = vld;
-                            gen.src_rdy = 1'b1;
+                            src_rdy = 1'b1;
 
                             hi_sqr.item_done();
                             frame = null;
@@ -256,6 +285,11 @@ class sequence_burst_rx #(
                     end
                 end
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.vld     = vld;
         end
     endtask
 
@@ -290,11 +324,12 @@ class sequence_full_speed_rx #(
     endfunction
 
     virtual task create_sequence_item();
+        logic src_rdy;
         logic [ITEMS-1 : 0] vld;
 
-        if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
-        vld = 0;
-        gen.src_rdy = 1'b0;
+        tr_init(gen);
+        vld     = 0;
+        src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
             if (hl_transactions != 0) begin
@@ -304,8 +339,7 @@ class sequence_full_speed_rx #(
                         vld[i] = 1'b1;
 
                         gen.data[i] = frame.data;
-                        gen.vld     = vld;
-                        gen.src_rdy = 1'b1;
+                        src_rdy = 1'b1;
 
                         hi_sqr.item_done();
                         hl_transactions--;
@@ -315,6 +349,11 @@ class sequence_full_speed_rx #(
                     space--;
                 end
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.vld     = vld;
         end
     endtask
 
@@ -342,7 +381,8 @@ class sequence_stop_rx #(
     endfunction
 
     virtual task create_sequence_item();
-        if (!gen.randomize() with {src_rdy == 0;}) `uvm_fatal(this.get_full_name(), "\n\tfailed to radnomize");
+        tr_init(gen);
+
         if (hl_transactions != 0) begin
             hl_transactions--;
         end
@@ -391,12 +431,12 @@ class sequence_const_space_rx #(
     endfunction
 
     virtual task create_sequence_item();
+        logic src_rdy;
         logic [ITEMS-1 : 0] vld;
 
-        if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
-
+        tr_init(gen);
         vld     = 0;
-        gen.src_rdy = 1'b0;
+        src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
             if (hl_transactions != 0) begin
@@ -406,8 +446,7 @@ class sequence_const_space_rx #(
                         vld[i] = 1'b1;
 
                         gen.data[i] = frame.data;
-                        gen.vld     = vld;
-                        gen.src_rdy = 1'b1;
+                        src_rdy = 1'b1;
 
                         hi_sqr.item_done();
                         hl_transactions--;
@@ -417,6 +456,11 @@ class sequence_const_space_rx #(
                     space--;
                 end
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.vld     = vld;
         end
     endtask
 
@@ -451,12 +495,12 @@ class sequence_const_possition_rx #(
     endfunction
 
     virtual task create_sequence_item();
+        logic src_rdy;
         logic [ITEMS-1 : 0] vld;
 
-        if (!gen.randomize()) `uvm_fatal(this.get_full_name(), "failed to radnomize");
-
+        tr_init(gen);
         vld     = 0;
-        gen.src_rdy = 1'b0;
+        src_rdy = 1'b0;
 
         for (int i = 0; i < ITEMS; i++) begin
             if (hl_transactions != 0) begin
@@ -467,8 +511,7 @@ class sequence_const_possition_rx #(
                             vld[i] = 1'b1;
 
                             gen.data[i] = frame.data;
-                            gen.vld     = vld;
-                            gen.src_rdy = 1'b1;
+                            src_rdy = 1'b1;
 
                             hi_sqr.item_done();
                             hl_transactions--;
@@ -479,6 +522,11 @@ class sequence_const_possition_rx #(
                     space--;
                 end
             end
+        end
+
+        if (src_rdy == 1) begin
+            gen.src_rdy = 1;
+            gen.vld     = vld;
         end
     endtask
 

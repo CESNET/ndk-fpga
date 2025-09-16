@@ -13,9 +13,13 @@ class config_sequence extends uvm_object;
     int unsigned space_size_min     =   0; // minimal space between two items it is usefull for full speed
     int unsigned space_size_max     = 200; // aproximation of maximal space size between two items is used for
 
+    typedef enum {INVALID_ZERO, INVALID_UNDEF, INVALID_RAND} invalid_val_t;
+    invalid_val_t generate_invalid;
+
     function new(string name = "uvm_logic_vector_mvb::config_sequence");
         super.new(name);
         state = null;
+        generate_invalid = INVALID_RAND;
     endfunction
 
 
