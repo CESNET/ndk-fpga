@@ -1,4 +1,13 @@
+import cocotb
+import cocotb.triggers
+import cocotb.utils
+
 from .. import modelsim as ms
+
+from cocotbext.ofm.mfb.monitors import MFBMonitor
+
+
+st = cocotb.utils.get_sim_time
 
 
 class Bus():
@@ -49,6 +58,46 @@ class MvbBus(Bus):
 
 class MfbBus(Bus):
     _SIGNALS = ['DATA', 'SRC_RDY', 'DST_RDY', 'SOF', 'EOF', 'SOF_POS', 'EOF_POS']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.clear()
+
+    def add_wave(self, **kwargs):
+        super().add_wave(**kwargs)
+        sr = self._get_handle('SRC_RDY')
+        dr = self._get_handle('DST_RDY')
+
+        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)}}} transfer")
+        self._w.add_wave(name, group=self._label, label='transfer')
+
+    def clear(self):
+        self._sum_pkts = 0
+        self._sum_cycles = 0
+        self._sum_bytes = 0
+
+    async def monitor(self, clk):
+        self.clear()
+
+        m = MFBMonitor(self._instance, self._prefix, clk, array_idx=self._index)
+
+        def cb_transaction(trn):
+            self._sum_pkts += 1
+            self._sum_bytes += len(trn)
+
+        m.add_callback(cb_transaction)
+
+        tpre = st()
+        while True:
+            tpost = st()
+            tdiff = (tpost - tpre) / 1000  # to Mpps
+
+            self._sum_cycles += 1
+            sc = self._sum_cycles
+            if sc > 0 and tdiff > 0:
+                self._thr = float(self._sum_bytes) * 8 / float(sc * tdiff)
+
+            tpre = tpost
 
 
 class MiBus(Bus):
