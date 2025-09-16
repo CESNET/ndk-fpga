@@ -47,8 +47,9 @@ class Servicer(ext.AbstractNfb):
 
         @cocotb.function
         def burst_put(self):
-            for pkt in self._burst_temp:
-                yield self._q.sendmsg(pkt)
+            last_index = len(self._burst_temp) - 1
+            for i, pkt in enumerate(self._burst_temp):
+                yield self._q.sendmsg(pkt, i == last_index)
             self._burst_temp.clear()
 
     def __init__(self, device, dtb, *args, **kwargs):
