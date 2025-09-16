@@ -139,15 +139,19 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
                 await cocotb.start(Clock(eth_core.network_mod_core_i.ftile_clk_out, 2482, 'ps').start())
 
     def _init_pcie(self):
-        handle = simulator.get_root_handle("combo_user_const")
-        combo_user_const = cocotb.handle.SimHandle(handle)
-        self._card_name = combo_user_const.CARD_NAME.value.decode()
-
         try:
             self._core = NFBDevice.core_instance_from_top(self._dut)
         except Exception:
             # No fpga_common instance in card, try fpga_common directly
             self._core = self._dut
+
+        try:
+            handle = simulator.get_root_handle("combo_user_const")
+            combo_user_const = cocotb.handle.SimHandle(handle)
+            self._card_name = combo_user_const.CARD_NAME.value.decode()
+        except Exception:
+            # Workardound for nvc
+            self._card_name = self._core.BOARD.value.decode()
 
         pcie_i = self._core.pcie_i.pcie_core_i
         self.mi = []
