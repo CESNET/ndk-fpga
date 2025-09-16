@@ -7,8 +7,18 @@
 
 
 // This low level sequence define bus functionality
-class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base#(config_sequence, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_simple_rx_base#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_simple_rx_base #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_common::sequence_base#(config_sequence, uvm_mfb::sequence_item #(
+                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+          ));
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_simple_rx_base#(
+                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+    ))
     `uvm_declare_p_sequencer(uvm_mfb::sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
 
     int unsigned space_size = 0;
@@ -20,7 +30,13 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
     typedef enum {state_last, state_next, state_reset} state_t;
     state_t state;
 
-    typedef enum {state_packet_none, state_packet_new, state_packet_data, state_packet_space, state_packet_space_new} state_packet_t;
+    typedef enum {
+            state_packet_none,
+            state_packet_new,
+            state_packet_data,
+            state_packet_space,
+            state_packet_space_new
+    } state_packet_t;
     state_packet_t state_packet;
 
     rand int unsigned hl_transactions;
@@ -154,8 +170,12 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
         space_size = 0;
         state_packet = state_packet_space_new;
 
-        req = uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
-        gen = uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("reg");
+        req = uvm_mfb::sequence_item #(
+                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+        )::type_id::create("req");
+        gen = uvm_mfb::sequence_item #(
+                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+        )::type_id::create("gen");
 
         //send empty frame to get first response
         send_empty_frame();
@@ -173,8 +193,16 @@ class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, 
 endclass
 
 
-class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_simple_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_simple_rx #(
+                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+    ))
 
     rand int unsigned space_size_min;
     rand int unsigned space_size_max;
@@ -183,30 +211,45 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
         space_size_min <= space_size_max;
         space_size_min dist {
              cfg.space_size_min :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
              cfg.space_size_max :/ 5
         };
 
         space_size_max dist {
              cfg.space_size_min :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
              cfg.space_size_max :/ 5
         };
-
     }
 
     rand int unsigned rdy_probability;
@@ -214,13 +257,21 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     constraint c_rdy_probability {
         rdy_probability != 0;
         rdy_probability dist {
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
              cfg.rdy_probability_max :/ 30
         };
@@ -231,7 +282,9 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     endfunction
 
     virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_simple_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_simple_rx #(%0d, %0d, %0d, %0d, %0d)",
+                                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+               );
     endfunction
 
     /////////
@@ -276,7 +329,9 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (sof[it] == 1 ||
+                            (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))
+                    ) begin
                         break;
                     end
 
@@ -289,7 +344,8 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    const int unsigned data_rest = (data.data.size() - data_index);
+                    const int unsigned loop_end = BLOCK_SIZE < data_rest ? BLOCK_SIZE : data_rest;
                     src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -328,8 +384,16 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     endtask
 endclass
 
-class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_burst_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_burst_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_burst_rx #(
+                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+    ))
 
     rand int unsigned rdy_probability_min;
     rand int unsigned rdy_probability_max;
@@ -340,25 +404,41 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
 
         rdy_probability_min <= rdy_probability_max;
         rdy_probability_min dist {
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
              cfg.rdy_probability_max :/ 30
         };
 
         rdy_probability_max dist {
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
              cfg.rdy_probability_max :/ 30
         };
@@ -379,7 +459,9 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
     endfunction
 
     virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_burst_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_burst_rx #(%0d, %0d, %0d, %0d, %0d)",
+                                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+               );
     endfunction
 
     /////////
@@ -442,7 +524,9 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
 
                     if (state_packet == state_packet_new) begin
                         // Check SOF and EOF position if we can insert packet into this region
-                        if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                        if (sof[it] == 1 ||
+                                (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))
+                        ) begin
                             break;
                         end
 
@@ -455,7 +539,8 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
                     end
 
                     if (state_packet == state_packet_data) begin
-                        int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                        const int unsigned data_rest = (data.data.size() - data_index);
+                        const int unsigned loop_end = BLOCK_SIZE < data_rest ? BLOCK_SIZE : data_rest;
                         src_rdy = 1;
 
                         for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -496,8 +581,16 @@ class sequence_burst_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int un
 endclass
 
 
-class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_position_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_position_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_position_rx #(
+                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+    ))
 
     rand logic [REGION_SIZE-1:0] sof_pos;
     constraint sof_pos_c {sof_pos > 0;};
@@ -508,26 +601,42 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
         space_size_min <= space_size_max;
         space_size_min dist {
              cfg.space_size_min :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
              cfg.space_size_max :/ 5
         };
 
         space_size_max dist {
              cfg.space_size_min :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*0 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1] :/ 20,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*1 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2] :/ 7,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*2 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*3 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*4 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5] :/ 2,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*5 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*6 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*7 : cfg.space_size_min + (cfg.space_size_max-cfg.space_size_min)/8*8] :/ 3,
              cfg.space_size_max :/ 5
         };
@@ -537,13 +646,21 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
     constraint c_rdy_probability {
         rdy_probability != 0;
         rdy_probability dist {
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*0 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*1 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*2 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*3 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4] :/ 1,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*4 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5] :/ 3,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*5 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6] :/ 5,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*6 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7] :/ 10,
+             // verilog_lint: waive line-length
             [cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*7 : cfg.rdy_probability_min + (cfg.rdy_probability_max-cfg.rdy_probability_min)/8*8] :/ 20,
              cfg.rdy_probability_max :/ 30
         };
@@ -556,7 +673,9 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
     endfunction
 
     virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_position_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_position_rx #(%0d, %0d, %0d, %0d, %0d)",
+                            REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+               );
     endfunction
 
     /////////
@@ -601,7 +720,9 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (sof[it] == 1 ||
+                            (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))
+                    ) begin
                         break;
                     end
 
@@ -614,7 +735,8 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    const int unsigned data_rest = (data.data.size() - data_index);
+                    const int unsigned loop_end   = BLOCK_SIZE < data_rest ? BLOCK_SIZE : data_rest;
                     src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -647,15 +769,25 @@ class sequence_position_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int
 endclass
 
 
-class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_full_speed_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(
+            REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+    ))
 
     function new (string name = "sequence_full_speed_rx");
         super.new(name);
     endfunction
 
     virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_full_speed_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_full_speed_rx #(%0d, %0d, %0d, %0d, %0d)",
+                        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+               );
     endfunction
 
     /////////
@@ -694,7 +826,9 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (sof[it] == 1 || (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (sof[it] == 1 ||
+                            (eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))
+                    ) begin
                         break;
                     end
 
@@ -707,7 +841,8 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    const int unsigned data_rest = (data.data.size() - data_index);
+                    const int unsigned loop_end   = BLOCK_SIZE < data_rest ? BLOCK_SIZE : data_rest;
                     src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -738,8 +873,16 @@ class sequence_full_speed_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endtask
 endclass
 
-class sequence_stop_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_stop_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_stop_rx #(
+        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+    ))
 
     function new (string name = "sequence_stop_rx");
         super.new(name);
@@ -748,7 +891,9 @@ class sequence_stop_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int uns
     endfunction
 
     virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_stop_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+        return $sformatf("uvm_logic_vector_array_mfb::sequence_stop_rx #(%0d, %0d, %0d, %0d, %0d)",
+                            REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+               );
     endfunction
 
     /////////
