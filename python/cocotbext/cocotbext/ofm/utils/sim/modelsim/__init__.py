@@ -5,30 +5,33 @@ import sys
 from ctypes import cdll, c_void_p, c_char_p, c_int
 
 #__lib = cdll.LoadLibrary('/opt/modeltech/modeltech/linux_x86_64/libmtipli.so')
-__lib = cdll.LoadLibrary('libmtipli.so')
-
-__lib.mti_Cmd.argtypes = [c_char_p]
-__lib.mti_Cmd.restype = c_int
-
-__lib.mti_Break.argtypes = []
-
-__lib.mti_Interp.argtypes = []
-__lib.mti_Interp.restype = c_void_p
-
-__lib.Tcl_GetStringResult.argtypes = [c_void_p]
-__lib.Tcl_GetStringResult.restype = c_char_p
-
-__lib.Tcl_ResetResult.argtypes = [c_void_p]
-
 try:
+    __lib = cdll.LoadLibrary('libmtipli.so')
+
+    __lib.mti_Cmd.argtypes = [c_char_p]
+    __lib.mti_Cmd.restype = c_int
+
+    __lib.mti_Break.argtypes = []
+
+    __lib.mti_Interp.argtypes = []
+    __lib.mti_Interp.restype = c_void_p
+
+    __lib.Tcl_GetStringResult.argtypes = [c_void_p]
+    __lib.Tcl_GetStringResult.restype = c_char_p
+
+    __lib.Tcl_ResetResult.argtypes = [c_void_p]
+
     __interp = __lib.mti_Interp()
     assert __interp
 except Exception:
+    __lib = None
     logger = logging.getLogger("modelsim")
     logger.warn("can't load modelsim interpreter handle.")
 
 
 def cmd(command):
+    if __lib is None:
+        return
     __lib.mti_Cmd(command.encode())
     res = __lib.Tcl_GetStringResult(__interp)
     ret = res.decode()
@@ -37,6 +40,8 @@ def cmd(command):
 
 
 def mti_break():
+    if __lib is None:
+        return
     __lib.mti_Break()
 
 
@@ -46,6 +51,8 @@ def print(*args, **kwargs):
 
 
 def cocotb2path(obj):
+    if __lib is None:
+        return ""
     return "/" + obj._path.replace(".", "/").replace("[", "(").replace("]", ")")
 
 
