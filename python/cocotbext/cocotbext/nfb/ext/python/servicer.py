@@ -14,11 +14,13 @@ class Servicer(ext.AbstractNfb):
             self._burst_temp = []
             self._q = q
 
+        @cocotb.function
         def start(self):
-            pass
+            yield self._q.start()
 
+        @cocotb.function
         def stop(self):
-            pass
+            yield self._q.stop()
 
     class NdpQueueRx(NdpQueue, ext.AbstractNdpQueueRx):
         def burst_get(self, count):

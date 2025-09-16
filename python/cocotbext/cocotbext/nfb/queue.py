@@ -78,6 +78,9 @@ class QueueNdp:
         self._ctrl.sdp += 1
         self._dsc_free -= 1
 
+    async def stop(self):
+        await e(self._ctrl.stop)()
+
     async def start(self):
         upd = memoryview(self._ram._mem)[self._upd_base:self._upd_base + 8]
         try:
@@ -101,8 +104,7 @@ class QueueNdpRx(QueueNdp):
         QueueNdp.__init__(self, nfb, node, buf_index)
 
     async def _push_desc(self, flush=True):
-        if self._state == 0:
-            await self.start()
+        assert self._state != 0, "Queue not started yet"
 
         while self._dsc_free < 2:
             # TODO: check if can be flushed
@@ -150,10 +152,7 @@ class QueueNdpTx(QueueNdp):
         pkt, hdr, flags = pkt
         pkt_hdr = pkt + hdr
         assert self._ctrl.mtu[0] <= len(pkt_hdr) <= min(self._packet_length_max, self._ctrl.mtu[1])
-
-        # INFO: may be obsolete, the libnfb.ndp starts it
-        if self._state == 0:
-            await self.start()
+        assert self._state != 0, "Queue not started yet"
 
         while self._dsc_free < 2:
             hdp = self._ctrl.update_hdp()
