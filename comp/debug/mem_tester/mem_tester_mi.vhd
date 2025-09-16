@@ -183,19 +183,19 @@ architecture FULL of MEM_TESTER_MI is
 
     -- MI registers addresses --
     -- 0x00
-    constant CTRL_IN_REG        : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000000";
+    constant CTRL_IN_REG        : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000000";
     -- 0x04
-    constant CTRL_OUT_REG       : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000001";
+    constant CTRL_OUT_REG       : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000001";
     -- 0x08
-    constant ERR_CNT_REG        : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000010";
+    constant ERR_CNT_REG        : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000010";
     -- 0x0C
-    constant BURST_CNT_REG      : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000011";
+    constant BURST_CNT_REG      : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000011";
     -- 0x10
-    constant ADDR_LIM_REG       : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000100";
+    constant ADDR_LIM_REG       : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000100";
     -- 0x14
-    constant REFRESH_TICKS_REG  : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000101";
+    constant REFRESH_TICKS_REG  : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000101";
     -- 0x18
-    constant DEF_REFR_REG       : std_logic_vector(MI_ADDR_LIMIT downto MI_ADDR_CUTOFF) := "000110";
+    constant DEF_REFR_REG       : std_logic_vector(MI_ADDR_LIMIT downto 2) := "000110";
 
     -- Bits in registers
     -- CTRL IN REG
