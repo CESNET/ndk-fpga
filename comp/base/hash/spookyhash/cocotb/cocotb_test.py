@@ -113,7 +113,7 @@ async def run_test(dut, trans_cnt=10000):
     for i in range(trans_cnt):
         transaction = dict()
         transaction["KEY"]   = randint(0, 2**key_width-1)
-        transaction["SEED"]  = randint(0, 2**hash_width-1)
+        transaction["SEED"]  = randint(0, 2**128-1)
         transaction["META"]  = randint(0, 2**meta_width-1)
 
         cocotb.log.info(f"{i=}, {transaction=}")
