@@ -157,8 +157,8 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         self.mi = []
         self.pcie_req = []
 
-        for i, clk in enumerate(pcie_i.pcie_hip_clk):
-            clk = pcie_i.pcie_hip_clk[i]
+        for i, clk in enumerate(pcie_i.pcie_clk):
+            clk = pcie_i.pcie_clk[i]
             #rst = pcie_i.pcie_hip_rst[i]
             if hasattr(pcie_i, "pcie_cq_axi_data"):
                 cq  = Axi4StreamMasterV(pcie_i, "pcie_cq_axi", clk, array_idx=i)
