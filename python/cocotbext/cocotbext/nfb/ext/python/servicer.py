@@ -2,6 +2,7 @@
 # Copyright (C) 2023 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
+import re
 import logging
 import cocotb
 
@@ -63,8 +64,10 @@ class Servicer(ext.AbstractNfb):
         return base(attr[index])
 
     def get_node_base(self, bus_node, node):
-        # TODO: fix mi[0]
-        return (self._device.mi[0], node.get_property("reg")[0])
+        m = re.search(r'PCI(?P<pci>\d+),BAR(?P<bar>\d+)', bus_node.get_property("resource").value)
+        pci, _ = int(m.group('pci')), int(m.group('bar'))
+        mi = self._device.mi[pci]
+        return (mi, node.get_property("reg")[0])
 
     @cocotb.function
     def read(self, bus_node, node, offset, nbyte):
