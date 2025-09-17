@@ -64,6 +64,8 @@ class MfbGenerator(nfb.BaseComp):
     @enabled.setter
     def enabled(self, en: bool) -> None:
         self._comp.write32(self._REG_CONTROL, int(en))
+        while bool(self.generating) != en:
+            pass
 
     @property
     def generating(self) -> bool:
