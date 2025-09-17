@@ -225,10 +225,11 @@ begin
     -- handle the last 0..15 bytes, and its length
     remainder_i: entity work.SPOOKY_REMAINDER
     generic map (
-        KEY_WIDTH => KEY_WIDTH_ALIGNED,
-        REMAINDER => REMAINDER16,
-        SC_CONST  => SC_CONST,
-        REG_SETUP => REMAINDER_REG_SETUP
+        KEY_WIDTH  => KEY_WIDTH_ALIGNED,
+        REMAINDER  => REMAINDER16,
+        SC_CONST   => SC_CONST,
+        META_WIDTH => META_WIDTH,
+        REG_SETUP  => REMAINDER_REG_SETUP
     ) port map (
         CLK       => CLK,
         RESET     => RESET,
