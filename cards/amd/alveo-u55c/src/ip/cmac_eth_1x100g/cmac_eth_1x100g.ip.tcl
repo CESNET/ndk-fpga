@@ -1,3 +1,9 @@
+# cmac_eth_1x100g.ip.tcl: generation script for the CMAC IPs
+# Copyright 2025 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
+# Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 array set PARAMS $IP_PARAMS_L
 
 set IP_COMP_NAME $PARAMS(IP_COMP_NAME)
@@ -15,8 +21,8 @@ set config_list [list \
     CONFIG.ADD_GT_CNRL_STS_PORTS {1} \
     CONFIG.CMAC_CAUI4_MODE {1} \
     CONFIG.CMAC_CORE_SELECT {CMACE4_X0Y3} \
-    CONFIG.GT_DRP_CLK {50.00} \
-    CONFIG.GT_GROUP_SELECT {X0Y20~X0Y23} \
+    CONFIG.GT_DRP_CLK {100.00} \
+    CONFIG.GT_GROUP_SELECT {X0Y24~X0Y27} \
     CONFIG.GT_REF_CLK_FREQ {161.1328125} \
     CONFIG.INCLUDE_RS_FEC {1} \
     CONFIG.NUM_LANES {4x25} \

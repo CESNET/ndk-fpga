@@ -59,7 +59,12 @@ entity TX_DMA_PCIE_TRANS_BUFFER is
 
         -- Determines the number of bytes that can be stored in the buffer.
         -- The amount of bytes equals 2\*\*POINTER_WIDTH
-        POINTER_WIDTH : natural := 16
+        POINTER_WIDTH          : natural := 16;
+        -- If true, each port of the TDPs (used by the 2,1,8,32 MFB configuration) is controlled by
+        -- separate interfaces
+        SPLIT_READ_PORTS       : boolean := FALSE;
+        -- If true, the read data are aligned according to the lower bits of the RD_ADDR input
+        READ_BARREL_SHIFTER_EN : b_array_t(1 downto 0) := (TRUE, TRUE)
     );
     port (
         CLK   : in std_logic;
@@ -69,21 +74,29 @@ entity TX_DMA_PCIE_TRANS_BUFFER is
         -- Input MFB bus (quasi BRAM writing interface)
         -- =========================================================================================
         PCIE_MFB_DATA    : in  std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-        PCIE_MFB_META    : in  std_logic_vector(MFB_REGIONS*((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
+        PCIE_MFB_META    : in  slv_array_t(MFB_REGIONS -1 downto 0)(((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
         PCIE_MFB_SOF     : in  std_logic_vector(MFB_REGIONS -1 downto 0);
         PCIE_MFB_SRC_RDY : in  std_logic;
 
         -- =========================================================================================
-        -- Output reading interface
-        --
-        -- Similar to BRAM block.
+        -- Output reading interface for port A of the TDP or the single read port of the SDP
         -- =========================================================================================
-        -- Note: This will be shared for both regions.
-        RD_CHAN     : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
-        RD_DATA     : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-        RD_ADDR     : in  std_logic_vector(POINTER_WIDTH -1 downto 0);
-        RD_EN       : in  std_logic;
-        RD_DATA_VLD : out std_logic
+        RD_CHAN_A     : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
+        RD_DATA_A     : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        RD_ADDR_A     : in  std_logic_vector(POINTER_WIDTH -1 downto 0);
+        RD_EN_A       : in  std_logic;
+        RD_DATA_VLD_A : out std_logic;
+
+        -- =========================================================================================
+        -- Output reading interface for port B
+        --
+        -- Unused if SPLIT_READ_PORTS=FALSE or MFB configuration is (1,1,8,32)
+        -- =========================================================================================
+        RD_CHAN_B     : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
+        RD_DATA_B     : out std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0) := (others => '0');
+        RD_ADDR_B     : in  std_logic_vector(POINTER_WIDTH -1 downto 0);
+        RD_EN_B       : in  std_logic;
+        RD_DATA_VLD_B : out std_logic := '0'
     );
 end entity;
 
@@ -130,13 +143,17 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
 
     -- Input register
     signal pcie_mfb_data_inp_reg    : slv_array_t(INP_REG_NUM downto 0)(PCIE_MFB_DATA'range);
-    signal pcie_mfb_meta_inp_reg    : slv_array_t(INP_REG_NUM downto 0)(PCIE_MFB_META'range);
+    signal pcie_mfb_meta_inp_reg    : slv_array_2d_t(INP_REG_NUM downto 0)(MFB_REGIONS -1 downto 0)(((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0);
     signal pcie_mfb_sof_inp_reg     : slv_array_t(INP_REG_NUM downto 0)(PCIE_MFB_SOF'range);
     signal pcie_mfb_src_rdy_inp_reg : std_logic_vector(INP_REG_NUM downto 0);
 
     -- counter of the address for each valid word following the beginning of the transaction
     signal addr_cntr_pst            : unsigned(META_PCIE_ADDR_W -1 downto 0);
     signal addr_cntr_nst            : unsigned(META_PCIE_ADDR_W -1 downto 0);
+
+    -- Stores the index of the packet that get currently stored
+    signal chan_num_reg             : std_logic_vector(META_CHAN_NUM_W -1 downto 0);
+    signal chan_num_next            : std_logic_vector(META_CHAN_NUM_W -1 downto 0);
 
     -- control of the amount of shift on the writing barrel shifters
     signal wr_shift_sel             : slv_array_t(MFB_REGIONS - 1 downto 0)(log2(MFB_LENGTH/32) -1 downto 0);
@@ -146,13 +163,13 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
     signal wr_addr_bram_by_shift    : slv_array_2d_t(MFB_REGIONS - 1 downto 0)((PCIE_MFB_DATA'length/32) -1 downto 0)(log2(BUFFER_DEPTH*CHANS_PER_ARRAY) -1 downto 0);
     signal wr_data_bram_bshifter    : slv_array_t(MFB_REGIONS - 1 downto 0)(MFB_LENGTH -1 downto 0);
 
-    signal chan_num_pst             : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
-    signal chan_num_nst             : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
+    signal mem_arr_idx_reg          : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
+    signal mem_arr_idx_next         : std_logic_vector(log2(MEM_ARRAYS) -1 downto 0);
 
-    signal rd_en_bram_demux         : std_logic_vector(MEM_ARRAYS -1 downto 0);
-    signal rd_data_bram_mux         : std_logic_vector(MFB_LENGTH -1 downto 0);
+    signal rd_en_bram_demux         : slv_array_t(MEM_ARRAYS -1 downto 0)(MFB_REGIONS -1 downto 0);
+    signal rd_data_bram_mux         : slv_array_t(MFB_REGIONS -1 downto 0)(MFB_LENGTH -1 downto 0);
     signal rd_data_bram             : slv_array_2d_t(MEM_ARRAYS -1 downto 0)(MFB_REGIONS - 1 downto 0)(MFB_LENGTH -1 downto 0);
-    signal rd_addr_bram_by_shift    : slv_array_t((PCIE_MFB_DATA'length/8) -1 downto 0)(log2(BUFFER_DEPTH*CHANS_PER_ARRAY) -1 downto 0);
+    signal rd_addr_bram_by_shift    : slv_array_2d_t(MFB_REGIONS -1 downto 0)((PCIE_MFB_DATA'length/8) -1 downto 0)(log2(BUFFER_DEPTH*CHANS_PER_ARRAY) -1 downto 0);
 
     -- ================= --
     -- 2 regions support --
@@ -170,7 +187,7 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
     -- Read data valid - TDP
     signal rd_data_valid_arr        : std_logic_vector(MFB_REGIONS - 1 downto 0);
 
-    -- Read enable per channel
+    -- Read enable per memory array per BRAM port
     signal rd_en_pch                : slv_array_t(MEM_ARRAYS - 1 downto 0)(MFB_REGIONS - 1 downto 0);
 
     -- Meta signal for whole MFB word
@@ -190,6 +207,15 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
     signal rdwr_collision_detected    : slv_array_2d_t(MEM_ARRAYS -1 downto 0)(MFB_REGIONS -1 downto 0)(MFB_BYTES -1 downto 0);
 
 begin
+
+    assert (
+        (MFB_REGIONS = 2 and SPLIT_READ_PORTS)
+        or (MFB_REGIONS = 1 and (not SPLIT_READ_PORTS))
+        or (MFB_REGIONS = 2 and (not SPLIT_READ_PORTS))
+        )
+        report "TX_DMA_PCIE_TRANS_BUFFER: The configuration with split ports is only allowed for a 2-region setting!"
+        severity FAILURE;
+
     -- =============================================================================================
     -- Input shift registers
     -- =============================================================================================
@@ -217,7 +243,7 @@ begin
     end generate;
 
     -- Meta array
-    pcie_mfb_meta_arr   <= slv_array_deser(pcie_mfb_meta_inp_reg(INP_REG_NUM), MFB_REGIONS);
+    pcie_mfb_meta_arr   <= pcie_mfb_meta_inp_reg(INP_REG_NUM);
 
     -- =============================================================================================
     -- Assertions for verification
@@ -225,8 +251,8 @@ begin
 
     -- psl assert_captured_dma_header :
     --      assert forall it in {0 to (MFB_REGIONS -1)} :
-    --      always ((not (PCIE_MFB_SRC_RDY = '1' or slv_array_deser(PCIE_MFB_META, MFB_REGIONS)(it)(META_BE) /= (META_BE_W -1 downto 0 => '0'))) or
-    --              (slv_array_deser(PCIE_MFB_META, MFB_REGIONS)(it)(META_IS_DMA_HDR) = "0")) abort(RESET) @rising_edge(CLK)
+    --      always ((not (PCIE_MFB_SRC_RDY = '1' or PCIE_MFB_META(it)(META_BE) /= (META_BE_W -1 downto 0 => '0'))) or
+    --              (PCIE_MFB_META(it)(META_IS_DMA_HDR) = "0")) abort(RESET) @rising_edge(CLK)
     --      report "TX_DMA_PCIE_TRANS_BUFFER: captured DMA header on region  to_string(it) Danger of data overwrite!";
 
     -- =============================================================================================
@@ -237,8 +263,10 @@ begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
                 addr_cntr_pst <= (others => '0');
+                chan_num_reg  <= (others => '0');
             else
                 addr_cntr_pst <= addr_cntr_nst;
+                chan_num_reg  <= chan_num_next;
             end if;
         end if;
     end process;
@@ -246,6 +274,7 @@ begin
     addr_cntr_nst_logic_p : process (all) is
     begin
         addr_cntr_nst <= addr_cntr_pst;
+        chan_num_next <= chan_num_reg;
 
         -- Increment the address for a next word by 8 (the number of DWs in the
         -- word) to be written to the BRAMs.  When the new packet arrives, its
@@ -266,6 +295,7 @@ begin
                     -- particularly in the first region, then increment by 16 because the frame
                     -- continues in the next word.
                     addr_cntr_nst   <= unsigned(pcie_mfb_meta_arr(i)(META_PCIE_ADDR)) + (MFB_REGIONS - i)*MFB_BLOCK_SIZE;
+                    chan_num_next   <= pcie_mfb_meta_arr(i)(META_CHAN_NUM);
                 end if;
             end loop;
         end if;
@@ -420,7 +450,7 @@ begin
                 -- Pass address to variable
                 pcie_mfb_meta_addr_v := pcie_mfb_meta_arr(0)(META_PCIE_ADDR);
                 buff_addr_v          := pcie_mfb_meta_addr_v(log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS));
-                chan_addr_v          := pcie_mfb_meta_addr_v(log2(CHANS_PER_ARRAY) + 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS));
+                chan_addr_v          := pcie_mfb_meta_arr(0)(log2(CHANS_PER_ARRAY) + META_CHAN_NUM_O -1 downto META_CHAN_NUM_O);
 
                 wr_addr_bram_by_shift(0) <= (others => (chan_addr_v & buff_addr_v));
 
@@ -432,7 +462,7 @@ begin
                 end loop;
             else
                 buff_addr_v := std_logic_vector(addr_cntr_pst(log2(BUFFER_DEPTH) + log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS)));
-                chan_addr_v := std_logic_vector(addr_cntr_pst(log2(CHANS_PER_ARRAY) + 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS)));
+                chan_addr_v := chan_num_reg;
 
                 wr_addr_bram_by_shift(0) <= (others => (chan_addr_v & buff_addr_v));
 
@@ -460,7 +490,7 @@ begin
                     -- Pass address to variable
                     pcie_mfb_meta_addr_v := pcie_mfb_meta_arr(1)(META_PCIE_ADDR);
                     buff_addr_v          := pcie_mfb_meta_addr_v(log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS));
-                    chan_addr_v          := pcie_mfb_meta_addr_v(log2(CHANS_PER_ARRAY) + 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS) -1 downto 1 + log2(BUFFER_DEPTH)+log2(MFB_DWORDS));
+                    chan_addr_v          := pcie_mfb_meta_arr(1)(log2(CHANS_PER_ARRAY) + META_CHAN_NUM_O -1 downto META_CHAN_NUM_O);
 
                     wr_addr_bram_by_shift(1) <= (others => (chan_addr_v & buff_addr_v));
 
@@ -484,61 +514,75 @@ begin
     -- TODO: It should be taken into consideration that this storing process should be removed
     -- because the channel number is already extracted in METADATA_EXTRACTOR and the index of a
     -- channel is held through the duration of a whole packet.
-    chan_num_hold_reg_p : process (CLK) is
-    begin
-        if (rising_edge(CLK)) then
-            if (RESET = '1') then
-                chan_num_pst <= (others => '0');
-            else
-                chan_num_pst <= chan_num_nst;
+    mem_arr_indx_hold_g: if (MEM_ARRAYS > 1) generate
+        mem_arr_idx_hold_reg_p : process (CLK) is
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    mem_arr_idx_reg <= (others => '0');
+                else
+                    mem_arr_idx_reg <= mem_arr_idx_next;
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
 
-    -- This FSM stores a part of a channel number to determine the memory array
-    -- to which the data ought to be send. It stores channel number for the last
-    -- valid SOF in the word.
-    chan_num_hold_nst_logic_p : process (all) is
-        variable chan_num_v : std_logic_vector(log2(CHANNELS) -1 downto 0);
-    begin
-        chan_num_nst <= chan_num_pst;
+        -- This FSM stores a part of a channel number to determine the memory array
+        -- to which the data ought to be send. It stores channel number for the last
+        -- valid SOF in the word.
+        mem_arr_idx_hold_nst_logic_p : process (all) is
+            variable mem_arr_idx_v : std_logic_vector(log2(CHANNELS) -1 downto 0);
+        begin
+            mem_arr_idx_next <= mem_arr_idx_reg;
 
-        -- Higher takes
-        if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+            -- Higher takes
+            if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+                for i in 0 to (MFB_REGIONS - 1) loop
+                    if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
+
+                        mem_arr_idx_v    := pcie_mfb_meta_arr(i)(META_CHAN_NUM);
+                        mem_arr_idx_next <= mem_arr_idx_v(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY));
+
+                    end if;
+                end loop;
+            end if;
+        end process;
+
+        -- =============================================================================================
+        -- Demultiplexers - Byte enable
+        -- =============================================================================================
+        -- Possibilites:
+        --     SOF(0) SOF(1)
+        -- 1)    0      0   - Port A handles whole MFB word = Last valid channel is used
+        -- 2)    0      1   - Port A handles first region, Second region is dispatched by port B (illegal for incoming data)
+        -- 3)    1      0   - Port A handles whole MFB word = Current channel is used
+        -- 4)    1      1   - Port A handles first region, Second region is dispatched by port B
+        wr_bram_data_demux_p : process (all) is
+        begin
+            wr_be_bram_demux <= (others => (others => (others => '0')));
+
             for i in 0 to (MFB_REGIONS - 1) loop
-                if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
-
-                    chan_num_v   := pcie_mfb_meta_arr(i)(META_CHAN_NUM);
-                    chan_num_nst <= chan_num_v(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY));
-
+                if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+                    if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
+                        wr_be_bram_demux(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_MEM_ARR_IDX))))(i) <= wr_be_bram_bshifter(i);
+                    else
+                        wr_be_bram_demux(to_integer(unsigned(mem_arr_idx_reg)))(i)                        <= wr_be_bram_bshifter(i);
+                    end if;
                 end if;
             end loop;
-        end if;
-    end process;
+        end process;
+    else generate
 
-    -- =============================================================================================
-    -- Demultiplexers - Byte enable
-    -- =============================================================================================
-    -- Possibilites:
-    --     SOF(0) SOF(1)
-    -- 1)    0      0   - Port A handles whole MFB word = Last valid channel is used
-    -- 2)    0      1   - Port A handles first region, Second region is dispatched by port B (illegal for incoming data)
-    -- 3)    1      0   - Port A handles whole MFB word = Current channel is used
-    -- 4)    1      1   - Port A handles first region, Second region is dispatched by port B
-    wr_bram_data_demux_p : process (all) is
-    begin
-        wr_be_bram_demux <= (others => (others => (others => '0')));
+        wr_bram_data_demux_p : process (all) is
+        begin
+            wr_be_bram_demux <= (others => (others => (others => '0')));
 
-        for i in 0 to (MFB_REGIONS - 1) loop
-            if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
-                if (pcie_mfb_sof_inp_reg(INP_REG_NUM)(i) = '1') then
-                    wr_be_bram_demux(to_integer(unsigned(pcie_mfb_meta_arr(i)(META_MEM_ARR_IDX))))(i) <= wr_be_bram_bshifter(i);
-                else
-                    wr_be_bram_demux(to_integer(unsigned(chan_num_pst)))(i)                           <= wr_be_bram_bshifter(i);
+            for i in 0 to (MFB_REGIONS - 1) loop
+                if (pcie_mfb_src_rdy_inp_reg(INP_REG_NUM) = '1') then
+                    wr_be_bram_demux(0)(i) <= wr_be_bram_bshifter(i);
                 end if;
-            end if;
-        end loop;
-    end process;
+            end loop;
+        end process;
+    end generate;
 
     -- =============================================================================================
     -- Registers between BARREL_SHIFTERs and BRAMs
@@ -592,9 +636,9 @@ begin
                     RD_CLK      => CLK,
                     RD_RST      => RESET,
                     RD_EN       => '1',
-                    RD_PIPE_EN  => rd_en_bram_demux(mem_arr_idx),
+                    RD_PIPE_EN  => rd_en_bram_demux(mem_arr_idx)(0),
                     RD_META_IN  => (others => '0'),
-                    RD_ADDR     => rd_addr_bram_by_shift(wbyte),
+                    RD_ADDR     => rd_addr_bram_by_shift(0)(wbyte),
                     RD_DATA     => rd_data_bram(mem_arr_idx)(0)(wbyte*8 +7 downto wbyte*8),
                     RD_META_OUT => open,
                     RD_DATA_VLD => open
@@ -640,7 +684,7 @@ begin
                     if (addr_sel(ch)(rgn) = '1') then
                         rw_addr_bram_by_mux(ch)(rgn) <= wr_addr_bram_by_multi(rgn);
                     else
-                        rw_addr_bram_by_mux(ch)(rgn) <= rd_addr_bram_by_shift;
+                        rw_addr_bram_by_mux(ch)(rgn) <= rd_addr_bram_by_shift(rgn);
                     end if;
                 end process;
             end generate;
@@ -650,7 +694,7 @@ begin
         rd_en_ch_g : for ch in 0 to (MEM_ARRAYS -1) generate
             rd_en_reg_g : for rgn in 0 to (MFB_REGIONS -1) generate
                 -- Read enable per channel
-                rd_en_pch(ch)(rgn) <= rd_en_bram_demux(ch) and (not addr_sel(ch)(rgn));
+                rd_en_pch(ch)(rgn) <= rd_en_bram_demux(ch)(rgn) and (not addr_sel(ch)(rgn));
             end generate;
         end generate;
 
@@ -745,66 +789,168 @@ begin
     -- =============================================================================================
     -- Demulitplexors
     -- =============================================================================================
-    -- Note: This part is common for both regions
-    rd_en_demux : process (all) is
-    begin
-        rd_en_bram_demux <= (others => '0');
+    split_port_logic_g : if (SPLIT_READ_PORTS and MFB_REGIONS = 2) generate
 
-        if (RD_EN = '1') then
-            rd_en_bram_demux(to_integer(unsigned(RD_CHAN(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY))))) <= '1';
-        end if;
-    end process;
-
-    rd_data_demux_g: if (MFB_REGIONS = 1) generate
-
-        rd_data_vld_reg_p : process (CLK) is
+        bram_demux_p : process (all) is
         begin
-            if (rising_edge(CLK)) then
-                RD_DATA_VLD <= RD_EN;
-            end if;
+            rd_en_bram_demux                                                                                                               <= (others => (others => '0'));
+            rd_en_bram_demux(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0) <= RD_EN_A;
+            rd_en_bram_demux(to_integer(unsigned(RD_CHAN_B(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(1) <= RD_EN_B;
+
+            rd_data_bram_mux    <= (others => (others => '0'));
+            rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
+            rd_data_bram_mux(1) <= rd_data_bram(to_integer(unsigned(RD_CHAN_B(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(1);
         end process;
 
-        rd_data_bram_mux <= rd_data_bram(to_integer(unsigned(RD_CHAN(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
+        RD_DATA_VLD_A <= rd_data_valid_arr(0);
+        RD_DATA_VLD_B <= rd_data_valid_arr(1);
+
+        rd_barrel_shifter_a_g : if (READ_BARREL_SHIFTER_EN(0)) generate
+            rd_data_barrel_shifter_a_i : entity work.BARREL_SHIFTER_GEN
+            generic map (
+                -- The Reading side is addressable by bytes so the number of blocks is 4 times more than on the
+                -- reading side
+                BLOCKS     => MFB_BYTES,
+                BLOCK_SIZE => 8,
+                SHIFT_LEFT => FALSE
+            )
+            port map (
+                DATA_IN  => rd_data_bram_mux(0),
+                DATA_OUT => RD_DATA_A,
+                SEL      => RD_ADDR_A(log2(MFB_BYTES) - 1 downto 0)
+            );
+
+            rd_addr_recalc_p : process (all) is
+                variable chan_addr_a_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
+            begin
+                chan_addr_a_v            := RD_CHAN_A(log2(CHANS_PER_ARRAY) -1 downto 0);
+                rd_addr_bram_by_shift(0) <= (others => chan_addr_a_v & RD_ADDR_A(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES)));
+
+                for i in 0 to ((MFB_LENGTH/8) -1) loop
+                    if (i < unsigned(RD_ADDR_A(log2(MFB_BYTES) - 1 downto 0))) then
+                        rd_addr_bram_by_shift(0)(i) <= chan_addr_a_v & std_logic_vector(unsigned(RD_ADDR_A(log2(BUFFER_DEPTH) + log2(MFB_BYTES) -1 downto log2(MFB_BYTES))) + 1);
+                    end if;
+                end loop;
+            end process;
+        else generate
+            RD_DATA_A <= rd_data_bram_mux(0);
+
+            rd_addr_recalc_p : process (all) is
+                variable chan_addr_a_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
+            begin
+                chan_addr_a_v            := RD_CHAN_A(log2(CHANS_PER_ARRAY) -1 downto 0);
+                rd_addr_bram_by_shift(0) <= (others => chan_addr_a_v & RD_ADDR_A(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES)));
+            end process;
+        end generate;
+
+        rd_barrel_shifter_b_g : if (READ_BARREL_SHIFTER_EN(1)) generate
+            rd_data_barrel_shifter_b_i : entity work.BARREL_SHIFTER_GEN
+            generic map (
+                -- The Reading side is addressable by bytes so the number of blocks is 4 times more than on the
+                -- reading side
+                BLOCKS     => MFB_BYTES,
+                BLOCK_SIZE => 8,
+                SHIFT_LEFT => FALSE
+            )
+            port map (
+                DATA_IN  => rd_data_bram_mux(1),
+                DATA_OUT => RD_DATA_B,
+                SEL      => RD_ADDR_B(log2(MFB_BYTES) - 1 downto 0)
+            );
+
+            rd_addr_recalc_p : process (all) is
+                variable chan_addr_b_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
+            begin
+                chan_addr_b_v            := RD_CHAN_B(log2(CHANS_PER_ARRAY) -1 downto 0);
+                rd_addr_bram_by_shift(1) <= (others => chan_addr_b_v & RD_ADDR_B(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES)));
+
+                for i in 0 to ((MFB_LENGTH/8) -1) loop
+                    if (i < unsigned(RD_ADDR_B(log2(MFB_BYTES) - 1 downto 0))) then
+                        rd_addr_bram_by_shift(1)(i) <= chan_addr_b_v & std_logic_vector(unsigned(RD_ADDR_B(log2(BUFFER_DEPTH) + log2(MFB_BYTES) -1 downto log2(MFB_BYTES))) + 1);
+                    end if;
+                end loop;
+            end process;
+        else generate
+            RD_DATA_B <= rd_data_bram_mux(1);
+
+            rd_addr_recalc_p : process (all) is
+                variable chan_addr_b_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
+            begin
+                chan_addr_b_v            := RD_CHAN_B(log2(CHANS_PER_ARRAY) -1 downto 0);
+                rd_addr_bram_by_shift(1) <= (others => chan_addr_b_v & RD_ADDR_B(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES)));
+            end process;
+        end generate;
     else generate
-
-        rd_data_demux_p : process (all)
+        bram_demux_p : process (all) is
         begin
-            rd_data_bram_mux <= (others => '0');
-            RD_DATA_VLD      <= '0';
-
-            for i in 0 to MFB_REGIONS - 1 loop
-                if (rd_data_valid_arr(i) = '1') then
-                    rd_data_bram_mux <= rd_data_bram(to_integer(unsigned(RD_CHAN(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(i);
-                    RD_DATA_VLD      <= '1';
-                end if;
-            end loop;
+            rd_en_bram_demux                                                                                                            <= (others => (others => '0'));
+            rd_en_bram_demux(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY))))) <= (others => RD_EN_A);
         end process;
+
+        rd_data_demux_g : if (MFB_REGIONS = 1) generate
+
+            rd_data_vld_reg_p : process (CLK) is
+            begin
+                if (rising_edge(CLK)) then
+                    RD_DATA_VLD_A <= RD_EN_A;
+                end if;
+            end process;
+
+            rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
+        else generate
+
+            rd_data_demux_p : process (all)
+            begin
+                rd_data_bram_mux <= (others => (others => '0'));
+                RD_DATA_VLD_A    <= '0';
+
+                for i in 0 to MFB_REGIONS - 1 loop
+                    if (rd_data_valid_arr(i) = '1') then
+                        rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(i);
+                        RD_DATA_VLD_A       <= '1';
+                    end if;
+                end loop;
+            end process;
+        end generate;
+
+        rd_barrel_shifter_g : if (READ_BARREL_SHIFTER_EN(0)) generate
+            rd_data_barrel_shifter_i : entity work.BARREL_SHIFTER_GEN
+            generic map (
+                BLOCKS     => MFB_BYTES,
+                -- The Reading side is addressable by bytes so the number of blocks is 4 times more than on the
+                -- reading side
+                BLOCK_SIZE => 8,
+                SHIFT_LEFT => FALSE
+            )
+            port map (
+                DATA_IN  => rd_data_bram_mux(0),
+                DATA_OUT => RD_DATA_A,
+                SEL      => RD_ADDR_A(log2(MFB_BYTES) - 1 downto 0)
+            );
+
+            rd_addr_recalc_g : for rgn in 0 to (MFB_REGIONS -1) generate
+                rd_addr_recalc_p : process (all) is
+                    variable chan_addr_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
+                begin
+                    chan_addr_v                := RD_CHAN_A(log2(CHANS_PER_ARRAY) -1 downto 0);
+                    rd_addr_bram_by_shift(rgn) <= (others => (chan_addr_v & RD_ADDR_A(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES))));
+
+                    for i in 0 to ((MFB_LENGTH/8) -1) loop
+                        if (i < unsigned(RD_ADDR_A(log2(MFB_BYTES) - 1 downto 0))) then
+                            rd_addr_bram_by_shift(rgn)(i) <= chan_addr_v & std_logic_vector(unsigned(RD_ADDR_A(log2(BUFFER_DEPTH) + log2(MFB_BYTES) -1 downto log2(MFB_BYTES))) + 1);
+                        end if;
+                    end loop;
+                end process;
+            end generate;
+        else generate
+            RD_DATA_A <= rd_data_bram_mux(0);
+
+            rd_addr_recalc_p : process (all) is
+                variable chan_addr_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
+            begin
+                chan_addr_v           := RD_CHAN_A(log2(CHANS_PER_ARRAY) -1 downto 0);
+                rd_addr_bram_by_shift <= (others => (others => (chan_addr_v & RD_ADDR_A(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES)))));
+            end process;
+        end generate;
     end generate;
-
-    -- The Reading side is addressable by bytes so the number of blocks is 4 times more than on the
-    -- reading side
-    rd_data_barrel_shifter_i : entity work.BARREL_SHIFTER_GEN
-    generic map (
-        BLOCKS     => MFB_BYTES,
-        BLOCK_SIZE => 8,
-        SHIFT_LEFT => FALSE
-    )
-    port map (
-        DATA_IN  => rd_data_bram_mux,
-        DATA_OUT => RD_DATA,
-        SEL      => RD_ADDR(log2(MFB_BYTES) - 1 downto 0)
-    );
-
-    rd_addr_recalc_p : process (all) is
-        variable chan_addr_v : std_logic_vector(log2(CHANS_PER_ARRAY) -1 downto 0);
-    begin
-        chan_addr_v           := RD_CHAN(log2(CHANS_PER_ARRAY) -1 downto 0);
-        rd_addr_bram_by_shift <= (others => (chan_addr_v & RD_ADDR(log2(BUFFER_DEPTH)+log2(MFB_BYTES) -1 downto log2(MFB_BYTES))));
-
-        for i in 0 to ((MFB_LENGTH/8) -1) loop
-            if (i < unsigned(RD_ADDR(log2(MFB_BYTES) - 1 downto 0))) then
-                rd_addr_bram_by_shift(i) <= chan_addr_v & std_logic_vector(unsigned(RD_ADDR(log2(BUFFER_DEPTH) + log2(MFB_BYTES) -1 downto log2(MFB_BYTES))) + 1);
-            end if;
-        end loop;
-    end process;
 end architecture;

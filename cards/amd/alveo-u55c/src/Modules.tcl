@@ -20,31 +20,32 @@ lappend COMPONENTS [list "AXI_QSPI_FLASH_CTRL" $AXI_QSPI_FLASH_CTRL_BASE "FULL" 
 #lappend COMPONENTS [list "MI2AXI4"     $MI2AXI4_BASE           "FULL"  ]
 
 # IP sources
-lappend MOD "$ENTITY_BASE/ip/axi_quad_spi/axi_quad_spi_0.xci"
+source $ARCHGRP_ARR(IP_TEMPLATE_ROOT)/common.tcl
 
-if {$ARCHGRP_ARR(PCIE_ENDPOINTS) == 1} {
-    if {$ARCHGRP_ARR(PCIE_ENDPOINT_MODE) == 2} {
-        lappend MOD "$ENTITY_BASE/ip/pcie_gen3_x8ll/pcie4_uscale_plus.xci"
-    } else {
-        lappend MOD "$ENTITY_BASE/ip/pcie_gen3_x16/pcie4_uscale_plus.xci"
-    }
-} elseif {$ARCHGRP_ARR(PCIE_ENDPOINTS) == 2} {
-    if {$ARCHGRP_ARR(PCIE_ENDPOINT_MODE) == 1} {
-        lappend MOD "$ENTITY_BASE/ip/pcie_gen4_x8/pcie4_uscale_plus/pcie4_uscale_plus.xci"
-        lappend MOD "$ENTITY_BASE/ip/pcie_gen4_x8/pcie4_uscale_plus_1/pcie4_uscale_plus_1.xci"
-    }
+#set ARCHGRP_ARR(IP_TEMPLATE_BASE) $ARCHGRP_ARR(IP_TEMPLATE_ROOT)/amd
+set ARCHGRP_ARR(IP_MODIFY_BASE)   $ENTITY_BASE/ip
+set ARCHGRP_ARR(USE_IP_SUBDIRS)   true
+
+lappend IP_COMPONENTS [list "pcie" "pcie4_uscale_plus" "pcie4_uscale_plus" 0 1]
+if {$ARCHGRP_ARR(PCIE_ENDPOINTS) == 2 && $ARCHGRP_ARR(PCIE_ENDPOINT_MODE) == 1} {
+    lappend IP_COMPONENTS [list "pcie" "pcie4c_uscale_plus" "pcie4_uscale_plus_1" 0 1]
 }
 
+lappend IP_COMPONENTS [list "mem"  "axi_quad_spi"    "axi_quad_spi_0"    0 1]
 
 if {$ARCHGRP_ARR(VIRTUAL_DEBUG_ENABLE)} {
-    lappend MOD "$ENTITY_BASE/ip/xvc_vsec/xvc_vsec.xci"
+    lappend IP_COMPONENTS [list "misc" "xvc_vsec" "xvc_vsec" 0 1]
 }
 
-lappend MOD "$ENTITY_BASE/ip/hbm/hbm_ip.xci"
+if {$ARCHGRP_ARR(HBM_PORTS) > 0} {
+    lappend IP_COMPONENTS [list "mem" "hbm_ip" "hbm_ip" 0 1]
+}
 
 if {$ARCHGRP_ARR(NET_MOD_ARCH) != "EMPTY"} {
-    lappend MOD "$ENTITY_BASE/ip/cmac_eth_1x100g/cmac_eth_1x100g.xci"
+    lappend IP_COMPONENTS [list "eth" "cmac_eth_1x100g" "cmac_eth_1x100g" 0 1]
 }
+
+lappend MOD {*}[get_ip_mod_files $IP_COMPONENTS [array get ARCHGRP_ARR]]
 
 # HOTFIX: Use glbl module for simulation
 global NC_FLAGS

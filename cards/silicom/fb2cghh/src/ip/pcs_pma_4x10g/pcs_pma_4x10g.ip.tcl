@@ -11,7 +11,7 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
   CONFIG.ADD_GT_CNTRL_STS_PORTS {1} \
   CONFIG.BASE_R_KR {BASE-R} \
   CONFIG.CORE {Ethernet PCS/PMA 64-bit} \
@@ -20,4 +20,6 @@ set_property -dict [list \
   CONFIG.GT_REF_CLK_FREQ {161.1328125} \
   CONFIG.LINE_RATE {10} \
   CONFIG.NUM_OF_CORES {4} \
-] $IP
+]
+
+set_property -dict $config_list $IP

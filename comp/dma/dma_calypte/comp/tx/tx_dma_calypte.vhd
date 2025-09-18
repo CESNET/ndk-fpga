@@ -219,7 +219,6 @@ architecture FULL of TX_DMA_CALYPTE is
     -- parsed specific bits from st_sp_ctrl_mfb_meta_arr that indicate the validity of the DMA
     -- header in a current word
     signal st_sp_ctrl_mfb_sof_masked       : std_logic_vector(PCIE_CQ_MFB_REGIONS -1 downto 0);
-    signal st_sp_ctrl_mfb_meta_w_be_masked : std_logic_vector(st_sp_ctrl_mfb_meta'range);
     signal st_sp_ctrl_mfb_meta_is_dma_hdr  : std_logic_vector(PCIE_CQ_MFB_REGIONS -1 downto 0);
     signal st_sp_ctrl_mfb_meta_be          : slv_array_t(PCIE_CQ_MFB_REGIONS -1 downto 0)(META_BE_W-1 downto 0);
     signal mfb_meta_be_masked              : slv_array_t(PCIE_CQ_MFB_REGIONS -1 downto 0)(META_BE_W-1 downto 0);
@@ -416,8 +415,6 @@ begin
         mfb_meta_vld_regions(i)                                        <= (or (st_sp_ctrl_mfb_meta_be(i)(3 downto 0))) and (not st_sp_ctrl_mfb_meta_is_dma_hdr(i));
     end generate;
 
-    st_sp_ctrl_mfb_meta_w_be_masked <= slv_array_ser(mfb_meta_new);
-
     tx_dma_pcie_trans_buffer_i : entity work.TX_DMA_PCIE_TRANS_BUFFER
     generic map (
         DEVICE   => DEVICE,
@@ -428,22 +425,30 @@ begin
         MFB_BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
 
-        POINTER_WIDTH => POINTER_WIDTH
+        POINTER_WIDTH          => POINTER_WIDTH,
+        SPLIT_READ_PORTS       => FALSE,
+        READ_BARREL_SHIFTER_EN => (FALSE, TRUE)
     )
     port map (
         CLK   => CLK,
         RESET => RESET,
 
         PCIE_MFB_DATA    => st_sp_ctrl_mfb_data,
-        PCIE_MFB_META    => st_sp_ctrl_mfb_meta_w_be_masked,
+        PCIE_MFB_META    => mfb_meta_new,
         PCIE_MFB_SOF     => st_sp_ctrl_mfb_sof_masked,
         PCIE_MFB_SRC_RDY => (or mfb_meta_vld_regions) and st_sp_ctrl_mfb_src_rdy,
 
-        RD_CHAN     => trbuff_rd_chan,
-        RD_DATA     => trbuff_rd_data,
-        RD_ADDR     => trbuff_rd_addr,
-        RD_EN       => trbuff_rd_en,
-        RD_DATA_VLD => trbuff_rd_data_vld
+        RD_CHAN_A     => trbuff_rd_chan,
+        RD_DATA_A     => trbuff_rd_data,
+        RD_ADDR_A     => trbuff_rd_addr,
+        RD_EN_A       => trbuff_rd_en,
+        RD_DATA_VLD_A => trbuff_rd_data_vld,
+
+        RD_CHAN_B     => (others => '0'),
+        RD_DATA_B     => open,
+        RD_ADDR_B     => (others => '0'),
+        RD_EN_B       => '0',
+        RD_DATA_VLD_B => open
     );
 
     -- Deserialize metadata for better handling

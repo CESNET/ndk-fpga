@@ -5,9 +5,9 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_simple extends uvm_sequence#(uvm_tx_dma_calypte_cq::sequence_item);
-    `uvm_object_param_utils(uvm_tx_dma_calypte::sequence_simple)
-    `uvm_declare_p_sequencer(uvm_tx_dma_calypte_cq::sequencer)
+class sequence_simple #(int unsigned POINTER_WIDTH) extends uvm_sequence#(uvm_tx_dma_calypte_cq::sequence_item);
+    `uvm_object_param_utils(uvm_tx_dma_calypte::sequence_simple #(POINTER_WIDTH))
+    `uvm_declare_p_sequencer(uvm_tx_dma_calypte_cq::sequencer #(POINTER_WIDTH))
 
     int unsigned m_packet_size_min = 60;
     int unsigned m_packet_size_max = 2048;
@@ -30,7 +30,8 @@ class sequence_simple extends uvm_sequence#(uvm_tx_dma_calypte_cq::sequence_item
         it = 0;
         while(it < transaction_count && (m_state == null || m_state.next())) begin
             start_item(req);
-            assert(req.randomize() with {req.m_packet.size() inside {[m_packet_size_min:m_packet_size_max-1]};}) else `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize packet");
+            assert(req.randomize() with {req.m_packet.size() inside {[m_packet_size_min:m_packet_size_max-1]};}) else
+                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize packet");
             finish_item(req);
 
             it++;
@@ -39,11 +40,13 @@ class sequence_simple extends uvm_sequence#(uvm_tx_dma_calypte_cq::sequence_item
 
     task body();
         uvm_common::sequence_cfg                   m_state;
-        uvm_tx_dma_calypte_regs::start_channel_seq m_start_chan_seq;
-        uvm_tx_dma_calypte_regs::stop_channel_seq  m_stop_chan_seq;
+        uvm_tx_dma_calypte_regs::start_channel_seq #(POINTER_WIDTH) m_start_chan_seq;
+        uvm_tx_dma_calypte_regs::stop_channel_seq  #(POINTER_WIDTH) m_stop_chan_seq;
 
-        m_start_chan_seq = uvm_tx_dma_calypte_regs::start_channel_seq::type_id::create("m_start_chan_seq", m_sequencer);
-        m_stop_chan_seq  = uvm_tx_dma_calypte_regs::stop_channel_seq ::type_id::create("m_stop_chan_seq",  m_sequencer);
+        m_start_chan_seq = uvm_tx_dma_calypte_regs::start_channel_seq #(POINTER_WIDTH)::type_id
+                           ::create("m_start_chan_seq", m_sequencer);
+        m_stop_chan_seq  = uvm_tx_dma_calypte_regs::stop_channel_seq #(POINTER_WIDTH) ::type_id
+                           ::create("m_stop_chan_seq",  m_sequencer);
         m_start_chan_seq.m_regmodel_channel = p_sequencer.m_regmodel_channel;
         m_stop_chan_seq.m_regmodel_channel  = p_sequencer.m_regmodel_channel;
 

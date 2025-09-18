@@ -7,7 +7,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mfb_if.dut_rx   cq_mfb,
@@ -15,7 +15,8 @@ module DUT (
     mi_if.dut_slave config_mi
 );
 
-    localparam USR_SOF_POS_WIDTH = (($clog2(USR_MFB_REGION_SIZE)*USR_MFB_REGIONS) == 0) ? (USR_MFB_REGIONS) : (USR_MFB_REGIONS*$clog2(USR_MFB_REGION_SIZE));
+    localparam USR_SOF_POS_WIDTH = (($clog2(USR_MFB_REGION_SIZE)*USR_MFB_REGIONS) == 0) ? (USR_MFB_REGIONS)
+               : (USR_MFB_REGIONS*$clog2(USR_MFB_REGION_SIZE));
     localparam USR_EOF_POS_WIDTH = USR_MFB_REGIONS*$clog2(USR_MFB_REGION_SIZE*USR_MFB_BLOCK_SIZE);
 
     logic [$clog2(PKT_SIZE_MAX+1)-1:0] packet_size;
@@ -25,9 +26,12 @@ module DUT (
 
     generate
         //{packet_size, channel, meta} 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS)[CHANNELS]
-        assign usr_mfb.META[24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS)-1 -: $clog2(PKT_SIZE_MAX+1)] = packet_size[$clog2(PKT_SIZE_MAX+1)-1 -: $clog2(PKT_SIZE_MAX+1)];
-        assign usr_mfb.META[24 + $clog2(CHANNELS)-1                          -: $clog2(CHANNELS)]       = channel[$clog2(CHANNELS)-1 -: $clog2(CHANNELS)]                ;
-        assign usr_mfb.META[24 - 1                                           -: 24]                     = meta[24-1 -: 24]                                               ;
+        assign usr_mfb.META[24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS)-1 -: $clog2(PKT_SIZE_MAX+1)]
+            = packet_size[$clog2(PKT_SIZE_MAX+1)-1 -: $clog2(PKT_SIZE_MAX+1)];
+        assign usr_mfb.META[24 + $clog2(CHANNELS)-1 -: $clog2(CHANNELS)]
+            = channel[$clog2(CHANNELS)-1 -: $clog2(CHANNELS)];
+        assign usr_mfb.META[24-1 -: 24]
+            = meta[24-1 -: 24];
     endgenerate
 
     assign cq_mfb_sof_int = '0;
@@ -47,13 +51,12 @@ module DUT (
         .PCIE_CQ_MFB_BLOCK_SIZE   (PCIE_CQ_MFB_BLOCK_SIZE),
         .PCIE_CQ_MFB_ITEM_WIDTH   (PCIE_CQ_MFB_ITEM_WIDTH),
 
-        .DMA_HDR_POINTER_WIDTH    (DMA_HDR_POINTER_WIDTH),
-        .DATA_POINTER_WIDTH       (DATA_POINTER_WIDTH),
         .CHANNELS                 (CHANNELS),
+        .POINTER_WIDTH            (DATA_POINTER_WIDTH),
         .CNTRS_WIDTH              (CNTRS_WIDTH),
         .HDR_META_WIDTH           (HDR_META_WIDTH),
         .PKT_SIZE_MAX             (PKT_SIZE_MAX)
-    ) VHDL_DUT_U (
+    ) vhdl_dut_i (
         .CLK                      (CLK),
         .RESET                    (RST),
 

@@ -5,14 +5,16 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class data_comparer #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
+class data_comparer #(int unsigned ITEM_WIDTH) extends
+    uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `uvm_component_param_utils(uvm_tx_dma_calypte::data_comparer #(ITEM_WIDTH))
 
     function new(string name = "uvm_tx_dma_calypte.data_comparer", uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
-    virtual function string message(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_model, uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_dut);
+    virtual function string message(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_model,
+                                    uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_dut);
         string msg = "";
         int unsigned newline_break_cntr = 0;
         int unsigned last_wrong_byte_idx = 0;
@@ -20,7 +22,8 @@ class data_comparer #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_orde
         msg = $sformatf("%s\nByte comparison:\n", msg);
 
         if (tr_model.data.size() != tr_dut.data.size()) begin
-            msg = $sformatf("%s\n\tTransaction lengths match: NO (MODEL: %0d, DUT: %0d)\n. \tUnable to compare!\n", msg, tr_model.data.size(), tr_dut.data.size());
+            msg = $sformatf("%s\n\tTransaction lengths match: NO (MODEL: %0d, DUT: %0d)\n. \tUnable to compare!\n",
+                            msg, tr_model.data.size(), tr_dut.data.size());
         end else begin
             msg = $sformatf("%s\n\tTransaction lengths match: YES\n", msg);
             msg = $sformatf("%s\n\tWRONG_BYTES:\n",  msg);
@@ -28,8 +31,9 @@ class data_comparer #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_orde
             foreach (tr_dut.data[it]) begin
                 // msg = $sformatf("%s%0d: (%2h, %2h), \n", msg, it, tr_dut.data[it], tr_model.data[it]);
                 if (tr_dut.data[it] !== tr_model.data[it]) begin
-                    if (last_wrong_byte_idx != (it -1))
+                    if (last_wrong_byte_idx != (it -1)) begin
                         msg = $sformatf("%s\n\n\t", msg);
+                    end
 
                     msg = $sformatf("%s%0d: (%2h, %2h), ", msg, it, tr_dut.data[it], tr_model.data[it]);
                     newline_break_cntr++;
@@ -47,7 +51,8 @@ class data_comparer #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_orde
         return msg;
     endfunction
 
-    virtual function int unsigned compare(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_model, uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_dut);
+    virtual function int unsigned compare(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_model,
+                                          uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_dut);
 
         int unsigned comp_res = tr_model.compare(tr_dut);
 
@@ -68,20 +73,24 @@ class scoreboard #(
     string       DEVICE
 ) extends uvm_scoreboard;
 
-    `uvm_component_param_utils(uvm_tx_dma_calypte::scoreboard #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE))
+    `uvm_component_param_utils(uvm_tx_dma_calypte::scoreboard #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS,
+                                                                DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE))
 
     //INPUT TO DUT
-    uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(PCIE_CQ_MFB_ITEM_WIDTH))          m_pcie_cq_data_analysis_export;
-    uvm_analysis_export #(uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)) m_pcie_cq_meta_analysis_export;
-    uvm_analysis_export #(uvm_logic_vector::sequence_item #(1))                                     m_pkt_drop_analysis_export;
+    uvm_analysis_export #(uvm_logic_vector_array::sequence_item
+                          #(PCIE_CQ_MFB_ITEM_WIDTH))                m_pcie_cq_data_analysis_export;
+    uvm_analysis_export #(uvm_logic_vector::sequence_item
+                          #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)) m_pcie_cq_meta_analysis_export;
+    uvm_analysis_export #(uvm_logic_vector::sequence_item #(1))     m_pkt_drop_analysis_export;
 
     //DUT OUTPUT
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH)) m_usr_data_analysis_export;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))       m_usr_meta_analysis_export;
 
-    model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE) m_model;
+    model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH,
+            DEVICE)                                                                    m_model;
 
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS)                                     m_regmodel_top;
+    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH)                 m_regmodel_top;
     data_comparer #(USR_MFB_ITEM_WIDTH)                                                         m_data_cmp;
     uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))       m_meta_cmp;
 
@@ -114,16 +123,18 @@ class scoreboard #(
         return ret;
     endfunction
 
-    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top#(CHANNELS) m_regmodel);
+    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) m_regmodel);
         this.m_regmodel_top = m_regmodel;
         m_model.regmodel_set(m_regmodel);
     endfunction
 
     //build phase
     function void build_phase(uvm_phase phase);
-        m_model    = model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE)::type_id::create("m_model",    this);
-        m_data_cmp = data_comparer #(USR_MFB_ITEM_WIDTH)                                                                          ::type_id::create("m_data_cmp", this);
-        m_meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))                        ::type_id::create("m_meta_cmp", this);
+        m_model    = model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH,
+                             USR_MFB_META_WIDTH, DEVICE)::type_id::create("m_model",    this);
+        m_data_cmp = data_comparer #(USR_MFB_ITEM_WIDTH)::type_id::create("m_data_cmp", this);
+        m_meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))::type_id
+                     ::create("m_meta_cmp", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -138,7 +149,8 @@ class scoreboard #(
         m_pkt_drop_analysis_export.connect(m_model.m_discard_comp.m_internal_meta_analysis_fifo.analysis_export);
     endfunction
 
-    function void print_counters(ref string msg, input string cntr_name, int unsigned dut_cntr, int unsigned model_cntr);
+    function void print_counters(ref string   msg, input string cntr_name, int unsigned dut_cntr,
+                                 int unsigned model_cntr);
         msg = {msg, $sformatf("%s\n", cntr_name)};
         msg = {msg, $sformatf("DUT:   %0d\n", dut_cntr)};
         msg = {msg, $sformatf("MODEL: %0d\n", model_cntr)};
@@ -158,14 +170,18 @@ class scoreboard #(
 
         if (this.get_report_verbosity_level() >= UVM_LOW) begin
             m_delay.count(min, max, avg, std_dev);
-            msg = {msg, $sformatf("\tDelay statistic (SOF to SOF) => min : %0dns, max : %0dns, average : %0dns, standard deviation : %0dns, median : %0dns, modus : %0dns\n", min, max, avg, std_dev, median, modus)};
+            msg = {msg, $sformatf({"\tDelay statistic (SOF to SOF) => min : %0dns, max : %0dns, average : %0dns, ",
+                                  "standard deviation : %0dns, median : %0dns, modus : %0dns\n"}, min, max, avg,
+                                  std_dev, median, modus)};
         end
 
         for (int chan = 0; chan < CHANNELS; chan++) begin
 
-            msg = {msg, $sformatf("\n=================================================================================\n")};
+            msg = {msg, $sformatf(
+                "\n=================================================================================\n")};
             msg = {msg, $sformatf("CHANNEL %0d\n", chan)};
-            msg = {msg, $sformatf("=================================================================================\n")};
+            msg = {msg, $sformatf(
+                "=================================================================================\n")};
 
             if (byte_cnt[chan] != m_model.m_channel_info[chan].dma_transactions_bytes &&
                 pkt_cnt[chan]  != m_model.m_channel_info[chan].dma_transactions &&
@@ -180,17 +196,25 @@ class scoreboard #(
                 match_flag &= 1;
             end
 
-            if (pkt_cnt[chan]  != m_model.m_channel_info[chan].dma_transactions)
-                print_counters(msg, "SEND_PACKETS",    pkt_cnt[chan],          m_model.m_channel_info[chan].dma_transactions);
+            if (pkt_cnt[chan]  != m_model.m_channel_info[chan].dma_transactions) begin
+                print_counters(msg, "SEND_PACKETS",    pkt_cnt[chan],
+                               m_model.m_channel_info[chan].dma_transactions);
+            end
 
-            if (byte_cnt[chan] != m_model.m_channel_info[chan].dma_transactions_bytes)
-                print_counters(msg, "SEND_BYTES",      byte_cnt[chan],         m_model.m_channel_info[chan].dma_transactions_bytes);
+            if (byte_cnt[chan] != m_model.m_channel_info[chan].dma_transactions_bytes) begin
+                print_counters(msg, "SEND_BYTES",      byte_cnt[chan],
+                               m_model.m_channel_info[chan].dma_transactions_bytes);
+            end
 
-            if (discard_pkt_cnt[chan] != m_model.m_channel_info[chan].drop_transactions)
-                print_counters(msg, "DISCARD_PACKETS", discard_pkt_cnt[chan],  m_model.m_channel_info[chan].drop_transactions);
+            if (discard_pkt_cnt[chan] != m_model.m_channel_info[chan].drop_transactions) begin
+                print_counters(msg, "DISCARD_PACKETS", discard_pkt_cnt[chan],
+                               m_model.m_channel_info[chan].drop_transactions);
+            end
 
-            if (discard_byte_cnt[chan] != m_model.m_channel_info[chan].drop_transactions_bytes)
-                print_counters(msg, "DISCARD_BYTES",   discard_byte_cnt[chan], m_model.m_channel_info[chan].drop_transactions_bytes);
+            if (discard_byte_cnt[chan] != m_model.m_channel_info[chan].drop_transactions_bytes) begin
+                print_counters(msg, "DISCARD_BYTES",   discard_byte_cnt[chan],
+                               m_model.m_channel_info[chan].drop_transactions_bytes);
+            end
 
             msg = {msg, $sformatf("\n----MODEL COUNTERS----\n"                                                   )};
             msg = {msg, $sformatf("PKT_CNT            %d\n", m_model.m_channel_info[chan].dma_transactions       )};
@@ -209,10 +233,14 @@ class scoreboard #(
 
         if (this.used() == 0 && match_flag == 1) begin
 
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     ",
+                                        "VERIFICATION SUCCESS      ----\n\t---------------------------------------"},
+                      UVM_NONE)
         end else begin
             string msg = "";
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     ",
+                                        "VERIFICATION FAILED       ----\n\t---------------------------------------"},
+                      UVM_NONE)
         end
     endfunction
 endclass

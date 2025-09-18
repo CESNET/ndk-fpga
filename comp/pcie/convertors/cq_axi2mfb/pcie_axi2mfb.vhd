@@ -150,12 +150,10 @@ architecture FULL of PCIE_CQ_AXI2MFB is
     ---------------------------------------------------------------------------
 
 begin
-    assert (AXI_CQUSER_WIDTH = 85 or AXI_CQUSER_WIDTH = 88 or AXI_CQUSER_WIDTH = 183)
-        report "PCIE_CQ_AXI2MFB: Unsupported AXI CQ USER port width, the supported are: 85, 88, 183"
-        severity FAILURE;
-
-    assert not ((AXI_CQUSER_WIDTH = 85 or AXI_CQUSER_WIDTH = 88) and STRADDLING = true)
-        report "PCIE_CQ_AXI2MFB: Straddling is permited only for CQ_USER_WIDTH = 183"
+    assert ((MFB_REGIONS = 1 and (AXI_CQUSER_WIDTH = 85 or AXI_CQUSER_WIDTH = 88) and not STRADDLING)
+            or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 183 and STRADDLING)
+            or (MFB_REGIONS = 2 and AXI_CQUSER_WIDTH = 183 and not STRADDLING))
+        report "PCIE_CQ_AXI2MFB: Unsupported AXI CQ USER port width, the supported are: 85 (MFB_REGIONS = 1), 88 (MFB_REGIONS = 1), 183 (MFB_REGIONS = 2)"
         severity FAILURE;
 
     -- =========================================================================
@@ -207,55 +205,66 @@ begin
     -- =========================================================================
 
     axi_512b_g: if (AXI_CQUSER_WIDTH = 183 and STRADDLING) generate
-        cq_axi_user_sop         <= CQ_AXI_USER(82-1 downto 80);
-        cq_axi_user_sop_ptr(0)  <= CQ_AXI_USER(84-1 downto 82);
-        cq_axi_user_sop_ptr(1)  <= CQ_AXI_USER(86-1 downto 84);
-        cq_axi_user_eop         <= CQ_AXI_USER(88-1 downto 86);
-        cq_axi_user_eop         <= CQ_AXI_USER(88-1 downto 86);
-        cq_axi_user_eop_ptr(0)  <= CQ_AXI_USER(92-1 downto 88);
-        cq_axi_user_eop_ptr(1)  <= CQ_AXI_USER(96-1 downto 92);
+        cq_axi_user_sop         <= CQ_AXI_USER(81 downto 80);
+        cq_axi_user_sop_ptr(0)  <= CQ_AXI_USER(83 downto 82);
+        cq_axi_user_sop_ptr(1)  <= CQ_AXI_USER(85 downto 84);
+        cq_axi_user_eop         <= CQ_AXI_USER(87 downto 86);
+        cq_axi_user_eop_ptr(0)  <= CQ_AXI_USER(91 downto 88);
+        cq_axi_user_eop_ptr(1)  <= CQ_AXI_USER(95 downto 92);
 
         -- conversion process
-        sop_eop_sof_eof_conv_pr : process (cq_axi_user_sop, cq_axi_user_sop_ptr, CQ_AXI_USER, cq_axi_user_eop, cq_axi_user_eop_ptr, CQ_AXI_VALID)
-            variable ptr_sop : integer := 0;
+        sop_eop_sof_eof_conv_pr : process (all)
         begin
             -- default values
             CQ_MFB_SOF_POS <= (others => '0');
             CQ_MFB_EOF_POS <= (others => '0');
             CQ_MFB_SOF     <= (others => '0');
             CQ_MFB_EOF     <= (others => '0');
-            CQ_TPH_PRESENT <= (others => '0');
-            CQ_TPH_TYPE    <= (others => '0');
-            CQ_TPH_ST_TAG  <= (others => '0');
+            CQ_TPH_PRESENT <= CQ_AXI_USER(98 downto 97);
+            CQ_TPH_TYPE    <= CQ_AXI_USER(102 downto 99);
+            CQ_TPH_ST_TAG  <= CQ_AXI_USER(118 downto 103);
 
-            -- for each input region
-            for i in 0 to MFB_REGIONS-1 loop
+            -- There is only one TLP in this beat
+            if (cq_axi_user_sop = "01") then
+                -- TLP Present in the second region
+                if (cq_axi_user_sop_ptr(0) = "10") then
+                    CQ_MFB_SOF <= "10";
 
-                case cq_axi_user_sop_ptr(i) is
-                    when "00"   => ptr_sop := 0;
-                    when "10"   => ptr_sop := 1;
-                    when others => ptr_sop := 0;
-                end case;
+                    CQ_TPH_PRESENT <= CQ_AXI_USER(97) & "0";
+                    CQ_TPH_TYPE    <= CQ_AXI_USER(100 downto 99) & "00";
+                    CQ_TPH_ST_TAG  <= CQ_AXI_USER(110 downto 103) & "00000000";
+                -- TLP Present in the first region
+                else
+                    CQ_MFB_SOF <= "01";
 
-                if (cq_axi_user_sop(i) = '1') then
-                    CQ_MFB_SOF(ptr_sop)                 <= '1';
-                    CQ_MFB_SOF_POS(i)                   <= or cq_axi_user_sop_ptr(i);
-                    CQ_TPH_PRESENT(i)                   <= CQ_AXI_USER(97+i);
-                    CQ_TPH_TYPE((i+1)*2-1 downto i*2)   <= CQ_AXI_USER((i)*2+101-1 downto i*2+99);
-                    CQ_TPH_ST_TAG((i+1)*8-1 downto i*8) <= CQ_AXI_USER((i)*8+111-1 downto i*8+103);
+                    CQ_TPH_PRESENT <= "0" & CQ_AXI_USER(97);
+                    CQ_TPH_TYPE    <= "00" & CQ_AXI_USER(100 downto 99);
+                    CQ_TPH_ST_TAG  <= "00000000" & CQ_AXI_USER(110 downto 103);
                 end if;
 
-                if (cq_axi_user_eop(i) = '1') then
-                    if (cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH) = '1') then
-                        CQ_MFB_EOF(1)                                          <= '1';
-                        CQ_MFB_EOF_POS(2*EOP_POS_WIDTH-1 downto EOP_POS_WIDTH) <= cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH-1 downto 0);
-                    else
-                        CQ_MFB_EOF(0)                            <= '1';
-                        CQ_MFB_EOF_POS(EOP_POS_WIDTH-1 downto 0) <= cq_axi_user_eop_ptr(i)(EOP_POS_WIDTH-1 downto 0);
-                    end if;
+            -- THere are 2 TLPs in this beat
+            elsif (cq_axi_user_sop = "11") then
+                CQ_MFB_SOF <= "11";
+            end if;
+
+            -- One TLP ends in this beat
+            if (cq_axi_user_eop = "01") then
+                -- The TLP ends in the first region
+                if (unsigned(cq_axi_user_eop_ptr(0)) < 8) then
+                    CQ_MFB_EOF     <= "01";
+                    CQ_MFB_EOF_POS <= "000" & cq_axi_user_eop_ptr(0)(2 downto 0);
+
+                -- The TLP ends in the second region
+                else
+                    CQ_MFB_EOF     <= "10";
+                    CQ_MFB_EOF_POS <= cq_axi_user_eop_ptr(0)(2 downto 0) & "000";
                 end if;
-            end loop;
-            ptr_sop := 0;
+
+            -- Two TLPs end in this beat
+            elsif (cq_axi_user_eop = "11") then
+                CQ_MFB_EOF     <= "11";
+                CQ_MFB_EOF_POS <= cq_axi_user_eop_ptr(1)(2 downto 0) & cq_axi_user_eop_ptr(0)(2 downto 0);
+            end if;
         end process;
     end generate;
 
@@ -326,7 +335,7 @@ begin
     -- It's defined for STRADDLING and non STRADDLING operation
     -- =========================================================================
 
-    axi_straddling_g: if MFB_REGIONS > 1 generate
+    axi_straddling_g: if MFB_REGIONS = 2 generate
         fbe_lbe_str_pr : process (all)
         begin
             CQ_FBE <= (others => '0');

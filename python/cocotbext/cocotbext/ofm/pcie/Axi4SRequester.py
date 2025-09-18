@@ -5,52 +5,8 @@
 
 import cocotb
 from cocotb.queue import Queue
-
-from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize, SerializableHeader
-
-
-class RequestHeader(SerializableHeader):
-    items = list(zip(
-        [
-            'at', 'addr', 'dword_count', 'type', 'poisoned_request',
-            'req_id', 'tag', 'completer_id', 'req_id_en', 'tc', 'attr', 'force_ecrc',
-        ],
-        [2, 62, 11, 4, 1, 16, 8, 16, 1, 3, 3, 1],
-    ))
-
-
-class CompletionHeader(SerializableHeader):
-    items = list(zip(
-        [
-            'addr', 'error_code', 'byte_count', 'locked_read_completion',
-            'request_completed', 'res1', 'dword_count', 'completion_status',
-            'poisoned_completion', 'res2', 'requester_id', 'tag', 'completer_id',
-            'res3', 'tc', 'attr', 'res4',
-        ],
-        [12, 4, 13, 1, 1, 1, 11, 3, 1, 1, 16, 8, 16, 1, 3, 3, 1],
-    ))
-
-
-class RqUser(SerializableHeader):
-    items = list(zip(
-        [
-            'first_be0', 'first_be1', 'last_be0', 'last_be1', 'addr_offset0',
-            'addr_offset1', 'sop', 'sop0', 'sop1', 'eop', 'eop0', 'eop1',
-            'discontinue', 'tph_present', 'tph_type', 'tph_st_tag',
-            'tph_indirect_tag_en', 'seq_num0', 'seq_num1', 'parity',
-        ],
-        [4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 4, 4, 1, 2, 4, 16, 2, 6, 6, 64],
-    ))
-
-
-class RcUser(SerializableHeader):
-    items = list(zip(
-        [
-            'be', 'sop', 'sop0', 'sop1', 'sop2', 'sop3',
-            'eop', 'eop0', 'eop1', 'eop2', 'eop3', 'discontinue', 'parity'
-        ],
-        [64, 4, 2, 2, 2, 2, 4, 4, 4, 4, 4, 1, 64],
-    ))
+from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize
+from .PcieHeaders import RQHeader, RCHeader, RQUser, RCUser
 
 
 class Frame(object):
@@ -86,7 +42,7 @@ class Axi4SRequester:
         cocotb.start_soon(self.handle_response())
 
     def handle_rq_transaction(self, transaction):
-        tuser = RqUser.deserialize(int.from_bytes(transaction['TUSER'], byteorder='big'))
+        tuser = RQUser.deserialize(int.from_bytes(transaction['TUSER'], byteorder='big'))
         tdata = int.from_bytes(transaction['TDATA'], byteorder='big')
 
         sop_pos = [getattr(tuser, 'sop{:d}'.format(i)) for i in range(bin(tuser.sop).count("1"))]
@@ -115,19 +71,19 @@ class Axi4SRequester:
 
     def handle_request(self, req):
         fbe, lbe, addr_offset = req.meta
-        header = RequestHeader.deserialize(req.data)
+        header = RQHeader.deserialize(req.data)
         payload = byte_serialize(req.data >> len(header), header.dword_count * 4)
 
         addr = header.addr << 2
         byte_count = header.dword_count * 4
 
-        if header.type == 1:
+        if header.req_type == 1:
             self._ram.w(addr, payload)
             if self._verbosity:
                 print(type(self).__name__, "Write addr:", hex(addr), "dword_count:", header.dword_count, "payload:", payload)
             return
 
-        elif header.type == 0:
+        elif header.req_type == 0:
             d = self._ram.r(addr, byte_count)
             if self._verbosity:
                 print(type(self).__name__, "Read  addr:", hex(addr), "dword_count:", header.dword_count, header.tag, "payload:", list(d))
@@ -139,19 +95,19 @@ class Axi4SRequester:
             req_fbe, req_lbe, req_addr_offset = req_meta
             dword_count = request.dword_count + 3
 
-            header = CompletionHeader()
+            header = RCHeader()
             header.tag = request.tag
             header.dword_count = request.dword_count
             # 15.bit_count() # only in Python 3.10 and newer can be used below
             # TODO: Check IO and CFG transfers
-            header.bytes = (
+            header.byte_count = (
                 request.dword_count * 4
                 - (4 - numberOfSetBits(req_fbe))
                 - ((4 - numberOfSetBits(req_fbe)) if request.dword_count > 1 else 0)
             )
             header.request_completed = 1
             header.addr = 0  # Info: increment for each consequent completion
-            user = RcUser()
+            user = RCUser()
             user.sop = 1
             user.eop = 0
             user.eop0 = dword_count - 1

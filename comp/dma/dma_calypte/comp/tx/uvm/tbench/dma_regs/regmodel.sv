@@ -5,10 +5,10 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class regmodel_top #(int unsigned CHANNELS) extends uvm_reg_block;
-    `uvm_object_param_utils(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS))
+class regmodel_top #(int unsigned CHANNELS, int unsigned POINTER_WIDTH) extends uvm_reg_block;
+    `uvm_object_param_utils(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, POINTER_WIDTH))
 
-    uvm_tx_dma_calypte_regs::regmodel_channel m_regmodel_channel [CHANNELS];
+    uvm_tx_dma_calypte_regs::regmodel_channel #(POINTER_WIDTH) m_regmodel_channel [CHANNELS];
 
     function new(string name = "m_regmodel_top");
         super.new(name, build_coverage(UVM_NO_COVERAGE));
@@ -28,7 +28,7 @@ class regmodel_top #(int unsigned CHANNELS) extends uvm_reg_block;
             string it_num;
             it_num.itoa(it);
             //CREATE
-            m_regmodel_channel[it] = uvm_tx_dma_calypte_regs::regmodel_channel::type_id::create({"m_regmodel_channel_", it_num}, , get_full_name());
+            m_regmodel_channel[it] = uvm_tx_dma_calypte_regs::regmodel_channel #(POINTER_WIDTH)::type_id::create({"m_regmodel_channel_", it_num}, , get_full_name());
             //BUILD and CONFIGURE register
             m_regmodel_channel[it].build('h0, bus_width);
             m_regmodel_channel[it].configure(this, {"m_regmodel_channel_", it_num});

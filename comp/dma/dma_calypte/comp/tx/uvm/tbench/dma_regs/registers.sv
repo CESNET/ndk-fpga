@@ -59,14 +59,14 @@ class status_register extends uvm_reg;
     endfunction
 endclass
 
-class pointer_register extends uvm_reg;
-    `uvm_object_utils(uvm_tx_dma_calypte_regs::pointer_register)
+class pointer_register #(int unsigned POINTER_WIDTH) extends uvm_reg;
+    `uvm_object_utils(uvm_tx_dma_calypte_regs::pointer_register #(POINTER_WIDTH) )
 
     // Write
     rand uvm_reg_field pointer;
 
     function new(string name = "pointer_register");
-        super.new(name, 16, UVM_NO_COVERAGE);
+        super.new(name, POINTER_WIDTH, UVM_NO_COVERAGE);
     endfunction
 
     virtual function void build();
@@ -74,7 +74,7 @@ class pointer_register extends uvm_reg;
         pointer = uvm_reg_field::type_id::create("pointer");
         //Configure
         pointer.configure(this, // Parent
-                         16   , // Number of bits
+                         POINTER_WIDTH, // Number of bits
                          0  , // LSB
                          "RW", // Access
                          0   , // Volatility
@@ -86,30 +86,30 @@ class pointer_register extends uvm_reg;
     endfunction
 endclass
 
-class pointer_mask_register extends uvm_reg;
-    `uvm_object_utils(uvm_tx_dma_calypte_regs::pointer_mask_register)
+class pointer_mask_register #(int unsigned POINTER_WIDTH)  extends uvm_reg;
+    `uvm_object_utils(uvm_tx_dma_calypte_regs::pointer_mask_register #(POINTER_WIDTH))
 
     // Write
-    rand uvm_reg_field pointer;
+    rand uvm_reg_field pointer_mask;
 
     function new(string name = "pointer_mask_register");
-        super.new(name, 16, UVM_NO_COVERAGE);
+        super.new(name, POINTER_WIDTH, UVM_NO_COVERAGE);
     endfunction
 
     virtual function void build();
         //Create fields
-        pointer = uvm_reg_field::type_id::create("pointer_mask");
+        pointer_mask = uvm_reg_field::type_id::create("pointer_mask");
         //Configure
-        pointer.configure(this, // Parent
-                         16   , // Number of bits
-                         0  , // LSB
-                         "RO", // Access
-                         0   , // Volatility
-                         0   , // Value on reset
-                         0   , // Can the value be reset?
-                         0   , // Can the value be randomized?
-                         0     // Does the field occupy an entire byte lane?
-                         );
+        pointer_mask.configure(this, // Parent
+                               POINTER_WIDTH, // Number of bits
+                               0  , // LSB
+                               "RO", // Access
+                               0   , // Volatility
+                               0   , // Value on reset
+                               0   , // Can the value be reset?
+                               0   , // Can the value be randomized?
+                               0     // Does the field occupy an entire byte lane?
+                               );
     endfunction
 endclass
 

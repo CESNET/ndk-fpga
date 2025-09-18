@@ -6,10 +6,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class start_channel_seq extends uvm_sequence;
-    `uvm_object_utils(uvm_tx_dma_calypte_regs::start_channel_seq)
+class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
+    `uvm_object_utils(uvm_tx_dma_calypte_regs::start_channel_seq #(POINTER_WIDTH))
 
-    regmodel_channel m_regmodel_channel;
+    regmodel_channel #(POINTER_WIDTH) m_regmodel_channel;
 
     function new (string name = "start_channel_seq");
         super.new(name);
@@ -34,17 +34,18 @@ class start_channel_seq extends uvm_sequence;
             #(300ns)
             m_regmodel_channel.status_reg.read(status, data, .parent(this));
 
-            assert (start_attempts < 100) else
+            assert (start_attempts < 100) else begin
                 `uvm_warning(this.get_type_name(), "\n\nThe start of a channel takes suspiciously long time!\n")
+            end
 
         end while ((data & 32'h1) != 1);
     endtask
 endclass
 
-class stop_channel_seq extends uvm_sequence;
-    `uvm_object_utils(uvm_tx_dma_calypte_regs::stop_channel_seq)
+class stop_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
+    `uvm_object_utils(uvm_tx_dma_calypte_regs::stop_channel_seq #(POINTER_WIDTH))
 
-    regmodel_channel m_regmodel_channel;
+    regmodel_channel #(POINTER_WIDTH) m_regmodel_channel;
 
     function new (string name = "start_channel_seq");
         super.new(name);
@@ -79,8 +80,12 @@ class stop_channel_seq extends uvm_sequence;
             m_regmodel_channel.status_reg.read(status, data, .parent(this));
             stop_attempts++;
 
-            assert (stop_attempts < 500) else
-                `uvm_warning(m_regmodel_channel.get_full_name(), $sformatf("\nThe stop of a channel takes suspiciously long time!\n\tDATA SW(%0d) HW(%0d)\n\tHDR SW(%0d) HW(%0d)\n\tSTATUS %0d\n-----------------------\n", sw_data, hw_data, sw_hdr, hw_hdr, (data & 32'h1)));
+            assert (stop_attempts < 500) else begin
+                `uvm_warning(m_regmodel_channel.get_full_name(),
+                             $sformatf( {"\nThe stop of a channel takes suspiciously long time!\n\tDATA SW(%0d) HW(%0d) ",
+                                         "\n\tHDR SW(%0d) HW(%0d)\n\tSTATUS %0d\n-----------------------\n"},
+                                         sw_data, hw_data, sw_hdr, hw_hdr, (data & 32'h1)));
+            end
 
         end while (sw_data != hw_data || sw_hdr != hw_hdr || (data & 32'h1) != 0);
     endtask

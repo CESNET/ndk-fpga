@@ -1,3 +1,9 @@
+# axi_quad_spi.ip.tcl: generation script for AXI_QUAD_SPI controller
+# Copyright 2025 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
+# Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 array set PARAMS $IP_PARAMS_L
 
 set IP_COMP_NAME $PARAMS(IP_COMP_NAME)
@@ -12,13 +18,13 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 set IP [get_ips $IP_COMP_NAME]
 
 set config_list [list \
-    CONFIG.Async_Clk {1} \
-    CONFIG.C_FIFO_DEPTH {256} \
-    CONFIG.C_SCK_RATIO {2} \
-    CONFIG.C_SPI_MEMORY {2} \
-    CONFIG.C_SPI_MODE {2} \
-    CONFIG.C_USE_STARTUP {1} \
-    CONFIG.C_USE_STARTUP_INT {1} \
+  CONFIG.Async_Clk {1} \
+  CONFIG.C_FIFO_DEPTH {256} \
+  CONFIG.C_SCK_RATIO {2} \
+  CONFIG.C_SPI_MEMORY {2} \
+  CONFIG.C_SPI_MODE {2} \
+  CONFIG.C_USE_STARTUP {1} \
+  CONFIG.C_USE_STARTUP_INT {1} \
 ]
 
 set_property -dict $config_list $IP

@@ -44,7 +44,7 @@ if {$DMA_TYPE == 4} {
     }
 }
 
-if {$ETH_PORTS == 0} {
+if {!$env(NET_MOD_ENABLE)} {
     set NET_MOD_ARCH "EMPTY"
 }
 
@@ -86,22 +86,12 @@ VhdlPkgStr CARD_NAME     $CARD_NAME
 VhdlPkgStr PCIE_MOD_ARCH $PCIE_MOD_ARCH
 VhdlPkgStr NET_MOD_ARCH  $NET_MOD_ARCH
 
-# This is only to ensure the correct package generation.
-if {$ETH_PORTS == 0} {
-    VhdlPkgInt    ETH_PORTS       1
-    VhdlPkgIntArr ETH_PORT_SPEED  1
-    VhdlPkgIntArr ETH_PORT_CHAN   1
-    VhdlPkgIntArr EHIP_PORT_TYPE  1
-    VhdlPkgIntArr ETH_PORT_RX_MTU 1
-    VhdlPkgIntArr ETH_PORT_TX_MTU 1
-} else {
-    VhdlPkgInt    ETH_PORTS       $ETH_PORTS
-    VhdlPkgIntArr ETH_PORT_SPEED  $ETH_PORTS
-    VhdlPkgIntArr ETH_PORT_CHAN   $ETH_PORTS
-    VhdlPkgIntArr EHIP_PORT_TYPE  $ETH_PORTS
-    VhdlPkgIntArr ETH_PORT_RX_MTU $ETH_PORTS
-    VhdlPkgIntArr ETH_PORT_TX_MTU $ETH_PORTS
-}
+VhdlPkgInt    ETH_PORTS       $ETH_PORTS
+VhdlPkgIntArr ETH_PORT_SPEED  $ETH_PORTS
+VhdlPkgIntArr ETH_PORT_CHAN   $ETH_PORTS
+VhdlPkgIntArr EHIP_PORT_TYPE  $ETH_PORTS
+VhdlPkgIntArr ETH_PORT_RX_MTU $ETH_PORTS
+VhdlPkgIntArr ETH_PORT_TX_MTU $ETH_PORTS
 
 VhdlPkgIntArr ETH_CHAN_MAP    8
 

@@ -11,7 +11,7 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.CHANNEL_ENABLE {X0Y3 X0Y2 X0Y1 X0Y0} \
     CONFIG.ENABLE_OPTIONAL_PORTS {loopback_in rxpcsreset_in rxpd_in rxpmareset_in rxpolarity_in txpcsreset_in txpd_in txpmareset_in txpolarity_in rxresetdone_out txresetdone_out} \
     CONFIG.FREERUN_FREQUENCY {156.25} \
@@ -33,4 +33,6 @@ set_property -dict [list \
     CONFIG.TX_REFCLK_FREQUENCY {161.1328125} \
     CONFIG.TX_REFCLK_SOURCE {} \
     CONFIG.TX_USER_DATA_WIDTH {64} \
-] $IP
+]
+
+set_property -dict $config_list $IP

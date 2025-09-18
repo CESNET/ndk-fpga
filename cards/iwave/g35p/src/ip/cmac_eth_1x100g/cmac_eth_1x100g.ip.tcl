@@ -11,7 +11,7 @@ if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
 
 set IP [get_ips $IP_COMP_NAME]
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.ADD_GT_CNRL_STS_PORTS {1} \
     CONFIG.CMAC_CAUI4_MODE {1} \
     CONFIG.CMAC_CORE_SELECT {CMACE4_X0Y2} \
@@ -22,4 +22,6 @@ set_property -dict [list \
     CONFIG.RX_FLOW_CONTROL {0} \
     CONFIG.RX_MAX_PACKET_LEN {16383} \
     CONFIG.TX_FLOW_CONTROL {0} \
-] $IP
+]
+
+set_property -dict $config_list $IP

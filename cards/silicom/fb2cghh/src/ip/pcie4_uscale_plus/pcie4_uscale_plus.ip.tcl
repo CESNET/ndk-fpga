@@ -25,7 +25,7 @@ set PF0_DEVICE_ID {00d2}
 # common properties they should be the same for all cards
 # ==============================================================================
 
-set_property -dict [list \
+set config_list [list \
     CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s} \
     CONFIG.ext_pcie_cfg_space_enabled {true} \
     CONFIG.extended_tag_field {true} \
@@ -47,37 +47,43 @@ set_property -dict [list \
     CONFIG.pf0_rbar_cap_bar0 {0xffffffffffff} \
     CONFIG.pf0_dsn_enabled {true} \
     CONFIG.pf0_msi_enabled {false} \
-    CONFIG.pf0_msix_enabled {true} \
+    CONFIG.pf0_msix_enabled {false} \
     CONFIG.PF0_MSIX_CAP_PBA_BIR {BAR_1:0} \
     CONFIG.PF0_MSIX_CAP_TABLE_BIR {BAR_1:0} \
-    CONFIG.MSI_X_OPTIONS {MSI-X_External} \
+    CONFIG.MSI_X_OPTIONS {None} \
     CONFIG.mode_selection {Advanced} \
     CONFIG.type1_membase_memlimit_enable {Disabled} \
     CONFIG.type1_prefetchable_membase_memlimit {Disabled} \
-] $IP
+    CONFIG.cfg_ctl_if {true} \
+    CONFIG.cfg_fc_if {true} \
+    CONFIG.cfg_mgmt_if {false} \
+    CONFIG.cfg_pm_if {false} \
+    CONFIG.cfg_tx_msg_if {false} \
+    CONFIG.rcv_msg_if {false} \
+    CONFIG.tx_fc_if {false} \
+]
 
 if {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
     # x8_low_latency properties
-    set_property -dict [list \
+    lappend config_list \
         CONFIG.axisten_if_width {256_bit} \
         CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8} \
-        CONFIG.coreclk_freq {500} \
-    ] $IP
+        CONFIG.coreclk_freq {500}
 } else {
     # x16 properties
-    set_property -dict [list \
+    lappend config_list \
         CONFIG.AXISTEN_IF_EXT_512_CQ_STRADDLE {false} \
         CONFIG.AXISTEN_IF_EXT_512_RC_4TLP_STRADDLE {true} \
         CONFIG.AXISTEN_IF_EXT_512_RQ_STRADDLE {true} \
         CONFIG.axisten_if_width {512_bit} \
-        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X16} \
-    ] $IP
+        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X16}
 }
 
 # set PCIE IDs, must be in last set_property
-set_property -dict [list \
+lappend config_list \
     CONFIG.PF0_DEVICE_ID [subst $PF0_DEVICE_ID] \
     CONFIG.PF0_SUBSYSTEM_ID [subst $PF0_DEVICE_ID] \
     CONFIG.PF0_SUBSYSTEM_VENDOR_ID [subst $VENDOR_ID] \
-    CONFIG.vendor_id [subst $VENDOR_ID] \
-] $IP
+    CONFIG.vendor_id [subst $VENDOR_ID]
+
+set_property -dict $config_list $IP

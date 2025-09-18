@@ -1,3 +1,9 @@
+# xvc_vsec.ip.tcl: generation script for the Xilinx Virtual Cable IP
+# Copyright 2025 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
+# Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 array set PARAMS $IP_PARAMS_L
 
 set IP_COMP_NAME $PARAMS(IP_COMP_NAME)
