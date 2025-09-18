@@ -255,6 +255,17 @@ available on the <code class="xref vhdl vhdl-portsignal docutils literal notrans
 <td><p>Determines the number of bytes that can be stored in the buffer.
 The amount of bytes equals 2**POINTER_WIDTH</p></td>
 </tr>
+<tr class="row-odd" id="vhdl-gengeneric-tx_dma_pcie_trans_buffer-split_read_ports"><td><p>SPLIT_READ_PORTS</p></td>
+<td><p>boolean</p></td>
+<td><p>FALSE</p></td>
+<td><p>If true, each port of the TDPs (used by the 2,1,8,32 MFB configuration) is controlled by
+separate interfaces</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-tx_dma_pcie_trans_buffer-read_barrel_shifter_en"><td><p>READ_BARREL_SHIFTER_EN</p></td>
+<td><p>b_array_t(1 downto 0)</p></td>
+<td><p>(TRUE, TRUE)</p></td>
+<td><p>If true, the read data are aligned according to the lower bits of the RD_ADDR input</p></td>
+</tr>
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">
@@ -287,7 +298,7 @@ The amount of bytes equals 2**POINTER_WIDTH</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-pcie_mfb_meta"><td><p>PCIE_MFB_META</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
+<td><p>slv_array_t(MFB_REGIONS -1 downto 0)(((MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH)/8+log2(CHANNELS)+62+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -302,31 +313,61 @@ The amount of bytes equals 2**POINTER_WIDTH</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>Output reading interface</p></td>
+<td><p>Output reading interface for port A of the TDP or the single read port of the SDP</p></td>
 <td><p>=====</p></td>
-<td><p>Similar to BRAM block.</p></td>
+<td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_chan"><td><p>RD_CHAN</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_chan_a"><td><p>RD_CHAN_A</p></td>
 <td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Note: This will be shared for both regions.</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data"><td><p>RD_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data_a"><td><p>RD_DATA_A</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_addr"><td><p>RD_ADDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_addr_a"><td><p>RD_ADDR_A</p></td>
 <td><p>std_logic_vector(POINTER_WIDTH -1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_en"><td><p>RD_EN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_en_a"><td><p>RD_EN_A</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data_vld"><td><p>RD_DATA_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data_vld_a"><td><p>RD_DATA_VLD_A</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Output reading interface for port B</p></td>
+<td><p>=====</p></td>
+<td><p>Unused if SPLIT_READ_PORTS=FALSE or MFB configuration is (1,1,8,32)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_chan_b"><td><p>RD_CHAN_B</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data_b"><td><p>RD_DATA_B</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_addr_b"><td><p>RD_ADDR_B</p></td>
+<td><p>std_logic_vector(POINTER_WIDTH -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_en_b"><td><p>RD_EN_B</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_pcie_trans_buffer-rd_data_vld_b"><td><p>RD_DATA_VLD_B</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
