@@ -77,40 +77,40 @@ port (
 
     QSFP1_LED_R           : out   std_logic;
     QSFP1_LED_G           : out   std_logic;
-    QSFP1_LED_B           : out   std_logic
+    QSFP1_LED_B           : out   std_logic;
 
-    -- -- =========================================================================
-    -- -- BMC INTERFACE
-    -- -- =========================================================================
-    -- -- QSPI interface from FPGA to Max10:
-    -- QSPI_CSN_1V2             : out    std_logic;
-    -- QSPI_D0                  : inout  std_logic;
-    -- QSPI_D1                  : inout  std_logic;
-    -- QSPI_D2                  : inout  std_logic;
-    -- QSPI_D3                  : inout  std_logic;
-    -- QSPI_CLK                 : out    std_logic;
+    -- =========================================================================
+    -- BMC INTERFACE
+    -- =========================================================================
+    -- QSPI interface from FPGA to Max10:
+    QSPI_CSN_1V2             : out    std_logic;
+    QSPI_D0                  : inout  std_logic;
+    QSPI_D1                  : inout  std_logic;
+    QSPI_D2                  : inout  std_logic;
+    QSPI_D3                  : inout  std_logic;
+    QSPI_CLK                 : out    std_logic;
 
-    -- -- SPI Ingress (Seen from BMC) FPGA > MAX
-    -- SPI_INGRESS_SCLK         : out    std_logic;
-    -- SPI_INGRESS_CSN          : out    std_logic;
-    -- SPI_INGRESS_MISO         : in     std_logic;
-    -- SPI_INGRESS_MOSI         : out    std_logic;
+    -- SPI Ingress (Seen from BMC) FPGA > MAX
+    SPI_INGRESS_SCLK         : out    std_logic;
+    SPI_INGRESS_CSN          : out    std_logic;
+    SPI_INGRESS_MISO         : in     std_logic;
+    SPI_INGRESS_MOSI         : out    std_logic;
 
-    -- -- SPI Egress (Seen from BMC) MAX > FPGA
-    -- SPI_EGRESS_MOSI          : in     std_logic;
-    -- SPI_EGRESS_CSN           : in     std_logic;
-    -- SPI_EGRESS_SCLK          : in     std_logic;
-    -- SPI_EGRESS_MISO          : out    std_logic;
+    -- SPI Egress (Seen from BMC) MAX > FPGA
+    SPI_EGRESS_MOSI          : in     std_logic;
+    SPI_EGRESS_CSN           : in     std_logic;
+    SPI_EGRESS_SCLK          : in     std_logic;
+    SPI_EGRESS_MISO          : out    std_logic;
 
-    -- -- Misc signals between FPGA and BMC:
-    -- -- Heart beat from BMC NIOS in the BMC
-    -- MAX_FPGA_HB_1V2          : in     std_logic;
-    -- -- Heart beat from PMCI NIOS in this FPGA
-    -- FPGA_MAX_HB              : out    std_logic;
-    -- -- Single Event Upset. Active high.
-    -- FPGA_MAX_FPGA_SEU_1V2    : out    std_logic;
-    -- -- Thermal shutdown. Active Low
-    -- FPGA_MAX_THRM_SHTD_N_1V2 : out    std_logic
+    -- Misc signals between FPGA and BMC:
+    -- Heart beat from BMC NIOS in the BMC
+    MAX_FPGA_HB_1V2          : in     std_logic;
+    -- Heart beat from PMCI NIOS in this FPGA
+    FPGA_MAX_HB              : out    std_logic;
+    -- Single Event Upset. Active high.
+    FPGA_MAX_FPGA_SEU_1V2    : out    std_logic;
+    -- Thermal shutdown. Active Low
+    FPGA_MAX_THRM_SHTD_N_1V2 : out    std_logic
 );
 end entity;
 
@@ -301,52 +301,52 @@ begin
         MISC_OUT                => open
     );
 
-    -- -- BMC controller
-    -- QSPI_D0 <= qspi_data_out(0) when qspi_data_oe(0) = '1' else 'Z';
-    -- QSPI_D1 <= qspi_data_out(1) when qspi_data_oe(1) = '1' else 'Z';
-    -- QSPI_D2 <= qspi_data_out(2) when qspi_data_oe(2) = '1' else 'Z';
-    -- QSPI_D3 <= qspi_data_out(3) when qspi_data_oe(3) = '1' else 'Z';
+    -- BMC controller
+    QSPI_D0 <= qspi_data_out(0) when qspi_data_oe(0) = '1' else 'Z';
+    QSPI_D1 <= qspi_data_out(1) when qspi_data_oe(1) = '1' else 'Z';
+    QSPI_D2 <= qspi_data_out(2) when qspi_data_oe(2) = '1' else 'Z';
+    QSPI_D3 <= qspi_data_out(3) when qspi_data_oe(3) = '1' else 'Z';
 
-    -- pmci_i : entity work.PMCI_FB2CDG1
-    -- generic map(
-    --     DEVICE        => "AGILEX",
-    --     G_SWB_RD_TYPE => 1 -- Thunderfjord
-    -- ) port map(
-    --     CLK                      => boot_mi_clk,
-    --     RESET                    => boot_mi_reset,
+    pmci_i : entity work.PMCI_FB2CDG1
+    generic map(
+        DEVICE        => "AGILEX",
+        G_SWB_RD_TYPE => 1 -- Thunderfjord
+    ) port map(
+        CLK                      => boot_mi_clk,
+        RESET                    => boot_mi_reset,
 
-    --     MI_DWR                   => boot_mi_dwr,
-    --     MI_ADDR                  => boot_mi_addr,
-    --     MI_RD                    => boot_mi_rd,
-    --     MI_WR                    => boot_mi_wr,
-    --     MI_BE                    => boot_mi_be,
-    --     MI_DRD                   => boot_mi_drd,
-    --     MI_ARDY                  => boot_mi_ardy,
-    --     MI_DRDY                  => boot_mi_drdy,
+        MI_DWR                   => boot_mi_dwr,
+        MI_ADDR                  => boot_mi_addr,
+        MI_RD                    => boot_mi_rd,
+        MI_WR                    => boot_mi_wr,
+        MI_BE                    => boot_mi_be,
+        MI_DRD                   => boot_mi_drd,
+        MI_ARDY                  => boot_mi_ardy,
+        MI_DRDY                  => boot_mi_drdy,
 
-    --     FLASH_CTRLR_ATOM_PORTS_DCLK     => QSPI_CLK,
-    --     FLASH_CTRLR_ATOM_PORTS_NCS      => QSPI_CSN_1V2,
-    --     FLASH_CTRLR_ATOM_PORTS_OE       => open,
-    --     FLASH_CTRLR_ATOM_PORTS_DATAOUT  => qspi_data_out,
-    --     FLASH_CTRLR_ATOM_PORTS_DATAOE   => qspi_data_oe,
-    --     FLASH_CTRLR_ATOM_PORTS_DATAIN   => QSPI_D3 & QSPI_D2 & QSPI_D1 & QSPI_D0,
+        FLASH_CTRLR_ATOM_PORTS_DCLK     => QSPI_CLK,
+        FLASH_CTRLR_ATOM_PORTS_NCS      => QSPI_CSN_1V2,
+        FLASH_CTRLR_ATOM_PORTS_OE       => open,
+        FLASH_CTRLR_ATOM_PORTS_DATAOUT  => qspi_data_out,
+        FLASH_CTRLR_ATOM_PORTS_DATAOE   => qspi_data_oe,
+        FLASH_CTRLR_ATOM_PORTS_DATAIN   => QSPI_D3 & QSPI_D2 & QSPI_D1 & QSPI_D0,
 
-    --     M10_GPIO_FPGA_USR_100M          => '0',
-    --     M10_GPIO_FPGA_M10_HB            => MAX_FPGA_HB_1V2,
-    --     M10_GPIO_PMCI_NIOS_HB           => FPGA_MAX_HB,
-    --     M10_GPIO_M10_SEU_ERROR          => '0',
-    --     M10_GPIO_FPGA_THERM_SHDN        => FPGA_MAX_THRM_SHTD_N_1V2,
-    --     M10_GPIO_FPGA_SEU_ERROR         => FPGA_MAX_FPGA_SEU_1V2,
+        M10_GPIO_FPGA_USR_100M          => '0',
+        M10_GPIO_FPGA_M10_HB            => MAX_FPGA_HB_1V2,
+        M10_GPIO_PMCI_NIOS_HB           => FPGA_MAX_HB,
+        M10_GPIO_M10_SEU_ERROR          => '0',
+        M10_GPIO_FPGA_THERM_SHDN        => FPGA_MAX_THRM_SHTD_N_1V2,
+        M10_GPIO_FPGA_SEU_ERROR         => FPGA_MAX_FPGA_SEU_1V2,
 
-    --     SPI_INGRESS_SCLK                => SPI_INGRESS_SCLK,
-    --     SPI_INGRESS_CSN                 => SPI_INGRESS_CSN,
-    --     SPI_INGRESS_MISO                => SPI_INGRESS_MISO,
-    --     SPI_INGRESS_MOSI                => SPI_INGRESS_MOSI,
+        SPI_INGRESS_SCLK                => SPI_INGRESS_SCLK,
+        SPI_INGRESS_CSN                 => SPI_INGRESS_CSN,
+        SPI_INGRESS_MISO                => SPI_INGRESS_MISO,
+        SPI_INGRESS_MOSI                => SPI_INGRESS_MOSI,
 
-    --     SPI_EGRESS_MOSI                 => SPI_EGRESS_MOSI,
-    --     SPI_EGRESS_CSN                  => SPI_EGRESS_CSN,
-    --     SPI_EGRESS_SCLK                 => SPI_EGRESS_SCLK,
-    --     SPI_EGRESS_MISO                 => SPI_EGRESS_MISO
-    -- );
+        SPI_EGRESS_MOSI                 => SPI_EGRESS_MOSI,
+        SPI_EGRESS_CSN                  => SPI_EGRESS_CSN,
+        SPI_EGRESS_SCLK                 => SPI_EGRESS_SCLK,
+        SPI_EGRESS_MISO                 => SPI_EGRESS_MISO
+    );
 
 end architecture;

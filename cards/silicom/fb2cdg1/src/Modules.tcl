@@ -8,12 +8,12 @@
 array set ARCHGRP_ARR $ARCHGRP
 
 # Paths
-# set PMCI_FB2CDG1_BASE "$ENTITY_BASE/comp/pmci"
+set PMCI_FB2CDG1_BASE "$OFM_PATH/extra/ip-3rdparty/silicom/fb2cdg1"
 set FPGA_COMMON_BASE  "$ARCHGRP_ARR(CORE_BASE)/top"
 
 # Components
 lappend COMPONENTS [list "FPGA_COMMON"   $FPGA_COMMON_BASE      $ARCHGRP]
-# lappend COMPONENTS [list "PMCI_FB2CDG1"  $PMCI_FB2CDG1_BASE     "FULL"  ]
+lappend COMPONENTS [list "PMCI_FB2CDG1"  $PMCI_FB2CDG1_BASE     "FULL"  ]
 
 # IP components
 set IP_COMMON_TCL $ARCHGRP_ARR(IP_TEMPLATE_ROOT)/common.tcl

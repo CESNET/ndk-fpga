@@ -42,7 +42,7 @@ lappend HIERARCHY(COMPONENTS) \
 set SYNTH_FLAGS(MODULE)    "FPGA"
 set SYNTH_FLAGS(FPGA)      $CARD_FPGA
 set SYNTH_FLAGS(BITSTREAM) "OFS_PMCI"
-set SYNTH_FLAGS(OFS_PMCI_SCRIPT_DIR) $CARD_BASE/scripts/
+set SYNTH_FLAGS(OFS_PMCI_SCRIPT_DIR) $OFM_PATH/extra/ip-3rdparty/silicom/fb2cdg1/scripts
 
 # Enable Quartus Support-Logic Generation stage
 set SYNTH_FLAGS(QUARTUS_TLG) 1
