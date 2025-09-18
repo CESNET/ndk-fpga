@@ -4,6 +4,11 @@ import sys
 
 from ctypes import cdll, c_void_p, c_char_p, c_int
 
+import cocotb.utils
+
+
+st = cocotb.utils.get_sim_time
+
 #__lib = cdll.LoadLibrary('/opt/modeltech/modeltech/linux_x86_64/libmtipli.so')
 try:
     __lib = cdll.LoadLibrary('libmtipli.so')
@@ -81,3 +86,14 @@ def add_wave(*args, **kwargs):
         name = "{" + name + " {" + " ".join([cocotb2path(o) + f"[{r.stop - 1}:{r.start}]" for o, r in kwargs['bus']]) + "}}"
 
     cmd("add wave" + params + name)
+
+
+def add_cursor(name=None, time=None, lock=True):
+    if time is None:
+        time = st()
+
+    a = cmd("wave cursor active")
+    c = f"wave cursor add -lock {1 if lock else 0} -time {{{time} ps}}" + ("" if name is None else f" -name {{{name}}}")
+    n = cmd(c)
+    cmd(f"wave cursor active {a}")
+    return n
