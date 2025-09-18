@@ -70,7 +70,7 @@ entity SPOOKYHASH is
         -- key to be hashed
         IN_KEY      : in std_logic_vector(KEY_WIDTH-1 downto 0);
         -- use seed for better durability of the hash
-        IN_SEED     : in std_logic_vector(HASH_WIDTH-1 downto 0);
+        IN_SEED     : in std_logic_vector(128-1 downto 0);
         -- passthrough metadata input
         IN_META     : in std_logic_vector(META_WIDTH-1 downto 0);
         -- validity of input
@@ -153,13 +153,8 @@ begin
         key(PIPE_LENGTH-1) <= (8-(KEY_WIDTH mod 8)-1 downto 0 => '0') & unsigned(IN_KEY);
     end generate;
 
-    pass_seed_g: if HASH_WIDTH > 64 generate
-        h0(PIPE_LENGTH-1) <= unsigned(IN_SEED(64-1 downto 0));
-        h1(PIPE_LENGTH-1) <= (128-HASH_WIDTH-1 downto 0 => '0') & unsigned(IN_SEED(HASH_WIDTH-1 downto 64));
-    else generate
-        h0(PIPE_LENGTH-1) <= (64-HASH_WIDTH-1 downto 0 => '0') & unsigned(IN_SEED(HASH_WIDTH-1 downto 0));
-        h1(PIPE_LENGTH-1) <= (64-HASH_WIDTH-1 downto 0 => '0') & unsigned(IN_SEED(HASH_WIDTH-1 downto 0));
-    end generate;
+    h0(PIPE_LENGTH-1) <= unsigned(IN_SEED(64-1 downto 0));
+    h1(PIPE_LENGTH-1) <= unsigned(IN_SEED(128-1 downto 64));
 
     h2(PIPE_LENGTH-1)   <= SC_CONST;
     h3(PIPE_LENGTH-1)   <= SC_CONST;
@@ -230,10 +225,11 @@ begin
     -- handle the last 0..15 bytes, and its length
     remainder_i: entity work.SPOOKY_REMAINDER
     generic map (
-        KEY_WIDTH => KEY_WIDTH_ALIGNED,
-        REMAINDER => REMAINDER16,
-        SC_CONST  => SC_CONST,
-        REG_SETUP => REMAINDER_REG_SETUP
+        KEY_WIDTH  => KEY_WIDTH_ALIGNED,
+        REMAINDER  => REMAINDER16,
+        SC_CONST   => SC_CONST,
+        META_WIDTH => META_WIDTH,
+        REG_SETUP  => REMAINDER_REG_SETUP
     ) port map (
         CLK       => CLK,
         RESET     => RESET,
