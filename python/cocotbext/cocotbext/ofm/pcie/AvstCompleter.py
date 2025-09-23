@@ -108,15 +108,23 @@ class AvstCompleter(AvstBase):
 
             trigger, item, req_data = self._read_requests[tag]
             addr, byte_count, req_type, orig_data = item
-            offset = addr % 4
-            req_data = data[offset:byte_count + offset]
+
+            is_first = len(req_data) == 0
+            offset = addr % 4 if is_first else 0
+            data = data[offset:]
+
+            rem = byte_count - len(req_data)
+            is_last = len(data) >= rem
+            data = data[:rem] if is_last else data[:]
+            req_data.extend(data)
             # firstBe = [0xF, 0xE, 0xC, 0x8][addr % 4]
             # lastBe = [0xF, 0x1, 0x3, 0x7][(addr + byte_count) % 4]
             # fixme: BE & length & completed = 0
 
-            del self._read_requests[tag]
-            trigger.set(req_data)
-            self._tag_queue.put_nowait(tag)
+            if is_last:
+                del self._read_requests[tag]
+                trigger.set(req_data)
+                self._tag_queue.put_nowait(tag)
 
     async def read(self, addr, byte_count) -> bytes:
         # TODO: split big reads to more transactions

@@ -55,11 +55,18 @@ class Axi4SCompleter:
         data = list(reversed(tr["TDATA"]))
         # FIXME: Monitor sends values as bytes
         tlast = bool(tr['TLAST'][0])
+
+        # INFO: tkeep not checked for continuity
+        tkeep = int.from_bytes(tr['TKEEP'], byteorder='big')
+        vld_bytes = int(tkeep).bit_count() * 4
+
         if self._cc_inframe is None:
             h = len(CCHeader()) // 8
             hdrbytes, data = data[:h], data[h:]
+            vld_bytes -= h
             self._cc_inframe = CCHeader.deserialize(int.from_bytes(hdrbytes, byteorder='little'))
 
+        data = data[:int(vld_bytes)]
         hdr = self._cc_inframe
 
         trigger, item, req_data = self._read_requests[hdr.tag]
@@ -67,11 +74,13 @@ class Axi4SCompleter:
 
         # Splitted completion for request
         is_first = len(req_data) == 0
-        is_last = len(req_data) + len(data) >= byte_count
+        offset = addr % 4 if is_first else 0
+        data = data[offset:]
 
-        off_s = addr % 4 if is_first else 0
-        off_e = byte_count - len(req_data) if is_last and tlast else len(data)
-        req_data.extend(data[off_s:off_s + off_e])
+        rem = byte_count - len(req_data)
+        is_last = len(data) >= rem
+        data = data[:rem] if is_last else data[:]
+        req_data.extend(data)
 
         if tlast:
             self._cc_inframe = None
