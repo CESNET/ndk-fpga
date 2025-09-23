@@ -134,7 +134,7 @@ begin
             if (RST = '1') then
 
                 tprocess_pst       <= IDLE;
-                if (IS_INTEL = FALSE) then
+                if (not IS_INTEL) then
                     high_shift_val_pst <= "11";
                 else
                     high_shift_val_pst <= "00";
@@ -144,214 +144,569 @@ begin
 
                 tprocess_pst       <= tprocess_nst;
                 high_shift_val_pst <= high_shift_val_nst;
-
             end if;
         end if;
     end process;
 
-    --=============================================================================================================
-    -- FSM next state logic
-    --=============================================================================================================
-    tprocess_nst_logic_p : process (all) is
-    begin
+    tprocess_amd_1_rgn_g : if (not IS_INTEL and TX_REGIONS = 1) generate
+        tprocess_nst_logic_p : process (all) is
+        begin
+            tprocess_nst <= tprocess_pst;
 
-        tprocess_nst <= tprocess_pst;
-
-        case tprocess_pst is
-            when IDLE =>
-
-                if (RX_MFB_SRC_RDY = '1') then
-
-                    if (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '0') then
-                        tprocess_nst <= PKT_DROP;
-
-                    -- Don't wait for the DMA header if that does not arrive go forward.
-                    elsif (HDRM_PKT_DROP = '0' or HDRM_DMA_HDR_SRC_RDY = '0') then
-                        if (HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
-                            -- The data in "intel packet" will be aligned - there is no room for DMA_HDR in second region
-                            and (IS_INTEL
-                            -- The PCIe HDR for DMA HDR is handled in different place
-                                    or (TX_REGIONS = 1
-                            -- For Xilinx we are waiting for PCIE HDR of DMA_HDR because it will fit in the last word of MFB (in second region)
-                                           or (TX_REGIONS = 2 and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1' and HDRM_DMA_HDR_SRC_RDY = '1')
-                            -- Normal data transafer
-                                           or (TX_REGIONS = 2 and RX_MFB_EOF = '0')
-                                       ))) then
-                            tprocess_nst <= TRANSACTION_SEND;
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '0') then
+                            tprocess_nst <= PKT_DROP;
+                        -- Don't wait for the DMA header if that does not arrive go forward.(it is
+                        -- handled in a different place with its PCIe header)
+                        elsif (HDRM_PKT_DROP = '0' or HDRM_DMA_HDR_SRC_RDY = '0') then
+                            if (HDRM_DATA_PCIE_HDR_SRC_RDY = '1') then
+                                tprocess_nst <= TRANSACTION_SEND;
+                            end if;
                         end if;
                     end if;
-                end if;
 
-            when TRANSACTION_SEND =>
-
-                if (IS_INTEL = FALSE) then
+                when TRANSACTION_SEND =>
                     if (high_shift_val_pst = "11") then
-
-                        -- For one region - the DMA header is sent in separate word
-                        if (RX_MFB_EOF = '1' and TX_REGIONS = 1) then
+                        -- the DMA header is sent in a separate word
+                        if (RX_MFB_EOF = '1') then
                             tprocess_nst <= DMA_HDR_SEND;
-                        -- For two regions - the DMA header is able to fit in second region of the TX word
-                        -- So doesn't matter whether there is or is not the EOF
-                        elsif ((RX_MFB_EOF = '1' and TX_REGIONS = 2) or RX_MFB_EOF = '0') then
-
+                        elsif (RX_MFB_EOF = '0') then
                             tprocess_nst <= IDLE;
                         end if;
                     end if;
-                else
-                    -- Both regions moves to DMA_HDR_SEND state when EOF occurs
-                    if (TX_REGIONS = 1) then
-                        if (high_shift_val_pst = "11") then
-                            if (RX_MFB_EOF = '1') then
-                                tprocess_nst <= DMA_HDR_SEND;
-                            else
-                                tprocess_nst <= IDLE;
-                            end if;
-                        end if;
-                    else
-                        if (high_shift_val_pst = "10") then
-                            if (RX_MFB_EOF = '1') then
-                                tprocess_nst <= DMA_HDR_SEND;
-                            else
-                                tprocess_nst <= IDLE;
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+
+                when PKT_DROP =>
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+            end case;
+        end process;
+
+        tshift_logic_p : process (all) is
+        begin
+            RX_MFB_DST_RDY             <= '0';
+            HDRM_DMA_PCIE_HDR_DST_RDY  <= '0';
+            HDRM_DATA_PCIE_HDR_DST_RDY <= '0';
+            HDRM_DMA_HDR_DST_RDY       <= '0';
+
+            case tprocess_pst is
+                -- In this state, the component waits for the arrival of three crucial components,
+                -- a valid packet, the PCIE header and the DMA header
+                when IDLE =>
+                    -- when valid word arrives deassert the RX_DST_RDY signal because the FSM awaits
+                    -- the arrival of the PCIE header, no need to wait for the MFB_SOF signal the
+                    -- RX_DST_RDY signal is sufficient
+                    if (RX_MFB_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY <= '0';
+                    end if;
+
+                    -- awaiting the arrival of valid DMA header with the information if packet
+                    -- should be dropped or not
+                    if (HDRM_DMA_HDR_SRC_RDY = '1') then
+                        -- when valid PKT_DROP signal is captured, then the next valid packet
+                        -- should be dropped
+                        if (HDRM_PKT_DROP = '1') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+
+                            -- if valid SOF is captured, current DMA header is also dropped
+                            if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                                HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
                             end if;
                         end if;
                     end if;
-                end if;
 
-            when DMA_HDR_SEND =>
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "11") then
+                        -- switch the PCIE header on the input to the next one DMA_HDR request
+                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
 
-                -- Just wait for valid PCIE_HDR for DMA_HDR
-                if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
-                    tprocess_nst <= IDLE;
-                end if;
-
-            when PKT_DROP =>
-
-                if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
-                    tprocess_nst <= IDLE;
-                end if;
-        end case;
-    end process;
-
-    --=============================================================================================================
-    -- FSM process which controls the input RX MFB and Header Manager signals
-    --=============================================================================================================
-    tshift_logic_p : process (all) is
-    begin
-
-        RX_MFB_DST_RDY             <= '0';
-        HDRM_DMA_PCIE_HDR_DST_RDY  <= '0';
-        HDRM_DATA_PCIE_HDR_DST_RDY <= '0';
-        HDRM_DMA_HDR_DST_RDY       <= '0';
-
-        case tprocess_pst is
-            -- In this state, the component waits for the arrival of three crucial components, a valid packet, the
-            -- PCIEX header and the DMA header
-            when IDLE =>
-
-                -- when valid word arrives deassert the RX_DST_RDY signal because the FSM awaits the arrival of
-                -- the PCIE header, no need to wait for the MFB_SOF signal the RX_DST_RDY signal is sufficient
-                if (RX_MFB_SRC_RDY = '1') then
-                    RX_MFB_DST_RDY <= '0';
-                end if;
-
-                -- If PCIE header has been captured, then deassert the PCIE_HDR_DST_RDY signal because we need to
-                -- wait for a valid packet to arrive. This packet should also be the one which will not be
-                -- dropped. (PCIE  headers on the input are always valid)
-
-                -- awaiting the arrival of valid DMA header with the information if packet should be dropped or not
-                if (HDRM_DMA_HDR_SRC_RDY = '1') then
-                    -- when valid PKT_DROP signal is captured, then the next valid packet should be dropped
-                    if (HDRM_PKT_DROP = '1') then
-
-                        RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
-
-                        -- if valid SOF is captured, current DMA header is also dropped
-                        if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
-                            HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                        if (RX_MFB_EOF = '0') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
                         end if;
                     end if;
-                end if;
 
-            when TRANSACTION_SEND =>
+                -- This state will be used in One region configuration only
+                when DMA_HDR_SEND =>
+                    -- release the headers on the input and allow next packet to arrive
+                    HDRM_DMA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
 
-                if (IS_INTEL = FALSE) then
-
-                    if (TX_REGIONS = 1) then
-                        if (high_shift_val_pst = "11") then
-                            -- switch the PCIE header on the input to the next one
-                            -- DMA_HDR request
-                            HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-
-                            -- switch also the word on the input but only if a current packet does not contain an EOF
-                            -- because the transmission needs to be paused and the special transaction with a DMA
-                            -- header is sent
-                            -- NOTE: This is a possible bottleneck because the next word can be loaded
-                            -- on the input in the next clock cycle.
-                            if (RX_MFB_EOF = '0') then
-                                RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
-                            end if;
-                        end if;
-                    else
-                        if (high_shift_val_pst = "11") then
-
-                            RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
-                            -- switch the PCIE header on the input to the next one (for the next transaction)
-                            HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-
-                            if (RX_MFB_EOF = '1') then
-                                HDRM_DMA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-                                HDRM_DMA_HDR_DST_RDY      <= TX_MFB_DST_RDY;
-                            end if;
-                        end if;
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY       <= TX_MFB_DST_RDY;
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
                     end if;
-                else
-                    -- Both regions moves to DMA_HDR_SEND state when EOF occurs
-                    if (TX_REGIONS = 1) then
-                        if (high_shift_val_pst = "11") then
-                            -- PCIe_HDR request
-                            HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
 
-                            -- No DMA_HDR - new data request
-                            if (RX_MFB_EOF = '0') then
-                                RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
-                            end if;
-                        end if;
-                    else
-                        if (high_shift_val_pst = "10") then
-                            -- PCIe_HDR request
-                            HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                when PKT_DROP =>
+                    RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
 
-                            -- No DMA_HDR - new data request
-                            if (RX_MFB_EOF = '0') then
-                                RX_MFB_DST_RDY  <= TX_MFB_DST_RDY;
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+            end case;
+        end process;
+
+        tout_logic_p : process (all) is
+        begin
+            high_shift_val_nst <= high_shift_val_pst;
+
+            TX_MFB_DATA    <= bshifter_data_out(TX_MFB_DATA'high downto 0);
+            TX_MFB_SOF     <= (others => '0');
+            TX_MFB_EOF     <= (others => '0');
+            TX_MFB_SOF_POS <= (others => '0');
+            TX_MFB_EOF_POS <= (others => '0');
+            TX_MFB_SRC_RDY <= '0';
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1'
+                        and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
+                        and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))) then
+
+                        high_shift_val_nst <= init_shift;
+                        TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & HDRM_DATA_PCIE_HDR;
+                        TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_SRC_RDY     <= '1';
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+
+                    if (high_shift_val_pst = "11") then
+                        high_shift_val_nst <= high_shift_val_pst;
+                        TX_MFB_EOF         <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS     <= std_logic_vector(to_unsigned(3, TX_MFB_EOF_POS'length));
+                    end if;
+                    TX_MFB_SRC_RDY <= '1';
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
+                        TX_MFB_DATA    <= (TX_MFB_DATA'high downto 128 + 64 => '0') & HDRM_DMA_HDR_DATA & HDRM_DMA_PCIE_HDR;
+                        TX_MFB_SOF     <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_EOF     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(5, TX_MFB_EOF_POS'length));
+                        TX_MFB_SRC_RDY <= '1';
+                    end if;
+
+                when PKT_DROP => null;
+            end case;
+        end process;
+    end generate;
+
+    tprocess_amd_2_rgn_g : if (not IS_INTEL and TX_REGIONS = 2) generate
+        tprocess_nst_logic_p : process (all) is
+        begin
+            tprocess_nst <= tprocess_pst;
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '0') then
+                            tprocess_nst <= PKT_DROP;
+                        elsif (HDRM_PKT_DROP = '0' or HDRM_DMA_HDR_SRC_RDY = '0') then
+                            if (HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
+                                and ((HDRM_DMA_PCIE_HDR_SRC_RDY = '1'
+                                         and RX_MFB_EOF = '1'
+                                         and HDRM_DMA_HDR_SRC_RDY = '1')
+                                        or RX_MFB_EOF = '0')) then
+
+                                tprocess_nst <= TRANSACTION_SEND;
                             end if;
                         end if;
                     end if;
-                end if;
 
-            -- This state will be used in One region configuration only
-            when DMA_HDR_SEND =>
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "11") then
+                        tprocess_nst <= IDLE;
+                    end if;
 
-                -- release the headers on the input and allow next packet to arrive
-                HDRM_DMA_PCIE_HDR_DST_RDY  <= TX_MFB_DST_RDY;
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
 
-                if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                when PKT_DROP =>
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+            end case;
+        end process;
 
-                    RX_MFB_DST_RDY       <= TX_MFB_DST_RDY;
-                    HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
-                end if;
+        tshift_logic_p : process (all) is
+        begin
+            RX_MFB_DST_RDY             <= '0';
+            HDRM_DMA_PCIE_HDR_DST_RDY  <= '0';
+            HDRM_DATA_PCIE_HDR_DST_RDY <= '0';
+            HDRM_DMA_HDR_DST_RDY       <= '0';
 
-            when PKT_DROP =>
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY <= '0';
+                    end if;
 
-                RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                    if (HDRM_DMA_HDR_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                            if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                                HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                            end if;
+                        end if;
+                    end if;
 
-                if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
-                    HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
-                end if;
-        end case;
-    end process;
-    --=============================================================================================================
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "11") then
+                        RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
+                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                        if (RX_MFB_EOF = '1') then
+                            HDRM_DMA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                            HDRM_DMA_HDR_DST_RDY      <= TX_MFB_DST_RDY;
+                        end if;
+                    end if;
+
+                when DMA_HDR_SEND =>
+                    HDRM_DMA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY       <= TX_MFB_DST_RDY;
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+
+                when PKT_DROP =>
+                    RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+            end case;
+        end process;
+
+        tout_logic_p : process (all) is
+        begin
+            high_shift_val_nst <= high_shift_val_pst;
+
+            TX_MFB_DATA    <= bshifter_data_out(TX_MFB_DATA'high downto 0);
+            TX_MFB_SOF     <= (others => '0');
+            TX_MFB_EOF     <= (others => '0');
+            TX_MFB_SOF_POS <= (others => '0');
+            TX_MFB_EOF_POS <= (others => '0');
+            TX_MFB_SRC_RDY <= '0';
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1'
+                        and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
+                        and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))
+                        and ((HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1')
+                                or RX_MFB_EOF = '0')
+                    ) then
+
+                        high_shift_val_nst <= init_shift;
+                        TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & HDRM_DATA_PCIE_HDR;
+                        TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_SRC_RDY     <= '1';
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+
+                    if (high_shift_val_pst = "11") then
+
+                        high_shift_val_nst <= high_shift_val_pst;
+
+                        if (RX_MFB_EOF = '1') then
+                            TX_MFB_DATA    <= (TX_MFB_DATA'high downto 128 + 64 + (TX_MFB_DATA'length / 2) => '0')
+                                              & HDRM_DMA_HDR_DATA
+                                              & HDRM_DMA_PCIE_HDR
+                                              & ((TX_MFB_DATA'length / 2) - 1 downto 128                   => '0')
+                                              & bshifter_data_out(127 downto 0);
+                            TX_MFB_SOF     <= std_logic_vector(to_unsigned(2, TX_MFB_SOF'length));
+                            TX_MFB_EOF     <= std_logic_vector(to_unsigned(3, TX_MFB_EOF'length));
+                            TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(43, TX_MFB_EOF_POS'length));
+                        else
+                            TX_MFB_EOF     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                            TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(3, TX_MFB_EOF_POS'length));
+                        end if;
+                    end if;
+
+                    TX_MFB_SRC_RDY <= '1';
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
+                        TX_MFB_DATA    <= (TX_MFB_DATA'high downto 128 + 64 => '0') & HDRM_DMA_HDR_DATA & HDRM_DMA_PCIE_HDR;
+                        TX_MFB_SOF     <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_EOF     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(5, TX_MFB_EOF_POS'length));
+                        TX_MFB_SRC_RDY <= '1';
+                    end if;
+
+                when PKT_DROP => null;
+            end case;
+        end process;
+    end generate;
+
+    tprocess_intel_1_rgn_g : if (IS_INTEL and TX_REGIONS = 1) generate
+        tprocess_nst_logic_p : process (all) is
+        begin
+            tprocess_nst <= tprocess_pst;
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '0') then
+                            tprocess_nst <= PKT_DROP;
+                        elsif (HDRM_PKT_DROP = '0' or HDRM_DMA_HDR_SRC_RDY = '0') then
+                            if (HDRM_DATA_PCIE_HDR_SRC_RDY = '1') then
+                                tprocess_nst <= TRANSACTION_SEND;
+                            end if;
+                        end if;
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "11") then
+                        if (RX_MFB_EOF = '1') then
+                            tprocess_nst <= DMA_HDR_SEND;
+                        else
+                            tprocess_nst <= IDLE;
+                        end if;
+                    end if;
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+
+                when PKT_DROP =>
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+            end case;
+        end process;
+
+        tshift_logic_p : process (all) is
+        begin
+            RX_MFB_DST_RDY             <= '0';
+            HDRM_DMA_PCIE_HDR_DST_RDY  <= '0';
+            HDRM_DATA_PCIE_HDR_DST_RDY <= '0';
+            HDRM_DMA_HDR_DST_RDY       <= '0';
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY <= '0';
+                    end if;
+
+                    if (HDRM_DMA_HDR_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                            if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                                HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                            end if;
+                        end if;
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "11") then
+                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                        if (RX_MFB_EOF = '0') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                        end if;
+                    end if;
+
+                when DMA_HDR_SEND =>
+                    HDRM_DMA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY       <= TX_MFB_DST_RDY;
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+
+                when PKT_DROP =>
+                    RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+            end case;
+        end process;
+
+        tout_logic_p : process (all) is
+        begin
+            high_shift_val_nst <= high_shift_val_pst;
+
+            TX_MFB_DATA    <= bshifter_data_out(TX_MFB_DATA'high downto 0);
+            TX_MFB_SOF     <= (others => '0');
+            TX_MFB_EOF     <= (others => '0');
+            TX_MFB_SOF_POS <= (others => '0');
+            TX_MFB_EOF_POS <= (others => '0');
+            TX_MFB_SRC_RDY <= '0';
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1'
+                        and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
+                        and not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1')) then
+
+                        high_shift_val_nst <= high_shift_val_pst + shift_inc;
+                        TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 0);
+                        TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_SRC_RDY     <= '1';
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+
+                    if (high_shift_val_pst = "11") then
+                        TX_MFB_EOF     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(7, TX_MFB_EOF_POS'length));
+                    end if;
+                    TX_MFB_SRC_RDY <= '1';
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
+                        high_shift_val_nst <= (others                     => '0');
+                        TX_MFB_DATA        <= (TX_MFB_DATA'high downto 64 => '0') & HDRM_DMA_HDR_DATA;
+                        TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_EOF         <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF_POS'length));
+                        TX_MFB_SRC_RDY     <= '1';
+                    end if;
+
+                when PKT_DROP => null;
+            end case;
+        end process;
+    end generate;
+
+    tprocess_intel_2_rgn_g : if (IS_INTEL and TX_REGIONS = 2) generate
+        tprocess_nst_logic_p : process (all) is
+        begin
+            tprocess_nst <= tprocess_pst;
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '0') then
+                            tprocess_nst <= PKT_DROP;
+                        elsif (HDRM_PKT_DROP = '0' or HDRM_DMA_HDR_SRC_RDY = '0') then
+                            if (HDRM_DATA_PCIE_HDR_SRC_RDY = '1') then
+                                tprocess_nst <= TRANSACTION_SEND;
+                            end if;
+                        end if;
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "10") then
+                        if (RX_MFB_EOF = '1') then
+                            tprocess_nst <= DMA_HDR_SEND;
+                        else
+                            tprocess_nst <= IDLE;
+                        end if;
+                    end if;
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+
+                when PKT_DROP =>
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        tprocess_nst <= IDLE;
+                    end if;
+            end case;
+        end process;
+
+        tshift_logic_p : process (all) is
+        begin
+            RX_MFB_DST_RDY             <= '0';
+            HDRM_DMA_PCIE_HDR_DST_RDY  <= '0';
+            HDRM_DATA_PCIE_HDR_DST_RDY <= '0';
+            HDRM_DMA_HDR_DST_RDY       <= '0';
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY <= '0';
+                    end if;
+
+                    if (HDRM_DMA_HDR_SRC_RDY = '1') then
+                        if (HDRM_PKT_DROP = '1') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                            if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                                HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                            end if;
+                        end if;
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    if (high_shift_val_pst = "10") then
+                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                        if (RX_MFB_EOF = '0') then
+                            RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                        end if;
+                    end if;
+
+                when DMA_HDR_SEND =>
+                    HDRM_DMA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
+                        RX_MFB_DST_RDY       <= TX_MFB_DST_RDY;
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+
+                when PKT_DROP =>
+                    RX_MFB_DST_RDY <= TX_MFB_DST_RDY;
+                    if (RX_MFB_EOF = '1' and RX_MFB_SRC_RDY = '1') then
+                        HDRM_DMA_HDR_DST_RDY <= TX_MFB_DST_RDY;
+                    end if;
+            end case;
+        end process;
+
+        tout_logic_p : process (all) is
+        begin
+            high_shift_val_nst <= high_shift_val_pst;
+
+            TX_MFB_DATA    <= bshifter_data_out(TX_MFB_DATA'high downto 0);
+            TX_MFB_SOF     <= (others => '0');
+            TX_MFB_EOF     <= (others => '0');
+            TX_MFB_SOF_POS <= (others => '0');
+            TX_MFB_EOF_POS <= (others => '0');
+            TX_MFB_SRC_RDY <= '0';
+
+            case tprocess_pst is
+                when IDLE =>
+                    if (RX_MFB_SRC_RDY = '1'
+                        and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
+                        and not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1')) then
+
+                        high_shift_val_nst <= high_shift_val_pst + shift_inc;
+                        TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 0);
+                        TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_SRC_RDY     <= '1';
+                    end if;
+
+                when TRANSACTION_SEND =>
+                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+
+                    if (high_shift_val_pst = "10") then
+                        TX_MFB_EOF     <= std_logic_vector(to_unsigned(2, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(56, TX_MFB_EOF_POS'length));
+                    end if;
+                    TX_MFB_SRC_RDY <= '1';
+
+                when DMA_HDR_SEND =>
+                    if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
+                        high_shift_val_nst <= (others                     => '0');
+                        TX_MFB_DATA        <= (TX_MFB_DATA'high downto 64 => '0') & HDRM_DMA_HDR_DATA;
+                        TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                        TX_MFB_EOF         <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                        TX_MFB_EOF_POS     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF_POS'length));
+                        TX_MFB_SRC_RDY     <= '1';
+                    end if;
+
+                when PKT_DROP => null;
+            end case;
+        end process;
+    end generate;
 
     -- Same for Intel ... the reset value must change
     -- my attempt to make the set of constants which change according to the specified generic parameters
@@ -364,146 +719,6 @@ begin
         -- shifting by two is needed
         shift_inc  <= "10";
     end generate;
-
-    --=============================================================================================================
-    -- FSM process which controls the output MFB signals and their logic
-    --=============================================================================================================
-    tout_logic_p : process (all) is
-    begin
-
-        TX_MFB_DATA    <= bshifter_data_out(TX_MFB_DATA'high downto 0);
-        TX_MFB_SOF     <= (others => '0');
-        TX_MFB_EOF     <= (others => '0');
-        TX_MFB_SOF_POS <= (others => '0');
-        TX_MFB_EOF_POS <= (others => '0');
-        TX_MFB_SRC_RDY <= '0';
-
-        high_shift_val_nst <= high_shift_val_pst;
-
-        case tprocess_pst is
-            when IDLE =>
-
-                -- valid data on the input
-                if (RX_MFB_SRC_RDY = '1'
-                    -- valid PCIe header for the data
-                    and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
-                    -- Not a valid drop signal for the current packet
-                    and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))
-                    and (IS_INTEL
-                            or (TX_REGIONS = 1
-                                   or (TX_REGIONS = 2 and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '1')
-                    -- The 2 region configuration needs to have a valid DMA header with the
-                    -- ending transaction since this can fit to the second region of the last
-                    -- of the last word of a PCIe transaction
-                                   or (TX_REGIONS = 2 and RX_MFB_EOF = '0')
-                               ))) then
-
-                    -- Place the PCIe header at the beginning of the data (Xilinx only)
-                    -- For Intel, the header is placed in Meta signal and is valid with SOF - The HDR_TYPE is not relevant
-                    if (IS_INTEL = FALSE) then
-                        high_shift_val_nst <= init_shift;
-                        TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & HDRM_DATA_PCIE_HDR;
-                    else
-                        -- There is no such think as INIT_SHIFT needed for Intel devices
-                        high_shift_val_nst  <= high_shift_val_pst + shift_inc;
-                        TX_MFB_DATA         <= bshifter_data_out(TX_MFB_DATA'high downto 0);
-                    end if;
-
-                    -- Correct for Xilinx and Intel
-                    TX_MFB_SOF     <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
-                    TX_MFB_SRC_RDY <= '1';
-
-                end if;
-
-            when TRANSACTION_SEND =>
-
-                high_shift_val_nst <= high_shift_val_pst + shift_inc;
-
-                -- Xilinx
-                if (IS_INTEL = FALSE) then
-                    if (high_shift_val_pst = "11") then
-
-                        -- because the design in this configuration contains two regions, the output word
-                        -- is organized in the way that the first half is occupied by the rest of a current
-                        -- transaction and the second half by the prepared DMA header with its PCIe header
-                        if (TX_REGIONS = 2 and RX_MFB_EOF = '1') then
-                            -- the value of "10"
-                            TX_MFB_SOF <= std_logic_vector(to_unsigned(2, TX_MFB_SOF'length));
-                            -- the value of "11"
-                            TX_MFB_EOF <= std_logic_vector(to_unsigned(3, TX_MFB_EOF'length));
-                        else
-                            -- the value of "01"
-                            TX_MFB_EOF <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
-                        end if;
-
-                        -- keep the shift to the next segment because the PCIex header needs to be inserted which means
-                        -- that the initial shift is at its highest value (e.q. "011")
-                        high_shift_val_nst <= high_shift_val_pst;
-
-                        if (TX_REGIONS = 2 and RX_MFB_EOF = '1') then
-                            TX_MFB_DATA <= (TX_MFB_DATA'high downto 128 + 64 + (TX_MFB_DATA'length / 2) => '0')
-                                        & HDRM_DMA_HDR_DATA
-                                        & HDRM_DMA_PCIE_HDR
-                                        & ((TX_MFB_DATA'length / 2) - 1 downto 128                      => '0')
-                                        & bshifter_data_out(127 downto 0);
-
-                            -- the value of "101" & "011"
-                            TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(43, TX_MFB_EOF_POS'length));
-                        else
-                            -- the value of "000" & "011"
-                            TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(3, TX_MFB_EOF_POS'length));
-                        end if;
-                    end if;
-                -- Intel
-                else
-                    if (TX_REGIONS = 1) then
-                        if (high_shift_val_pst = "11") then
-
-                            -- The packet will be aligned "111"
-                            TX_MFB_EOF      <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
-                            TX_MFB_EOF_POS  <= std_logic_vector(to_unsigned(7, TX_MFB_EOF_POS'length));
-
-                        end if;
-                    else
-                        if (high_shift_val_pst = "10") then
-
-                            -- The packet will be aligned "111000"
-                            TX_MFB_EOF      <= std_logic_vector(to_unsigned(2, TX_MFB_EOF'length));
-                            TX_MFB_EOF_POS  <= std_logic_vector(to_unsigned(56, TX_MFB_EOF_POS'length));
-
-                        end if;
-                    end if;
-                end if;
-
-                TX_MFB_SRC_RDY <= '1';
-
-            -- For intel this state will be used for both regions
-            when DMA_HDR_SEND =>
-
-                if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
-
-                    -- Both
-                    TX_MFB_SOF     <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
-                    TX_MFB_EOF     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
-                    TX_MFB_SRC_RDY <= '1';
-
-                    -- Xilinx
-                    intel_hdr: if (IS_INTEL = FALSE) then
-                        -- load the DMA header and some other non-important data
-                        TX_MFB_DATA    <= (TX_MFB_DATA'high downto 128 + 64 => '0') & HDRM_DMA_HDR_DATA & HDRM_DMA_PCIE_HDR;
-                        TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(5, TX_MFB_EOF_POS'length));
-                    -- Intel - both regions
-                    else
-                        TX_MFB_DATA         <= (TX_MFB_DATA'high downto 64 => '0') & HDRM_DMA_HDR_DATA;
-                        TX_MFB_EOF_POS      <= std_logic_vector(to_unsigned(1, TX_MFB_EOF_POS'length));
-
-                        high_shift_val_nst  <= (others => '0');
-                    end if;
-                end if;
-
-            when PKT_DROP => null;
-        end case;
-    end process;
 
     --=============================================================================================================
     -- Shifter of the output data
