@@ -85,8 +85,8 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
 
     localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
-
-    localparam BLOCK_SIZE = 128;
+    localparam BLOCK_SIZE_BYTES = 128;
+    localparam BLOCK_SIZE_DWS = BLOCK_SIZE_BYTES/4;
 
     //UVM PROBE - model input
     disc_probe_cbs m_probe_discard;
@@ -164,7 +164,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
     endfunction
 
 
-    function model_packet get_pcie_transaction(logic [64-1:0] addr, int unsigned packet_size, logic [32-1:0] data []);
+    function model_packet get_pcie_transaction(logic [64-1:0] addr, int unsigned packet_byte_size, logic [32-1:0] data []);
         model_packet rq;
 
         rq = model_packet::type_id::create(this.get_full_name);
@@ -193,7 +193,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         // FBE
         rq.fbe = '1;
         // LBE
-        case (packet_size % 4)
+        case (packet_byte_size % 4)
             0:
                 rq.lbe = 4'b1111;
             1:
@@ -203,7 +203,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
             3:
                 rq.lbe = 4'b0111;
         endcase
-        rq.length = (packet_size + 3)/4;
+        rq.length = (packet_byte_size + 3)/4;
         rq.data   = data;
 
         if (rq.length == 1) begin
@@ -222,27 +222,25 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
     endfunction
 
 
-    function void get_data_last(logic[32-1 : 0] packet[], int unsigned f_start, int unsigned f_end, output logic[32-1 : 0] out[BLOCK_SIZE/4]);
+    function void get_data_last(logic[32-1 : 0] packet[], int unsigned f_start, int unsigned f_end, output logic[32-1 : 0] out[]);
+        out = new [f_end - f_start];
         for (int unsigned it = 0; it < f_end - f_start; it++) begin
             out[it] = packet[f_start + it];
-        end
-
-        for (int unsigned it = f_end - f_start; it < BLOCK_SIZE/4; it++) begin
-            out[it] = 'x;
         end
     endfunction
 
     task packet_send(logic [ITEM_WIDTH-1:0] packet[], time start_time, int unsigned channel, logic [24-1:0] meta);
+        string                     msg;
+        int unsigned               rem ;
         model_packet               packet_output;
         int unsigned               it;
-        logic[32-1 : 0]            packet_end[BLOCK_SIZE/4];
+        // Packet end is rounded up to whole dwords
+        logic [32-1 : 0]           packet_end[] = new [((packet.size() % BLOCK_SIZE_BYTES)+3)/4];
         logic[32-1 : 0]            pcie_packet[];
         logic[32-1 : 0]            packet_hdr[2];
         int unsigned               packet_pointer_start;
         int unsigned               parts;
         logic [64-1:0]             addr;
-
-        string dbg_msg;
 
         packet_pointer_start = m_data[channel].data_ptr;
         pcie_packet = new[(packet.size()+3)/4];
@@ -250,13 +248,13 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
             pcie_packet[it] = {<<8{packet[it*4 +: 4]}};
         end
 
-        parts = (packet.size() + BLOCK_SIZE-1)/BLOCK_SIZE;
+        parts = (packet.size() + BLOCK_SIZE_BYTES-1)/BLOCK_SIZE_BYTES;
         //SEND PARTS OF PACKETS EXCEPT LAST PART
         for (it = 0; it < (parts-1); it++) begin
-            addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
+            addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE_BYTES);
             m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
 
-            packet_output = get_pcie_transaction(addr, BLOCK_SIZE, pcie_packet[it*(BLOCK_SIZE/4) +: BLOCK_SIZE/4]);
+            packet_output = get_pcie_transaction(addr, BLOCK_SIZE_BYTES, pcie_packet[it*BLOCK_SIZE_DWS +: BLOCK_SIZE_DWS]);
             packet_output.packet_num   = m_pkt_cntr_total_chan[channel];
             packet_output.data_packet  = 1;
             packet_output.channel      = channel;
@@ -267,11 +265,12 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         end
 
         //SEND LAST PART OF PACKET
-        addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE);
+        addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE_BYTES);
         m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
 
-        get_data_last(pcie_packet, it*(BLOCK_SIZE/4), (packet.size()+3)/4, packet_end);
-        packet_output = get_pcie_transaction(addr, BLOCK_SIZE, packet_end);
+        get_data_last(pcie_packet, it*BLOCK_SIZE_DWS, (packet.size()+3)/4, packet_end);
+        rem = packet.size() % BLOCK_SIZE_BYTES;
+        packet_output = get_pcie_transaction(addr, rem == 0 ? 128 : rem, packet_end);
         packet_output.packet_num   = m_pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 1;
         packet_output.channel      = channel;

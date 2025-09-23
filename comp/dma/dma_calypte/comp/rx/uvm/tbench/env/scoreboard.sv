@@ -123,6 +123,7 @@ class scoreboard #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) exten
         logic [64-1:2]  addr;
         logic [2-1:0]   ph;
         logic [1-1:0]   td;
+        int unsigned    min_length;
 
         if (IS_INTEL_DEV) begin // Intel P/R-Tile
             logic [1-1:0] tag_8;
@@ -195,13 +196,32 @@ class scoreboard #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) exten
         ret &= (lbe            ==? tr_model.lbe) === 1'b1;
         ret &= (addr           ==? tr_model.address) === 1'b1;
         ret &= (length         ==? tr_model.length) === 1'b1;
-        ret &= (data           ==? tr_model.data) === 1'b1;
         ret &= (ph             ==? tr_model.ph) === 1'b1;
 
-        //Check pcie requiretments
-        if (data.size() > MPS || (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE)) begin
-            `uvm_error(this.get_full_name(), $sformatf("\n\tPacket doesn't meet pcie requirements.\n\t\tPacket size %0d\n\t\tMaximum payload(%0d) exceeded %0d\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
-                                    data.size(), MPS, data.size() > MPS, PAGE_SIZE, (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE), addr));
+        min_length= ((tr_dut.data.size()-4) < tr_model.data.size()) ? tr_dut.data.size()-4 : tr_model.data.size();
+
+        if ((length == tr_model.length) && (tr_dut.data.size()-4 == tr_model.data.size())) begin
+            for (int j = 0; j < 4; j++) begin
+                if (fbe[j] === 1'b1) begin
+                    ret &= (data[0][8*j +: 8] ==? tr_model.data[0][8*j +: 8]) === 1'b1;
+                end
+            end
+
+            for (int unsigned it = 1; it < length-1; it++) begin
+                ret &= (data[it] ==? tr_model.data[it]) === 1'b1;
+            end
+
+            for (int j = 0; j < 4; j++) begin
+                if (lbe[j] === 1'b1) begin
+                    ret &= (data[length-1][8*j +: 8] ==? tr_model.data[length-1][8*j +: 8]) === 1'b1;
+                end
+            end
+
+            //Check pcie requiretments
+            if (data.size() > MPS || (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE)) begin
+                `uvm_error(this.get_full_name(), $sformatf("\n\tPacket doesn't meet pcie requirements.\n\t\tPacket size %0d\n\t\tMaximum payload(%0d) exceeded %0d\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
+                                        data.size(), MPS, data.size() > MPS, PAGE_SIZE, (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE), addr));
+            end
         end
 
         return ret;
@@ -288,7 +308,7 @@ class scoreboard #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE) exten
             if (pcie_compare(tr_dut.item, tr_dut.meta, packet_model) == 0) begin
                 m_errors++;
 
-                msg = {msg, $sformatf("\nExpected transaction is:\n\t\tPart is : %s\n\t\tChannel : %0d\n\t\tPart %0d/%0d\n\t\tInput time\n\t\t\t",  packet_model.data_packet == 1 ? "DATA" : "HEADER",  packet_model.channel, packet_model.part, packet_model.part_num, packet_model.time2string())};
+                msg = {msg, $sformatf("\nExpected transaction is:\n\t\tPart is : %s\n\t\tChannel : %0d\n\t\tPart %0d/%0d\n\t\tInput time %d\n\t\t\t",  packet_model.data_packet == 1 ? "DATA" : "HEADER",  packet_model.channel, packet_model.part, packet_model.part_num, packet_model.time2string())};
                 msg = {msg, $sformatf("\n\tDUT Transaction doesnt match Model transaction\n\tDUT Transaction : \n\tMETA : %s\n\tDATA : %s\nMODEL TRANSACTION %s\n", tr_dut.meta.convert2string(), tr_dut.item.convert2string(), packet_model.convert2string())};
                 `uvm_error(this.get_full_name(), msg);
             end else begin

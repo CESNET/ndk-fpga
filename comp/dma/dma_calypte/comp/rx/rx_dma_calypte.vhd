@@ -187,7 +187,6 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_pkt_sent_bytes : std_logic_vector((log2(PKT_SIZE_MAX+1)-1) downto 0);
 
     signal mfb_data_trbuf    : std_logic_vector(MFB_REGION_SIZE_TRBUF2INS*MFB_BLOCK_SIZE_TRBUF2INS*MFB_ITEM_WIDTH_TRBUF2INS-1 downto 0);
-    signal mfb_sof_pos_trbuf : std_logic_vector (max(1, log2(MFB_REGION_SIZE_TRBUF2INS))-1 downto 0);
     signal mfb_eof_pos_trbuf : std_logic_vector (max(1, log2(MFB_REGION_SIZE_TRBUF2INS*MFB_BLOCK_SIZE_TRBUF2INS))-1 downto 0);
     signal mfb_sof_trbuf     : std_logic;
     signal mfb_eof_trbuf     : std_logic;
@@ -605,6 +604,7 @@ begin
         RX_MFB_DATA    => mfb_data_trbuf,
         RX_MFB_SOF     => mfb_sof_trbuf,
         RX_MFB_EOF     => mfb_eof_trbuf,
+        RX_MFB_EOF_POS => mfb_eof_pos_trbuf,
         RX_MFB_SRC_RDY => mfb_src_rdy_trbuf,
         RX_MFB_DST_RDY => mfb_dst_rdy_trbuf,
 
@@ -652,7 +652,7 @@ begin
         RX_MFB_DST_RDY => mfb_dst_rdy_lng_check,
 
         TX_MFB_DATA    => mfb_data_trbuf,
-        TX_MFB_SOF_POS => mfb_sof_pos_trbuf,
+        TX_MFB_SOF_POS => open,
         TX_MFB_EOF_POS => mfb_eof_pos_trbuf,
         TX_MFB_SOF     => mfb_sof_trbuf,
         TX_MFB_EOF     => mfb_eof_trbuf,
