@@ -32,7 +32,6 @@ proc ints {PATH} {
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/stop_*
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/hdrm_*
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/mfb_*
-    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/trbuf_fifo_*
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/data_path_dst_rdy
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/hdr_log_dst_rdy
 }
@@ -75,6 +74,7 @@ proc hdr_ins {PATH} {
     add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(127 downto 0)"
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_SOF
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_EOF
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_EOF_POS
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_SRC_RDY
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_DST_RDY
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/TX_*
@@ -83,12 +83,16 @@ proc hdr_ins {PATH} {
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(255 downto 128)"
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(127 downto 0)"
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/low_shift_val
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_pst
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_nst
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_sel_pst
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_sel_nst
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_pst
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_nst
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/tprocess_pst
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/tprocess_nst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/init_shift
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_inc
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var1
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var2
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var3
 }
 
 proc inp_buff {PATH} {
@@ -96,7 +100,7 @@ proc inp_buff {PATH} {
 }
 
 proc trans_buff {PATH} {
-    add_wave [list -noupdate -hex -group "TRANSACTION_BUFFER"] $PATH/tr_buff_g/transaction_buffer_i/*
+    add_wave [list -noupdate -hex -group "TRANSACTION_BUFFER"] $PATH/transaction_buffer_i/*
 }
 
 proc hdr_mgr {PATH} {

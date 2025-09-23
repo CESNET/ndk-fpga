@@ -11,3 +11,4 @@ lappend COMPONENTS [list "BARREL_SHIFTER_GEN" "$OFM_PATH/comp/base/logic/barrel_
 
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/pcie_hdr_fields_pkg.vhd"
