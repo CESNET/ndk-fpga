@@ -14,8 +14,10 @@ Before you get started, there are a few requirements that you need to have.
 
 - To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 25.1** or **Xilinx Vivado 2022.2** (depending on the target card), including a valid license.
 - We recommend using the **Questa Sim-64 2024.3** tool to run HDL verifications (UVM).
+- To control an FPGA card with an application based on the NDK framework, you also need:
+    - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 - Supported FPGA cards in the NDK framework available as open-source:
-    - ReflexCES XpressSX AGI-FH400G card (BOARD_REV=0 requires Quartus version 22.4)
+    - ReflexCES XpressSX AGI-FH400G card (BOARD_REV = 0 or 1 requires Quartus version 22.4)
     - Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)
     - Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)
     - Silicom fb2CGhh@KU15P card
@@ -32,8 +34,6 @@ Before you get started, there are a few requirements that you need to have.
     - Napatech NT200A02
 - Other supported FPGA cards in the NDK framework but not available as open-source:
     - Netcope NFB-200G2QL card
-- To control an FPGA card with an application based on the NDK framework, you also need:
-    - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
 
 ### How to clone the necessary repositories
 
@@ -103,6 +103,7 @@ Unless otherwise noted, the content of this repository is available under the BS
 - The .ip files located in the `cards/<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Intel Quartus Prime Pro, and their use may be subject to additional license agreements.
 - The .xci files located in the `cards/<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Xilinx Vivado, and their use may be subject to additional license agreements.
 - The files located in the `cards/silicom/n6010/src/comp/pmci/pmci_ip` and `cards/silicom/n6010/scripts` folders were taken from the [ofs-agx7-pcie-attach repository](https://github.com/OFS/ofs-agx7-pcie-attach) and are subject to the MIT license. Please read [LICENSE.txt file](cards/silicom/n6010/scripts/LICENSE.txt).
+- The files located in the `comp/base/hash/spookyhash/sw/` by Bob Jenkins from [burtleburtle.net](https://burtleburtle.net/bob/hash/spooky.html), Public domain.
 
 ## Repository Maintainer
 
