@@ -12,8 +12,8 @@ Before you get started, there are a few requirements that you need to have.
 
 ### Requirements and supported FPGA cards
 
-- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 24.1** or **Xilinx Vivado 2022.2** (depending on the target card), including a valid license.
-- We recommend using the **Questa Sim-64 2024.1** tool to run HDL verifications (UVM).
+- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 25.1** or **Xilinx Vivado 2022.2** (depending on the target card), including a valid license.
+- We recommend using the **Questa Sim-64 2024.3** tool to run HDL verifications (UVM).
 - Supported FPGA cards in the NDK framework available as open-source:
     - ReflexCES XpressSX AGI-FH400G card (BOARD_REV=0 requires Quartus version 22.4)
     - Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)
