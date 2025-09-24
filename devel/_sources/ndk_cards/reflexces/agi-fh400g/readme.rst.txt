@@ -40,7 +40,7 @@ NDK firmware support
 Board Revision
 ^^^^^^^^^^^^^^
 
-This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=1.
+This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=2.
 The correct revision for the firmware build can be selected using the Makefile parameter BOARD_REV, for example as follows:
 
 .. code::
