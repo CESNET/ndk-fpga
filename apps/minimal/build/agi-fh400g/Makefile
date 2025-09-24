@@ -10,7 +10,7 @@ COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/reflexces/agi-fh400g
 APP_CONF = app_conf.tcl
 
-BOARD_REV ?= 1
+BOARD_REV ?= 2
 export BOARD_REV
 PCIE_CONF ?= 2xgen5x8x8
 export PCIE_CONF

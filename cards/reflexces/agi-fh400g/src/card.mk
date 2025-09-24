@@ -15,7 +15,7 @@ OUTPUT_NAME ?= agi-fh400g
 USER_ENV ?=
 
 # Default board revision
-BOARD_REV ?= 0
+BOARD_REV ?= 2
 
 # Private parameters (do not change these values in user Makefile)
 ###############################################################################
