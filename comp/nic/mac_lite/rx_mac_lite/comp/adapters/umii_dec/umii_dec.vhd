@@ -82,7 +82,7 @@ architecture FULL of UMII_DEC is
     signal mii_vld_in                       : std_logic;
 
     -- logic stage 1
-    signal s_is_locfault                     : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_sequence                     : std_logic_vector(REGIONS-1 downto 0);
     signal s_is_preamble                     : std_logic_vector(REGIONS-1 downto 0);
     signal s_is_terminate                    : std_logic_vector(REGIONS-1 downto 0);
     signal s_is_error                        : std_logic_vector(REGIONS-1 downto 0);
@@ -92,7 +92,7 @@ architecture FULL of UMII_DEC is
     -- register stage 1
     signal s_mii_rxd_reg1                    : std_logic_vector(MII_DW-1 downto 0);
     signal s_mii_rxc_reg1                    : std_logic_vector(MII_CW-1 downto 0);
-    signal s_is_locfault_reg1                : std_logic_vector(REGIONS-1 downto 0);
+    signal s_is_sequence_reg1                : std_logic_vector(REGIONS-1 downto 0);
     signal s_is_preamble_reg1                : std_logic_vector(REGIONS-1 downto 0);
     signal s_is_terminate_reg1               : std_logic_vector(REGIONS-1 downto 0);
     signal s_is_error_reg1                   : std_logic_vector(REGIONS-1 downto 0);
@@ -270,7 +270,10 @@ begin
             MII_RXD       => mii_rxd_in((r+1)*REGION_WIDTH-1 downto r*REGION_WIDTH),
             MII_RXC       => mii_rxc_in((r+1)*REGION_ITEMS-1 downto r*REGION_ITEMS),
 
-            IS_LOCFAULT   => s_is_locfault(r),
+            IS_LOCFAULT   => open,
+            IS_REMFAULT   => open,
+            IS_LINKINT    => open,
+            IS_SEQUENCE   => s_is_sequence(r),
             IS_PREAMBLE   => s_is_preamble(r),
             IS_START      => open,
             IS_TERMINATE  => s_is_terminate(r),
@@ -293,7 +296,7 @@ begin
         if (rising_edge(CLK)) then
             s_mii_rxd_reg1       <= mii_rxd_in;
             s_mii_rxc_reg1       <= mii_rxc_in;
-            s_is_locfault_reg1   <= s_is_locfault;
+            s_is_sequence_reg1   <= s_is_sequence;
             s_is_preamble_reg1   <= s_is_preamble;
             s_is_terminate_reg1  <= s_is_terminate;
             s_is_error_reg1      <= s_is_error;
@@ -318,7 +321,7 @@ begin
     -- =========================================================================
 
     -- On link is error
-    s_link_error <= (or s_is_error_reg1) or (or s_is_locfault_reg1);
+    s_link_error <= (or s_is_error_reg1) or (or s_is_sequence_reg1);
 
     -- First and last Terminate position
     terminate_first_last_g : for r in 0 to REGIONS-1 generate
@@ -395,7 +398,7 @@ begin
     s_is_some_terminate <= or s_is_terminate_reg2;
 
     -- link error timeout counter enable
-    s_cnt_let_en <= s_valid_reg2 and (or s_cnt_let_uns_reg3);
+    s_cnt_let_en <= s_valid_reg2 and ((or s_cnt_let_uns_reg3) or s_link_error_reg2);
 
     -- link error timeout counter logic
     s_cnt_let_nxt_uns_p : process (all)
@@ -491,7 +494,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                s_cnt_let_uns_reg3 <= (others => '0');
+                s_cnt_let_uns_reg3 <= (others => '1');
             elsif (s_cnt_let_en = '1') then
                 s_cnt_let_uns_reg3 <= s_cnt_let_nxt_uns;
             end if;
