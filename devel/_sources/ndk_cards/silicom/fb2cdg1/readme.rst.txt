@@ -1,7 +1,7 @@
 .. _card_fb2cdg1:
 
 Silicom fb2CDg1\@AGM39D-2
-------------------------
+-------------------------
 
 - Card information:
     - Vendor: Silicom

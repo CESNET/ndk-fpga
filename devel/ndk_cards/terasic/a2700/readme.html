@@ -57,7 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -77,10 +77,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
 <ul>
@@ -213,15 +213,16 @@ Design requires enabled bifurcation (x8x8) on target machine</p>
 <section id="boot-instructions-initial">
 <h2>Boot instructions (initial)<a class="headerlink" href="#boot-instructions-initial" title="Link to this heading"></a></h2>
 <p>Supported boot is handled by the Secure Device Manager (SDM), which has its own 1Gb flash to store Factory and User defined image.
-To enable this method, it is necessary to set the switches on the board as follows:
-- Ensure that the MSEL[2:0] switch on the board is set to ‘Active Serial Normal’ mode - MSEL[2:0] = 3’b011</p>
-<blockquote>
-<div><ul class="simple">
+To enable this method, it is necessary to set the switches on the board as follows:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Ensure that the MSEL[2:0] switch on the board is set to ‘Active Serial Normal’ mode - MSEL[2:0] = 3’b011</dt><dd><ul>
 <li><p>Set SW4 to 2’b01 and SW5 to 2’b10.</p></li>
 <li><p>The SW4(1) set to 0 to load user image or to 1 to load factory image after power up.</p></li>
 </ul>
-</div></blockquote>
-<ul class="simple">
+</dd>
+</dl>
+</li>
 <li><p>For more detailed description refer to <a class="reference external" href="https://www.terasic.com.tw/cgi-bin/page/archive_download.pl?Language=English&amp;No=1300&amp;FID=96d539627a1f37a9b6386bd0571f7e3f">Mercury A2700 User Manual</a></p></li>
 </ul>
 <p>Before you can use the nfb-boot tool, you must write the initial NDK firmware to flash memory using a regular JTAG programmer.

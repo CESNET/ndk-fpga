@@ -352,11 +352,8 @@ be returned.
 
 .. note:: ``MultiBitDriver`` is useful in these cases:
 
-    - you have a component with a multi-bit ready signal and you want it to randomly activate and deactivate
-    (which you usually want to properly verify that the behavior of the component is correct)
-
-    - you want a little more control over the driven signal than the standard ``BitDriver`` provides, thanks to the configurable pattern
-    function.
+    - you have a component with a multi-bit ready signal and you want it to randomly activate and deactivate (which you usually want to properly verify that the behavior of the component is correct)
+    - you want a little more control over the driven signal than the standard ``BitDriver`` provides, thanks to the configurable pattern function.
 
 cocotbext.ofm.avst_eth
 ----------------------

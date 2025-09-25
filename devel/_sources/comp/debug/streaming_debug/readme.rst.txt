@@ -53,12 +53,14 @@ The typical connection of the Debug Probes is shown in the following diagram.
 
 Debug Master
 ------------
+
 The Debug Master component is connected to the MI bus and one or more Probes.
 It accepts commands through the MI bus to control the Probes or read statistical data.
 The module contains counters that increment according to signals received from each Probe (one counter - of each type - per Probe).
 
 Counters
 ~~~~~~~~
+
 Six types of counters are available in the Debug Master for each Debug Probe.
 Each can be disabled/enabled by generic parameters: "E" or "e" to "enable"; anything else will translate as "disable".
 
@@ -71,6 +73,7 @@ Each can be disabled/enabled by generic parameters: "E" or "e" to "enable"; anyt
 
 Debug Probes
 ------------
+
 Each Probe has three interfaces:
 
 - `RX` - connect signals on the interface of the previous component in the pipeline.
@@ -95,6 +98,7 @@ Each Probe is identified by:
 
 Bus control
 -----------
+
 When this "advanced" feature is enabled, the user can halt or discard the traffic flowing through a selected Probe.
 To utilize this feature, the Probe must be inserted into the pipeline as shown in the :ref:`second diagram <figure2>`.
 And for each Probe, it has to be enabled using the `BUS_CONTROL` generic parameter.
@@ -110,6 +114,7 @@ This sets the requested Probe to:
 
 Usage
 -----
+
 Use the `nfb-busdebugctl` tool for easy control of the whole Streaming Debug system.
 For more info, see the tool's documentation.
 
@@ -120,7 +125,7 @@ Entities
 
 .. vhdl:autoentity:: STREAMING_DEBUG_PROBE_MFB
 
-.. rubrica:: Footnotes
+.. rubric:: Footnotes
 
 .. [#f1] The monitored signals are expected to be negated.
 

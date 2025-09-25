@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started with Verifications Using cocotb/cocotbext-ndk &mdash; NDK-FPGA  documentation</title>
+  <title>Getting Started with cocotb &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Verible Tools" href="tests/verible/readme.html" />
-    <link rel="prev" title="cocotbext-ndk" href="cocotbext.html" /> 
+    <link rel="next" title="cocotbext-ndk" href="cocotbext.html" />
+    <link rel="prev" title="MFB specification" href="comp/mfb_tools/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,7 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -77,14 +77,14 @@
 <li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with Verifications Using cocotb/cocotbext-ndk</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with cocotb</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-test">Creating a Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-test">Running the Test</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
 <ul>
@@ -123,7 +123,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Getting Started with Verifications Using cocotb/cocotbext-ndk</li>
+      <li class="breadcrumb-item active">Getting Started with cocotb</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/basic_cocotb_test.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -133,12 +133,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="getting-started-with-verifications-using-cocotb-cocotbext-ndk">
-<h1>Getting Started with Verifications Using cocotb/cocotbext-ndk<a class="headerlink" href="#getting-started-with-verifications-using-cocotb-cocotbext-ndk" title="Link to this heading"></a></h1>
-<p>In this section, you will learn how to create a basic test for a flow/storage hardware component (such as a pipe,
-FIFO, etc.).</p>
-<p>To get started, first create a <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> folder in the directory where the tested component is located,
-and put all the scripts implemented in this tutorial into it.</p>
+  <section id="getting-started-with-cocotb">
+<h1>Getting Started with cocotb<a class="headerlink" href="#getting-started-with-cocotb" title="Link to this heading"></a></h1>
+<p>In this section, you will learn how to create a basic test for a flow/storage hardware component (such as a pipe, FIFO, etc.). To get started, first create a <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> folder in the directory where the tested component is located, and put all the scripts implemented in this tutorial into it.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For automatic generation of a test template use the <code class="docutils literal notranslate"><span class="pre">generate_test_template</span></code> script in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/build/scripts/cocotb</span></code>.</p>
@@ -283,36 +280,19 @@ It can be found at <code class="docutils literal notranslate"><span class="pre">
 <span class="linenos">134</span>    <span class="k">raise</span> <span class="n">tb</span><span class="o">.</span><span class="n">scoreboard</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
 </div>
-<p>This test can be used as a template for tests of basic <cite>flow</cite> and <cite>storage</cite> components, and can be easily adapted for
-most other verifications.</p>
-<p>It consists of two basic parts: the testbench class and the test itself.</p>
-<p>The testbench is the more reusable of the two and usually looks basically the same, so it can be copied and adapted.
-Its purpose is to initialize and encapsulate objects that drive the test. It sets up drivers,
-monitors, a scoreboard, expected outputs, and other optional objects, such as a bit driver for ready signals,
-adds probes, and so on. It also includes a simulated reset.</p>
-<p>The second part is the test part. It can consist of one test (typical for simple components) or multiple tests
-(more common for larger designs, such as the whole firmware of a card). Every test must have the <code class="docutils literal notranslate"><span class="pre">&#64;cocotb.test()</span></code>
-decorator and be <code class="docutils literal notranslate"><span class="pre">async</span></code>.</p>
-<p>A test begins with the clock starting, testbench initialization, and a reset.
-After the reset, a bit driver is started to test the component’s reaction to backpressure (dst_rdy).
-Random data is then generated, which can either be done
-using <code class="docutils literal notranslate"><span class="pre">random_transactions</span></code> or random data that is then inserted into transaction objects (this is the
-case in the test above). The generated transaction is then passed to the <code class="docutils literal notranslate"><span class="pre">model</span></code> method of the testbench,
-which inserts it into the <code class="docutils literal notranslate"><span class="pre">expected_output</span></code> list. The generated transaction is also inserted into
-the driver’s send queue using the <code class="docutils literal notranslate"><span class="pre">append</span></code> method, from where it is then written onto the bus.</p>
-<p>The data is then read from the bus by a monitor, which should pack it into a transaction of the same type as was
-modeled and pass it to the test’s scoreboard via a callback. The scoreboard pops the transaction from the
-front of the expected output queue that the monitor is connected to and compares this transaction with the transaction
-it received from the monitor. If they are not the same, a test failure is raised.</p>
-<p>A waiting loop is implemented to ensure that the test doesn’t report scoreboard results prematurely before all the transactions have been received.
-Otherwise, the scoreboard may receive a different number of transactions than it expected, which will lead to an error.</p>
+<p>This test can be used as a template for tests of basic <cite>flow</cite> and <cite>storage</cite> components, and can be easily adapted for most other verifications. It consists of two basic parts: the testbench class and the test itself:</p>
+<ul class="simple">
+<li><p>The testbench is the more reusable of the two and usually looks basically the same, so it can be copied and adapted. Its purpose is to initialize and encapsulate objects that drive the test. It sets up drivers, monitors, a scoreboard, expected outputs, and other optional objects, such as a bit driver for ready signals, adds probes, and so on. It also includes a simulated reset.</p></li>
+<li><p>The second part is the test part. It can consist of one test (typical for simple components) or multiple tests (more common for larger designs, such as the whole firmware of a card). Every test must have the <code class="docutils literal notranslate"><span class="pre">&#64;cocotb.test()</span></code> decorator and be <code class="docutils literal notranslate"><span class="pre">async</span></code>.</p></li>
+</ul>
+<p>A test begins with the clock starting, testbench initialization, and a reset. After the reset, a bit driver is started to test the component’s reaction to backpressure (dst_rdy). Random data is then generated, which can either be done using <code class="docutils literal notranslate"><span class="pre">random_transactions</span></code> or random data that is then inserted into transaction objects (this is the case in the test above). The generated transaction is then passed to the <code class="docutils literal notranslate"><span class="pre">model</span></code> method of the testbench, which inserts it into the <code class="docutils literal notranslate"><span class="pre">expected_output</span></code> list. The generated transaction is also inserted into the driver’s send queue using the <code class="docutils literal notranslate"><span class="pre">append</span></code> method, from where it is then written onto the bus.</p>
+<p>The data is then read from the bus by a monitor, which should pack it into a transaction of the same type as was modeled and pass it to the test’s scoreboard via a callback. The scoreboard pops the transaction from the front of the expected output queue that the monitor is connected to and compares this transaction with the transaction it received from the monitor. If they are not the same, a test failure is raised.</p>
+<p>A waiting loop is implemented to ensure that the test doesn’t report scoreboard results prematurely before all the transactions have been received. Otherwise, the scoreboard may receive a different number of transactions than it expected, which will lead to an error.</p>
 <p>After all the packets are received, <code class="docutils literal notranslate"><span class="pre">tb.scoreboard.result</span></code> is raised, and the test results are shown.</p>
 </section>
 <section id="running-the-test">
 <h2>Running the Test<a class="headerlink" href="#running-the-test" title="Link to this heading"></a></h2>
-<p>To successfully build and run the simulation, it’s necessary to implement a couple more files.
-Examples of these can again be found in the <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/</span></code>
-folder.</p>
+<p>To successfully build and run the simulation, it’s necessary to implement a couple more files. Examples of these can again be found in the <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/</span></code> folder.</p>
 <p>First, it is necessary to implement a <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> with all test dependencies listed:</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">[project]</span>
 <span class="linenos"> 2</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;cocotb-hash-table-simple-test&quot;</span>
@@ -362,8 +342,7 @@ folder.</p>
 <p class="admonition-title">Note</p>
 <p>Don’t forget to adjust the values that are component-specific and the relative paths if needed.</p>
 </div>
-<p>You can run the simulation by creating a python virtual environment using make cocotb-venv, entering the created virtual environment,
-and running the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+<p>You can run the simulation by creating a python virtual environment using make cocotb-venv, entering the created virtual environment, and running the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cocotb-venv
 <span class="nb">source</span><span class="w"> </span>venv-xxx/bin/activate
 make
@@ -376,8 +355,8 @@ make
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cocotbext.html" class="btn btn-neutral float-left" title="cocotbext-ndk" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tests/verible/readme.html" class="btn btn-neutral float-right" title="Verible Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="comp/mfb_tools/readme.html" class="btn btn-neutral float-left" title="MFB specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cocotbext.html" class="btn btn-neutral float-right" title="cocotbext-ndk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

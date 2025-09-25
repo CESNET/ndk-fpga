@@ -1,6 +1,6 @@
-===============================================
-Top-Level Simulation using cocotb/cocotbext-ndk
-===============================================
+=================================
+Top-Level Simulation using cocotb
+=================================
 
 NDK-FPGA also includes a top-level simulation for running tests on the whole firmware of FPGA cards. It is implemented using
 **Python** and the ``cocotb`` framework. Some parts of ``cocotb`` were also modified and extended by us to better fit our use cases, creating
@@ -15,7 +15,7 @@ Cloning `ndk-fpga` from GitHub with all its dependencies is also required. You c
 
 .. code-block:: bash
 
-    git clone --recurse-submodules https://github.com/CESNET/ndk-fpga.git
+    $ git clone --recurse-submodules https://github.com/CESNET/ndk-fpga.git
 
 .. warning:: Some submodules are internal to CESNET and may not be accessible for cloning by unauthorized users.
 
@@ -26,26 +26,26 @@ Locate the `ndk-fpga` repository. Then use the following command to change into 
 
 .. code-block:: bash
 
-    cd ndk-fpga/apps/minimal/tests/cocotb
+    $ cd ndk-fpga/apps/minimal/tests/cocotb
 
 Use the **prepare.sh** script which automatically creates a **Python virtual environment** with all the dependencies:
 
 .. code-block:: bash
 
-    make cocotb-venv
+    $ make cocotb-venv
 
 After the script is finished, enter the newly created virtual environment:
 
 .. code-block:: bash
 
-    source venv-fpga/bin/activate
+    $ source venv-fpga/bin/activate
 
 Then run the simulation using the included **Makefile**. You can also specify the card that shall be simulated.
 Selection of the simulated card is performed with the environment variable **CARD**:
 
 .. code-block:: bash
 
-    make CARD=...
+    $ make CARD=n6010
 
 .. note:: Source files used to run the simulation of all cards can be found in ``ndk-fpga/apps/minimal/build``. To find out which
     cards are supported, refer to **NFBDevice** in ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.

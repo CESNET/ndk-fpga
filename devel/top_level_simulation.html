@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Top-Level Simulation using cocotb/cocotbext-ndk &mdash; NDK-FPGA  documentation</title>
+  <title>Top-Level Simulation using cocotb &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
 
@@ -57,7 +57,7 @@
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Top-Level Simulation using cocotb/cocotbext-ndk</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Top-Level Simulation using cocotb</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-run">How to run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
@@ -82,10 +82,10 @@
 <li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="basic_cocotb_test.html">Getting Started with cocotb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1"><a class="reference internal" href="basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
 <ul>
@@ -124,7 +124,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Top-Level Simulation using cocotb/cocotbext-ndk</li>
+      <li class="breadcrumb-item active">Top-Level Simulation using cocotb</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/top_level_simulation.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -134,8 +134,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="top-level-simulation-using-cocotb-cocotbext-ndk">
-<h1>Top-Level Simulation using cocotb/cocotbext-ndk<a class="headerlink" href="#top-level-simulation-using-cocotb-cocotbext-ndk" title="Link to this heading"></a></h1>
+  <section id="top-level-simulation-using-cocotb">
+<h1>Top-Level Simulation using cocotb<a class="headerlink" href="#top-level-simulation-using-cocotb" title="Link to this heading"></a></h1>
 <p>NDK-FPGA also includes a top-level simulation for running tests on the whole firmware of FPGA cards. It is implemented using
 <strong>Python</strong> and the <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> framework. Some parts of <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> were also modified and extended by us to better fit our use cases, creating
 the <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> package. If you want to discover more about <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code>, refer to <a class="reference internal" href="cocotbext.html#cocotbext-ndk"><span class="std std-ref">its chapter</span></a>.</p>
@@ -143,7 +143,7 @@ the <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p><strong>Python version 3.11</strong> and higher, <strong>Intel Quartus Prime Pro</strong> or <strong>AMD Vivado</strong>, and <strong>Questa Sim</strong> are required.</p>
 <p>Cloning <cite>ndk-fpga</cite> from GitHub with all its dependencies is also required. You can achieve this using the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/CESNET/ndk-fpga.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/CESNET/ndk-fpga.git
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -154,20 +154,20 @@ the <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</
 <section id="how-to-run">
 <h2>How to run<a class="headerlink" href="#how-to-run" title="Link to this heading"></a></h2>
 <p>Locate the <cite>ndk-fpga</cite> repository. Then use the following command to change into the simulation’s location:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ndk-fpga/apps/minimal/tests/cocotb
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>ndk-fpga/apps/minimal/tests/cocotb
 </pre></div>
 </div>
 <p>Use the <strong>prepare.sh</strong> script which automatically creates a <strong>Python virtual environment</strong> with all the dependencies:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cocotb-venv
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>cocotb-venv
 </pre></div>
 </div>
 <p>After the script is finished, enter the newly created virtual environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv-fpga/bin/activate
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>venv-fpga/bin/activate
 </pre></div>
 </div>
 <p>Then run the simulation using the included <strong>Makefile</strong>. You can also specify the card that shall be simulated.
 Selection of the simulated card is performed with the environment variable <strong>CARD</strong>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">CARD</span><span class="o">=</span>...
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span><span class="nv">CARD</span><span class="o">=</span>n6010
 </pre></div>
 </div>
 <div class="admonition note">
