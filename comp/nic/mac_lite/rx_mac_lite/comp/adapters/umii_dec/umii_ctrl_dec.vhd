@@ -26,6 +26,9 @@ entity UMII_CTRL_DEC is
         -- OUTPUT CONTROL OCCUR INTERFACE
         -- =====================================================================
         IS_LOCFAULT   : out std_logic;
+        IS_REMFAULT   : out std_logic;
+        IS_LINKINT    : out std_logic;
+        IS_SEQUENCE   : out std_logic;
         IS_PREAMBLE   : out std_logic;
         IS_START      : out std_logic;
         IS_TERMINATE  : out std_logic;
@@ -33,7 +36,10 @@ entity UMII_CTRL_DEC is
         -- =====================================================================
         -- OUTPUT CONTROL POSITION INTERFACE
         -- =====================================================================
+        POS_SEQUENCE  : out std_logic_vector(MII_DW/64-1 downto 0);
         POS_LOCFAULT  : out std_logic_vector(MII_DW/64-1 downto 0);
+        POS_REMFAULT  : out std_logic_vector(MII_DW/64-1 downto 0);
+        POS_LINKINT   : out std_logic_vector(MII_DW/64-1 downto 0);
         POS_PREAMBLE  : out std_logic_vector(MII_DW/64-1 downto 0);
         POS_START     : out std_logic_vector(MII_DW/64-1 downto 0);
         POS_TERMINATE : out std_logic_vector(MII_DW/8-1 downto 0);
@@ -49,23 +55,31 @@ architecture FULL of UMII_CTRL_DEC is
     constant MII_START       : std_logic_vector := X"FB";
     constant MII_TERMINATE   : std_logic_vector := X"FD";
     constant MII_ERROR       : std_logic_vector := X"FE";
-    constant MII_LOCFAULT_D  : std_logic_vector(31 downto 0) := X"010000" & MII_SEQUENCE;
-    constant MII_LOCFAULT_C  : std_logic_vector(3 downto 0) := "0001";
+    constant MII_LOCFAULT_D  : std_logic_vector(23 downto 0) := X"010000"; -- Local fault
+    constant MII_REMFAULT_D  : std_logic_vector(23 downto 0) := X"020000"; -- Remote fault
+    constant MII_LINKINT_D   : std_logic_vector(23 downto 0) := X"030000"; -- Link interrupt
     constant MII_PREAMBLE_D  : std_logic_vector(63 downto 0) := X"D5555555555555" & MII_START;
+    constant MII_SEQUENCE_C  : std_logic_vector(3 downto 0) := "0001";
     constant MII_PREAMBLE_C  : std_logic_vector(7 downto 0) := "00000001";
 
     constant BYTES_COUNT : natural := MII_DW/8;
     constant BLOCK_COUNT : natural := MII_DW/64;
 
+    signal s_sequence_char_d  : std_logic_vector(BLOCK_COUNT-1 downto 0);
+    signal s_sequence_char_c  : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_locfault_char_d  : std_logic_vector(BLOCK_COUNT-1 downto 0);
-    signal s_locfault_char_c  : std_logic_vector(BLOCK_COUNT-1 downto 0);
+    signal s_remfault_char_d  : std_logic_vector(BLOCK_COUNT-1 downto 0);
+    signal s_linkint_char_d   : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_preamble_char_d  : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_preamble_char_c  : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_start_char_d     : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_terminate_char_d : std_logic_vector(BYTES_COUNT-1 downto 0);
     signal s_error_char_d     : std_logic_vector(BYTES_COUNT-1 downto 0);
 
+    signal s_pos_sequence     : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_pos_locfault     : std_logic_vector(BLOCK_COUNT-1 downto 0);
+    signal s_pos_remfault     : std_logic_vector(BLOCK_COUNT-1 downto 0);
+    signal s_pos_linkint      : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_pos_preamble     : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_pos_start        : std_logic_vector(BLOCK_COUNT-1 downto 0);
     signal s_pos_terminate    : std_logic_vector(BYTES_COUNT-1 downto 0);
@@ -75,11 +89,26 @@ begin
 
     -- detect at each eighth byte (block)
     block_detect : for i in 0 to BLOCK_COUNT-1 generate
-        -- detect local fault sequence starting at each eighth byte (block)
-        s_locfault_char_d(i) <= '1' when (MII_RXD((i+1)*64-33 downto i*64) = MII_LOCFAULT_D) else '0';
-        s_locfault_char_c(i) <= '1' when (MII_RXC((i+1)*8-5 downto i*8) = MII_LOCFAULT_C) else '0';
-        s_pos_locfault(i)    <= s_locfault_char_d(i) and s_locfault_char_c(i);
+        -- detect sequence starting at each eighth byte (block)
+        s_sequence_char_d(i) <= '1' when (MII_RXD((i+1)*64-57 downto i*8) = MII_SEQUENCE) else '0';
+        s_sequence_char_c(i) <= '1' when (MII_RXC((i+1)*8-5 downto i*8) = MII_SEQUENCE_C) else '0';
+        s_pos_sequence(i)    <= s_sequence_char_d(i) and s_sequence_char_c(i);
+        POS_SEQUENCE(i)      <= s_pos_sequence(i);
+
+        -- detect local fault sequence
+        s_locfault_char_d(i) <= '1' when (MII_RXD((i+1)*64-33 downto i*64+8) = MII_LOCFAULT_D) else '0';
+        s_pos_locfault(i)    <= s_locfault_char_d(i) and s_pos_sequence(i);
         POS_LOCFAULT(i)      <= s_pos_locfault(i);
+
+        -- detect remote fault sequence
+        s_remfault_char_d(i) <= '1' when (MII_RXD((i+1)*64-33 downto i*64+8) = MII_REMFAULT_D) else '0';
+        s_pos_remfault(i)    <= s_remfault_char_d(i) and s_pos_sequence(i);
+        POS_REMFAULT(i)      <= s_pos_remfault(i);
+
+        -- detect link interrupt sequence
+        s_linkint_char_d(i) <= '1' when (MII_RXD((i+1)*64-33 downto i*64+8) = MII_LINKINT_D) else '0';
+        s_pos_linkint(i)    <= s_linkint_char_d(i) and s_pos_sequence(i);
+        POS_LINKINT(i)      <= s_pos_linkint(i);
 
         -- detect start control characters and preamble pattern starting at each eighth byte (block)
         s_preamble_char_d(i) <= '1' when (MII_RXD((i+1)*64-1 downto i*64) = MII_PREAMBLE_D) else '0';
@@ -108,6 +137,9 @@ begin
 
     -- output control occur
     IS_LOCFAULT  <= or s_pos_locfault;
+    IS_REMFAULT  <= or s_pos_remfault;
+    IS_LINKINT   <= or s_pos_linkint;
+    IS_SEQUENCE  <= or s_pos_sequence;
     IS_PREAMBLE  <= or s_pos_preamble;
     IS_START     <= or s_pos_start;
     IS_TERMINATE <= or s_pos_terminate;
