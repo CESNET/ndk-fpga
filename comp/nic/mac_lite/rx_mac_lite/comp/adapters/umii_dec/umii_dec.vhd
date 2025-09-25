@@ -395,7 +395,7 @@ begin
     s_is_some_terminate <= or s_is_terminate_reg2;
 
     -- link error timeout counter enable
-    s_cnt_let_en <= s_valid_reg2 and (or s_cnt_let_uns_reg3);
+    s_cnt_let_en <= s_valid_reg2 and ((or s_cnt_let_uns_reg3) or s_link_error_reg2);
 
     -- link error timeout counter logic
     s_cnt_let_nxt_uns_p : process (all)
@@ -491,7 +491,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RESET = '1') then
-                s_cnt_let_uns_reg3 <= (others => '0');
+                s_cnt_let_uns_reg3 <= (others => '1');
             elsif (s_cnt_let_en = '1') then
                 s_cnt_let_uns_reg3 <= s_cnt_let_nxt_uns;
             end if;
