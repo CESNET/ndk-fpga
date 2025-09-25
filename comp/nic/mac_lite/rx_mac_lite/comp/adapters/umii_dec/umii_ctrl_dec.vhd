@@ -49,8 +49,8 @@ architecture FULL of UMII_CTRL_DEC is
     constant MII_START       : std_logic_vector := X"FB";
     constant MII_TERMINATE   : std_logic_vector := X"FD";
     constant MII_ERROR       : std_logic_vector := X"FE";
-    constant MII_LOCFAULT_D  : std_logic_vector(63 downto 0) := X"00000000010000" & MII_SEQUENCE;
-    constant MII_LOCFAULT_C  : std_logic_vector(7 downto 0) := "00000001";
+    constant MII_LOCFAULT_D  : std_logic_vector(31 downto 0) := X"010000" & MII_SEQUENCE;
+    constant MII_LOCFAULT_C  : std_logic_vector(3 downto 0) := "0001";
     constant MII_PREAMBLE_D  : std_logic_vector(63 downto 0) := X"D5555555555555" & MII_START;
     constant MII_PREAMBLE_C  : std_logic_vector(7 downto 0) := "00000001";
 
@@ -76,8 +76,8 @@ begin
     -- detect at each eighth byte (block)
     block_detect : for i in 0 to BLOCK_COUNT-1 generate
         -- detect local fault sequence starting at each eighth byte (block)
-        s_locfault_char_d(i) <= '1' when (MII_RXD((i+1)*64-1 downto i*64) = MII_LOCFAULT_D) else '0';
-        s_locfault_char_c(i) <= '1' when (MII_RXC((i+1)*8-1 downto i*8) = MII_LOCFAULT_C) else '0';
+        s_locfault_char_d(i) <= '1' when (MII_RXD((i+1)*64-33 downto i*64) = MII_LOCFAULT_D) else '0';
+        s_locfault_char_c(i) <= '1' when (MII_RXC((i+1)*8-5 downto i*8) = MII_LOCFAULT_C) else '0';
         s_pos_locfault(i)    <= s_locfault_char_d(i) and s_locfault_char_c(i);
         POS_LOCFAULT(i)      <= s_pos_locfault(i);
 
