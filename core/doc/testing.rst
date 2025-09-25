@@ -21,16 +21,18 @@ Testing R/W access to the scratch registers
 
 The NDK firmware implements 64 32-bit scratch registers for testing purposes. Like other parts of the firmware, they are accessible via the :ref:`MI bus <ndk_mi>`. This address space is (among other things) stored in the :ref:`DeviceTree <ndk_devtree>`. The `nfb-bus tool <https://cesnet.github.io/ndk-sw/tools/nfb-bus.html>`_ can be used for easy R/W access to any register in the firmware that is mapped to the MI bus. The following example shows how to:
 
+- obtain or verify the DeviceTree path of the MI TEST SPACE component in the firmware
 - read the first scratch register (the offset is 0x0 in the byte format) in the MI TEST SPACE component (selected using the DeviceTree path),
 - write a new value (0x42) to it, and
 - read it again.
 
 .. code-block:: bash
 
-    $ nfb-bus -p /firmware/mi_bus0/mi_test_space 0x0
+    $ nfb-bus -l | grep mi_test_space
+    $ nfb-bus -p /firmware/mi_pci0_bar0/mi_test_space 0x0
     00000000
-    $ nfb-bus -p /firmware/mi_bus0/mi_test_space 0x0 0x42
-    $ nfb-bus -p /firmware/mi_bus0/mi_test_space 0x0
+    $ nfb-bus -p /firmware/mi_pci0_bar0/mi_test_space 0x0 0x42
+    $ nfb-bus -p /firmware/mi_pci0_bar0/mi_test_space 0x0
     00000042
 
 You can test R/W requests to the NDK firmware address space of these scratch registers however you want. Similarly, in the future, you can access the registers in your own application that you build on the NDK platform.

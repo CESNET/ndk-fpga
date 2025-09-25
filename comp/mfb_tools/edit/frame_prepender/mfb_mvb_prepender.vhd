@@ -29,12 +29,12 @@ use work.type_pack.all;
 --
 -- .. warning::
 --
--- Does not meet timing constrains with MFB_REGIONS=4!
+--     Does not meet timing constrains with MFB_REGIONS=4!
 --
 -- .. note::
 --
--- Resource consumption increases with the :vhdl:genconstant:`MVB_ITEM_SIZE <MFB_MVB_PREPENDER.MVB_ITEM_SIZE>`
--- generic! (Or more precisely, with the MAX_PREPEND_REGIONS constant, which depends on this generic.)
+--     Resource consumption increases with the :vhdl:genconstant:`MVB_ITEM_SIZE <MFB_MVB_PREPENDER.MVB_ITEM_SIZE>`
+--     generic! (Or more precisely, with the MAX_PREPEND_REGIONS constant, which depends on this generic.)
 --
 entity MFB_MVB_PREPENDER is
     generic (

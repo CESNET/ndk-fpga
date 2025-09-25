@@ -82,7 +82,7 @@ it also provides converters:
 
 --------
 
-.. toctree ::
+.. toctree::
     :maxdepth: 1
     :caption: Bus Specifications
 
@@ -91,12 +91,11 @@ it also provides converters:
     comp/mfb_tools/readme
 
 .. toctree::
-    :caption: Cocotb/CocotbExt
+    :caption: cocotb Verifications
     :maxdepth: 1
 
-    cocotbext
     basic_cocotb_test
-
+    cocotbext
 
 .. toctree::
     :caption: GitLab CI/CD Tools
@@ -117,7 +116,6 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
 
     ndk_cards/reflexces/agi-fh400g/readme
     ndk_cards/intel/dk-dev-1sdx-p/readme
-    ndk_cards/intel/dk-dev-agi027res/readme
     ndk_cards/silicom/fb4cgg3/readme
     ndk_cards/silicom/fb2cghh/readme
     ndk_cards/silicom/n6010/readme
@@ -127,7 +125,7 @@ support a subset of these cards. A complete list of supported FPGA cards can be 
     ndk_cards/amd/alveo-u200/readme
     ndk_cards/amd/alveo-u55c/readme
     ndk_cards/amd/vcu118/readme
-    extra/nfb-200g2ql/readme
+    ndk_extra/nfb-200g2ql/readme
     ndk_cards/prodesign/pd-falcon/readme
     ndk_cards/terasic/a2700/readme
     ndk_cards/iwave/g35p/readme

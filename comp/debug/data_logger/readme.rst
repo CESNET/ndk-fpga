@@ -183,6 +183,7 @@ Package can be installed using this command:
 * You also need to install ``python nfb`` package
 
 .. code-block::
+
     python3 -m pip install --upgrade pip
 
     # Install nfb:
@@ -198,7 +199,6 @@ Package can be installed using this command:
 Example usage of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`):
 
 .. code-block::
-
 
     import logger_stats as Stats
     from data_logger.data_logger import DataLogger
