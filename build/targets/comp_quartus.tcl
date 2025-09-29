@@ -69,7 +69,7 @@ if {![info exists SYNTH_FLAGS(FPGA)]} {
     }
     set SYNTH_FLAGS(FPGA) [string map {
             "STRATIX10"     "1SD280PT2F55E1VG"
-            "AGILEX"        "AGIB027R29A1E2VR0"
+            "AGILEX"        "AGIB023R18A1E1V"
         } $SYNTH_FLAGS(DEVICE)]
 }
 
