@@ -20,6 +20,7 @@ Overview
     ndk_build/readme
     ndk_core/doc/devtree
     ndk_core/doc/faq
+    ndk_core/doc/known_limitations
 
 The **Network Development Kit (NDK) for FPGAs** is a comprehensive framework designed
 for the rapid and efficient development of FPGA-accelerated network applications. Optimized
