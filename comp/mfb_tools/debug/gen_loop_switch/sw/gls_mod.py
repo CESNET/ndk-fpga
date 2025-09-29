@@ -1,25 +1,37 @@
 #!/usr/bin/env python3
 # Copyright (C) 2022 CESNET z. s. p. o.
-# Author: Jakub Cabal <cabal@cesnet.cz>
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#            Daniel Kondys <kondys@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import sys
+import re
 import subprocess
 import time
 import os
 import csv
 import signal
+import socket
+import datetime
+import logging
+import argparse
+from typing import List, Optional
+from dataclasses import dataclass
+from tabulate import tabulate
+
+import nfb
+from ofm.comp.mfb_tools.debug.gen_loop_switch import GenLoopSwitch
+from ofm.utils.units import convert_units
 
 
 class GracefulExiter():
-
+    """Graceful exit on SIGINT"""
     def __init__(self):
         self.state = False
         signal.signal(signal.SIGINT, self.change_state)
 
     def change_state(self, signum, frame):
-        print("Exit flag set to True")
+        print("\nExit flag set to True")
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         self.state = True
 
@@ -27,373 +39,617 @@ class GracefulExiter():
         return self.state
 
 
-def get_gls_path(n):
-    return subprocess.Popen(f"nfb-bus -l | grep cesnet,ofm,gen_loop_switch -m{n+1} | tail -n1", shell=True, stdout=subprocess.PIPE).stdout.read().strip().decode("utf-8").split()[2]
+def stop_process(p: subprocess.Popen | None, timeout: float = 0.5) -> None:
+    """Best-effort stop of a process group or single process."""
+    if p is None:
+        return
+    if p.poll() is None: # process still runs
+        try:
+            # Try process group first
+            pgid = os.getpgid(p.pid)
+            os.killpg(pgid, signal.SIGINT)
+        except ProcessLookupError:
+            # Fallback to single process if process group not found
+            p.send_signal(signal.SIGINT)
+        time.sleep(0.2)
+        if p.poll() is None: # still runs after SIGINT
+            try:
+                pgid = os.getpgid(p.pid)
+                os.killpg(pgid, signal.SIGTERM)
+            except ProcessLookupError:
+                p.terminate()
+        time.sleep(0.2)
+        if p.poll() is None: # still runs after SIGTERM
+            try:
+                pgid = os.getpgid(p.pid)
+                os.killpg(pgid, signal.SIGKILL)
+            except ProcessLookupError:
+                p.kill()
+        p.wait(timeout=timeout) # reap the process (wait for child processs' exit status)
 
 
-def nfb_bus(path, addr, value=None):
-    pcie_index = 0
-    if value is None: # read
-        return int("0x" + subprocess.Popen("nfb-bus -i%d -p%s %s" % (pcie_index, path, hex(addr)), shell=True, stdout=subprocess.PIPE).stdout.read().strip().decode("utf-8"), 16)
-    else: # write
-        return subprocess.call("nfb-bus -i%d -p%s %s %s" % (pcie_index, path, hex(addr), hex(value)), shell=True)
+@dataclass
+class GlsMuxConfig:
+    r2l_gen: Optional[int]
+    r2l_loop: Optional[int]
+    l2r_gen: Optional[int]
+    l2r_loop: Optional[int]
 
 
-def sm_get_speed(path, offset, frequency, type=0):
-    done = 0
-    check_cnt = 0
-    if type == 1:
-        ticks_offset = 0x44
-        bytes_offset = 0x48
-        max_offset = 0x28
-    else:
-        ticks_offset = 0x0
-        bytes_offset = 0x8
-        max_offset = 0x4
-
-    # Check if speed meter is done
-    while (done != 1 and check_cnt < 10):
-        done = nfb_bus(path, offset + max_offset)
-        if type == 1:
-            done = done >> 28
-        check_cnt += 1
-        #print(check_cnt)
-        time.sleep(0.01)
-
-    # read accumulated bytes and convert to Gigabits
-    sm_bytes = nfb_bus(path, offset + bytes_offset) * 8 / (10**9)
-    if sm_bytes == 0:
-        return 0
-
-    # read test length in number of ticks
-    sm_ticks = nfb_bus(path, offset + ticks_offset)
-    sm_run_time = sm_ticks / frequency
-
-    return round(sm_bytes / sm_run_time, 2)
+@dataclass
+class TestModeSpec:
+    desc: str
+    mux_cfg: GlsMuxConfig
+    gen_rev_chan: bool
+    tx_sm: Optional[int] # None means it does not matter which one of the two will be used
+    rx_sm: Optional[int] # None means it does not matter which one of the two will be used
+    eth_loop: bool
+    ndp_read: bool
 
 
-def sm_reset(path, offset, type=0):
-    if type == 1:
-        nfb_bus(path, offset + 0x2C, 0x4)
-    else:
-        nfb_bus(path, offset + 0xC, 0x1)
+@dataclass
+class GlsInternals:
+    gen: Optional[nfb.BaseComp]
+    tx_sm: Optional[nfb.BaseComp]
+    rx_sm: Optional[nfb.BaseComp]
 
 
-def run_test(mode, min_fr_size, max_fr_size, fr_size_step, gls_clk_freq, log_en, demo_en, port_list, dma_streams, port_dma_channels):
+# ==============================================================================
+# The main TEST FUNCTION
+# ==============================================================================
 
-    os.system("killall ndp-generate -9 2> /dev/null; killall ndp-read -9 2> /dev/null")
+def run_test(
+    gls_internals : List[GlsInternals],
+    mode : str,
+    fr_sizes : List[int],
+    gls_clk_freq : int,
+    log_en : bool,
+    demo_en : bool,
+    global_chan_range : str,
+    rate_layer : int,
+    cycles : int,
+    report_name: str,
+    device : int,
+    exiter : GracefulExiter,
+) -> None:
+
+    demo_path = "/tmp/demo_gui.txt"
+    ndp_gen = None
 
     if log_en:
-        file_str = "./report_" + mode + ".csv"
+        csv_name = "./report_" + report_name + ".csv"
         # Open CSV file to save data
-        f = open(file_str, 'w', newline='')
+        f = open(csv_name, "w", newline="")
         writer = csv.writer(f)
 
         # CSV file row
         row = ["Length", "TX APP speed", "RX APP speed"]
         writer.writerow(row)
 
-    sm_gls_eth_tx_addr = 0x70
-    sm_gls_eth_rx_addr = 0x60
-    sm_gls_dma_tx_addr = 0x50
-    sm_gls_dma_rx_addr = 0x40
+    if mode in ["tx", "rxtx", "dma_tx", "dma_rxtx", "dma_loop"]:
+        use_ndp_gen = True
+    else:
+        use_ndp_gen = False
 
-    dt_path_gls = {}
-    dt_path_gen2eth = {}
-    dt_path_gen2dma = {}
+    try:
+        for length in fr_sizes:
 
-    # List of frame lengths for TX generator(s)
-    fr_lengths = []
-    fr_lengths = list(range(min_fr_size, max_fr_size, fr_size_step))
+            if exiter.exit():
+                return
 
-    for p in dma_streams:
-        # Prepare DT paths
-        dt_path_gls[p] = get_gls_path(int(p))
-        dt_path_gen2eth[p] = dt_path_gls[p] + "/mfb_gen2eth"
-        dt_path_gen2dma[p] = dt_path_gls[p] + "/mfb_gen2dma"
-        # Set GLS muxes back to default
-        nfb_bus(dt_path_gls[p], 0x00, 0x0)
-        nfb_bus(dt_path_gls[p], 0x04, 0x0)
-        nfb_bus(dt_path_gls[p], 0x08, 0x0)
-        nfb_bus(dt_path_gls[p], 0x0C, 0x0)
-        # Set GLS GEN channel range to default
-        nfb_bus(dt_path_gen2eth[p], 0xC, 0xffff0000)
-        nfb_bus(dt_path_gen2dma[p], 0xC, 0xffff0000)
+            # FW adds CRC to frame in ETH IP, generate smaller frames
+            gen_length = length - 4
 
-    channel_list = []
-    for p in port_list:
-        for i in range(port_dma_channels):
-            channel_list.append(int(p) * port_dma_channels + i)
-    channel_list_str = ','.join(str(e) for e in channel_list)
-    channel_min = min(channel_list)
-    channel_max = max(channel_list)
-    chan_range = (65536 * channel_max) + channel_min
-    print("INFO: Selected queues: %s\n" % channel_list_str)
-    #print(channel_min)
-    #print(channel_max)
-    #print(chan_range)
-
-    # Enable MACs
-    os.system('nfb-eth -e 1')
-    # Reset MAC counters
-    os.system('nfb-eth -R')
-
-    # Select correct SpeedMeters
-    sm_tx_addr = sm_gls_eth_tx_addr
-    sm_rx_addr = sm_gls_eth_rx_addr
-    if mode in ["dma_rx", "dma_tx", "dma_rxtx", "dma_loop"]:
-        sm_tx_addr = sm_gls_dma_tx_addr
-        sm_rx_addr = sm_gls_dma_rx_addr
-
-    # Setup loopback paths in GLS
-    if mode in ["eth_gen", "dma_rx", "dma_rxtx"]:
-        # create a black hole for the RX data (DMA input will be from RX generator)
-        for p in dma_streams:
-            nfb_bus(dt_path_gls[p], 0x08, 0x1)
-    if mode in ["rx", "eth_gen", "dma_tx", "dma_rxtx", "dma_loop"]:
-        # make the TX generator the source of data
-        for p in dma_streams:
-            nfb_bus(dt_path_gls[p], 0x0C, 0x1)
-    if mode in ["dma_loop"]:
-        # enable DMA loopback (TX to RX)
-        for p in dma_streams:
-            nfb_bus(dt_path_gls[p], 0x00, 0x1)
-
-    # Enable RX DMA for all channels
-    if mode in ["rx", "rxtx", "dma_rx", "dma_rxtx", "dma_loop"]:
-        ndp_read = subprocess.Popen("ndp-read", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        time.sleep(0.5)
-
-    for i in range(len(fr_lengths)):
-        length = fr_lengths[i]
-        print("Frame Size (with CRC):     % 4i [Bytes]" % length)
-        print("----------------------------------------")
-        #os.system('nfb-eth -R')
-
-        if mode in ["tx", "rxtx", "dma_tx", "dma_rxtx", "dma_loop"]:
-            ndp_gen = subprocess.Popen("ndp-generate -s%d -i %s" % (length - 4, channel_list_str), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if mode in ["rx", "eth_gen"]:
-            for p in dma_streams:
-                # set GLS TX generator
-                nfb_bus(dt_path_gen2eth[p], 0x4, length - 4)
-                # select correct channel range for device with single GLS
-                if dma_streams != port_list:
-                    nfb_bus(dt_path_gen2eth[p], 0xC, chan_range)
-                # channel 0 only
-                #nfb_bus(dt_path_gen2eth[p], 0x8, 0x10000)
-                # Start TX generator
-                nfb_bus(dt_path_gen2eth[p], 0x0, 0x1)
-        if mode in ["dma_rx", "dma_rxtx"]:
-            for p in dma_streams:
-                # set GLS RX generator
-                nfb_bus(dt_path_gen2dma[p], 0x4, length - 4)
-                # select correct channel range for device with single GLS
-                if dma_streams != port_list:
-                    nfb_bus(dt_path_gen2dma[p], 0xC, chan_range)
-                # channel reverse
-                #nfb_bus(dt_path_gen2dma[p], 0x8, 0x10101)
-                # channel 0 only
-                nfb_bus(dt_path_gen2dma[p], 0x8, 0x10001)
-                # Start RX generator
-                nfb_bus(dt_path_gen2dma[p], 0x0, 0x1)
-
-        time.sleep(0.1)
-        tx_total_speed = 0
-        rx_total_speed = 0
-
-        for p in dma_streams:
-            print("DMA Stream: " + str(p))
-            tx_app_speed = 0
-            rx_app_speed = 0
-            measurements = 2
-
-            for j in range(measurements):
-                # Reset TX and RX speed meter
-                sm_reset(dt_path_gls[p], sm_tx_addr)
-                sm_reset(dt_path_gls[p], sm_rx_addr)
-                tx_speed = sm_get_speed(dt_path_gls[p], sm_tx_addr, gls_clk_freq)
-                rx_speed = sm_get_speed(dt_path_gls[p], sm_rx_addr, gls_clk_freq)
-                tx_app_speed += tx_speed
-                rx_app_speed += rx_speed
-                time.sleep(0.05)
-
-            tx_app_speed = round((tx_app_speed / measurements), 2)
-            rx_app_speed = round((rx_app_speed / measurements), 2)
-
-            print("Stream Speed TX:          % 7.2f [Gbps]" % tx_app_speed)
-            print("Stream Speed RX:          % 7.2f [Gbps]" % rx_app_speed)
+            if rate_layer == 2:
+                print(f"Frame Size (with CRC):     {length} [Bytes]")
+            else:
+                length = length + 8 + 12
+                print(f"Frame Size (with preamble, SFD, CRC, and IPG):  {length} [Bytes]")
             print("----------------------------------------")
 
-            tx_total_speed += tx_app_speed
-            rx_total_speed += rx_app_speed
+            # Start generating traffic
+            if use_ndp_gen:
+                ndp_gen = subprocess.Popen(
+                    f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}",
+                    shell=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True, # spawns new session / process group
+                )
+            for g in gls_internals:
+                if g.gen is not None:
+                    g.gen.frame_length = gen_length
+                    g.gen.enabled = True
 
-        tx_total_speed = round(tx_total_speed, 2)
-        rx_total_speed = round(rx_total_speed, 2)
+            time.sleep(0.5)
+            tx_total_speed = 0
+            rx_total_speed = 0
 
-        print("Total Speed TX:           % 7.2f [Gbps]" % tx_total_speed)
-        print("Total Speed RX:           % 7.2f [Gbps]" % rx_total_speed)
-        print("========================================")
+            for i, g in enumerate(gls_internals):
+                print("Data Stream: " + str(i))
+                tx_app_speed = 0
+                rx_app_speed = 0
 
-        if demo_en:
-            demo_gui = open("/tmp/demo_gui.txt", "w")
-            demo_gui.write(str(length - 4) + '\n')
-            demo_gui.write(str(tx_total_speed) + '\n')
-            demo_gui.write(str(rx_total_speed))
-            demo_gui.close()
+                for _ in range(cycles):
+                    if g.tx_sm is not None:
+                        g.tx_sm.clear_data()
+                        tx_speed = g.tx_sm.measure(f=gls_clk_freq)[0]
+                    else:
+                        tx_speed = 0
+                    if g.rx_sm is not None:
+                        g.rx_sm.clear_data()
+                        rx_speed = g.rx_sm.measure(f=gls_clk_freq)[0]
+                    else:
+                        rx_speed = 0
 
-        # Stop TX generator
-        if mode in ["tx", "rxtx", "dma_tx", "dma_rxtx", "dma_loop"]:
-            ndp_gen.send_signal(signal.SIGINT)
-        if mode in ["rx", "eth_gen"]:
-            # Stop TX generator
-            nfb_bus(dt_path_gen2eth[p], 0x0, 0x0)
-        if mode in ["dma_rx", "dma_rxtx"]:
-            # Stop RX generator
-            nfb_bus(dt_path_gen2dma[p], 0x0, 0x0)
+                    tx_app_speed += tx_speed
+                    rx_app_speed += rx_speed
 
+                tx_app_speed = round((tx_app_speed/cycles), 2)
+                rx_app_speed = round((rx_app_speed/cycles), 2)
+
+                # Adjust speed according to the actual frame size based on the layer (L1 or L2)
+                fix = (length) / (gen_length)
+                tx_app_speed = tx_app_speed * fix
+                rx_app_speed = rx_app_speed * fix
+
+                tx_app_speed_conv, tx_units = convert_units(tx_app_speed)
+                rx_app_speed_conv, rx_units = convert_units(rx_app_speed)
+                print(f"Stream Speed TX:          {tx_app_speed_conv:7.2f} [{tx_units}bps]")
+                print(f"Stream Speed RX:          {rx_app_speed_conv:7.2f} [{rx_units}bps]")
+                print("----------------------------------------")
+
+                tx_total_speed += tx_app_speed
+                rx_total_speed += rx_app_speed
+
+            tx_total_speed = round(tx_total_speed, 2)
+            rx_total_speed = round(rx_total_speed, 2)
+
+            tx_total_speed_conv, tx_units = convert_units(tx_app_speed)
+            rx_total_speed_conv, rx_units = convert_units(rx_app_speed)
+
+            # Total => all ports added together
+            print(f"Total Speed TX:           {tx_total_speed_conv:7.2f} [{tx_units}bps]")
+            print(f"Total Speed RX:           {rx_total_speed_conv:7.2f} [{rx_units}bps]")
+            print("========================================")
+
+            if demo_en:
+                with open(demo_path, "w") as demo_gui:
+                    demo_gui.write(str(length) + "\n")
+                    demo_gui.write(str(tx_total_speed) + "\n")
+                    demo_gui.write(str(rx_total_speed))
+
+            # Stop generating traffic
+            if ndp_gen is not None:
+                stop_process(ndp_gen)
+                ndp_gen = None
+            for g in gls_internals:
+                if g.gen is not None:
+                    g.gen.enabled = False
+
+            time.sleep(0.1)
+
+            if log_en:
+                # Save row to CSV file
+                row = [str(length), str(tx_total_speed), str(rx_total_speed)]
+                writer.writerow(row) # write data to CSV file
+
+    finally:
+        stop_process(ndp_gen)
         if log_en:
-            # Save row to CSV file
-            row = [str(length), str(tx_total_speed), str(rx_total_speed)]
-            writer.writerow(row) # write data to CSV file
+            try:
+                f.close()
+            except Exception:
+                pass
+        if demo_en:
+            try:
+                os.remove(demo_path)
+            except FileNotFoundError:
+                pass
 
-        #os.system('nfb-eth -S')
-    if mode in ["rx", "rxtx", "dma_rx", "dma_rxtx", "dma_loop"]:
-        ndp_read.send_signal(signal.SIGINT)
-        ndp_read.terminate()
 
-    if log_en:
-        f.close()
-    if demo_en:
-        os.remove("/tmp/demo_gui.txt")
+# ==============================================================================
+# GLS HELP FUNCTIONs
+# ==============================================================================
 
-    # Set muxes back to default
-    for p in dma_streams:
-        nfb_bus(dt_path_gls[p], 0x00, 0x0)
-        nfb_bus(dt_path_gls[p], 0x04, 0x0)
-        nfb_bus(dt_path_gls[p], 0x08, 0x0)
-        nfb_bus(dt_path_gls[p], 0x0C, 0x0)
+def parse_range_arg(arg: str | None, max_value: int, default: str = "0") -> List[int]:
+    """Parse a string argument representing a list/range of integers.
+
+    Args:
+        arg: The input string to parse. If None, the value of the `default` param is used.
+        max_value: The maximum value for the range; used when arg is "-1".
+        default: The default value assigned to the `arg` param if it is None.
+
+    Returns:
+        A list of integers parsed from the input string.
+
+    Raises:
+        ValueError: If the input string is invalid.
+
+    Examples:
+        "0,1,2-5,7" -> [0, 1, 2, 3, 4, 5, 7]
+        "-1" -> list(range(0, max_value))
+        None -> [int(default)]
+    """
+    if arg is None:
+        arg = default
+    if arg == "-1":
+        return list(range(0, max_value))
+    items = arg.split(",")
+    result = []
+    for item in items:
+        if "-" in item:
+            lo_idx, hi_idx = item.split("-")
+            result.extend(list(range(int(lo_idx), int(hi_idx)+1)))
+        else:
+            result.append(int(item))
+    return result
+
 
 # ==============================================================================
 # GLS MAIN FUNCTION
 # ==============================================================================
 
+def main():
 
-def print_modes():
-    print("gls_mod.py mode [port_list]")
-    print("Example: gls_mod.py 1 \"0,1\"")
-    print()
-    print("Supported modes:")
-    print("1: HW Gen --> TX ETH     ==> RX ETH --> Black Hole; (ext. ETH loopback required)")
-    print("2: HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ext. ETH loopback required)")
-    print("3: TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ext. ETH loopback required)")
-    print("4: TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ext. ETH loopback required)")
-    print("5: HW Gen --> RX DMA     ###")
-    print("6: TX DMA --> Black Hole ###")
-    print("7: TX DMA --> Black Hole ### HW Gen --> RX DMA;")
-    print("8: TX DMA --> RX DMA     ### (internal DMA loopback)")
-    print()
-    print("Port list: (default: \"0\")")
-    print("List of used Ethernet ports (Warning: On cards with a single DMA stream,")
-    print("the Ethernet ports must be selected consecutively, so for example")
-    print("the option \"0,2,3\" cannot be selected! This is a limitation of the HW")
-    print("packet generator.)\n")
-    print("Additional configuration is available inside the script.")
+    logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
+    modes = {
+        "eth_gen":  TestModeSpec(
+                        desc="HW Gen --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=0, l2r_gen=1, l2r_loop=0),
+                        gen_rev_chan=False,
+                        tx_sm=1,
+                        rx_sm=2,
+                        eth_loop=True,
+                        ndp_read=False,
+                    ),
+        "rx":       TestModeSpec(
+                        desc="HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=0, l2r_gen=0, l2r_loop=0),
+                        gen_rev_chan=False,
+                        tx_sm=1,
+                        rx_sm=0,
+                        eth_loop=True,
+                        ndp_read=True,
+                    ),
+        "tx":       TestModeSpec(
+                        desc="TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=0, r2l_loop=0, l2r_gen=1, l2r_loop=0),
+                        gen_rev_chan=False,
+                        tx_sm=1, # Both (1 or 3) can be used
+                        rx_sm=2,
+                        eth_loop=True,
+                        ndp_read=False,
+                    ),
+        "rxtx":     TestModeSpec(
+                        desc="TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=0, r2l_loop=0, l2r_gen=0, l2r_loop=0),
+                        gen_rev_chan=False,
+                        tx_sm=1, # Both (1 or 3) can be used
+                        rx_sm=0, # Both (0 or 2) can be used
+                        eth_loop=True,
+                        ndp_read=True,
+                    ),
+        "dma_rx":   TestModeSpec(
+                        desc="HW Gen --> RX DMA     ###",
+                        mux_cfg=GlsMuxConfig(r2l_gen=None, r2l_loop=None, l2r_gen=1, l2r_loop=0),
+                        gen_rev_chan=False, # Setting this true may have positive impact on performance
+                        tx_sm=None, # Speed Meter not used
+                        rx_sm=0,
+                        eth_loop=False,
+                        ndp_read=True,
+                    ),
+        "dma_tx":   TestModeSpec(
+                        desc="TX DMA --> Black Hole ###",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=None, l2r_loop=None),
+                        gen_rev_chan=False,
+                        tx_sm=3,
+                        rx_sm=None, # Speed Meter not used
+                        eth_loop=False,
+                        ndp_read=False,
+                    ),
+        "dma_rxtx": TestModeSpec(
+                        desc="TX DMA --> Black Hole ### HW Gen --> RX DMA;",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=1, l2r_loop=0),
+                        gen_rev_chan=False, # Setting this true may have positive impact on performance
+                        tx_sm=3,
+                        rx_sm=0,
+                        eth_loop=False,
+                        ndp_read=True,
+                    ),
+        "dma_loop": TestModeSpec(
+                        desc="TX DMA --> RX DMA     ### (internal DMA loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=None, l2r_loop=1),
+                        gen_rev_chan=False,
+                        tx_sm=3,
+                        rx_sm=0,
+                        eth_loop=False,
+                        ndp_read=True,
+                    ),
+    }
 
-if __name__ == '__main__':
-    args = []
-    args = sys.argv[1:]
+    modes_table = tabulate([(k, v.desc) for k, v in modes.items()], tablefmt="grid")
 
-    if len(args) == 0 or len(args) > 2:
-        print_modes()
-        exit()
+    help_dict = {
+        "device"    : "set the target device; default: 0 (/dev/nfb0)",
+        "index"     : "select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0",
+        "log"       : "enable logging to a CSV file",
+        "demo"      : "enable for demo - logs to a TXT file in /tmp directory",
+        "mode"      : "set the test mode; options:\n" + modes_table,
+        "channels"  : "select the range of Channels used in the test in 'min-max' format; default = all available",
+        "size"      : "set the frame size(s) in bytes; MIN must be >= 64, MAX <= 1518, STEP >= 1; default: 64 1518 16",
+        "repeat"    : "repeat the test until interrupted, otherwise it runs only once",
+        "loopback"  : "force using external loopback instead of PMA loopback (default, only for some modes)",
+        "cycles"    : "set the number of test cycles that are averaged for each frame length, default: 4",
+        "frequency" : "set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000",
+        "layer"     : "measure the rate at ISO/OSI layer: 1 or 2; default: 2",
+    }
 
-    mode = {
-        1: "eth_gen",
-        2: "rx",
-        3: "tx",
-        4: "rxtx",
-        5: "dma_rx",
-        6: "dma_tx",
-        7: "dma_rxtx",
-        8: "dma_loop",
-    }.get(int(args[0]))
+    gls_desc = """
+        Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
+    """
 
-    if mode is None:
-        print("Incorrect mode!\n")
-        print_modes()
-        exit()
+    arg_parser = argparse.ArgumentParser(
+        prog="gls_mod.py",
+        description=gls_desc,
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
 
-    port_list = [0]
-    if len(args) > 1:
-        port_list = list(args[1].split(","))
+    arg_parser.add_argument("-d", "--device", default=nfb.default_dev_path, help=help_dict["device"])
+    arg_parser.add_argument("-i", "--index", nargs="?", default="0", help=help_dict["index"])
+    arg_parser.add_argument("-l", "--log", action="store_true", help=help_dict["log"])
+    arg_parser.add_argument("-L", "--log_demo", action="store_true", help=help_dict["demo"])
+    arg_parser.add_argument("-m", "--mode", required=True, choices=modes.keys(), help=help_dict["mode"])
+    arg_parser.add_argument("-c", "--channels", help=help_dict["channels"])
+    arg_parser.add_argument("-s", "--frame_size", nargs=3, metavar=("MIN", "MAX", "STEP"), help=help_dict["size"])
+    arg_parser.add_argument("-R", "--repeat", action="store_true", help=help_dict["repeat"])
+    arg_parser.add_argument("-e", "--ext_loop", action="store_true", help=help_dict["loopback"])
+    arg_parser.add_argument("-C", "--test_cycles", type=int, default=4, help=help_dict["cycles"])
+    arg_parser.add_argument("-f", "--frequency", type=int, default=200_000_000, help=help_dict["frequency"])
+    arg_parser.add_argument("-r", "--rate_layer", type=int, default=2, choices=[1, 2], help=help_dict["layer"])
+    args = arg_parser.parse_args()
+
+    device = nfb.open(args.device)
+
+    sel_mode = modes[args.mode]
+
+    if args.frame_size:
+        try:
+            min_fr_size = int(args.frame_size[0])
+            max_fr_size = int(args.frame_size[1])
+            fr_size_step = int(args.frame_size[2])
+        except ValueError as exc:
+            raise ValueError("ERROR: Invalid frame_size parameter! See help for details.") from exc
+        if min_fr_size < 64 or max_fr_size > 1518 or fr_size_step < 1:
+            raise ValueError("ERROR: Invalid frame_size parameter! See help for details.")
+        fr_sizes = list(range(min_fr_size, max_fr_size+1, fr_size_step))
+    else:
+        fr_sizes = list(range(64, 1518+1, 16))
 
     # ==========================================================================
     # TEST CONFIGURATION
     # ==========================================================================
 
-    # Speed meter clock frequency in HZ
-    gls_clk_freq = 200000000 # 200 MHz
+    # Enable RX DMA
+    ndp_read = None
+    if sel_mode.ndp_read:
+        pname = f"ndp-read -d {args.device}"
+        ndp_read = subprocess.Popen(
+            pname,
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True, # spawns new session / process group
+        )
+        logging.info(f"Enabled RX DMA ({pname})")
 
-    # Define min and max frame sizes (in bytes)
-    min_fr_size = 64
-    max_fr_size = 1518
-    fr_size_step = 32
+    logging.info("Finding information about NDK firmware...")
+    fdt_firmware = nfb.Nfb(args.device).fdt.get_node("firmware")
+    card_name = fdt_firmware.get_property("card-name").value
+    logging.info(f"Card name:      {card_name}")
 
-    log_en = False
-    demo_en = False
-    single_cycle = True
-
-    print("INFO: Finding information about NDK firmware...")
-    card_name = subprocess.Popen("nfb-info -q card", shell=True, stdout=subprocess.PIPE).stdout.read().strip().decode("utf-8")
     # Total number of Ethernet ports on card
-    #eth_ports = int(subprocess.Popen("nfb-info -q port",shell=True,stdout=subprocess.PIPE).stdout.read().strip())
-    eth_ports = int(subprocess.Popen("nfb-bus -l | grep -iw app_core | wc -l", shell=True, stdout=subprocess.PIPE).stdout.read().strip())
-    print("INFO: Card name:      %s" % card_name)
-    print("INFO: APP streams:    %d" % eth_ports)
+    eth_ports = len(list(device.eth))
+    logging.info(f"APP streams:    {eth_ports}")
+
+    # Find GLS modules in the Device Tree
+    gls_count = 0
+    pattern = re.compile(r"^dbg_gls(\d+)$")
+    fdt_mi_pci0_bar0 = fdt_firmware.get_subnode("mi_pci0_bar0")
+    for node in fdt_mi_pci0_bar0.nodes:
+        if re.search(pattern, node.name):
+            gls_count += 1
+    logging.info(f"GLS modules:    {gls_count}")
+    if (gls_count == 0):
+        raise RuntimeError("ERROR: Unsupported NDK firmware, no GLS modules found!")
+    elif (gls_count > eth_ports) or (gls_count < eth_ports and gls_count != 1):
+        raise RuntimeError("ERROR: Unsupported NDK firmware, unsupported configuration of GLS modules or ETH ports!")
+
     # Get total number of DMA channels
-    dma_chan_rx = int(subprocess.Popen("nfb-info -q rx", shell=True, stdout=subprocess.PIPE).stdout.read().strip())
-    dma_chan_tx = int(subprocess.Popen("nfb-info -q tx", shell=True, stdout=subprocess.PIPE).stdout.read().strip())
-    print("INFO: DMA RX queues:  %d" % dma_chan_rx)
-    print("INFO: DMA TX queues:  %d" % dma_chan_tx)
-    if dma_chan_rx != dma_chan_tx:
-        print("ERROR: Unsupported NDK firmware, the number of RX and TX DMA queues must be the same!")
-        exit()
-    gls_count = int(subprocess.Popen("nfb-bus -l | grep gen_loop_switch | wc -l", shell=True, stdout=subprocess.PIPE).stdout.read().strip())
-    print("INFO: GLS modules:    %d" % gls_count)
-    if gls_count == 0:
-        print("ERROR: Unsupported NDK firmware, no GLS modules found!")
-        exit()
-    if gls_count > eth_ports or (gls_count < eth_ports and gls_count != 1):
-        print("ERROR: Unsupported NDK firmware, unsupported configuration of GLS modules or ETH ports!")
-        exit()
+    rx_queues = device.ndp.rx
+    tx_queues = device.ndp.tx
+    dma_chan_rx = len(rx_queues)
+    dma_chan_tx = len(tx_queues)
+    logging.info(f"DMA RX queues:  {dma_chan_rx}")
+    logging.info(f"DMA TX queues:  {dma_chan_tx}")
+    if (dma_chan_rx != dma_chan_tx):
+        raise RuntimeError("ERROR: Unsupported NDK firmware, the number of RX and TX DMA queues must be the same!")
 
     dma_channels = dma_chan_rx
 
-    force_single_dma_stream = False
-    #if (card_name == "FB4CGG3" or card_name == "FB2CGG3" or card_name == "FB2CGHH"):
-    if gls_count == 1 and gls_count < eth_ports:
-        force_single_dma_stream = True
+    # NO DMA hotfix
+    if dma_channels == 0:
+        logging.warning("No DMA channels found, defaulting to 8 as a hotfix for no-DMA configuration.")
+        dma_channels = gls_count*8
 
-    # List of used DMA streams (for FB4CGG3/FB2CGG3 and FB2CGHH must be [0] for
-    # others cards must be same as port_list)
-    dma_streams = port_list
-    if force_single_dma_stream:
-        dma_streams = [0]
-    port_dma_channels = int(dma_channels / eth_ports)
+    # Process selected channels argument
+    if args.channels:
+        if "-" in args.channels:
+            try:
+                sel_channel_min_str, sel_channel_max_str = args.channels.split("-")
+            except ValueError as exc:
+                raise ValueError("ERROR: Invalid channel range selection! See help for details.") from exc
+            try:
+                sel_channel_min = int(sel_channel_min_str)
+                sel_channel_max = int(sel_channel_max_str)
+            except ValueError as exc:
+                raise ValueError("ERROR: Invalid channel range selection! See help for details.") from exc
+            if sel_channel_min < 0 or sel_channel_min > sel_channel_max:
+                raise ValueError("ERROR: Invalid channel range selection! See help for details.")
+            if sel_channel_max >= dma_channels:
+                raise ValueError(f"ERROR: Invalid channel range selection! Available channels: {dma_channels}.")
+            if sel_channel_min == sel_channel_max:
+                full_chan_range = str(sel_channel_min)
+            else:
+                full_chan_range = f"{sel_channel_min}-{sel_channel_max}"
+        else:
+            try:
+                sel_channel_min = int(args.channels)
+            except ValueError as exc:
+                raise ValueError("ERROR: Invalid channel selection! See help for details.") from exc
+            if sel_channel_min < 0 or sel_channel_min >= dma_channels:
+                raise ValueError(f"ERROR: Invalid channel selection! Available channels: {dma_channels}.")
+            sel_channel_max = sel_channel_min
+            full_chan_range = args.channels
+    else:
+        sel_channel_min = 0
+        sel_channel_max = dma_channels - 1
+        full_chan_range = f"{sel_channel_min}-{sel_channel_max}"
+
+    # Generate Channel range (min-max values) per each GLS Generator according to the selection.
+    # For l2r Generators (to RX DMA), it is not neccessary to restrict the chanel range like this.
+    # Instead, the full selected channel range could be applied to the l2r Generator of each GLS module.
+    channels_per_stream = dma_channels // gls_count
+    gls_operated_channels = []
+    sel_chan_ranges = []
+    for i in range(gls_count):
+        stream_min = i * channels_per_stream
+        stream_max = (i + 1) * channels_per_stream - 1
+        gls_operated_channels.append(f"{stream_min}-{stream_max}")
+        # Decide per GLS if there is an overlap with the selected channel range
+        overlap_min = max(stream_min, sel_channel_min)
+        overlap_max = min(stream_max, sel_channel_max)
+        if overlap_min <= overlap_max:
+            sel_chan_ranges.append((overlap_min-stream_min, overlap_max-stream_min))
+        else:
+            sel_chan_ranges.append(None)
+
+    gls_chan_range_list = list(zip(range(gls_count), gls_operated_channels))
+    gls_chan_range_table = tabulate(gls_chan_range_list, headers=["GLS Module Index", "Available Channels"], tablefmt="grid")
+    logging.info(f"GLS Modules Channel Ranges:\n{gls_chan_range_table}")
+    logging.info(f"Selected Channel Range: {full_chan_range}")
+
+    # GLS modules instantiation and configuration
+    try:
+        gls_idx_list = parse_range_arg(args.index, gls_count)
+    except ValueError as exc:
+        raise ValueError("ERROR: Failed to parse GLS instance selection! See help for details.") from exc
+    logging.info(f"Selected GLS instance(s): {','.join(map(str, gls_idx_list))}")
+    gls_internals_list = []
+    for i in gls_idx_list:
+        try:
+            gls = GenLoopSwitch(dev=device, index=i)
+        except IndexError as exc:
+            raise ValueError(f"ERROR: GLS module at index {i} not available!") from exc
+
+        # Select and configure the generator according to the selected mode
+        if args.mode in ["eth_gen", "rx"]:
+            gls_gen = gls.r2l.gen
+        elif args.mode in ["dma_rx", "dma_rxtx"]:
+            gls_gen = gls.l2r.gen
+        else:
+            gls_gen = None
+
+        if sel_chan_ranges[i] is not None:
+            if gls_gen is not None: # gls_gen only exists in some modes
+                gls_gen.minimum_channel = sel_chan_ranges[i][0]
+                gls_gen.maximum_channel = sel_chan_ranges[i][1]
+                # gls_gen.channel_increment = ...
+                gls_gen.channel_increment_reversed = sel_mode.gen_rev_chan
+        else:
+            raise RuntimeError(f"ERROR: No selected channels overlap with the available channels of Generator at GLS {i}!")
+
+        # Configure the four GLS MUXes according to the selected mode
+        gls_mux_cfg = sel_mode.mux_cfg
+        if gls_mux_cfg.r2l_gen is not None:
+            gls.r2l.mux_generator = gls_mux_cfg.r2l_gen
+        if gls_mux_cfg.r2l_loop is not None:
+            gls.r2l.mux_loopback = gls_mux_cfg.r2l_loop
+        if gls_mux_cfg.l2r_gen is not None:
+            gls.l2r.mux_generator = gls_mux_cfg.l2r_gen
+        if gls_mux_cfg.l2r_loop is not None:
+            gls.l2r.mux_loopback = gls_mux_cfg.l2r_loop
+
+        # Get TX and RX Speed Meters according to the selected mode
+        match sel_mode.tx_sm:
+            case 1: gls_tx_sm = gls.r2l.tx_sm
+            case 3: gls_tx_sm = gls.r2l.rx_sm
+            case _: gls_tx_sm = None
+        match sel_mode.rx_sm:
+            case 0: gls_rx_sm = gls.l2r.tx_sm
+            case 2: gls_rx_sm = gls.l2r.rx_sm
+            case _: gls_rx_sm = None
+        gls_internals_list.append(
+            GlsInternals(
+                gen=gls_gen,
+                tx_sm=gls_tx_sm,
+                rx_sm=gls_rx_sm,
+            )
+        )
+
+    # Reset Ethernet stats and enable MACs (and potentionally PMA loopback)
+    for e in device.eth:
+        e.stats_reset()
+        e.enable()
+        if not args.ext_loop and sel_mode.eth_loop:
+            e.pcspma.pma_local_loopback = True
+
+    # Reset DMA stats
+    for q in rx_queues:
+        q.stats_reset()
+    for q in tx_queues:
+        q.stats_reset()
+
+    logging.info("Initial test setup completed.\n")
 
     # ==========================================================================
     # GLS TEST START
     # ==========================================================================
 
     x = 1
-    flag = GracefulExiter()
+    exiter = GracefulExiter()
     while True:
-        print("\nINFO: Test #", x, "started...")
-        run_test(mode, min_fr_size, max_fr_size, fr_size_step, gls_clk_freq, log_en, demo_en, port_list, dma_streams, port_dma_channels)
+        logging.info(f"Test #{x} started...")
         x += 1
-        #print MAC stats
-        os.system('nfb-eth -S')
-        print("finished.")
-        if single_cycle or flag.exit():
+        now = datetime.datetime.now()
+        date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+        host_name = socket.gethostname().partition(".")[0] # get short hostname without domain (.liberouter.org)
+        report_name = host_name + "_" + card_name + "_" + args.mode + "_ch" + full_chan_range + "_" + date_time
+        run_test(
+            gls_internals=gls_internals_list,
+            mode=args.mode,
+            fr_sizes=fr_sizes,
+            gls_clk_freq=args.frequency,
+            log_en=args.log,
+            demo_en=args.log_demo,
+            global_chan_range=full_chan_range,
+            rate_layer=args.rate_layer,
+            cycles=args.test_cycles,
+            report_name=report_name,
+            device=args.device,
+            exiter=exiter,
+        )
+        logging.info("Test finished.\n")
+        if not args.repeat or exiter.exit():
+            print("END: Exiting...")
+            for gi in gls_internals_list:
+                if gi.gen is not None:
+                    gi.gen.enabled = False
+            time.sleep(1.0)
+            stop_process(ndp_read)
             break
+
+
+if __name__ == "__main__":
+    main()
