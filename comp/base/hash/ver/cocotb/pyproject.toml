@@ -1,10 +1,11 @@
 [project]
-name = "cocotb-spookyhash"
+name = "cocotb-hash_wrapper"
 version = "0.1.0"
 dependencies = [
     "cocotbext-ofm @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
     "setuptools",
     "spookyhash",
+    "siphash-cffi",
 ]
 
 [build-system]
