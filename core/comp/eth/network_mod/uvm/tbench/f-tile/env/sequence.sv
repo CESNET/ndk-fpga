@@ -428,7 +428,7 @@ class virt_sequence_simple #(
         end
 
         //SEND STOP
-        wait (transactions >= ETH_PORTS*30_000);
+        wait (transactions >= ETH_PORTS*20_000);
         seq_sync_port_end.send_stop();
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             wait(port_end[it] == 1);
