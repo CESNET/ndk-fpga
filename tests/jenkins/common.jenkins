@@ -9,6 +9,16 @@
 
 library 'liberouter'
 
+
+def propagateUserInterupt(err) {
+    if (err.getClass() == org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) {
+        echo "Detected exception: ${err.toString()}, proceeding to end the whole job..."
+        throw err
+    } else {
+        echo "Detected exception: ${err.toString()}"
+    }
+}
+
 // Jenkins configuration for multiple modules
 def commonPrekladVerRun(COMPONENTS) {
 
@@ -52,6 +62,7 @@ def commonPrekladVerRun(COMPONENTS) {
                 }
             }
         } catch(err) {
+            propagateUserInterupt(err)
             currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
             failed.add("$name")
         } finally { // collect interesting files
@@ -142,13 +153,18 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
                 }
             }
         } catch(err) {
+            propagateUserInterupt(err)
             currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
             failed.add("$name")
         } finally { // collect interesting files
             archiveArtifacts "$path/transcript*" // verification log
             if (run_coverage_report) {
                 // Generate a coverage report file
-                sh "python3 ${coverage_reporter} --name \"$name\" --input \"$path/coverage_merged.ucdb\" --output \"$path/coverage_report.json\""
+                sh(
+                    script: "python3 ${coverage_reporter} --name \"$name\" --input \"$path/coverage_merged.ucdb\" --output \"$path/coverage_report.json\"",
+                    returnStatus: true,
+                    returnStdout: false,
+                )
             }
             if(currentBuild.result == "FAILURE") {
                 archiveArtifacts "$path/vsim.wlf"   // generated waveform, use vsim -view vsim.wlf
@@ -237,6 +253,7 @@ def commonPrekladHarpRun(COMPONENTS, ofm_path = pwd()) {
                 }
             }
         } catch(err) {
+            propagateUserInterupt(err)
             currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
             failed.add("$name")
         } finally { // collect interesting files
@@ -388,6 +405,7 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
                             sh "$command"
 
                         } catch (err) {
+                            propagateUserInterupt(err)
                             echo "Error detected, firmware build failed!"
                             currentBuild.result = 'FAILURE'
                             currentStage.result = 'FAILURE'
@@ -401,6 +419,7 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
                             sh "test -f results.xml"
                         } catch (err) {
                             echo "Error detected, no tests performed (results missing)!"
+                            propagateUserInterupt(err)
                             currentBuild.result = 'FAILURE'
                             currentStage.result = 'FAILURE'
                             failed.add("$name")
@@ -409,6 +428,7 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
                 }
             }
         } catch(err) {
+            propagateUserInterupt(err)
             currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
             failed.add("$name")
         } finally { // collect interesting files
@@ -456,44 +476,51 @@ def commonPrekladCocotbMultiVerRun(COMPONENTS, ofm_path = pwd()) {
 
     def failed = []
 
-    // run verification of every component
-    for(c in COMPONENTS) {
-        // parse
-        def name     = c[0]
-        def path     = c[1]
-        def settings = c[2]
+    try {
+        // run verification of every component
+        for(c in COMPONENTS) {
+            // parse
+            def name     = c[0]
+            def path     = c[1]
+            def settings = c[2]
 
-        def multi_ver = "$ofm_path/build/scripts/multi_ver/multi_ver_cocotb.py"
+            def multi_ver = "$ofm_path/build/scripts/multi_ver/multi_ver_cocotb.py"
 
-        // exec vsim
-        try { // try-catch is a hack to continue even after the first failed verification
-            timeout(time: 4, unit: 'HOURS') {
-                stage("cocotb (MULTIVER): $name") {
-                    dir("$path") {
-                        try {
-                            // run multi ver script for cocotb
-                            def command = "python3 $multi_ver $settings"
-                            sh "${print_info}"
-                            sh "$command"
+            // exec vsim
+            try { // try-catch is a hack to continue even after the first failed verification
+                timeout(time: 4, unit: 'HOURS') {
+                    stage("cocotb (MULTIVER): $name") {
+                        dir("$path") {
+                            try {
+                                // run multi ver script for cocotb
+                                def command = "python3 $multi_ver $settings"
+                                sh "${print_info}"
+                                sh "$command"
 
-                        } catch (err) {
-                            echo "Error detected, firmware build failed!"
-                            currentBuild.result = 'FAILURE'
-                            currentStage.result = 'FAILURE'
-                            failed.add("$name")
+                            } catch (err) {
+                                propagateUserInterupt(err)
+                                echo "Error detected, firmware build failed!"
+                                currentBuild.result = 'FAILURE'
+                                currentStage.result = 'FAILURE'
+                                failed.add("$name")
+                            }
                         }
                     }
                 }
-            }
-        } catch(err) {
-            currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
-            failed.add("$name")
-        } finally { // collect interesting files
-            archiveArtifacts "$path/transcript" // verification log
-            if(currentBuild.result == "FAILURE") {
-                archiveArtifacts "$path/vsim.wlf" // generated waveform, use vsim -view vsim.wlf
+            } catch(err) {
+                propagateUserInterupt(err)
+                currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
+                failed.add("$name")
+            } finally { // collect interesting files
+                archiveArtifacts "$path/transcript" // verification log
+                if(currentBuild.result == "FAILURE") {
+                    archiveArtifacts "$path/vsim.wlf" // generated waveform, use vsim -view vsim.wlf
+                }
             }
         }
+    } catch(err) {
+        echo "Error:"
+        echo err.toString()
     }
 
     // send out emails if failure is detected
