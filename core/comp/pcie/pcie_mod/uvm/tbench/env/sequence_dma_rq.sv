@@ -11,13 +11,16 @@ class sequence_dma_rq#(DMA_PORTS) extends uvm_sequence#(uvm_dma::sequence_item_r
     localparam MAX_REQUEST_SIZE = 128;
     localparam MAX_PAYLOAD_SIZE = 64;
 
-    rand int unsigned unit_id;
+    rand logic [uvm_ptc_info::sequence_item::DMA_REQUEST_UNITID_W-1:0] unit_id;
     rand int unsigned transactions;
     //protected logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1:0] tags[logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1:0]];
     uvm_dma::seq_info info;
 
     constraint trans_const {
         transactions inside {[20:60]};
+        if (DMA_PORTS > 1) {
+		unit_id[($clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1) -1:0] == 0;
+	}
     };
 
     function new(string name = "mi_cc_sequence");
@@ -40,9 +43,6 @@ class sequence_dma_rq#(DMA_PORTS) extends uvm_sequence#(uvm_dma::sequence_item_r
 
             assert(req.randomize() with {
                 req.hdr.unitid == unit_id;
-                if (DMA_PORTS > 1) {
-                    req.hdr.tag[sv_dma_bus_pack::DMA_REQUEST_TAG_W-1 -: $clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1] == unit_id[($clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1) -1:0];
-                }
                 (req.hdr.type_ide == 0) -> !(req.hdr.tag inside {info.tags[unit_id]});
                 req.hdr.firstib inside {0};
                 req.hdr.lastib  inside {0};

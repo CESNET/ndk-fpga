@@ -254,6 +254,9 @@ class model_ptc#(RQ_REGIONS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
             dma_tr.completed = completed;
             dma_tr.tag       = dma_info.tag;
             dma_tr.unit_id   = dma_info.unit_id;
+            if (DMA_PORTS > 1) begin
+                dma_tr.unit_id[$clog2(DMA_PORTS)-1:0] = 0;
+            end
             dma_tr.data      = pcie_tr.data;
             `uvm_info(this.get_full_name(), $sformatf("\nDMA RC PORT %0d %s", dma_info.port, dma_tr.convert2string()), UVM_FULL);
 
@@ -268,6 +271,7 @@ class model_ptc#(RQ_REGIONS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
         int unsigned rq_tr_tmp;
 
         forever begin
+            logic [uvm_ptc_info::sequence_item::DMA_REQUEST_UNITID_W-1:0] unitid;
             dma_rq[dma].get(rq_tr);
 
             rsp_tr       = uvm_pcie::request_header::type_id::create("rsp_tr", this);
@@ -279,7 +283,6 @@ class model_ptc#(RQ_REGIONS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
             rsp_tr.fmt        = {1'b0, rq_tr.hdr.type_ide, rq_tr.hdr.global_id[64-1:0] != 32'b0 ? 1'b1 : 1'b0};
             rsp_tr.pcie_type  = 5'b0;
 
-            //rq_tr.hdr.unitid // NOT USED
 
             `uvm_info(this.get_full_name(), $sformatf("\nGET DMA RX [%0d] TRANSACTION %0d %s", dma, rq_tr_tmp, rq_tr.convert2string()), UVM_FULL);
 
@@ -294,7 +297,12 @@ class model_ptc#(RQ_REGIONS, DMA_PORTS, ITEM_WIDTH) extends uvm_component;
             rsp_tr.length            = rq_tr.hdr.length;
             rsp_tr.data              = rq_tr.hdr.type_ide == 1'b1 ? rq_tr.data : {};
             rsp_tr.requester_id      = {8'b0,  rq_tr.hdr.vfid};
-            tags.get_dma2pcie(rq_tr.hdr.type_ide, dma, rq_tr.hdr.tag, rq_tr.hdr.unitid, rsp_tr.tag);
+            unitid = rq_tr.hdr.unitid;
+            if (DMA_PORTS > 1) begin
+                 unitid[$clog2(DMA_PORTS)-1:0] = dma;
+            end
+
+            tags.get_dma2pcie(rq_tr.hdr.type_ide, dma, rq_tr.hdr.tag, unitid, rsp_tr.tag);
             case(rq_tr.hdr.lastib)
                 0 : rsp_tr.lbe = 4'b1111;
                 1 : rsp_tr.lbe = 4'b0111;
