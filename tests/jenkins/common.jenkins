@@ -160,8 +160,9 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
             archiveArtifacts "$path/transcript*" // verification log
             if (run_coverage_report) {
                 // Generate a coverage report file
+                def command = "python3 ${coverage_reporter} --name \"$name\" --input \"$path/coverage_merged.ucdb\" --output \"$path/coverage_report.json\""
                 sh(
-                    script: "python3 ${coverage_reporter} --name \"$name\" --input \"$path/coverage_merged.ucdb\" --output \"$path/coverage_report.json\"",
+                    script: "${toolsel}${command}",
                     returnStatus: true,
                     returnStdout: false,
                 )
