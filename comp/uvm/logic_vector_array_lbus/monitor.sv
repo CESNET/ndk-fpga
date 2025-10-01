@@ -41,7 +41,9 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
     endfunction
 
     protected virtual function void send_packet();
-        uvm_logic_vector_array::sequence_item #(8) item = uvm_logic_vector_array::sequence_item #(8)::type_id::create("item");
+        uvm_logic_vector_array::sequence_item #(8) item;
+
+        item = uvm_logic_vector_array::sequence_item #(8)::type_id::create("item");
         item.data = bytes;
         bytes.delete();
         analysis_port.write(item);
@@ -82,7 +84,10 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
                 else begin
                     assert(t.eop[i] !== 1'b1)
                     else begin
-                       `uvm_error(this.get_full_name(), "\n\tThe EOP was set before a new packet transfer started. A SOP wasn't set before this EOP")
+                        string msg;
+                        // verilog_lint: waive line-length
+                        msg = "\n\tThe EOP was set before a new packet transfer started. A SOP wasn't set before this EOP";
+                       `uvm_error(this.get_full_name(), msg);
                     end
                 end
             end
@@ -98,7 +103,10 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
 
                 assert(t.sop[i] !== 1'b1)
                 else begin
-                    `uvm_error(this.get_full_name(), "\n\tThe SOP was before the last packet transfer correctly ended. A EOP wasn't set at the end of the packet transfer")
+                    string msg;
+                    // verilog_lint: waive line-length
+                    msg = "\n\tThe SOP was before the last packet transfer correctly ended. A EOP wasn't set at the end of the packet transfer";
+                    `uvm_error(this.get_full_name(), msg);
                 end
             end
         end
@@ -150,7 +158,9 @@ class monitor_logic_vector extends uvm_logic_vector::monitor #(1);
 
         for (int unsigned i = 0; i < 4; i++) begin
             if (t.ena[i] === 1'b1 && t.eop[i] === 1'b1) begin
-                uvm_logic_vector::sequence_item #(1) item = uvm_logic_vector::sequence_item #(1)::type_id::create("item");
+                uvm_logic_vector::sequence_item #(1) item;
+
+                item = uvm_logic_vector::sequence_item #(1)::type_id::create("item");
                 item.data = t.err[i];
                 analysis_port.write(item);
             end
