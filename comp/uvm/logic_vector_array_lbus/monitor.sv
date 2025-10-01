@@ -33,16 +33,9 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
         ready_deassertion_counter = 0;
     endfunction
 
-    protected virtual function void save_segment_by_index(uvm_lbus::sequence_item item, int unsigned segment_index, bit full_segment = 0);
-        logic [128-1 : 0] data = item.data[128*(segment_index+1)-1 -: 128];
-        logic [4  -1 : 0] mty = (full_segment ? 0 : item.mty[4*(segment_index+1)-1 -: 4]);
-        save_segment(data, mty);
-    endfunction
-
     protected virtual function void save_segment(logic [128-1 : 0] data, logic [4-1 : 0] mty = 0);
-        int unsigned valid_byte_count = (128/8)-mty;
-
-        for (int unsigned i = 0; i < valid_byte_count; i++) begin
+        for (int unsigned i = (128/8); i > mty; ) begin
+            i--;
             bytes.push_back(data[8*(i+1)-1 -: 8]);
         end
     endfunction
@@ -80,11 +73,11 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
 
             if (!inside_frame) begin
                 if (t.sop[i] === 1'b1 && t.eop[i] === 1'b1) begin
-                    save_segment_by_index(t, i);
+                    save_segment(t.data[128*(i+1)-1 -: 128], t.mty[4*(i+1)-1 -: 4]);
                 end
                 else if (t.sop[i] === 1'b1) begin
                     inside_frame = 1;
-                    save_segment_by_index(t, i, 1);
+                    save_segment(t.data[128*(i+1)-1 -: 128], 0);
                 end
                 else begin
                     assert(t.eop[i] !== 1'b1)
@@ -96,11 +89,11 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
             else begin
                 if (t.eop[i] === 1'b1) begin
                     inside_frame = 0;
-                    save_segment_by_index(t, i);
+                    save_segment(t.data[128*(i+1)-1 -: 128], t.mty[4*(i+1)-1 -: 4]);
                     send_packet();
                 end
                 else begin
-                    save_segment_by_index(t, i, 1);
+                    save_segment(t.data[128*(i+1)-1 -: 128], 0);
                 end
 
                 assert(t.sop[i] !== 1'b1)
