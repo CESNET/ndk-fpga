@@ -124,10 +124,8 @@ class sequence_base #(
     endfunction
 
     virtual task run_rq(int unsigned pcie, int unsigned dma);
-        const int unsigned dma_unitid_const = (DMA_PORTS*pcie + dma);
-
         while (stop == 0) begin
-            assert (dma_rq[pcie][dma].randomize() with {dma_rq[pcie][dma].unit_id ==  dma_unitid_const;});
+            assert (dma_rq[pcie][dma].randomize());
             dma_rq[pcie][dma].start(p_sequencer.m_dma_rq[pcie][dma]);
         end
         rx_stop[pcie][dma] = 1;

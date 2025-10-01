@@ -25,13 +25,13 @@ class virt_seq #(MRRS, MIN_READ_REQ_SIZE, MPS, MIN_WRITE_REQ_SIZE) extends uvm_s
         m_packet.init_sequence();
         m_packet.cfg = new();
         m_packet.cfg.array_size_set(MIN_WRITE_REQ_SIZE, MPS);
-        m_packet.min_random_count = 60;
-        m_packet.max_random_count = 80;
+        m_packet.min_random_count = 40;
+        m_packet.max_random_count = 60;
 
         m_info_lib   = uvm_ptc_info::sequence_lib_info #(MRRS, MIN_READ_REQ_SIZE)::type_id::create("m_info_lib");
         m_info_lib.init_sequence();
-        m_info_lib.min_random_count = 60;
-        m_info_lib.max_random_count = 80;
+        m_info_lib.min_random_count = 40;
+        m_info_lib.max_random_count = 60;
         m_info = m_info_lib;
     endfunction
 
