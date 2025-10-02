@@ -470,9 +470,6 @@ begin
         START_REQ_VLD  => start_req_vld,
         START_REQ_ACK  => start_req_done,
 
-        STOP_FORCE_CHAN => open,
-        STOP_FORCE      => open,
-
         STOP_REQ_CHAN => stop_req_chan,
         STOP_REQ_VLD  => stop_req_vld,
         STOP_REQ_ACK  => stop_req_done,
