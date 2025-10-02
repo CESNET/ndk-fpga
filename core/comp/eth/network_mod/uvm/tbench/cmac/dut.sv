@@ -4,6 +4,7 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
+// verilog_lint: waive module-filename
 module DUT #(
     string       ETH_CORE_ARCH,
     int unsigned ETH_PORTS,
@@ -124,22 +125,25 @@ module DUT #(
     );
 
     generate;
-        for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin
-            localparam int unsigned ETH_PORT_CHAN_LOCAL = ETH_PORT_CHAN[eth_it];
-            initial assert(ETH_PORT_CHAN_LOCAL == 1);
+        for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin : eth_inf
+            initial begin
+                assert(ETH_PORT_CHAN[eth_it] == 1);
+            end
 
-            wire logic [4*128-1 : 0] eth_rx_data;
             logic CLK_ETH_GEN = 1'b0;
 
+            // verilog_lint: waive explicit-begin
             always #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH_GEN = ~CLK_ETH_GEN;
 
             // ------- //
             // TX side //
             // ------- //
 
-            for (genvar slice = 0; slice < 4; slice++) begin
+            for (genvar slice = 0; slice < 4; slice++) begin : slice_tx
                 initial begin
-                    force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_data[slice] = {<<8{eth_tx[eth_it].DATA[128*(slice+1)-1 -: 128]}}; // Byte reordering
+                    // verilog_lint: waive line-length
+                    force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_data[slice] = eth_tx[eth_it].DATA[128*(slice+1)-1 -: 128]; // Byte reordering
+                    // verilog_lint: waive line-length
                     force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_mty [slice] = eth_tx[eth_it].MTY[4*(slice+1)-1 -: 4];
                 end
             end
@@ -157,28 +161,32 @@ module DUT #(
             // RX side //
             // ------- //
 
-            assign eth_rx_data = {>>{DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_data}};
-            for (genvar segment = 0; segment < 4; segment++) begin
-                wire logic [128-1 : 0] segment_data;
-
-                assign segment_data = eth_rx_data[128*(segment+1)-1 -: 128];
-                assign eth_rx[eth_it].DATA[128*(segment+1)-1 -: 128] = {<<8{segment_data}}; // Byte reordering
+            for (genvar segment = 0; segment < 4; segment++) begin : slice_rx
+                // verilog_lint: waive line-length
+                assign eth_rx[eth_it].DATA[128*(segment+1)-1 -: 128] = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_data[segment]; // Byte reordering
+                // verilog_lint: waive line-length
+                assign eth_rx[eth_it].MTY[4*(segment+1)-1 -: 4]      = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_mty[segment];
             end
 
             assign eth_rx[eth_it].ENA = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_ena;
             assign eth_rx[eth_it].SOP = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_sop;
             assign eth_rx[eth_it].EOP = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_eop;
             assign eth_rx[eth_it].ERR = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_err;
-            assign eth_rx[eth_it].MTY = {>>{DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_mty}};
 
-            initial force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_rdy = eth_rx[eth_it].RDY;
+            // verilog_lint: waive line-length
+            initial begin
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_rdy = eth_rx[eth_it].RDY;
+            end
 
             // ----- //
             // Other //
             // ----- //
 
             // CLK connection
-            initial force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_gt_tx_clk_322m = CLK_ETH_GEN;
+            // verilog_lint: waive line-length
+            initial begin
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_gt_tx_clk_322m = CLK_ETH_GEN;
+            end
         end
     endgenerate
 
