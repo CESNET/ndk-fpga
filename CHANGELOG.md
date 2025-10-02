@@ -6,23 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
-## [0.12.0] - Unreleased
+## [0.12.0] - 2025-10-02
 
 ### Added
 - cocotb: Added basic nvm-sim support.
 - cocotb: Added support for Silicom FB2CDG1 card in top-level-sim.
-- cards: Introduced support for boot controller for Alveo-U200 card.
 - cards: Added support for IA-440i card with AGIB023R18A1E1VC.
 - cards: Added external PPS support on N6010, IA-440i, agi-fh400g cards.
+- cards: Introduced support for boot controller for Alveo-U200 card.
 - core: Introduced support for external PPS signal.
 - comp: Introduced spookyhash component.
 - comp: Introduced MFB_SWITCH_SIMPLE component.
 - comp: Added IPv4/UDP support to MFB Generator.
+- docs: Introduced Known Limitations section in NDK documentation.
 - dma: Introduced support for wide pointers over 16 bits in DMA Calypte.
 - ci: Introduced vhdl-style-guide tool to check VHDL in CI stage.
 
 ### Changed
 - cocotb: Huge improved cocotb enviroment.
+- build: Updated default Agilex device in build system.
 - cards: Enabled experimental configuration PCIE_CONF=1xGen5x16 for AGI-FH400G card.
 - core: Used UNITID to route to individual DMA endpoints instead of tags.
 - core: Improved link status decoding in MII adapter.
@@ -34,8 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - uvm: Improved DMA Calypte verification.
 - uvm: Improved UVM verification framework.
 - uvm: Improved MTU packet support in UVM.
+- sw: Updated recommended tool versions, see README.md file.
+- ci: Improved Jenkins files for verifications.
 
 ### Removed
+- cocotb: Removed old cocotb examples.
 - comp: Removed old simulation of asfifo_bram.
 
 ### Fixed
@@ -62,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - dma: Fixed reset internal EOF_POS value in DMA Calypte.
 - dma: Fixed derivation of channel index from metadata in DMA Calypte.
 - uvm: Fixed generating vld when src_rdy is zero in MVB driver.
+- uvm: Fixed byte ordering in LBUS/CMAC UVM monitor.
 - sw: Fixed path for GLS using "nfb-bus -l" in GLS script.
 
 ## [0.11.0] - 2025-07-10
