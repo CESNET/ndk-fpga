@@ -82,9 +82,6 @@ entity RX_DMA_CALYPTE_SW_MANAGER is
         START_REQ_VLD        : out std_logic;
         START_REQ_ACK        : in  std_logic;
 
-        STOP_FORCE_CHAN      : out std_logic_vector(log2(CHANNELS)-1 downto 0);
-        STOP_FORCE           : out std_logic;
-
         STOP_REQ_CHAN        : out std_logic_vector(log2(CHANNELS)-1 downto 0);
         STOP_REQ_VLD         : out std_logic;
         STOP_REQ_ACK         : in  std_logic;
@@ -830,18 +827,6 @@ begin
     reg_di   (R_HHP)(1) <= std_logic_vector(resize_left(unsigned(HHP_WR_DATA),MI_WIDTH));
     reg_we   (R_HHP)(1) <= HHP_WR_EN;
     reg_addra(R_HHP)(1) <= HHP_WR_CHAN;
-    ------------------------------------
-
-    -- Force channel stop flag ------------------------
-    mi_stop_req <= '1' when (piped_mi_wr = '1' and mi_reg_addri = R_CONTROL and piped_mi_dwr(0) = '0') else '0';
-
-    process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            STOP_FORCE_CHAN <= mi_chan;
-            STOP_FORCE      <= mi_stop_req;
-        end if;
-    end process;
     ------------------------------------
     -- =====================================================================
 
