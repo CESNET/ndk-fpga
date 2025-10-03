@@ -22,6 +22,7 @@ Before you get started, there are a few requirements that you need to have.
     - Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)
     - Silicom fb2CGhh@KU15P card
     - Silicom fb2CDg1@AGM39D-2 (ThunderFjord) card (preliminary support).
+    - Silicom N5014 card
     - Silicom N6010 card
     - Bittware IA-420f card
     - Bittware IA-440i card
@@ -103,6 +104,7 @@ Unless otherwise noted, the content of this repository is available under the BS
 - The .ip files located in the `cards/<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Intel Quartus Prime Pro, and their use may be subject to additional license agreements.
 - The .xci files located in the `cards/<VENDOR>/<CARD_NAME>/src/ip/` folder were generated in the Xilinx Vivado, and their use may be subject to additional license agreements.
 - The files located in the `cards/silicom/n6010/src/comp/pmci/pmci_ip` and `cards/silicom/n6010/scripts` folders were taken from the [ofs-agx7-pcie-attach repository](https://github.com/OFS/ofs-agx7-pcie-attach) and are subject to the MIT license. Please read [LICENSE.txt file](cards/silicom/n6010/scripts/LICENSE.txt).
+- The files located in the `cards/silicom/n5014/src/comp/hbm` folder were taken from the [ofs-fim-common repository](https://github.com/OFS/ofs-fim-common) and are subject to the MIT license. Please read [LICENSE.txt file](cards/silicom/n5014/src/comp/hbm/LICENSE.txt).
 - The files located in the `comp/base/hash/spookyhash/sw/` by Bob Jenkins from [burtleburtle.net](https://burtleburtle.net/bob/hash/spooky.html), Public domain.
 
 ## Repository Maintainer
