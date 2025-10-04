@@ -10,14 +10,16 @@ import test::*;
 
 module testbench;
 
+    localparam PTR_UPD_REQ_MVB_ITEM_W = 2*POINTER_WIDTH + 1 + SW_ADDR_WIDTH;
+
     //TESTS
     typedef test::base#(test::USR_MFB_REGIONS, test::USR_MFB_REGION_SIZE, test::USR_MFB_BLOCK_SIZE, test::USR_MFB_ITEM_WIDTH,
                         test::PCIE_RQ_REGIONS, test::PCIE_RQ_REGION_SIZE, test::PCIE_RQ_BLOCK_SIZE, test::PCIE_RQ_ITEM_WIDTH, test::PCIE_RQ_META_WIDTH,
-                        test::CHANNELS, test::PKT_SIZE_MAX, test::MI_WIDTH, test::DEVICE) base;
+                        test::CHANNELS, test::PKT_SIZE_MAX, test::MI_WIDTH, test::DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) base;
 
     typedef test::speed#(test::USR_MFB_REGIONS, test::USR_MFB_REGION_SIZE, test::USR_MFB_BLOCK_SIZE, test::USR_MFB_ITEM_WIDTH,
                          test::PCIE_RQ_REGIONS, test::PCIE_RQ_REGION_SIZE, test::PCIE_RQ_BLOCK_SIZE, test::PCIE_RQ_ITEM_WIDTH, test::PCIE_RQ_META_WIDTH,
-                         test::CHANNELS, test::PKT_SIZE_MAX, test::MI_WIDTH, test::DEVICE) speed;
+                         test::CHANNELS, test::PKT_SIZE_MAX, test::MI_WIDTH, test::DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) speed;
 
     localparam USR_MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
@@ -31,6 +33,8 @@ module testbench;
     reset_if                                                                                                   reset(CLK);
     mfb_if #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH) usr_mfb(CLK);
     mfb_if #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH) pcie_rq_mfb(CLK);
+    mfb_if #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH) ptr_upd_mfb(CLK);
+    mvb_if #(1, PTR_UPD_REQ_MVB_ITEM_W)                                                                        ptr_upd_req_mvb(CLK);
     mvb_if #(1, 1)                                                                                             pkt_disc_mvb(CLK);
     mi_if #(MI_WIDTH, MI_WIDTH)                                                                                mi_config(CLK);
 
@@ -48,6 +52,8 @@ module testbench;
         uvm_config_db#(virtual reset_if)::set(null, "", "reset_vif", reset);
         uvm_config_db#(virtual mfb_if #(test::USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH))::set(null, "", "usr_mfb_vif", usr_mfb);
         uvm_config_db#(virtual mfb_if #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH))::set(null, "", "pcie_rq_mfb_vif", pcie_rq_mfb);
+        uvm_config_db#(virtual mfb_if #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH))::set(null, "", "ptr_upd_mfb_vif", ptr_upd_mfb);
+        uvm_config_db#(virtual mvb_if #(1, PTR_UPD_REQ_MVB_ITEM_W))::set(null, "", "ptr_upd_req_mvb_vif", ptr_upd_req_mvb);
         uvm_config_db#(virtual mvb_if #(1, 1))::set(null, "", "pkt_disc_mvb_vif", pkt_disc_mvb);
         uvm_config_db#(virtual mi_if #(MI_WIDTH, MI_WIDTH))::set(null, "", "config_mi_vif", mi_config);
 
@@ -85,11 +91,13 @@ module testbench;
         .PERF_CNTR_EN        (test::PERF_CNTR_EN)
     )
     DUT_U (
-        .CLK         (CLK),
-        .RST         (RST | reset.RESET),
-        .usr_mfb     (usr_mfb),
-        .pcie_rq_mfb (pcie_rq_mfb),
-        .config_mi   (mi_config)
+        .CLK             (CLK),
+        .RST             (RST | reset.RESET),
+        .usr_mfb         (usr_mfb),
+        .pcie_rq_mfb     (pcie_rq_mfb),
+        .ptr_upd_mfb     (ptr_upd_mfb),
+        .ptr_upd_req_mvb (ptr_upd_req_mvb),
+        .config_mi       (mi_config)
     );
 
 
@@ -112,6 +120,7 @@ module testbench;
         .RESET       (RST | reset.RESET),
         .usr_mfb     (usr_mfb),
         .pcie_rq_mfb (pcie_rq_mfb),
+        .ptr_upd_mfb (ptr_upd_mfb),
         .config_mi   (mi_config)
     );
 

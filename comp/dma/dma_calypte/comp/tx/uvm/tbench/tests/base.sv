@@ -26,7 +26,8 @@ class base extends uvm_test;
         HDR_META_WIDTH,
         DATA_POINTER_WIDTH,
         PKT_SIZE_MAX,
-        PCIE_LEN_MAX
+        PCIE_LEN_MAX,
+        UPD_THRESHOLD
     ) m_env;
 
     localparam USR_MFB_META_WIDTH = HDR_META_WIDTH + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
@@ -50,7 +51,7 @@ class base extends uvm_test;
                                           USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
                                           PCIE_CQ_MFB_REGIONS, PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE,
                                           PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH, DATA_POINTER_WIDTH,
-                                          PKT_SIZE_MAX, PCIE_LEN_MAX)::type_id::create("m_env", this);
+                                          PKT_SIZE_MAX, PCIE_LEN_MAX, UPD_THRESHOLD)::type_id::create("m_env", this);
     endfunction
 
     virtual task run_phase(uvm_phase phase);
@@ -61,10 +62,12 @@ class base extends uvm_test;
         uvm_status_e   status_r;
         time end_time;
         virt_seq #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
-                   CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH) m_virt_seq;
+                   CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH, PCIE_CQ_MFB_REGIONS,
+                   PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH) m_virt_seq;
 
         m_virt_seq = virt_seq #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
-                                CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH)::type_id
+                                CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH, PCIE_CQ_MFB_REGIONS,
+                                PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH)::type_id
                      ::create("m_virt_seq");
 
         phase.raise_objection(this);

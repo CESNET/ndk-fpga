@@ -14,17 +14,23 @@ class start_channel extends uvm_sequence;
     rand int unsigned   data_mask_width;
     rand logic [64-1:0] hdr_base_addr;
     rand int unsigned   hdr_mask_width;
+    rand logic [64-1:0] update_base_addr;
+    rand logic          p2p_enable;
+    rand logic [32-1:0] upd_timeout;
 
     constraint c_start {
         data_mask_width < 16;
         data_mask_width > 5;
         hdr_mask_width  < 16;
         hdr_mask_width  > 3;
+        upd_timeout > 4;
 
         // Packet BLOCK_SIZE
         data_base_addr % 128 == 0;
         // Packet header size
         hdr_base_addr  % 8   == 0;
+        // Update buffer address
+        update_base_addr % 4 == 0;
     }
 
     function new (string name = "start_channel");
@@ -43,8 +49,9 @@ class start_channel extends uvm_sequence;
 
         //Randomize sequence of doing this
         //write base address
-        m_regmodel.data_base.write(status, data_base_addr, .parent(this));
-        m_regmodel.hdr_base.write(status,  hdr_base_addr,  .parent(this));
+        m_regmodel.update_base.write(status, update_base_addr, .parent(this));
+        m_regmodel.data_base.write(status, data_base_addr,     .parent(this));
+        m_regmodel.hdr_base.write(status,  hdr_base_addr,      .parent(this));
         //write sw_pointers
         m_regmodel.sw_data_pointer.write(status, 'h0, .parent(this));
         m_regmodel.sw_hdr_pointer.write(status,  'h0, .parent(this));
@@ -53,7 +60,9 @@ class start_channel extends uvm_sequence;
         m_regmodel.hdr_mask.write(status,  hdr_mask,  .parent(this));
 
         //startup channel
-        m_regmodel.control.write(status,  32'h1,  .parent(this));
+        m_regmodel.upd_timeout.write(status, upd_timeout, .parent(this));
+        m_regmodel.exper.write(status, p2p_enable, .parent(this));
+        m_regmodel.control.write(status,  32'h1, .parent(this));
         #(100ns)
         m_regmodel.status.read(status, data, .parent(this));
 

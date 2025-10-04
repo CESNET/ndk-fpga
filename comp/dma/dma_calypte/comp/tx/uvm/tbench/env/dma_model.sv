@@ -1,4 +1,4 @@
-// model.sv: Model of implementation
+// dma_model.sv: DMA Model of the TX_DMA_CALYPTE DUT
 // Copyright (C) 2022-2024 CESNET z. s. p. o.
 // Author(s): Daniel Kriz <danielkriz@cesnet.cz>
 //            Vladislav Valek <valekv@cesnet.cz>
@@ -22,7 +22,7 @@ class discard #(int unsigned CHANNELS) extends uvm_component;
     endtask
 endclass
 
-class model #(
+class dma_model #(
     int unsigned USR_MFB_ITEM_WIDTH,
     int unsigned PCIE_CQ_MFB_ITEM_WIDTH,
     int unsigned CHANNELS,
@@ -31,8 +31,8 @@ class model #(
     string DEVICE
 ) extends uvm_component;
 
-    `uvm_component_param_utils(uvm_tx_dma_calypte::model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS,
-                                                           DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE))
+    `uvm_component_param_utils(uvm_tx_dma_calypte::dma_model #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS,
+                                                               DATA_POINTER_WIDTH, USR_MFB_META_WIDTH, DEVICE))
 
     localparam DATA_ADDR_MASK = 2**DATA_POINTER_WIDTH-1;
 
@@ -41,8 +41,6 @@ class model #(
                             #(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))                         m_cq_meta_analysis_fifo;
     uvm_analysis_port     #(uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH))      m_usr_data_analysis_port;
     uvm_analysis_port     #(uvm_logic_vector::sequence_item #(USR_MFB_META_WIDTH))            m_usr_meta_analysis_port;
-
-    local uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH)               m_regmodel_top;
 
     protected int unsigned m_discard_wait;
     discard #(CHANNELS) m_discard_comp;
@@ -87,10 +85,6 @@ class model #(
             m_channel_info[it].dma_transactions_bytes  = 0;
             m_channel_info[it].drop_transactions_bytes = 0;
         end
-    endfunction
-
-    function void regmodel_set(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH) regmodel);
-        this.m_regmodel_top = regmodel;
     endfunction
 
     function void time_add (int unsigned channel, time inf_time[string], int unsigned id);
@@ -204,7 +198,7 @@ class model #(
             debug_msg = "\n";
             debug_msg = { debug_msg,
                     $sformatf("================================================================================= \n")};
-            debug_msg = { debug_msg, $sformatf("MODEL INPUT PCIe TRANSACTION %0d\n", m_pcie_transactions)};
+            debug_msg = { debug_msg, $sformatf("DMA MODEL INPUT PCIe TRANSACTION %0d\n", m_pcie_transactions)};
             debug_msg = { debug_msg,
                     $sformatf("================================================================================= \n")};
             debug_msg = { debug_msg, $sformatf("CHANNEL     : %0d\n", channel)};
@@ -218,7 +212,7 @@ class model #(
             debug_msg = { debug_msg, $sformatf("DATA        : %s\n", cq_data_tr.convert2string())};
             debug_msg = { debug_msg,
                     $sformatf("================================================================================= \n")};
-            `uvm_info(this.get_full_name(), debug_msg, UVM_MEDIUM);
+            `uvm_info(this.get_full_name(), debug_msg, UVM_HIGH);
 
             //if PCIE transaction is not DMA HEADER
             if (hdr_inf == 1'b0) begin
@@ -292,7 +286,7 @@ class model #(
                     debug_msg = "\n";
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
-                    debug_msg = {debug_msg, $sformatf("MODEL OUTPUT DMA TRANSACTION %0d\n", m_dma_transactions)};
+                    debug_msg = {debug_msg, $sformatf("DMA MODEL OUTPUT DMA TRANSACTION %0d\n", m_dma_transactions)};
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("CHANNEL              : %0d\n", channel)};
@@ -306,7 +300,7 @@ class model #(
                     debug_msg = {debug_msg, $sformatf("OUT DATA: %s\n", usr_tx_data_tr.convert2string())};
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
-                    `uvm_info(this.get_full_name(), debug_msg, UVM_MEDIUM)
+                    `uvm_info(this.get_full_name(), debug_msg, UVM_HIGH)
 
                     m_usr_data_analysis_port.write(usr_tx_data_tr);
                     m_usr_meta_analysis_port.write(usr_tx_meta_tr);
@@ -318,7 +312,7 @@ class model #(
                     debug_msg = "\n";
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
-                    debug_msg = {debug_msg, $sformatf("MODEL DROP %0d\n", m_drop_transactions)};
+                    debug_msg = {debug_msg, $sformatf("DMA MODEL DROP %0d\n", m_drop_transactions)};
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
                     debug_msg = {debug_msg, $sformatf("CHANNEL              : %0d\n", channel)};
@@ -332,7 +326,7 @@ class model #(
                     debug_msg = {debug_msg, $sformatf("OUT DATA: %s\n", usr_tx_data_tr.convert2string())};
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
-                    `uvm_info(this.get_full_name(), debug_msg, UVM_MEDIUM)
+                    `uvm_info(this.get_full_name(), debug_msg, UVM_HIGH)
                 end
 
                 m_channel_info[channel].infs.delete();

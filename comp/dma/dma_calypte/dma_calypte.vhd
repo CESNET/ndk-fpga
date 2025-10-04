@@ -195,6 +195,7 @@ entity DMA_CALYPTE is
 end entity;
 
 architecture FULL of DMA_CALYPTE is
+    constant SW_ADDR_WIDTH : positive := 64;
 
     -- Address space mapping between the controllers
     constant MI_SPLIT_BASES : slv_array_t(2 -1 downto 0)(MI_WIDTH-1 downto 0) := (
@@ -223,6 +224,60 @@ architecture FULL of DMA_CALYPTE is
     signal inp_fifo_mfb_src_rdy : std_logic;
     signal inp_fifo_mfb_dst_rdy : std_logic;
 
+    -- =============================================================================================
+    -- Interfaces to Pointer Updater
+    -- =============================================================================================
+    signal rx_stop_req_buff_ba : std_logic_vector(SW_ADDR_WIDTH -1 downto 0);
+    signal rx_stop_req_p2p_en  : std_logic;
+    signal rx_stop_req_hdp     : std_logic_vector(RX_PTR_WIDTH -1 downto 0);
+    signal rx_stop_req_hhp     : std_logic_vector(RX_PTR_WIDTH -1 downto 0);
+    signal rx_stop_req_en      : std_logic;
+    signal rx_stop_req_ack     : std_logic;
+
+    signal tx_rt_upd_ch      : std_logic_vector(log2(TX_CHANNELS) -1 downto 0);
+    signal tx_rt_upd_buff_ba : std_logic_vector(63 downto 0);
+    signal tx_rt_upd_p2p_en  : std_logic;
+
+    signal tx_pkt_disp_upd_ch  : std_logic_vector(log2(TX_CHANNELS) -1 downto 0);
+    signal tx_pkt_disp_upd_hdp : std_logic_vector(TX_PTR_WIDTH -1 downto 0);
+    signal tx_pkt_disp_upd_hhp : std_logic_vector(TX_PTR_WIDTH-3 -1 downto 0);
+    signal tx_pkt_disp_upd_en  : std_logic;
+
+    signal tx_start_req_ch  : std_logic_vector(log2(TX_CHANNELS) -1 downto 0);
+    signal tx_start_req_vld : std_logic;
+    signal tx_start_req_ack : std_logic;
+
+    signal tx_stop_req_buff_ba : std_logic_vector(SW_ADDR_WIDTH -1 downto 0);
+    signal tx_stop_req_p2p_en  : std_logic;
+    signal tx_stop_req_hdp     : std_logic_vector(TX_PTR_WIDTH -1 downto 0);
+    signal tx_stop_req_hhp     : std_logic_vector(TX_PTR_WIDTH-3 -1 downto 0);
+    signal tx_stop_req_en      : std_logic;
+    signal tx_stop_req_ack     : std_logic;
+
+    -- =============================================================================================
+    -- Input interfaces to MFB merger
+    -- =============================================================================================
+    signal ptr_upd_rq_mfb_data    : std_logic_vector(PCIE_RQ_MFB_DATA'range);
+    signal ptr_upd_rq_mfb_meta    : std_logic_vector(PCIE_RQ_MFB_META'range);
+    signal ptr_upd_rq_mfb_sof     : std_logic_vector(PCIE_RQ_MFB_SOF'range);
+    signal ptr_upd_rq_mfb_eof     : std_logic_vector(PCIE_RQ_MFB_EOF'range);
+    signal ptr_upd_rq_mfb_sof_pos : std_logic_vector(PCIE_RQ_MFB_SOF_POS'range);
+    signal ptr_upd_rq_mfb_eof_pos : std_logic_vector(PCIE_RQ_MFB_EOF_POS'range);
+    signal ptr_upd_rq_mfb_src_rdy : std_logic;
+    signal ptr_upd_rq_mfb_dst_rdy : std_logic;
+
+    signal rx_dma_rq_mfb_data    : std_logic_vector(PCIE_RQ_MFB_DATA'range);
+    signal rx_dma_rq_mfb_meta    : std_logic_vector(PCIE_RQ_MFB_META'range);
+    signal rx_dma_rq_mfb_sof     : std_logic_vector(PCIE_RQ_MFB_SOF'range);
+    signal rx_dma_rq_mfb_eof     : std_logic_vector(PCIE_RQ_MFB_EOF'range);
+    signal rx_dma_rq_mfb_sof_pos : std_logic_vector(PCIE_RQ_MFB_SOF_POS'range);
+    signal rx_dma_rq_mfb_eof_pos : std_logic_vector(PCIE_RQ_MFB_EOF_POS'range);
+    signal rx_dma_rq_mfb_src_rdy : std_logic;
+    signal rx_dma_rq_mfb_dst_rdy : std_logic;
+
+    -- =============================================================================================
+    -- MARK_DEBUG attributes for enabling ILA cores for the signals
+    -- =============================================================================================
     -- attribute mark_debug : string;
 
     -- attribute mark_debug of USR_RX_MFB_META_PKT_SIZE : signal is "true";
@@ -275,7 +330,7 @@ begin
 
             CHANNELS       => RX_CHANNELS,
             POINTER_WIDTH  => RX_PTR_WIDTH,
-            SW_ADDR_WIDTH  => 64,
+            SW_ADDR_WIDTH  => SW_ADDR_WIDTH,
             CNTRS_WIDTH    => DSP_CNT_WIDTH,
             HDR_META_WIDTH => HDR_META_WIDTH,
             PKT_SIZE_MAX   => USR_RX_PKT_SIZE_MAX,
@@ -296,6 +351,13 @@ begin
             MI_ARDY => mi_split_ardy(0),
             MI_DRDY => mi_split_drdy(0),
 
+            PTR_UPD_BUFF_BA  => rx_stop_req_buff_ba,
+            PTR_UPD_P2P_EN   => rx_stop_req_p2p_en,
+            PTR_UPD_HDP      => rx_stop_req_hdp,
+            PTR_UPD_HHP      => rx_stop_req_hhp,
+            PTR_UPD_DISP_EN  => rx_stop_req_en,
+            PTR_UPD_DISP_ACK => rx_stop_req_ack,
+
             USER_RX_MFB_META_HDR_META => USR_RX_MFB_META_HDR_META,
             USER_RX_MFB_META_CHAN     => USR_RX_MFB_META_CHAN,
 
@@ -307,19 +369,25 @@ begin
             USER_RX_MFB_SRC_RDY => USR_RX_MFB_SRC_RDY,
             USER_RX_MFB_DST_RDY => USR_RX_MFB_DST_RDY,
 
-            PCIE_UP_MFB_DATA    => PCIE_RQ_MFB_DATA,
-            PCIE_UP_MFB_META    => PCIE_RQ_MFB_META,
-            PCIE_UP_MFB_SOF     => PCIE_RQ_MFB_SOF,
-            PCIE_UP_MFB_EOF     => PCIE_RQ_MFB_EOF,
-            PCIE_UP_MFB_SOF_POS => PCIE_RQ_MFB_SOF_POS,
-            PCIE_UP_MFB_EOF_POS => PCIE_RQ_MFB_EOF_POS,
-            PCIE_UP_MFB_SRC_RDY => PCIE_RQ_MFB_SRC_RDY,
-            PCIE_UP_MFB_DST_RDY => PCIE_RQ_MFB_DST_RDY
+            PCIE_UP_MFB_DATA    => rx_dma_rq_mfb_data,
+            PCIE_UP_MFB_META    => rx_dma_rq_mfb_meta,
+            PCIE_UP_MFB_SOF     => rx_dma_rq_mfb_sof,
+            PCIE_UP_MFB_EOF     => rx_dma_rq_mfb_eof,
+            PCIE_UP_MFB_SOF_POS => rx_dma_rq_mfb_sof_pos,
+            PCIE_UP_MFB_EOF_POS => rx_dma_rq_mfb_eof_pos,
+            PCIE_UP_MFB_SRC_RDY => rx_dma_rq_mfb_src_rdy,
+            PCIE_UP_MFB_DST_RDY => rx_dma_rq_mfb_dst_rdy
         );
     else generate
         mi_split_drd(0)  <= X"DEAD_BEAD";
         mi_split_ardy(0) <= mi_split_rd(0) or mi_split_wr(0);
         mi_split_drdy(0) <= mi_split_rd(0);
+
+        rx_stop_req_buff_ba <= (others => '0');
+        rx_stop_req_p2p_en  <= '0';
+        rx_stop_req_hdp     <= (others => '0');
+        rx_stop_req_hhp     <= (others => '0');
+        rx_stop_req_en      <= '0';
 
         USR_RX_MFB_DST_RDY <= '1';
 
@@ -383,6 +451,26 @@ begin
             ST_SP_DBG_CHAN => ST_SP_DBG_CHAN,
             ST_SP_DBG_META => ST_SP_DBG_META,
 
+            PKT_DISP_UPD_CH  => tx_pkt_disp_upd_ch,
+            PKT_DISP_UPD_HDP => tx_pkt_disp_upd_hdp,
+            PKT_DISP_UPD_HHP => tx_pkt_disp_upd_hhp,
+            PKT_DISP_UPD_EN  => tx_pkt_disp_upd_en,
+
+            RT_UPD_CH      => tx_rt_upd_ch,
+            RT_UPD_BUFF_BA => tx_rt_upd_buff_ba,
+            RT_UPD_P2P_EN  => tx_rt_upd_p2p_en,
+
+            PTR_UPD_START_REQ_CH  => tx_start_req_ch,
+            PTR_UPD_START_REQ_VLD => tx_start_req_vld,
+            PTR_UPD_START_REQ_ACK => tx_start_req_ack,
+
+            PTR_UPD_STOP_REQ_BUFF_BA => tx_stop_req_buff_ba,
+            PTR_UPD_STOP_REQ_P2P_EN  => tx_stop_req_p2p_en,
+            PTR_UPD_STOP_REQ_HDP     => tx_stop_req_hdp,
+            PTR_UPD_STOP_REQ_HHP     => tx_stop_req_hhp,
+            PTR_UPD_STOP_REQ_EN      => tx_stop_req_en,
+            PTR_UPD_STOP_REQ_ACK     => tx_stop_req_ack,
+
             MI_ADDR => mi_split_addr(1),
             MI_DWR  => mi_split_dwr(1),
             MI_BE   => mi_split_be(1),
@@ -413,7 +501,125 @@ begin
 
         ST_SP_DBG_CHAN <= (others => '0');
         ST_SP_DBG_META <= (others => '0');
+
+        tx_pkt_disp_upd_ch  <= (others => '0');
+        tx_pkt_disp_upd_hdp <= (others => '0');
+        tx_pkt_disp_upd_hhp <= (others => '0');
+        tx_pkt_disp_upd_en  <= '0';
+
+        tx_rt_upd_buff_ba <= (others => '0');
+        tx_rt_upd_p2p_en  <= '0';
+
+        tx_start_req_ch  <= (others => '0');
+        tx_start_req_vld <= '0';
+
+        tx_stop_req_buff_ba <= (others => '0');
+        tx_stop_req_p2p_en  <= '0';
+        tx_stop_req_hdp     <= (others => '0');
+        tx_stop_req_hhp     <= (others => '0');
+        tx_stop_req_en      <= '0';
     end generate;
+
+    dma_ptr_updater_i : entity work.DMA_PTR_UPDATER
+    generic map (
+        DEVICE            => DEVICE,
+
+        MFB_REGIONS       => PCIE_RQ_MFB_REGIONS,
+        MFB_REGION_SIZE   => PCIE_RQ_MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE    => PCIE_RQ_MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH    => PCIE_RQ_MFB_ITEM_WIDTH,
+
+        RX_CHANNELS       => RX_CHANNELS,
+        RX_PTR_WIDTH      => RX_PTR_WIDTH,
+
+        TX_CHANNELS       => TX_CHANNELS,
+        TX_DATA_PTR_WIDTH => TX_PTR_WIDTH,
+        TX_HDR_PTR_WIDTH  => TX_PTR_WIDTH-3,
+        TX_UPD_THRESHOLD  => USR_TX_PKT_SIZE_MAX/2
+    )
+    port map (
+        CLK                 => CLK,
+        RESET               => RESET,
+
+        RX_STOP_REQ_BUFF_BA => rx_stop_req_buff_ba,
+        RX_STOP_REQ_P2P_EN  => rx_stop_req_p2p_en,
+        RX_STOP_REQ_HDP     => rx_stop_req_hdp,
+        RX_STOP_REQ_HHP     => rx_stop_req_hhp,
+        RX_STOP_REQ_EN      => rx_stop_req_en,
+        RX_STOP_REQ_ACK     => rx_stop_req_ack,
+
+        TX_RT_UPD_CH        => tx_rt_upd_ch,
+        TX_RT_UPD_BUFF_BA   => tx_rt_upd_buff_ba,
+        TX_RT_UPD_P2P_EN    => tx_rt_upd_p2p_en,
+
+        TX_PKT_DISP_CH      => tx_pkt_disp_upd_ch,
+        TX_PKT_DISP_HDP     => tx_pkt_disp_upd_hdp,
+        TX_PKT_DISP_HHP     => tx_pkt_disp_upd_hhp,
+        TX_PKT_DISP_EN      => tx_pkt_disp_upd_en,
+
+        TX_START_REQ_CH     => tx_start_req_ch,
+        TX_START_REQ_VLD    => tx_start_req_vld,
+        TX_START_REQ_ACK    => tx_start_req_ack,
+
+        TX_STOP_REQ_BUFF_BA => tx_stop_req_buff_ba,
+        TX_STOP_REQ_P2P_EN  => tx_stop_req_p2p_en,
+        TX_STOP_REQ_HDP     => tx_stop_req_hdp,
+        TX_STOP_REQ_HHP     => tx_stop_req_hhp,
+        TX_STOP_REQ_EN      => tx_stop_req_en,
+        TX_STOP_REQ_ACK     => tx_stop_req_ack,
+
+        PCIE_RQ_MFB_DATA    => ptr_upd_rq_mfb_data,
+        PCIE_RQ_MFB_META    => ptr_upd_rq_mfb_meta,
+        PCIE_RQ_MFB_SOF     => ptr_upd_rq_mfb_sof,
+        PCIE_RQ_MFB_EOF     => ptr_upd_rq_mfb_eof,
+        PCIE_RQ_MFB_SOF_POS => ptr_upd_rq_mfb_sof_pos,
+        PCIE_RQ_MFB_EOF_POS => ptr_upd_rq_mfb_eof_pos,
+        PCIE_RQ_MFB_SRC_RDY => ptr_upd_rq_mfb_src_rdy,
+        PCIE_RQ_MFB_DST_RDY => ptr_upd_rq_mfb_dst_rdy
+    );
+
+    pcie_rq_mfb_merger_i : entity work.MFB_MERGER_SIMPLE
+    generic map (
+        REGIONS     => PCIE_RQ_MFB_REGIONS,
+        REGION_SIZE => PCIE_RQ_MFB_REGION_SIZE,
+        BLOCK_SIZE  => PCIE_RQ_MFB_BLOCK_SIZE,
+        ITEM_WIDTH  => PCIE_RQ_MFB_ITEM_WIDTH,
+
+        META_WIDTH  => PCIE_RQ_META_WIDTH,
+        MASKING_EN  => false,
+        CNT_MAX     => 2**3
+    )
+    port map (
+        CLK             => CLK,
+        RST             => RESET,
+
+        RX_MFB0_DATA    => rx_dma_rq_mfb_data,
+        RX_MFB0_META    => rx_dma_rq_mfb_meta,
+        RX_MFB0_SOF     => rx_dma_rq_mfb_sof,
+        RX_MFB0_SOF_POS => rx_dma_rq_mfb_sof_pos,
+        RX_MFB0_EOF     => rx_dma_rq_mfb_eof,
+        RX_MFB0_EOF_POS => rx_dma_rq_mfb_eof_pos,
+        RX_MFB0_SRC_RDY => rx_dma_rq_mfb_src_rdy,
+        RX_MFB0_DST_RDY => rx_dma_rq_mfb_dst_rdy,
+
+        RX_MFB1_DATA    => ptr_upd_rq_mfb_data,
+        RX_MFB1_META    => ptr_upd_rq_mfb_meta,
+        RX_MFB1_SOF     => ptr_upd_rq_mfb_sof,
+        RX_MFB1_SOF_POS => ptr_upd_rq_mfb_sof_pos,
+        RX_MFB1_EOF     => ptr_upd_rq_mfb_eof,
+        RX_MFB1_EOF_POS => ptr_upd_rq_mfb_eof_pos,
+        RX_MFB1_SRC_RDY => ptr_upd_rq_mfb_src_rdy,
+        RX_MFB1_DST_RDY => ptr_upd_rq_mfb_dst_rdy,
+
+        TX_MFB_DATA     => PCIE_RQ_MFB_DATA,
+        TX_MFB_META     => PCIE_RQ_MFB_META,
+        TX_MFB_SOF      => PCIE_RQ_MFB_SOF,
+        TX_MFB_SOF_POS  => PCIE_RQ_MFB_SOF_POS,
+        TX_MFB_EOF      => PCIE_RQ_MFB_EOF,
+        TX_MFB_EOF_POS  => PCIE_RQ_MFB_EOF_POS,
+        TX_MFB_SRC_RDY  => PCIE_RQ_MFB_SRC_RDY,
+        TX_MFB_DST_RDY  => PCIE_RQ_MFB_DST_RDY
+    );
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
     generic map (

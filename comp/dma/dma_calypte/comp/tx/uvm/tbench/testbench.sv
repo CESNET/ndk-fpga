@@ -15,11 +15,14 @@ module testbench;
     typedef test::base base;
     typedef test::speed speed;
 
-    localparam USR_MFB_META_WIDTH = HDR_META_WIDTH + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
+    localparam USR_MFB_META_WIDTH      = HDR_META_WIDTH + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
+    localparam UPD_STOP_REQ_MVB_ITEM_W = (DATA_POINTER_WIDTH-3) + DATA_POINTER_WIDTH + 1 + 64;
+    localparam RT_UPD_MVB_ITEM_W       = (DATA_POINTER_WIDTH-3) + DATA_POINTER_WIDTH + $clog2(CHANNELS);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
     logic CLK = 0;
+    logic RST = 1;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
@@ -45,12 +48,41 @@ module testbench;
         .CLK(CLK)
     );
 
-    // This is a bit confusing that the mvb interface is callled mfb in its name but that is because the
-    // internal metainformation are transported as MFB metadata.
+    mfb_if #(
+        .REGIONS(PCIE_CQ_MFB_REGIONS),
+        .REGION_SIZE(PCIE_CQ_MFB_REGION_SIZE),
+        .BLOCK_SIZE(PCIE_CQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(PCIE_CQ_MFB_ITEM_WIDTH),
+        .META_WIDTH(sv_pcie_meta_pack::PCIE_RQ_META_WIDTH)
+    ) ptr_upd_mfb_vif (
+        .CLK(CLK)
+    );
+
+    mvb_if #(
+        .ITEMS(1),
+        .ITEM_WIDTH(UPD_STOP_REQ_MVB_ITEM_W)
+    ) upd_stop_req_mvb_vif (
+        .CLK(CLK)
+    );
+
+    mvb_if #(
+        .ITEMS(1),
+        .ITEM_WIDTH($clog2(CHANNELS))
+    ) chan_start_req_mvb_vif (
+        .CLK(CLK)
+    );
+
+    mvb_if #(
+        .ITEMS(1),
+        .ITEM_WIDTH(RT_UPD_MVB_ITEM_W)
+    ) rt_upd_mvb_vif (
+        .CLK(CLK)
+    );
+
     mvb_if #(
         .ITEMS(PCIE_CQ_MFB_REGIONS),
         .ITEM_WIDTH(1)
-    ) internal_meta_mfb_vif (
+    ) pkt_drop_meta_mvb_vif (
         .CLK(CLK)
     );
 
@@ -61,15 +93,12 @@ module testbench;
         .CLK(CLK)
     );
 
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Define clock period
     always begin
         #(CLK_PERIOD/2)
         CLK = ~CLK;
     end
+    initial #(10ns) RST <= 0;
 
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Start of tests
     initial begin
         uvm_root m_root;
 
@@ -92,10 +121,28 @@ module testbench;
             .BLOCK_SIZE(USR_MFB_BLOCK_SIZE),
             .ITEM_WIDTH(USR_MFB_ITEM_WIDTH),
             .META_WIDTH(USR_MFB_META_WIDTH)))                   ::set(null, "", "usr_mfb_vif", usr_mfb_vif);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS(PCIE_CQ_MFB_REGIONS),
+            .REGION_SIZE(PCIE_CQ_MFB_REGION_SIZE),
+            .BLOCK_SIZE(PCIE_CQ_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(PCIE_CQ_MFB_ITEM_WIDTH),
+            .META_WIDTH(sv_pcie_meta_pack::PCIE_RQ_META_WIDTH)))::set(null, "", "ptr_upd_mfb_vif", ptr_upd_mfb_vif);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS(1),
+            .ITEM_WIDTH(UPD_STOP_REQ_MVB_ITEM_W)))              ::set(null, "", "upd_stop_req_mvb_vif",
+                                                                      upd_stop_req_mvb_vif);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS(1),
+            .ITEM_WIDTH($clog2(CHANNELS))))                     ::set(null, "", "chan_start_req_mvb_vif",
+                                                                      chan_start_req_mvb_vif);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS(1),
+            .ITEM_WIDTH(RT_UPD_MVB_ITEM_W)))                    ::set(null, "", "rt_upd_mvb_vif",
+                                                                      rt_upd_mvb_vif);
         uvm_config_db#(virtual mvb_if #(
             .ITEMS(PCIE_CQ_MFB_REGIONS),
-            .ITEM_WIDTH(1)))                                    ::set(null, "", "internal_meta_mfb_vif",
-                                                                      internal_meta_mfb_vif);
+            .ITEM_WIDTH(1)))                                    ::set(null, "", "pkt_drop_meta_mvb_vif",
+                                                                      pkt_drop_meta_mvb_vif);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -109,15 +156,17 @@ module testbench;
     end
 
     dut dut_i (
-        .CLK       (CLK),
-        .RST       (reset_vif.RESET),
-        .cq_mfb    (cq_mfb_vif),
-        .usr_mfb   (usr_mfb_vif),
-        .config_mi (config_mi_vif)
+        .CLK                (CLK),
+        .RST                (RST | reset_vif.RESET),
+        .cq_mfb             (cq_mfb_vif),
+        .usr_mfb            (usr_mfb_vif),
+        .ptr_upd_mfb        (ptr_upd_mfb_vif),
+        .upd_stop_req_mvb   (upd_stop_req_mvb_vif),
+        .chan_start_req_mvb (chan_start_req_mvb_vif),
+        .rt_upd_mvb         (rt_upd_mvb_vif),
+        .config_mi          (config_mi_vif)
     );
 
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Properties
     TX_DMA_CALYPTE_PROPERTY #(
         .USR_MFB_REGIONS         (USR_MFB_REGIONS),
         .USR_MFB_REGION_SIZE     (USR_MFB_REGION_SIZE),
@@ -127,17 +176,24 @@ module testbench;
         .PCIE_CQ_MFB_REGION_SIZE (PCIE_CQ_MFB_REGION_SIZE),
         .PCIE_CQ_MFB_BLOCK_SIZE  (PCIE_CQ_MFB_BLOCK_SIZE),
         .PCIE_CQ_MFB_ITEM_WIDTH  (PCIE_CQ_MFB_ITEM_WIDTH),
-        .USR_MFB_META_WIDTH      (USR_MFB_META_WIDTH)
+        .USR_MFB_META_WIDTH      (USR_MFB_META_WIDTH),
+        .CHANNELS                (CHANNELS),
+        .UPD_STOP_REQ_MVB_ITEM_W (UPD_STOP_REQ_MVB_ITEM_W),
+        .RT_UPD_MVB_ITEM_W       (RT_UPD_MVB_ITEM_W)
     ) tx_dma_calypte_property_i (
-        .RESET                   (reset_vif.RESET),
-        .cq_mfb                  (cq_mfb_vif),
-        .usr_mfb                 (usr_mfb_vif)
+        .RESET              (RST | reset_vif.RESET),
+        .cq_mfb             (cq_mfb_vif),
+        .usr_mfb            (usr_mfb_vif),
+        .ptr_upd_mfb        (ptr_upd_mfb_vif),
+        .upd_stop_req_mvb   (upd_stop_req_mvb_vif),
+        .chan_start_req_mvb (chan_start_req_mvb_vif),
+        .rt_upd_mvb         (rt_upd_mvb_vif)
     );
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // GRAY BOX CONNECTION
-    assign internal_meta_mfb_vif.DATA    = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.pkt_drop_en;
-    assign internal_meta_mfb_vif.VLD     = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.PCIE_MFB_SOF;
-    assign internal_meta_mfb_vif.SRC_RDY = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.PCIE_MFB_SRC_RDY;
-    assign internal_meta_mfb_vif.DST_RDY = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.PCIE_MFB_DST_RDY;
+    assign pkt_drop_meta_mvb_vif.DATA    = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.pkt_drop_en;
+    assign pkt_drop_meta_mvb_vif.VLD     = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.PCIE_MFB_SOF;
+    assign pkt_drop_meta_mvb_vif.SRC_RDY = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.PCIE_MFB_SRC_RDY;
+    assign pkt_drop_meta_mvb_vif.DST_RDY = dut_i.vhdl_dut_i.tx_dma_chan_start_stop_ctrl_i.PCIE_MFB_DST_RDY;
 endmodule

@@ -117,8 +117,8 @@ proc sw_mgr {PATH} {
 
 proc conf_regs {PATH} {
 
-    set regs [list "R_CONTROL" "R_STATUS" "R_SDP" "R_SHP" "R_HDP" "R_HHP" "R_DADDR_LOW" "R_DADDR_HIGH" "R_HADDR_LOW" "R_HADDR_HIGH" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
-    set reg_idxs [list 0 1 4 5 6 7 16 17 18 19 22 23 24 25 26 27 28 29 30 31]
+    set regs [list "R_CONTROL" "R_STATUS" "R_EXP" "R_SDP" "R_SHP" "R_HDP" "R_HHP" "R_UPDATE_TIMEOUT" "R_DADDR_LOW" "R_DADDR_HIGH" "R_HADDR_LOW" "R_HADDR_HIGH" "R_UPD_ADDR_L" "R_UPD_ADDR_H" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
+    set reg_idxs [list 0 1 2 4 5 6 7 8 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31]
 
     foreach {n} $regs {i} $reg_idxs {
         add_wave [list -noupdate -hex -group "CONFIGURATION REGISTERS" -label "${n}_0"] $PATH/rx_dma_sw_manager_i/reg_gen(${i})/reg_i/memg(0)/lutram_i/distmem
@@ -127,6 +127,10 @@ proc conf_regs {PATH} {
             add_wave [list -noupdate -hex -group "CONFIGURATION REGISTERS" -label "${n}_1"] $PATH/rx_dma_sw_manager_i/reg_gen(${i})/reg_i/memg(1)/lutram_i/distmem
         }
     }
+}
+
+proc ptr_updater {PATH} {
+    add_wave [list -noupdate -hex -group "POINTER_UPDATER"] $PATH/dma_ptr_updater_i/*
 }
 
 proc pkt_cntrs {PATH} {

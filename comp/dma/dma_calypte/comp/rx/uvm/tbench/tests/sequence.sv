@@ -16,11 +16,13 @@ class virt_seq#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_R
     uvm_logic_vector_array::sequence_lib #(USR_MFB_ITEM_WIDTH)                                                                                m_usr_mfb_seq;
     uvm_dma_ll::reg_sequence#(CHANNELS)                                                                                                       m_reg_seq;
     uvm_sequence#(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)) m_pcie_rq_mfb_seq;
+    uvm_sequence#(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)) m_ptr_upd_mfb_seq;
 
     local logic m_done;
 
     virtual function void init(uvm_dma_ll::regmodel#(CHANNELS) m_regmodel);
         uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH) m_pcie_rq_mfb_seq_lib;
+        uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH) m_ptr_upd_mfb_seq_lib;
 
         m_reset_seq = uvm_reset::sequence_start::type_id::create("rst_seq");
 
@@ -37,12 +39,18 @@ class virt_seq#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_R
         m_pcie_rq_mfb_seq_lib  = uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
         m_pcie_rq_mfb_seq_lib.init_sequence();
         m_pcie_rq_mfb_seq = m_pcie_rq_mfb_seq_lib;
+
+        m_ptr_upd_mfb_seq_lib  = uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
+        m_ptr_upd_mfb_seq_lib.init_sequence();
+        m_ptr_upd_mfb_seq = m_ptr_upd_mfb_seq_lib;
     endfunction
 
     virtual task run_mfb();
         forever begin
             assert(m_pcie_rq_mfb_seq.randomize());
+            assert(m_ptr_upd_mfb_seq.randomize());
             m_pcie_rq_mfb_seq.start(p_sequencer.m_pcie_rq_mfb_sqcr);
+            m_ptr_upd_mfb_seq.start(p_sequencer.m_ptr_upd_mfb_sqcr);
         end
     endtask
 

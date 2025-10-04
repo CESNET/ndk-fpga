@@ -59,6 +59,31 @@ class status_register extends uvm_reg;
     endfunction
 endclass
 
+class exper_register extends uvm_reg;
+    `uvm_object_utils(uvm_dma_ll::exper_register)
+
+    rand uvm_reg_field p2p_enable;
+
+    function new(string name = "exper_register");
+        super.new(name, 1, UVM_NO_COVERAGE);
+    endfunction
+
+    virtual function void build();
+        //Create fields
+        p2p_enable = uvm_reg_field::type_id::create("p2p_enable");
+        //Configure
+        p2p_enable.configure(this, // Parent
+                                 1   , // Number of bits
+                                 0  , // LSB
+                                 "RW", // Access
+                                 0   , // Volatility
+                                 0   , // Value on reset
+                                 1   , // Can the value be reset?
+                                 1   , // Can the value be randomized?
+                                 0     // Does the field occupy an entire byte lane?
+                                 );
+    endfunction
+endclass
 
 class pointer_register extends uvm_reg;
     `uvm_object_utils(uvm_dma_ll::pointer_register)
@@ -84,6 +109,33 @@ class pointer_register extends uvm_reg;
                          1   , // Can the value be randomized?
                          0     // Does the field occupy an entire byte lane?
                          );
+    endfunction
+endclass
+
+class upd_timeout_register extends uvm_reg;
+    `uvm_object_utils(uvm_dma_ll::upd_timeout_register)
+
+    // Write
+    rand uvm_reg_field upd_timeout;
+
+    function new(string name = "upd_timeout_register");
+        super.new(name, 32, UVM_NO_COVERAGE);
+    endfunction
+
+    virtual function void build();
+        //Create fields
+        upd_timeout = uvm_reg_field::type_id::create("upd_timeout");
+        //Configure
+        upd_timeout.configure(this, // Parent
+                              32  , // Number of bits
+                              0   , // LSB
+                              "RW", // Access
+                              0   , // Volatility
+                              0   , // Value on reset
+                              1   , // Can the value be reset?
+                              1   , // Can the value be randomized?
+                              0     // Does the field occupy an entire byte lane?
+                              );
     endfunction
 endclass
 

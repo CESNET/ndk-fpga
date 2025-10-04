@@ -17,7 +17,8 @@ package uvm_dma_ll;
     `include "regmodel.sv"
     `include "reg_sequence.sv"
 
-    `include "model.sv"
+    `include "dma_model.sv"
+    `include "ptr_upd_model.sv"
     `include "scoreboard.sv"
     `include "sequencer.sv"
     `include "env.sv"
