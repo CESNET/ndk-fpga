@@ -95,13 +95,10 @@ entity TX_DMA_PKT_DISPATCHER is
 
         ENABLED_CHANS : in std_logic_vector(CHANNELS -1 downto 0);
 
-        UPD_HDP_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
+        UPD_HP_CHAN  : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         UPD_HDP_DATA : out std_logic_vector(DATA_POINTER_WIDTH -1 downto 0);
-        UPD_HDP_EN   : out std_logic;
-
-        UPD_HHP_CHAN : out std_logic_vector(log2(CHANNELS) -1 downto 0);
         UPD_HHP_DATA : out std_logic_vector(DMA_HDR_POINTER_WIDTH -1 downto 0);
-        UPD_HHP_EN   : out std_logic
+        UPD_HP_EN    : out std_logic
     );
 end entity;
 
@@ -204,8 +201,7 @@ begin
         BUFF_RD_EN   <= '0';
 
         PKT_SENT_INC <= '0';
-        UPD_HDP_EN   <= '0';
-        UPD_HHP_EN   <= '0';
+        UPD_HP_EN   <= '0';
 
         dma_hdr_frame_ptr_v    := unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
         dma_hdr_frame_length_v := unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH));
@@ -272,8 +268,7 @@ begin
             when S_UPDATE_STATUS =>
                 HDR_BUFF_DST_RDY <= USR_MFB_DST_RDY;
                 PKT_SENT_INC     <= USR_MFB_DST_RDY;
-                UPD_HDP_EN       <= USR_MFB_DST_RDY;
-                UPD_HHP_EN       <= USR_MFB_DST_RDY;
+                UPD_HP_EN        <= USR_MFB_DST_RDY;
         end case;
     end process;
 
@@ -287,9 +282,8 @@ begin
     fr_len_round_up_msk <= not to_unsigned(31,16);
     fr_len_rounded      <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 31) and fr_len_round_up_msk;
 
-    UPD_HDP_CHAN <= HDR_BUFF_CHAN;
+    UPD_HP_CHAN <= HDR_BUFF_CHAN;
     UPD_HDP_DATA <= std_logic_vector(resize(fr_len_rounded + unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR)), DATA_POINTER_WIDTH));
-    UPD_HHP_CHAN <= HDR_BUFF_CHAN;
     UPD_HHP_DATA <= std_logic_vector(unsigned(HDR_BUFF_ADDR(1 + DMA_HDR_POINTER_WIDTH -1 downto 1)) + 1);
 
     -- This process delays the set of all output MFB signals because the data come from the data

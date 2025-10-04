@@ -123,17 +123,31 @@ proc top_input {PATH META_CHAN_NUM_W BUFF_ADDR_W REGIONS DEVICE PCIE_META_W} {
 
 proc top_outputs {PATH} {
     add wave -noupdate -divider "USER_TX_OUTPUTS"
-
-    add_wave "-noupdate -unsigned" $PATH/USR_TX_MFB_META_PKT_SIZE
-    add_wave "-noupdate -unsigned" $PATH/USR_TX_MFB_META_CHAN
-    add_wave "-noupdate -hex" $PATH/USR_TX_MFB_META_HDR_META
-    add_wave "-noupdate" $PATH/USR_TX_MFB_DATA
-    add_wave "-noupdate -bin" $PATH/USR_TX_MFB_SOF
-    add_wave "-noupdate -bin" $PATH/USR_TX_MFB_EOF
-    add_wave "-noupdate -bin" $PATH/USR_TX_MFB_SOF_POS
+    add_wave "-noupdate -unsigned" $PATH/vhdl_dut_i/USR_TX_MFB_META_PKT_SIZE
+    add_wave "-noupdate -unsigned" $PATH/vhdl_dut_i/USR_TX_MFB_META_CHAN
+    add_wave "-noupdate -hex" $PATH/vhdl_dut_i/USR_TX_MFB_META_HDR_META
+    add_wave "-noupdate" $PATH/vhdl_dut_i/USR_TX_MFB_DATA
+    add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_SOF
+    add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_EOF
+    add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_SOF_POS
     add_wave "-noupdate -bin" $PATH/USR_TX_MFB_EOF_POS
-    add_wave "-noupdate" $PATH/USR_TX_MFB_SRC_RDY
-    add_wave "-noupdate" $PATH/USR_TX_MFB_DST_RDY
+    add_wave "-noupdate" $PATH/vhdl_dut_i/USR_TX_MFB_SRC_RDY
+    add_wave "-noupdate" $PATH/vhdl_dut_i/USR_TX_MFB_DST_RDY
+
+    add wave -noupdate -divider "POINTER_UPD_OUTPUTS"
+    add_wave "-noupdate" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_DATA
+    add_wave "-noupdate -hex" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_META
+    add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_SOF
+    add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_EOF
+    add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_SOF_POS
+    add_wave "-noupdate -bin" $PATH/PCIE_RQ_MFB_EOF_POS
+    add_wave "-noupdate" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_SRC_RDY
+    add_wave "-noupdate" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_DST_RDY
+}
+
+proc ptr_updater {PATH} {
+    add wave -noupdate -divider "POINTER_UPD"
+    add_wave "-noupdate -group \"POINTER_UPD\"" $PATH/*
 }
 
 proc internals {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_BE_W META_BYTE_CNT_W META_FBE_W META_LBE_W META_REDUCED_W META_WO_BYTE_CNT_W REGIONS} {
@@ -563,8 +577,8 @@ proc sw_mgr {PATH} {
 
 proc conf_regs {PATH DEVICE} {
 
-    set regs [list "R_CONTROL" "R_STATUS" "R_SDP" "R_HDP" "R_SHP" "R_HHP" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
-    set reg_idxs [list 0 1 4 6 5 7 22 23 24 25 26 27 28 29 30 31]
+    set regs [list "R_CONTROL" "R_STATUS" "R_EXP" "R_SDP" "R_HDP" "R_SHP" "R_HHP" "R_UPDATE_TIMEOUT" "R_UPD_ADDR_L" "R_UPD_ADDR_H" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
+    set reg_idxs [list 0 1 2 4 6 5 7 8 20 21 22 23 24 25 26 27 28 29 30 31]
 
     foreach {n} $regs {i} $reg_idxs {
 

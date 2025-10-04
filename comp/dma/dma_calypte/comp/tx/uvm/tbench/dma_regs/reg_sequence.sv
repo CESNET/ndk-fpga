@@ -10,6 +10,14 @@ class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
     `uvm_object_utils(uvm_tx_dma_calypte_regs::start_channel_seq #(POINTER_WIDTH))
 
     regmodel_channel #(POINTER_WIDTH) m_regmodel_channel;
+    rand logic [64-1:0] update_base_addr;
+    rand logic          p2p_enable;
+    rand logic [32-1:0] upd_timeout;
+
+    constraint c_start {
+        upd_timeout > 4;
+        update_base_addr % 4 == 0;
+    }
 
     function new (string name = "start_channel_seq");
         super.new(name);
@@ -22,12 +30,15 @@ class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
 
         int unsigned start_attempts = 0;
 
+        m_regmodel_channel.update_base_reg.write(status, update_base_addr, .parent(this));
         //Randomize sequence of doing this
         //write sw_pointers
         m_regmodel_channel.sw_data_pointer_reg.write(status, 'h0, .parent(this));
         m_regmodel_channel.sw_hdr_pointer_reg .write(status, 'h0, .parent(this));
 
         //startup channel
+        m_regmodel_channel.upd_timeout_reg.write(status, upd_timeout, .parent(this));
+        m_regmodel_channel.exper_reg.write(status, p2p_enable, .parent(this));
         m_regmodel_channel.control_reg.write(status,  32'h1,  .parent(this));
 
         do begin
@@ -47,7 +58,7 @@ class stop_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
 
     regmodel_channel #(POINTER_WIDTH) m_regmodel_channel;
 
-    function new (string name = "start_channel_seq");
+    function new (string name = "stop_channel_seq");
         super.new(name);
     endfunction
 

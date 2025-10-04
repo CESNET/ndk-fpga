@@ -19,11 +19,18 @@ module TX_DMA_CALYPTE_PROPERTY #(
     int unsigned PCIE_CQ_MFB_BLOCK_SIZE,
     int unsigned PCIE_CQ_MFB_ITEM_WIDTH,
 
-    int unsigned USR_MFB_META_WIDTH
+    int unsigned USR_MFB_META_WIDTH,
+    int unsigned CHANNELS,
+    int unsigned UPD_STOP_REQ_MVB_ITEM_W,
+    int unsigned RT_UPD_MVB_ITEM_W
 ) (
     input logic RESET,
     mfb_if cq_mfb,
-    mfb_if usr_mfb
+    mfb_if usr_mfb,
+    mfb_if ptr_upd_mfb,
+    mvb_if upd_stop_req_mvb,
+    mvb_if chan_start_req_mvb,
+    mvb_if rt_upd_mvb
 );
 
     string module_name = "";
@@ -70,5 +77,53 @@ module TX_DMA_CALYPTE_PROPERTY #(
     ) usr_mfb_property_i (
         .RESET (RESET),
         .vif   (usr_mfb)
+    );
+
+    mfb_property #(
+        .REGIONS     (PCIE_CQ_MFB_REGIONS),
+        .REGION_SIZE (PCIE_CQ_MFB_REGION_SIZE),
+        .BLOCK_SIZE  (PCIE_CQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (PCIE_CQ_MFB_ITEM_WIDTH),
+        .META_WIDTH  (sv_pcie_meta_pack::PCIE_RQ_META_WIDTH)
+    ) ptr_upd_mfb_prop_i (
+        .RESET (RESET),
+        .vif   (ptr_upd_mfb)
+    );
+
+    generate if (PCIE_CQ_MFB_REGIONS > 1) begin
+        property ptr_upd_sof_after_eof;
+            @(posedge ptr_upd_mfb.CLK) disable iff(RESET)
+            ptr_upd_mfb.SRC_RDY |-> (( ~(ptr_upd_mfb.EOF[PCIE_CQ_MFB_REGIONS-2:0]) & ptr_upd_mfb.SOF[PCIE_CQ_MFB_REGIONS-1:1]) == 0);
+        endproperty
+
+        // Check when SOF is not on first position then previous packet have to end in region right before.
+        assert property (ptr_upd_sof_after_eof)
+            else begin
+                `uvm_error(module_name, $sformatf("\n\tPointer Update interface: If sof is set on different region that 0 then region befor have to be eof set\n\tSOF %b\n\tEOF %b", ptr_upd_mfb.SOF, ptr_upd_mfb.EOF));
+            end
+    end endgenerate
+
+    mvb_property #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (UPD_STOP_REQ_MVB_ITEM_W)
+    ) upd_stop_req_mvb_prop_i (
+        .RESET      (RESET),
+        .vif        (upd_stop_req_mvb)
+    );
+
+    mvb_property #(
+        .ITEMS      (1),
+        .ITEM_WIDTH ($clog2(CHANNELS))
+    ) chan_start_req_mvb_prop_i (
+        .RESET      (RESET),
+        .vif        (chan_start_req_mvb)
+    );
+
+    mvb_property #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (RT_UPD_MVB_ITEM_W)
+    ) rt_upd_mvb_prop_i (
+        .RESET      (RESET),
+        .vif        (rt_upd_mvb)
     );
 endmodule

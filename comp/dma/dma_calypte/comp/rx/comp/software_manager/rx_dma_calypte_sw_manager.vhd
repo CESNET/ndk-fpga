@@ -89,7 +89,7 @@ entity RX_DMA_CALYPTE_SW_MANAGER is
         ENABLED_CHAN         : out std_logic_vector(CHANNELS-1 downto 0);
 
         -- =====================================================================
-        -- Pointer update interface
+        -- Pointer update interface (from Header Manager)
         -- =====================================================================
         -- Software pointer read interface
         SDP_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
@@ -118,6 +118,16 @@ entity RX_DMA_CALYPTE_SW_MANAGER is
         HPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
 
         -- =========================================================================================
+        -- Interface to Pointer Updater
+        -- =========================================================================================
+        PTR_UPD_BUFF_BA  : out std_logic_vector(SW_ADDR_WIDTH -1 downto 0);
+        PTR_UPD_P2P_EN   : out std_logic;
+        PTR_UPD_HDP      : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_HHP      : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_DISP_EN  : out std_logic;
+        PTR_UPD_DISP_ACK : in  std_logic;
+
+        -- =========================================================================================
         -- Performance counters increment interface
         -- =========================================================================================
         DATA_BUFF_FULL_CHAN         : out std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -141,6 +151,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant R_CONTROL         : natural :=  0;
     -- DMA Channel Status
     constant R_STATUS          : natural :=  1;
+    -- Enabling experimental features
+    constant R_EXP             : natural :=  2;
     -- Software Descriptor Pointer
     constant R_SDP             : natural :=  4;
     -- Software Header Pointer
@@ -149,6 +161,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant R_HDP             : natural :=  6;
     -- Hardware Header Pointer
     constant R_HHP             : natural :=  7;
+    -- Time in clock cycles when the update of HHP/HDP is repeated
+    constant R_UPDATE_TIMEOUT  : natural :=  8;
     -- Base address of Descriptor Buffer in RAM (bits 31:0)
     constant R_DADDR_LOW       : natural := 16;
     -- Base address of Descriptor Buffer in RAM (bits 63:32)
@@ -157,6 +171,10 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant R_HADDR_LOW       : natural := 18;
     -- Base address of Header Buffer in RAM (bits 63:32)
     constant R_HADDR_HIGH      : natural := 19;
+    -- Base addres of Update Buffer in RAM (bits 31:0)
+    constant R_UPD_ADDR_L      : natural := 20;
+    -- Base addres of Update Buffer in RAM (bits 63:32)
+    constant R_UPD_ADDR_H      : natural := 21;
     -- Mask for SDP and HDP determining Descriptor Buffer size
     constant R_DPM             : natural := 22;
     -- Mask for SHP and HHP determining Header Buffer size
@@ -179,9 +197,7 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant R_DISC_BYTES_HIGH : natural := 31;
 
     -- reserved register numbers
-    constant RSV_2  : natural := 2;
     constant RSV_3  : natural := 3;
-    constant RSV_8  : natural := 8;
     constant RSV_9  : natural := 9;
     constant RSV_10 : natural := 10;
     constant RSV_11 : natural := 11;
@@ -189,8 +205,6 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant RSV_13 : natural := 13;
     constant RSV_14 : natural := 14;
     constant RSV_15 : natural := 15;
-    constant RSV_20 : natural := 20;
-    constant RSV_21 : natural := 21;
 
     -- Total number of registers
     constant REGS : natural := 32;
@@ -199,13 +213,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant R_ADDRS : n_array_t(REGS-1 downto 0) := (
     R_CONTROL         => 16#00#,
     R_STATUS          => 16#04#,
-    RSV_2             => 16#08#,
+    R_EXP             => 16#08#,
     RSV_3             => 16#0C#,
     R_SDP             => 16#10#,
     R_SHP             => 16#14#,
     R_HDP             => 16#18#,
     R_HHP             => 16#1C#,
-    RSV_8             => 16#20#,
+    R_UPDATE_TIMEOUT  => 16#20#,
     RSV_9             => 16#24#,
     RSV_10            => 16#28#,
     RSV_11            => 16#2C#,
@@ -217,8 +231,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     R_DADDR_HIGH      => 16#44#,
     R_HADDR_LOW       => 16#48#,
     R_HADDR_HIGH      => 16#4C#,
-    RSV_20            => 16#50#,
-    RSV_21            => 16#54#,
+    R_UPD_ADDR_L      => 16#50#,
+    R_UPD_ADDR_H      => 16#54#,
     R_DPM             => 16#58#,
     R_HPM             => 16#5C#,
     R_SENT_PKTS_LOW   => 16#60#,
@@ -239,13 +253,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant STROBE_EN : b_array_t(REGS-1 downto 0) := (
         R_CONTROL         => FALSE,
         R_STATUS          => FALSE,
-        RSV_2             => FALSE,
+        R_EXP             => FALSE,
         RSV_3             => FALSE,
         R_SDP             => FALSE,
         R_SHP             => FALSE,
         R_HDP             => FALSE,
         R_HHP             => FALSE,
-        RSV_8             => FALSE,
+        R_UPDATE_TIMEOUT  => FALSE,
         RSV_9             => FALSE,
         RSV_10            => FALSE,
         RSV_11            => FALSE,
@@ -257,8 +271,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
         R_DADDR_HIGH      => FALSE,
         R_HADDR_LOW       => FALSE,
         R_HADDR_HIGH      => FALSE,
-        RSV_20            => FALSE,
-        RSV_21            => FALSE,
+        R_UPD_ADDR_L      => FALSE,
+        R_UPD_ADDR_H      => FALSE,
         R_DPM             => FALSE,
         R_HPM             => FALSE,
         R_SENT_PKTS_LOW   => TRUE,
@@ -276,13 +290,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant WR_EN : b_array_t(REGS-1 downto 0) := (
         R_CONTROL         => TRUE  or STROBE_EN(R_CONTROL        ),
         R_STATUS          => FALSE or STROBE_EN(R_STATUS         ),
-        RSV_2             => FALSE or STROBE_EN(RSV_2            ),
+        R_EXP             => TRUE  or STROBE_EN(R_EXP            ),
         RSV_3             => FALSE or STROBE_EN(RSV_3            ),
         R_SDP             => TRUE  or STROBE_EN(R_SDP            ),
         R_SHP             => TRUE  or STROBE_EN(R_SHP            ),
         R_HDP             => FALSE or STROBE_EN(R_HDP            ),
         R_HHP             => FALSE or STROBE_EN(R_HHP            ),
-        RSV_8             => FALSE or STROBE_EN(RSV_8            ),
+        R_UPDATE_TIMEOUT  => TRUE  or STROBE_EN(R_UPDATE_TIMEOUT ),
         RSV_9             => FALSE or STROBE_EN(RSV_9            ),
         RSV_10            => FALSE or STROBE_EN(RSV_10           ),
         RSV_11            => FALSE or STROBE_EN(RSV_11           ),
@@ -294,8 +308,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
         R_DADDR_HIGH      => TRUE  or STROBE_EN(R_DADDR_HIGH     ),
         R_HADDR_LOW       => TRUE  or STROBE_EN(R_HADDR_LOW      ),
         R_HADDR_HIGH      => TRUE  or STROBE_EN(R_HADDR_HIGH     ),
-        RSV_20            => FALSE or STROBE_EN(RSV_20           ),
-        RSV_21            => FALSE or STROBE_EN(RSV_21           ),
+        R_UPD_ADDR_L      => TRUE  or STROBE_EN(R_UPD_ADDR_L     ),
+        R_UPD_ADDR_H      => TRUE  or STROBE_EN(R_UPD_ADDR_H     ),
         R_DPM             => TRUE  or STROBE_EN(R_DPM            ),
         R_HPM             => TRUE  or STROBE_EN(R_HPM            ),
         R_SENT_PKTS_LOW   => TRUE  or STROBE_EN(R_SENT_PKTS_LOW  ),
@@ -313,13 +327,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant WR_PORTS : i_array_t(REGS-1 downto 0) := (
         R_CONTROL         => tsel(WR_EN(R_CONTROL        ),1,0) + 1,
         R_STATUS          => tsel(WR_EN(R_STATUS         ),1,0) + 1, -- Channel Start/Stop confirmation
-        RSV_2             => tsel(WR_EN(RSV_2            ),1,0) + 0,
+        R_EXP             => tsel(WR_EN(R_EXP            ),1,0) + 0,
         RSV_3             => tsel(WR_EN(RSV_3            ),1,0) + 0,
         R_SDP             => tsel(WR_EN(R_SDP            ),1,0) + 0,
         R_SHP             => tsel(WR_EN(R_SHP            ),1,0) + 0,
         R_HDP             => tsel(WR_EN(R_HDP            ),1,0) + 2, -- Channel Start reset + Header manager
         R_HHP             => tsel(WR_EN(R_HHP            ),1,0) + 2, -- Channel Start reset + Header manager
-        RSV_8             => tsel(WR_EN(RSV_8            ),1,0) + 0,
+        R_UPDATE_TIMEOUT  => tsel(WR_EN(R_UPDATE_TIMEOUT ),1,0) + 0,
         RSV_9             => tsel(WR_EN(RSV_9            ),1,0) + 0,
         RSV_10            => tsel(WR_EN(RSV_10           ),1,0) + 0,
         RSV_11            => tsel(WR_EN(RSV_11           ),1,0) + 0,
@@ -331,8 +345,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
         R_DADDR_HIGH      => tsel(WR_EN(R_DADDR_HIGH     ),1,0) + 0,
         R_HADDR_LOW       => tsel(WR_EN(R_HADDR_LOW      ),1,0) + 0,
         R_HADDR_HIGH      => tsel(WR_EN(R_HADDR_HIGH     ),1,0) + 0,
-        RSV_20            => tsel(WR_EN(RSV_20           ),1,0) + 0,
-        RSV_21            => tsel(WR_EN(RSV_21           ),1,0) + 0,
+        R_UPD_ADDR_L      => tsel(WR_EN(R_UPD_ADDR_L     ),1,0) + 0,
+        R_UPD_ADDR_H      => tsel(WR_EN(R_UPD_ADDR_H     ),1,0) + 0,
         R_DPM             => tsel(WR_EN(R_DPM            ),1,0) + 0,
         R_HPM             => tsel(WR_EN(R_HPM            ),1,0) + 0,
         R_SENT_PKTS_LOW   => tsel(WR_EN(R_SENT_PKTS_LOW  ),1,0) + 0,
@@ -351,13 +365,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant RD_PORTS : i_array_t(REGS-1 downto 0) := (
         R_CONTROL         => 1 + 1,     -- Channel Start/Stop detection
         R_STATUS          => 1 + 1,     -- Channel Start/Stop indication
-        RSV_2             => 1 + 0,
+        R_EXP             => 1 + 1,     -- Stop logic
         RSV_3             => 1 + 0,
         R_SDP             => 1 + 2,     -- Channel Stop indication (comparator) + Header manager
         R_SHP             => 1 + 2,     -- Channel Stop indication (comparator) + Header manager
         R_HDP             => 1 + 2,     -- Comparator + Perf. counters
         R_HHP             => 1 + 2,     -- Comparator + Perf. counters
-        RSV_8             => 1 + 0,
+        R_UPDATE_TIMEOUT  => 1 + 1,     -- Channel stop logic
         RSV_9             => 1 + 0,
         RSV_10            => 1 + 0,
         RSV_11            => 1 + 0,
@@ -369,8 +383,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
         R_DADDR_HIGH      => 1 + 1,     -- Header manager
         R_HADDR_LOW       => 1 + 1,     -- Header manager
         R_HADDR_HIGH      => 1 + 1,     -- Header manager
-        RSV_20            => 1 + 0,
-        RSV_21            => 1 + 0,
+        R_UPD_ADDR_L      => 1 + 1,     -- Channel stop logic
+        R_UPD_ADDR_H      => 1 + 1,     -- Channel stop logic
         R_DPM             => 1 + 1,     -- Header manager
         R_HPM             => 1 + 1,     -- Header manager
         R_SENT_PKTS_LOW   => 1 + 0,
@@ -389,13 +403,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant WR_BE_SUPPORT : b_array_t(REGS-1 downto 0) := (
         R_CONTROL         => FALSE,
         R_STATUS          => FALSE,
-        RSV_2             => FALSE,
+        R_EXP             => FALSE,
         RSV_3             => FALSE,
         R_SDP             => FALSE,
         R_SHP             => FALSE,
         R_HDP             => FALSE,
         R_HHP             => FALSE,
-        RSV_8             => FALSE,
+        R_UPDATE_TIMEOUT  => FALSE,
         RSV_9             => FALSE,
         RSV_10            => FALSE,
         RSV_11            => FALSE,
@@ -407,8 +421,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
         R_DADDR_HIGH      => FALSE,
         R_HADDR_LOW       => FALSE,
         R_HADDR_HIGH      => FALSE,
-        RSV_20            => FALSE,
-        RSV_21            => FALSE,
+        R_UPD_ADDR_L      => FALSE,
+        R_UPD_ADDR_H      => FALSE,
         R_DPM             => FALSE,
         R_HPM             => FALSE,
         R_SENT_PKTS_LOW   => FALSE,
@@ -426,13 +440,13 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant RD_WIDTH : i_array_t(REGS-1 downto 0) := (
         R_CONTROL         => 1,
         R_STATUS          => 1,
-        RSV_2             => 0,
+        R_EXP             => 1,
         RSV_3             => 0,
         R_SDP             => POINTER_WIDTH,
         R_SHP             => POINTER_WIDTH,
         R_HDP             => POINTER_WIDTH,
         R_HHP             => POINTER_WIDTH,
-        RSV_8             => 0,
+        R_UPDATE_TIMEOUT  => MI_WIDTH,
         RSV_9             => 0,
         RSV_10            => 0,
         RSV_11            => 0,
@@ -444,8 +458,8 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
         R_DADDR_HIGH      => MI_WIDTH,
         R_HADDR_LOW       => MI_WIDTH,
         R_HADDR_HIGH      => MI_WIDTH,
-        RSV_20            => 0,
-        RSV_21            => 0,
+        R_UPD_ADDR_L      => MI_WIDTH,
+        R_UPD_ADDR_H      => MI_WIDTH,
         R_DPM             => POINTER_WIDTH,
         R_HPM             => POINTER_WIDTH,
         R_SENT_PKTS_LOW   => minimum(MI_WIDTH, RECV_PKT_CNT_WIDTH),
@@ -559,7 +573,7 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     -- =====================================================================
     --  Stop request logic
     -- =====================================================================
-    type   stop_fsm_type is (IDLE, WAIT_FOR_REQ_ACK, WAIT_FOR_POINTERS);
+    type   stop_fsm_type is (IDLE, WAIT_FOR_REQ_ACK, WAIT_FOR_POINTERS, WAIT_FOR_PTR_UPDATE_DISPATCH);
     signal stop_fsm_pst : stop_fsm_type;
     signal stop_fsm_nst : stop_fsm_type;
 
@@ -568,6 +582,10 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     signal stop_fsm_channel_reg : std_logic_vector(log2(CHANNELS)-1 downto 0);
     signal stop_fsm_channel     : std_logic_vector(log2(CHANNELS)-1 downto 0);
     signal stop_acked           : std_logic;
+
+    constant UPD_TIMEOUT_CNTR_NULL_VAL : unsigned(MI_WIDTH -1 downto 0) := (others => '0');
+    signal   upd_timeout_cntr_reg      : unsigned(MI_WIDTH -1 downto 0);
+    signal   upd_timeout_cntr_next     : unsigned(MI_WIDTH -1 downto 0);
     -- =====================================================================
 
 
@@ -1058,25 +1076,28 @@ begin
     stop_fsm_pst_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-
             if (RESET = '1') then
                 stop_fsm_pst         <= IDLE;
                 stop_fsm_channel_reg <= (others => '0');
+                upd_timeout_cntr_reg <= (others => '0');
             else
                 stop_fsm_pst         <= stop_fsm_nst;
                 stop_fsm_channel_reg <= stop_fsm_channel;
+                upd_timeout_cntr_reg <= upd_timeout_cntr_next;
             end if;
         end if;
     end process;
 
     stop_fsm_nst_logic_p : process (all)
     begin
-        stop_fsm_nst     <= stop_fsm_pst;
-        stop_fsm_channel <= stop_fsm_channel_reg;
-        STOP_REQ_CHAN    <= stop_fsm_channel_reg;
-        STOP_REQ_VLD     <= '0';
-        stop_acked       <= '0';
-        enabled_chan_rst <= (others => '0');
+        stop_fsm_nst          <= stop_fsm_pst;
+        stop_fsm_channel      <= stop_fsm_channel_reg;
+        STOP_REQ_CHAN         <= stop_fsm_channel_reg;
+        STOP_REQ_VLD          <= '0';
+        stop_acked            <= '0';
+        enabled_chan_rst      <= (others => '0');
+        PTR_UPD_DISP_EN       <= '0';
+        upd_timeout_cntr_next <= upd_timeout_cntr_reg;
 
         case (stop_fsm_pst) is
 
@@ -1092,17 +1113,36 @@ begin
             when WAIT_FOR_REQ_ACK =>
 
                 if (STOP_REQ_ACK = '1') then
+                    stop_fsm_nst <= WAIT_FOR_PTR_UPDATE_DISPATCH;
+                end if;
+
+            when WAIT_FOR_PTR_UPDATE_DISPATCH =>
+                PTR_UPD_DISP_EN       <= '1';
+                upd_timeout_cntr_next <= unsigned(reg_dob_opt(R_UPDATE_TIMEOUT)(1));
+
+                if (PTR_UPD_DISP_ACK = '1') then
                     stop_fsm_nst <= WAIT_FOR_POINTERS;
                 end if;
 
             when WAIT_FOR_POINTERS =>
 
+                -- If timeout is not required, it can be disabled by setting the R_UPDATE_TIMEOUT
+                -- register to zero. Only one update dispatch is then performed.
+                if (unsigned(reg_dob_opt(R_UPDATE_TIMEOUT)(1)) /= UPD_TIMEOUT_CNTR_NULL_VAL) then
+                    if (upd_timeout_cntr_reg /= UPD_TIMEOUT_CNTR_NULL_VAL) then
+                        upd_timeout_cntr_next <= upd_timeout_cntr_reg - 1;
+                    else
+                        -- If timeout runs out, do the pointer update one more time
+                        stop_fsm_nst <= WAIT_FOR_PTR_UPDATE_DISPATCH;
+                    end if;
+                end if;
+
+                -- This takes priority if this would occur at the same time with timeout counter runout
                 if (stop_chan_ok = '1' and stop_ptr_ok = '1') then
                     stop_fsm_nst                                                 <= IDLE;
                     stop_acked                                                   <= '1';
                     enabled_chan_rst(to_integer(unsigned(stop_fsm_channel_reg))) <= '1';
                 end if;
-
         end case;
     end process;
 
@@ -1111,6 +1151,24 @@ begin
     stop_ptr_ok  <= stop_hdp_ok_reg and stop_hhp_ok_reg;
     -- =====================================================================
 
+    -- =============================================================================================
+    -- Interface for the Pointer Updater
+    -- =============================================================================================
+    -- The bit 0 within each channel's R_EXP register enables P2P transfers
+    reg_addrb(R_EXP)(1) <= stop_fsm_channel_reg;
+    PTR_UPD_P2P_EN      <= reg_dob_opt(R_EXP)(1)(0);
+
+    -- Since the signals to the comparator are selected at the same time when pointer values for
+    -- pointer updater are needed, the same port is used here.
+    PTR_UPD_HDP <= reg_dob_opt(R_HDP)(1)(POINTER_WIDTH-1 downto 0);
+    PTR_UPD_HHP <= reg_dob_opt(R_HHP)(1)(POINTER_WIDTH-1 downto 0);
+
+    reg_addrb(R_UPD_ADDR_L)(1) <= stop_fsm_channel_reg;
+    reg_addrb(R_UPD_ADDR_H)(1) <= stop_fsm_channel_reg;
+    PTR_UPD_BUFF_BA            <= reg_dob_opt(R_UPD_ADDR_H)(1) & reg_dob_opt(R_UPD_ADDR_L)(1);
+
+    reg_addrb(R_UPDATE_TIMEOUT)(1) <= stop_fsm_channel_reg;
+    -- =============================================================================================
 
     -- =====================================================================
     --  Register array of enabled channels

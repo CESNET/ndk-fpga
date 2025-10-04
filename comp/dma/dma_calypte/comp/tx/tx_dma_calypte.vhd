@@ -95,6 +95,29 @@ entity TX_DMA_CALYPTE is
         ST_SP_DBG_META : out std_logic_vector(ST_SP_DBG_SIGNAL_W -1 downto 0);
 
         -- =========================================================================================
+        -- Pointer update interface
+        -- =========================================================================================
+        PKT_DISP_UPD_CH  : out std_logic_vector(log2(CHANNELS) -1 downto 0);
+        PKT_DISP_UPD_HDP : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PKT_DISP_UPD_HHP : out std_logic_vector(POINTER_WIDTH-3 -1 downto 0);
+        PKT_DISP_UPD_EN  : out std_logic;
+
+        RT_UPD_CH      : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
+        RT_UPD_BUFF_BA : out std_logic_vector(64 -1 downto 0);
+        RT_UPD_P2P_EN  : out std_logic;
+
+        PTR_UPD_START_REQ_CH  : out std_logic_vector(log2(CHANNELS) -1 downto 0);
+        PTR_UPD_START_REQ_VLD : out std_logic;
+        PTR_UPD_START_REQ_ACK : in std_logic;
+
+        PTR_UPD_STOP_REQ_BUFF_BA : out std_logic_vector(64 -1 downto 0);
+        PTR_UPD_STOP_REQ_P2P_EN  : out std_logic;
+        PTR_UPD_STOP_REQ_HDP     : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_STOP_REQ_HHP     : out std_logic_vector(POINTER_WIDTH-3 -1 downto 0);
+        PTR_UPD_STOP_REQ_EN      : out std_logic;
+        PTR_UPD_STOP_REQ_ACK     : in  std_logic;
+
+        -- =========================================================================================
         -- Control MI bus for software access
         -- =========================================================================================
         MI_ADDR : in  std_logic_vector(MI_WIDTH -1 downto 0);
@@ -154,13 +177,10 @@ architecture FULL of TX_DMA_CALYPTE is
     signal stop_req_vld  : std_logic;
     signal stop_req_ack  : std_logic;
 
-    signal upd_hdp_chan : std_logic_vector(log2(CHANNELS) -1 downto 0);
+    signal upd_hp_chan  : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal upd_hdp_data : std_logic_vector(POINTER_WIDTH -1 downto 0);
-    signal upd_hdp_en   : std_logic;
-
-    signal upd_hhp_chan : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal upd_hhp_data : std_logic_vector(POINTER_WIDTH-3 -1 downto 0);
-    signal upd_hhp_en   : std_logic;
+    signal upd_hp_en    : std_logic;
 
     signal ext_mfb_data    : std_logic_vector(PCIE_CQ_MFB_WIDTH -1 downto 0);
     signal ext_mfb_meta    : std_logic_vector(PCIE_CQ_MFB_REGIONS*(META_BYTE_CNT_O+META_BYTE_CNT_W)-1 downto 0);
@@ -306,12 +326,27 @@ begin
 
         ENABLED_CHAN => enabled_chans,
 
-        HDP_WR_CHAN => upd_hdp_chan,
+        RT_UPD_CH      => RT_UPD_CH,
+        RT_UPD_BUFF_BA => RT_UPD_BUFF_BA,
+        RT_UPD_P2P_EN  => RT_UPD_P2P_EN,
+
+        PTR_UPD_START_REQ_CH  => PTR_UPD_START_REQ_CH,
+        PTR_UPD_START_REQ_VLD => PTR_UPD_START_REQ_VLD,
+        PTR_UPD_START_REQ_ACK => PTR_UPD_START_REQ_ACK,
+
+        PTR_UPD_STOP_REQ_BUFF_BA => PTR_UPD_STOP_REQ_BUFF_BA,
+        PTR_UPD_STOP_REQ_P2P_EN  => PTR_UPD_STOP_REQ_P2P_EN,
+        PTR_UPD_STOP_REQ_HDP     => PTR_UPD_STOP_REQ_HDP,
+        PTR_UPD_STOP_REQ_HHP     => PTR_UPD_STOP_REQ_HHP,
+        PTR_UPD_STOP_REQ_EN      => PTR_UPD_STOP_REQ_EN,
+        PTR_UPD_STOP_REQ_ACK     => PTR_UPD_STOP_REQ_ACK,
+
+        HDP_WR_CHAN => upd_hp_chan,
         HDP_WR_DATA => upd_hdp_data,
-        HDP_WR_EN   => upd_hdp_en,
-        HHP_WR_CHAN => upd_hhp_chan,
+        HDP_WR_EN   => upd_hp_en,
+        HHP_WR_CHAN => upd_hp_chan,
         HHP_WR_DATA => upd_hhp_data,
-        HHP_WR_EN   => upd_hhp_en
+        HHP_WR_EN   => upd_hp_en
     );
 
     tx_dma_metadata_extractor_i : entity work.TX_DMA_METADATA_EXTRACTOR
@@ -550,14 +585,16 @@ begin
 
         ENABLED_CHANS => enabled_chans,
 
-        UPD_HDP_CHAN => upd_hdp_chan,
+        UPD_HP_CHAN  => upd_hp_chan,
         UPD_HDP_DATA => upd_hdp_data,
-        UPD_HDP_EN   => upd_hdp_en,
-
-        UPD_HHP_CHAN => upd_hhp_chan,
         UPD_HHP_DATA => upd_hhp_data,
-        UPD_HHP_EN   => upd_hhp_en
+        UPD_HP_EN    => upd_hp_en
     );
+
+    PKT_DISP_UPD_CH  <= upd_hp_chan;
+    PKT_DISP_UPD_HDP <= upd_hdp_data;
+    PKT_DISP_UPD_HHP <= upd_hhp_data;
+    PKT_DISP_UPD_EN  <= upd_hp_en;
 
     out_pipe_i : entity work.MFB_PIPE
     generic map (

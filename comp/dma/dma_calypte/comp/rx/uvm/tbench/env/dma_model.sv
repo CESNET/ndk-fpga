@@ -1,12 +1,12 @@
-//-- model.sv: Model of implementation
+//-- dma_model.sv: Model of the DMA module
 //-- Copyright (C) 2022 CESNET z. s. p. o.
 //-- Author(s): Radek Iša <isa@cesnet.cz>
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class model_packet extends uvm_pcie::request_header;
-    `uvm_object_utils(uvm_dma_ll::model_packet);
+class dma_model_packet extends uvm_pcie::request_header;
+    `uvm_object_utils(uvm_dma_ll::dma_model_packet);
 
     bit          data_packet;
     int unsigned packet_num;
@@ -14,14 +14,14 @@ class model_packet extends uvm_pcie::request_header;
     int unsigned part;
     int unsigned part_num;
 
-    function new(string name = "model_packet");
+    function new(string name = "dma_model_packet");
         super.new(name);
         data_packet  = 0;
     endfunction
 endclass
 
 
-class model_data;
+class dma_model_data;
     int unsigned data_ptr;
     int unsigned hdr_ptr;
     bit          vld_bit;
@@ -29,9 +29,9 @@ endclass
 
 
 class status_cbs extends uvm_reg_cbs;
-    model_data data;
+    dma_model_data data;
 
-    function new(model_data data);
+    function new(dma_model_data data);
         this.data = data;
     endfunction
 
@@ -44,8 +44,8 @@ class status_cbs extends uvm_reg_cbs;
     endtask
 endclass
 
-class model_accept#(CHANNELS) extends uvm_subscriber#(uvm_mvb::sequence_item#(1, 1));
-    `uvm_component_param_utils(uvm_dma_ll::model_accept #(CHANNELS))
+class dma_model_accept#(CHANNELS) extends uvm_subscriber#(uvm_mvb::sequence_item#(1, 1));
+    `uvm_component_param_utils(uvm_dma_ll::dma_model_accept #(CHANNELS))
     logic fifo[$];
 
     function new(string name, uvm_component parent = null);
@@ -80,8 +80,8 @@ class disc_probe_cbs extends uvm_probe::cbs_simple #(1);
     endfunction
 endclass
 
-class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
-    `uvm_component_param_utils(uvm_dma_ll::model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX))
+class dma_model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
+    `uvm_component_param_utils(uvm_dma_ll::dma_model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX))
 
     localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
@@ -93,8 +93,8 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) m_usr_mfb_data_fifo;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(USER_META_WIDTH))  m_usr_mfb_meta_fifo;
-    model_accept #(CHANNELS)                                                     m_pkt_disc_mvb_subs;
-    uvm_analysis_port #(model_packet)                                            m_pcie_rq_mfb_port;
+    dma_model_accept #(CHANNELS)                                                 m_pkt_disc_mvb_subs;
+    uvm_analysis_port #(dma_model_packet)                                        m_pcie_rq_mfb_port;
 
     typedef struct{
         logic [$clog2(PKT_SIZE_MAX+1)-1:0] packet_size;
@@ -122,8 +122,8 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
 
     pkt_cntrs_storage m_pkt_cntrs_storage;
 
-    local model_data m_data[CHANNELS];
-    local status_cbs m_status_cbs[CHANNELS];
+    local dma_model_data m_data[CHANNELS];
+    local status_cbs     m_status_cbs[CHANNELS];
 
     function new (string name, uvm_component parent = null);
         super.new(name, parent);
@@ -164,10 +164,10 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
     endfunction
 
 
-    function model_packet get_pcie_transaction(logic [64-1:0] addr, int unsigned packet_byte_size, logic [32-1:0] data []);
-        model_packet rq;
+    function dma_model_packet get_pcie_transaction(logic [64-1:0] addr, int unsigned packet_byte_size, logic [32-1:0] data []);
+        dma_model_packet rq;
 
-        rq = model_packet::type_id::create(this.get_full_name);
+        rq = dma_model_packet::type_id::create(this.get_full_name);
 
         rq.at                = 0;
         rq.traffic_class     = 0;
@@ -232,7 +232,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
     task packet_send(logic [ITEM_WIDTH-1:0] packet[], time start_time, int unsigned channel, logic [24-1:0] meta);
         string                     msg;
         int unsigned               rem ;
-        model_packet               packet_output;
+        dma_model_packet           packet_output;
         int unsigned               it;
         // Packet end is rounded up to whole dwords
         logic [32-1 : 0]           packet_end[] = new [((packet.size() % BLOCK_SIZE_BYTES)+3)/4];
@@ -279,6 +279,13 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         packet_output.start[this.get_full_name()]  = start_time;
         m_pcie_rq_mfb_port.write(packet_output);
 
+        msg = {msg, $sformatf("\nSend last segment of packet (CH %d, no. %d):\n", channel, parts)};
+        msg = {msg, $sformatf("\tStart pointer in input: %d \n", it*BLOCK_SIZE_DWS)};
+        msg = {msg, $sformatf("\tLength of input: %d Bytes (rounded: %d DWs) \n", packet.size(), (packet.size()+3)/4)};
+        msg = {msg, $sformatf("\tLast block length: actual -, requred %d Bytes\n", packet.size() % BLOCK_SIZE_BYTES)};
+        msg = {msg, $sformatf("\tPacket data:\n%s\n", packet_output.convert_data2string())};
+        `uvm_info(this.get_full_name(), msg, UVM_HIGH);
+
         //SEND DMA HEADER
         addr = m_regmodel.channel[channel].hdr_base.get() + (m_data[channel].hdr_ptr*8);
         m_data[channel].hdr_ptr = (m_data[channel].hdr_ptr + 1) & m_regmodel.channel[channel].hdr_mask.get();
@@ -313,7 +320,7 @@ class model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
     endtask
 
     function void build_phase(uvm_phase phase);
-        m_pkt_disc_mvb_subs = model_accept#(CHANNELS)::type_id::create("m_pkt_disc_mvb_subs", this);
+        m_pkt_disc_mvb_subs = dma_model_accept#(CHANNELS)::type_id::create("m_pkt_disc_mvb_subs", this);
 
         m_probe_discard = disc_probe_cbs::type_id::create("m_probe_discard", this);
         uvm_probe::pool::get_global_pool().get({ "probe_event_component_", "testbench.DUT_U.VHDL_DUT_U", ".probe_discard" }).add_callback(m_probe_discard);

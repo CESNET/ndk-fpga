@@ -72,6 +72,16 @@ entity RX_DMA_CALYPTE is
         MI_ARDY : out std_logic;
         MI_DRDY : out std_logic;
 
+        -- =========================================================================================
+        -- Pointer update interface
+        -- =========================================================================================
+        PTR_UPD_BUFF_BA  : out std_logic_vector(SW_ADDR_WIDTH -1 downto 0);
+        PTR_UPD_P2P_EN   : out std_logic;
+        PTR_UPD_HDP      : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_HHP      : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_DISP_EN  : out std_logic;
+        PTR_UPD_DISP_ACK : in  std_logic;
+
         -- =========================================================================================================
         -- User MFB interface
         --
@@ -144,6 +154,9 @@ architecture FULL of RX_DMA_CALYPTE is
     signal mi_split_ardy : std_logic_vector(MI_SPLIT_PORTS -1 downto 0);
     signal mi_split_drdy : std_logic_vector(MI_SPLIT_PORTS -1 downto 0);
 
+    -- =============================================================================================
+    -- SW Manager ---> Header Manager
+    -- =============================================================================================
     signal start_req_chan : std_logic_vector((log2(CHANNELS)-1) downto 0);
     signal start_req_vld  : std_logic;
     signal start_req_done : std_logic;
@@ -186,6 +199,9 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_pkt_disc_inc   : std_logic;
     signal hdrm_pkt_sent_bytes : std_logic_vector((log2(PKT_SIZE_MAX+1)-1) downto 0);
 
+    -- =============================================================================================
+    -- Transaction Buffer ---> Header Insertor
+    -- =============================================================================================
     signal mfb_data_trbuf    : std_logic_vector(MFB_REGION_SIZE_TRBUF2INS*MFB_BLOCK_SIZE_TRBUF2INS*MFB_ITEM_WIDTH_TRBUF2INS-1 downto 0);
     signal mfb_eof_pos_trbuf : std_logic_vector (max(1, log2(MFB_REGION_SIZE_TRBUF2INS*MFB_BLOCK_SIZE_TRBUF2INS))-1 downto 0);
     signal mfb_sof_trbuf     : std_logic;
@@ -498,12 +514,18 @@ begin
         HPM_RD_CHAN => hdrm_hdr_rd_chan,
         HPM_RD_DATA => hdrm_hpm_rd_data,
 
+        PTR_UPD_BUFF_BA  => PTR_UPD_BUFF_BA,
+        PTR_UPD_P2P_EN   => PTR_UPD_P2P_EN,
+        PTR_UPD_HDP      => PTR_UPD_HDP,
+        PTR_UPD_HHP      => PTR_UPD_HHP,
+        PTR_UPD_DISP_EN  => PTR_UPD_DISP_EN,
+        PTR_UPD_DISP_ACK => PTR_UPD_DISP_ACK,
+
         DATA_BUFF_FULL_CHAN         => data_buff_full_chan,
         DATA_BUFF_FULL_CNTR_INCR    => data_buff_full_cntr_incr,
         DMA_HDR_BUFF_FULL_CHAN      => dma_hdr_buff_full_chan,
         DMA_HDR_BUFF_FULL_CNTR_INCR => dma_hdr_buff_full_cntr_incr
     );
-
 
     USER_RX_MFB_DST_RDY <= hdr_log_dst_rdy and data_path_dst_rdy;
 

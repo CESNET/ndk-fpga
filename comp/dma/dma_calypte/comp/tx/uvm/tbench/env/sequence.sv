@@ -56,6 +56,7 @@ class sequence_simple #(int unsigned POINTER_WIDTH) extends uvm_sequence#(uvm_tx
             m_state = null;
         end
 
+        assert(m_start_chan_seq.randomize());
         m_start_chan_seq.start(null);
 
         while(m_state == null || !m_state.stopped()) begin
