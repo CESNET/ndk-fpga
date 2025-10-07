@@ -585,12 +585,13 @@ architecture FULL of TX_DMA_SW_MANAGER is
     -- =====================================================================
     --  Start request sending
     -- =====================================================================
-    signal start_pending_reg_chan  : std_logic_vector(log2(CHANNELS)-1 downto 0);
-    signal start_pending_reg_vld   : std_logic;
-    signal start_pending_reg_acked : std_logic;
-    signal chan_start_det          : std_logic;
+    type   start_fsm_t is (S_IDLE, S_WAIT_FOR_REQ_ACK, S_CHANNEL_ENABLE);
+    signal start_fsm_pst : start_fsm_t := S_IDLE;
+    signal start_fsm_nst : start_fsm_t := S_IDLE;
 
-    signal start_acked             : std_logic;
+    signal start_fsm_channel_reg : std_logic_vector(log2(CHANNELS)-1 downto 0);
+    signal start_fsm_channel     : std_logic_vector(log2(CHANNELS)-1 downto 0);
+    signal start_acked           : std_logic;
     -- =====================================================================
 
 
@@ -845,8 +846,8 @@ begin
     -- Reset after DMA Channel Start
     -- Update by Header manager module
     reg_di   (R_HDP)(0) <= (others => '0');
-    reg_we   (R_HDP)(0) <= chan_start_det;
-    reg_addra(R_HDP)(0) <= start_pending_reg_chan;
+    reg_we   (R_HDP)(0) <= start_acked;
+    reg_addra(R_HDP)(0) <= active_chan_reg;
 
     reg_di   (R_HDP)(1) <= std_logic_vector(resize_left(unsigned(HDP_WR_DATA),MI_WIDTH));
     reg_we   (R_HDP)(1) <= HDP_WR_EN;
@@ -857,8 +858,8 @@ begin
     -- Reset after DMA Channel Start
     -- Update by Header Manager module
     reg_di   (R_HHP)(0) <= (others => '0');
-    reg_we   (R_HHP)(0) <= chan_start_det;
-    reg_addra(R_HHP)(0) <= start_pending_reg_chan;
+    reg_we   (R_HHP)(0) <= start_acked;
+    reg_addra(R_HHP)(0) <= active_chan_reg;
 
     reg_di   (R_HHP)(1) <= std_logic_vector(resize_left(unsigned(HHP_WR_DATA),MI_WIDTH));
     reg_we   (R_HHP)(1) <= HHP_WR_EN;
@@ -1041,49 +1042,50 @@ begin
     -- =====================================================================
     --  Start request sending
     -- =====================================================================
-    start_pending_reg_pr : process (CLK)
+    start_fsm_reg_p : process (CLK) is
     begin
         if (rising_edge(CLK)) then
-            START_REQ_CHAN   <= start_pending_reg_chan;
-            START_REQ_VLD    <= '0';
-            chan_start_det   <= '0';
-            enabled_chan_set <= (others => '0');
-
-            -- Set new start pending request (and propagate request to output)
-            if (start_pending_reg_vld = '0') then
-                if (reg_dob_opt(R_CONTROL)(1)(0) = '1' and reg_dob_opt(R_STATUS)(1)(0) = '0') then
-                    start_pending_reg_chan  <= active_chan_reg;
-                    start_pending_reg_vld   <= '1';
-                    start_pending_reg_acked <= '0';
-                    -- resets HDP a HHP pointers
-                    chan_start_det          <= '1';
-                    START_REQ_CHAN          <= active_chan_reg;
-                    START_REQ_VLD           <= '1';
-                end if;
-            end if;
-
-            -- Accept Acknowledge for Start request
-            if (start_pending_reg_vld = '1') then
-                if (START_REQ_ACK = '1') then
-                    start_pending_reg_acked <= '1';
-                end if;
-            end if;
-
-            -- Clear after acknowledge propagation to Status register
-            if (start_acked = '1') then
-                start_pending_reg_vld               <= '0';
-                enabled_chan_set(active_chan_regi)  <= '1';
-            end if;
-
             if (RESET = '1') then
-                start_pending_reg_vld   <= '0';
-                START_REQ_VLD           <= '0';
+                start_fsm_pst         <= S_IDLE;
+                start_fsm_channel_reg <= (others => '0');
+            else
+                start_fsm_pst         <= start_fsm_nst;
+                start_fsm_channel_reg <= start_fsm_channel;
             end if;
         end if;
     end process;
 
-    -- Detect Start acknowledgement propagation to Status Register
-    start_acked <= '1' when start_pending_reg_vld = '1' and start_pending_reg_acked = '1' and start_pending_reg_chan = active_chan_reg else '0';
+    start_fsm_nst_logic_p : process (all)
+    begin
+        start_fsm_nst     <= start_fsm_pst;
+        start_fsm_channel <= start_fsm_channel_reg;
+        START_REQ_CHAN    <= start_fsm_channel_reg;
+        START_REQ_VLD     <= '0';
+        start_acked       <= '0';
+        enabled_chan_set  <= (others => '0');
+
+        case start_fsm_pst is
+            when S_IDLE =>
+                if (reg_dob_opt(R_CONTROL)(1)(0) = '1' and reg_dob_opt(R_STATUS)(1)(0) = '0') then
+                    start_fsm_nst     <= S_WAIT_FOR_REQ_ACK;
+                    start_fsm_channel <= active_chan_reg;
+                    START_REQ_CHAN    <= active_chan_reg;
+                    START_REQ_VLD     <= '1';
+                end if;
+
+            when S_WAIT_FOR_REQ_ACK =>
+                if (START_REQ_ACK = '1') then
+                    start_fsm_nst <= S_CHANNEL_ENABLE;
+                end if;
+
+            when S_CHANNEL_ENABLE =>
+                if (start_fsm_channel = active_chan_reg) then
+                    start_fsm_nst                      <= S_IDLE;
+                    start_acked                        <= '1';
+                    enabled_chan_set(active_chan_regi) <= '1';
+                end if;
+        end case;
+    end process;
     -- =====================================================================
 
 
