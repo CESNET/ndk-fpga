@@ -251,7 +251,7 @@ begin
             REPLICAS => 3 -- MEM_TESTER + MEM_LOGGER + MI_ASYNC
         )
         port map (
-            CLK        => DDR_RESET(i),
+            CLK        => DDR_CLK(i),
             ASYNC_RST  => DDR_RESET(i),
             OUT_RST    => ddr_reset_repl(i)
         );
