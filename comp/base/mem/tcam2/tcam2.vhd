@@ -160,9 +160,6 @@ architecture FULL of TCAM2 is
     -- match vector
     signal mem_match_vector  : slv_array_2d_t(COLUMNS-1 downto 0)(ROWS-1 downto 0)(MEMORY_DATA_WIDTH-1 downto 0);
 
-    -- match carry
-    signal mem_match_carry   : slv_array_2d_t(COLUMNS   downto 0)(ROWS-1 downto 0)(MEMORY_DATA_WIDTH-1 downto 0);
-
     -- output after matching process
     signal mem_match_out     : slv_array_t(ROWS-1 downto 0)(MEMORY_DATA_WIDTH-1 downto 0);
 
@@ -268,9 +265,6 @@ begin
         end if;
     end process;
 
-    -- match carry initialization
-    mem_match_carry(0) <= (others => (others => mem_match_en_reg));
-
     -- MLAB write registers
     mem_wr_regs_p : process (CLK)
     begin
@@ -305,12 +299,19 @@ begin
                 RD_ADDR    => mem_addr_arr(c),
                 RD_DATA    => mem_match_vector(c)(r)
             );
-            mem_match_carry(c+1)(r) <= mem_match_carry(c)(r) and mem_match_vector(c)(r);
         end generate;
-    end generate;
 
-    -- result of match propagation
-    mem_match_out <= mem_match_carry(COLUMNS);
+        carry_p : process (all)
+            variable ret : std_logic_vector(MEMORY_DATA_WIDTH-1 downto 0);
+        begin
+            ret := (MEMORY_DATA_WIDTH-1 downto 0 => mem_match_en_reg);
+            for it in 0 to COLUMNS-1 loop
+                ret := ret and mem_match_vector(it)(r);
+            end loop;
+
+            mem_match_out(r) <= ret;
+        end process;
+    end generate;
 
     -- additional WRITE_DATA and WRITE_MASK storage when READ_FROM_TCAM = true
     data_and_mask_storage_g : if READ_FROM_TCAM generate
