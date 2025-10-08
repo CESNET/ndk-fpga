@@ -155,7 +155,7 @@ architecture FULL of PACKET_PLANNER is
     -- The FIFO must contain enough items to compensate this time,
     -- so VLD does not drop.
     constant OUT_FIFO_ITEMS        : natural := PLANNED_PKTS*32;
-    constant OUT_FIFO_AFULL_OFFSET : natural := 6*PLANNED_PKTS;
+    constant OUT_FIFO_AFULL_OFFSET : natural := 16*PLANNED_PKTS;
 
     -- =====================================================================
 
