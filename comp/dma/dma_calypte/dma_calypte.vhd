@@ -213,17 +213,6 @@ architecture FULL of DMA_CALYPTE is
     signal mi_split_ardy : std_logic_vector(2 -1 downto 0);
     signal mi_split_drdy : std_logic_vector(2 -1 downto 0);
 
-    signal inp_fifo_status : std_logic_vector(log2(512) downto 0);
-
-    signal inp_fifo_mfb_data    : std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH-1 downto 0);
-    signal inp_fifo_mfb_meta    : std_logic_vector(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH -1 downto 0);
-    signal inp_fifo_mfb_sof     : std_logic_vector(PCIE_CQ_MFB_REGIONS -1 downto 0);
-    signal inp_fifo_mfb_eof     : std_logic_vector(PCIE_CQ_MFB_REGIONS -1 downto 0);
-    signal inp_fifo_mfb_sof_pos : std_logic_vector(PCIE_CQ_MFB_REGIONS*max(1, log2(PCIE_CQ_MFB_REGION_SIZE)) -1 downto 0);
-    signal inp_fifo_mfb_eof_pos : std_logic_vector(PCIE_CQ_MFB_REGIONS*max(1, log2(PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE)) -1 downto 0);
-    signal inp_fifo_mfb_src_rdy : std_logic;
-    signal inp_fifo_mfb_dst_rdy : std_logic;
-
     -- =============================================================================================
     -- Interfaces to Pointer Updater
     -- =============================================================================================
