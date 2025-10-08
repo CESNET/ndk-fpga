@@ -53,11 +53,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
@@ -115,10 +116,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
@@ -242,34 +247,38 @@ Currently used only in SIMPLE architecture to optimize usage of input/output pip
 <td><p>true</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-input_fifo_size"><td><p>INPUT_FIFO_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>To enable optional MFB FIFOs at input</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-input_fifo_size"><td><p>INPUT_FIFO_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Size of input MVB and MFB FIFOs (in words)
-Only used in architecture FULL.
 Minimum value is 2!</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-sw_timeout_width"><td><p>SW_TIMEOUT_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-sw_timeout_width"><td><p>SW_TIMEOUT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Width of timeout counter, determines the time when the switch to
 the next active MVB/MFB stream occurs.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-in_pipe_en"><td><p>IN_PIPE_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-in_pipe_en"><td><p>IN_PIPE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
 <td><p>Input PIPEs enable
 Only used in architecture SIMPLE.
 Input registers is created when this is set to false.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Output PIPE enable
 Only used in architecture SIMPLE.
 Output register is created when this is set to false.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>“ULTRASCALE”, “7SERIES”</p></td>

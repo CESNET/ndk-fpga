@@ -10,7 +10,7 @@ Bittware IA-440I
     - PCIe conectors: Edge connector
     - `FPGA Card Website <https://www.bittware.com/fpga/ia-440i/>`_
 - FPGA specification:
-    - FPGA part number: ``AGIB023R18A1E1V``
+    - FPGA part number: ``AGIB023R18A1E1V``, ``AGIB023R18A1E1VC``
     - Ethernet Hard IP: F-Tile (up to 400G Ethernet)
     - PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)
 
@@ -30,6 +30,22 @@ NDK firmware support
 .. note::
 
     To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.
+
+Board Variants
+^^^^^^^^^^^^^^
+
+This card exists in multiple variants.
+The correct variant for the firmware build can be selected using the Makefile parameter BOARD_VARIANT, for example as follows:
+
+.. code::
+
+    $ cd <NDK-FPGA_root_directory>/apps/minimal/build/ia-440i
+    $ make BOARD_VARIANT=1
+
+**Allowed values of BOARD_VARIANT parameter**
+
+- ``BOARD_VARIANT=1`` - The board uses FPGA part number ``AGIB023R18A1E1VC`` (C0 F-Tile).
+- ``BOARD_VARIANT=0`` - The board uses FPGA part number ``AGIB023R18A1E1V``.
 
 General boot information
 ^^^^^^^^^^^^^^^^^^^^^^^^

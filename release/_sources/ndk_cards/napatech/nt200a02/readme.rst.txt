@@ -1,7 +1,7 @@
 .. _card_napatech_nt200a02:
 
 Napatech NT200A02
---------------
+-----------------
 
 - Card information:
     - Vendor: Napatech
@@ -30,7 +30,7 @@ NDK firmware support
     - OR use JTAG (see "JTAG programming" below).
 
 JTAG programming
-^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 1. Buld the firmware using ``make`` as described above ("Generate bitstream" using Vivado GUI flow)
 2. Connect USB cable to the JTAG interface of the card

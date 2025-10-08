@@ -1,7 +1,7 @@
 .. _card_terasic-a2700:
 
 Terasic A2700
-----------------
+-------------
 
 - Card information:
     - Vendor: Terasic
@@ -38,8 +38,10 @@ NDK firmware support
 
 Boot instructions (initial)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Supported boot is handled by the Secure Device Manager (SDM), which has its own 1Gb flash to store Factory and User defined image.
 To enable this method, it is necessary to set the switches on the board as follows:
+
 - Ensure that the MSEL[2:0] switch on the board is set to 'Active Serial Normal' mode - MSEL[2:0] = 3'b011
     - Set SW4 to 2'b01 and SW5 to 2'b10.
     - The SW4(1) set to 0 to load user image or to 1 to load factory image after power up.

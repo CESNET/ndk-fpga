@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Intel Stratix 10 DX FPGA DK" href="../../intel/dk-dev-1sdx-p/readme.html" />
-    <link rel="prev" title="Getting Started with Verifications Using cocotb/cocotbext-ndk" href="../../../basic_cocotb_test.html" /> 
+    <link rel="prev" title="Verible Tools" href="../../../tests/verible/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,11 +53,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -77,10 +78,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tests/verible/readme.html">Verible Tools</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul class="current">
@@ -200,7 +205,7 @@
 </section>
 <section id="board-revision">
 <h2>Board Revision<a class="headerlink" href="#board-revision" title="Link to this heading"></a></h2>
-<p>This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=1.
+<p>This card exists in multiple revisions. The default revision for the firmware build is BOARD_REV=2.
 The correct revision for the firmware build can be selected using the Makefile parameter BOARD_REV, for example as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;NDK-FPGA_root_directory&gt;/apps/minimal/build/agi-fh400g
 $ make BOARD_REV=2
@@ -242,7 +247,7 @@ $ make BOARD_REV=2
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../../basic_cocotb_test.html" class="btn btn-neutral float-left" title="Getting Started with Verifications Using cocotb/cocotbext-ndk" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../tests/verible/readme.html" class="btn btn-neutral float-left" title="Verible Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../intel/dk-dev-1sdx-p/readme.html" class="btn btn-neutral float-right" title="Intel Stratix 10 DX FPGA DK" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

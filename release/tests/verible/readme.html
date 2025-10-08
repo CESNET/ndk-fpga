@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cocotb toplevel simulation core &mdash; NDK-FPGA  documentation</title>
+  <title>Verible Tools &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -18,7 +18,9 @@
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ReflexCES XpressSX AGI-FH400G" href="../../ndk_cards/reflexces/agi-fh400g/readme.html" />
+    <link rel="prev" title="cocotbext-ndk" href="../../cocotbext.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,20 +44,21 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../doc/how_to_start.html">How to start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/terminology.html">NDK Terminology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/readme.html">NDK Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/testing.html">NDK testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/performance.html">Performance report</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/devtree.html">Device Tree</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -75,10 +78,22 @@
 <li class="toctree-l1"><a class="reference internal" href="../../comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Verible Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#verible-linter">Verible Linter</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#gitlab-runner">GitLab Runner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul>
@@ -113,9 +128,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Cocotb toplevel simulation core</li>
+      <li class="breadcrumb-item active">Verible Tools</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/ndk_core/cocotb/README.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/tests/verible/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -123,23 +138,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="cocotb-toplevel-simulation-core">
-<span id="cocotb-sim"></span><h1>Cocotb toplevel simulation core<a class="headerlink" href="#cocotb-toplevel-simulation-core" title="Link to this heading"></a></h1>
-<section id="quick-start">
-<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
-<ol class="arabic simple">
-<li><p>Install python packages with ‘pip install -r requirements.txt’</p></li>
-<li><p>Copy example files to your project card build directory</p></li>
-<li><p>Let create generated files (e.g. by ‘make’ with PROJ_ONLY)</p></li>
-<li><p>Run ‘make cocotb’</p></li>
-</ol>
+  <section id="verible-tools">
+<h1>Verible Tools<a class="headerlink" href="#verible-tools" title="Link to this heading"></a></h1>
+<section id="verible-linter">
+<h2>Verible Linter<a class="headerlink" href="#verible-linter" title="Link to this heading"></a></h2>
+<p>Verible linter is one of the Verible tools.
+The rules for the linter can be set by specifying a rule configuration.
+The rule configuration is defined in the <em>rules</em> file in this directory.</p>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>verible-verilog-lint<span class="w"> </span>--ruleset<span class="o">=</span>none<span class="w"> </span>--rules_config<span class="o">=</span>tests/verible/rules<span class="w"> </span>comp/mfb_tools/edit/frame_trimmer/uvm/tbench/testbench.sv
+</pre></div>
+</div>
+</section>
+</section>
+<section id="gitlab-runner">
+<h2>GitLab Runner<a class="headerlink" href="#gitlab-runner" title="Link to this heading"></a></h2>
+<p>The current implementation of the GitLab runner applies the Verible linter to each modified source file (<em>.sv</em> file) within a GitLab merge request and displays the output in the GitLab log, if a rule is violated.
+It uses the rule configuration defined in the <em>rules</em> file in this directory.
+The runner needs to be provided with a GitLab API token.</p>
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/chipsalliance/verible">https://github.com/chipsalliance/verible</a></p></li>
+</ul>
 </section>
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../cocotbext.html" class="btn btn-neutral float-left" title="cocotbext-ndk" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../ndk_cards/reflexces/agi-fh400g/readme.html" class="btn btn-neutral float-right" title="ReflexCES XpressSX AGI-FH400G" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

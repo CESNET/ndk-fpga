@@ -26,7 +26,7 @@ The DT blob is located in the PCI configuration space. A custom extension (PCIe 
 Example of DTS of one component
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: dts
+.. code-block::
 
     /*
      * ref_name:   instance name, typically populated by the parent module when needed
@@ -58,7 +58,7 @@ Example of DTS of one component
 Example of generated DTS for FPGA card
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: dts
+.. code-block::
 
     /dts-v1/;
 

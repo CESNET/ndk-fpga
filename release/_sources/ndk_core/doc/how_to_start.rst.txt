@@ -28,14 +28,14 @@ List of make parameters:
 
 - ``PCIE_CONF`` -- Allows you to set the PCIe configuration, for example: ``make PCIE_CONF=1xGen4x16``. More information can be found in the :ref:`documentation of the PCIe module <ndk_pcie_mod>`.
 - ``DMA_TYPE``  -- Allows you to select the DMA controller, for example ``make DMA_TYPE=4``. More information and allowed values can be found in the :ref:`documentation of the DMA module <ndk_dma>`.
-- ``BOARD_REV`` -- Allows you to set the board revision number, for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card.
+- ``BOARD_VARIANT`` -- Allows you to set the board variant number, for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card (for example Bittware IA-440i). Alternatively, it may also encounter a similar parameter ``BOARD_REV``.
 
 How to prepare the FPGA card and the host PC
 ============================================
 
 - The target FPGA card may require proper switch settings. Check the card manufacturer's instructions.
 - Plug the target FPGA card into the PCIe slot of the host PC.
-- Install `the NDK drivers and tools <https://github.com/CESNET/ndk-sw>`_ on the host PC. `The pre-built .rpm and .deb packages can be found here <https://github.com/CESNET/ndk-sw/releases>`_.
+- Install `the NDK drivers and tools <https://github.com/CESNET/ndk-sw>`_ on the host PC. The RPM packages are available in `the NDK Copr repository <https://copr.fedorainfracloud.org/coprs/g/CESNET/nfb-framework/>`_. Alternatively, `the pre-built .rpm and .deb packages can be found here <https://github.com/CESNET/ndk-sw/releases>`_.
 
 .. WARNING::
     The FPGA card and its firmware are designed for a specific PCIe generation and a specific number of PCIe lines. If you plug an FPGA card into a slot that does not support such PCIe configuration, you may experience slower data transfer over the PCIe interface or a general malfunction.
@@ -66,24 +66,27 @@ The NDK platform uses the `nfb-info tool <https://cesnet.github.io/ndk-sw/tools/
     --------------------------------------- Board info ----
     Board name                 : COMBO-GENERIC
     Serial number              : 0
-    Network interfaces         : 2
+    Network interfaces         : 1
     ------------------------------------ Firmware info ----
-    Card name                  : N6010
+    Card name                  : IA-440I-VAR1
     Project name               : NDK_MINIMAL
-    Project variant            : 100G2
-    Project version            : 0.5.8
-    Built at                   : 2024-02-07 08:45:45
-    Build tool                 : Quartus Version 22.4.0 Build 94 12/07/2022 SC Pro Edition
-    Build author               : no-reply@liberouter.org
-    RX queues                  : 16
-    TX queues                  : 16
-    ETH channels               : 2
+    Project variant            : 400G1
+    Project version            : 0.11.0
+    Built at                   : 2025-08-15 12:14:10
+    Build tool                 : Quartus Version 25.1.0 Build 129 03/26/2025 SC Pro Edition
+    Build author               : cabal@cesnet.cz
+    Build revision             : 7ba87361
+    RX queues                  : 32
+    TX queues                  : 32
+    ETH channels               : 1
     -------------------------------------- System info ----
     PCIe Endpoint 0:
-    * PCI slot                : 0000:17:00.0
-    * PCI speed               : 16 GT/s
+    * PCI slot                : 0000:05:00.0
+    * PCI link speed          : 32 GT/s
     * PCI link width          : x16
     * NUMA node               : 0
+    * MI BAR 0 size           : 64 MiB
+    * MI BAR 2 size           : 16 MiB
 
 Further work with the NDK
 =========================

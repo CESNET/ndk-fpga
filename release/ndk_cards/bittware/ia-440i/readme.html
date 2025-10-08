@@ -53,11 +53,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Applications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb/cocotbext-ndk</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
@@ -77,10 +78,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../comp/mfb_tools/readme.html">MFB specification</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Cocotb/CocotbExt</span></p>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with Verifications Using cocotb/cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tests/verible/readme.html">Verible Tools</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
 <ul class="current">
@@ -93,6 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Bittware IA-440I</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#board-variants">Board Variants</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#general-boot-information">General boot information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bootstrap-instructions">Bootstrap instructions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#phase-1-let-the-nfb-driver-handle-the-device">Phase 1: Let the nfb driver handle the device</a></li>
@@ -152,7 +158,7 @@
 </li>
 <li><dl class="simple">
 <dt>FPGA specification:</dt><dd><ul>
-<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1V</span></code></p></li>
+<li><p>FPGA part number: <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1V</span></code>, <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1VC</span></code></p></li>
 <li><p>Ethernet Hard IP: F-Tile (up to 400G Ethernet)</p></li>
 <li><p>PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)</p></li>
 </ul>
@@ -197,6 +203,20 @@
 <p class="admonition-title">Note</p>
 <p>To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.</p>
 </div>
+</section>
+<section id="board-variants">
+<h2>Board Variants<a class="headerlink" href="#board-variants" title="Link to this heading"></a></h2>
+<p>This card exists in multiple variants.
+The correct variant for the firmware build can be selected using the Makefile parameter BOARD_VARIANT, for example as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;NDK-FPGA_root_directory&gt;/apps/minimal/build/ia-440i
+$ make BOARD_VARIANT=1
+</pre></div>
+</div>
+<p><strong>Allowed values of BOARD_VARIANT parameter</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">BOARD_VARIANT=1</span></code> - The board uses FPGA part number <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1VC</span></code> (C0 F-Tile).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BOARD_VARIANT=0</span></code> - The board uses FPGA part number <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1V</span></code>.</p></li>
+</ul>
 </section>
 <section id="general-boot-information">
 <h2>General boot information<a class="headerlink" href="#general-boot-information" title="Link to this heading"></a></h2>
