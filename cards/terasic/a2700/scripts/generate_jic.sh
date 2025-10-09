@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Copyright (C) 2024 BrnoLogic, Ltd.
-# Author(s): David Beneš <benes@brnologic.com>
+# Copyright (C) 2024 DynaNIC Semiconductors, Ltd.
+# Author(s): David Beneš <benes@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

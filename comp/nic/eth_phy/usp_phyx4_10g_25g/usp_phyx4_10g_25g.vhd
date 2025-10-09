@@ -2,7 +2,7 @@
 --                         core wrapper for Xilinx UltraScale+ FPGA
 -- Copyright (C) 2017 CESNET z. s. p. o.
 -- Author(s): Stepan Friedl <friedl@cesnet.cz>
---            Vlastimil Kosar <kosar@brnologic.com>
+--            Vlastimil Kosar <kosar@dyna-nic.com>
 -- SPDX-License-Identifier: BSD-3-Clause
 --
 -- NOTE:

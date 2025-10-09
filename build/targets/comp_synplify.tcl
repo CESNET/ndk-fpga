@@ -1,6 +1,6 @@
 # comp_synplify.tcl: Target Tcl script for Synplify to compile single component
-# Copyright (C) 2023 BrnoLogic
-# Author(s): Lukas Kekely <kekely@brnologic.com>
+# Copyright (C) 2023 DynaNIC Semiconductors, Ltd.
+# Author(s): Lukas Kekely <kekely@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

@@ -1,6 +1,6 @@
 # Makefile.Synplify.inc: Include Makefile for compilation with Synplify
-# Copyright (C) 2023 BrnoLogic
-# Author: Lukas Kekely <kekely@brnologic.com>
+# Copyright (C) 2023 DynaNIC Semiconductors, Ltd.
+# Author: Lukas Kekely <kekely@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

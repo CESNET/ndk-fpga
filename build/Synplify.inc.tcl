@@ -1,6 +1,6 @@
 # Synplify.inc.tcl: Synplify global include Tcl script to compile whole design
-# Copyright (C) 2023 BrnoLogic
-# Author: Lukas Kekely <kekely@brnologic.com>
+# Copyright (C) 2023 DynaNIC Semiconductors, Ltd.
+# Author: Lukas Kekely <kekely@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
