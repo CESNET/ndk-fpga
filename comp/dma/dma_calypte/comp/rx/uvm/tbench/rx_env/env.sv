@@ -67,7 +67,7 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX
     // Connect agent's ports with ports from scoreboard.
     function void connect_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
-            m_sequencer.m_data = m_logic_vector_array_agent.m_sequencer;
+            m_sequencer.m_data_sqcr = m_logic_vector_array_agent.m_sequencer;
 
             m_driver.seq_item_port_logic_vector_array.connect(m_logic_vector_array_agent.m_sequencer.seq_item_export);
         end

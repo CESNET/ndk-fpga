@@ -7,15 +7,15 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-module DMA_LL_PROPERTY  #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX)
+module DMA_LL_PROPERTY  #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX)
     (
         input logic RESET,
-        mfb_if   mfb_rx,
-        mfb_if   mfb_tx,
+        mfb_if   usr_mfb,
+        mfb_if   pcie_rq_mfb,
         mi_if    config_mi
     );
 
-    localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
+    localparam USR_MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
 
     string module_name = "";
@@ -29,49 +29,49 @@ module DMA_LL_PROPERTY  #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZ
     ////////////////////////////////////
     // RX PROPERTY
     mfb_property #(
-        .REGIONS     (USER_REGIONS),
-        .REGION_SIZE (USER_REGION_SIZE),
-        .BLOCK_SIZE  (USER_BLOCK_SIZE ),
-        .ITEM_WIDTH  (USER_ITEM_WIDTH ),
-        .META_WIDTH  (USER_META_WIDTH)
+        .REGIONS     (USR_MFB_REGIONS),
+        .REGION_SIZE (USR_MFB_REGION_SIZE),
+        .BLOCK_SIZE  (USR_MFB_BLOCK_SIZE ),
+        .ITEM_WIDTH  (USR_MFB_ITEM_WIDTH ),
+        .META_WIDTH  (USR_MFB_META_WIDTH)
     )
-    MFB_RX (
+    usr_mfb_property_i (
         .RESET (RESET),
-        .vif   (mfb_rx)
+        .vif   (usr_mfb)
     );
 
 
     ////////////////////////////////////
     // TX PROPERTY
     mfb_property #(
-        .REGIONS     (PCIE_UP_REGIONS),
-        .REGION_SIZE (PCIE_UP_REGION_SIZE),
-        .BLOCK_SIZE  (PCIE_UP_BLOCK_SIZE),
-        .ITEM_WIDTH  (PCIE_UP_ITEM_WIDTH),
+        .REGIONS     (PCIE_RQ_REGIONS),
+        .REGION_SIZE (PCIE_RQ_REGION_SIZE),
+        .BLOCK_SIZE  (PCIE_RQ_BLOCK_SIZE),
+        .ITEM_WIDTH  (PCIE_RQ_ITEM_WIDTH),
         .META_WIDTH  (0)
     )
-    MFB_TX (
+    pcie_rq_mfb_property_i (
         .RESET (RESET),
-        .vif   (mfb_tx)
+        .vif   (pcie_rq_mfb)
     );
 
-    generate if (PCIE_UP_REGIONS > 1) begin
+    generate if (PCIE_RQ_REGIONS > 1) begin
         property sof_after_eof;
-            @(posedge mfb_tx.CLK) disable iff(RESET)
-            mfb_tx.SRC_RDY |-> (( ~(mfb_tx.EOF[PCIE_UP_REGIONS-2:0]) & mfb_tx.SOF[PCIE_UP_REGIONS-1:1]) == 0);
+            @(posedge pcie_rq_mfb.CLK) disable iff(RESET)
+            pcie_rq_mfb.SRC_RDY |-> (( ~(pcie_rq_mfb.EOF[PCIE_RQ_REGIONS-2:0]) & pcie_rq_mfb.SOF[PCIE_RQ_REGIONS-1:1]) == 0);
         endproperty
 
         // Check when SOF is not on first position then previous packet have to end in region right before.
         assert property (sof_after_eof)
             else begin
-                `uvm_error(module_name, $sformatf("\n\tIf sof is set on different region that 0 then region befor have to be eof set\n\tSOF %b\n\tEOF %b", mfb_tx.SOF, mfb_tx.EOF));
+                `uvm_error(module_name, $sformatf("\n\tIf sof is set on different region that 0 then region befor have to be eof set\n\tSOF %b\n\tEOF %b", pcie_rq_mfb.SOF, pcie_rq_mfb.EOF));
             end
     end endgenerate
 
     //simplyfied rule. No space in middle of packet
     property sof_eof_src_rdy;
-        @(posedge mfb_tx.CLK) disable iff(RESET)
-        (mfb_tx.SRC_RDY && (mfb_tx.SOF != 0)) |-> mfb_tx.SRC_RDY s_until_with (mfb_tx.EOF != 0);
+        @(posedge pcie_rq_mfb.CLK) disable iff(RESET)
+        (pcie_rq_mfb.SRC_RDY && (pcie_rq_mfb.SOF != 0)) |-> pcie_rq_mfb.SRC_RDY s_until_with (pcie_rq_mfb.EOF != 0);
     endproperty
 
     assert property (sof_eof_src_rdy)
