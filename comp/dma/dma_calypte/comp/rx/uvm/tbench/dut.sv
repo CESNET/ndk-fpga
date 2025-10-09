@@ -5,12 +5,12 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-module DMA_LL_DUT #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, SW_ADDR_WIDTH, POINTER_WIDTH, CNTRS_WIDTH, TRBUF_REG_EN, PERF_CNTR_EN)
+module DMA_LL_DUT #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, SW_ADDR_WIDTH, POINTER_WIDTH, CNTRS_WIDTH, TRBUF_REG_EN, PERF_CNTR_EN)
     (
         input logic     CLK,
         input logic     RST,
-        mfb_if.dut_rx   mfb_rx,
-        mfb_if.dut_tx   mfb_tx,
+        mfb_if.dut_rx   usr_mfb,
+        mfb_if.dut_tx   pcie_rq_mfb,
         mi_if.dut_slave config_mi
     );
 
@@ -20,27 +20,27 @@ module DMA_LL_DUT #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USE
     logic [$clog2(CHANNELS)-1:0]       channel;
     logic [24-1:0]                     meta;
 
-    assign channel[$clog2(CHANNELS)-1 -: $clog2(CHANNELS)]                 = mfb_rx.META[24 + $clog2(CHANNELS)-1                          -: $clog2(CHANNELS)];
-    assign meta[24-1 -: 24]                                                = mfb_rx.META[24 -1                                            -: 24];
+    assign channel[$clog2(CHANNELS)-1 -: $clog2(CHANNELS)]                 = usr_mfb.META[24 + $clog2(CHANNELS)-1                          -: $clog2(CHANNELS)];
+    assign meta[24-1 -: 24]                                                = usr_mfb.META[24 -1                                            -: 24];
 
-    logic [((PCIE_UP_REGION_SIZE != 1) ? PCIE_UP_REGIONS*$clog2(PCIE_UP_REGION_SIZE) : PCIE_UP_REGIONS*1)-1:0] sof_pos;
+    logic [((PCIE_RQ_REGION_SIZE != 1) ? PCIE_RQ_REGIONS*$clog2(PCIE_RQ_REGION_SIZE) : PCIE_RQ_REGIONS*1)-1:0] pcie_rq_mfb_sof_pos;
     generate
-    if (PCIE_UP_REGION_SIZE != 1) begin
-        assign  mfb_tx.SOF_POS = sof_pos;
+    if (PCIE_RQ_REGION_SIZE != 1) begin
+        assign  pcie_rq_mfb.SOF_POS = pcie_rq_mfb_sof_pos;
     end
     endgenerate
 
     RX_DMA_CALYPTE #(
         .DEVICE           (DEVICE),
-        .USER_RX_MFB_REGIONS     (USER_REGIONS),
-        .USER_RX_MFB_REGION_SIZE (USER_REGION_SIZE),
-        .USER_RX_MFB_BLOCK_SIZE  (USER_BLOCK_SIZE),
-        .USER_RX_MFB_ITEM_WIDTH  (USER_ITEM_WIDTH),
+        .USER_RX_MFB_REGIONS     (USR_MFB_REGIONS),
+        .USER_RX_MFB_REGION_SIZE (USR_MFB_REGION_SIZE),
+        .USER_RX_MFB_BLOCK_SIZE  (USR_MFB_BLOCK_SIZE),
+        .USER_RX_MFB_ITEM_WIDTH  (USR_MFB_ITEM_WIDTH),
 
-        .PCIE_UP_MFB_REGIONS     (PCIE_UP_REGIONS),
-        .PCIE_UP_MFB_REGION_SIZE (PCIE_UP_REGION_SIZE),
-        .PCIE_UP_MFB_BLOCK_SIZE  (PCIE_UP_BLOCK_SIZE),
-        .PCIE_UP_MFB_ITEM_WIDTH  (PCIE_UP_ITEM_WIDTH),
+        .PCIE_UP_MFB_REGIONS     (PCIE_RQ_REGIONS),
+        .PCIE_UP_MFB_REGION_SIZE (PCIE_RQ_REGION_SIZE),
+        .PCIE_UP_MFB_BLOCK_SIZE  (PCIE_RQ_BLOCK_SIZE),
+        .PCIE_UP_MFB_ITEM_WIDTH  (PCIE_RQ_ITEM_WIDTH),
 
         .CHANNELS      (CHANNELS),
         .POINTER_WIDTH (POINTER_WIDTH),
@@ -65,21 +65,21 @@ module DMA_LL_DUT #(DEVICE, USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USE
         .USER_RX_MFB_META_HDR_META    (meta),
         .USER_RX_MFB_META_CHAN        (channel),
 
-        .USER_RX_MFB_DATA        (mfb_rx.DATA),
-        .USER_RX_MFB_SOF_POS     (mfb_rx.SOF_POS),
-        .USER_RX_MFB_EOF_POS     (mfb_rx.EOF_POS),
-        .USER_RX_MFB_SOF         (mfb_rx.SOF),
-        .USER_RX_MFB_EOF         (mfb_rx.EOF),
-        .USER_RX_MFB_SRC_RDY     (mfb_rx.SRC_RDY),
-        .USER_RX_MFB_DST_RDY     (mfb_rx.DST_RDY),
+        .USER_RX_MFB_DATA        (usr_mfb.DATA),
+        .USER_RX_MFB_SOF_POS     (usr_mfb.SOF_POS),
+        .USER_RX_MFB_EOF_POS     (usr_mfb.EOF_POS),
+        .USER_RX_MFB_SOF         (usr_mfb.SOF),
+        .USER_RX_MFB_EOF         (usr_mfb.EOF),
+        .USER_RX_MFB_SRC_RDY     (usr_mfb.SRC_RDY),
+        .USER_RX_MFB_DST_RDY     (usr_mfb.DST_RDY),
 
-        .PCIE_UP_MFB_DATA     (mfb_tx.DATA),
-        .PCIE_UP_MFB_META     (mfb_tx.META),
-        .PCIE_UP_MFB_SOF_POS  (sof_pos),
-        .PCIE_UP_MFB_EOF_POS  (mfb_tx.EOF_POS),
-        .PCIE_UP_MFB_SOF      (mfb_tx.SOF),
-        .PCIE_UP_MFB_EOF      (mfb_tx.EOF),
-        .PCIE_UP_MFB_SRC_RDY  (mfb_tx.SRC_RDY),
-        .PCIE_UP_MFB_DST_RDY  (mfb_tx.DST_RDY)
+        .PCIE_UP_MFB_DATA     (pcie_rq_mfb.DATA),
+        .PCIE_UP_MFB_META     (pcie_rq_mfb.META),
+        .PCIE_UP_MFB_SOF_POS  (pcie_rq_mfb_sof_pos),
+        .PCIE_UP_MFB_EOF_POS  (pcie_rq_mfb.EOF_POS),
+        .PCIE_UP_MFB_SOF      (pcie_rq_mfb.SOF),
+        .PCIE_UP_MFB_EOF      (pcie_rq_mfb.EOF),
+        .PCIE_UP_MFB_SRC_RDY  (pcie_rq_mfb.SRC_RDY),
+        .PCIE_UP_MFB_DST_RDY  (pcie_rq_mfb.DST_RDY)
     );
 endmodule
