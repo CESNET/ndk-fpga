@@ -1,8 +1,8 @@
 # Modules.tcl: Local include Modules tcl script
 # Copyright (C) 2015 CESNET
-# Copyright (C) 2024 BrnoLogic
+# Copyright (C) 2024 DynaNIC Semiconductors, Ltd.
 # Author: Lukas Kekely <kekely@cesnet.cz>
-#         Vlastimil Kosar <kosar@brnologic.com>
+#         Vlastimil Kosar <kosar@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

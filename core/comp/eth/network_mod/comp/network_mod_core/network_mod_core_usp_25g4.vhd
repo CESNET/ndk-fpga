@@ -1,6 +1,6 @@
 -- network_mod_core_25g4.vhd: Core of the Network module with 25G4 XILINX PCSPMA
 -- Copyright (C) 2024 CESNET z. s. p. o.
--- Author(s): Vlastimil Kosar <kosar@brnologic.com>
+-- Author(s): Vlastimil Kosar <kosar@dyna-nic.com>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 

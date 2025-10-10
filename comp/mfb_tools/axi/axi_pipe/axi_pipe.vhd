@@ -1,6 +1,6 @@
 -- axi_pipe.vhd: AXI Bus pipeline
--- Copyright (C) 2024 BrnoLogic, Ltd.
--- Author(s): Radek Hajek <hajek@brnologic.cz>
+-- Copyright (C) 2024 DynaNIC Semiconductors, Ltd.
+-- Author(s): Radek Hajek <hajek@dyna-nic.com>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 --
