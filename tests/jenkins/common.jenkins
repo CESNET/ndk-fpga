@@ -114,7 +114,7 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
 
     def run_coverage_report = (
         params.FORCE_RUN_COVERAGE_REPORT || // Used for manually triggered jobs
-        ['devel'].contains(env.BRANCH_NAME) // Used for automatically triggered jobs
+        ['release'].contains(env.BRANCH_NAME) // Used for automatically triggered jobs
     )
 
     def failed = []
