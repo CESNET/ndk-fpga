@@ -1,6 +1,6 @@
 # Modules.tcl: Local include Modules tcl script
 # Copyright (C) 2022 CESNET
-# Author: David Beneš <benes.david2000@seznam.cz>
+# Author: David Beneš <benes@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

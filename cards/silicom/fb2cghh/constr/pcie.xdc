@@ -1,6 +1,6 @@
 # pcie.xdc
 # Copyright (C) 2022 CESNET z. s. p. o.
-# Author(s): David Beneš <benes.david2000@seznam.cz>
+# Author(s): David Beneš <benes@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
