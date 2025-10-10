@@ -114,8 +114,14 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
 
     def run_coverage_report = (
         params.FORCE_RUN_COVERAGE_REPORT || // Used for manually triggered jobs
-        ['devel'].contains(env.BRANCH_NAME) // Used for automatically triggered jobs
+        ['release'].contains(env.BRANCH_NAME) // Used for automatically triggered jobs
     )
+
+    def time_val = 4
+    if (run_coverage_report) {
+        // verifications with enabled coverage can take much longer
+        time_val = 12
+    }
 
     def failed = []
     //load new fpga_version and set default simulator
@@ -140,7 +146,7 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
         def coverage_reporter = "$ofm_path/python/coverage_reporter/coverage_reporter.py"
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
-            timeout(time: 4, unit: 'HOURS') {
+            timeout(time: time_val, unit: 'HOURS') {
                 stage("$name") {
                     dir("$path") {
                         def command = "python3 $multi_ver $fdo $pkg $settings -p \"$name\""
