@@ -20,6 +20,8 @@ set COMPONENTS [list \
 
 # Disable Code Coverage
 set CODE_COVERAGE "false"
+# Disable faulty optimization in QuestaSim
+set SIM_FLAGS(EXTRA_VFLAGS) "-voptargs=+acc"
 
 set MAKEFILE_GEN "true"
 
