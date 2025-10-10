@@ -1,6 +1,6 @@
 # Makefile: Makefile for card
-# Copyright (C) BrnoLogic, Ltd. - All Rights Reserved
-# Author: Tomas Fukac <fukac@brnologic.com>, May 2024
+# Copyright (C) DynaNIC Semiconductors, Ltd. - All Rights Reserved
+# Author: Tomas Fukac <fukac@dyna-nic.com>, May 2024
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

@@ -1,6 +1,6 @@
 # ddr4.qsf: DDR4 modules constraint
-# Copyright (C) BrnoLogic, Ltd. - All Rights Reserved
-# Author: Tomas Fukac<fukac@brnologic.com>, 2023
+# Copyright (C) DynaNIC Semiconductors, Ltd. - All Rights Reserved
+# Author: Tomas Fukac<fukac@dyna-nic.com>, 2023
 #
 # SPDX-License-Identifier: BSD-3-Clause
 

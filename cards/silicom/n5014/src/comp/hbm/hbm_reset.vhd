@@ -1,6 +1,6 @@
 -- hbm_reset.vhd: HBM reset controller
--- Copyright (C) BrnoLogic, Ltd. - All Rights Reserved
--- Author: Tomas Fukac <fukac@brnologic.com>, 2024
+-- Copyright (C) DynaNIC Semiconductors, Ltd. - All Rights Reserved
+-- Author: Tomas Fukac <fukac@dyna-nic.com>, 2024
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 
