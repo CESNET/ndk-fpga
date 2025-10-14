@@ -269,7 +269,6 @@ architecture FULL of DMA_CALYPTE is
     -- =============================================================================================
     -- attribute mark_debug : string;
 
-    -- attribute mark_debug of USR_RX_MFB_META_PKT_SIZE : signal is "true";
     -- attribute mark_debug of USR_RX_MFB_META_CHAN     : signal is "true";
     -- attribute mark_debug of USR_RX_MFB_META_HDR_META : signal is "true";
     -- attribute mark_debug of USR_RX_MFB_DATA          : signal is "true";
@@ -279,6 +278,33 @@ architecture FULL of DMA_CALYPTE is
     -- attribute mark_debug of USR_RX_MFB_EOF           : signal is "true";
     -- attribute mark_debug of USR_RX_MFB_SRC_RDY       : signal is "true";
     -- attribute mark_debug of USR_RX_MFB_DST_RDY       : signal is "true";
+
+    -- attribute mark_debug of rx_stop_req_buff_ba : signal is "true";
+    -- attribute mark_debug of rx_stop_req_p2p_en  : signal is "true";
+    -- attribute mark_debug of rx_stop_req_hdp     : signal is "true";
+    -- attribute mark_debug of rx_stop_req_hhp     : signal is "true";
+    -- attribute mark_debug of rx_stop_req_en      : signal is "true";
+    -- attribute mark_debug of rx_stop_req_ack     : signal is "true";
+
+    -- attribute mark_debug of tx_stop_req_buff_ba : signal is "true";
+    -- attribute mark_debug of tx_stop_req_p2p_en  : signal is "true";
+    -- attribute mark_debug of tx_stop_req_hdp     : signal is "true";
+    -- attribute mark_debug of tx_stop_req_hhp     : signal is "true";
+    -- attribute mark_debug of tx_stop_req_en      : signal is "true";
+    -- attribute mark_debug of tx_stop_req_ack     : signal is "true";
+
+    -- attribute mark_debug of tx_rt_upd_ch      : signal is "true";
+    -- attribute mark_debug of tx_rt_upd_buff_ba : signal is "true";
+    -- attribute mark_debug of tx_rt_upd_p2p_en  : signal is "true";
+
+    -- attribute mark_debug of tx_start_req_ch  : signal is "true";
+    -- attribute mark_debug of tx_start_req_vld : signal is "true";
+    -- attribute mark_debug of tx_start_req_ack : signal is "true";
+
+    -- attribute mark_debug of tx_pkt_disp_upd_ch  : signal is "true";
+    -- attribute mark_debug of tx_pkt_disp_upd_hdp : signal is "true";
+    -- attribute mark_debug of tx_pkt_disp_upd_hhp : signal is "true";
+    -- attribute mark_debug of tx_pkt_disp_upd_en  : signal is "true";
 
     -- attribute mark_debug of USR_TX_MFB_META_PKT_SIZE : signal is "true";
     -- attribute mark_debug of USR_TX_MFB_META_CHAN     : signal is "true";
@@ -291,14 +317,23 @@ architecture FULL of DMA_CALYPTE is
     -- attribute mark_debug of USR_TX_MFB_SRC_RDY       : signal is "true";
     -- attribute mark_debug of USR_TX_MFB_DST_RDY       : signal is "true";
 
-    -- attribute mark_debug of PCIE_CQ_MFB_DATA    : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_META    : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_SOF     : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_EOF     : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_SOF_POS : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_EOF_POS : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_SRC_RDY : signal is "true";
-    -- attribute mark_debug of PCIE_CQ_MFB_DST_RDY : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_data    : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_meta    : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_sof     : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_eof     : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_sof_pos : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_eof_pos : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_src_rdy : signal is "true";
+    -- attribute mark_debug of ptr_upd_rq_mfb_dst_rdy : signal is "true";
+
+    -- attribute mark_debug of rx_dma_rq_mfb_data    : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_meta    : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_sof     : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_eof     : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_sof_pos : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_eof_pos : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_src_rdy : signal is "true";
+    -- attribute mark_debug of rx_dma_rq_mfb_dst_rdy : signal is "true";
 begin
 
     rx_dma_calypte_g : if (RX_GEN_EN) generate
