@@ -118,7 +118,7 @@ class Axi4SRequester:
             )
             while dword_count > 0:
                 tkeep = bitmask(self._rq_width // 32)
-                if dword_count < self._rq_width // 32:
+                if dword_count <= self._rq_width // 32:
                     user.eop = 1
                     user.eop_pos0 = dword_count
                     tkeep = bitmask(dword_count)
