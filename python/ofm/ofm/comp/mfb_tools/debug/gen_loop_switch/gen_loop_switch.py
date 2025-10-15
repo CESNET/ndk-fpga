@@ -148,12 +148,13 @@ class GlsStream:
 
         self.gen.enabled = True
 
-    def gen_stop(self) -> None:
+    def gen_stop(self, en_path: bool = False) -> None:
         """Stop generating frames and return MUXes to their default state (both to 0)."""
         self.gen.enabled = False
         while self.gen.enabled:
             continue
-        self.input = 0
+        if en_path:
+            self.input = 1
 
     # ############
     # Frame Player (not yet supported)
