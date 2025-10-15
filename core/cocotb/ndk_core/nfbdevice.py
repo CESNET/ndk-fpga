@@ -78,7 +78,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             await cocotb.start(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
         elif "A2700" in self._card_name:
             await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 20, 'ns').start())
-        elif self._card_name == "N6010":
+        elif self._card_name in ["N6010", "N5014"]:
             await cocotb.start(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
             self._core.clk_gen_i.LOCKED.value = 1
             self._core.clk_gen_i.INIT_DONE_N.value = 0
@@ -121,7 +121,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             await cocotb.start(Clock(self._dut.SYSCLK, 10, 'ns').start())
 
         # Workaround for all Intel PLL/CLOCKGEN
-        if any([(name in self._card_name) for name in ["IA-420F", "N6010", "DK-DEV-1SDX-P", "AGI-FH400G", "IA-440I", "A2700", "FB2CDG1"]]):
+        if any([(name in self._card_name) for name in ["IA-420F", "N6010", "N5014", "DK-DEV-1SDX-P", "AGI-FH400G", "IA-440I", "A2700", "FB2CDG1"]]):
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_0, 2.5, 'ns').start())
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_1, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_2, 5, 'ns').start())

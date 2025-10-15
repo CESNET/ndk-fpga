@@ -1,0 +1,20 @@
+# hbm.qsf: HBM modules constraint
+# Copyright (C) DynaNIC Semiconductors, Ltd. - All Rights Reserved
+# Author: Tomas Fukac<fukac@dyna-nic.com>, 2023
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# HBM top
+# ==============================================================================
+
+set_location_assignment PIN_P27 -to {HBM_TOP_REF_CLK}
+set_location_assignment PIN_N27 -to {HBM_TOP_REF_CLK(n)}
+
+
+# ==============================================================================
+# HBM bottom
+# ==============================================================================
+
+set_location_assignment PIN_AT26 -to {HBM_BOTTOM_REF_CLK}
+set_location_assignment PIN_AU26 -to {HBM_BOTTOM_REF_CLK(n)}
