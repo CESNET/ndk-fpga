@@ -25,7 +25,7 @@ NDK firmware support
 - Makefile targets for building the NDK firmware (valid for Minimal app, may vary for other apps):
     - Use ``make 400g2`` command for firmware with 2x400GE (default).
 - Support for booting the NDK firmware using the nfb-boot tool:
-    - NO
+    - YES, starting with the nfb-framework version 6.28.5
 
 .. note::
 
