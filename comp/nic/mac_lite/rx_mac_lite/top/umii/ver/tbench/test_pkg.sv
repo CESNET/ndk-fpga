@@ -13,7 +13,7 @@ package test_pkg;
     // ======================
     // RX MII configuration, allows you to set the required input data width
     // according to the selected Ethernet standard.
-    parameter MII_DATA_WIDTH  = 1024;
+    parameter MII_DATA_WIDTH  = 64;
     parameter MII_LANE_WIDTH  = 64;
     parameter RX_ITEM_WIDTH   = 8;
 
@@ -25,16 +25,16 @@ package test_pkg;
 
     // TX MFB configuration, by default the same as RX. Useful, for example,
     // for enlargement data width from 128b (RX) to 512b (TX).
-    parameter TX_REGIONS      = TXA_REGIONS;
-    parameter TX_REGION_SIZE  = TXA_REGION_SIZE;
-    parameter TX_BLOCK_SIZE   = TXA_BLOCK_SIZE;
-    parameter TX_ITEM_WIDTH   = TXA_ITEM_WIDTH;
+    parameter TX_REGIONS      = 1;
+    parameter TX_REGION_SIZE  = 8;
+    parameter TX_BLOCK_SIZE   = 8;
+    parameter TX_ITEM_WIDTH   = 8;
 
-    parameter RESIZE_BUFFER   = 0;
+    parameter RESIZE_BUFFER   = 1;
     parameter METADATA_WIDTH  = 102;
 
-    parameter CRC_CHECK_EN    = 0;
-    parameter MAC_CHECK_EN    = 0;
+    parameter CRC_CHECK_EN    = 1;
+    parameter MAC_CHECK_EN    = 1;
     parameter MAC_COUNT_MAX   = 16;
     parameter TIMESTAMP_EN    = FALSE;
     parameter INBANDFCS       = 0;
@@ -46,12 +46,12 @@ package test_pkg;
     parameter MAC_CHECK_MODE = 3;
 
     // Generator parameters
-    parameter FRAME_SIZE_MAX    = 4096;
-    parameter FRAME_SIZE_MIN    = 256;
-    parameter TRANSACTION_COUNT = 4000;
+    parameter FRAME_SIZE_MAX    = 512;
+    parameter FRAME_SIZE_MIN    = 50;
+    parameter TRANSACTION_COUNT = 2500;
 
-    parameter RX_CLK_PERIOD = 5.1ns;
-    parameter TX_CLK_PERIOD = 5ns;
+    parameter RX_CLK_PERIOD = 5ns;
+    parameter TX_CLK_PERIOD = 8ns;
     parameter MI_CLK_PERIOD = 7ns;
     parameter RESET_TIME    = 10*MI_CLK_PERIOD;
 

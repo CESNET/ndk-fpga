@@ -98,16 +98,25 @@ program TEST (
 
 
     task disableTestEnvironment();
+        int ready2stop;
+        #(1000*TX_CLK_PERIOD);
+        wait(!mii_driver.busy);
+        //$write("DisableTestEnvironment start, time: %t\n", $time);
+        ready2stop = 0;
+        do begin
+            if (!mfb_monitor.busy && !mvb_monitor.busy) begin
+                ready2stop++;
+            end else begin
+                ready2stop = 0;
+            end;
+            //$write("ready2stop %d, time: %t\n", ready2stop, $time);
+            #(500*TX_CLK_PERIOD);
+        end while (ready2stop < 100);
+        #(5000*TX_CLK_PERIOD);
+        //$write("DisableTestEnvironment ready, time: %t\n", $time);
+
         generator.setDisabled();
         mii_driver.setDisabled();
-        wait(!mii_driver.busy);
-        do begin
-            wait(!mfb_monitor.busy && !mvb_monitor.busy);
-            fork : StayIdleWait0
-                wait(mfb_monitor.busy || mvb_monitor.busy) disable StayIdleWait0;
-                #(100*TX_CLK_PERIOD) disable StayIdleWait0;
-            join
-        end while(mfb_monitor.busy || mvb_monitor.busy);
         mfb_monitor.setDisabled();
         mfb_responder.setDisabled();
         mvb_monitor.setDisabled();
