@@ -334,7 +334,8 @@ begin
             MI_DRD <= (others => '0');
             case (MI_ADDR(6-1 downto 0)) is
                 when "000000"  => MI_DRD(0)                       <= en_reg;
-                    MI_DRD(1)                                     <= TX_MFB_SRC_RDY; -- read only busy bit
+                    MI_DRD(1)                                     <= TX_MFB_SRC_RDY;                     -- read only busy bit
+                    MI_DRD(2)                                     <= TX_MFB_DST_RDY;                     -- read only busy bit
                     MI_DRD(4)                                     <= clr_reg;
                 when "000100"  => MI_DRD(LENGTH_WIDTH-1 downto 0) <= len_reg;
                 when "001000"  => MI_DRD                          <= chan_inc_reg;
