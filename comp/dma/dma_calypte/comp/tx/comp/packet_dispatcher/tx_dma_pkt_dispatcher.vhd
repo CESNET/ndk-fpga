@@ -127,9 +127,30 @@ architecture FULL of TX_DMA_PKT_DISPATCHER is
     signal disp_fsm_mfb_eof_pos : std_logic_vector(USR_MFB_EOF_POS'range);
     signal disp_fsm_mfb_src_rdy : std_logic;
 
-    signal fr_len_round_up_msk  : unsigned(16 -1 downto 0);
     signal fr_len_rounded       : unsigned(16 -1 downto 0);
+
+    signal fr_ptr_adj : unsigned(DMA_FRAME_PTR_W -1 downto 0);
 begin
+
+    -- =============================================================================================
+    -- Adjusting frame pointer in the DMA header
+    -- =============================================================================================
+    frame_ptr_adjust_p : process (all) is
+    begin
+        if (HDR_BUFF_DATA(DMA_P2P_EN) = "1") then
+            -- The length of a packet gets rounded up to the nearest multiple of 128 since these are
+            -- the units, that the neighboring RX DMA controller is communicating with (i.e. in
+            -- Peer-to-Peer settings).
+            fr_ptr_adj     <= resize(unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR)), 16 - 7) & "0000000";
+            fr_len_rounded <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 127) and (not to_unsigned(127, 16));
+        else
+            -- The length of a packet gets rounded up to the nearest multiple of 32 since these are
+            -- the units, the host software is communicating with.
+            fr_ptr_adj     <= unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
+            fr_len_rounded <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 31) and (not to_unsigned(31, 16));
+        end if;
+    end process;
+
     -- =============================================================================================
     -- FSM controlling output MFB signals
     -- =============================================================================================
@@ -149,13 +170,8 @@ begin
     end process;
 
     pkt_dispatch_fsm_nst_logic_p : process (all) is
-        variable dma_hdr_frame_ptr_v    : unsigned(DMA_FRAME_PTR_W -1 downto 0);
-        variable dma_hdr_frame_length_v : unsigned(DMA_FRAME_LENGTH_W -1 downto 0);
     begin
         pkt_dispatch_nst <= pkt_dispatch_pst;
-
-        dma_hdr_frame_ptr_v    := unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
-        dma_hdr_frame_length_v := unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH));
 
         case pkt_dispatch_pst is
             when S_IDLE =>
@@ -184,7 +200,6 @@ begin
 
     -- This machine expects data next clock
     pkt_dispatch_fsm_output_logic_p : process (all) is
-        variable dma_hdr_frame_ptr_v    : unsigned(DMA_FRAME_PTR_W -1 downto 0);
         variable dma_hdr_frame_length_v : unsigned(DMA_FRAME_LENGTH_W -1 downto 0);
     begin
         addr_cntr_nst <= addr_cntr_pst;
@@ -203,7 +218,6 @@ begin
         PKT_SENT_INC <= '0';
         UPD_HP_EN   <= '0';
 
-        dma_hdr_frame_ptr_v    := unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
         dma_hdr_frame_length_v := unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH));
 
         case pkt_dispatch_pst is
@@ -216,10 +230,10 @@ begin
                     -- if (ENABLED_CHANS(to_integer(unsigned(HDR_BUFF_CHAN))) = '0') then
                     --     HDR_BUFF_DST_RDY <= '1';
                     -- else
-                    addr_cntr_nst <= resize(dma_hdr_frame_ptr_v, addr_cntr_nst'length) + (USR_MFB_DATA'length /8);
+                    addr_cntr_nst <= resize(fr_ptr_adj, addr_cntr_nst'length) + (USR_MFB_DATA'length /8);
                     byte_cntr_nst <= resize(dma_hdr_frame_length_v, byte_cntr_nst'length);
 
-                    BUFF_RD_ADDR <= std_logic_vector(resize(dma_hdr_frame_ptr_v, BUFF_RD_ADDR'length));
+                    BUFF_RD_ADDR <= std_logic_vector(resize(fr_ptr_adj, BUFF_RD_ADDR'length));
                     BUFF_RD_EN   <= '1';
                     -- end if;
                 end if;
@@ -277,13 +291,8 @@ begin
     PKT_SENT_CHAN  <= HDR_BUFF_CHAN;
     PKT_SENT_BYTES <= HDR_BUFF_DATA(DMA_FRAME_LENGTH)(PKT_SENT_BYTES'range);
 
-    -- The length of a packet gets rounded up to the nearest multiple of 32 and this value is then
-    -- used for the HDP pointer update.
-    fr_len_round_up_msk <= not to_unsigned(31,16);
-    fr_len_rounded      <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 31) and fr_len_round_up_msk;
-
-    UPD_HP_CHAN <= HDR_BUFF_CHAN;
-    UPD_HDP_DATA <= std_logic_vector(resize(fr_len_rounded + unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR)), DATA_POINTER_WIDTH));
+    UPD_HP_CHAN  <= HDR_BUFF_CHAN;
+    UPD_HDP_DATA <= std_logic_vector(resize(fr_len_rounded + fr_ptr_adj, DATA_POINTER_WIDTH));
     UPD_HHP_DATA <= std_logic_vector(unsigned(HDR_BUFF_ADDR(1 + DMA_HDR_POINTER_WIDTH -1 downto 1)) + 1);
 
     -- This process delays the set of all output MFB signals because the data come from the data

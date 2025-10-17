@@ -173,6 +173,7 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_hpm_rd_data  : std_logic_vector(POINTER_WIDTH-1 downto 0);
     signal hdrm_sdp_rd_data  : std_logic_vector(POINTER_WIDTH-1 downto 0);
     signal hdrm_shp_rd_data  : std_logic_vector(POINTER_WIDTH-1 downto 0);
+    signal hdrm_p2p_en_data  : std_logic;
 
     signal hdrm_hdp_update_chan : std_logic_vector(log2(CHANNELS)-1 downto 0);
     signal hdrm_hdp_update_data : std_logic_vector(POINTER_WIDTH-1 downto 0);
@@ -514,6 +515,9 @@ begin
         HPM_RD_CHAN => hdrm_hdr_rd_chan,
         HPM_RD_DATA => hdrm_hpm_rd_data,
 
+        P2P_EN_CHAN => hdrm_hdr_rd_chan,
+        P2P_EN_DATA => hdrm_p2p_en_data,
+
         PTR_UPD_BUFF_BA  => PTR_UPD_BUFF_BA,
         PTR_UPD_P2P_EN   => PTR_UPD_P2P_EN,
         PTR_UPD_HDP      => PTR_UPD_HDP,
@@ -567,6 +571,7 @@ begin
         ADDR_HEADER_BASE       => hdrm_hba_rd_data,
         ADDR_HEADER_MASK       => hdrm_hpm_rd_data,
         ADDR_HEADER_SW_POINTER => hdrm_shp_rd_data,
+        ADDR_HEADER_P2P_EN     => hdrm_p2p_en_data,
 
         INF_META     => USER_RX_MFB_META_HDR_META,
         INF_CHANNEL  => USER_RX_MFB_META_CHAN,

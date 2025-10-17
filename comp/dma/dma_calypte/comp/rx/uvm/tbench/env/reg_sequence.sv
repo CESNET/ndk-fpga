@@ -20,7 +20,7 @@ class start_channel extends uvm_sequence;
 
     constraint c_start {
         data_mask_width < 16;
-        data_mask_width > 5;
+        data_mask_width > 3;
         hdr_mask_width  < 16;
         hdr_mask_width  > 3;
         upd_timeout > 4;

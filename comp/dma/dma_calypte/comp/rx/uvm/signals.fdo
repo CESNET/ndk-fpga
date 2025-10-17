@@ -60,6 +60,10 @@ proc high_level_view {PATH} {
     add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "pcie_hdr_dma_hdr_tran_fifo_status"] $PATH/rx_dma_hdr_manager_i/pcie_hdr_dma_hdr_tran_fifo_i/STATUS
     add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/dma_hdr_fifo_status
     add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "input_fifo_status"] $PATH/rx_dma_hdr_manager_i/input_mvb_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "discard_fifo_status"] $PATH/rx_dma_hdr_manager_i/dma_discard_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "pkt_size_fifo_status"] $PATH/rx_dma_hdr_manager_i/pkt_size_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "hdr_meta_fifo_status"] $PATH/rx_dma_hdr_manager_i/hdr_meta_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "ptr_fifo_status"] $PATH/rx_dma_hdr_manager_i/ptr_fifo_i/STATUS
 }
 
 proc hdr_ins {PATH} {

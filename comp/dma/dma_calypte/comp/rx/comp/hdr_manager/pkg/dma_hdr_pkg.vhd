@@ -16,7 +16,8 @@ package dma_hdr_pkg is
     constant DMA_FRAME_LENGTH_W : natural := 16;
     constant DMA_FRAME_PTR_W    : natural := 16;
     constant DMA_VLD_BIT_W      : natural := 1;
-    constant DMA_RSVD_BITS_W    : natural := 7;
+    constant DMA_P2P_EN_W       : natural := 1;
+    constant DMA_RSVD_BITS_W    : natural := 6;
     constant DMA_USR_METADATA_W : natural := 24;
     --=============================================================================================================
 
@@ -47,7 +48,8 @@ package dma_hdr_pkg is
     constant DMA_FRAME_LENGTH_O : natural := 0;
     constant DMA_FRAME_PTR_O    : natural := DMA_FRAME_LENGTH_O + DMA_FRAME_LENGTH_W;
     constant DMA_VLD_BIT_O      : natural := DMA_FRAME_PTR_O    + DMA_FRAME_PTR_W;
-    constant DMA_RSVD_BITS_O    : natural := DMA_VLD_BIT_O      + DMA_VLD_BIT_W;
+    constant DMA_P2P_EN_O       : natural := DMA_VLD_BIT_O      + DMA_VLD_BIT_W;
+    constant DMA_RSVD_BITS_O    : natural := DMA_P2P_EN_O       + DMA_P2P_EN_W;
     constant DMA_USR_METADATA_O : natural := DMA_RSVD_BITS_O    + DMA_RSVD_BITS_W;
     --=============================================================================================================
 
@@ -78,6 +80,7 @@ package dma_hdr_pkg is
     subtype DMA_FRAME_LENGTH    is natural range DMA_FRAME_LENGTH_O + DMA_FRAME_LENGTH_W    - 1 downto DMA_FRAME_LENGTH_O;
     subtype DMA_FRAME_PTR       is natural range DMA_FRAME_PTR_O    + DMA_FRAME_PTR_W       - 1 downto DMA_FRAME_PTR_O;
     subtype DMA_VLD_BIT         is natural range DMA_VLD_BIT_O      + DMA_VLD_BIT_W         - 1 downto DMA_VLD_BIT_O;
+    subtype DMA_P2P_EN          is natural range DMA_P2P_EN_O       + DMA_P2P_EN_W          - 1 downto DMA_P2P_EN_O;
     subtype DMA_RSVD_BITS       is natural range DMA_RSVD_BITS_O    + DMA_RSVD_BITS_W       - 1 downto DMA_RSVD_BITS_O;
     subtype DMA_USR_METADATA    is natural range DMA_USR_METADATA_O + DMA_USR_METADATA_W    - 1 downto DMA_USR_METADATA_O;
     --=============================================================================================================

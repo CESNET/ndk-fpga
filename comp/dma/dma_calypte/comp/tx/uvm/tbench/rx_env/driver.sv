@@ -81,7 +81,10 @@ class driver #(
 
     localparam PCIE_HDR_SIZE = 128;
     localparam DMA_HDR_SIZE  = 64;
-    localparam PACKET_ALIGNMENT = 32;
+    // This is the most common packet alignment when the DUT is communicating with the software
+    localparam SW_PACKET_ALIGNMENT = 32;
+    // This is the alignment if the DUT is communicating with RX DMA Calypte controller
+    localparam HW_PACKET_ALIGNMENT = 128;
 
     driver_sync #(MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) m_data_export;
     uvm_reset::sync_terminate                                            m_reset_terminate;
@@ -330,6 +333,8 @@ class driver #(
         int unsigned pcie_trans_cnt;
         int unsigned pcie_trans_ptr;
         string       debug_msg;
+        int unsigned alignment_select;
+        bit          p2p_en;
 
         debug_msg = "\n";
 
@@ -483,14 +488,17 @@ class driver #(
 
         debug_msg = {debug_msg, "\n"};
 
+        p2p_en = m_regmodel_channel.exper_reg.get();
+        alignment_select =  (p2p_en == 1'b1) ? HW_PACKET_ALIGNMENT : SW_PACKET_ALIGNMENT;
+
         //Allign pointer to PACKET ALLIGMENT
-        if ((m_driv_data.data_addr % PACKET_ALIGNMENT) != 0) begin
+        if ((m_driv_data.data_addr % alignment_select) != 0) begin
             int unsigned size_to_allign;
 
             debug_msg = {debug_msg, $sformatf("\tRealigning ptr: 0x%h (free_space: %0d)\n", m_driv_data.data_addr,
                                               m_driv_data.data_free_space)};
             debug_msg = {debug_msg, $sformatf("\tPtr mask: %h\n", m_driv_data.data_mask)};
-            size_to_allign = (PACKET_ALIGNMENT-(m_driv_data.data_addr % PACKET_ALIGNMENT));
+            size_to_allign = (alignment_select - (m_driv_data.data_addr % alignment_select));
             debug_msg = {debug_msg, $sformatf("\tRemaining size to align: %0d (0x%h)\n", size_to_allign,
                                               size_to_allign)};
 
@@ -520,24 +528,32 @@ class driver #(
     // previously and it allows to send a DMA header when the channel gets a stop
     // request during packet reception
     task send_header(logic [16-1:0] packet_ptr);
-        pcie_info pcie_transaction;
+        pcie_info                 pcie_transaction;
         int unsigned              pcie_len;
         logic [4-1:0]             fbe;
         logic [4-1:0]             lbe;
         logic [DMA_HDR_SIZE-1:0]  dma_hdr;
         logic [64-1 : 0]          pcie_addr;
-        string debug_msg;
+        string                    debug_msg;
+        bit                       p2p_en;
 
         //////////////////////////////////
         // DMA HEADER
         fbe                   = '1;
         lbe                   = '1;
         pcie_len              = 2;
+        p2p_en = m_regmodel_channel.exper_reg.get();
+
+        if (p2p_en == 1'b1) begin
+            packet_ptr = {7'b0000000, packet_ptr[15:7]};
+        end
 
         // DMA HDR Filling
         dma_hdr[15 : 0]  = req.m_packet.size();
         dma_hdr[31 : 16] = packet_ptr;
-        dma_hdr[39 : 32] = '0;
+        dma_hdr[32] = 1'b1;
+        dma_hdr[33] = p2p_en;
+        dma_hdr[39 : 34] = '0;
         dma_hdr[63 : 40] = req.m_meta;
 
         pcie_addr = '0;

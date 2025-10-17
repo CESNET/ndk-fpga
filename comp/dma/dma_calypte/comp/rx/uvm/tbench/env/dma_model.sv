@@ -214,10 +214,10 @@ class dma_model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         return rq;
     endfunction
 
-    function void get_dma_header(logic [16-1:0] frame_pointer, logic[16-1:0] frame_length, logic [24-1:0] meta, bit valid_bit, output logic[32-1 : 0] header[2]);
+    function void get_dma_header(logic [16-1:0] frame_pointer, logic[16-1:0] frame_length, logic [24-1:0] meta, bit valid_bit, bit p2p_en, output logic[32-1 : 0] header[2]);
         logic [64-1:0] out_hdr;
 
-        out_hdr = {meta, 7'b0, valid_bit, frame_pointer, frame_length};
+        out_hdr = {meta, 6'b0, p2p_en, valid_bit, frame_pointer, frame_length};
         header = {<<32{out_hdr}};
     endfunction
 
@@ -241,6 +241,7 @@ class dma_model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         int unsigned               packet_pointer_start;
         int unsigned               parts;
         logic [64-1:0]             addr;
+        logic [32-1 : 0]           exper_reg;
 
         packet_pointer_start = m_data[channel].data_ptr;
         pcie_packet = new[(packet.size()+3)/4];
@@ -289,8 +290,9 @@ class dma_model #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_component;
         //SEND DMA HEADER
         addr = m_regmodel.channel[channel].hdr_base.get() + (m_data[channel].hdr_ptr*8);
         m_data[channel].hdr_ptr = (m_data[channel].hdr_ptr + 1) & m_regmodel.channel[channel].hdr_mask.get();
+        exper_reg = m_regmodel.channel[channel].exper.get();
 
-        get_dma_header(packet_pointer_start, packet.size(), meta, m_data[channel].vld_bit, packet_hdr);
+        get_dma_header(packet_pointer_start, packet.size(), meta, m_data[channel].vld_bit, exper_reg[0], packet_hdr);
         packet_output = get_pcie_transaction(addr, 8, packet_hdr);
         packet_output.packet_num   = m_pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 0;
