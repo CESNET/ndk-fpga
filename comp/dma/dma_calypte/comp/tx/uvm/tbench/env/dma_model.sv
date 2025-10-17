@@ -254,10 +254,16 @@ class dma_model #(
                 logic [16-1 : 0] packet_size;
                 logic [24-1 : 0] dma_meta;
                 logic [DATA_POINTER_WIDTH-1 : 0] frame_pointer;
+                bit                              p2p_en;
 
                 packet_size   = cq_data_tr.data[usr_data_begin_idx][16-1 : 0];
                 frame_pointer = cq_data_tr.data[usr_data_begin_idx][32-1 : 16];
+                p2p_en        = cq_data_tr.data[usr_data_begin_idx+1][1];
                 dma_meta      = cq_data_tr.data[usr_data_begin_idx+1][32-1 : 8];
+
+                if (p2p_en == 1'b1) begin
+                    frame_pointer = {frame_pointer, 7'b0};
+                end
 
                 if (drop == 1'b0) begin
                     usr_tx_data_tr      = uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH)::type_id
@@ -293,6 +299,7 @@ class dma_model #(
                     debug_msg = {debug_msg, $sformatf("TRANSACTION          : %0d\n",
                                                       m_channel_info[channel].dma_transactions)};
                     debug_msg = {debug_msg, $sformatf("FRAME POINTER        : %0d\n", frame_pointer)};
+                    debug_msg = {debug_msg, $sformatf("PEER2PEER ENABLE     : %0d\n", p2p_en)};
                     debug_msg = {debug_msg, $sformatf("SIZE IN BYTES        : %0d\n", packet_size)};
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};
@@ -319,6 +326,7 @@ class dma_model #(
                     debug_msg = {debug_msg, $sformatf("TRANSACTION          : %0d\n",
                                                       m_channel_info[channel].drop_transactions)};
                     debug_msg = {debug_msg, $sformatf("FRAME POINTER        : %0d\n", frame_pointer)};
+                    debug_msg = {debug_msg, $sformatf("PEER2PEER ENABLE     : %0d\n", p2p_en)};
                     debug_msg = {debug_msg, $sformatf("SIZE IN BYTES        : %0d\n", packet_size)};
                     debug_msg = {debug_msg, $sformatf(
                         "================================================================================= \n")};

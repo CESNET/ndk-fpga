@@ -56,7 +56,8 @@ entity RX_DMA_CALYPTE_ADDR_MANAGER is
         ADDR_MASK       : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
         -- SW pointer to ring buffer
         ADDR_SW_POINTER : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
-
+        -- Assert if Peer-to-peer transfer is enabled on the channel
+        ADDR_P2P_EN     : in  std_logic;
 
         -- =====================================================================
         -- HW UPDATE ADDRESS INTERFACE (To SW manager)
@@ -85,6 +86,7 @@ entity RX_DMA_CALYPTE_ADDR_MANAGER is
         -- Address to RAM
         ADDR     : out std_logic_vector(ADDR_WIDTH-1 downto 0);
         OFFSET   : out std_logic_vector(POINTER_WIDTH-1 downto 0);
+        P2P_EN   : out std_logic;
         ADDR_VLD : out std_logic
     );
 
@@ -215,6 +217,7 @@ begin
             if (rising_edge(CLK)) then
                 ADDR     <= std_logic_vector(unsigned(ADDR_BASE) + hw_offset);
                 OFFSET   <= hw_pointer_rd_data;
+                P2P_EN   <= ADDR_P2P_EN;
                 ADDR_VLD <= packet_vld;
                 if (RESET = '1') then
                     ADDR_VLD <= '0';
@@ -224,6 +227,7 @@ begin
     else generate
         ADDR     <= std_logic_vector(unsigned(ADDR_BASE) + hw_offset);
         OFFSET   <= hw_pointer_rd_data;
+        P2P_EN   <= ADDR_P2P_EN;
         ADDR_VLD <= packet_vld;
     end generate;
 

@@ -71,6 +71,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         ADDR_HEADER_BASE       : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
         ADDR_HEADER_MASK       : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
         ADDR_HEADER_SW_POINTER : in  std_logic_vector(POINTER_WIDTH-1 downto 0);
+        ADDR_HEADER_P2P_EN     : in  std_logic;
 
         -- =====================================================================
         -- HW POINTER UPDATE INTERFACE
@@ -195,7 +196,7 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     -- PCIe header FIFOs
     -- =============================================================================================
     -- Width of data in the FIFO for PCIe headers of transactions carrying DMA header
-    constant PCIE_HDR_DMA_TRAN_FIFO_W     : natural := 128 + 1;
+    constant PCIE_HDR_DMA_TRAN_FIFO_W     : natural := 128 + 1 + 1;
     constant PCIE_HDR_DMA_TRAN_FIFO_SIZE  : natural := 8;
     -- Width of data in the FIFO for PCIe headers of transactions carrying user data
     constant PCIE_HDR_DATA_TRAN_FIFO_W    : natural := 128;
@@ -243,6 +244,8 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     signal pcie_addr_len_dma_hdr_tran : std_logic;
     -- Content of a PCIe header for a transaction with DMA header
     signal pcie_hdr_dma_hdr_tran      : std_logic_vector(128-1 downto 0);
+    signal dma_hdr_p2p_en             : std_logic;
+    signal dma_hdr_p2p_en_reg         : std_logic;
 
     -- =============================================================================================
     -- FSM that tracks the current state of the packet reception
@@ -270,6 +273,7 @@ architecture FULL of RX_DMA_CALYPTE_HDR_MANAGER is
     signal   vld_bits_per_ch               : std_logic_vector(CHANNELS -1 downto 0);
     signal   vld_bit_sel                   : std_logic;
     signal   vld_bit_out                   : std_logic;
+    signal   p2p_en_out                    : std_logic;
 
     signal pkt_chan_reg : std_logic_vector(log2(CHANNELS) -1 downto 0);
     signal pkt_chan_new : std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -765,6 +769,7 @@ begin
         ADDR_BASE       => ADDR_DATA_BASE,
         ADDR_MASK       => ADDR_DATA_MASK,
         ADDR_SW_POINTER => ADDR_DATA_SW_POINTER,
+        ADDR_P2P_EN     => '0',
 
         POINTER_UPDATE_CHAN => HDP_UPDATE_CHAN,
         POINTER_UPDATE_DATA => HDP_UPDATE_DATA,
@@ -778,6 +783,7 @@ begin
 
         ADDR     => data_pcie_addr,
         OFFSET   => data_ptr,
+        P2P_EN   => open,
         ADDR_VLD => data_pcie_addr_vld
     );
 
@@ -817,6 +823,7 @@ begin
         ADDR_BASE       => ADDR_HEADER_BASE,
         ADDR_MASK       => ADDR_HEADER_MASK,
         ADDR_SW_POINTER => ADDR_HEADER_SW_POINTER,
+        ADDR_P2P_EN     => ADDR_HEADER_P2P_EN,
 
         POINTER_UPDATE_CHAN => HHP_UPDATE_CHAN,
         POINTER_UPDATE_DATA => HHP_UPDATE_DATA,
@@ -830,6 +837,7 @@ begin
 
         ADDR     => dma_hdr_pcie_addr,
         OFFSET   => dma_hdr_ptr,
+        P2P_EN   => dma_hdr_p2p_en,
         ADDR_VLD => dma_hdr_pcie_addr_vld
     );
 
@@ -860,6 +868,7 @@ begin
             dma_hdr_pcie_addr_reg         <= dma_hdr_pcie_addr;
             pcie_hdr_dma_hdr_tran_fifo_wr <= dma_hdr_pcie_addr_vld;
             pcie_addr_len_dma_hdr_tran    <= '1' when (DEVICE = "ULTRASCALE" or dma_hdr_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
+            dma_hdr_p2p_en_reg            <= dma_hdr_p2p_en;
             vld_bit_sel                   <= vld_bits_per_ch(to_integer(unsigned(dma_hdr_addr_chan)));
         end if;
     end process;
@@ -881,7 +890,7 @@ begin
         end if;
     end process;
 
-    pcie_hdr_dma_hdr_tran_fifo_in <= pcie_hdr_dma_hdr_tran & vld_bit_sel;
+    pcie_hdr_dma_hdr_tran_fifo_in <= pcie_hdr_dma_hdr_tran & vld_bit_sel & dma_hdr_p2p_en_reg;
 
     pcie_hdr_dma_hdr_tran_fifo_i : entity work.FIFOX
     generic map (
@@ -909,9 +918,9 @@ begin
         AEMPTY => open
     );
 
-    (DMA_PCIE_HDR, vld_bit_out)   <= pcie_hdr_dma_hdr_tran_fifo_do;
-    DMA_PCIE_HDR_SRC_RDY          <= not pcie_hdr_dma_hdr_tran_fifo_empty;
-    pcie_hdr_dma_hdr_tran_fifo_rd <= DMA_PCIE_HDR_DST_RDY;
+    (DMA_PCIE_HDR, vld_bit_out, p2p_en_out) <= pcie_hdr_dma_hdr_tran_fifo_do;
+    DMA_PCIE_HDR_SRC_RDY                    <= not pcie_hdr_dma_hdr_tran_fifo_empty;
+    pcie_hdr_dma_hdr_tran_fifo_rd           <= DMA_PCIE_HDR_DST_RDY;
 
     pcie_hdr_data_tran_reg_p : process (CLK) is
     begin
@@ -1081,7 +1090,8 @@ begin
     DMA_DISCARD <= discard_fifo_do(0);
     DMA_HDR     <= (24-1 downto METADATA_SIZE => '0')
                & hdr_meta_fifo_do
-               & (7-1 downto 0                => '0')
+               & (6-1 downto 0                => '0')
+               & p2p_en_out
                & vld_bit_out
                & std_logic_vector(resize(unsigned(ptr_fifo_do), 16))
                & (16-1 downto log2(PKT_MTU+1) => '0')

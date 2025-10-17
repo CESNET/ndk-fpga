@@ -318,13 +318,15 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
             run_input();
         join_none
 
-        fork
-            forever begin
-                string            msg = "";
-                dma_model_packet  packet_dma_model;
-                output_type       tr_dut;
+        forever begin
+            string            msg = "";
+            dma_model_packet  packet_dma_model;
+            output_type       tr_dut;
+            uvm_logic_vector_array::sequence_item #(32)   ptr_upd_dut_tr_data;
+            uvm_logic_vector::sequence_item #(META_WIDTH) ptr_upd_dut_tr_meta;
+            uvm_pcie::request_header                      ptr_upd_model_tr;
 
-                wait (m_out_data.size() != 0);
+            if (m_out_data.size() != 0) begin
                 tr_dut = m_out_data.pop_front();
 
                 m_dma_model_output_fifo.get(packet_dma_model);
@@ -341,19 +343,17 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
                 end else begin
                     msg = {msg, $sformatf("\nRecive correct transaction :\n\t\tSegment contains: %s\n\t\tChannel : %0d\n\t\tPart %0d/%0d\n\t\tPart is delay from SOF on input %0dns",  packet_dma_model.data_packet == 1 ? "DATA" : "HEADER",  packet_dma_model.channel, packet_dma_model.part, packet_dma_model.part_num, (tr_dut.output_time - packet_dma_model.time_last())/1ns)};
                     `uvm_info(this.get_full_name(), $sformatf("%s\nTransaction%s", msg, packet_dma_model.convert2string()), UVM_MEDIUM);
-                end
 
-                //Count delay if you get first data packet.
-                if (packet_dma_model.part == 1 && packet_dma_model.data_packet == 1) begin
-                    m_delay_stat.next_val((tr_dut.output_time - packet_dma_model.time_last())/1ns);
+                    //Count delay if you get first data packet.
+                    if (packet_dma_model.part == 1 && packet_dma_model.data_packet == 1) begin
+                        m_delay_stat.next_val((tr_dut.output_time - packet_dma_model.time_last())/1ns);
+                    end
                 end
             end
 
-            forever begin
-                string                                        msg = "";
-                uvm_logic_vector_array::sequence_item #(32)   ptr_upd_dut_tr_data;
-                uvm_logic_vector::sequence_item #(META_WIDTH) ptr_upd_dut_tr_meta;
-                uvm_pcie::request_header                      ptr_upd_model_tr;
+            if (m_ptr_upd_mfb_data_fifo.size() != 0 &&
+                    m_ptr_upd_mfb_meta_fifo.size() != 0 &&
+                    m_ptr_upd_model_output_fifo.size() != 0) begin
 
                 m_ptr_upd_mfb_data_fifo.get(ptr_upd_dut_tr_data);
                 m_ptr_upd_mfb_meta_fifo.get(ptr_upd_dut_tr_meta);
@@ -373,7 +373,8 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
                     `uvm_info(this.get_full_name(), msg, UVM_MEDIUM);
                 end
             end
-        join
+            #(1ns);
+        end
     endtask
 
     function void check_phase(uvm_phase phase);

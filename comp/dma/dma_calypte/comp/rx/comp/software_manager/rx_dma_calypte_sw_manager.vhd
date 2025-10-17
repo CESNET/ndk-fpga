@@ -117,6 +117,9 @@ entity RX_DMA_CALYPTE_SW_MANAGER is
         HPM_RD_CHAN     : in  std_logic_vector(log2(CHANNELS)-1 downto 0);
         HPM_RD_DATA     : out std_logic_vector(POINTER_WIDTH-1 downto 0);
 
+        P2P_EN_CHAN : in  std_logic_vector(log2(CHANNELS) -1 downto 0);
+        P2P_EN_DATA : out std_logic;
+
         -- =========================================================================================
         -- Interface to Pointer Updater
         -- =========================================================================================
@@ -365,7 +368,7 @@ architecture FULL of RX_DMA_CALYPTE_SW_MANAGER is
     constant RD_PORTS : i_array_t(REGS-1 downto 0) := (
         R_CONTROL         => 1 + 1,     -- Channel Start/Stop detection
         R_STATUS          => 1 + 1,     -- Channel Start/Stop indication
-        R_EXP             => 1 + 1,     -- Stop logic
+        R_EXP             => 1 + 2,     -- Stop logic + Header manager
         RSV_3             => 1 + 0,
         R_SDP             => 1 + 2,     -- Channel Stop indication (comparator) + Header manager
         R_SHP             => 1 + 2,     -- Channel Stop indication (comparator) + Header manager
@@ -1188,6 +1191,17 @@ begin
     end generate;
     -- =====================================================================
 
+    -- =====================================================================
+    -- Hardware pointer/mask read interface
+    -- =====================================================================
+    reg_addrb(R_EXP)(2)           <= P2P_EN_CHAN;
+
+    exper_reg_rd_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            P2P_EN_DATA <= reg_dob_opt(R_EXP)(2)(0);
+        end if;
+    end process;
 
     -- =====================================================================
     -- Hardware pointer/mask read interface

@@ -132,8 +132,11 @@ class ptr_updater_model #(POINTER_WIDTH, CHANNELS, UPD_THRESHOLD) extends uvm_co
                     out_tr.fbe    = 4'b1111;
                     out_tr.lbe    = 4'b0011;
                     out_tr.length = 2;
-                    // out_tr.data   = {{{(16-POINTER_WIDTH){1'b0}},     hdp_int},
-                    //                  {{(16-(POINTER_WIDTH-3)){1'b0}}, hhp_int}};
+
+                    if (p2p_en_int == 1'b1) begin
+                        hdp_int = hdp_int[POINTER_WIDTH-1:7];
+                    end
+
                     out_tr.data   = {hdp_int, hhp_int};
 
                     m_ptr_upd_pcie_port.write(out_tr);
@@ -179,6 +182,11 @@ class ptr_updater_model #(POINTER_WIDTH, CHANNELS, UPD_THRESHOLD) extends uvm_co
                 out_tr.fbe    = 4'b1111;
                 out_tr.lbe    = 4'b0011;
                 out_tr.length = 2;
+
+                if (p2p_en_int == 1'b1) begin
+                    hdp_int = hdp_int[POINTER_WIDTH-1:7];
+                end
+
                 out_tr.data   = { hdp_int, hhp_int };
 
                 out_tr.time_add("ptr_upd_model", $time());

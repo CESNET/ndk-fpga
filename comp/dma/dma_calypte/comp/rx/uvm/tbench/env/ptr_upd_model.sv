@@ -40,7 +40,7 @@ class ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH) extends uvm_component;
             // Deparse the input data
             m_ptr_upd_req_fifo.get(in_tr);
             {hhp_int, hdp_int, p2p_en_int, upd_buff_addr_int} = in_tr.data;
-            msg = {msg, $sformatf("\n\t PTR_UPD_MODEL -> Received transaction:\n\t", in_tr.convert2string())};
+            msg = {msg, $sformatf("\n\t PTR_UPD_MODEL -> Received transaction: %s\n\t", in_tr.convert2string())};
             `uvm_info(this.get_full_name(), msg,  UVM_HIGH);
 
             out_tr = uvm_pcie::request_header::type_id::create(this.get_full_name);
@@ -70,6 +70,10 @@ class ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH) extends uvm_component;
             out_tr.fbe    = 4'b1111;
             out_tr.lbe    = 4'b0011;
             out_tr.length = 2;
+
+            if (p2p_en_int == 1'b1) begin
+                hdp_int = {hdp_int, 7'b0};
+            end
             out_tr.data   = { hdp_int, hhp_int };
 
             m_ptr_upd_rq_mfb_port.write(out_tr);

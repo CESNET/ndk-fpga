@@ -133,6 +133,10 @@ architecture FULL of DMA_PTR_UPDATER is
     signal tx_mfb_data_arr    : slv_array_t(MFB_REGIONS -1 downto 0)(MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH -1 downto 0);
     signal tx_mfb_meta_arr    : slv_array_t(MFB_REGIONS -1 downto 0)(PCIE_RQ_META_WIDTH -1 downto 0);
     signal tx_mfb_eof_pos_arr : slv_array_t(MFB_REGIONS -1 downto 0)(maximum(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE)) -1 downto 0);
+
+    signal tx_stop_req_hdp_adj : unsigned(15 downto 0);
+    signal rx_stop_req_hdp_adj : unsigned(15 downto 0);
+    signal tx_rt_upd_hdp_adj   : unsigned(15 downto 0);
 begin
 
     assert (TX_UPD_THRESHOLD <= 2**(TX_DATA_PTR_WIDTH-1))
@@ -170,9 +174,20 @@ begin
         OUT_HEADER => rx_stop_pcie_hdr_data
     );
 
+    -- purpose: The HDP needs to be adjusted if this channel is communicating Peer-to-Peer since
+    -- the dispatching channel has different units for its HDP than the receiving one.
+    rx_stop_hdp_adjust_p : process (all) is
+    begin
+        if (RX_STOP_REQ_P2P_EN = '1') then
+            rx_stop_req_hdp_adj <= resize(unsigned(RX_STOP_REQ_HDP), 16 - 7) & "0000000";
+        else
+            rx_stop_req_hdp_adj <= resize(unsigned(RX_STOP_REQ_HDP), 16);
+        end if;
+    end process;
+
     fifo_din_arr(2) <= std_logic_vector(resize(unsigned(RX_STOP_REQ_HHP), 16))
                        & X"0000"
-                       & std_logic_vector(resize(unsigned(RX_STOP_REQ_HDP), 16))
+                       & std_logic_vector(rx_stop_req_hdp_adj)
                        & rx_stop_pcie_hdr_data;
     fifo_wr(2)      <= RX_STOP_REQ_EN and (not fifo_full) when RX_STOP_REQ_BUFF_BA /= ADDR_NULL else '0';
     RX_STOP_REQ_ACK <= not fifo_full when RX_STOP_REQ_BUFF_BA /= ADDR_NULL else '0';
@@ -200,9 +215,23 @@ begin
         OUT_HEADER => tx_stop_pcie_hdr_data
     );
 
+    -- purpose: The HDP needs to be adjusted if this channel is communicating Peer-to-Peer since
+    -- the dispatching channel has different units for its HDP than the receiving one.
+    tx_stop_hdp_adjust_p : process (all) is
+        variable hdp_full_width : unsigned(15 downto 0);
+    begin
+        hdp_full_width := resize(unsigned(TX_STOP_REQ_HDP), 16);
+
+        if (TX_STOP_REQ_P2P_EN = '1') then
+            tx_stop_req_hdp_adj <= resize(hdp_full_width(hdp_full_width'high downto 7), 16);
+        else
+            tx_stop_req_hdp_adj <= hdp_full_width;
+        end if;
+    end process;
+
     fifo_din_arr(1) <= std_logic_vector(resize(unsigned(TX_STOP_REQ_HHP), 16))
                        & X"0000"
-                       & std_logic_vector(resize(unsigned(TX_STOP_REQ_HDP), 16))
+                       & std_logic_vector(tx_stop_req_hdp_adj)
                        & tx_stop_pcie_hdr_data;
     fifo_wr(1)      <= TX_STOP_REQ_EN and (not fifo_full) when TX_STOP_REQ_BUFF_BA /= ADDR_NULL else '0';
     TX_STOP_REQ_ACK <= not fifo_full when TX_STOP_REQ_BUFF_BA /= ADDR_NULL else '0';
@@ -289,9 +318,21 @@ begin
         OUT_HEADER => tx_rt_pcie_hdr_data
     );
 
+    tx_rt_upd_hdp_adjust_p : process (all) is
+        variable hdp_full_width : unsigned(15 downto 0);
+    begin
+        hdp_full_width := resize(unsigned(hdp_ptr_to_wr_reg), 16);
+
+        if (TX_RT_UPD_P2P_EN = '1') then
+            tx_rt_upd_hdp_adj <= resize(hdp_full_width(hdp_full_width'high downto 7), 16);
+        else
+            tx_rt_upd_hdp_adj <= hdp_full_width;
+        end if;
+    end process;
+
     fifo_din_arr(0) <= std_logic_vector(resize(unsigned(hhp_ptr_to_wr_reg), 16))
                        & X"0000"
-                       & std_logic_vector(resize(unsigned(hdp_ptr_to_wr_reg), 16))
+                       & std_logic_vector(tx_rt_upd_hdp_adj)
                        & tx_rt_pcie_hdr_data;
 
     fifo_wr(0)      <= upd_req_vld_int_reg when TX_RT_UPD_BUFF_BA /= ADDR_NULL else '0';
