@@ -38,7 +38,6 @@ def COMPONENTS_VER = [\
 //  [ 'name'             , 'path_to_ver'                             , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
 def COMPONENTS_MULTIVER = [\
     ['TRANS_SORTER'      , 'comp/base/misc/trans_sorter/ver'         , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
-    ['CROSSBARX'         , 'comp/base/misc/crossbarx/ver'            , 'top_level.fdo'      , 'test_pkg.vhd'       , 'ver_settings.py'       ],\
     ['PACKET_PLANNER'    , 'comp/base/misc/packet_planner/ver'       , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'       ],\
     ['FIFOX'             , 'comp/base/fifo/fifox/uvm'                , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'       ],\
     ['REG_FIFO'          , 'comp/base/fifo/reg_fifo/uvm'             , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'       ],\
