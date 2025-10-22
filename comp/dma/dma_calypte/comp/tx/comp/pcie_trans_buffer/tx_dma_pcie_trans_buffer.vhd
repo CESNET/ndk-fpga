@@ -462,7 +462,7 @@ begin
                 end loop;
             else
                 buff_addr_v := std_logic_vector(addr_cntr_pst(log2(BUFFER_DEPTH) + log2(MFB_DWORDS) -1 downto log2(MFB_DWORDS)));
-                chan_addr_v := chan_num_reg;
+                chan_addr_v := chan_num_reg(log2(CHANS_PER_ARRAY) -1 downto 0);
 
                 wr_addr_bram_by_shift(0) <= (others => (chan_addr_v & buff_addr_v));
 
