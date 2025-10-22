@@ -35,6 +35,11 @@ if {$BOARD_VARIANT == 0} {
 - 1 for board with AGIB023R18A1E1VC."
 }
 
+set CARD_ARCHGRP(BMC_CTRL_ARCH) "EMPTY"
+if {$BMC_ENABLE} {
+    set CARD_ARCHGRP(BMC_CTRL_ARCH) "FULL"
+}
+
 set CARD_ARCHGRP(FPGA)               $CARD_FPGA
 
 # make lists from associative arrays

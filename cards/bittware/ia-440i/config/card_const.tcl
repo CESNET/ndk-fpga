@@ -27,7 +27,9 @@ set DMA_MODULES 1
 set QSFP_CAGES 1
 # I2C address of each QSFP cage
 set QSFP_I2C_ADDR(0) "0xA0"
-set QSFP_I2C_CUSTOM_CTRLS [list "i2c_bmc"]
+if {$BMC_ENABLE} {
+    set QSFP_I2C_CUSTOM_CTRLS [list "i2c_bmc"]
+}
 
 # ------------------------------------------------------------------------------
 # Checking of parameter compatibility
