@@ -8,23 +8,11 @@
 array set ARCHGRP_ARR $ARCHGRP
 
 # Paths
-set PMCI_FB2CDG1_BASE "$OFM_PATH/extra/ip-3rdparty/silicom/fb2cdg1"
 set FPGA_COMMON_BASE  "$ARCHGRP_ARR(CORE_BASE)/top"
 
 # Components
 lappend COMPONENTS [list "FPGA_COMMON"   $FPGA_COMMON_BASE      $ARCHGRP]
-# Check whether the 3rd-party repository exists
-if ![file exists $PMCI_FB2CDG1_BASE/Modules.tcl] {
-    puts "\n"
-    puts "ERROR: PMCI IP is not present. PMCI requires an additional license."
-    puts "------------------------------------------------------------------------------------------------"
-    puts "Please contact Support for more information (see the Partners section of the NDK documentation)."
-    puts "------------------------------------------------------------------------------------------------"
-    puts "\n"
-    exit 1
-} else {
-    lappend COMPONENTS [list "PMCI_FB2CDG1"  $PMCI_FB2CDG1_BASE     "FULL"  ]
-}
+lappend COMPONENTS [list "BMC_WARP" "$ENTITY_BASE/comp/bmc_wrap" $ARCHGRP_ARR(BMC_CTRL_ARCH)]
 
 # IP components
 set IP_COMMON_TCL $ARCHGRP_ARR(IP_TEMPLATE_ROOT)/common.tcl
