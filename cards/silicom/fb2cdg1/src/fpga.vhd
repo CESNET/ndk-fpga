@@ -146,9 +146,6 @@ architecture FULL of FPGA is
     signal boot_mi_ardy           : std_logic;
     signal boot_mi_drdy           : std_logic;
 
-    signal qspi_data_out          : std_logic_vector(4 - 1 downto 0);
-    signal qspi_data_oe           : std_logic_vector(4 - 1 downto 0);
-
 begin
 
     QSFP0_LED_B <= '0';
@@ -302,15 +299,9 @@ begin
     );
 
     -- BMC controller
-    QSPI_D0 <= qspi_data_out(0) when qspi_data_oe(0) = '1' else 'Z';
-    QSPI_D1 <= qspi_data_out(1) when qspi_data_oe(1) = '1' else 'Z';
-    QSPI_D2 <= qspi_data_out(2) when qspi_data_oe(2) = '1' else 'Z';
-    QSPI_D3 <= qspi_data_out(3) when qspi_data_oe(3) = '1' else 'Z';
-
-    pmci_i : entity work.PMCI_FB2CDG1
+    bmc_wrap_i : entity work.BMC_WRAP
     generic map(
-        DEVICE        => "AGILEX",
-        G_SWB_RD_TYPE => 1 -- Thunderfjord
+        DEVICE => DEVICE
     ) port map(
         CLK                      => boot_mi_clk,
         RESET                    => boot_mi_reset,
@@ -324,29 +315,24 @@ begin
         MI_ARDY                  => boot_mi_ardy,
         MI_DRDY                  => boot_mi_drdy,
 
-        FLASH_CTRLR_ATOM_PORTS_DCLK     => QSPI_CLK,
-        FLASH_CTRLR_ATOM_PORTS_NCS      => QSPI_CSN_1V2,
-        FLASH_CTRLR_ATOM_PORTS_OE       => open,
-        FLASH_CTRLR_ATOM_PORTS_DATAOUT  => qspi_data_out,
-        FLASH_CTRLR_ATOM_PORTS_DATAOE   => qspi_data_oe,
-        FLASH_CTRLR_ATOM_PORTS_DATAIN   => QSPI_D3 & QSPI_D2 & QSPI_D1 & QSPI_D0,
-
-        M10_GPIO_FPGA_USR_100M          => '0',
-        M10_GPIO_FPGA_M10_HB            => MAX_FPGA_HB_1V2,
-        M10_GPIO_PMCI_NIOS_HB           => FPGA_MAX_HB,
-        M10_GPIO_M10_SEU_ERROR          => '0',
-        M10_GPIO_FPGA_THERM_SHDN        => FPGA_MAX_THRM_SHTD_N_1V2,
-        M10_GPIO_FPGA_SEU_ERROR         => FPGA_MAX_FPGA_SEU_1V2,
-
-        SPI_INGRESS_SCLK                => SPI_INGRESS_SCLK,
-        SPI_INGRESS_CSN                 => SPI_INGRESS_CSN,
-        SPI_INGRESS_MISO                => SPI_INGRESS_MISO,
-        SPI_INGRESS_MOSI                => SPI_INGRESS_MOSI,
-
-        SPI_EGRESS_MOSI                 => SPI_EGRESS_MOSI,
-        SPI_EGRESS_CSN                  => SPI_EGRESS_CSN,
-        SPI_EGRESS_SCLK                 => SPI_EGRESS_SCLK,
-        SPI_EGRESS_MISO                 => SPI_EGRESS_MISO
+        QSPI_CSN_1V2             => QSPI_CSN_1V2,
+        QSPI_D0                  => QSPI_D0,
+        QSPI_D1                  => QSPI_D1,
+        QSPI_D2                  => QSPI_D2,
+        QSPI_D3                  => QSPI_D3,
+        QSPI_CLK                 => QSPI_CLK,
+        SPI_INGRESS_SCLK         => SPI_INGRESS_SCLK,
+        SPI_INGRESS_CSN          => SPI_INGRESS_CSN,
+        SPI_INGRESS_MISO         => SPI_INGRESS_MISO,
+        SPI_INGRESS_MOSI         => SPI_INGRESS_MOSI,
+        SPI_EGRESS_MOSI          => SPI_EGRESS_MOSI,
+        SPI_EGRESS_CSN           => SPI_EGRESS_CSN,
+        SPI_EGRESS_SCLK          => SPI_EGRESS_SCLK,
+        SPI_EGRESS_MISO          => SPI_EGRESS_MISO,
+        MAX_FPGA_HB_1V2          => MAX_FPGA_HB_1V2,
+        FPGA_MAX_HB              => FPGA_MAX_HB,
+        FPGA_MAX_FPGA_SEU_1V2    => FPGA_MAX_FPGA_SEU_1V2,
+        FPGA_MAX_THRM_SHTD_N_1V2 => FPGA_MAX_THRM_SHTD_N_1V2
     );
 
 end architecture;

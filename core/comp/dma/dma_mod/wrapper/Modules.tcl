@@ -32,6 +32,17 @@ lappend COMPONENTS [ list "ASYNC_RESET" $ASYNC_RESET_BASE "FULL" ]
 
 if { $ARCHGRP == "MEDUSA" } {
 
+    if ![file exists $DMA_MEDUSA_BASE/Modules.tcl] {
+        puts "-----------------------------------------------------------------------------"
+        puts "ERROR: DMA MEDUSA IP source codes are missing!"
+        puts "-----------------------------------------------------------------------------"
+        puts "The DMA MEDUSA IP is not freely available, instead you can use the open-source"
+        puts "DMA Calypte IP using the make parameter DMA_TYPE=4. To obtain a DMA Medusa IP,"
+        puts "contact NDK partners (see partner list in top-level README.md)."
+        puts "-----------------------------------------------------------------------------"
+        exit 1
+    }
+
     lappend COMPONENTS [ list "MI_SPLITTER_PLUS_GEN" $MI_SPLITTER_PLUS_GEN_BASE "FULL" ]
     lappend COMPONENTS [ list "DMA_MEDUSA"           $DMA_MEDUSA_BASE           "FULL" ]
 

@@ -60,8 +60,13 @@ if { $DMA_TYPE == 4 } {
           ($PCIE_GEN == 4 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 0)
         )
     } {
-        error "Incompatible DMA_TYPE: $DMA_TYPE with chosen PCIE_ENDPOINTS: $PCIE_ENDPOINTS\
-                and PCIE_ENDPOINT_MODE: $PCIE_ENDPOINT_MODE!"
+        puts "-----------------------------------------------------------------------------"
+        puts "ERROR: Incompatible PCIE_CONF with DMA Calypte IP (DMA_TYPE=4)!"
+        puts "-----------------------------------------------------------------------------"
+        puts "Try using one of the following configurations for the PCIE_CONF parameter:"
+        puts "- PCIE_CONF=1xGen3x16\n- PCIE_CONF=1xGen4x16\n- PCIE_CONF=1xGen3x8LL"
+        puts "-----------------------------------------------------------------------------"
+        exit 1
     }
 
     if { $DMA_TX_FRAME_SIZE_MAX > [expr 2**$DMA_TX_DATA_PTR_W -1] } {

@@ -18,7 +18,10 @@ set NET_MOD_ARCH     "F_TILE"
 # Achitecture of SDM/SYSMON module
 set SDM_SYSMON_ARCH  "INTEL_SDM"
 # Boot controller type (5=OFS_PMCI)
-set BOOT_TYPE        5
+set BOOT_TYPE        0
+if {$BMC_ENABLE} {
+    set BOOT_TYPE    5
+}
 
 # Total number of QSFP cages
 set QSFP_CAGES       2
