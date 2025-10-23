@@ -2,7 +2,7 @@ def common_card_test_run(CARD_NAME) {
     try {
         sh """
         source venv-fpga/bin/activate
-        make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\"
+        make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\" BMC_ENABLE=0
         """
     } catch (err) {
         echo "Error detected, firmware build failed!"
