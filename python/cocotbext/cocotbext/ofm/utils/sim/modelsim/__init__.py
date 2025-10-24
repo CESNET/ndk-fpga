@@ -72,12 +72,13 @@ def add_wave(*args, **kwargs):
         else:
             name += " {" + cocotb2path(obj) + "}"
     params = ""
+
+    groups = kwargs.get("groups", [])
     if 'group' in kwargs:
-        params += f' -group "{kwargs["group"]}" '
-        # Nested grouping also possible, just use more -group switches.
-        # This should be done by new kwarg, for example. cmd_prefix='-group base_group_name'
-    if 'expand' in kwargs:
-        params += ' -expand'# "{kwargs["expand"]}"'
+        groups.append(kwargs['group'])
+
+    for g in groups:
+        params += f' -group "{g}" '
     if 'label' in kwargs:
         params += f' -label {{{kwargs["label"]}}}'
 
