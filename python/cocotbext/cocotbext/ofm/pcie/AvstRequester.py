@@ -8,6 +8,7 @@ import cocotb
 from cocotb.queue import Queue
 
 from ..utils import concat, deconcat, numberOfSetBits, SerializableHeader
+from .PcieHeaders import fbe2offset
 
 
 class CompletionHeaderEmpty(SerializableHeader):
@@ -124,11 +125,11 @@ class AvstRequester(AvstBase):
             d = self._ram.r(addr, byte_count)
             if self._verbosity:
                 print(type(self).__name__, "Read addr:", hex(addr), "dwords:", header.dwords, "payload:", list(d))
-            self._q.put_nowait((header, d))
+            self._q.put_nowait((header, d, addr))
 
     async def handle_response(self):
         while True:
-            rq_hdr, data = await self._q.get()
+            rq_hdr, data, addr = await self._q.get()
             rq_fbe = rq_hdr.fbe
 
             header_empty = CompletionHeaderEmpty()
@@ -146,5 +147,7 @@ class AvstRequester(AvstBase):
             )
 
             header.compl_stat = 1
-            header.low_addr = 0  # Info: increment for each consequent completion
+            # TODO: for multiple completions must be updated
+            #       FBE is only applied in first completion
+            header.low_addr = ((addr) + fbe2offset(rq_fbe)) & 0x7f
             await self._send_frame(self._cdriver.write_rc, data, header, header_empty)

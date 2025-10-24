@@ -6,7 +6,7 @@
 import cocotb
 from cocotb.queue import Queue
 from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize
-from .PcieHeaders import RQHeader, RCHeader, RQUser, RCUser
+from .PcieHeaders import RQHeader, RCHeader, RQUser, RCUser, fbe2offset
 
 
 class Frame(object):
@@ -106,7 +106,9 @@ class Axi4SRequester:
                 - ((4 - numberOfSetBits(req_fbe)) if request.dword_count > 1 else 0)
             )
             header.request_completed = 1
-            header.addr = 0  # Info: increment for each consequent completion
+            # TODO: for multiple completions must be updated
+            #       FBE is only applied in first completion
+            header.addr = (request.addr << 2) + fbe2offset(req_fbe)
             user = RCUser()
             user.sop = 1
             user.eop = 0
