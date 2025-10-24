@@ -32,16 +32,19 @@ class MvbBus(Bus):
     def add_wave(self, **kwargs):
         super().add_wave(**kwargs)
         o = self._get_handle('DATA')
-
-        for name, ran in self._ITEMS:
-            bus = [(o, ran)]
-            self._w.add_wave(name, group=self._label, bus=bus)
-
         sr = self._get_handle('SRC_RDY')
         dr = self._get_handle('DST_RDY')
+        vld = self._get_handle('VLD')
 
-        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)}}} transfer")
-        self._w.add_wave(name, group=self._label, label='transfer')
+        dw = len(o)
+        off = dw // len(vld)
+        for v in range(len(vld)):
+            groups = [self._label, v]
+            ho = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)} and {self._w.cocotb2path(vld[v])}}} handover")
+            self._w.add_wave(ho, groups=groups, label='handover')
+            for name, ran in self._ITEMS:
+                bus = [(o, range(ran.start + off * v, ran.stop + off * v))]
+                self._w.add_wave(f"{name}", groups=groups, bus=bus)
 
 
 class MfbBus(Bus):
