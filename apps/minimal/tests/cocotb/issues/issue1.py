@@ -11,7 +11,7 @@ import cocotbext.ofm.utils.sim.modelsim as ms
 from cocotbext.ofm.utils.sim.bus import MfbBus, DmaDownMvbBus
 from cocotbext.ofm.utils.scapy import simple_tcp_bytes
 
-from ndk_core import NFBDevice
+from cocotbext.ndk_core import NFBDevice
 
 print = ms.print
 
