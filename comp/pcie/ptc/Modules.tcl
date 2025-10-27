@@ -17,6 +17,7 @@ lappend PACKAGES "$PKG_BASE/type_pack.vhd"
 lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # list of sub-components
+lappend COMPONENTS [ list "ASYNC_RESET"         "$OFM_PATH/comp/base/async/reset"            "FULL" ]
 lappend COMPONENTS [ list "MVB_SFIFOX"          "$MVB_TOOLS_BASE/storage/fifox"              "FULL" ]
 lappend COMPONENTS [ list "MVB_ASFIFOX"         "$MVB_TOOLS_BASE/storage/asfifox"            "FULL" ]
 lappend COMPONENTS [ list "MVB_SHAKEDOWN"       "$MVB_TOOLS_BASE/flow/shakedown"             "FULL" ]
