@@ -2,6 +2,7 @@
 # Copyright (C) 2023 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
+import re
 import logging
 import cocotb
 
@@ -10,16 +11,17 @@ import nfb.ext.python as ext
 
 class Servicer(ext.AbstractNfb):
     class NdpQueue(ext.AbstractNdpQueue):
-        _burst_temp = []
-
         def __init__(self, q):
+            self._burst_temp = []
             self._q = q
 
+        @cocotb.function
         def start(self):
-            pass
+            yield self._q.start()
 
+        @cocotb.function
         def stop(self):
-            pass
+            yield self._q.stop()
 
     class NdpQueueRx(NdpQueue, ext.AbstractNdpQueueRx):
         def burst_get(self, count):
@@ -34,15 +36,21 @@ class Servicer(ext.AbstractNfb):
             self._burst_temp.clear()
 
     class NdpQueueTx(NdpQueue, ext.AbstractNdpQueueTx):
+        @cocotb.function
         def burst_get(self, pkts):
             p = [(bytes(pkts[i][0]), bytes(pkts[i][1]), pkts[i][2]) for i in range(len(pkts))]
-            self._burst_temp += p
+            n = yield self._q.wait_sendable(p)
+            if n != len(p):
+                return []
+
+            self._burst_temp.extend(p)
             return p
 
         @cocotb.function
         def burst_put(self):
-            for pkt in self._burst_temp:
-                yield self._q.sendmsg(pkt)
+            last_index = len(self._burst_temp) - 1
+            for i, pkt in enumerate(self._burst_temp):
+                yield self._q.sendmsg(pkt, i == last_index)
             self._burst_temp.clear()
 
     def __init__(self, device, dtb, *args, **kwargs):
@@ -56,8 +64,10 @@ class Servicer(ext.AbstractNfb):
         return base(attr[index])
 
     def get_node_base(self, bus_node, node):
-        # TODO: fix mi[0]
-        return (self._device.mi[0], node.get_property("reg")[0])
+        m = re.search(r'PCI(?P<pci>\d+),BAR(?P<bar>\d+)', bus_node.get_property("resource").value)
+        pci, _ = int(m.group('pci')), int(m.group('bar'))
+        mi = self._device.mi[pci]
+        return (mi, node.get_property("reg")[0])
 
     @cocotb.function
     def read(self, bus_node, node, offset, nbyte):

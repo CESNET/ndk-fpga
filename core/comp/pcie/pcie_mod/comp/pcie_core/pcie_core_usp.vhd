@@ -321,13 +321,13 @@ architecture USP of PCIE_CORE is
     signal pcie_cc_axi_last         : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_cc_axi_keep         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(AXI_DATA_WIDTH/32-1 downto 0);
     signal pcie_cc_axi_valid        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
-    signal pcie_cc_axi_ready        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
+    signal pcie_cc_axi_ready_s      : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_rq_axi_data         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(AXI_DATA_WIDTH-1 downto 0);
     signal pcie_rq_axi_user         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(AXI_RQUSER_WIDTH-1 downto 0);
     signal pcie_rq_axi_last         : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_rq_axi_keep         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(AXI_DATA_WIDTH/32-1 downto 0);
     signal pcie_rq_axi_valid        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
-    signal pcie_rq_axi_ready        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
+    signal pcie_rq_axi_ready_s      : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_rc_axi_data         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(AXI_DATA_WIDTH-1 downto 0);
     signal pcie_rc_axi_user         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(AXI_RCUSER_WIDTH-1 downto 0);
     signal pcie_rc_axi_last         : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
@@ -335,8 +335,8 @@ architecture USP of PCIE_CORE is
     signal pcie_rc_axi_valid        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_rc_axi_ready        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
 
-    signal s_axis_rq_tready         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
-    signal s_axis_cc_tready         : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
+    signal pcie_cc_axi_ready        : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
+    signal pcie_rq_axi_ready        : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
 
     signal tag_assign_int       : slv_array_t(PCIE_ENDPOINTS -1 downto 0)(16 -1 downto 0);
     signal tag_assign_vld_int   : slv_array_t(PCIE_ENDPOINTS -1 downto 0)(2 -1 downto 0);
@@ -370,7 +370,7 @@ architecture USP of PCIE_CORE is
     -- attribute mark_debug of pcie_cc_axi_user  : signal is "true";
     -- attribute mark_debug of pcie_cc_axi_keep  : signal is "true";
     -- attribute mark_debug of pcie_cc_axi_last  : signal is "true";
-    -- attribute mark_debug of pcie_cc_axi_ready : signal is "true";
+    -- attribute mark_debug of pcie_cc_axi_ready_s : signal is "true";
     -- attribute mark_debug of pcie_cc_axi_valid : signal is "true";
 
     -- attribute mark_debug of pcie_rc_axi_data  : signal is "true";
@@ -439,8 +439,8 @@ begin
                 CEB   => '0'
             );
 
-            pcie_rq_axi_ready(i) <= s_axis_rq_tready(i)(0);
-            pcie_cc_axi_ready(i) <= s_axis_cc_tready(i)(0);
+            pcie_rq_axi_ready_s(i) <= pcie_rq_axi_ready(i)(0);
+            pcie_cc_axi_ready_s(i) <= pcie_cc_axi_ready(i)(0);
 
             pcie_clk(i) <= pcie_hip_clk(i);
 
@@ -467,7 +467,7 @@ begin
                     s_axis_rq_tdata                   => pcie_rq_axi_data(i),
                     s_axis_rq_tuser                   => pcie_rq_axi_user(i),
                     s_axis_rq_tkeep                   => pcie_rq_axi_keep(i),
-                    s_axis_rq_tready                  => s_axis_rq_tready(i),
+                    s_axis_rq_tready                  => pcie_rq_axi_ready(i),
                     s_axis_rq_tvalid                  => pcie_rq_axi_valid(i),
                     m_axis_rc_tdata                   => pcie_rc_axi_data(i),
                     m_axis_rc_tuser                   => pcie_rc_axi_user(i),
@@ -486,7 +486,7 @@ begin
                     s_axis_cc_tlast                   => pcie_cc_axi_last(i),
                     s_axis_cc_tkeep                   => pcie_cc_axi_keep(i),
                     s_axis_cc_tvalid                  => pcie_cc_axi_valid(i),
-                    s_axis_cc_tready                  => s_axis_cc_tready(i),
+                    s_axis_cc_tready                  => pcie_cc_axi_ready(i),
 
                     pcie_rq_seq_num0                  => open,
                     pcie_rq_seq_num_vld0              => open,
@@ -584,7 +584,7 @@ begin
                     s_axis_rq_tdata                   => pcie_rq_axi_data(i),
                     s_axis_rq_tuser                   => pcie_rq_axi_user(i),
                     s_axis_rq_tkeep                   => pcie_rq_axi_keep(i),
-                    s_axis_rq_tready                  => s_axis_rq_tready(i),
+                    s_axis_rq_tready                  => pcie_rq_axi_ready(i),
                     s_axis_rq_tvalid                  => pcie_rq_axi_valid(i),
                     m_axis_rc_tdata                   => pcie_rc_axi_data(i),
                     m_axis_rc_tuser                   => pcie_rc_axi_user(i),
@@ -603,7 +603,7 @@ begin
                     s_axis_cc_tlast                   => pcie_cc_axi_last(i),
                     s_axis_cc_tkeep                   => pcie_cc_axi_keep(i),
                     s_axis_cc_tvalid                  => pcie_cc_axi_valid(i),
-                    s_axis_cc_tready                  => s_axis_cc_tready(i),
+                    s_axis_cc_tready                  => pcie_cc_axi_ready(i),
 
                     pcie_rq_seq_num0                  => open,
                     pcie_rq_seq_num_vld0              => open,
@@ -702,8 +702,8 @@ begin
                     CEB   => '0'
                 );
 
-                pcie_rq_axi_ready(2*i+j) <= s_axis_rq_tready(2*i+j)(0);
-                pcie_cc_axi_ready(2*i+j) <= s_axis_cc_tready(2*i+j)(0);
+                pcie_rq_axi_ready_s(2*i+j) <= pcie_rq_axi_ready(2*i+j)(0);
+                pcie_cc_axi_ready_s(2*i+j) <= pcie_cc_axi_ready(2*i+j)(0);
 
                 pcie_clk(2*i+j) <= pcie_hip_clk(2*i+j);
 
@@ -730,7 +730,7 @@ begin
                         s_axis_rq_tdata                   => pcie_rq_axi_data(2*i+j),
                         s_axis_rq_tuser                   => pcie_rq_axi_user(2*i+j),
                         s_axis_rq_tkeep                   => pcie_rq_axi_keep(2*i+j),
-                        s_axis_rq_tready                  => s_axis_rq_tready(2*i+j),
+                        s_axis_rq_tready                  => pcie_rq_axi_ready(2*i+j),
                         s_axis_rq_tvalid                  => pcie_rq_axi_valid(2*i+j),
                         m_axis_rc_tdata                   => pcie_rc_axi_data(2*i+j),
                         m_axis_rc_tuser                   => pcie_rc_axi_user(2*i+j),
@@ -749,7 +749,7 @@ begin
                         s_axis_cc_tlast                   => pcie_cc_axi_last(2*i+j),
                         s_axis_cc_tkeep                   => pcie_cc_axi_keep(2*i+j),
                         s_axis_cc_tvalid                  => pcie_cc_axi_valid(2*i+j),
-                        s_axis_cc_tready                  => s_axis_cc_tready(2*i+j),
+                        s_axis_cc_tready                  => pcie_cc_axi_ready(2*i+j),
 
                         pcie_rq_seq_num0                  => open,
                         pcie_rq_seq_num_vld0              => open,
@@ -847,7 +847,7 @@ begin
                         s_axis_rq_tdata                   => pcie_rq_axi_data(2*i+j),
                         s_axis_rq_tuser                   => pcie_rq_axi_user(2*i+j),
                         s_axis_rq_tkeep                   => pcie_rq_axi_keep(2*i+j),
-                        s_axis_rq_tready                  => s_axis_rq_tready(2*i+j),
+                        s_axis_rq_tready                  => pcie_rq_axi_ready(2*i+j),
                         s_axis_rq_tvalid                  => pcie_rq_axi_valid(2*i+j),
                         m_axis_rc_tdata                   => pcie_rc_axi_data(2*i+j),
                         m_axis_rc_tuser                   => pcie_rc_axi_user(2*i+j),
@@ -866,7 +866,7 @@ begin
                         s_axis_cc_tlast                   => pcie_cc_axi_last(2*i+j),
                         s_axis_cc_tkeep                   => pcie_cc_axi_keep(2*i+j),
                         s_axis_cc_tvalid                  => pcie_cc_axi_valid(2*i+j),
-                        s_axis_cc_tready                  => s_axis_cc_tready(2*i+j),
+                        s_axis_cc_tready                  => pcie_cc_axi_ready(2*i+j),
 
                         pcie_rq_seq_num0                  => open,
                         pcie_rq_seq_num_vld0              => open,
@@ -1039,14 +1039,14 @@ begin
             CC_AXI_LAST         => pcie_cc_axi_last(i),
             CC_AXI_KEEP         => pcie_cc_axi_keep(i),
             CC_AXI_VALID        => pcie_cc_axi_valid(i),
-            CC_AXI_READY        => pcie_cc_axi_ready(i),
+            CC_AXI_READY        => pcie_cc_axi_ready_s(i),
 
             RQ_AXI_DATA         => pcie_rq_axi_data(i),
             RQ_AXI_USER         => pcie_rq_axi_user(i),
             RQ_AXI_LAST         => pcie_rq_axi_last(i),
             RQ_AXI_KEEP         => pcie_rq_axi_keep(i),
             RQ_AXI_VALID        => pcie_rq_axi_valid(i),
-            RQ_AXI_READY        => pcie_rq_axi_ready(i),
+            RQ_AXI_READY        => pcie_rq_axi_ready_s(i),
 
             CQ_MFB_DATA         => CQ_MFB_DATA(i),
             CQ_MFB_META         => CQ_MFB_META(i),
@@ -1196,7 +1196,7 @@ begin
         PCIE_RESET          => pcie_hip_rst,
 
         DBG_UP_SRC_RDY      => pcie_rq_axi_valid,
-        DBG_UP_DST_RDY      => pcie_rq_axi_ready,
+        DBG_UP_DST_RDY      => pcie_rq_axi_ready_s,
         DBG_DW_SRC_RDY      => pcie_rc_axi_valid,
         DBG_DW_DST_RDY      => pcie_rc_axi_ready,
 

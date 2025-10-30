@@ -1,5 +1,11 @@
-
 from ..utils import SerializableHeader
+
+
+def fbe2offset(fbe):
+    for i, mask in enumerate((1, 2, 4, 8)):
+        if fbe & mask:
+            return i
+    raise ValueError
 
 
 class RQHeader(SerializableHeader):

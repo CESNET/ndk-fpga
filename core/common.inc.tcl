@@ -32,11 +32,6 @@ lappend HIERARCHY(PACKAGES) [nb_generate_file_register_userpkg "combo_user_const
 # Let generate DevTree.vhd and add it to project
 lappend HIERARCHY(PACKAGES) [nb_generate_file_register_devtree]
 
-# For cocotb run, append runtime environment to system path
-if {![info exists env(PYTHONPATH)] || [string first "$CORE_BASE/cocotb" $env(PYTHONPATH)] == -1} {
-    append env(PYTHONPATH) ":$CORE_BASE/cocotb"
-}
-
 # ----- Default target: synthesis of the project ------------------------------
 proc target_default {} {
     global SYNTH_FLAGS HIERARCHY

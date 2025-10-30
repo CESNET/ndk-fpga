@@ -207,7 +207,7 @@ architecture FULL of AMM_GEN is
     signal amm_write_delayed        : std_logic_vector(AMM_WRITE_DELAY downto 0);
     signal amm_read_delayed         : std_logic_vector(AMM_READ_DELAY downto 0);
 
-    signal target_burst_cnt         : std_logic_vector(BURST_BITS - 1 downto 0);
+    signal target_burst_cnt         : std_logic_vector(BURST_BITS - 1 downto 0) := std_logic_vector(to_unsigned(INIT_BURST_CNT, BURST_BITS));
     signal target_burst_cnt_lim     : std_logic_vector(BURST_BITS - 1 downto 0);    -- Indexed from 0 to match curr_burst
     signal curr_burst_cnt           : std_logic_vector(BURST_BITS - 1 downto 0);
     -- To restore burst cnt when amm_ready occurs

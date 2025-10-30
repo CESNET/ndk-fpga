@@ -24,4 +24,4 @@ export NDK_FPGA_COCOTBEXT_OFM_URL="${NDK_FPGA_PYTHON_PATH}/cocotbext/"
 export NDK_SW_PYTHON_URL="git+https://github.com/CESNET/ndk-sw.git#subdirectory="
 # NDK software alternative path for local ndk-sw repository
 #NDK_SW_REALPATH=$(realpath $NDK_FPGA_PATH/../swbase)
-#NDK_SW_PYTHON_URL="file:///$(realpath $NDK_SW_PATH)/"
+#export NDK_SW_PYTHON_URL="file:///$(realpath $NDK_SW_REALPATH)/"

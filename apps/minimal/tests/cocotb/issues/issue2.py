@@ -9,7 +9,7 @@ import cocotbext.ofm.utils.sim.modelsim as ms
 
 from cocotbext.ofm.utils.sim.bus import MiBus
 
-from ndk_core import NFBDevice
+from cocotbext.ndk_core import NFBDevice
 
 print = ms.print
 

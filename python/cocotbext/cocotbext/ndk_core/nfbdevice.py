@@ -128,7 +128,13 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_3, 10, 'ns').start())
 
         for pcie_clk in self._core.pcie_i.pcie_core_i.pcie_hip_clk:
-            await cocotb.start(Clock(pcie_clk, 4, 'ns').start())
+            if self._core.pcie_i.pcie_core_i.ENDPOINT_TYPE.value.decode() == "P_TILE":
+                # This is default value in IP core for g4_pld_clkfreq_user_hwctl
+                period = 2.5
+            else:
+                period = 4
+
+            await cocotb.start(Clock(pcie_clk, period, 'ns').start())
 
         for eth_core in self._core.network_mod_i.eth_core_g if hasattr(self._core.network_mod_i, 'eth_core_g') else []:
             if hasattr(eth_core.network_mod_core_i, 'cmac_clk_322m'):
@@ -139,22 +145,26 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
                 await cocotb.start(Clock(eth_core.network_mod_core_i.ftile_clk_out, 2482, 'ps').start())
 
     def _init_pcie(self):
-        handle = simulator.get_root_handle("combo_user_const")
-        combo_user_const = cocotb.handle.SimHandle(handle)
-        self._card_name = combo_user_const.CARD_NAME.value.decode()
-
         try:
             self._core = NFBDevice.core_instance_from_top(self._dut)
         except Exception:
             # No fpga_common instance in card, try fpga_common directly
             self._core = self._dut
 
+        try:
+            handle = simulator.get_root_handle("combo_user_const")
+            combo_user_const = cocotb.handle.SimHandle(handle)
+            self._card_name = combo_user_const.CARD_NAME.value.decode()
+        except Exception:
+            # Workardound for nvc
+            self._card_name = self._core.BOARD.value.decode()
+
         pcie_i = self._core.pcie_i.pcie_core_i
         self.mi = []
         self.pcie_req = []
 
-        for i, clk in enumerate(pcie_i.pcie_hip_clk):
-            clk = pcie_i.pcie_hip_clk[i]
+        for i, clk in enumerate(pcie_i.pcie_clk):
+            clk = pcie_i.pcie_clk[i]
             #rst = pcie_i.pcie_hip_rst[i]
             if hasattr(pcie_i, "pcie_cq_axi_data"):
                 cq  = Axi4StreamMasterV(pcie_i, "pcie_cq_axi", clk, array_idx=i)

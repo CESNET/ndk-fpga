@@ -86,22 +86,22 @@ architecture FULL of MI_INDIRECT_ACCESS is
 
     -- Interface register - set this register to choose output interface
     -- 0x00
-    constant INF_REG_ADDR             : std_logic_vector(7 downto UNNECESSARY_BITS) := "000000";
+    constant INF_REG_ADDR             : std_logic_vector(7 downto 2) := "000000";
     -- Address register - this register stores the address of the request that will be sent to desired output interface
     -- 0x04
-    constant ADDR_REG_ADDR            : std_logic_vector(7 downto UNNECESSARY_BITS) := "000001";
+    constant ADDR_REG_ADDR            : std_logic_vector(7 downto 2) := "000001";
     -- Write data register - this register stores the data of Write request that will come from desired output interface
     -- 0x08
-    constant DWR_REG_ADDR             : std_logic_vector(7 downto UNNECESSARY_BITS) := "000010";
+    constant DWR_REG_ADDR             : std_logic_vector(7 downto 2) := "000010";
     -- Read data register - this register stores the data of Read request that will come from desired output interface
     -- 0x0C
-    constant DRD_REG_ADDR             : std_logic_vector(7 downto UNNECESSARY_BITS) := "000011";
+    constant DRD_REG_ADDR             : std_logic_vector(7 downto 2) := "000011";
     -- Command register (cmd_reg(0) = Write, cmd_reg(1) = Read) - after asserting WR or RD, the request will be sent
     -- 0x10
-    constant COMMAND_REG_ADDR         : std_logic_vector(7 downto UNNECESSARY_BITS) := "000100";
+    constant COMMAND_REG_ADDR         : std_logic_vector(7 downto 2) := "000100";
     -- Status register (stat_reg(0) = Busy)
     -- 0x14
-    constant STATUS_REG_ADDR          : std_logic_vector(7 downto UNNECESSARY_BITS) := "000101";
+    constant STATUS_REG_ADDR          : std_logic_vector(7 downto 2) := "000101";
 
     -- ====================================================================
     --                               SIGNALS

@@ -8,7 +8,7 @@ import logging
 import cocotb
 from cocotb.triggers import Timer
 
-from ndk_core import NFBDevice
+from cocotbext.ndk_core import NFBDevice
 
 import cocotbext.ofm.utils.sim.modelsim as ms
 import cocotb.utils
