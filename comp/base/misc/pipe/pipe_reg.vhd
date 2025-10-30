@@ -52,6 +52,10 @@ architecture BEHAVIORAL of PIPE_REG is
     signal reg1_we    : std_logic;
     signal reg2_we    : std_logic;
 
+    attribute maxfan : integer;
+    attribute maxfan of reg1_we : signal is 128;
+    attribute maxfan of reg2_we : signal is 128;
+
 begin
 
     fake_reg_true : if(FAKE_PIPE = true) generate
