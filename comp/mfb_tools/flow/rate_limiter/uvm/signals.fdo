@@ -38,7 +38,6 @@ proc fsm {PATH} {
                                     $PATH/start_run_flag  \
                                     $PATH/stop_conf_flag  \
                                     $PATH/stop_run_flag   \
-                                    $PATH/reset_ptr_flag  \
                                     $PATH/limit_byte_flag \
                                     $PATH/limit_pkts_flag
 }

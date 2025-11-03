@@ -12,7 +12,8 @@ class regmodel#(INTERVAL_COUNT) extends uvm_reg_block;
     uvm_rate_limiter::data_register interval;
     uvm_rate_limiter::data_register count;
     uvm_rate_limiter::data_register frequency;
-    uvm_rate_limiter::data_register speed [INTERVAL_COUNT-1:0];
+    uvm_rate_limiter::data_register speed_ptr;
+    uvm_rate_limiter::data_register speed;
 
     function new(string name = "reg_block");
         super.new(name, build_coverage(UVM_NO_COVERAGE));
@@ -31,11 +32,11 @@ class regmodel#(INTERVAL_COUNT) extends uvm_reg_block;
         count.set_frontdoor(c_frontdoor);
         $cast(c_frontdoor, frontdoor.clone());
         frequency.set_frontdoor(c_frontdoor);
+        $cast(c_frontdoor, frontdoor.clone());
+        speed_ptr.set_frontdoor(c_frontdoor);
+        $cast(c_frontdoor, frontdoor.clone());
+        speed.set_frontdoor(c_frontdoor);
 
-        for (int i = 0; i < INTERVAL_COUNT; i++) begin
-            $cast(c_frontdoor, frontdoor.clone());
-            speed[i].set_frontdoor(c_frontdoor);
-        end
     endfunction
 
     function void build(uvm_reg_addr_t base, int unsigned bus_width);
@@ -44,24 +45,24 @@ class regmodel#(INTERVAL_COUNT) extends uvm_reg_block;
         interval  = data_register::type_id::create("interval");
         count     = data_register::type_id::create("count");
         frequency = data_register::type_id::create("frequency");
-        for (int i = 0; i < INTERVAL_COUNT; i++)
-            speed[i] = data_register::type_id::create({"speed_",i});
+        speed_ptr = data_register::type_id::create("speed_ptr");
+        speed     = data_register::type_id::create("speed");
 
         status.build();
         section.build("RW", 1000, 1);
         interval.build("RW", 40, 1);
         count.build("RO", INTERVAL_COUNT, 0);
         frequency.build("RO", 200, 0);
-        for (int i = 0; i < INTERVAL_COUNT; i++)
-            speed[i].build("RW", 0, 1);
+        speed_ptr.build("RW", 0, 1);
+        speed.build("RW", 62500, 1);
 
         status.configure(this);
         section.configure(this);
         interval.configure(this);
         count.configure(this);
         frequency.configure(this);
-        for (int i = 0; i < INTERVAL_COUNT; i++)
-            speed[i].configure(this);
+        speed_ptr.configure(this);
+        speed.configure(this);
 
         this.default_map = create_map("MAP", base, bus_width/8, UVM_LITTLE_ENDIAN);
 
@@ -70,8 +71,8 @@ class regmodel#(INTERVAL_COUNT) extends uvm_reg_block;
         this.default_map.add_reg(interval,  'h08, "RW");
         this.default_map.add_reg(count,     'h0C, "RO");
         this.default_map.add_reg(frequency, 'h10, "RO");
-        for (int i = 0; i < INTERVAL_COUNT; i++)
-            this.default_map.add_reg(speed[i],'h14+i*4, "RW");
+        this.default_map.add_reg(speed_ptr, 'h14, "RW");
+        this.default_map.add_reg(speed,     'h18, "RW");
 
         this.lock_model();
     endfunction

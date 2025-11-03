@@ -11,7 +11,6 @@ class status_register extends uvm_reg;
     uvm_reg_field conf;
     uvm_reg_field run;
     uvm_reg_field wr_aux;
-    uvm_reg_field ptr_rst;
     uvm_reg_field shaping;
 
     function new(string name = "reg_status");
@@ -23,7 +22,6 @@ class status_register extends uvm_reg;
         conf    = uvm_reg_field::type_id::create("conf");
         run     = uvm_reg_field::type_id::create("run");
         wr_aux  = uvm_reg_field::type_id::create("wr_aux");
-        ptr_rst = uvm_reg_field::type_id::create("ptr_rst");
         shaping = uvm_reg_field::type_id::create("shaping");
 
         //                 parent, bits, lsb, access, volatile?, reset value, reset?, random?, byte?
@@ -31,8 +29,7 @@ class status_register extends uvm_reg;
         conf.configure(    this  , 1   , 1  , "RW"  , 0        , 0          , 1     , 0      , 0     );
         run.configure(     this  , 1   , 2  , "RW"  , 0        , 0          , 1     , 0      , 0     );
         wr_aux.configure(  this  , 1   , 3  , "RW"  , 0        , 0          , 1     , 0      , 0     );
-        ptr_rst.configure( this  , 1   , 4  , "RW"  , 0        , 0          , 1     , 0      , 0     );
-        shaping.configure( this  , 1   , 5  , "RW"  , 0        , 0          , 1     , 0      , 0     );
+        shaping.configure( this  , 1   , 4  , "RW"  , 0        , 0          , 1     , 0      , 0     );
     endfunction
 endclass
 
@@ -45,7 +42,7 @@ class data_register extends uvm_reg;
         super.new(name, 32, UVM_NO_COVERAGE);
     endfunction
 
-    virtual function void build(string access = "RW", unsigned rst_val = 32, bit reset = 1);
+    virtual function void build(string access = "RW", int unsigned rst_val = 32, bit reset = 1);
         data = uvm_reg_field::type_id::create("data");
         data.configure(this, 32, 0, access, 0, rst_val, reset, 0, 1);
     endfunction

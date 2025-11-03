@@ -5,7 +5,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_rate_limiter::scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD))
+    `uvm_component_param_utils(
+        uvm_rate_limiter::scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD)
+    )
 
     uvm_analysis_export#(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH)) analysis_export_rx_packet;
     uvm_analysis_export#(uvm_logic_vector::sequence_item#(MFB_META_WIDTH))       analysis_export_rx_meta;
@@ -52,14 +54,18 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
         this.m_regmodel = m_regmodel;
     endfunction
 
-    function void read_config_regs();
-        section_length  = m_regmodel.get_reg_by_name("section").get();
-        interval_length = m_regmodel.get_reg_by_name("interval").get();
+    task read_config_regs();
+        uvm_status_e status;
+        m_regmodel.get_reg_by_name("section").read(status, section_length);
+        m_regmodel.get_reg_by_name("interval").read(status, interval_length);
         // only half of the registers get configured (to test looping from the first register)
         for (int i = 0; i < INTERVAL_COUNT/2; i++) begin
-            interval_speed[i] = m_regmodel.get_reg_by_name({"speed_", i}).get();
+            m_regmodel.get_reg_by_name("speed_ptr").write(status, i);
+            m_regmodel.get_reg_by_name("speed").read(status, interval_speed[i]);
+            interval_speed[i] &= ~'h80000000; // MSB represents valid for that speed
         end
-    endfunction
+        m_regmodel.get_reg_by_name("speed_ptr").write(status, 0); // speed pointer has to be reset manually
+    endtask
 
     function real conv_Bscn2Gbs(int unsigned Bscn, int unsigned sec_len);
         real clk_period = (CLK_PERIOD*2) / 64'd1_000_000_000_000;
@@ -102,7 +108,7 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
 
         // time variables
         time speed_test_time = interval_length*section_length*CLK_PERIOD*2;
-        time speed_test_start = 400ns;
+        time speed_test_start = 1000ns;
         time speed_meter_duration;
         time time_act;
 
@@ -112,6 +118,7 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
         real exp_speed_section;
         real exp_speed_second;
         real speed_var_section;
+        real speed_var_abs;
         real speed_var_second;
         real speed_lim_section;
         real speed_lim_second;
@@ -125,7 +132,7 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
         string speed_pkts_s = "pkts/s";
 
         forever begin
-            time_act = $time();
+            time_act = $time;
             speed_meter_duration = time_act - speed_test_start;
             if (speed_meter_duration >= speed_test_time) begin
 
@@ -136,7 +143,8 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
                     act_speed_second  = conv_Bscn2Gbs(act_speed_section, section_length);
                     exp_speed_second  = conv_Bscn2Gbs(exp_speed_section, section_length);
                     speed_var_section = exp_speed_section - act_speed_section;
-                    speed_var_second  = conv_Bscn2Gbs((speed_var_section < 0) ? -speed_var_section : speed_var_section, section_length);
+                    speed_var_abs     = (speed_var_section < 0) ? -speed_var_section : speed_var_section;
+                    speed_var_second  = conv_Bscn2Gbs(speed_var_abs, section_length);
                     speed_tolerance   = real'(conv_Gbs2Bscn(0.1, section_length));
                     speed_lim_second  = 5.0;
                     speed_lim_section = conv_Gbs2Bscn(speed_lim_second, section_length);
@@ -146,7 +154,8 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
                     act_speed_second  = conv_Pscn2Ps(act_speed_section, section_length);
                     exp_speed_second  = conv_Pscn2Ps(exp_speed_section, section_length);
                     speed_var_section = exp_speed_section - act_speed_section;
-                    speed_var_second  = conv_Pscn2Ps((speed_var_section < 0) ? -speed_var_section : speed_var_section, section_length);
+                    speed_var_abs     = (speed_var_section < 0) ? -speed_var_section : speed_var_section;
+                    speed_var_second  = conv_Pscn2Ps(speed_var_abs, section_length);
                     speed_tolerance   = 1.0;
                     speed_lim_section = 5.0;
                     speed_lim_second  = conv_Pscn2Ps(speed_lim_section, section_length);
@@ -154,13 +163,26 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
                 end
 
                 // report
-                `uvm_info(this.get_full_name(), $sformatf("Speed = %7.3f / %7.3f [%s] (Variance = %.3f [%s])", act_speed_second, exp_speed_second, speed_s, speed_var_second, speed_s), UVM_NONE)
+                `uvm_info(
+                    this.get_full_name(),
+                    $sformatf("Speed = %7.3f / %7.3f [%s] (Variance = %.3f [%s])",
+                        act_speed_second, exp_speed_second, speed_s, speed_var_second, speed_s),
+                    UVM_NONE)
+
                 if (speed_var_section < 0 && speed_var_section >= -speed_tolerance) begin
-                    `uvm_info(this.get_full_name(), $sformatf("Limit exceeded a little! (probably due to measurement error)"), UVM_NONE)
+                    `uvm_info(
+                        this.get_full_name(),
+                        $sformatf("Limit exceeded a little! (probably due to measurement error)"),
+                        UVM_NONE)
                 end else if (speed_var_section < -speed_tolerance) begin
-                    `uvm_error(this.get_full_name(), $sformatf("Limit exceeded too much!"))
+                    `uvm_error(
+                        this.get_full_name(),
+                        $sformatf("Limit exceeded too much!"))
                 end else if (speed_var_section >= speed_lim_section) begin
-                    `uvm_error(this.get_full_name(), $sformatf("Too slow! (Variance = %.3f / %.3f [%s]).", speed_var_second, speed_lim_second, speed_s))
+                    `uvm_error(
+                        this.get_full_name(),
+                        $sformatf("Too slow! (Variance = %.3f / %.3f [%s]).",
+                            speed_var_second, speed_lim_second, speed_s))
                 end
 
                 // preparation
@@ -183,6 +205,8 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
 
         read_config_regs();
 
+        #(600ns)
+
         fork
             measuring();
         join_none
@@ -198,7 +222,12 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
 
             if (tr_dut_in.compare(tr_dut_out) == 0 || tr_dut_in_meta.compare(tr_dut_out_meta) == 0) begin
                 string msg;
-                msg = $sformatf( "\n\tCheck packet failed.\n\n\tInput packet\n%s\n%s\n\n\tOutput packet\n%s\n%s", tr_dut_in_meta.convert2string(), tr_dut_in.convert2string(), tr_dut_out_meta.convert2string(), tr_dut_out.convert2string());
+                msg = $sformatf( "\n\tCheck packet failed.\n\n\tInput packet\n%s\n%s\n\n\tOutput packet\n%s\n%s",
+                    tr_dut_in_meta.convert2string(),
+                    tr_dut_in.convert2string(),
+                    tr_dut_out_meta.convert2string(),
+                    tr_dut_out.convert2string()
+                );
                 `uvm_error(this.get_full_name(), msg);
             end
         end
@@ -216,9 +245,25 @@ class scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, 
     function void report_phase(uvm_phase phase);
 
         if (this.used() == 0) begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                {
+                    "\n",
+                    "\n\t---------------------------------------",
+                    "\n\t----     VERIFICATION SUCCESS      ----",
+                    "\n\t---------------------------------------"
+                },
+                UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                {
+                    "\n",
+                    "\n\t---------------------------------------",
+                    "\n\t----     VERIFICATION FAILED       ----",
+                    "\n\t---------------------------------------"
+                },
+                UVM_NONE)
         end
 
     endfunction
