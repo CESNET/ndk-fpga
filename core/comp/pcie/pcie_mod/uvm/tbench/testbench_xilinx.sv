@@ -219,14 +219,14 @@ module testbench;
             assign cc_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_LAST;
             assign cc_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_KEEP;
             assign cc_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_VALID;
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.s_axis_cc_tready[pcie_e][0] = cc_axi[pcie_e].TREADY;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cc_axi_ready[pcie_e][0] = cc_axi[pcie_e].TREADY;
 
             assign rq_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_DATA;
             assign rq_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_USER;
             assign rq_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_LAST;
             assign rq_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_KEEP;
             assign rq_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_VALID;
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.s_axis_rq_tready[pcie_e][0] = rq_axi[pcie_e].TREADY;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_rq_axi_ready[pcie_e][0] = rq_axi[pcie_e].TREADY;
 
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_rcb_status[pcie_e][0] = 1'b0;
         end
