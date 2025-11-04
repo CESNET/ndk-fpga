@@ -42,7 +42,7 @@ set PF0_DEVICE_ID {c000}
 set config_list [list \
     CONFIG.ext_pcie_cfg_space_enabled {true} \
     CONFIG.extended_tag_field {true} \
-    CONFIG.plltype {QPLL1} \
+    CONFIG.plltype {QPLL0} \
     CONFIG.axisten_freq {250} \
     CONFIG.AXISTEN_IF_ENABLE_CLIENT_TAG {true} \
     CONFIG.pf0_dev_cap_max_payload {512_bytes} \
