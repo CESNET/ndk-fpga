@@ -11,7 +11,7 @@ class RAM:
         self._mem = bytearray(capacity)
 
     def wint(self, addr, integer, byte_count, byteorder="little"):
-        self.w(addr, list(integer.to_bytes(byte_count, byteorder=byteorder)))
+        self.w(addr, integer.to_bytes(byte_count, byteorder=byteorder))
 
     def rint(self, addr, byte_count, byteorder="little"):
         return int.from_bytes(self.r(addr, byte_count), byteorder=byteorder)

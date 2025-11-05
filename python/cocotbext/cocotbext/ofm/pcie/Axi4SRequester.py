@@ -72,7 +72,7 @@ class Axi4SRequester:
     def handle_request(self, req):
         fbe, lbe, addr_offset = req.meta
         header = RQHeader.deserialize(req.data)
-        payload = byte_serialize(req.data >> len(header), header.dword_count * 4)
+        payload = bytes(byte_serialize(req.data >> len(header), header.dword_count * 4))
 
         addr = header.addr << 2
         byte_count = header.dword_count * 4
@@ -80,13 +80,11 @@ class Axi4SRequester:
         if header.req_type == 1:
             self._ram.w(addr, payload)
             if self._verbosity:
-                print(type(self).__name__, "Write addr:", hex(addr), "dword_count:", header.dword_count, "payload:", payload)
-            return
-
+                print(type(self).__name__, "Write addr:", hex(addr), "dword_count:", header.dword_count, "payload:", payload.hex())
         elif header.req_type == 0:
             d = self._ram.r(addr, byte_count)
             if self._verbosity:
-                print(type(self).__name__, "Read  addr:", hex(addr), "dword_count:", header.dword_count, header.tag, "payload:", list(d))
+                print(type(self).__name__, "Read  addr:", hex(addr), "dword_count:", header.dword_count, header.tag, "payload:", d.hex())
             self._q.put_nowait((header, req.meta, d))
 
     async def handle_response(self):
