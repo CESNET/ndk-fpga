@@ -30,7 +30,7 @@ try:
     assert __interp
 except Exception:
     __lib = None
-    logger = logging.getLogger("modelsim")
+    logger = logging.getLogger(__name__)
     logger.warn("can't load modelsim interpreter handle.")
 
 

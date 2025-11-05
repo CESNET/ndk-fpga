@@ -9,9 +9,8 @@ import nfb.ext.python as ext
 
 
 class Servicer(ext.AbstractNfb):
-
     def __init__(self, device, dtb, *args, **kwargs):
-        self._log = logging.getLogger("cocotb.nfb.ext.python_servicer")
+        self._log = logging.getLogger(__name__)
         self._device = device
         super().__init__(dtb)
 
