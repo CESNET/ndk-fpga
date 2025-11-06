@@ -1,3 +1,4 @@
+from typing import Optional, Union
 import cocotb
 import cocotb.triggers
 import cocotb.utils
@@ -14,25 +15,43 @@ class Bus():
     _w = ms
     _SIGNALS = [] # or {}
 
-    def __init__(self, instance, prefix, index=None, label=None, sep='_'):
+    def __init__(self, instance, prefix: str, index: Optional[Union[list[int], int]] = None, label: Optional[str] = None, sep: str = '_', slices: Optional[int] = None):
+        """
+        slices: Meaningful only when index is specified.
+                Specifies the number of separate buses in the one shared std_logic_vector,
+                as the Bus class has to select the right slice.
+                The bus configuration must be the same for all buses in that vector.
+                For an n-dimensional bus signal, the value specifies the number of buses in the last dimension.
+        """
+
         self._instance = instance
         self._prefix = prefix
         self._index = index
+        self._slices = slices
         self._sep = sep
         self._label = label if label is not None else prefix
 
-    def _get_handle(self, name):
+    def _get_handle_slice(self, name):
         o = getattr(self._instance, self._prefix + self._sep + name)
+        sl = ()
         if self._index is not None:
-            o = o[self._index]
-        return o
+            if self._slices is not None:
+                w = len(o) // self._slices
+                sl = (self._index * w, (self._index + 1) * w)
+
+            else:
+                o = o[self._index]
+        return o, sl
+
+    def _get_handle(self, name):
+        return self._get_handle_slice(name)[0]
 
     def add_wave(self, **kwargs):
         groups = self._get_groups(**kwargs)
-        os = []
         for s in self._SIGNALS:
-            os.append(self._get_handle(s))
-        self._w.add_wave(*os, groups=groups) # , expand=self._prefix)
+            h, sl = self._get_handle_slice(s)
+            p = self._w.cocotb2path(h, sl)
+            self._w.add_wave(p, label=s, groups=groups)
 
     def _get_groups(self, **kwargs):
         groups = kwargs["groups"].copy() if "groups" in kwargs else []
@@ -74,10 +93,10 @@ class MfbBus(Bus):
         super().add_wave(**kwargs)
 
         groups = self._get_groups(**kwargs)
-        sr = self._get_handle('SRC_RDY')
-        dr = self._get_handle('DST_RDY')
+        sr, srs = self._get_handle_slice('SRC_RDY')
+        dr, drs = self._get_handle_slice('DST_RDY')
 
-        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)}}} transfer")
+        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr, srs)} and {self._w.cocotb2path(dr, drs)}}} transfer")
         self._w.add_wave(name, groups=groups, label='transfer')
 
     def clear(self):
