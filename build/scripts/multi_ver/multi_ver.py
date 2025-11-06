@@ -84,7 +84,7 @@ parser.add_argument("--coverage", action="store_true", help="Generate and save c
 args = parser.parse_args()
 
 # Detect package type
-PKG_MOD_SED = """sed -i "s/\\\\(\\<parameter\\>\\s\\s*\\<{}\\W*\\\\)=..*;/\\\\1= {};/g" {}""" # SystemVerilog format
+PKG_MOD_SED = """sed -i "s/\\\\(\\<\\(parameter\\|localparam int unsigned\\)\\>\\s\\s*\\<{}\\W*\\\\)=..*;/\\\\1= {};/g" {}"""
 if len(args.test_pkg_file) > 4:
     if args.test_pkg_file[-4:] == ".vhd":
         PKG_MOD_SED = """sed -i "s/\\\\(\\<constant\\>\\s\\s*\\<{}\\W*:.*\\\\):=..*;/\\\\1:= {};/g" {}""" # VHDL format
