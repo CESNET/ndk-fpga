@@ -55,20 +55,29 @@ def print(*args, **kwargs):
     sys.stdout.flush()
 
 
-def cocotb2path(obj):
+def cocotb2path(obj, slice=()):
     if __lib is None:
         return ""
-    return "/" + obj._path.replace(".", "/").replace("[", "(").replace("]", ")")
+
+    bp = "/" + obj._path.replace(".", "/").replace("[", "(").replace("]", ")")
+    sl = ""
+    if len(slice) == 1:
+        sl = f"[{slice[0]}]"
+    elif len(slice) == 2:
+        sl = f"[{slice[1]-1}:{slice[0]}]"
+    return bp + sl
 
 
 def add_wave(*args, **kwargs):
     # TODO: translate kwargs to some of these:
     #[-allowconstants] [-clampanalog {0|1}] [-color <standard_color_name>] [-depth <level>] [-divider <divider_name>...] [-expand <signal_name>] [-filter <f> | -nofilter <f>] [-format <type> | -<format>] [-group <group_name> [<sig_name1>...]] [-height <pixels>] [[-in] [-out] [-inout] | [-ports]] [-internal] [-label <name>] [-max <real_num>] [-min <real_num>] [-mvcall] [-mvcovm] [-mvcreccomplete] [-noupdate] [-numdynitem <int>] [-optcells] [-position <location>] [-queueends] [-radix <type> | -<radix_type>] [-radixenumnumeric | -radixenumsymbolic] [-recursive] [-startdynitem <int>] [-time] [-window <wname>] [<object_name>...] [{<object_name> {sig1 sig2 ...}}] # noqa
 
+    # The '-expand' precedes a '-group' (or more specific groups) and can be postponed e.g. with '-recursive /NONEXISTING'
+
     name = ""
     for obj in args:
         if isinstance(obj, str):
-            name += " " + obj
+            name += f" {{{obj}}}"
         else:
             name += " {" + cocotb2path(obj) + "}"
     params = ""
