@@ -29,7 +29,7 @@ class Bus():
         self._index = index
         self._slices = slices
         self._sep = sep
-        self._label = label if label is not None else prefix
+        self._label = label
 
     def _get_handle_slice(self, name):
         o = getattr(self._instance, self._prefix + self._sep + name)
@@ -54,8 +54,11 @@ class Bus():
             self._w.add_wave(p, label=s, groups=groups)
 
     def _get_groups(self, **kwargs):
-        groups = kwargs["groups"].copy() if "groups" in kwargs else []
-        groups.append(self._label)
+        groups = kwargs.get("groups", []).copy()
+        if self._label is not None:
+            groups.append(self._label)
+        elif not groups:
+            groups.append(self._prefix)
         return groups
 
 
