@@ -8,14 +8,11 @@
 # QSFP MISC INTERFACES
 # ==============================================================================
 
-set_property PACKAGE_PIN BL13     [get_ports "QSFP_ACT_LED_G[0]"];
-set_property PACKAGE_PIN BK14     [get_ports "QSFP_ACT_LED_G[1]"];
 set_property PACKAGE_PIN BK11     [get_ports "QSFP_STA_LED_G[0]"];
 set_property PACKAGE_PIN BK15     [get_ports "QSFP_STA_LED_G[1]"];
 set_property PACKAGE_PIN BJ11     [get_ports "QSFP_STA_LED_Y[0]"];
 set_property PACKAGE_PIN BL12     [get_ports "QSFP_STA_LED_Y[1]"];
 
-set_property IOSTANDARD  LVCMOS18 [get_ports "QSFP_ACT_LED_G"];
 set_property IOSTANDARD  LVCMOS18 [get_ports "QSFP_STA_LED_G"];
 set_property IOSTANDARD  LVCMOS18 [get_ports "QSFP_STA_LED_Y"];
 

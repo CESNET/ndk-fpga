@@ -1315,6 +1315,7 @@ begin
         QSFP0_TX_N <= eth_tx_n(1*ETH_LANES-1 downto 0*ETH_LANES);
     end generate;
 
+    -- Tied to 0 to ensure that these LEDs are turned off
     QSFP_ACT_LED_G <= (others => '0');
 
     -- =========================================================================
