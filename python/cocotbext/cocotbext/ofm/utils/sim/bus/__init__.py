@@ -51,7 +51,7 @@ class Bus():
         for s in self._SIGNALS:
             h, sl = self._get_handle_slice(s)
             p = self._w.cocotb2path(h, sl)
-            self._w.add_wave(p, label=s, groups=groups)
+            self._w.add_wave(p, **(kwargs | dict(groups=groups, label=s)))
 
     def _get_groups(self, **kwargs):
         groups = kwargs.get("groups", []).copy()
@@ -79,10 +79,10 @@ class MvbBus(Bus):
             groups = self._get_groups(**kwargs)
             groups.append(v)
             ho = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)} and {self._w.cocotb2path(vld[v])}}} handover")
-            self._w.add_wave(ho, groups=groups, label='handover')
+            self._w.add_wave(ho, **(kwargs | dict(groups=groups, label='handover')))
             for name, ran in self._ITEMS:
                 bus = [(o, range(ran.start + off * v, ran.stop + off * v))]
-                self._w.add_wave(f"{name}", groups=groups, bus=bus)
+                self._w.add_wave(f"{name}", **(kwargs | dict(groups=groups, bus=bus)))
 
 
 class MfbBus(Bus):
@@ -100,7 +100,7 @@ class MfbBus(Bus):
         dr, drs = self._get_handle_slice('DST_RDY')
 
         name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr, srs)} and {self._w.cocotb2path(dr, drs)}}} transfer")
-        self._w.add_wave(name, groups=groups, label='transfer')
+        self._w.add_wave(name, **(kwargs | dict(groups=groups, label='transfer')))
 
     def clear(self):
         self._sum_pkts = 0
