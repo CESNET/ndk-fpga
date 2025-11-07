@@ -86,10 +86,15 @@ def add_wave(*args, **kwargs):
     if 'group' in kwargs:
         groups.append(kwargs['group'])
 
-    for g in groups:
+    expand = kwargs.get("expand", [])
+    for i, g in enumerate(groups):
+        if i in expand:
+            params += " -expand "
         params += f' -group "{g}" '
-    if 'label' in kwargs:
-        params += f' -label {{{kwargs["label"]}}}'
+
+    for p in ["label", "color"]:
+        if p in kwargs:
+            params += f' -{p} {{{kwargs[p]}}} '
 
     if 'bus' in kwargs:
         params += f" -label {name} "
