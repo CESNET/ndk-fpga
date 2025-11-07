@@ -77,6 +77,8 @@ class MfbBus(Bus):
         self._sum_bytes = 0
 
     async def monitor(self, clk):
+        re = cocotb.triggers.RisingEdge(clk)
+
         self.clear()
 
         m = MFBMonitor(self._instance, self._prefix, clk, array_idx=self._index)
@@ -89,6 +91,8 @@ class MfbBus(Bus):
 
         tpre = st()
         while True:
+            await re
+
             tpost = st()
             tdiff = (tpost - tpre) / 1000  # to Mpps
 
