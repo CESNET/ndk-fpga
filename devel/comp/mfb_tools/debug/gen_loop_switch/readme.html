@@ -66,7 +66,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Gen Loop Switch (GLS)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Gen Loop Switch (GLS)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#control-software">Control software</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../generator/readme.html">MFB Generator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_appender/readme.html">MFB MVB Appender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
@@ -679,6 +682,14 @@ connection from DMA interfaces to ETH interfaces</p></td>
 </table>
 </dd></dl>
 
+<section id="control-software">
+<h2>Control software<a class="headerlink" href="#control-software" title="Link to this heading"></a></h2>
+<p>The Gen Loop Switch (GLS) module can be controlled using the <cite>GenLoopSwitch</cite> class located in the <cite>ofm</cite> Python package at <cite>ofm.comp.mfb_tools.debug.gen_loop_switch.gen_loop_switch</cite>.
+There is also the <cite>ofm-gls</cite> command-line tool available after the package installation.</p>
+<p>A script that uses the <cite>GenLoopSwitch</cite> class is provided here in the <cite>./sw</cite> directory.
+This script is performs throughput measurements in various modes and is the base for many HW tests.
+See the <a class="reference internal" href="../../../../ndk_core/doc/testing.html#ndk-testing-gls"><span class="std std-ref">GLS module tutorial</span></a> for more information.</p>
+</section>
 </section>
 
 

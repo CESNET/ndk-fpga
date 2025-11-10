@@ -42,37 +42,114 @@ You can test R/W requests to the NDK firmware address space of these scratch reg
 GLS module tutorial
 ^^^^^^^^^^^^^^^^^^^
 
-The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller. The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches. Please refer to the :ref:`GLS module documentation <gls_debug>` for a more information.
+The NDK firmware may include a GLS module that is instantiated in each DMA stream between the application core and the DMA controller.
+This is typical for the ndk-app-minimal reference design (apps/minimal).
+The GLS module is used for testing purposes and contains HW packet generators, speed meters, and datapath switches.
+Please refer to the :ref:`GLS module documentation <gls_debug>` for a more information.
 
-The GLS module also comes with a Python script (``<NDK-FPGA_root_directory>/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py``) that can be used to quickly perform several basic tests (modes). For example, you can measure the throughput of the NDK firmware. A list of tests can be obtained by running this script without parameters:
+The GLS module also comes with a Python script (``<NDK-FPGA_root_directory>/comp/mfb_tools/debug/gen_loop_switch/sw/gls_mod.py``) that can be used to quickly perform several basic tests (modes).
+For example, you can measure the throughput of the NDK firmware.
+A list of test modes can be obtained by running this script th `-h` option.
+However, there is a couple of steps that should preceed the usage of this script.
+
+Steps to launch
+***************
+
+1. Make sure you have a proper FPGA FW booted, i.e., it contains a GLS module.
+You can check this, for example, by issuing ``nfb-bus -l | grep gen_loop_switch`` in the terminal.
+The output should be similar to this (more than one instance of GLS may be present):
 
 .. code-block:: text
 
-    $ python3 gls_mod.py
-    gls_mod.py mode [port_list]
-    Example: gls_mod.py 1 "0,1"
+    $ nfb-bus -l | grep gen_loop_switch
+    0x00005000: cesnet,ofm,gen_loop_switch          /firmware/mi_pci0_bar0/dbg_gls0
 
-    Supported modes:
-    1: HW Gen --> TX ETH     ==> RX ETH --> Black Hole; (ext. ETH loopback required)
-    2: HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ext. ETH loopback required)
-    3: TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ext. ETH loopback required)
-    4: TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ext. ETH loopback required)
-    5: HW Gen --> RX DMA     ###
-    6: TX DMA --> Black Hole ###
-    7: TX DMA --> Black Hole ### RX DMA --> Black Hole;
-    8: TX DMA --> RX DMA     ### (internal DMA loopback)
+2. Install the Python OFM package as described in its readme ``ndk-fpga/python/ofm/README.md``.
+Do not deactivate the virtual environment.
 
-Some tests require an available DMA controller; others require an external QSFP loopback for Ethernet. Test 1 can be used for NDK firmware without a DMA controller. In this test, the :ref:`HW generator <mfb_generator>` sends Ethernet packets of constant length to the output network interface at full speed. The script measures the transmission data rate and continues to repeat the test for incrementing packet lengths until the maximum packet length is reached.
+3. Launch this script by ``python gls_mod.py <options>``.
+Add path before the script name if it is not in the current directory.
 
-.. warning::
+Usage
+*****
 
-    Some Ethernet Hard IPs (especially E-Tile and F-tile) may not receive data for transmission if they do not detect the Ethernet link. The test will not work in this case, so we recommend connecting an external QSFP loopback.
+See the test modes and other options by running the script with the ``-h`` option:
 
-.. note::
+.. code-block:: text
 
-    If you do not have an external QSFP loopback available, you can simply enable the Ethernet PMA loopback directly in the FPGA using the nfb-eth tool: ``nfb-eth -Pc "+PMA local loopback"``.
+    $ python gls_mod.py -h
+    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
 
-If an external QSFP loopback is connected, the transmitted packets are received back into the FPGA, where the script measures the receiving speed. In this test, packets pass through the application core so that the measured throughput corresponds with the throughput of the implemented application. The throughput calculation considers L2 packets from the destination MAC address to the end of the payload. Below is an example of the script output after running test 1:
+            Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
+
+    options:
+    -h, --help              show this help message and exit
+    -d DEVICE, --device DEVICE
+                            set the target device; default: 0 (/dev/nfb0)
+    -i [INDEX], --index [INDEX]
+                            select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0
+    -l, --log               enable logging to a CSV file
+    -L, --log_demo          enable for demo - logs to a TXT file in /tmp directory
+    -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop}
+                            set the test mode; options:
+
+                            +----------+-----------------------------------------------------------------+
+                            | eth_gen  | HW Gen --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback) |
+                            +----------+-----------------------------------------------------------------+
+                            | rx       | HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback) |
+                            +----------+-----------------------------------------------------------------+
+                            | tx       | TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback) |
+                            +----------+-----------------------------------------------------------------+
+                            | rxtx     | TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback) |
+                            +----------+-----------------------------------------------------------------+
+                            | dma_rx   | HW Gen --> RX DMA     ###                                       |
+                            +----------+-----------------------------------------------------------------+
+                            | dma_tx   | TX DMA --> Black Hole ###                                       |
+                            +----------+-----------------------------------------------------------------+
+                            | dma_rxtx | TX DMA --> Black Hole ### HW Gen --> RX DMA;                    |
+                            +----------+-----------------------------------------------------------------+
+                            | dma_loop | TX DMA --> RX DMA     ### (internal DMA loopback)               |
+                            +----------+-----------------------------------------------------------------+
+
+    -c CHANNELS, --channels CHANNELS
+                            select the range of Channels used in the test in 'min-max' format; default = all available
+    -s MIN MAX STEP, --frame_size MIN MAX STEP
+                            set the frame size(s) in bytes (including CRC); default: 64 1518 16
+    -R, --repeat            repeat the test until interrupted, otherwise it runs only once
+    -e, --ext_loop          force using external loopback instead of PMA loopback (default, only for some modes)
+    -C TEST_CYCLES, --test_cycles TEST_CYCLES
+                            set the number of test cycles that are averaged for each frame length, default: 4
+    -f FREQUENCY, --frequency FREQUENCY
+                            set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000
+    -r {1,2}, --rate_layer {1,2}
+                            measure the rate at ISO/OSI layer: 1 or 2; default: 2
+
+When launched, the script performs a test or a continuous series of tests that generates data (in SW or using a generator in the design), sets datapaths, and measures throughput.
+When using TX DMA, the scripts uses the ``ndp-generate`` tool to generate and send packets via DMA into the FPGA FW.
+Other source of data can be one of the HW packet generators inside the GLS module (see :ref:`GLS module documentation <gls_debug>`).
+When using RX DMA, the script uses the ``ndp-read`` tool to accept packets from the FPGA.
+Else packets are dropped in the RX DMA module, which can be observed using the ``nfb-dma`` tool.
+The variations of tests are set by the `-m`, `--mode` parameter (the only required one).
+One test run in the selected mode consists of multiple partial tests for different lengths of generated frames, defined by the `-s`, `--frame_size` parameter that expects three values in bytes like so: `min max step`.
+
+Some tests require an available DMA controller; test mode `eth_gen` can be used for NDK firmware without a DMA controller.
+More about DMA controllers in the NDK can be found in the :ref:`DMA module documentation <ndk_dma>`.
+
+Using the `eth_gen` test as an example, the :ref:`HW generator <mfb_generator>` generates Ethernet frames of constant length and sends them to the output network interface at full speed.
+In this test, packets pass through the application core so that the measured throughput corresponds with the throughput of the implemented application.
+Automatically, the Ethernet PMA loopback is enabled in the FPGA so that the transmitted packets are received back into the FPGA (can be disabled using `-e`, `--ext_loop`).
+The script measures the TX and RX data rates and continues to repeat the test for incrementing packet lengths until the maximum packet length is reached.
+For each packet length, the test is repeated a number of times (set by the `-C`, `--test_cycles` parameter) and the results are averaged.
+The data rates are calculated either at layer 1 or layer 2 (set by the `-r`, `--rate_layer` parameter).
+The data rate calculation at layer 2 considers Ethernet frames from the destination MAC address to the end of the payload.
+CRC is appended by the TX MAC module and removed by the RX MAC module, in the rest of the path inside the FPGA, CRC is absent, so frames are shorter by 4 Bytes.
+
+.. Note::
+
+    Some Ethernet Hard IPs (especially E-Tile and F-tile) may not receive data for transmission if they do not detect the Ethernet link.
+    The test will not work in this case, so we recommend connecting an external QSFP loopback.
+
+Below is an example of the script output after running test 1:
 
 .. code-block:: text
 
@@ -107,4 +184,17 @@ If an external QSFP loopback is connected, the transmitted packets are received 
     Total Speed TX:             83.78 [Gbps]
     Total Speed RX:             83.78 [Gbps]
 
-Some cards have multiple Ethernet ports. In this case, it is possible to select the number of ports to test with the ``port_list`` parameter when running the script. Other settings can be manually modified inside the script, such as the range and step of packet lengths or enabling the measurement report.
+Perhaps the most confusing can be the selection of channels for transmission and reception.
+When transferring data through the DMA (i.e., using ndp-generate for transmission to TX DMA and using GLS Generator for transmission to RX DMA, or using TX DMA -> RX DMA loopback), the DMA channels are utilized as is set by the user.
+However, when traffic passes through the Network Module (i.e., through the PMA or external loopback), the conversion between DMA-to-Ethernet and Ethernet-to-DMA channels, at least in the ndk-app-minimal design, causes channel mixing according to the configured distribution.
+In the default configuration, do not expect packets to arrive on the same DMA channels on which they were transmitted.
+
+The main reason to use  the channels parameter is in the case of a single GLS module in the design (= a single DMA stream) on a NIC with multiple Ethernet ports.
+This way, it is possible to select one of/both Ethernet ports to be used in the test (considering the ndk-app-minimal design) as the bottom half of channels forwards traffic to the first Ethernet port, the top half to the second Ethernet port.
+
+End of test
+***********
+
+A single run of the script takes a while and can be terminated using Ctrl+C (once).
+Partial test is finished before exiting, which causes a slight delay.
+When `-r`, `--repeat` option is used, the script continues to run tests until interrupted using Ctrl+C (once).
