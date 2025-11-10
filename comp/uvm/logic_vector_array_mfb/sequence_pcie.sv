@@ -98,8 +98,12 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                             break;
                         end
 
-                        if (index != 0 || (it != 0 && cfg.straddling == 0))
-                            break;
+                    // Break when straddling is enable and previous eof is
+                    // not set. When straddling is not set then generate sof
+                    // only to first region
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                        break;
+                    end
 
                         gen.sof[it]     = 1'b1;
                         gen.sof_pos[it] = index;
@@ -195,8 +199,12 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
                         break;
                     end
 
-                    if (index != 0 || (it != 0 && cfg.straddling == 0))
+                    // Break when straddling is enable and previous eof is
+                    // not set. When straddling is not set then generate sof
+                    // only to first region
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
                         break;
+                    end
 
                     gen.sof[it]     = 1'b1;
                     gen.sof_pos[it] = index;
@@ -283,8 +291,12 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                         break;
                     end
 
-                    if (index != 0 || (it != 0 && cfg.straddling == 0))
+                    // Break when straddling is enable and previous eof is
+                    // not set. When straddling is not set then generate sof
+                    // only to first region
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
                         break;
+                    end
 
                     gen.sof[it]     = 1'b1;
                     gen.sof_pos[it] = index;

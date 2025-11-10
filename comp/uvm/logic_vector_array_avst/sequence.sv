@@ -289,11 +289,13 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
                  // Check if packet can size in and if straddling is set then put data
                  // on first or when previous packet end in previous region
 
-                 st_new = 1;
                  // if straddling is enabled then previous packet have to end in previous region
                  // to start new packet in on first region.
-                 if (it != 0 && cfg.straddling == 0)
-                    st_new = gen.eop[it-1];
+                 if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                     st_new = 0;
+                 end else begin
+                    st_new = 1;
+                 end
 
                  // Check if packet can be put in actual region.
                  if (gen.sop[it] == 0 && st_new == 1 && gen.eop[it] == 0) begin
@@ -436,8 +438,11 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                             break;
                         end
 
-                        if (index != 0 || (it != 0 && cfg.straddling == 0))
+                        // Break when straddling is enable and previous eof is
+                        // not set
+                        if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
                             break;
+                        end
 
                         gen.sop[it]     = 1'b1;
                         if (hl_sqr.meta_behav == config_item::META_SOF && META_WIDTH != 0) begin
@@ -536,8 +541,11 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
                         break;
                     end
 
-                    if (index != 0 || (it != 0 && cfg.straddling == 0))
+                    // Break when straddling is enable and previous eof is
+                    // not set
+                    if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
                         break;
+                    end
 
                     gen.sop[it]     = 1'b1;
                     if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
@@ -610,7 +618,7 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                 end
 
                 if (state_packet == state_packet_space) begin
-                    if (space_size != 0) begin
+                  if (space_size != 0) begin
                         space_size--;
                     end else begin
                         state_packet = state_packet_none;
@@ -623,12 +631,15 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
 
                 if (state_packet == state_packet_new) begin
                     // Check SOP and EOP position
-                    if (gen.sop[it] && gen.eop[it]) begin
+                    if (gen.sop[it] == 1 || (gen.eop[it] == 1'b1)) begin
                         break;
                     end
 
-                    if (index != 0 || (it != 0 && cfg.straddling == 0))
+                    // Break when straddling is enable and previous eof is
+                    // not set
+                    if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
                         break;
+                    end
 
                     gen.sop[it]     = 1'b1;
                     if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
