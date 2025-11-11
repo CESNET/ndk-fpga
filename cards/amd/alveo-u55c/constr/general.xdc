@@ -53,3 +53,12 @@ set_property IOSTANDARD  LVCMOS18 [get_ports "HBM_CATTRIP"];
 
 # Lock DNA_PORT2E to X0Y0 due to different Chip ID in each SLRs!!!
 set_property LOC CONFIG_SITE_X0Y0 [get_cells cm_i/hwid_i/usp_g.dna_port_i]
+
+# ==============================================================================
+# Miscellaneous
+# ==============================================================================
+
+# These LEDs are only connected and tied to 0 to ensure they are turned off.
+set_property PACKAGE_PIN BL13     [get_ports "QSFP_ACT_LED_G[0]"];
+set_property PACKAGE_PIN BK14     [get_ports "QSFP_ACT_LED_G[1]"];
+set_property IOSTANDARD  LVCMOS18 [get_ports "QSFP_ACT_LED_G"];

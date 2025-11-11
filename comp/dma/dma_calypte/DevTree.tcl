@@ -11,8 +11,8 @@ proc dts_dma_calypte_ctrl {DTS dir id base pcie} {
         dts_appendprop_int dts "version" 0x10000
         dts_appendprop_int dts "pcie" $pcie
         if { $dir == "tx" } {
-            append dts "data_buff = <&dma_calypte_tx_data_buff$id>;"
-            append dts "hdr_buff = <&dma_calypte_tx_hdr_buff$id>;"
+            append dts "data_buff = <&dma_calypte_tx_data_buff$id\_pcie$pcie>;"
+            append dts "hdr_buff = <&dma_calypte_tx_hdr_buff$id\_pcie$pcie>;"
         }
         append dts "params = <&dma_params_$dir$pcie>;"
     }
@@ -27,7 +27,7 @@ proc dts_dma_calypte_ctrl {DTS dir id base pcie} {
 proc dts_dma_calypte_tx_buffer {DTS type id base size pcie} {
     upvar 1 $DTS dts
 
-    dts_create_labeled_node dts "dma_calypte_tx_${type}_buff${id}" "dma_calypte_tx_${type}_buff${id}" {
+    dts_create_labeled_node dts "dma_calypte_tx_${type}_buff${id}_pcie${pcie}" "dma_calypte_tx_${type}_buff${id}" {
         dts_appendprop_comp_node dts $base $size "cesnet,dma_calypte_tx_${type}_buff"
         dts_appendprop_int dts "pcie" $pcie
     }

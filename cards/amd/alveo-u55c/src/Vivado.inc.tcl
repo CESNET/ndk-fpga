@@ -46,10 +46,10 @@ lappend HIERARCHY(COMPONENTS) [list "TOPLEVEL" $CARD_BASE/src $ARCHGRP_ALL]
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/general.xdc"
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pblock.xdc"
 
+lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie_half.xdc"
+
 if {$PCIE_ENDPOINT_MODE == 0 || $PCIE_ENDPOINT_MODE == 1} {
-    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie.xdc"
-} else {
-    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie_half.xdc"
+    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie_full.xdc"
 }
 
 if {$NET_MOD_ARCH != "EMPTY"} {

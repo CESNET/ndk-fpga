@@ -24,7 +24,7 @@ if {[string is integer -strict $last_part]} {
     set endpoint_idx 0
 }
 
-puts "The index of an endpoint is $endpoint_idx"
+puts "Creating PCIe endpoint with index $endpoint_idx"
 
 set IP [get_ips $IP_COMP_NAME]
 
@@ -42,7 +42,7 @@ set PF0_DEVICE_ID {c000}
 set config_list [list \
     CONFIG.ext_pcie_cfg_space_enabled {true} \
     CONFIG.extended_tag_field {true} \
-    CONFIG.plltype {QPLL1} \
+    CONFIG.plltype {QPLL0} \
     CONFIG.axisten_freq {250} \
     CONFIG.AXISTEN_IF_ENABLE_CLIENT_TAG {true} \
     CONFIG.pf0_dev_cap_max_payload {512_bytes} \
@@ -51,8 +51,6 @@ set config_list [list \
     CONFIG.MSI_X_OPTIONS {None} \
     CONFIG.mode_selection {Advanced} \
     CONFIG.pf0_msix_enabled {false} \
-    CONFIG.pf1_msi_enabled {false} \
-    CONFIG.pf1_msix_enabled {false} \
     CONFIG.pf0_bar0_64bit {true} \
     CONFIG.pf0_bar0_prefetchable {false} \
     CONFIG.pf0_bar0_scale {Megabytes} \

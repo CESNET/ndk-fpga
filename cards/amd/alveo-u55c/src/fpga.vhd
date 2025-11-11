@@ -116,6 +116,9 @@ architecture FULL of FPGA is
     signal qsfp_modprs_n    : std_logic_vector(2-1 downto 0);
     signal qsfp_int_n       : std_logic_vector(2-1 downto 0);
 
+    signal qsfp_sta_led_g_int : std_logic_vector(QSFP_STA_LED_G'range);
+    signal qsfp_sta_led_y_int : std_logic_vector(QSFP_STA_LED_Y'range);
+
     signal boot_mi_clk      : std_logic;
     signal boot_mi_reset    : std_logic;
     signal boot_mi_addr     : std_logic_vector(32-1 downto 0);
@@ -1313,8 +1316,12 @@ begin
         QSFP1_TX_N <= eth_tx_n(2*ETH_LANES-1 downto 1*ETH_LANES);
         QSFP0_TX_P <= eth_tx_p(1*ETH_LANES-1 downto 0*ETH_LANES);
         QSFP0_TX_N <= eth_tx_n(1*ETH_LANES-1 downto 0*ETH_LANES);
+
+        QSFP_STA_LED_Y <= qsfp_sta_led_y_int;
+        QSFP_STA_LED_G <= qsfp_sta_led_g_int;
     end generate;
 
+    -- Tied to 0 to ensure that these LEDs are turned off
     QSFP_ACT_LED_G <= (others => '0');
 
     -- =========================================================================
@@ -1496,8 +1503,8 @@ begin
         ETH_TX_P                => eth_tx_p(ETH_PORTS*ETH_LANES-1 downto 0),
         ETH_TX_N                => eth_tx_n(ETH_PORTS*ETH_LANES-1 downto 0),
 
-        ETH_LED_R               => QSFP_STA_LED_Y,
-        ETH_LED_G               => QSFP_STA_LED_G,
+        ETH_LED_R               => qsfp_sta_led_y_int,
+        ETH_LED_G               => qsfp_sta_led_g_int,
 
         QSFP_I2C_SCL            => open,
         QSFP_I2C_SDA            => open,

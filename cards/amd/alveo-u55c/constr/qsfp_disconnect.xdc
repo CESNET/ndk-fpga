@@ -8,3 +8,6 @@ set_property IO_BUFFER_TYPE NONE [get_ports {QSFP0_TX_P[*]}]
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP0_TX_N[*]}]
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP1_TX_P[*]}]
 set_property IO_BUFFER_TYPE NONE [get_ports {QSFP1_TX_N[*]}]
+
+set_property IO_BUFFER_TYPE NONE [get_ports {QSFP_STA_LED_G[*]}]
+set_property IO_BUFFER_TYPE NONE [get_ports {QSFP_STA_LED_Y[*]}]

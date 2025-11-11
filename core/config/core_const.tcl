@@ -57,7 +57,8 @@ if { $DMA_TYPE == 4 } {
         !(
           ($PCIE_GEN == 3 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 0) ||
           ($PCIE_GEN == 3 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 2) ||
-          ($PCIE_GEN == 4 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 0)
+          ($PCIE_GEN == 4 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 0) ||
+          ($PCIE_GEN == 4 && $PCIE_ENDPOINTS == 2 && $PCIE_ENDPOINT_MODE == 1)
         )
     } {
         puts "-----------------------------------------------------------------------------"
