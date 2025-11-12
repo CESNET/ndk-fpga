@@ -1,3 +1,4 @@
+from typing import Optional, Union
 import cocotb
 import cocotb.triggers
 import cocotb.utils
@@ -14,24 +15,51 @@ class Bus():
     _w = ms
     _SIGNALS = [] # or {}
 
-    def __init__(self, instance, prefix, index=None, label=None, sep='_'):
+    def __init__(self, instance, prefix: str, index: Optional[Union[list[int], int]] = None, label: Optional[str] = None, sep: str = '_', slices: Optional[int] = None):
+        """
+        slices: Meaningful only when index is specified.
+                Specifies the number of separate buses in the one shared std_logic_vector,
+                as the Bus class has to select the right slice.
+                The bus configuration must be the same for all buses in that vector.
+                For an n-dimensional bus signal, the value specifies the number of buses in the last dimension.
+        """
+
         self._instance = instance
         self._prefix = prefix
         self._index = index
+        self._slices = slices
         self._sep = sep
-        self._label = label if label is not None else prefix
+        self._label = label
+
+    def _get_handle_slice(self, name):
+        o = getattr(self._instance, self._prefix + self._sep + name)
+        sl = ()
+        if self._index is not None:
+            if self._slices is not None:
+                w = len(o) // self._slices
+                sl = (self._index * w, (self._index + 1) * w)
+
+            else:
+                o = o[self._index]
+        return o, sl
 
     def _get_handle(self, name):
-        o = getattr(self._instance, self._prefix + self._sep + name)
-        if self._index is not None:
-            o = o[self._index]
-        return o
+        return self._get_handle_slice(name)[0]
 
     def add_wave(self, **kwargs):
-        os = []
+        groups = self._get_groups(**kwargs)
         for s in self._SIGNALS:
-            os.append(self._get_handle(s))
-        self._w.add_wave(*os, group=self._label) # , expand=self._prefix)
+            h, sl = self._get_handle_slice(s)
+            p = self._w.cocotb2path(h, sl)
+            self._w.add_wave(p, **(kwargs | dict(groups=groups, label=s)))
+
+    def _get_groups(self, **kwargs):
+        groups = kwargs.get("groups", []).copy()
+        if self._label is not None:
+            groups.append(self._label)
+        elif not groups:
+            groups.append(self._prefix)
+        return groups
 
 
 class MvbBus(Bus):
@@ -48,12 +76,13 @@ class MvbBus(Bus):
         dw = len(o)
         off = dw // len(vld)
         for v in range(len(vld)):
-            groups = [self._label, v]
+            groups = self._get_groups(**kwargs)
+            groups.append(v)
             ho = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)} and {self._w.cocotb2path(vld[v])}}} handover")
-            self._w.add_wave(ho, groups=groups, label='handover')
+            self._w.add_wave(ho, **(kwargs | dict(groups=groups, label='handover', color='yellow')))
             for name, ran in self._ITEMS:
                 bus = [(o, range(ran.start + off * v, ran.stop + off * v))]
-                self._w.add_wave(f"{name}", groups=groups, bus=bus)
+                self._w.add_wave(f"{name}", **(kwargs | dict(groups=groups, bus=bus)))
 
 
 class MfbBus(Bus):
@@ -65,11 +94,13 @@ class MfbBus(Bus):
 
     def add_wave(self, **kwargs):
         super().add_wave(**kwargs)
-        sr = self._get_handle('SRC_RDY')
-        dr = self._get_handle('DST_RDY')
 
-        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)}}} transfer")
-        self._w.add_wave(name, group=self._label, label='transfer')
+        groups = self._get_groups(**kwargs)
+        sr, srs = self._get_handle_slice('SRC_RDY')
+        dr, drs = self._get_handle_slice('DST_RDY')
+
+        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr, srs)} and {self._w.cocotb2path(dr, drs)}}} transfer")
+        self._w.add_wave(name, **(kwargs | dict(groups=groups, label='transfer', color='yellow')))
 
     def clear(self):
         self._sum_pkts = 0

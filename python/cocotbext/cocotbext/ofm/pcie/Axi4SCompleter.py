@@ -90,6 +90,14 @@ class Axi4SCompleter:
                 self._tag_queue.put_nowait(hdr.tag)
 
     async def _cq_req(self, addr, byte_count, req_type=0, data=[], tag=None, sync=True):
+        if byte_count == 0:
+            if tag is not None:
+                trigger, item, req_data = self._read_requests[tag]
+                del self._read_requests[tag]
+                self._tag_queue.put_nowait(tag)
+                trigger.set(req_data)
+            return
+
         header_empty = CQHeaderEmpty()
         header = CQHeader()
         user = CQUser()

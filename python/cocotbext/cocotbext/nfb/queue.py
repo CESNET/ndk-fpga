@@ -62,10 +62,6 @@ class QueueNdp:
         self._hdr_base = bb + bs + (bs // 4) * 1 # if self._dir == 0 else 0
         self._upd_base = bb + bs + (bs // 4) * 2
 
-        if self._upd_base + 4 > len(self._ram._mem):
-            raise Exception("Not enough memory for QueueNdp in RAM object. "
-                            "Try to increase RAM size or decrease number of queues")
-
     def update_desc_upper_address(self, ba):
         desc = self._ctrl.desc0(ba)
         if self._ctrl.last_upper_addr == desc:
@@ -76,6 +72,8 @@ class QueueNdp:
         return True
 
     def _push_one_desc(self, desc):
+        assert self._state != 0, "Queue not started yet"
+
         self._ram.wint(self._dsc_base + self._ctrl.sdp * 8, desc, 8)
         self._ctrl.sdp += 1
         self._dsc_free -= 1
@@ -84,6 +82,10 @@ class QueueNdp:
         await e(self._ctrl.stop)()
 
     async def start(self):
+        if self._upd_base + 4 > len(self._ram._mem):
+            raise Exception("Not enough memory for QueueNdp in RAM object. "
+                            "Try to increase RAM size or decrease number of queues")
+
         upd = memoryview(self._ram._mem)[self._upd_base:self._upd_base + 8]
         try:
             await e(self._ctrl.start)(self._dsc_base, self._hdr_base, self._upd_base, upd, self._desc_cnt, self._desc_cnt)

@@ -3,8 +3,8 @@
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
-#import sys
 import logging
+from cocotbext.ofm.utils import partial
 import cocotb
 from cocotb.triggers import Timer
 
@@ -17,10 +17,12 @@ from cocotbext.ofm.utils.sim.bus import MfbBus, MiBus, DmaUpMvbBus, DmaDownMvbBu
 
 from ofm.comp.base.misc.frequency_meter import FrequencyMeter, tabulate_data
 
-#logging.basicConfig(stream=sys.stderr, force=True)
-#logging.getLogger().setLevel(logging.INFO)
 
 logger = logging.getLogger(__name__)
+#logger.setLevel(logging.DEBUG)
+#logging.getLogger("cocotbext.nfb.ext").setLevel(logging.DEBUG)
+#logging.getLogger("cocotbext.ofm.pcie").setLevel(logging.DEBUG)
+
 
 # Shortcuts
 e = cocotb.external
@@ -115,12 +117,10 @@ async def _test_ndp_sendmsg(dut, dev=None, nfb=None):
         await e(eth.txmac.reset_stats)()
         await e(eth.txmac.enable)()
 
-    pkt = bytes([i for i in range(72)])
-
     for i, tx in enumerate(dev._eth_tx_monitor):
-        def eth_tx_monitor_cb(p):
+        def eth_tx_monitor_cb(i, p):
             logger.debug(f"tx_eth{i} packet transmitted: len={len(p)}, data={bytes(p).hex()}")
-        tx.add_callback(eth_tx_monitor_cb)
+        tx.add_callback(partial(eth_tx_monitor_cb, i))
 
     count = 1
     for i in range(count):
@@ -141,9 +141,9 @@ async def _test_ndp_sendmsg_burst(dut, dev=None, nfb=None):
         await e(eth.txmac.enable)()
 
     for i, tx in enumerate(dev._eth_tx_monitor):
-        def eth_tx_monitor_cb(p):
+        def eth_tx_monitor_cb(i, p):
             logger.debug(f"tx_eth{i} packet transmitted: len={len(p)}, data={bytes(p).hex()}")
-        tx.add_callback(eth_tx_monitor_cb)
+        tx.add_callback(partial(eth_tx_monitor_cb, i))
 
     pkts = range(20, 28)
     for i in pkts:
@@ -169,26 +169,34 @@ core = NFBDevice.core_instance_from_top(cocotb.top)
 
 pcic = core.pcie_i.pcie_core_i
 #ms.cmd(f"log -recursive {ms.cocotb2path(core)}/*")
+#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/pcie_i/*")
+#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/dma_i/dma_i/*")
+#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/app_i/*")
+#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/network_mod_i/*")
 
-MfbBus(core.dma_i, 'RX_USR_MFB', 0).add_wave()
-MfbBus(core.dma_i, 'TX_USR_MFB', 0).add_wave()
+DMA_STREAMS = core.dma_i.DMA_STREAMS.value
+DMA_ENDPOINTS = core.dma_i.DMA_ENDPOINTS.value
+ETH_STREAMS = core.app_i.ETH_STREAMS.value
 
-DmaUpMvbBus(core.dma_i, 'PCIE_RQ_MVB', 0).add_wave()
-MfbBus(core.dma_i, 'PCIE_RQ_MFB', 0).add_wave()
-
-DmaDownMvbBus(core.dma_i, 'PCIE_RC_MVB', 0).add_wave()
-MfbBus(core.dma_i, 'PCIE_RC_MFB', 0).add_wave()
-
-#MfbBus(pcic, 'RC_MFB', 0).add_wave()
-#MfbBus(pcic, 'RQ_MFB', 0).add_wave()
-#MfbBus(pcic, 'CC_MFB', 0).add_wave()
-#MfbBus(pcic, 'CQ_MFB', 0).add_wave()
-MiBus(core.pcie_i, 'MI', 0, label='MI_PCIe').add_wave()
-#MiBus(core.dma_i, 'MI', 0, label='MI_DMA').add_wave()
-
-
-ms.add_wave(core.pcie_i.MI_CLK)
 ms.add_wave(core.pcie_i.MI_RESET)
-ms.add_wave(core.dma_i.MI_CLK)
-ms.add_wave(core.dma_i.MI_RESET)
-ms.add_wave(core.global_reset)
+ms.add_wave(core.pcie_i.MI_CLK)
+MiBus(core.pcie_i, 'MI', 0, label='MI_PCIe').add_wave()
+MiBus(core.app_i, 'MI', label='MI_APP').add_wave()
+
+ms.add_wave(core.dma_i.USR_CLK)
+for i in range(DMA_STREAMS):
+    MfbBus(core.dma_i, "RX_USR_MFB", i).add_wave(groups=["DMA_RX_MFB", i], expand=[1])
+    MfbBus(core.dma_i, "TX_USR_MFB", i).add_wave(groups=["DMA_TX_MFB", i], expand=[1])
+    #MfbBus(core.app_i, "DMA_RX_MFB", i, slices=DMA_STREAMS).add_wave(groups=["APP_DMA_RX_MFB", i], expand=[1])
+    #MfbBus(core.app_i, "DMA_TX_MFB", i, slices=DMA_STREAMS).add_wave(groups=["APP_DMA_TX_MFB", i], expand=[1])
+
+for i in range(DMA_ENDPOINTS):
+    DmaUpMvbBus(core.dma_i, 'PCIE_RQ_MVB', i).add_wave(groups=["DMA2PCIe", "RQ MVB", i], expand=[2, 3])
+    MfbBus(core.dma_i, 'PCIE_RQ_MFB', i).add_wave(groups=["DMA2PCIe", "RQ MFB", i], expand=[2])
+    DmaDownMvbBus(core.dma_i, 'PCIE_RC_MVB', i).add_wave(groups=["DMA2PCIe", "RC MVB", i], expand=[2, 3])
+    MfbBus(core.dma_i, 'PCIE_RQ_MFB', i).add_wave(groups=["DMA2PCIe", "RC MFB", i], expand=[2])
+
+ms.add_wave(core.app_i.CLK_ETH[0])
+for i in range(ETH_STREAMS):
+    MfbBus(core.app_i, 'ETH_RX_MFB', i, label=f"ETH_RX_MFB{i}").add_wave()
+    MfbBus(core.app_i, 'ETH_TX_MFB', i, label=f"ETH_TX_MFB{i}").add_wave()

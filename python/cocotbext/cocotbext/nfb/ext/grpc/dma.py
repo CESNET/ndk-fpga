@@ -91,8 +91,8 @@ class RAM(cocotbext.ofm.utils.RAM):
     def r(self, addr, byte_count):
         if self._rq is None:
             self._log.error(f"Dma client for RAM access not connected: read {byte_count}B from {addr:0x}")
-            return list(bytes(byte_count))
+            return bytes(byte_count)
 
         resp = DmaRequest(dma_pb2.DmaRequest(type=dma_pb2.DmaOperation.DMA_READ, addr=addr, nbyte=byte_count, data=None))
         self._rq.put(resp)
-        return list(resp.wait())
+        return resp.wait()

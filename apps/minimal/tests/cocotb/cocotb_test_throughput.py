@@ -8,7 +8,6 @@
 # and produces graphs in app/build/card directory
 
 import os
-import sys
 import logging
 import cocotb
 import itertools
@@ -37,13 +36,9 @@ PORT_THROUGHPUT = 100
 PKTLEN = [x for x in range(64, 300) if x % 8 in [0, 1]]
 
 
-logging.basicConfig(stream=sys.stderr, force=True)
-logging.getLogger().setLevel(logging.INFO)
-
 logger = logging.getLogger(__name__)
+#logging.getLogger("cocotb.nfb.ext").setLevel(logging.DEBUG)
 
-logger_mi = logging.getLogger("cocotb.nfb.ext.python_servicer")
-#logger_mi.setLevel(logging.DEBUG)
 
 # Shortcuts
 e = cocotb.external
@@ -257,7 +252,8 @@ async def test_ndp_recvmsg_burst(dut):
 
 
 core = NFBDevice.core_instance_from_top(cocotb.top)
-#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/*")
+#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/pcie_i/*")
+#ms.cmd(f"log -recursive {ms.cocotb2path(core)}/dma_i/dma_i/*")
 
 DMA_STREAMS = core.dma_i.DMA_STREAMS.value
 

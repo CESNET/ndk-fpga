@@ -54,7 +54,7 @@ class Servicer(ext.AbstractNfb):
             self._burst_temp.clear()
 
     def __init__(self, device, dtb, *args, **kwargs):
-        self._log = logging.getLogger("cocotb.nfb.ext.python_servicer")
+        self._log = logging.getLogger(__name__)
         self._device = device
         super().__init__(dtb)
 

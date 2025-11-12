@@ -2,7 +2,7 @@
 # Copyright (C) 2023 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
-
+import logging
 import cocotb
 from cocotb.queue import Queue
 from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize
@@ -23,7 +23,6 @@ class Frame(object):
 
 class Axi4SRequester:
     def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
-        self._verbosity = 0
         self._ram = ram
         self._rq = rq_driver
         self._rc = rc_driver
@@ -36,6 +35,8 @@ class Axi4SRequester:
         self._rq_pending_meta = ()
 
         self._rq_width = len(self._rq.bus.TDATA)
+
+        self._log = logging.getLogger(__name__)
 
         rq_monitor.add_callback(self.handle_rq_transaction)
 
@@ -72,22 +73,20 @@ class Axi4SRequester:
     def handle_request(self, req):
         fbe, lbe, addr_offset = req.meta
         header = RQHeader.deserialize(req.data)
-        payload = byte_serialize(req.data >> len(header), header.dword_count * 4)
+        payload = bytes(byte_serialize(req.data >> len(header), header.dword_count * 4))
 
         addr = header.addr << 2
         byte_count = header.dword_count * 4
 
         if header.req_type == 1:
             self._ram.w(addr, payload)
-            if self._verbosity:
-                print(type(self).__name__, "Write addr:", hex(addr), "dword_count:", header.dword_count, "payload:", payload)
-            return
-
+            self._log.debug(f"Write addr: {addr:#010x} dwords: {header.dword_count: 3} payload: {payload.hex()}")
         elif header.req_type == 0:
             d = self._ram.r(addr, byte_count)
-            if self._verbosity:
-                print(type(self).__name__, "Read  addr:", hex(addr), "dword_count:", header.dword_count, header.tag, "payload:", list(d))
+            self._log.debug(f"Read  addr: {addr:#010x} dwords: {header.dword_count: 3} payload: {d.hex()}")
             self._q.put_nowait((header, req.meta, d))
+        else:
+            raise NotImplementedError
 
     async def handle_response(self):
         while True:

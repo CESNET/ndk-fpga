@@ -4,6 +4,7 @@
 #            Martin Spinler <spinler@cesnet.cz>
 #            Radek Isa <isa@cesnet.cz>
 
+import logging
 import cocotb
 from cocotb.queue import Queue
 
@@ -81,7 +82,6 @@ class AvstRequester(AvstBase):
     def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
         super().__init__(rc_driver)
 
-        self._verbosity = 0
         self._ram = ram
         self._rq = rq_driver
         self._rc = rc_driver
@@ -94,18 +94,19 @@ class AvstRequester(AvstBase):
         self._rq_pending_dwords = 0
         self._rq_pending_meta = ()
 
+        self._log = logging.getLogger(__name__)
+
         rq_monitor.add_callback(self.handle_rq_transaction)
 
         cocotb.start_soon(self.handle_response())
 
     def handle_rq_transaction(self, transaction):
         header_bytes, data_bytes = transaction
-        data = list(data_bytes)
         hdr = RequestHeader.deserialize(int.from_bytes(header_bytes, byteorder="big"))
 
         # Process only if it is a request (DMA WR or RD)
         if hdr.tlp_type == 0 and hdr.req_type in [0, 1]:
-            self.handle_request((hdr, data))
+            self.handle_request((hdr, data_bytes))
 
     def handle_request(self, req):
         header, payload = req
@@ -119,13 +120,13 @@ class AvstRequester(AvstBase):
 
         if header.req_type == 1: # write
             self._ram.w(addr, payload)
-            if self._verbosity:
-                print(type(self).__name__, "Write addr:", hex(addr), "dwords:", header.dwords, "payload:", payload)
+            self._log.debug(f"Write addr: {addr:#010x} dwords: {header.dwords: 3} payload: {payload.hex()}")
         elif header.req_type == 0: # read
             d = self._ram.r(addr, byte_count)
-            if self._verbosity:
-                print(type(self).__name__, "Read addr:", hex(addr), "dwords:", header.dwords, "payload:", list(d))
+            self._log.debug(f"Read  addr: {addr:#010x} dwords: {header.dwords: 3} payload: {d.hex()}")
             self._q.put_nowait((header, d, addr))
+        else:
+            raise NotImplementedError
 
     async def handle_response(self):
         while True:
