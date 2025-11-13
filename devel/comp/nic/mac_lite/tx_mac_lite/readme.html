@@ -469,7 +469,9 @@ Ignored when IPG_GENERATE_EN==false</p></td>
 <tr class="row-even" id="vhdl-gengeneric-tx_mac_lite-ll_mode"><td><p>LL_MODE</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
-<td><p>Low-latency mode: do not discard errornous frames</p></td>
+<td><p>Low-latency mode: buffering is disabled, therefore erroneous frames are not discarded
+Also, frames may be corrupted when the MAC is disabled/enabled during ongoing traffic
+Use with care and only if you know what you are doing</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-tx_mac_lite-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
