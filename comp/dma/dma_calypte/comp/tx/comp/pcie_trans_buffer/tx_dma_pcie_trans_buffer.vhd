@@ -200,6 +200,11 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
 
     signal addr_sel                 : slv_array_t(MEM_ARRAYS -1 downto 0)(MFB_REGIONS - 1 downto 0);
 
+    signal rd_chan_a_reg : std_logic_vector(RD_CHAN_A'range);
+    signal rd_chan_b_reg : std_logic_vector(RD_CHAN_B'range);
+    signal rd_addr_a_reg : std_logic_vector(RD_ADDR_A'range);
+    signal rd_addr_b_reg : std_logic_vector(RD_ADDR_B'range);
+
     -- =============================================================================================
     -- DEBUG signals (verification or ILA)
     -- =============================================================================================
@@ -789,6 +794,21 @@ begin
     -- =============================================================================================
     -- Demulitplexors
     -- =============================================================================================
+    -- This register provides a one clock cycle delay which is needed since the data appear on the
+    -- output one clock cycle after the address and a channel number has been set and, after that,
+    -- multiplexed based on the channel index between memory arrays and shifted based on RD_ADDR_*.
+    rd_data_vld_reg_p : process (CLK) is
+    begin
+        if (rising_edge(CLK)) then
+            rd_chan_a_reg <= RD_CHAN_A;
+            rd_chan_b_reg <= RD_CHAN_B;
+            rd_addr_a_reg <= RD_ADDR_A;
+            rd_addr_b_reg <= RD_ADDR_B;
+        end if;
+    end process;
+
+    -- The split port configuration is only possible of 2-region variant since this uses dual-port
+    -- BRAMs for write (the 1-region variant uses SDP configuration of a BRAM)
     split_port_logic_g : if (SPLIT_READ_PORTS and MFB_REGIONS = 2) generate
 
         bram_demux_p : process (all) is
@@ -798,8 +818,8 @@ begin
             rd_en_bram_demux(to_integer(unsigned(RD_CHAN_B(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(1) <= RD_EN_B;
 
             rd_data_bram_mux    <= (others => (others => '0'));
-            rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
-            rd_data_bram_mux(1) <= rd_data_bram(to_integer(unsigned(RD_CHAN_B(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(1);
+            rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(rd_chan_a_reg(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
+            rd_data_bram_mux(1) <= rd_data_bram(to_integer(unsigned(rd_chan_b_reg(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(1);
         end process;
 
         RD_DATA_VLD_A <= rd_data_valid_arr(0);
@@ -817,7 +837,7 @@ begin
             port map (
                 DATA_IN  => rd_data_bram_mux(0),
                 DATA_OUT => RD_DATA_A,
-                SEL      => RD_ADDR_A(log2(MFB_BYTES) - 1 downto 0)
+                SEL      => rd_addr_a_reg(log2(MFB_BYTES) - 1 downto 0)
             );
 
             rd_addr_recalc_p : process (all) is
@@ -855,7 +875,7 @@ begin
             port map (
                 DATA_IN  => rd_data_bram_mux(1),
                 DATA_OUT => RD_DATA_B,
-                SEL      => RD_ADDR_B(log2(MFB_BYTES) - 1 downto 0)
+                SEL      => rd_addr_b_reg(log2(MFB_BYTES) - 1 downto 0)
             );
 
             rd_addr_recalc_p : process (all) is
@@ -896,7 +916,7 @@ begin
                 end if;
             end process;
 
-            rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
+            rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(rd_chan_a_reg(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(0);
         else generate
 
             rd_data_demux_p : process (all)
@@ -906,7 +926,7 @@ begin
 
                 for i in 0 to MFB_REGIONS - 1 loop
                     if (rd_data_valid_arr(i) = '1') then
-                        rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(RD_CHAN_A(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(i);
+                        rd_data_bram_mux(0) <= rd_data_bram(to_integer(unsigned(rd_chan_a_reg(log2(MEM_ARRAYS) + log2(CHANS_PER_ARRAY) -1 downto log2(CHANS_PER_ARRAY)))))(i);
                         RD_DATA_VLD_A       <= '1';
                     end if;
                 end loop;
@@ -925,7 +945,7 @@ begin
             port map (
                 DATA_IN  => rd_data_bram_mux(0),
                 DATA_OUT => RD_DATA_A,
-                SEL      => RD_ADDR_A(log2(MFB_BYTES) - 1 downto 0)
+                SEL      => rd_addr_a_reg(log2(MFB_BYTES) - 1 downto 0)
             );
 
             rd_addr_recalc_g : for rgn in 0 to (MFB_REGIONS -1) generate

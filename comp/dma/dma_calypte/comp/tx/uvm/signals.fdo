@@ -50,6 +50,7 @@ proc pcie_hdr_deparse {PATH META_CHAN_NUM_W BUFF_ADDR_W DEVICE {idx 0} {GRP ""} 
 proc dma_hdr_deparse {PATH GRP {idx 0} {OFFSET 0}} {
     add_wave "-noupdate -group \"$GRP\" -group \"DMA HDR FIELDS $idx\" -label \"frame_length\" -unsigned" ${PATH}([expr 15 + $OFFSET]\ downto\ $OFFSET)
     add_wave "-noupdate -group \"$GRP\" -group \"DMA HDR FIELDS $idx\" -label \"frame_pointer\" -hex" ${PATH}([expr 31 + $OFFSET]\ downto\ [expr 16 + $OFFSET])
+    add_wave "-noupdate -group \"$GRP\" -group \"DMA HDR FIELDS $idx\" -label \"ptp_enable\" -bin" ${PATH}([expr 33 + $OFFSET])
     add_wave "-noupdate -group \"$GRP\" -group \"DMA HDR FIELDS $idx\" -label \"user_metadata\" -hex" ${PATH}([expr 63 + $OFFSET]\ downto\ [expr 40 + $OFFSET])
 }
 
@@ -130,7 +131,7 @@ proc top_outputs {PATH} {
     add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_SOF
     add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_EOF
     add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_SOF_POS
-    add_wave "-noupdate -bin" $PATH/USR_TX_MFB_EOF_POS
+    add_wave "-noupdate -bin" $PATH/vhdl_dut_i/USR_TX_MFB_EOF_POS
     add_wave "-noupdate" $PATH/vhdl_dut_i/USR_TX_MFB_SRC_RDY
     add_wave "-noupdate" $PATH/vhdl_dut_i/USR_TX_MFB_DST_RDY
 
@@ -140,7 +141,7 @@ proc top_outputs {PATH} {
     add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_SOF
     add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_EOF
     add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_SOF_POS
-    add_wave "-noupdate -bin" $PATH/PCIE_RQ_MFB_EOF_POS
+    add_wave "-noupdate -bin" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_EOF_POS
     add_wave "-noupdate" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_SRC_RDY
     add_wave "-noupdate" $PATH/dma_ptr_updater_i/PCIE_RQ_MFB_DST_RDY
 }
@@ -161,12 +162,10 @@ proc internals {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_BE_
     add_wave "-noupdate -group \"INTERNALS\" -bin" $PATH/stop_req_ack
 
     add wave -group "INTERNALS" -noupdate -divider "Pointer_update_signals"
-    add_wave "-noupdate -group \"INTERNALS\" -unsigned" $PATH/upd_hdp_chan
+    add_wave "-noupdate -group \"INTERNALS\" -unsigned" $PATH/upd_hp_chan
     add_wave "-noupdate -group \"INTERNALS\" -unsigned" $PATH/upd_hdp_data
-    add_wave "-noupdate -group \"INTERNALS\"" $PATH/upd_hdp_en
     add_wave "-noupdate -group \"INTERNALS\" -unsigned" $PATH/upd_hhp_chan
-    add_wave "-noupdate -group \"INTERNALS\" -unsigned" $PATH/upd_hhp_data
-    add_wave "-noupdate -group \"INTERNALS\"" $PATH/upd_hhp_en
+    add_wave "-noupdate -group \"INTERNALS\"" $PATH/upd_hp_en
 
     add wave -group "INTERNALS" -noupdate -divider "Counter_updates"
     add_wave "-noupdate -group \"INTERNALS\" -unsigned" $PATH/pkt_sent_chan
@@ -253,7 +252,7 @@ proc internals {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_BE_
     }
     add_wave "-noupdate -group \"INTERNALS\" -label \"dma_hdr_addr\" -hex" $PATH/hdr_fifo_tx_data([expr $META_PCIE_ADDR_W + $META_CHAN_NUM_W + 64 -1]\ downto\ [expr $META_CHAN_NUM_W + 64])
 
-    add_wave "-noupdate -group \"INTERNALS\" -label \"fifo_status\" -unsigned" $PATH/dma_hdr_fifo_i/fifox_gen/fifox_i/STATUS
+    add_wave "-noupdate -group \"INTERNALS\" -label \"fifo_status\" -unsigned" $PATH/dma_hdr_fifo_i/multi_fifox_gen/fifox_gen/fifox_i/STATUS
     add_wave "-noupdate -group \"INTERNALS\" -label \"fifo_status\" -unsigned" $PATH/dma_hdr_fifo_i/single_fifox_gen/fifox_i/STATUS
     add_wave "-noupdate -group \"INTERNALS\"" $PATH/hdr_fifo_tx_src_rdy
     add_wave "-noupdate -group \"INTERNALS\"" $PATH/hdr_fifo_tx_dst_rdy
@@ -428,10 +427,11 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
 
     add wave -noupdate -group "$grp_name" -divider "PCIE_INPUT"
 
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/PCIE_MFB_DATA
-    int_mfb_meta_deparse $PATH/PCIE_MFB_META "$grp_name" $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W 0
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/PCIE_MFB_DATA(255\ downto\ 0)
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/PCIE_MFB_DATA(511\ downto\ 256)
+    int_mfb_meta_deparse $PATH/PCIE_MFB_META(0) "$grp_name" $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W 0
     if {$REGIONS == 2} {
-        int_mfb_meta_deparse $PATH/PCIE_MFB_META "$grp_name" $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W 1 $META_WO_BYTE_CNT_W
+        int_mfb_meta_deparse $PATH/PCIE_MFB_META(1) "$grp_name" $META_IS_DMA_HDR_W $META_PCIE_ADDR_W $META_CHAN_NUM_W $META_BE_W $META_BYTE_CNT_W $META_FBE_W $META_LBE_W 1
     }
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/PCIE_MFB_SOF
     add_wave "-noupdate -group \"$grp_name\"" $PATH/PCIE_MFB_SRC_RDY
@@ -454,10 +454,13 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_LENGTH
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_DWORDS
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MFB_BYTES
-    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/BUFFER_DEPTH
-    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MAX_BRAM_DEPTH
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/RAM_DATA_PORT_W
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/RAMS_PER_ARRAY
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MAX_RAM_DEPTH
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/CHANS_PER_ARRAY
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/MEM_ARRAYS
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/BUFFER_DEPTH
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/ADDRS_PER_ARR
 
     add wave -noupdate -group "$grp_name" -divider "Input registers"
     add_wave "-noupdate -group \"$grp_name\"" $PATH/pcie_mfb_data_inp_reg
@@ -477,8 +480,8 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
     add_wave "-noupdate -group \"$grp_name\"" $PATH/addr_cntr_pst
     add_wave "-noupdate -group \"$grp_name\"" $PATH/addr_cntr_nst
 
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/chan_num_pst
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/chan_num_nst
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/chan_num_reg
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/chan_num_next
 
     add wave -noupdate -group "$grp_name" -divider "BRAM registers"
     add_wave "-noupdate -group \"$grp_name\"" $PATH/wr_be_bram_demux_reg
@@ -487,7 +490,6 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
 
     add wave -noupdate -group "$grp_name" -divider "Write interface"
     add_wave "-noupdate -group \"$grp_name\"" $PATH/addr_sel
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/wr_addr_bram_by_multi
     add_wave "-noupdate -group \"$grp_name\"" $PATH/rw_addr_bram_by_mux
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/rd_en_pch
 
@@ -497,6 +499,10 @@ proc trans_buffer {PATH META_IS_DMA_HDR_W META_PCIE_ADDR_W META_CHAN_NUM_W META_
     add_wave "-noupdate -group \"$grp_name\"" $PATH/rd_data_bram_mux
     add_wave "-noupdate -group \"$grp_name\"" $PATH/rd_data_bram
     add_wave "-noupdate -group \"$grp_name\"" $PATH/rd_addr_bram_by_shift
+    add_wave "-noupdate -group \"$grp_name\" -hex" $PATH/rd_addr_a_reg
+    add_wave "-noupdate -group \"$grp_name\" -hex" $PATH/rd_addr_b_reg
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/rd_chan_a_reg
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/rd_chan_b_reg
 
     add wave -noupdate -group "$grp_name" -divider "Debug_signals"
     add_wave "-noupdate -group \"$grp_name\"" $PATH/wr_addr_collision_detected
@@ -508,17 +514,21 @@ proc pkt_dispatcher {PATH} {
 
     add wave -noupdate -group "$grp_name" -divider "BRAM_BUFF_INPUT"
 
-    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/BUFF_RD_CHAN
     add_wave "-noupdate -group \"$grp_name\"" $PATH/BUFF_RD_DATA
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/BUFF_RD_CHAN
     add_wave "-noupdate -group \"$grp_name\"" $PATH/BUFF_RD_ADDR
     add_wave "-noupdate -group \"$grp_name\"" $PATH/BUFF_RD_EN
     add_wave "-noupdate -group \"$grp_name\"" $PATH/BUFF_RD_DATA_VLD
 
     add wave -noupdate -group "$grp_name" -divider "HDR_BUFFER"
 
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/HDR_BUFF_CHAN_NEXT
+    dma_hdr_deparse $PATH/HDR_BUFF_DATA_NEXT "$grp_name" 0
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/HDR_BUFF_SRC_RDY_NEXT
+
     add_wave "-noupdate -group \"$grp_name\"" $PATH/HDR_BUFF_ADDR
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/HDR_BUFF_CHAN
-    dma_hdr_deparse $PATH/HDR_BUFF_DATA "$grp_name"
+    dma_hdr_deparse $PATH/HDR_BUFF_DATA "$grp_name" 1
     add_wave "-noupdate -group \"$grp_name\"" $PATH/HDR_BUFF_SRC_RDY
     add_wave "-noupdate -group \"$grp_name\"" $PATH/HDR_BUFF_DST_RDY
 
@@ -541,12 +551,10 @@ proc pkt_dispatcher {PATH} {
     add_wave "-noupdate -group \"$grp_name\"" $PATH/PKT_SENT_INC
     add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/PKT_SENT_BYTES
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/ENABLED_CHANS
-    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/UPD_HDP_CHAN
+    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/UPD_HP_CHAN
     add_wave "-noupdate -group \"$grp_name\"" $PATH/UPD_HDP_DATA
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/UPD_HDP_EN
-    add_wave "-noupdate -group \"$grp_name\" -unsigned" $PATH/UPD_HHP_CHAN
     add_wave "-noupdate -group \"$grp_name\"" $PATH/UPD_HHP_DATA
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/UPD_HHP_EN
+    add_wave "-noupdate -group \"$grp_name\"" $PATH/UPD_HP_EN
 
     add wave -noupdate -group "$grp_name" -divider "Internals"
 
@@ -558,8 +566,6 @@ proc pkt_dispatcher {PATH} {
 
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/disp_fsm_mfb_sof
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/disp_fsm_mfb_eof
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/disp_fsm_mfb_sof
-    add_wave "-noupdate -group \"$grp_name\"" $PATH/disp_fsm_mfb_eof
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/disp_fsm_mfb_sof_pos
     add_wave "-noupdate -group \"$grp_name\" -bin" $PATH/disp_fsm_mfb_eof_pos
     add_wave "-noupdate -group \"$grp_name\"" $PATH/disp_fsm_mfb_src_rdy
