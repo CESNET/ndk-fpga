@@ -203,9 +203,10 @@ architecture FULL of TX_DMA_CALYPTE is
     signal trbuff_rd_en           : std_logic;
     signal trbuff_rd_data_vld     : std_logic;
 
-    signal hdr_fifo_tx_data    : std_logic_vector(62 + log2(CHANNELS) + 64 -1 downto 0);
-    signal hdr_fifo_tx_src_rdy : std_logic;
-    signal hdr_fifo_tx_dst_rdy : std_logic;
+    signal hdr_fifo_tx_data     : std_logic_vector(2*(62 + log2(CHANNELS) + 64) -1 downto 0);
+    signal hdr_fifo_tx_data_arr : slv_array_t(1 downto 0)(62 + log2(CHANNELS) + 64 -1 downto 0);
+    signal hdr_fifo_tx_src_rdy  : std_logic_vector(1 downto 0);
+    signal hdr_fifo_tx_dst_rdy  : std_logic;
 
     signal pkt_disp_mfb_meta_hdr_meta    : std_logic_vector(HDR_META_WIDTH -1 downto 0);
     signal pkt_disp_mfb_meta_chan        : std_logic_vector(log2(CHANNELS) -1 downto 0);
@@ -252,8 +253,8 @@ architecture FULL of TX_DMA_CALYPTE is
     signal fifox_mult_di            : slv_array_t(PCIE_CQ_MFB_REGIONS - 1 downto 0)(62 + log2(CHANNELS) + 64 - 1 downto 0);
     signal fifox_mult_wr            : std_logic_vector(PCIE_CQ_MFB_REGIONS - 1 downto 0);
     signal fifox_mult_full          : std_logic;
-    signal fifox_mult_rd            : std_logic_vector(0 downto 0);
-    signal fifox_mult_empty         : std_logic_vector(0 downto 0);
+    signal fifox_mult_rd            : std_logic_vector(1 downto 0);
+    signal fifox_mult_empty         : std_logic_vector(1 downto 0);
 begin
 
     assert (
@@ -506,13 +507,12 @@ begin
 
     st_sp_ctrl_mfb_dst_rdy <= not fifox_mult_full;
 
-    -- FIFOX MULTI: (2 to 1)
     dma_hdr_fifo_i : entity work.FIFOX_MULTI
     generic map (
         DATA_WIDTH      => 62 + log2(CHANNELS) + 64,
         ITEMS           => (2**(POINTER_WIDTH-3)) * CHANNELS,
         WRITE_PORTS     => PCIE_CQ_MFB_REGIONS,
-        READ_PORTS      => 1,
+        READ_PORTS      => 2,
         RAM_TYPE        => "AUTO",
         DEVICE          => DEVICE,
         SAFE_READ_MODE  => false
@@ -532,8 +532,9 @@ begin
         AEMPTY  => open
     );
 
-    hdr_fifo_tx_src_rdy <= not fifox_mult_empty(0);
-    fifox_mult_rd(0)    <= hdr_fifo_tx_dst_rdy;
+    hdr_fifo_tx_data_arr <= slv_array_deser(hdr_fifo_tx_data, 2);
+    hdr_fifo_tx_src_rdy  <= not fifox_mult_empty;
+    fifox_mult_rd        <= (0 => hdr_fifo_tx_dst_rdy, 1 => '0');
 
     tx_dma_pkt_dispatcher_i : entity work.TX_DMA_PKT_DISPATCHER
     generic map (
@@ -567,10 +568,14 @@ begin
         USR_MFB_SRC_RDY => pkt_disp_mfb_src_rdy,
         USR_MFB_DST_RDY => pkt_disp_mfb_dst_rdy,
 
-        HDR_BUFF_ADDR    => hdr_fifo_tx_data(62+log2(CHANNELS)+64 -1 downto log2(CHANNELS)+64),
-        HDR_BUFF_CHAN    => hdr_fifo_tx_data(log2(CHANNELS)+64 -1 downto 64),
-        HDR_BUFF_DATA    => hdr_fifo_tx_data(63 downto 0),
-        HDR_BUFF_SRC_RDY => hdr_fifo_tx_src_rdy,
+        HDR_BUFF_CHAN_NEXT    => hdr_fifo_tx_data_arr(1)(log2(CHANNELS)+64 -1 downto 64),
+        HDR_BUFF_DATA_NEXT    => hdr_fifo_tx_data_arr(1)(63 downto 0),
+        HDR_BUFF_SRC_RDY_NEXT => hdr_fifo_tx_src_rdy(1),
+
+        HDR_BUFF_ADDR    => hdr_fifo_tx_data_arr(0)(62+log2(CHANNELS)+64 -1 downto log2(CHANNELS)+64),
+        HDR_BUFF_CHAN    => hdr_fifo_tx_data_arr(0)(log2(CHANNELS)+64 -1 downto 64),
+        HDR_BUFF_DATA    => hdr_fifo_tx_data_arr(0)(63 downto 0),
+        HDR_BUFF_SRC_RDY => hdr_fifo_tx_src_rdy(0),
         HDR_BUFF_DST_RDY => hdr_fifo_tx_dst_rdy,
 
         BUFF_RD_CHAN     => trbuff_rd_chan,

@@ -66,6 +66,10 @@ entity TX_DMA_PKT_DISPATCHER is
         -- =========================================================================================
         -- Input interface from header buffer
         -- =========================================================================================
+        HDR_BUFF_CHAN_NEXT    : in std_logic_vector(log2(CHANNELS) -1 downto 0);
+        HDR_BUFF_DATA_NEXT    : in std_logic_vector(DMA_HDR_WIDTH -1 downto 0);
+        HDR_BUFF_SRC_RDY_NEXT : in std_logic;
+
         -- This is not an address for reading interface of the buffer, but the addres to which the
         -- current header has been written.
         HDR_BUFF_ADDR    : in  std_logic_vector(62 -1 downto 0);
@@ -106,13 +110,13 @@ architecture FULL of TX_DMA_PKT_DISPATCHER is
     -- =============================================================================================
     -- Internal parameters
     -- =============================================================================================
-    constant MFB_LENGTH     : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    constant META_LENGTH    : natural := HDR_META_WIDTH + log2(CHANNELS) + log2(PKT_SIZE_MAX + 1);
+    constant MFB_LENGTH  : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+    constant META_LENGTH : natural := HDR_META_WIDTH + log2(CHANNELS) + log2(PKT_SIZE_MAX + 1);
 
     -- =============================================================================================
     -- Dispatch FSM signals
     -- =============================================================================================
-    type   pkt_dispatch_state_t is (S_IDLE, S_PKT_BEGIN, S_PKT_MIDDLE, S_UPDATE_STATUS);
+    type   pkt_dispatch_state_t is (S_IDLE, S_PKT_BEGIN, S_PKT_MIDDLE);
     signal pkt_dispatch_pst : pkt_dispatch_state_t := S_IDLE;
     signal pkt_dispatch_nst : pkt_dispatch_state_t := S_IDLE;
 
@@ -127,9 +131,11 @@ architecture FULL of TX_DMA_PKT_DISPATCHER is
     signal disp_fsm_mfb_eof_pos : std_logic_vector(USR_MFB_EOF_POS'range);
     signal disp_fsm_mfb_src_rdy : std_logic;
 
-    signal fr_len_rounded       : unsigned(16 -1 downto 0);
+    signal fr_len_rounded      : unsigned(16 -1 downto 0);
+    signal fr_len_rounded_next : unsigned(16 -1 downto 0);
 
-    signal fr_ptr_adj : unsigned(DMA_FRAME_PTR_W -1 downto 0);
+    signal fr_ptr_adj      : unsigned(DMA_FRAME_PTR_W -1 downto 0);
+    signal fr_ptr_adj_next : unsigned(DMA_FRAME_PTR_W -1 downto 0);
 begin
 
     -- =============================================================================================
@@ -148,6 +154,14 @@ begin
             -- the units, the host software is communicating with.
             fr_ptr_adj     <= unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
             fr_len_rounded <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 31) and (not to_unsigned(31, 16));
+        end if;
+
+        if (HDR_BUFF_DATA_NEXT(DMA_P2P_EN) = "1") then
+            fr_ptr_adj_next     <= resize(unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_PTR)), 16 - 7) & "0000000";
+            fr_len_rounded_next <= (unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_LENGTH)) + 127) and (not to_unsigned(127, 16));
+        else
+            fr_ptr_adj_next     <= unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_PTR));
+            fr_len_rounded_next <= (unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_LENGTH)) + 31) and (not to_unsigned(31, 16));
         end if;
     end process;
 
@@ -175,14 +189,18 @@ begin
 
         case pkt_dispatch_pst is
             when S_IDLE =>
-                if (HDR_BUFF_SRC_RDY = '1') then -- and ENABLED_CHANS(to_integer(unsigned(HDR_BUFF_CHAN))) = '1') then
+                if (HDR_BUFF_SRC_RDY = '1') then  -- and ENABLED_CHANS(to_integer(unsigned(HDR_BUFF_CHAN))) = '1') then
                     pkt_dispatch_nst <= S_PKT_BEGIN;
                 end if;
 
             when S_PKT_BEGIN =>
                 if (BUFF_RD_DATA_VLD = '1') then
                     if (byte_cntr_pst <= (USR_MFB_DATA'length /8)) then
-                        pkt_dispatch_nst <= S_UPDATE_STATUS;
+                        if (HDR_BUFF_SRC_RDY_NEXT = '1') then
+                            pkt_dispatch_nst <= S_PKT_BEGIN;
+                        else
+                            pkt_dispatch_nst <= S_IDLE;
+                        end if;
                     else
                         pkt_dispatch_nst <= S_PKT_MIDDLE;
                     end if;
@@ -190,11 +208,12 @@ begin
 
             when S_PKT_MIDDLE =>
                 if (byte_cntr_pst <= (USR_MFB_DATA'length /8) and BUFF_RD_DATA_VLD = '1') then
-                    pkt_dispatch_nst <= S_UPDATE_STATUS;
+                    if (HDR_BUFF_SRC_RDY_NEXT = '1') then
+                        pkt_dispatch_nst <= S_PKT_BEGIN;
+                    else
+                        pkt_dispatch_nst <= S_IDLE;
+                    end if;
                 end if;
-
-            when S_UPDATE_STATUS =>
-                pkt_dispatch_nst <= S_IDLE;
         end case;
     end process;
 
@@ -212,11 +231,12 @@ begin
 
         HDR_BUFF_DST_RDY <= '0';
 
+        BUFF_RD_CHAN <= HDR_BUFF_CHAN;
         BUFF_RD_ADDR <= std_logic_vector(addr_cntr_pst);
         BUFF_RD_EN   <= '0';
 
         PKT_SENT_INC <= '0';
-        UPD_HP_EN   <= '0';
+        UPD_HP_EN    <= '0';
 
         dma_hdr_frame_length_v := unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH));
 
@@ -237,8 +257,8 @@ begin
                 BUFF_RD_EN <= USR_MFB_DST_RDY;
 
                 if (BUFF_RD_DATA_VLD = '1') then
-                    addr_cntr_nst        <= addr_cntr_pst + (USR_MFB_DATA'length /8);
-                    byte_cntr_nst        <= byte_cntr_pst - (USR_MFB_DATA'length /8);
+                    addr_cntr_nst <= addr_cntr_pst + (USR_MFB_DATA'length /8);
+                    byte_cntr_nst <= byte_cntr_pst - (USR_MFB_DATA'length /8);
 
                     disp_fsm_mfb_sof     <= "1";
                     disp_fsm_mfb_src_rdy <= '1';
@@ -249,38 +269,62 @@ begin
                         disp_fsm_mfb_eof     <= "1";
                         -- take only the lower bits from the frame length
                         disp_fsm_mfb_eof_pos <= std_logic_vector(dma_hdr_frame_length_v(USR_MFB_EOF_POS'range) - 1);
+                        HDR_BUFF_DST_RDY     <= USR_MFB_DST_RDY;
+                        PKT_SENT_INC         <= USR_MFB_DST_RDY;
+                        UPD_HP_EN            <= USR_MFB_DST_RDY;
+
+                        -- Take the next packet to be read but only if the output interface is
+                        -- ready, otherwise data get lost. This is a performance improvement that
+                        -- removes a one-clock-cycle gap between packets.
+                        if (HDR_BUFF_SRC_RDY_NEXT = '1' and USR_MFB_DST_RDY = '1') then
+                            dma_hdr_frame_length_v := unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_LENGTH));
+                            addr_cntr_nst          <= resize(fr_ptr_adj_next, addr_cntr_nst'length) + (USR_MFB_DATA'length /8);
+                            byte_cntr_nst          <= resize(dma_hdr_frame_length_v, byte_cntr_nst'length);
+
+                            BUFF_RD_CHAN <= HDR_BUFF_CHAN_NEXT;
+                            BUFF_RD_ADDR <= std_logic_vector(resize(fr_ptr_adj_next, BUFF_RD_ADDR'length));
+                            BUFF_RD_EN   <= '1';
+                        end if;
                     end if;
                 else
                     BUFF_RD_ADDR <= std_logic_vector(addr_cntr_pst - (USR_MFB_DATA'length /8));
                 end if;
-
 
             when S_PKT_MIDDLE =>
 
                 BUFF_RD_EN <= USR_MFB_DST_RDY;
 
                 if (BUFF_RD_DATA_VLD = '1') then
-                    addr_cntr_nst        <= addr_cntr_pst + (USR_MFB_DATA'length /8);
-                    byte_cntr_nst        <= byte_cntr_pst - (USR_MFB_DATA'length /8);
+                    addr_cntr_nst <= addr_cntr_pst + (USR_MFB_DATA'length /8);
+                    byte_cntr_nst <= byte_cntr_pst - (USR_MFB_DATA'length /8);
 
                     disp_fsm_mfb_src_rdy <= '1';
 
                     if (byte_cntr_pst <= (USR_MFB_DATA'length /8)) then
                         disp_fsm_mfb_eof     <= "1";
                         disp_fsm_mfb_eof_pos <= std_logic_vector(dma_hdr_frame_length_v(USR_MFB_EOF_POS'range) - 1);
+                        HDR_BUFF_DST_RDY     <= USR_MFB_DST_RDY;
+                        PKT_SENT_INC         <= USR_MFB_DST_RDY;
+                        UPD_HP_EN            <= USR_MFB_DST_RDY;
+
+                        -- Take the next packet to be read but only if the output interface is
+                        -- ready, otherwise data get lost. This is a performance improvement that
+                        -- removes a one-clock-cycle gap between packets.
+                        if (HDR_BUFF_SRC_RDY_NEXT = '1' and USR_MFB_DST_RDY = '1') then
+                            dma_hdr_frame_length_v := unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_LENGTH));
+                            addr_cntr_nst          <= resize(fr_ptr_adj_next, addr_cntr_nst'length) + (USR_MFB_DATA'length /8);
+                            byte_cntr_nst          <= resize(dma_hdr_frame_length_v, byte_cntr_nst'length);
+
+                            BUFF_RD_CHAN <= HDR_BUFF_CHAN_NEXT;
+                            BUFF_RD_ADDR <= std_logic_vector(resize(fr_ptr_adj_next, BUFF_RD_ADDR'length));
+                            BUFF_RD_EN   <= '1';
+                        end if;
                     end if;
                 else
                     BUFF_RD_ADDR <= std_logic_vector(addr_cntr_pst - (USR_MFB_DATA'length /8));
                 end if;
-
-            when S_UPDATE_STATUS =>
-                HDR_BUFF_DST_RDY <= USR_MFB_DST_RDY;
-                PKT_SENT_INC     <= USR_MFB_DST_RDY;
-                UPD_HP_EN        <= USR_MFB_DST_RDY;
         end case;
     end process;
-
-    BUFF_RD_CHAN <= HDR_BUFF_CHAN;
 
     PKT_SENT_CHAN  <= HDR_BUFF_CHAN;
     PKT_SENT_BYTES <= HDR_BUFF_DATA(DMA_FRAME_LENGTH)(PKT_SENT_BYTES'range);
@@ -297,6 +341,10 @@ begin
             if (RESET = '1') then
                 USR_MFB_SRC_RDY <= '0';
             elsif (USR_MFB_DST_RDY = '1') then
+                USR_MFB_META_HDR_META <= resize(HDR_BUFF_DATA(DMA_USR_METADATA), HDR_META_WIDTH);
+                USR_MFB_META_CHAN     <= HDR_BUFF_CHAN;
+                USR_MFB_META_PKT_SIZE <= HDR_BUFF_DATA(DMA_FRAME_LENGTH)(USR_MFB_META_PKT_SIZE'range);
+
                 USR_MFB_DATA    <= BUFF_RD_DATA;
                 USR_MFB_SOF     <= disp_fsm_mfb_sof;
                 USR_MFB_EOF     <= disp_fsm_mfb_eof;
@@ -305,10 +353,6 @@ begin
             end if;
         end if;
     end process;
-
-    USR_MFB_META_HDR_META <= resize(HDR_BUFF_DATA(DMA_USR_METADATA),HDR_META_WIDTH);
-    USR_MFB_META_CHAN     <= HDR_BUFF_CHAN;
-    USR_MFB_META_PKT_SIZE <= HDR_BUFF_DATA(DMA_FRAME_LENGTH)(USR_MFB_META_PKT_SIZE'range);
 
     USR_MFB_SOF_POS <= (others => '0');
 end architecture;

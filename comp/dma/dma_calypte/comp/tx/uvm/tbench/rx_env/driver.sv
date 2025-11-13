@@ -449,8 +449,8 @@ class driver #(
             debug_msg = {debug_msg, "-----------------------------------------------\n"};
             debug_msg = {debug_msg, $sformatf("\tdata_addr 0x%h(%0d)\n", pcie_trans_ptr, pcie_trans_ptr)};
             debug_msg = {debug_msg, $sformatf("\tpcie_addr 0x%h(%0d)\n", pcie_addr, pcie_addr)};
-            debug_msg = {debug_msg, $sformatf("\tpcie_addr 0x%h(%0d) - CUTOUT\n", pcie_addr[DATA_POINTER_WIDTH-1 : 2],
-                                              pcie_addr[DATA_POINTER_WIDTH-1 : 2])};
+            debug_msg = {debug_msg, $sformatf("\tpcie_addr 0x%h(%0d) - CUTOUT\n", pcie_addr[DATA_POINTER_WIDTH-2-1 : 2],
+                                              pcie_addr[DATA_POINTER_WIDTH-2-1 : 2])};
             debug_msg = {debug_msg, $sformatf("\tpcie_len  %0d dwords (%0d B)\n", pcie_len, data_index)};
             debug_msg = {debug_msg, $sformatf("\tfbe %b lbe %b\n", fbe, lbe)};
             debug_msg = {debug_msg, print_data(data)};
@@ -482,7 +482,7 @@ class driver #(
             m_data_export.put(m_channel, pcie_transactions[it].meta, pcie_transactions[it].data);
 
             m_driv_data.data_addr = (m_driv_data.data_addr + trans_byte_size) & m_driv_data.data_mask;
-            debug_msg = {debug_msg, $sformatf("\tNew internal data ptr: 0x%h\n", m_driv_data.data_addr)};
+            debug_msg = {debug_msg, $sformatf("\tNew internal data ptr: %0d (0x%h)\n", m_driv_data.data_addr, m_driv_data.data_addr)};
             m_driv_data.data_free_space -= trans_byte_size;
         end
 
