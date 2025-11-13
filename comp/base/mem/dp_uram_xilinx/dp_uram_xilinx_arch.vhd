@@ -9,8 +9,15 @@
 --
 -- $Id$
 --
--- TODO:
---
+-- TODO: This implementation should be refactored and polished:
+--          1. The DEVICE generic set to BEHAVIORAL is not used anywhere in the NDK platform since
+--          this is already provided by behavioral architectures like DP_BRAM_BEHAV and can be
+--          easily obtained within Vivado's language templates.
+--          2. The simulation should be replaced by CocoTB or UVM verification to properly test this
+--          fundamental component.
+--          3. A byte-enable feature should be connected and made available on the WEA and WEB
+--          ports since URAM macro xpm_memory_tdpram does support this by setting BYTE_WRITE_WIDTH_A
+--          and BYTE_WRITE_WIDTH_B to 8.
 --
 library IEEE;
 use IEEE.std_logic_1164.all;
