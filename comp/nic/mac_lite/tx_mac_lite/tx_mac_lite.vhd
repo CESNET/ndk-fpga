@@ -69,7 +69,9 @@ entity TX_MAC_LITE is
         -- Maximum number of Transactions waiting for space insertion
         -- Ignored when IPG_GENERATE_EN==false
         TRANS_FIFO_SIZE : natural := 128;
-        -- Low-latency mode: do not discard errornous frames
+        -- Low-latency mode: buffering is disabled, therefore erroneous frames are not discarded
+        -- Also, frames may be corrupted when the MAC is disabled/enabled during ongoing traffic
+        -- Use with care and only if you know what you are doing
         LL_MODE         : boolean := false;
         -- FPGA device name.
         DEVICE          : string := "STRATIX10";
@@ -423,9 +425,10 @@ begin
     fl_mfb_frame_len_arr <= slv_array_deser(fl_mfb_frame_len,MD_REGIONS,LEN_WIDTH);
 
     fl_mfb_discard_g : for r in 0 to MD_REGIONS-1 generate
-        fl_mfb_undersize(r)   <= '1' when (unsigned(fl_mfb_frame_len_arr(r)) < FRAME_LEN_MIN) else '0';
+        fl_mfb_undersize(r)   <= '1' when (unsigned(fl_mfb_frame_len_arr(r)) < FRAME_LEN_MIN) and (not LL_MODE) else '0';
         fl_mfb_discard(r)     <= fl_mfb_undersize(r) or ctrl_ld_discard or ctrl_off_discard;
-        fl_mfb_discard_vld(r) <= fl_mfb_discard(r) and fl_mfb_eof(r) and fl_mfb_src_rdy;
+        fl_mfb_discard_vld(r) <= fl_mfb_discard(r) and fl_mfb_src_rdy and fl_mfb_eof(r) when (not LL_MODE) else
+                                 fl_mfb_discard(r) and fl_mfb_src_rdy;
     end generate;
 
     fl_mfb_dst_rdy <= fd_mfb_dst_rdy and crc_mfb_dst_rdy;
@@ -680,7 +683,7 @@ begin
             sp_mfb_sof      <= fd_mfb_sof;
             sp_mfb_eof      <= fd_mfb_eof;
             fd_mfb_dst_rdy  <= sp_mfb_dst_rdy;
-            sp_mfb_src_rdy  <= fd_mfb_src_rdy;
+            sp_mfb_src_rdy  <= fd_mfb_src_rdy and (not (or fd_mfb_discard));
         end generate;
     end generate;
 
