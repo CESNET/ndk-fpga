@@ -24,7 +24,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
     int unsigned response_only;
     rand int unsigned transactions;
     rand int unsigned bar_probability[];
-    protected pcie_info   info;
+    protected pcie_info#(8)   info;
 
     const int unsigned payload_max = MAX_PAYLOAD_SIZE < 1024 ? MAX_PAYLOAD_SIZE : 0;
     rand logic [10-1:0] length_max;
@@ -110,13 +110,18 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
         while (it < transactions /*&& (state == null || state.next())*/) begin
             //assert(std::randomize(rq))
             //generate CQ nebo RC
-            std::randomize(cq) with { cq dist {1'b1 :/ 5,  1'b0 :/ info.rq_hdr.size()}; };
+            assert(std::randomize(cq) with { cq dist {1'b1 :/ 5,  1'b0 :/ info.rq_hdr.size()}; }) else begin
+                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize cq item");
+            end
+
 
             if (cq == 1 && response_only == 0) begin
                 logic [16-1:0] dev_id_act;
                 uvm_pcie::request_header cq_hdr;
 
-                std::randomize(dev_id_act) with {dev_id_act inside {dev_id};};
+                assert(std::randomize(dev_id_act) with {dev_id_act inside {dev_id};}) else begin
+                    `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize device id");
+                end
                 wait (info.cq_tags[dev_id_act].size() < 256);
 
                 cq_hdr = uvm_pcie::request_header::type_id::create("cq_hdr", m_sequencer);
@@ -226,7 +231,7 @@ class sequence_base extends uvm_sequence #(uvm_pcie::header);
             // If there is notnigh to send, then prevent to infinite loop by add some waiting time.
             if (info.rq_hdr.size() == 0 && (cq == 0 || response_only != 0)) begin
                 int unsigned wait_time;
-                std::randomize(wait_time) with {wait_time inside {[10:333]};};
+                assert(std::randomize(wait_time) with {wait_time inside {[10:333]};})
                 #(wait_time*1ns);
             end
 

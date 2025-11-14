@@ -28,14 +28,12 @@ class transaction_info extends uvm_component;
                 uvm_pcie::header hdr;
 
                 fifo_cc.get(hdr);
-                $write("TEST CC %0s\n", hdr.convert2string());
             end
 
             if (fifo_rq.used() != 0) begin
                 uvm_pcie::header hdr;
 
                 fifo_rq.get(hdr);
-                $write("TEST CC %0s\n", hdr.convert2string());
             end
     endtask
 
