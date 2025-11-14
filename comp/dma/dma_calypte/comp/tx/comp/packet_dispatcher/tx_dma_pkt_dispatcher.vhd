@@ -225,17 +225,11 @@ begin
 
                 -- Change to common signal
                 if (HDR_BUFF_SRC_RDY = '1') then
-                    -- NOTE: Leave this here because this appeared from the testing in hardware and
-                    -- not from the verification.
-                    -- if (ENABLED_CHANS(to_integer(unsigned(HDR_BUFF_CHAN))) = '0') then
-                    --     HDR_BUFF_DST_RDY <= '1';
-                    -- else
                     addr_cntr_nst <= resize(fr_ptr_adj, addr_cntr_nst'length) + (USR_MFB_DATA'length /8);
                     byte_cntr_nst <= resize(dma_hdr_frame_length_v, byte_cntr_nst'length);
 
                     BUFF_RD_ADDR <= std_logic_vector(resize(fr_ptr_adj, BUFF_RD_ADDR'length));
                     BUFF_RD_EN   <= '1';
-                    -- end if;
                 end if;
 
             when S_PKT_BEGIN =>
