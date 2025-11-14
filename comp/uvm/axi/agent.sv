@@ -5,21 +5,25 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This is AXI rx agent, which declares basic components.
-class agent_rx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_agent;
+class agent_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_agent;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_axi::agent_rx #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+    `uvm_component_param_utils(uvm_axi::agent_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    uvm_analysis_port #(sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS)) analysis_port;
+    uvm_analysis_port #(sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)) analysis_port;
 
     // ------------------------------------------------------------------------
     // Agent's base components
-    sequencer       #(DATA_WIDTH, TUSER_WIDTH, REGIONS) m_sequencer;
-    driver_rx       #(DATA_WIDTH, TUSER_WIDTH, REGIONS) m_driver;
-    monitor         #(DATA_WIDTH, TUSER_WIDTH, REGIONS) m_monitor;
+    sequencer       #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_sequencer;
+    driver_rx       #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_driver;
+    monitor         #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_monitor;
     config_item                                         m_config;
 
     // ------------------------------------------------------------------------
@@ -40,12 +44,12 @@ class agent_rx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("m_sequencer", this);
-            m_driver    = driver_rx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("m_driver", this);
+            m_sequencer = sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_sequencer", this);
+            m_driver    = driver_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_driver", this);
         end
 
         // Create monitor
-        m_monitor   = monitor #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("m_monitor", this);
+        m_monitor   = monitor #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_monitor", this);
     endfunction
 
     virtual function uvm_active_passive_enum get_is_active();
@@ -55,12 +59,12 @@ class agent_rx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned
     function void connect_phase(uvm_phase phase);
 
         // Interface to connect with
-        virtual axi_if #(DATA_WIDTH, TUSER_WIDTH) vif;
+        virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) vif;
 
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual axi_if #(DATA_WIDTH, TUSER_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if(!uvm_config_db #(virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
             `uvm_fatal(this.get_full_name(), {"\n\tCannot find 'axi_if' with name ", m_config.interface_name, " inside uvm_config_db, probably not set!"})
         end
 
@@ -78,21 +82,25 @@ class agent_rx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned
 endclass
 
 // This is AXI tx agent, which declares basic components.
-class agent_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_agent;
+class agent_tx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_agent;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_axi::agent_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+    `uvm_component_param_utils(uvm_axi::agent_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    uvm_analysis_port #(sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS)) analysis_port;
+    uvm_analysis_port #(sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)) analysis_port;
 
     // ------------------------------------------------------------------------
     // Agent's base components
-    sequencer       #(DATA_WIDTH, TUSER_WIDTH, REGIONS) m_sequencer;
-    driver_tx       #(DATA_WIDTH, TUSER_WIDTH, REGIONS) m_driver;
-    monitor         #(DATA_WIDTH, TUSER_WIDTH, REGIONS) m_monitor;
+    sequencer       #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_sequencer;
+    driver_tx       #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_driver;
+    monitor         #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_monitor;
     config_item                                                                 m_config;
 
     // ------------------------------------------------------------------------
@@ -113,12 +121,12 @@ class agent_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("m_sequencer", this);
-            m_driver    = driver_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("m_driver", this);
+            m_sequencer = sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_sequencer", this);
+            m_driver    = driver_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_driver", this);
         end
 
         // Create monitor
-        m_monitor   = monitor #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("m_monitor", this);
+        m_monitor   = monitor #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_monitor", this);
     endfunction
 
     virtual function uvm_active_passive_enum get_is_active();
@@ -128,12 +136,12 @@ class agent_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned
     function void connect_phase(uvm_phase phase);
 
         // Interface to connect with
-        virtual axi_if #(DATA_WIDTH, TUSER_WIDTH) vif;
+        virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) vif;
 
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual axi_if #(DATA_WIDTH, TUSER_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if(!uvm_config_db #(virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
             `uvm_fatal(this.get_full_name(), {"\n\tCannot find 'axi_if' with name ", m_config.interface_name, " inside uvm_config_db, probably not set!"})
         end
 

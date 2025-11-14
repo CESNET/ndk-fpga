@@ -4,12 +4,16 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_simple_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_common::sequence_base #(config_sequence, uvm_axi::sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS));
-    `uvm_object_param_utils(uvm_axi::sequence_simple_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+class sequence_simple_tx #(
+    int unsigned ITEM,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, uvm_axi::sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
+    `uvm_object_param_utils(uvm_axi::sequence_simple_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS) req;
+    sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH) req;
     uvm_common::rand_rdy          rdy;
 
     int unsigned max_transaction_count = 100;
@@ -45,7 +49,7 @@ class sequence_simple_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, in
         rdy.bound_set(cfg.rdy_probability_min, cfg.rdy_probability_max);
 
         // Generate transaction_count transactions
-        req = sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("req");
+        req = sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("req");
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
             // Create a request for sequence item
@@ -55,12 +59,16 @@ class sequence_simple_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, in
     endtask
 endclass
 
-class sequence_full_speed_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS));
-    `uvm_object_param_utils(uvm_axi::sequence_full_speed_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+class sequence_full_speed_tx #(
+    int unsigned ITEM,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
+    `uvm_object_param_utils(uvm_axi::sequence_full_speed_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS) req;
+    sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH) req;
 
     int unsigned max_transaction_count = 100;
     int unsigned min_transaction_count = 10;
@@ -91,7 +99,7 @@ class sequence_full_speed_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH
             state = null;
         end
         // Generate transaction_count transactions
-        req = sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("req");
+        req = sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("req");
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
             // Create a request for sequence item
@@ -101,12 +109,16 @@ class sequence_full_speed_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH
     endtask
 endclass
 
-class sequence_stop_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS));
-    `uvm_object_param_utils(uvm_axi::sequence_stop_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+class sequence_stop_tx #(
+    int unsigned ITEM,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
+    `uvm_object_param_utils(uvm_axi::sequence_stop_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS) req;
+    sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH) req;
 
     int unsigned max_transaction_count = 50;
     int unsigned min_transaction_count = 10;
@@ -137,7 +149,7 @@ class sequence_stop_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int 
             state = null;
         end
         // Generate transaction_count transactions
-        req = sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("req");
+        req = sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("req");
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
             // Create a request for sequence item
@@ -150,9 +162,13 @@ endclass
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
-class sequence_lib_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_common::sequence_library#(config_sequence, uvm_axi::sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS));
-  `uvm_object_param_utils(uvm_axi::sequence_lib_tx#(DATA_WIDTH, TUSER_WIDTH, REGIONS))
-  `uvm_sequence_library_utils(uvm_axi::sequence_lib_tx#(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+class sequence_lib_tx #(
+    int unsigned ITEM,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_common::sequence_library#(config_sequence, uvm_axi::sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
+  `uvm_object_param_utils(uvm_axi::sequence_lib_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH))
+  `uvm_sequence_library_utils(uvm_axi::sequence_lib_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH))
 
   function new(string name = "sequence_lib_tx");
     super.new(name);
@@ -163,9 +179,9 @@ class sequence_lib_tx #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int u
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         super.init_sequence(param_cfg);
-        this.add_sequence(uvm_axi::sequence_simple_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::get_type());
-        this.add_sequence(uvm_axi::sequence_full_speed_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::get_type());
-        this.add_sequence(uvm_axi::sequence_stop_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::get_type());
+        this.add_sequence(uvm_axi::sequence_simple_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH)::get_type());
+        this.add_sequence(uvm_axi::sequence_full_speed_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH)::get_type());
+        this.add_sequence(uvm_axi::sequence_stop_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH)::get_type());
     endfunction
 endclass
 
