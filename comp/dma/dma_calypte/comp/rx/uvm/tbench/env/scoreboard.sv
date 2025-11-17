@@ -4,8 +4,18 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_dma_ll::scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH))
+class scoreboard #(
+    int unsigned USR_MFB_ITEM_WIDTH,
+    int unsigned CHANNELS,
+    int unsigned PKT_SIZE_MAX,
+    int unsigned META_WIDTH,
+    string DEVICE,
+    int unsigned POINTER_WIDTH,
+    int unsigned SW_ADDR_WIDTH
+) extends uvm_scoreboard;
+
+    `uvm_component_param_utils(uvm_dma_ll::scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVICE,
+                                                        POINTER_WIDTH, SW_ADDR_WIDTH))
 
     localparam LOGIC_WIDTH            = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
     localparam IS_INTEL_DEV           = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
@@ -89,14 +99,16 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
         m_output_speed_stat      = new();
     endfunction
 
-    function void regmodel_set(regmodel#(CHANNELS) m_regmodel);
+    function void regmodel_set(regmodel #(CHANNELS) m_regmodel);
         m_dma_model.regmodel_set(m_regmodel);
     endfunction
 
     //build phase
     function void build_phase(uvm_phase phase);
-        m_dma_model         = dma_model #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX)::type_id::create("m_dma_model", this);
-        m_ptr_updater_model = ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH)::type_id::create("m_ptr_updater_model", this);
+        m_dma_model         = dma_model #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX)::type_id
+                              ::create("m_dma_model", this);
+        m_ptr_updater_model = ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH)::type_id
+                              ::create("m_ptr_updater_model", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -127,9 +139,10 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
     endfunction
 
     function bit pcie_compare(
-                              uvm_logic_vector_array::sequence_item#(32) tr_dut,
-                              uvm_logic_vector::sequence_item#(META_WIDTH) tr_meta_dut,
-                              uvm_pcie::request_header tr_dma_model);
+                              uvm_logic_vector_array::sequence_item #(32)   tr_dut,
+                              uvm_logic_vector::sequence_item #(META_WIDTH) tr_meta_dut,
+                              uvm_pcie::request_header                      tr_dma_model
+                              );
         bit ret = 1;
 
         logic [3-1:0]   fmt;
@@ -157,16 +170,20 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
             logic [1-1:0] ln = 0;
 
             // This is strench
-            {fmt, pcie_type, tag_9, tc, tag_8, attr[2], ln, th, td, ep, attr[2-1:0], at, length} = tr_meta_dut.data[32-1 -: 32];
+            {fmt, pcie_type, tag_9, tc, tag_8, attr[2], ln, th, td, ep, attr[2-1:0], at, length}
+                = tr_meta_dut.data[32-1 -: 32];
             if (fmt[0] == 1'b0) begin
                 addr[64-1:32] = 0;
-                {requester_id, tag, lbe, fbe, addr[32-1:2], ph} = {tr_meta_dut.data[64-1 -: 32], tr_meta_dut.data[96-1 -: 32]};
+                {requester_id, tag, lbe, fbe, addr[32-1:2], ph} = {tr_meta_dut.data[64-1 -: 32],
+                                                                   tr_meta_dut.data[96-1 -: 32]};
             end else begin
-                {requester_id, tag, lbe, fbe, addr, ph} = {tr_meta_dut.data[64-1 -: 32], tr_meta_dut.data[96-1 -: 32], tr_meta_dut.data[128-1 -: 32]};
+                {requester_id, tag, lbe, fbe, addr, ph} = {tr_meta_dut.data[64-1 -: 32], tr_meta_dut.data[96-1 -: 32],
+                                                           tr_meta_dut.data[128-1 -: 32]};
             end
 
             if ({fmt, pcie_type} != 8'b01100000 && {fmt, pcie_type} != 8'b01000000) begin
-                `uvm_error(this.get_full_name(), $sformatf("\nUnsupporte request\n\tfmt : 0x%h\n\ttype : 0x%h\n", fmt, pcie_type));
+                `uvm_error(this.get_full_name(),
+                           $sformatf("\nUnsupporte request\n\tfmt : 0x%h\n\ttype : 0x%h\n", fmt, pcie_type));
             end
 
 
@@ -185,7 +202,8 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
             logic [4-1:0]  rq_type;
             logic [32-1:0] hdr[4];
 
-            {ecrc, attr, tc, rq_id_enabled, cm_id, tag, requester_id, ep, rq_type, dword_count, addr[64-1:2], at} = {tr_dut.data[3], tr_dut.data[2], tr_dut.data[1], tr_dut.data[0]};
+            {ecrc, attr, tc, rq_id_enabled, cm_id, tag, requester_id, ep, rq_type, dword_count, addr[64-1:2], at}
+                = {tr_dut.data[3], tr_dut.data[2], tr_dut.data[1], tr_dut.data[0]};
             data = new[tr_dut.data.size() -4];
             for (int unsigned it = 0; it < tr_dut.data.size() -4; it++) begin
                 data[it] = tr_dut.data[it+4];
@@ -224,7 +242,8 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
         ret &= (length         ==? tr_dma_model.length) === 1'b1;
         ret &= (ph             ==? tr_dma_model.ph) === 1'b1;
 
-        min_length= ((tr_dut.data.size()-4) < tr_dma_model.data.size()) ? tr_dut.data.size()-4 : tr_dma_model.data.size();
+        min_length= ((tr_dut.data.size()-4) < tr_dma_model.data.size()) ?
+                    tr_dut.data.size()-4 : tr_dma_model.data.size();
 
         if ((length == tr_dma_model.length) && (tr_dut.data.size()-4 == tr_dma_model.data.size())) begin
             for (int j = 0; j < 4; j++) begin
@@ -245,8 +264,12 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
 
             //Check pcie requiretments
             if (data.size() > MPS || (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE)) begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tPacket doesn't meet pcie requirements.\n\t\tPacket size %0d\n\t\tMaximum payload(%0d) exceeded %0d\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
-                                        data.size(), MPS, data.size() > MPS, PAGE_SIZE, (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE), addr));
+                string err_msg = $sformatf("\n\tPacket doesn't meet pcie requirements.");
+                err_msg = {err_msg, $sformaf("\n\t\tPacket size %0d", data.size())};
+                err_msg = {err_msg, $sformaf("\n\t\tMaximum payload(%0d) exceeded %0d", MPS, data.size() > MPS)};
+                err_msg = {err_msg, $sformaf("\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h", PAGE_SIZE,
+                                             (((addr & (PAGE_SIZE-1)) + data.size()) > PAGE_SIZE), addr)};
+                `uvm_error(this.get_full_name(), err_msg);
             end
         end
 
@@ -258,9 +281,9 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
         time         speed_start_time  = 0ns;
 
         forever begin
-            uvm_logic_vector_array::sequence_item#(USR_MFB_ITEM_WIDTH) tr;
-            time                                                       time_act;
-            time                                                       speed_metet_duration;
+            uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH) tr;
+            time                                                        time_act;
+            time                                                        speed_metet_duration;
 
             m_input_speed_meter_fifo.get(tr);
             time_act = $time();
@@ -332,17 +355,33 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
                 m_dma_model_output_fifo.get(packet_dma_model);
 
                 m_dma_tr_compared++;
-                msg = $sformatf("\nDMA Segments compared : %0d, segments erroneous: %0d. Channel: %0d, Packet num %0d", m_dma_tr_compared, m_dma_tr_errors, packet_dma_model.channel, packet_dma_model.packet_num);
+                msg = $sformatf("\nDMA Segments compared : %0d, segments erroneous: %0d. Channel: %0d, Packet num %0d",
+                                m_dma_tr_compared, m_dma_tr_errors, packet_dma_model.channel,
+                                packet_dma_model.packet_num);
 
                 if (pcie_compare(tr_dut.item, tr_dut.meta, packet_dma_model) == 0) begin
                     m_dma_tr_errors++;
 
-                    msg = {msg, $sformatf("\nExpected transaction is:\n\t\tPart is : %s\n\t\tChannel : %0d\n\t\tPart %0d/%0d\n\t\tInput time\n\t\t\t",  packet_dma_model.data_packet == 1 ? "DATA" : "HEADER",  packet_dma_model.channel, packet_dma_model.part, packet_dma_model.part_num, packet_dma_model.time2string())};
-                    msg = {msg, $sformatf("\n\tDUT Transaction doesnt match Model transaction\n\tDUT Transaction : \n\tMETA : %s\n\tDATA : %s\nMODEL TRANSACTION %s\n", tr_dut.meta.convert2string(), tr_dut.item.convert2string(), packet_dma_model.convert2string())};
+                    msg = {msg, $sformatf("\nExpected transaction is:\n\t\tPart is : %s",
+                                          packet_dma_model.data_packet == 1 ? "DATA" : "HEADER")};
+                    msg = {msg, $sformatf("\n\t\tChannel : %0d", packet_dma_model.channel)};
+                    msg = {msg, $sformatf("\n\t\tPart %0d/%0d", packet_dma_model.part, packet_dma_model.part_num)};
+                    msg = {msg, $sformatf("\n\t\tInput time\n\t\t\t", packet_dma_model.time2string())};
+                    msg = {msg, $sformatf("\n\tDUT Transaction doesnt match Model transaction")};
+                    msg = {msg, $sformatf("\n\tDUT Transaction: \n\tMETA: %s\n\tDATA: %s",
+                                          tr_dut.meta.convert2string(), tr_dut.item.convert2string())};
+                    msg = {msg, $sformatf("\nMODEL TRANSACTION %s\n", packet_dma_model.convert2string())};
                     `uvm_error(this.get_full_name(), msg);
                 end else begin
-                    msg = {msg, $sformatf("\nRecive correct transaction :\n\t\tSegment contains: %s\n\t\tChannel : %0d\n\t\tPart %0d/%0d\n\t\tPart is delay from SOF on input %0dns",  packet_dma_model.data_packet == 1 ? "DATA" : "HEADER",  packet_dma_model.channel, packet_dma_model.part, packet_dma_model.part_num, (tr_dut.output_time - packet_dma_model.time_last())/1ns)};
-                    `uvm_info(this.get_full_name(), $sformatf("%s\nTransaction%s", msg, packet_dma_model.convert2string()), UVM_MEDIUM);
+                    msg = {msg, $sformatf("\nRecive correct transaction:")};
+                    msg = {msg, $sformatf("\n\t\tSegment contains: %s", packet_dma_model.data_packet == 1
+                                          ? "DATA" : "HEADER")};
+                    msg = {msg, $sformatf("\n\t\tChannel: %0d", packet_dma_model.channel)};
+                    msg = {msg, $sformatf("\n\t\tPart %0d/%0d", packet_dma_model.part, packet_dma_model.part_num)};
+                    msg = {msg, $sformatf("\n\t\tPart is delay from SOF on input %0dns",
+                                          (tr_dut.output_time - packet_dma_model.time_last())/1ns)};
+                    `uvm_info(this.get_full_name(), $sformatf("%s\nTransaction%s", msg,
+                                                              packet_dma_model.convert2string()), UVM_MEDIUM);
 
                     //Count delay if you get first data packet.
                     if (packet_dma_model.part == 1 && packet_dma_model.data_packet == 1) begin
@@ -360,13 +399,16 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
                 m_ptr_upd_model_output_fifo.get(ptr_upd_model_tr);
 
                 m_ptr_upd_tr_compared++;
-                msg = $sformatf("\nPTR_UPD tr compared : %0d, PTR_UPD tr erroneous: %0d.", m_ptr_upd_tr_compared, m_ptr_upd_tr_errors);
+                msg = $sformatf("\nPTR_UPD tr compared : %0d, PTR_UPD tr erroneous: %0d.",
+                                m_ptr_upd_tr_compared, m_ptr_upd_tr_errors);
 
                 if (pcie_compare(ptr_upd_dut_tr_data, ptr_upd_dut_tr_meta, ptr_upd_model_tr) == 0) begin
                     m_ptr_upd_tr_errors++;
 
-                    msg = {msg, $sformatf("\nTransactions DO NOT match!\n\t====== DUT ======\n\tMETA: %s\n\tDATA: %s\n\n\t====== MODEL ======\n\t%s\n",
-                                          ptr_upd_dut_tr_meta.convert2string(), ptr_upd_dut_tr_data.convert2string(), ptr_upd_model_tr.convert2string())};
+                    msg = {msg, $sformatf("\nTransactions DO NOT match!")};
+                    msg = {msg, $sformatf("\n\t====== DUT ======\n\tMETA: %s\n\tDATA: %s\n",
+                                          ptr_upd_dut_tr_meta.convert2string(), ptr_upd_dut_tr_data.convert2string())};
+                    msg = {msg, $sformatf("\n\t====== MODEL ======\n\t%s\n", ptr_upd_model_tr.convert2string())};
                     `uvm_error(this.get_full_name(), msg);
                 end else begin
                     msg = {msg, $sformatf("\nReceived correct transaction: %s", ptr_upd_model_tr.convert2string())};
@@ -380,14 +422,17 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
     function void check_phase(uvm_phase phase);
         string msg = "";
 
-        if (m_pcie_rq_mfb_data_fifo.size() != 0 || m_pcie_rq_mfb_meta_fifo.size() != 0 || m_dma_model_output_fifo.size() != 0
-            || m_ptr_upd_mfb_data_fifo.size() != 0 || m_ptr_upd_mfb_meta_fifo.size() != 0 || m_ptr_upd_model_output_fifo.size() != 0) begin
+        if (m_pcie_rq_mfb_data_fifo.size() != 0 || m_pcie_rq_mfb_meta_fifo.size() != 0
+            || m_dma_model_output_fifo.size() != 0 || m_ptr_upd_mfb_data_fifo.size() != 0
+            || m_ptr_upd_mfb_meta_fifo.size() != 0 || m_ptr_upd_model_output_fifo.size() != 0) begin
 
             msg = {msg, "\nExpected some data\n:"};
             msg = {msg, $sformatf("\tDMA MODEL transactions: (%0d)\n", m_dma_model_output_fifo.size())};
-            msg = {msg, $sformatf("\tDMA DUT data packets: (%0d), meta: (%0d)\n", m_pcie_rq_mfb_data_fifo.size(), m_pcie_rq_mfb_meta_fifo.size())};
+            msg = {msg, $sformatf("\tDMA DUT data packets: (%0d), meta: (%0d)\n", m_pcie_rq_mfb_data_fifo.size(),
+                                  m_pcie_rq_mfb_meta_fifo.size())};
             msg = {msg, $sformatf("\tPTR_UPDATER MODEL transactions: (%0d)\n", m_ptr_upd_model_output_fifo.size())};
-            msg = {msg, $sformatf("\tPTR_UPDATER DUT data packets: (%0d), meta: (%0d)\n", m_ptr_upd_mfb_data_fifo.size(), m_ptr_upd_mfb_meta_fifo.size())};
+            msg = {msg, $sformatf("\tPTR_UPDATER DUT data packets: (%0d), meta: (%0d)\n",
+                                  m_ptr_upd_mfb_data_fifo.size(), m_ptr_upd_mfb_meta_fifo.size())};
             `uvm_error(this.get_full_name(), msg);
         end
     endfunction
@@ -410,28 +455,47 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
         str = {str, $sformatf("\tPacket counters\n")};
         str = {str, $sformatf("\t------------------------------------------------------------------\n")};
 
-        str = {str, $sformatf("\t------------------------------------------------------------------------------------------------------------------------------------------------\n")};
-        str = {str, $sformatf("\t|          |                           Packets                         |                                 Bytes                                 |\n")};
-        str = {str, $sformatf("\t|          |-----------------------------------------------------------|-----------------------------------------------------------------------|\n")};
-        str = {str, $sformatf("\t|  Channel |          Received           |          Discarded          |              Received             |             Discarded             |\n")};
-        str = {str, $sformatf("\t|          |-----------------------------|-----------------------------|-----------------------------------|-----------------------------------|\n")};
-        str = {str, $sformatf("\t|          |  Model  |   DUT   |   Diff  |  Model  |   DUT   |   Diff  |   Model   |    DUT    |    Diff   |   Model   |    DUT    |    Diff   |\n")};
-        str = {str, $sformatf("\t|----------------------------------------------------------------------------------------------------------------------------------------------|\n")};
+        str = {str, $sformatf("\t------------------------------------------------------------------------\n")};
+        str = {str, $sformatf("\t|          |                           Packets                         |\n")};
+        str = {str, $sformatf("\t|          |-----------------------------------------------------------|\n")};
+        str = {str, $sformatf("\t|  Channel |          Received           |          Discarded          |\n")};
+        str = {str, $sformatf("\t|          |-----------------------------|-----------------------------|\n")};
+        str = {str, $sformatf("\t|          |  Model  |   DUT   |   Diff  |  Model  |   DUT   |   Diff  |\n")};
+        str = {str, $sformatf("\t|-----------------------------------------------------------------------\n")};
 
         for (int unsigned it = 0; it < CHANNELS; it++) begin
             pkt_cntr_diff       = m_pkt_cnt[it]          - m_dma_model.m_pkt_cntrs_storage.pkt_sent_cntr[it];
-            byte_cntr_diff      = m_byte_cnt[it]         - m_dma_model.m_pkt_cntrs_storage.bytes_sent_cntr[it];
             disc_pkt_cntr_diff  = m_discard_pkt_cnt[it]  - m_dma_model.m_pkt_cntrs_storage.pkt_disc_cntr[it];
-            disc_byte_cntr_diff = m_discard_byte_cnt[it] - m_dma_model.m_pkt_cntrs_storage.bytes_disc_cntr[it];
 
-            str = {str, $sformatf("\t|   %2d     |  %6d |  %6d |  %6d |  %6d |  %6d |  %6d |  %8d |  %8d |  %8d |  %8d |  %8d |  %8d |\n",
+            str = {str, $sformatf("\t|   %2d     |  %6d |  %6d |  %6d |  %6d |  %6d |  %6d |\n",
                                   it,
                                   m_dma_model.m_pkt_cntrs_storage.pkt_sent_cntr[it],
                                   m_pkt_cnt[it],
                                   pkt_cntr_diff,
                                   m_dma_model.m_pkt_cntrs_storage.pkt_disc_cntr[it],
                                   m_discard_pkt_cnt[it],
-                                  disc_pkt_cntr_diff,
+                                  disc_pkt_cntr_diff
+                                  )};
+
+            if (pkt_cntr_diff != 0 || disc_pkt_cntr_diff != 0) begin
+                m_dma_tr_errors++;
+            end
+        end
+
+        str = {str, $sformatf("\t--------------------------------------------------------------------------------\n")};
+        str = {str, $sformatf("\t|      |                                 Bytes                                 |\n")};
+        str = {str, $sformatf("\t|      |-----------------------------------------------------------------------|\n")};
+        str = {str, $sformatf("\t| Chan |              Received             |             Discarded             |\n")};
+        str = {str, $sformatf("\t|      |-----------------------------------|-----------------------------------|\n")};
+        str = {str, $sformatf("\t|      |   Model   |    DUT    |    Diff   |   Model   |    DUT    |    Diff   |\n")};
+        str = {str, $sformatf("\t|------------------------------------------------------------------------------|\n")};
+
+        for (int unsigned it = 0; it < CHANNELS; it++) begin
+            byte_cntr_diff      = m_byte_cnt[it]         - m_dma_model.m_pkt_cntrs_storage.bytes_sent_cntr[it];
+            disc_byte_cntr_diff = m_discard_byte_cnt[it] - m_dma_model.m_pkt_cntrs_storage.bytes_disc_cntr[it];
+
+            str = {str, $sformatf("\t|  %2d  |  %8d |  %8d |  %8d |  %8d |  %8d |  %8d |\n",
+                                  it,
                                   m_dma_model.m_pkt_cntrs_storage.bytes_sent_cntr[it],
                                   m_byte_cnt[it],
                                   byte_cntr_diff,
@@ -440,10 +504,10 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
                                   disc_byte_cntr_diff
                                   )};
 
-            if (pkt_cntr_diff != 0 || byte_cntr_diff != 0 || disc_pkt_cntr_diff != 0 || disc_byte_cntr_diff != 0)
+            if (byte_cntr_diff != 0 || disc_byte_cntr_diff != 0) begin
                 m_dma_tr_errors++;
+            end
         end
-
         //-----------------------------------------------------------------------
         // Performance statistics (latency and throughput on each interface)
         //-----------------------------------------------------------------------
@@ -451,16 +515,23 @@ class scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, META_WIDTH, DEVIC
         str = {str, $sformatf("\tPerformance statistics\n")};
         str = {str, $sformatf("\t------------------------------------------------------------------\n")};
         m_delay_stat.count(min, max, avg, std_dev);
-        str = {str, $sformatf("\tDelay statistic (SOF to SOF) => min : %0dns, max : %0dns, avearge : %0dns, standard deviation : %0dns\n",  min, max, avg, std_dev)};
+        str = {str, $sformatf({"\tDelay statistic (SOF to SOF) => min : %0dns, max : %0dns, avearge : %0dns, ",
+                               "standard deviation : %0dns\n"},  min, max, avg, std_dev)};
         m_input_speed_stat.count(min, max, avg, std_dev);
-        str = {str, $sformatf("\tSpeed input  statistic (MFB RX)  => min : %0dGb/s, max : %0dGb/s, avearge : %0dG/s, standard deviation : %0dG/s\n",  min*8, max*8, avg*8, std_dev*8)};
+        str = {str, $sformatf({"\tSpeed input  statistic (MFB RX)  => min : %0dGb/s, max : %0dGb/s, avearge : %0dG/s, ",
+                               "standard deviation : %0dG/s\n"},  min*8, max*8, avg*8, std_dev*8)};
         m_output_speed_stat.count(min, max, avg, std_dev);
-        str = {str, $sformatf("\tSpeed output statistic (PCIE TX) => min : %0dGb/s, max : %0dGb/s, avearge : %0dG/s, standard deviation : %0dG/s\n",  min*8, max*8, avg*8, std_dev*8)};
+        str = {str, $sformatf({"\tSpeed output statistic (PCIE TX) => min : %0dGb/s, max : %0dGb/s, avearge : %0dG/s, ",
+                              "standard deviation : %0dG/s\n"},  min*8, max*8, avg*8, std_dev*8)};
 
         if (m_dma_tr_errors == 0 && m_ptr_upd_tr_errors == 0) begin
-            `uvm_info(this.get_full_name(), {str, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(this.get_full_name(), {str, "\n\n\t---------------------------------------",
+                                                  "\n\t----     VERIFICATION SUCCESS      ----",
+                                                  "\n\t---------------------------------------"}, UVM_NONE)
         end else begin
-            `uvm_info(this.get_full_name(), {str, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(this.get_full_name(), {str, "\n\n\t---------------------------------------",
+                                                  "\n\t----     VERIFICATION FAIL      ----",
+                                                  "\n\t---------------------------------------"}, UVM_NONE)
         end
     endfunction
 endclass

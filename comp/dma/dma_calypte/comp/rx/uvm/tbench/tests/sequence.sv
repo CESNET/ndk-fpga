@@ -4,43 +4,61 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_seq#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH,  CHANNELS))
-    `uvm_declare_p_sequencer(uvm_dma_ll::sequencer#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS))
+class virt_seq #(
+    int unsigned USR_MFB_ITEM_WIDTH,
+    int unsigned PCIE_RQ_REGIONS,
+    int unsigned PCIE_RQ_REGION_SIZE,
+    int unsigned PCIE_RQ_BLOCK_SIZE,
+    int unsigned PCIE_RQ_ITEM_WIDTH,
+    int unsigned PCIE_RQ_META_WIDTH,
+    int unsigned CHANNELS
+) extends uvm_sequence;
+
+    `uvm_object_param_utils(test::virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                             PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS))
+    `uvm_declare_p_sequencer(uvm_dma_ll::sequencer #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                                     PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH,
+                                                     CHANNELS))
 
     function new (string name = "virt_seq");
         super.new(name);
     endfunction
 
-    uvm_reset::sequence_start                                                                                                                 m_reset_seq;
-    uvm_logic_vector_array::sequence_lib #(USR_MFB_ITEM_WIDTH)                                                                                m_usr_mfb_seq;
-    uvm_dma_ll::reg_sequence#(CHANNELS)                                                                                                       m_reg_seq;
-    uvm_sequence#(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)) m_pcie_rq_mfb_seq;
-    uvm_sequence#(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)) m_ptr_upd_mfb_seq;
+    uvm_reset::sequence_start                                                        m_reset_seq;
+    uvm_logic_vector_array::sequence_lib #(USR_MFB_ITEM_WIDTH)                       m_usr_mfb_seq;
+    uvm_dma_ll::reg_sequence #(CHANNELS)                                             m_reg_seq;
+    uvm_sequence#(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                                           PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH))  m_pcie_rq_mfb_seq;
+    uvm_sequence#(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                                           PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH))  m_ptr_upd_mfb_seq;
 
     local logic m_done;
 
-    virtual function void init(uvm_dma_ll::regmodel#(CHANNELS) m_regmodel);
-        uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH) m_pcie_rq_mfb_seq_lib;
-        uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH) m_ptr_upd_mfb_seq_lib;
+    virtual function void init(uvm_dma_ll::regmodel #(CHANNELS) m_regmodel);
+        uvm_mfb::sequence_lib_tx #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+                                   PCIE_RQ_META_WIDTH) m_pcie_rq_mfb_seq_lib;
+        uvm_mfb::sequence_lib_tx #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+                                   PCIE_RQ_META_WIDTH) m_ptr_upd_mfb_seq_lib;
 
-        m_reset_seq = uvm_reset::sequence_start::type_id::create("rst_seq");
+        m_reset_seq = uvm_reset::sequence_start::type_id::create("m_reset_seq");
 
-        m_usr_mfb_seq = uvm_logic_vector_array::sequence_lib#(USR_MFB_ITEM_WIDTH)::type_id::create("m_usr_mfb_seq");
+        m_usr_mfb_seq = uvm_logic_vector_array::sequence_lib #(USR_MFB_ITEM_WIDTH)::type_id::create("m_usr_mfb_seq");
         m_usr_mfb_seq.init_sequence();
         m_usr_mfb_seq.min_random_count = 80;
         m_usr_mfb_seq.max_random_count = 100;
         m_usr_mfb_seq.cfg = new();
         m_usr_mfb_seq.cfg.array_size_set(60,PKT_SIZE_MAX);
 
-        m_reg_seq =  uvm_dma_ll::reg_sequence#(CHANNELS)::type_id::create("m_reg_seq");
+        m_reg_seq =  uvm_dma_ll::reg_sequence #(CHANNELS)::type_id::create("m_reg_seq");
         m_reg_seq.m_regmodel = m_regmodel;
 
-        m_pcie_rq_mfb_seq_lib  = uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
+        m_pcie_rq_mfb_seq_lib  = uvm_mfb::sequence_lib_tx #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                                                            PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
         m_pcie_rq_mfb_seq_lib.init_sequence();
         m_pcie_rq_mfb_seq = m_pcie_rq_mfb_seq_lib;
 
-        m_ptr_upd_mfb_seq_lib  = uvm_mfb::sequence_lib_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
+        m_ptr_upd_mfb_seq_lib  = uvm_mfb::sequence_lib_tx #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                                                            PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
         m_ptr_upd_mfb_seq_lib.init_sequence();
         m_ptr_upd_mfb_seq = m_ptr_upd_mfb_seq_lib;
     endfunction

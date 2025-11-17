@@ -482,7 +482,8 @@ class driver #(
             m_data_export.put(m_channel, pcie_transactions[it].meta, pcie_transactions[it].data);
 
             m_driv_data.data_addr = (m_driv_data.data_addr + trans_byte_size) & m_driv_data.data_mask;
-            debug_msg = {debug_msg, $sformatf("\tNew internal data ptr: %0d (0x%h)\n", m_driv_data.data_addr, m_driv_data.data_addr)};
+            debug_msg = {debug_msg, $sformatf("\tNew internal data ptr: %0d (0x%h)\n", m_driv_data.data_addr,
+                                              m_driv_data.data_addr)};
             m_driv_data.data_free_space -= trans_byte_size;
         end
 

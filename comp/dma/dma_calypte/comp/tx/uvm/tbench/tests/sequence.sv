@@ -56,8 +56,9 @@ class virt_seq #(
     uvm_tx_dma_calypte::sequence_simple #(DATA_POINTER_WIDTH)                        m_channel_seq [CHANNELS];
     uvm_sequence #(uvm_mfb::sequence_item #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE,
                                             USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH)) m_usr_mfb_seq;
-    uvm_sequence #(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
-                                            sv_pcie_meta_pack::PCIE_RQ_META_WIDTH))  m_ptr_upd_mfb_seq;
+    uvm_sequence #(uvm_mfb::sequence_item #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                                            PCIE_RQ_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH)
+                   )  m_ptr_upd_mfb_seq;
 
     local logic [CHANNELS-1:0] m_done;
 
@@ -86,7 +87,7 @@ class virt_seq #(
         m_ptr_upd_mfb_seq_lib = uvm_mfb::sequence_lib_tx #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
                                                            PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
                                                            sv_pcie_meta_pack::PCIE_RQ_META_WIDTH)::type_id
-                                ::create("m_ptr_upd_seq_lib");
+                                ::create("m_ptr_upd_mfb_seq_lib");
 
         m_usr_mfb_seq_lib.init_sequence();
         m_ptr_upd_mfb_seq_lib.init_sequence();

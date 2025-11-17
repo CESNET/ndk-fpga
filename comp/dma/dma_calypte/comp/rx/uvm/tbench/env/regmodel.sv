@@ -4,8 +4,11 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class regmodel#(CHANNELS) extends uvm_reg_block;
-    `uvm_object_param_utils(uvm_dma_ll::regmodel#(CHANNELS))
+class regmodel #(
+    int unsigned CHANNELS
+) extends uvm_reg_block;
+
+    `uvm_object_param_utils(uvm_dma_ll::regmodel #(CHANNELS))
 
 
     uvm_dma_ll::reg_channel channel[CHANNELS];

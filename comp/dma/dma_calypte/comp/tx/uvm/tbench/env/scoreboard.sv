@@ -66,7 +66,11 @@ class data_comparer #(int unsigned ITEM_WIDTH) extends
     endfunction
 endclass
 
-class ptr_upd_data_parser #(PCIE_CQ_MFB_ITEM_WIDTH, DEVICE) extends uvm_component;
+class ptr_upd_data_parser #(
+    int unsigned PCIE_CQ_MFB_ITEM_WIDTH,
+    string DEVICE
+) extends uvm_component;
+
     `uvm_component_param_utils(uvm_tx_dma_calypte::ptr_upd_data_parser #(PCIE_CQ_MFB_ITEM_WIDTH, DEVICE))
 
     localparam MPS          = 256;

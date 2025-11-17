@@ -8,7 +8,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-module TX_DMA_CALYPTE_PROPERTY #(
+module tx_dma_calypte_property #(
     int unsigned USR_MFB_REGIONS,
     int unsigned USR_MFB_REGION_SIZE,
     int unsigned USR_MFB_BLOCK_SIZE,
@@ -90,16 +90,20 @@ module TX_DMA_CALYPTE_PROPERTY #(
         .vif   (ptr_upd_mfb)
     );
 
-    generate if (PCIE_CQ_MFB_REGIONS > 1) begin
+    generate if (PCIE_CQ_MFB_REGIONS > 1) begin : sof_eof_rule_2reg_g
         property ptr_upd_sof_after_eof;
             @(posedge ptr_upd_mfb.CLK) disable iff(RESET)
-            ptr_upd_mfb.SRC_RDY |-> (( ~(ptr_upd_mfb.EOF[PCIE_CQ_MFB_REGIONS-2:0]) & ptr_upd_mfb.SOF[PCIE_CQ_MFB_REGIONS-1:1]) == 0);
+            ptr_upd_mfb.SRC_RDY |->
+                (( ~(ptr_upd_mfb.EOF[PCIE_CQ_MFB_REGIONS-2:0]) & ptr_upd_mfb.SOF[PCIE_CQ_MFB_REGIONS-1:1]) == 0);
         endproperty
 
         // Check when SOF is not on first position then previous packet have to end in region right before.
         assert property (ptr_upd_sof_after_eof)
             else begin
-                `uvm_error(module_name, $sformatf("\n\tPointer Update interface: If sof is set on different region that 0 then region befor have to be eof set\n\tSOF %b\n\tEOF %b", ptr_upd_mfb.SOF, ptr_upd_mfb.EOF));
+                `uvm_error(module_name,
+                           $sformatf({"\n\tPointer Update interface: If SOF is set on different region ",
+                                      "that 0 then the region before has to have EOF set\n\tSOF %b\n\tEOF %b"},
+                                     ptr_upd_mfb.SOF, ptr_upd_mfb.EOF));
             end
     end endgenerate
 
