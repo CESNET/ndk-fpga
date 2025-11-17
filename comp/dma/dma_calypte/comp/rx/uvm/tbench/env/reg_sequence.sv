@@ -226,10 +226,13 @@ endclass
 
 
 
-class reg_sequence#(CHANNELS) extends uvm_sequence;
-    `uvm_object_param_utils(uvm_dma_ll::reg_sequence#(CHANNELS))
+class reg_sequence #(
+    int unsigned CHANNELS
+) extends uvm_sequence;
 
-    regmodel#(CHANNELS) m_regmodel;
+    `uvm_object_param_utils(uvm_dma_ll::reg_sequence #(CHANNELS))
+
+    regmodel #(CHANNELS) m_regmodel;
 
     function new (string name = "run_channel");
         super.new(name);

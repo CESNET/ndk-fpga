@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class base extends uvm_test;
-    typedef uvm_component_registry#(test::base, "test::base") type_id;
+    typedef uvm_component_registry #(test::base, "test::base") type_id;
 
     uvm_tx_dma_calypte::env #(
         DEVICE,

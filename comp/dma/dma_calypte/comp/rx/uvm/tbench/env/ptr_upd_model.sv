@@ -5,7 +5,11 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH) extends uvm_component;
+class ptr_updater_model #(
+    int unsigned POINTER_WIDTH,
+    int unsigned SW_ADDR_WIDTH
+) extends uvm_component;
+
     `uvm_component_param_utils(uvm_dma_ll::ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH))
 
     localparam MVB_ITEM_WIDTH = 2*POINTER_WIDTH + 1 + SW_ADDR_WIDTH;
@@ -65,7 +69,10 @@ class ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH) extends uvm_component;
             end
             out_tr.pcie_type = 0;
 
-            assert(upd_buff_addr_int[2-1:0] == 0) else `uvm_fatal(this.get_full_name(), $sformatf("\n\tThis model doesnt support counting fbe. lower 2 bits of addres heve to zero"));
+            assert(upd_buff_addr_int[2-1:0] == 0) else begin
+                `uvm_fatal(this.get_full_name(), $sformatf({"\n\tThis model doesn't support counting FBE. ",
+                                                            "Lower 2 bits of the addres have to be zero"}));
+            end
 
             out_tr.fbe    = 4'b1111;
             out_tr.lbe    = 4'b0011;

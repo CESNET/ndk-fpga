@@ -52,9 +52,9 @@ module dut (
             PCIE_CQ_MFB_REGIONS*1)-1:0] ptr_upd_mfb_sof_pos;
 
     generate
-    if (PCIE_CQ_MFB_REGION_SIZE != 1) begin
+    if (PCIE_CQ_MFB_REGION_SIZE != 1) begin : sof_pos_assign_2reg_g
         assign  ptr_upd_mfb.SOF_POS = ptr_upd_mfb_sof_pos;
-    end else begin
+    end else begin : sof_pos_assign_1reg_g
         assign  ptr_upd_mfb.SOF_POS = '0;
     end
     endgenerate

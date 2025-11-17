@@ -5,23 +5,47 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_seq_full_speed#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS) extends virt_seq#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS);
-    `uvm_object_param_utils(test::virt_seq_full_speed#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS))
-    `uvm_declare_p_sequencer(uvm_dma_ll::sequencer#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS))
+class virt_seq_full_speed #(
+    int unsigned USR_MFB_ITEM_WIDTH,
+    int unsigned PCIE_RQ_REGIONS,
+    int unsigned PCIE_RQ_REGION_SIZE,
+    int unsigned PCIE_RQ_BLOCK_SIZE,
+    int unsigned PCIE_RQ_ITEM_WIDTH,
+    int unsigned PCIE_RQ_META_WIDTH,
+    int unsigned CHANNELS
+) extends virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+                     PCIE_RQ_META_WIDTH, CHANNELS);
+
+    `uvm_object_param_utils(test::virt_seq_full_speed #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                                        PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH,
+                                                        CHANNELS))
+
+    `uvm_declare_p_sequencer(uvm_dma_ll::sequencer #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                                     PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH,
+                                                     CHANNELS))
 
     function new (string name = "virt_seq_full_speed");
         super.new(name);
     endfunction
 
-    virtual function void init(uvm_dma_ll::regmodel#(CHANNELS) m_regmodel);
+    virtual function void init(uvm_dma_ll::regmodel #(CHANNELS) m_regmodel);
         super.init(m_regmodel);
-        m_pcie_rq_mfb_seq = uvm_mfb::sequence_full_speed_tx#(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id::create();
+        m_pcie_rq_mfb_seq = uvm_mfb::sequence_full_speed_tx #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                                                              PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH)::type_id
+                            ::create();
     endfunction
 endclass
 
-class mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-  `uvm_object_param_utils(    test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class mfb_rx_speed #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_logic_vector_array_mfb::sequence_lib_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+
+  `uvm_object_param_utils(    test::mfb_rx_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+  `uvm_sequence_library_utils(test::mfb_rx_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
     function new(string name = "mfb_rx_speed");
         super.new(name);
@@ -30,15 +54,42 @@ class mfb_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) ex
 
     virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
         super.init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE,
+                                                                               ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 
 
-class speed#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) extends base#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH);
-    typedef uvm_component_registry#(test::speed#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH), "test::speed") type_id;
+class speed #(
+    int unsigned USR_MFB_REGIONS,
+    int unsigned USR_MFB_REGION_SIZE,
+    int unsigned USR_MFB_BLOCK_SIZE,
+    int unsigned USR_MFB_ITEM_WIDTH,
+    int unsigned PCIE_RQ_REGIONS,
+    int unsigned PCIE_RQ_REGION_SIZE,
+    int unsigned PCIE_RQ_BLOCK_SIZE,
+    int unsigned PCIE_RQ_ITEM_WIDTH,
+    int unsigned PCIE_RQ_META_WIDTH,
+    int unsigned CHANNELS,
+    int unsigned PKT_SIZE_MAX,
+    int unsigned MI_WIDTH,
+    string DEVICE,
+    int unsigned POINTER_WIDTH,
+    int unsigned SW_ADDR_WIDTH
+) extends base #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS,
+                 PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS,
+                 PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH);
 
-    uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) m_env;
+    typedef uvm_component_registry #(test::speed #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE,
+                                                   USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                                   PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH,
+                                                   CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH,
+                                                   SW_ADDR_WIDTH), "test::speed") type_id;
+
+    uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS,
+                      PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS,
+                      PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) m_env;
+
     localparam USR_MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     // ------------------------------------------------------------------------
@@ -56,17 +107,24 @@ class speed#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_I
     endfunction
 
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH)::type_id::set_inst_override(mfb_rx_speed#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH)::get_type(),
-            {this.get_full_name(), ".m_env.m_env_rx.*"});
+        uvm_logic_vector_array_mfb::sequence_lib_rx #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE,
+                                                      USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH)::type_id
+            ::set_inst_override(mfb_rx_speed #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE,
+                                               USR_MFB_ITEM_WIDTH, USR_MFB_META_WIDTH)::get_type(),
+                                {this.get_full_name(), ".m_env.m_env_rx.*"});
 
-        m_env = uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
+                                  PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+                                  PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH,
+                                  SW_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences o their sequencers
     virtual task run_phase(uvm_phase phase);
         time end_time;
-        virt_seq_full_speed#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS) m_vseq;
+        virt_seq_full_speed #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                              PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS) m_vseq;
         uvm_reg_data_t pkt_cnt          [CHANNELS];
         uvm_reg_data_t byte_cnt         [CHANNELS];
         uvm_reg_data_t discard_pkt_cnt  [CHANNELS];
@@ -74,7 +132,9 @@ class speed#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_I
         uvm_status_e   status_r;
 
         //CREATE SEQUENCES
-        m_vseq = virt_seq_full_speed#(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS)::type_id::create("m_vseq");
+        m_vseq = virt_seq_full_speed #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                       PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS)::type_id
+                 ::create("m_vseq");
 
         //RISE OBJECTION
         phase.raise_objection(this);
@@ -84,7 +144,8 @@ class speed#(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_I
         m_vseq.start(m_env.m_sequencer);
 
         end_time = $time();
-        `uvm_info(this.get_full_name(), $sformatf("\n\tVirtual sequence finished (%0d ns). Environment used: %0d", end_time/1ns, m_env.m_scoreboard.used()), UVM_LOW);
+        `uvm_info(this.get_full_name(), $sformatf("\n\tVirtual sequence finished (%0d ns). Environment used: %0d",
+                                                  end_time/1ns, m_env.m_scoreboard.used()), UVM_LOW);
 
         while((end_time + 200us) > $time() && (m_env.m_scoreboard.used() != 0)) begin
             #(600ns);

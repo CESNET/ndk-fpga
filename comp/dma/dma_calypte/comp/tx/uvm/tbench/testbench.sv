@@ -97,7 +97,11 @@ module testbench;
         #(CLK_PERIOD/2)
         CLK = ~CLK;
     end
-    initial #(10ns) RST <= 0;
+
+    initial begin
+        #(10ns)
+        RST <= 0;
+    end
 
     initial begin
         uvm_root m_root;
@@ -167,7 +171,7 @@ module testbench;
         .config_mi          (config_mi_vif)
     );
 
-    TX_DMA_CALYPTE_PROPERTY #(
+    tx_dma_calypte_property #(
         .USR_MFB_REGIONS         (USR_MFB_REGIONS),
         .USR_MFB_REGION_SIZE     (USR_MFB_REGION_SIZE),
         .USR_MFB_BLOCK_SIZE      (USR_MFB_BLOCK_SIZE),

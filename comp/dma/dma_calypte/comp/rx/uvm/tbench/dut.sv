@@ -5,7 +5,9 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-module DMA_LL_DUT #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, SW_ADDR_WIDTH, POINTER_WIDTH, CNTRS_WIDTH, TRBUF_REG_EN, PERF_CNTR_EN)
+module dut #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
+             PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+             CHANNELS, PKT_SIZE_MAX, SW_ADDR_WIDTH, POINTER_WIDTH, CNTRS_WIDTH, TRBUF_REG_EN, PERF_CNTR_EN)
     (
         input logic     CLK,
         input logic     RST,
@@ -17,7 +19,13 @@ module DMA_LL_DUT #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_
     );
 
     // UVM_PROBE //
-    bind RX_DMA_CALYPTE: VHDL_DUT_U probe_inf #(1) probe_discard((hdrm_dma_hdr_src_rdy & hdrm_dma_hdr_dst_rdy & (RESET === 1'b0)), hdrm_pkt_drop, CLK);
+    bind RX_DMA_CALYPTE: VHDL_DUT_U probe_inf #(
+        .DATA_WIDTH(1)
+    ) probe_discard (
+        .event_signal(hdrm_dma_hdr_src_rdy & hdrm_dma_hdr_dst_rdy & (RESET === 1'b0)),
+        .event_data(hdrm_pkt_drop),
+        .CLK(CLK)
+    );
 
     logic [$clog2(CHANNELS)-1:0]       channel;
     logic [24-1:0]                     meta;
@@ -28,16 +36,21 @@ module DMA_LL_DUT #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_
     logic                              rx_stop_rq_en;
     logic                              rx_stop_rq_ack;
 
-    assign channel[$clog2(CHANNELS)-1 -: $clog2(CHANNELS)]                 = usr_mfb.META[24 + $clog2(CHANNELS)-1                          -: $clog2(CHANNELS)];
-    assign meta[24-1 -: 24]                                                = usr_mfb.META[24 -1                                            -: 24];
+    assign channel[$clog2(CHANNELS)-1 -: $clog2(CHANNELS)]
+        = usr_mfb.META[24 + $clog2(CHANNELS)-1 -: $clog2(CHANNELS)];
+    assign meta[24-1 -: 24]
+        = usr_mfb.META[24 -1 -: 24];
 
-    logic [((PCIE_RQ_REGION_SIZE != 1) ? PCIE_RQ_REGIONS*$clog2(PCIE_RQ_REGION_SIZE) : PCIE_RQ_REGIONS*1)-1:0] pcie_rq_mfb_sof_pos;
-    logic [((PCIE_RQ_REGION_SIZE != 1) ? PCIE_RQ_REGIONS*$clog2(PCIE_RQ_REGION_SIZE) : PCIE_RQ_REGIONS*1)-1:0] ptr_upd_mfb_sof_pos;
+    logic [((PCIE_RQ_REGION_SIZE != 1) ? PCIE_RQ_REGIONS*$clog2(PCIE_RQ_REGION_SIZE)
+            : PCIE_RQ_REGIONS*1)-1:0] pcie_rq_mfb_sof_pos;
+    logic [((PCIE_RQ_REGION_SIZE != 1) ? PCIE_RQ_REGIONS*$clog2(PCIE_RQ_REGION_SIZE)
+            : PCIE_RQ_REGIONS*1)-1:0] ptr_upd_mfb_sof_pos;
+
     generate
-    if (PCIE_RQ_REGION_SIZE != 1) begin
+    if (PCIE_RQ_REGION_SIZE != 1) begin : sof_assign_2reg_g
         assign  pcie_rq_mfb.SOF_POS = pcie_rq_mfb_sof_pos;
         assign  ptr_upd_mfb.SOF_POS = ptr_upd_mfb_sof_pos;
-    end else begin
+    end else begin : sof_assign_1reg_g
         assign  pcie_rq_mfb.SOF_POS = '0;
         assign  ptr_upd_mfb.SOF_POS = '0;
     end

@@ -4,17 +4,26 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) extends uvm_env;
-    `uvm_component_param_utils(uvm_dma_ll_rx::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX));
+class env #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned CHANNELS,
+    int unsigned PKT_SIZE_MAX
+) extends uvm_env;
+
+    `uvm_component_param_utils(uvm_dma_ll_rx::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS,
+                                                    PKT_SIZE_MAX));
 
     localparam MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     //top sequencer
-    sequencer#(ITEM_WIDTH)                      m_sequencer;
-    driver#(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) m_driver;
+    sequencer #(ITEM_WIDTH)                      m_sequencer;
+    driver #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) m_driver;
 
     //toplevel
-    uvm_logic_vector_array::agent#(ITEM_WIDTH)   m_logic_vector_array_agent;
+    uvm_logic_vector_array::agent #(ITEM_WIDTH)   m_logic_vector_array_agent;
     //low level
     uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MFB_META_WIDTH) m_env_rx;
     //implementa later
@@ -44,9 +53,11 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX
         m_logic_vector_array_agent_cfg = new();
         m_logic_vector_array_agent_cfg.active = m_config.active;
 
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", m_logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                  m_logic_vector_array_agent_cfg);
 
-        m_logic_vector_array_agent   = uvm_logic_vector_array::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_array_agent", this);
+        m_logic_vector_array_agent   = uvm_logic_vector_array::agent #(ITEM_WIDTH)::type_id
+                                       ::create("m_logic_vector_array_agent", this);
         // LOW level agent
         m_env_rx_cfg = new;
         m_env_rx_cfg.active  = m_config.active;
@@ -54,11 +65,12 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX
         m_env_rx_cfg.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_env_rx_cfg);
-        m_env_rx  = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_rx", this);
+        m_env_rx  = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH,
+                                                         MFB_META_WIDTH)::type_id::create("m_env_rx", this);
 
         if (m_config.active == UVM_ACTIVE) begin
-            m_sequencer = sequencer#(ITEM_WIDTH)::type_id::create("m_sequencer", this);
-            m_driver    = driver#(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX)::type_id::create(" m_driver", this);
+            m_sequencer = sequencer #(ITEM_WIDTH)::type_id::create("m_sequencer", this);
+            m_driver    = driver #(ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX)::type_id::create("m_driver", this);
         end
 
         reset_sync = new();
@@ -77,13 +89,14 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX
 
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
-            logic_vector_sequence#(MFB_META_WIDTH)   logic_vector_seq;
-            logic_vector_array_sequence#(ITEM_WIDTH) logic_vector_array_seq;
+            logic_vector_sequence #(MFB_META_WIDTH)   logic_vector_seq;
+            logic_vector_array_sequence #(ITEM_WIDTH) logic_vector_array_seq;
 
-            logic_vector_seq = logic_vector_sequence#(MFB_META_WIDTH)::type_id::create("logic_vector_seq", this);
+            logic_vector_seq = logic_vector_sequence #(MFB_META_WIDTH)::type_id::create("logic_vector_seq", this);
             logic_vector_seq.tr_export = m_driver.logic_vector_export;
             logic_vector_seq.randomize();
-            logic_vector_array_seq   = logic_vector_array_sequence#(ITEM_WIDTH)::type_id::create("logic_vector_array_seq", this);
+            logic_vector_array_seq   = logic_vector_array_sequence #(ITEM_WIDTH)::type_id
+                                       ::create("logic_vector_array_seq", this);
             logic_vector_array_seq.tr_export   = m_driver.logic_vector_array_export;
             logic_vector_array_seq.randomize();
 
