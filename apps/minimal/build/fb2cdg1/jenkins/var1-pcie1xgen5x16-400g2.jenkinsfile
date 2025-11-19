@@ -1,0 +1,14 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'apps/minimal/build/fb2cdg1',
+    target: '400g2',
+    tool: 'quartus',
+    project: 'fb2cdg1-var1-minimal-pcie1xgen5x16-400g2',
+    params: 'BOARD_VARIANT=1 PCIE_CONF=1xgen5x16',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'fb2cdg1-var1-minimal-pcie1xgen5x16-400g2',
+    lastBuilds: 2,
+)
