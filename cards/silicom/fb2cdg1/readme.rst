@@ -10,7 +10,7 @@ Silicom fb2CDg1\@AGM39D-2
     - PCIe conectors: Edge connector
     - `FPGA Card Website <https://www.silicom-usa.com/pr/server-adapters/programmable-fpga-server-adapter/fpga-intel-based-2/fpga-intel-agilex-based/fpga-smartnic-fb2cdg1agm39d-2-intel-based/>`_
 - FPGA specification:
-    - FPGA part number: ``AGMF039R47A2E2VR0``
+    - FPGA part number: ``AGMF039R47A2E2VR0``, ``AGMF039R47A1E2VC``
     - Ethernet Hard IP: F-Tile (up to 400G Ethernet)
     - PCIe Hard IP: R-Tile (up to PCIe Gen5 x16)
 
@@ -30,3 +30,19 @@ NDK firmware support
 .. note::
 
     To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro and PACSign tool installed, including a valid license.
+
+Board Variants
+^^^^^^^^^^^^^^
+
+This card exists in multiple variants.
+The correct variant for the firmware build can be selected using the Makefile parameter BOARD_VARIANT, for example as follows:
+
+.. code::
+
+    $ cd <NDK-FPGA_root_directory>/apps/minimal/build/fb2cdg1
+    $ make BOARD_VARIANT=1
+
+**Allowed values of BOARD_VARIANT parameter**
+
+- ``BOARD_VARIANT=1`` - The board uses FPGA part number ``AGMF039R47A1E2VC`` (Production sample).
+- ``BOARD_VARIANT=0`` - The board uses FPGA part number ``AGMF039R47A2E2VR0`` (Engineering sample).

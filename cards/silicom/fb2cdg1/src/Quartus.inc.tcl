@@ -24,7 +24,15 @@ set CARD_ARCHGRP(ETH_PORT_CHAN,0)    $ETH_PORT_CHAN(0)
 set CARD_ARCHGRP(EHIP_PORT_TYPE,0)   $EHIP_PORT_TYPE(0)
 
 # select fpga name
-set CARD_FPGA "AGMF039R47A2E2VR0"
+if {$BOARD_VARIANT == 0} {
+    set CARD_FPGA "AGMF039R47A2E2VR0"
+} elseif {$BOARD_VARIANT == 1} {
+    set CARD_FPGA "AGMF039R47A1E2VC"
+} else {
+    error "Unsupported BOARD_VARIANT=$BOARD_VARIANT! Supported values are:
+- 0 for board with AGMF039R47A2E2VR0,
+- 1 for board with AGMF039R47A1E2VC."
+}
 set CARD_ARCHGRP(FPGA) $CARD_FPGA
 
 set CARD_ARCHGRP(BMC_CTRL_ARCH) "EMPTY"
@@ -58,7 +66,12 @@ set SYNTH_FLAGS(IP_FILES_CLEAN_ENABLE) 1
 #set SYNTH_FLAGS(CONSTR) ""
 set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/timing.sdc"
 set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/bmc.qsf"
-set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/device.qsf"
+if {$BOARD_VARIANT == 0} {
+    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/device_var0.qsf"
+}
+if {$BOARD_VARIANT == 1} {
+    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/device_var1.qsf"
+}
 set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/general.qsf"
 set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/qsfp_misc.qsf"
 set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/pcie.qsf"
