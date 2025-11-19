@@ -8,7 +8,7 @@ proc dts_dma_calypte_ctrl {DTS dir id base pcie} {
 
     dts_create_node dts "dma_ctrl_calypte_$dir$id" {
         dts_appendprop_comp_node dts $base 0x80 "cesnet,dma_ctrl_calypte_$dir"
-        dts_appendprop_int dts "version" 0x10000
+        dts_appendprop_int dts "version" 0x20000
         dts_appendprop_int dts "pcie" $pcie
         if { $dir == "tx" } {
             append dts "data_buff = <&dma_calypte_tx_data_buff$id\_pcie$pcie>;"
