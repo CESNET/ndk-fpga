@@ -193,7 +193,8 @@ architecture FULL of TX_MAC_LITE is
 
     constant NUM_OF_PKTS         : natural := tsel(DEVICE = "ULTRASCALE" and TX_REGIONS = 1 and TX_REGION_SIZE = 1,1,4);
     constant LEN_WIDTH           : natural := log2(PKT_MTU_BYTES+1);
-    constant DFIFO_ITEMS         : natural := 2**log2(div_roundup((PKT_MTU_BYTES+1),(MD_DATA_W/8)));
+    constant WORST_ALIGNMENT     : natural := MD_DATA_W-(MD_BLOCK_SIZE*MD_ITEM_WIDTH);
+    constant DFIFO_ITEMS         : natural := 2**log2(max(div_roundup((PKT_MTU_BYTES+WORST_ALIGNMENT),(MD_DATA_W/8)), 512));
     constant FRAME_LEN_MIN       : natural := tsel(RX_INCLUDE_CRC,64,60);
     constant CRC_GEN             : boolean := CRC_INSERT_EN and not RX_INCLUDE_CRC;
     constant SPACER_GEN          : boolean := (CRC_GEN and not RX_INCLUDE_IPG) or IPG_GENERATE_EN;
