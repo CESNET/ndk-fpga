@@ -3,7 +3,7 @@ name = "cocotbext-ofm"
 version = "0.1.0"
 dependencies = [
 	"cocotb",
-	"cocotb-bus",
+	"cocotb-bus == 0.2.1",
 	"ofm @ ${NDK_FPGA_OFM_URL}",
 ]
 

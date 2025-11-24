@@ -2,7 +2,7 @@
 name = "cocotb-mfb_speed_meter_mi"
 version = "0.1.0"
 dependencies = [
-    "cocotb",
+    "cocotb == 1.9.2",
 ]
 
 [build-system]
