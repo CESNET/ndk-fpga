@@ -3,9 +3,9 @@ array set PARAMS $IP_PARAMS_L
 set IP_COMP_NAME $PARAMS(IP_COMP_NAME)
 if {[get_ips -quiet $IP_COMP_NAME] eq ""} {
     if {$PARAMS(IP_GEN_FILES) eq true} {
-        create_ip -name xxv_ethernet -vendor xilinx.com -library ip -version 4.1 -module_name $IP_COMP_NAME -dir $PARAMS(IP_BUILD_DIR) -force
+        create_ip -name xxv_ethernet -vendor xilinx.com -library ip -version 5.0 -module_name $IP_COMP_NAME -dir $PARAMS(IP_BUILD_DIR) -force
     } else {
-        create_ip -name xxv_ethernet -vendor xilinx.com -library ip -version 4.1 -module_name $IP_COMP_NAME
+        create_ip -name xxv_ethernet -vendor xilinx.com -library ip -version 5.0 -module_name $IP_COMP_NAME
     }
 }
 
