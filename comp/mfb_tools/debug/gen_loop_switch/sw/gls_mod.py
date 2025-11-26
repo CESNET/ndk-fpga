@@ -205,8 +205,8 @@ def run_test(
             tx_total_speed = round(tx_total_speed, 2)
             rx_total_speed = round(rx_total_speed, 2)
 
-            tx_total_speed_conv, tx_units = convert_units(tx_app_speed)
-            rx_total_speed_conv, rx_units = convert_units(rx_app_speed)
+            tx_total_speed_conv, tx_units = convert_units(tx_total_speed)
+            rx_total_speed_conv, rx_units = convert_units(rx_total_speed)
 
             # Total => all ports added together
             print(f"Total Speed TX:           {tx_total_speed_conv:7.2f} [{tx_units}bps]")
