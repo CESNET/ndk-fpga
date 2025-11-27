@@ -11,7 +11,7 @@
 # 11. qsfp_cages      - number of QSFP cages
 # 12. QSFP_I2C_ADDR   - array of integer, I2C address for all QSFP cages
 # 13. card_name       - name of the card
-proc dts_network_mod { base_mac base_pcs base_pmd ports ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU eth_ip_name qsfp_cages QSFP_I2C_ADDR card_name {i2c_custom_ctrls {}}} {
+proc dts_network_mod { base_mac base_pcs base_pmd ports ETH_PORT_SPEED ETH_PORT_CHAN ETH_PORT_LANES ETH_PORT_RX_MTU ETH_PORT_TX_MTU eth_ip_name qsfp_cages QSFP_I2C_ADDR card_name ETH_STREAMS_MODE {i2c_custom_ctrls {}}} {
 
     # use upvar to pass an array
     upvar $ETH_PORT_SPEED port_speed
@@ -64,12 +64,18 @@ proc dts_network_mod { base_mac base_pcs base_pmd ports ETH_PORT_SPEED ETH_PORT_
             }
             append ret "regarr$ei:" [dts_pcs_regs $ei [expr $base_pcs + $MGMT_PORT_OFF * $p + $MGMT_CHAN_OFF * $ch]]
             append ret "pcspma$ei:" [dts_mgmt $ei "$port_speed($p)G" "regarr$ei" $pcspma_params]
+
+            if {$ETH_STREAMS_MODE == 1} {
+                set rx_stream $ei
+            } else {
+                set rx_stream $p
+            }
             if {$ETH_MAC_BYPASS} {
-                append ret [dts_eth_channel $ei $pmd_id -1 -1 $ei $eth_lanes]
+                append ret [dts_eth_channel $ei $pmd_id -1 -1 $ei $eth_lanes $rx_stream]
             } else {
                 append ret "txmac$ei:" [dts_tx_mac_lite $ei $port_speed($p) [expr $base_mac + $p * $PORTS_OFF + $ch * $CHAN_OFF + $TX_RX_MAC_OFF * 0] $port_tx_mtu($p)]
                 append ret "rxmac$ei:" [dts_rx_mac_lite $ei $port_speed($p) [expr $base_mac + $p * $PORTS_OFF + $ch * $CHAN_OFF + $TX_RX_MAC_OFF * 1] $port_rx_mtu($p)]
-                append ret [dts_eth_channel $ei $pmd_id $ei $ei $ei $eth_lanes]
+                append ret [dts_eth_channel $ei $pmd_id $ei $ei $ei $eth_lanes $rx_stream]
             }
             incr ei
         }
@@ -116,10 +122,12 @@ proc dts_pmd_ctrl {no base} {
 # 4. txmac_num - number of txmac used by channel
 # 5. phy_num   - number of PCS/PMA used by channel
 # 6. lines     - indexes of serial lines used by channel
-proc dts_eth_channel {no pmd rxmac_num txmac_num phy_num lines} {
+# 7. rx_stream - stream ID in NDK application core
+proc dts_eth_channel {no pmd rxmac_num txmac_num phy_num lines rx_stream} {
     set    ret ""
     append ret "eth$no {"
     append ret "compatible = \"netcope,eth\";"
+    append ret "rx_stream = <$rx_stream>;"
     append ret "pmd = <&pmd$pmd>;"
     if {$phy_num   != -1} {append ret "pcspma = <&pcspma$phy_num>;"}
     if {$rxmac_num != -1} {append ret "rxmac = <&rxmac$rxmac_num>;"}
