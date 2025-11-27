@@ -76,6 +76,15 @@ class MfbGenerator(nfb.BaseComp):
         """
         return self._comp.get_bit(self._REG_CONTROL, 1)
 
+    @property
+    def stalled(self) -> bool:
+        """MFB transmission is blocked.
+
+        This returns true if there are valid data (i.e. SRC_RDY is set) but
+        receiver is not able to accept them (i.e. DST_RDY is cleared).
+        """
+        return self.generating and not self._comp.get_bit(self._REG_CONTROL, 2)
+
     def clear(self):
         """Clear packet counters."""
         self._comp.set_bit(self._REG_CONTROL, 4)
