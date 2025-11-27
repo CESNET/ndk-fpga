@@ -10,28 +10,25 @@ import test::*;
 
 module testbench;
 
+    localparam ITEM_WIDTH  = 32;
+    localparam TUSER_WIDTH = uvm_pcie_axi::tuser_width_get(ITEMS, uvm_pcie_axi::AXI_CC);
+
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
     logic CLK = 0;
-    logic RST = 0;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    axi_if #(CC_TDATA_WIDTH, CC_TUSER_WIDTH) axi_cc(CLK);
+    pullup (reset.RESET);
+
+    axi_if #(ITEMS, 32, TUSER_WIDTH) axi_cc(CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_cc(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
     always #(CLK_PERIOD) CLK = ~CLK;
 
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Initial reset
-    initial begin
-        RST = 1;
-        #(RESET_CLKS*CLK_PERIOD)
-        RST = 0;
-    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -39,7 +36,7 @@ module testbench;
         uvm_root m_root;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual axi_if #(CC_TDATA_WIDTH, CC_TUSER_WIDTH))::set(null, "", "vif_rx", axi_cc);
+        uvm_config_db#(virtual axi_if #(ITEMS, 32, TUSER_WIDTH))::set(null, "", "vif_rx_axi", axi_cc);
         uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_cc);
 
         m_root = uvm_root::get();
@@ -55,11 +52,25 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // DUT
-    DUT DUT_U (
+    DUT #(
+        .ITEMS      (ITEMS     ),
+        .STRADDLING (STRADDLING)
+    )DUT_U (
         .CLK    (CLK),
         .RST    (reset.RESET),
         .axi_cc (axi_cc),
         .mfb_cc (mfb_cc)
     );
 
+
+    axi_xilinx_property #(
+        .ITEMS       (test::ITEMS),
+        .ITEM_WIDTH  (32),
+        .TUSER_WIDTH (TUSER_WIDTH),
+        .STRADDLING  (test::STRADDLING)
+    )
+    PROP (
+        .RESET (reset.RESET),
+        .vif   (axi_cc)
+    );
 endmodule
