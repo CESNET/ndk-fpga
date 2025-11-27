@@ -15,10 +15,13 @@ package uvm_crdt;
     `include "config.sv"
     `include "sequence_item.sv"
     `include "sequencer.sv"
-    `include "sequence.sv"
     `include "driver.sv"
     `include "monitor.sv"
     `include "agent.sv"
+
+    `include "tr_planner.sv"
+    `include "sequence.sv"
+
 endpackage
 
 `endif

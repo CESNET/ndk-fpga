@@ -102,10 +102,14 @@ class agent_tx extends uvm_agent;
     monitor     m_monitor;
     config_item m_config;
 
+    //reset sync
+    uvm_reset::sync_cbs reset_sync;
+
     // ------------------------------------------------------------------------
     // Constructor
     function new(string name, uvm_component parent);
         super.new(name, parent);
+        reset_sync = new;
     endfunction
 
     // ------------------------------------------------------------------------
@@ -150,6 +154,8 @@ class agent_tx extends uvm_agent;
 
         // Connect monitor
         if(get_is_active() == UVM_ACTIVE) begin
+            reset_sync.push_back(m_sequencer.reset_sync);
+
             m_driver.vif = vif;
             m_driver.seq_item_port.connect(m_sequencer.seq_item_export);
         end

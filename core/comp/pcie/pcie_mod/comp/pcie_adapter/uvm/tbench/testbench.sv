@@ -13,27 +13,31 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
     logic CLK = 0;
-    logic RST = 0;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
+    pullup (reset.RESET);
+
     // For Intel (AVALON)
-    avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, AVST_DOWN_META_W) avst_down(CLK);
-    avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, AVST_UP_META_W)   avst_up(CLK);
+    localparam AVST_UP_META_W   = 128 + 32 + 1; // HDR + PREFIX + ERROR
+    localparam AVST_DOWN_META_W = 128 + 32 + 3; // HDR + PREFIX + BAR_RANGE
+    avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, AVST_DOWN_META_W) avst_down(CLK);
+    avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, AVST_UP_META_W)   avst_up(CLK);
     // For Credit control
     crdt_if crdt_down(CLK);
     crdt_if crdt_up(CLK);
     // For Xilinx (AXI)
-    axi_if #(AXI_DATA_WIDTH, AXI_CQUSER_WIDTH) cq_axi(CLK);
-    axi_if #(AXI_DATA_WIDTH, AXI_CCUSER_WIDTH) cc_axi(CLK);
-    axi_if #(AXI_DATA_WIDTH, AXI_RCUSER_WIDTH) rc_axi(CLK);
-    axi_if #(AXI_DATA_WIDTH, AXI_RQUSER_WIDTH) rq_axi(CLK);
+    localparam AXI_ITEMS     = CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
+    axi_if #(AXI_ITEMS, CQ_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)) cq_axi(CLK);
+    axi_if #(AXI_ITEMS, CC_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)) cc_axi(CLK);
+    axi_if #(AXI_ITEMS, RC_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)) rc_axi(CLK);
+    axi_if #(AXI_ITEMS, RQ_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)) rq_axi(CLK);
     // For Intel and Xilinx (MFB)
-    mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_ITEM_WIDTH, RQ_MFB_META_W)  rq_mfb(CLK);
-    mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, RC_MFB_META_W)  rc_mfb(CLK);
-    mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, CQ_MFB_META_W)  cq_mfb(CLK);
-    mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, CC_MFB_META_W)  cc_mfb(CLK);
+    mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH) rq_mfb(CLK);
+    mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RC_META_WIDTH) rc_mfb(CLK);
+    mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) cq_mfb(CLK);
+    mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH) cc_mfb(CLK);
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
     always #(CLK_PERIOD) CLK = ~CLK;
@@ -45,21 +49,21 @@ module testbench;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
         // AVALON interface
-        uvm_config_db#(virtual avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, AVST_DOWN_META_W))::set(null, "", "vif_avst_down", avst_down);
-        uvm_config_db#(virtual avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, AVST_UP_META_W))::set(null, "", "vif_avst_up", avst_up);
+        uvm_config_db#(virtual avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, AVST_DOWN_META_W))::set(null, "", "vif_pcie_down_avst", avst_down);
+        uvm_config_db#(virtual avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, AVST_UP_META_W))::set(null, "",   "vif_pcie_up_avst"  , avst_up);
         // Credit control interface
         uvm_config_db#(virtual crdt_if)::set(null, "", "vif_crdt_down", crdt_down);
         uvm_config_db#(virtual crdt_if)::set(null, "", "vif_crdt_up", crdt_up);
         // AXI interface
-        uvm_config_db#(virtual axi_if #(AXI_DATA_WIDTH, AXI_CQUSER_WIDTH))::set(null, "", "vif_cq_axi", cq_axi);
-        uvm_config_db#(virtual axi_if #(AXI_DATA_WIDTH, AXI_CCUSER_WIDTH))::set(null, "", "vif_cc_axi", cc_axi);
-        uvm_config_db#(virtual axi_if #(AXI_DATA_WIDTH, AXI_RCUSER_WIDTH))::set(null, "", "vif_rc_axi", rc_axi);
-        uvm_config_db#(virtual axi_if #(AXI_DATA_WIDTH, AXI_RQUSER_WIDTH))::set(null, "", "vif_rq_axi", rq_axi);
+        uvm_config_db#(virtual axi_if #(AXI_ITEMS, CQ_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)))::set(null, "", "vif_pcie_cq_axi", cq_axi);
+        uvm_config_db#(virtual axi_if #(AXI_ITEMS, CC_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)))::set(null, "", "vif_pcie_cc_axi", cc_axi);
+        uvm_config_db#(virtual axi_if #(AXI_ITEMS, RC_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)))::set(null, "", "vif_pcie_rc_axi", rc_axi);
+        uvm_config_db#(virtual axi_if #(AXI_ITEMS, RQ_MFB_ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)))::set(null, "", "vif_pcie_rq_axi", rq_axi);
         // MFB interface
-        uvm_config_db#(virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_ITEM_WIDTH, RQ_MFB_META_W))::set(null, "", "vif_rq_mfb", rq_mfb);
-        uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, RC_MFB_META_W))::set(null, "", "vif_rc_mfb", rc_mfb);
-        uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, CQ_MFB_META_W))::set(null, "", "vif_cq_mfb", cq_mfb);
-        uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, CC_MFB_META_W))::set(null, "", "vif_cc_mfb", cc_mfb);
+        uvm_config_db#(virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH))::set(null, "", "vif_usr_rq_mfb", rq_mfb);
+        uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RC_META_WIDTH))::set(null, "", "vif_usr_rc_mfb", rc_mfb);
+        uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))::set(null, "", "vif_usr_cq_mfb", cq_mfb);
+        uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH))::set(null, "", "vif_usr_cc_mfb", cc_mfb);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -72,17 +76,14 @@ module testbench;
         $stop(2);
     end
 
-    //RESET on start to prevent fire assertions
-    initial begin
-        RST <= 1'b1;
-        #(4*CLK_PERIOD) RST <= 1'b0;
-    end
+    //assign avst_down.VALID = 0;
+    //assign avst_up.READY = 0;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // DUT
     DUT DUT_U (
         .CLK      (CLK),
-        .RST      (reset.RESET || RST),
+        .RST      ((reset.RESET == 1'b1) ? 1'b1 : 1'b0),
         // For Intel
         .avst_up   (avst_up),
         .avst_down (avst_down),
@@ -109,16 +110,16 @@ module testbench;
        .RC_MFB_REGION_SIZE(RC_MFB_REGION_SIZE),
        .RC_MFB_BLOCK_SIZE (RC_MFB_BLOCK_SIZE ),
        .RC_MFB_ITEM_WIDTH (RC_MFB_ITEM_WIDTH ),
-       .RC_MFB_META_W     (RC_MFB_META_W     ),
+       .RC_MFB_META_W     (sv_pcie_meta_pack::PCIE_RC_META_WIDTH),
 
        .CQ_MFB_REGIONS    (CQ_MFB_REGIONS    ),
        .CQ_MFB_REGION_SIZE(CQ_MFB_REGION_SIZE),
        .CQ_MFB_BLOCK_SIZE (CQ_MFB_BLOCK_SIZE ),
        .CQ_MFB_ITEM_WIDTH (CQ_MFB_ITEM_WIDTH ),
-       .CQ_MFB_META_W     (CQ_MFB_META_W     )
+       .CQ_MFB_META_W     (sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
     )
     PROPERTY_U (
-        .RST      (reset.RESET || RST),
+        .RST      (reset.RESET),
         // For Intel
         .avst_up   (avst_up),
         .avst_down (avst_down),

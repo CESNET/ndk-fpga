@@ -25,11 +25,7 @@ SETTINGS = {
         "RQ_MFB_ITEM_WIDTH"    : "32"                ,
 
         "CQ_FIFO_ITEMS"        : "512"               ,
-        "AXI_CQUSER_WIDTH"     : "183"               ,
-        "AXI_CCUSER_WIDTH"     : "81"                ,
-        "AXI_RQUSER_WIDTH"     : "137"               ,
-        "AXI_RCUSER_WIDTH"     : "161"               ,
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"           : "0"                 ,
 
         "DEVICE"               : "\\\"STRATIX10\\\"" ,
         "ENDPOINT_TYPE"        : "\\\"P_TILE\\\""    ,
@@ -56,11 +52,7 @@ SETTINGS = {
         "RQ_MFB_BLOCK_SIZE"    : "8"                 ,
         "RQ_MFB_ITEM_WIDTH"    : "32"                ,
 
-        "AXI_CQUSER_WIDTH"     : "88"                ,
-        "AXI_CCUSER_WIDTH"     : "33"                ,
-        "AXI_RQUSER_WIDTH"     : "62"                ,
-        "AXI_RCUSER_WIDTH"     : "75"                ,
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"           : "0"                 ,
 
         "DEVICE"               : "\\\"ULTRASCALE\\\"",
         "ENDPOINT_TYPE"        : "\\\"DUMMY\\\""     ,
@@ -86,11 +78,7 @@ SETTINGS = {
         "RQ_MFB_BLOCK_SIZE"    : "8"                 ,
         "RQ_MFB_ITEM_WIDTH"    : "32"                ,
 
-        "AXI_CQUSER_WIDTH"     : "183"               ,
-        "AXI_CCUSER_WIDTH"     : "81"                ,
-        "AXI_RQUSER_WIDTH"     : "137"               ,
-        "AXI_RCUSER_WIDTH"     : "161"               ,
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"           : "0"                 ,
 
         "DEVICE"               : "\\\"ULTRASCALE\\\"",
         "ENDPOINT_TYPE"        : "\\\"DUMMY\\\""     ,
@@ -116,11 +104,7 @@ SETTINGS = {
         "RQ_MFB_BLOCK_SIZE"    : "8"                 ,
         "RQ_MFB_ITEM_WIDTH"    : "32"                ,
 
-        "AXI_CQUSER_WIDTH"     : "85"                ,
-        "AXI_CCUSER_WIDTH"     : "33"                ,
-        "AXI_RQUSER_WIDTH"     : "60"                ,
-        "AXI_RCUSER_WIDTH"     : "70"                ,
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"           : "0"                 ,
 
         "DEVICE"               : "\\\"7SERIES\\\"" ,
         "ENDPOINT_TYPE"        : "\\\"DUMMY\\\""    ,
