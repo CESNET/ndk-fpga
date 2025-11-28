@@ -153,7 +153,6 @@ architecture FULL of PTC_STORAGE_FIFO is
     signal mvb_fifo_rd         : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal mvb_fifo_empty      : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal safe_mvb_items_reg  : unsigned(log2(MAIN_FIFO_ITEMS*MFB_REGIONS+1)-1 downto 0);
-    signal mvb_items_vld_cnt   : unsigned(log2(MVB_ITEMS+1)-1 downto 0);
 
     -- Main MFB FIFO input
     signal main_mfb_fifo_in_data    : std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
@@ -334,9 +333,11 @@ begin
 
             -- substract 1 for every MVB item read from main MVB FIFO
             decrement := (others => '0');
-            if (TX_MVB_SRC_RDY = '1' and TX_MVB_DST_RDY = '1') then
-                decrement := mvb_items_vld_cnt;
-            end if;
+            for i in 0 to MVB_ITEMS-1 loop
+                if (TX_MVB_SRC_RDY = '1' and TX_MVB_DST_RDY = '1' and TX_MVB_VLD(i) = '1') then
+                    decrement := decrement+1;
+                end if;
+            end loop;
 
             -- set new register value
             safe_mvb_items_reg <= safe_mvb_items_reg + resize(increment,safe_mvb_items_reg'length) - resize(decrement,safe_mvb_items_reg'length);
@@ -417,21 +418,16 @@ begin
 
     -- safe MVB items checking
     safe_mvb_items_check_pr : process (safe_mvb_items_reg,TX_MVB_DST_RDY,mvb_fifo_empty)
-        variable items : unsigned(log2(MVB_ITEMS+1)-1 downto 0);
     begin
         -- read from FIFO, send TX MVB, count number of sent items
         mvb_fifo_rd <= (others => '0');
         TX_MVB_VLD  <= (others => '0');
-        items       := (others => '0');
         for i in 0 to MVB_ITEMS-1 loop
             if (i < safe_mvb_items_reg) then
                 mvb_fifo_rd(i) <= TX_MVB_DST_RDY;
                 TX_MVB_VLD (i) <= not mvb_fifo_empty(i);
-                items          := items+1;
             end if;
         end loop;
-
-        mvb_items_vld_cnt <= items;
     end process;
 
     TX_MVB_SRC_RDY <= (or TX_MVB_VLD);

@@ -65,12 +65,15 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     -- Name(s) (4-letter IDs) of Streaming Debug Probes.
     -- DRQ0 = DMA RQ 0
     constant DBG_PROBE_STR         : string := "PUMFPUMVPURQPDMFPDMVPDRC";
+    constant RST_WIDTH             : natural := 5;
 
     ---------------------------------------------------------------------------
 
     ---------------------------------------------------------------------------
     -- Signals
     ---------------------------------------------------------------------------
+
+    signal rst_local : std_logic_vector(RST_WIDTH-1 downto 0);
 
     -- UP MVB ASFIFO output / UP MVB Transformer input
     signal up_mvb_asfifo_out_data     : slv_array_t(DMA_PORTS-1 downto 0)(DMA_MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
@@ -302,6 +305,22 @@ begin
         report "PCIE_TRANSACTION_CTRL: unsupported ENDPOINT_TYPE (Intel FPGA only)!"
         severity failure;
 
+    -- =========================================================================
+    -- RESET DISTRIBUTION
+    -- =========================================================================
+
+    rst_i : entity work.ASYNC_RESET
+    generic map (
+        TWO_REG  => false,
+        OUT_REG  => true,
+        REPLICAS => RST_WIDTH
+    )
+    port map (
+        CLK        => CLK,
+        ASYNC_RST  => RESET,
+        OUT_RST    => rst_local
+    );
+
     -- ========================================================================
     -- UPSTREAM
     -- ========================================================================
@@ -331,7 +350,7 @@ begin
             RX_DST_RDY   => UP_MVB_DST_RDY(i),
 
             TX_CLK       => CLK,
-            TX_RESET     => RESET,
+            TX_RESET     => rst_local(0),
 
             TX_DATA      => up_mvb_asfifo_out_data(i),
             TX_VLD       => up_mvb_asfifo_out_vld(i),
@@ -355,7 +374,7 @@ begin
             )
             port map (
                 CLK        => CLK,
-                RESET      => RESET,
+                RESET      => rst_local(0),
 
                 RX_DATA    => up_mvb_asfifo_out_data(i),
                 RX_VLD     => up_mvb_asfifo_out_vld(i),
@@ -408,7 +427,7 @@ begin
             RX_DST_RDY   => UP_MFB_DST_RDY(i),
 
             TX_CLK       => CLK,
-            TX_RESET     => RESET,
+            TX_RESET     => rst_local(1),
 
             TX_DATA      => up_mfb_asfifo_out_data(i),
             TX_SOF_POS   => up_mfb_asfifo_out_sof_pos(i),
@@ -435,7 +454,7 @@ begin
         )
         port map (
             CLK         => CLK,
-            RESET       => RESET,
+            RESET       => rst_local(1),
 
             RX_DATA     => up_mfb_asfifo_out_data(i),
             RX_SOP      => up_mfb_asfifo_out_sof(i),
@@ -519,7 +538,7 @@ begin
         )
         port map (
             CLK            => CLK,
-            RESET          => RESET,
+            RESET          => rst_local(1),
 
             RX_MVB_DATA    => up_mvb_trans_out_data_fix,
             RX_MVB_PAYLOAD => up_mvb_trans_out_payload,
@@ -562,7 +581,7 @@ begin
         )
         port map (
             CLK   => CLK,
-            RESET => RESET,
+            RESET => rst_local(0),
 
             RX_DATA    => up_mvb_merge_out_data,
             RX_VLD     => up_mvb_merge_out_vld,
@@ -592,7 +611,7 @@ begin
     )
     port map (
         CLK      => CLK,
-        RESET    => RESET,
+        RESET    => rst_local(0),
 
         DIN      => up_mfb_merge_out_eof,
         DIN_MASK => (others => '1'),
@@ -611,7 +630,7 @@ begin
                 s_codapa_inc_sync_reg <= (others => '0');
             end if;
 
-            if (RESET = '1') then
+            if (rst_local(0) = '1') then
                 s_codapa_inc_sync_reg <= (others => '0');
             end if;
         end if;
@@ -633,7 +652,7 @@ begin
     )
     port map (
         CLK       => CLK,
-        RESET     => RESET,
+        RESET     => rst_local(0),
 
         RX_MVB_DATA          => up_mvb_mrgfi_out_data,
         RX_MVB_VLD           => up_mvb_mrgfi_out_vld,
@@ -678,7 +697,7 @@ begin
     )
     port map (
         CLK     => CLK,
-        RESET   => RESET,
+        RESET   => rst_local(0),
 
         RX_MVB_DATA         => up_mvb_dma2pcie_out_data,
         RX_MVB_BE           => up_mvb_dma2pcie_out_be,
@@ -725,7 +744,7 @@ begin
     )
     port map (
         CLK     => CLK,
-        RESET   => RESET,
+        RESET   => rst_local(1),
 
         RX_MVB_DATA         => up_mvb_c_checker_out_data,
         RX_MVB_BE           => up_mvb_c_checker_out_be,
@@ -799,7 +818,7 @@ begin
     )
     port map (
         CLK        => CLK,
-        RESET      => RESET,
+        RESET      => rst_local(2),
 
         MVB_UP_HDR_IN           => tagm_mvb_in,
         MVB_UP_HDR_IN_VLD       => tagm_mvb_in_vld,
@@ -837,7 +856,7 @@ begin
         DEVICE              => DEVICE
     ) port map (
         WR_CLK    => CLK,
-        WR_RST    => RESET,
+        WR_RST    => rst_local(2),
 
         WR_DATA   => pcie_tag_status_async,
         WR_EN     => '1',
@@ -896,7 +915,7 @@ begin
         )
         port map (
             CLK        => CLK,
-            RESET      => RESET,
+            RESET      => rst_local(3),
 
             RX_DATA    => RC_MFB_DATA,
             RX_SOF     => RC_MFB_SOF,
@@ -939,7 +958,7 @@ begin
         )
         port map (
             CLK    => CLK,
-            RESET  => RESET,
+            RESET  => rst_local(3),
 
             RX_DATA    => down_mfb_cutter_in_data,
             RX_SOF_POS => down_mfb_cutter_in_sof_pos,
@@ -1001,7 +1020,7 @@ begin
         )
         port map (
             CLK     => CLK,
-            RESET   => RESET,
+            RESET   => rst_local(3),
 
             RX_MVB_DATA     => down_mvb_stfifo_in_data,
             RX_MVB_VLD      => down_mvb_stfifo_in_vld,
@@ -1046,7 +1065,7 @@ begin
         )
         port map (
             CLK        => CLK,
-            RESET      => RESET,
+            RESET      => rst_local(4),
 
             RX_DATA    => down_mvb_stfifo_in_data,
             RX_VLD     => down_mvb_stfifo_in_vld,
@@ -1073,7 +1092,7 @@ begin
         )
         port map (
             CLK        => CLK,
-            RESET      => RESET,
+            RESET      => rst_local(3),
 
             RX_DATA    => down_mfb_stfifo_in_data,
             RX_SOF     => down_mfb_stfifo_in_sof,
@@ -1119,7 +1138,7 @@ begin
     )
     port map (
         CLK      => CLK,
-        RESET    => RESET,
+        RESET    => rst_local(4),
 
         RX_MVB_DATA        => down_mvb_pcie2dma_in_data,
         RX_MVB_VLD         => down_mvb_pcie2dma_in_vld,
@@ -1151,7 +1170,7 @@ begin
     )
     port map (
         CLK   => CLK,
-        RESET => RESET,
+        RESET => rst_local(4),
 
         RX_DATA    => down_mvb_tfifo_in_data,
         RX_VLD     => down_mvb_tfifo_in_vld,
@@ -1223,7 +1242,7 @@ begin
         )
         port map (
             CLK => CLK,
-            RST => RESET,
+            RST => rst_local(3),
 
             RX_DATA     => down_mfb_splfi_in_data,
             RX_SOF      => down_mfb_splfi_in_sof,
@@ -1263,7 +1282,7 @@ begin
         )
         port map (
             CLK            => CLK,
-            RESET          => RESET,
+            RESET          => rst_local(3),
 
             RX_MVB_DATA    => down_mvb_split_in_data,
             RX_MVB_SWITCH  => down_mvb_split_in_switch,
@@ -1328,7 +1347,7 @@ begin
             )
             port map (
                 CLK        => CLK,
-                RESET      => RESET,
+                RESET      => rst_local(4),
 
                 RX_DATA    => down_mvb_trans_in_data(i),
                 RX_VLD     => down_mvb_trans_in_vld(i),
@@ -1376,7 +1395,7 @@ begin
         )
         port map (
             RX_CLK       => CLK,
-            RX_RESET     => RESET,
+            RX_RESET     => rst_local(4),
 
             RX_DATA      => down_mvb_asfifo_in_data(i),
             RX_VLD       => down_mvb_asfifo_in_vld(i),
@@ -1409,7 +1428,7 @@ begin
         )
         port map (
             CLK         => CLK,
-            RESET       => RESET,
+            RESET       => rst_local(3),
 
             RX_DATA     => down_mfb_trans_in_data(i),
             RX_SOP      => down_mfb_trans_in_sof(i),
@@ -1447,7 +1466,7 @@ begin
         )
         port map (
             RX_CLK       => CLK,
-            RX_RESET     => RESET,
+            RX_RESET     => rst_local(3),
 
             RX_DATA      => down_mfb_asfifo_in_data(i),
             RX_SOF_POS   => down_mfb_asfifo_in_sof_pos(i),
@@ -1495,7 +1514,7 @@ begin
         )
         port map (
             CLK           => CLK,
-            RESET         => RESET,
+            RESET         => rst_local(4),
 
             MI_DWR        => DBG_MI_DWR,
             MI_ADDR       => DBG_MI_ADDR,
@@ -1663,7 +1682,7 @@ begin
     begin
         dbg_rq_cnt_v := (others => '0');
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (rst_local(4) = '1') then
                 dbg_rq_cnt <= (others => '0');
             elsif (RQ_MFB_SRC_RDY = '1' and RQ_MFB_DST_RDY = '1') then
                 for i in 0 to MFB_UP_REGIONS-1 loop
@@ -1679,7 +1698,7 @@ begin
     begin
         dbg_rc_cnt_v := (others => '0');
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (rst_local(4) = '1') then
                 dbg_rc_cnt <= (others => '0');
             elsif (RC_MFB_SRC_RDY = '1' and RC_MFB_DST_RDY = '1') then
                 for i in 0 to MFB_DOWN_REGIONS-1 loop
@@ -1695,7 +1714,7 @@ begin
     begin
         dbg_di_cnt_v := (others => '0');
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (rst_local(4) = '1') then
                 dbg_di_mvb_cnt <= (others => '0');
             elsif (down_mvb_split_in_src_rdy = '1' and down_mvb_split_in_dst_rdy = '1') then
                 for i in 0 to MFB_DOWN_REGIONS-1 loop
@@ -1711,7 +1730,7 @@ begin
     begin
         dbg_di_cnt_v := (others => '0');
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (rst_local(4) = '1') then
                 dbg_di_mfb_cnt <= (others => '0');
             elsif (down_mfb_split_in_src_rdy = '1' and down_mfb_split_in_dst_rdy = '1') then
                 for i in 0 to MFB_DOWN_REGIONS-1 loop
