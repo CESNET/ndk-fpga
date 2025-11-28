@@ -5,18 +5,18 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Driver of mfb rx interface
-class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
 
     // ------------------------------------------------------------------------
     // Register component to database
-    `uvm_component_param_utils(uvm_avst::driver_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `uvm_component_param_utils(uvm_avst::driver_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
     // ------------------------------------------------------------------------
     // Virtual interface of rx driver
-    virtual avst_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH).driver_rx vif;
+    virtual avst_if #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH).driver_rx vif;
 
-    localparam EMPTY_WIDTH = $clog2(REGION_SIZE * BLOCK_SIZE);
-    localparam DATA_WIDTH    = REGION_SIZE * BLOCK_SIZE * ITEM_WIDTH;
+    localparam EMPTY_WIDTH = $clog2(REGION_SIZE);
+    localparam DATA_WIDTH    = REGION_SIZE * ITEM_WIDTH;
     // ------------------------------------------------------------------------
     // Constructor
     function new(string name, uvm_component parent);
@@ -26,39 +26,40 @@ class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        rsp = sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");
+        rsp = sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");
 
         forever begin
             // Get new sequence item to drive to interface
             seq_item_port.try_next_item(req);
 
             if (req != null) begin
-                for (int i = 0; i < REGIONS; i++) begin
-                    vif.driver_rx_cb.DATA[(i+1)*DATA_WIDTH - 1 -: DATA_WIDTH]   <= req.data[i];
-                    vif.driver_rx_cb.META[(i+1)*META_WIDTH - 1 -: META_WIDTH]   <= req.meta[i];
-                    vif.driver_rx_cb.EMPTY[(i+1)*EMPTY_WIDTH -1 -: EMPTY_WIDTH] <= req.empty[i];
-                    vif.driver_rx_cb.VALID[i]                                   <= req.valid[i];
-                end
+                vif.driver_rx_cb.DATA  <= req.data;
+                vif.driver_rx_cb.META  <= req.meta;
+                vif.driver_rx_cb.EMPTY <= req.empty;
+                vif.driver_rx_cb.VALID <= req.valid;
                 vif.driver_rx_cb.SOP <= req.sop;
                 vif.driver_rx_cb.EOP <= req.eop;
                 rsp.copy(req);
                 rsp.set_id_info(req);
                 seq_item_port.item_done();
+
+                // Wait for the clocking block to write values to the registres
+                @(vif.driver_rx_cb);
+
+                rsp.ready = vif.driver_rx_cb.READY;
+                seq_item_port.put_response(rsp);
             end else begin
-                vif.driver_rx_cb.DATA   <= 'X;
-                vif.driver_rx_cb.META   <= 'X;
-                vif.driver_rx_cb.EMPTY  <= 'X;
+                for (int unsigned it = 0; it < REGIONS; it++) begin
+                    vif.driver_rx_cb.DATA[it]   <= 'X;
+                    vif.driver_rx_cb.META[it]   <= 'X;
+                    vif.driver_rx_cb.EMPTY[it]  <= 'X;
+                end
                 vif.driver_rx_cb.SOP    <= 'X;
                 vif.driver_rx_cb.EOP    <= 'X;
                 vif.driver_rx_cb.VALID  <= '0;
-            end
 
-            // Wait for the clocking block to write values to the registres
-            @(vif.driver_rx_cb);
-
-            if (req != null) begin
-                rsp.ready = vif.driver_rx_cb.READY;
-                seq_item_port.put_response(rsp);
+                // Wait for the clocking block to write values to the registres
+                @(vif.driver_rx_cb);
             end
         end
     endtask
@@ -66,12 +67,12 @@ class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
 endclass
 
 // Driver of mfb tx interface
-class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_component_param_utils(uvm_avst::driver_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_component_param_utils(uvm_avst::driver_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
     // ------------------------------------------------------------------------
     // Virtual interface of driver
-    virtual avst_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH).driver_tx vif;
+    virtual avst_if #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH).driver_tx vif;
 
     // ------------------------------------------------------------------------
     // Constructor
@@ -82,7 +83,7 @@ class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");;
+        req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");;
 
         forever begin
             // Get new sequence item to drive to interface
@@ -92,15 +93,16 @@ class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
             if (req != null) begin
                 vif.driver_tx_cb.READY <= req.ready;
                 seq_item_port.item_done();
+
+                // Wait for the clocking block to write values to the registres
+                @(vif.driver_tx_cb);
+
+                seq_item_port.put_response(req);
             end else begin
                 vif.driver_tx_cb.READY <= 1'b0;
-            end
 
-            // Wait for the clocking block to write values to the registres
-            @(vif.driver_tx_cb);
-
-            if (req != null) begin
-                seq_item_port.put_response(req);
+                // Wait for the clocking block to write values to the registres
+                @(vif.driver_tx_cb);
             end
         end
     endtask

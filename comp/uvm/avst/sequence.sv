@@ -4,12 +4,12 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_simple_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_avst::sequence_simple_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_simple_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_object_param_utils(uvm_avst::sequence_simple_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) req;
+    sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) req;
     uvm_common::rand_rdy          rdy;
 
     int unsigned max_transaction_count = 100;
@@ -45,7 +45,7 @@ class sequence_simple_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
         rdy.bound_set(cfg.rdy_probability_min, cfg.rdy_probability_max);
 
         // Generate transaction_count transactions
-        req = sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
+        req = sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
             // Create a request for sequence item
@@ -55,12 +55,12 @@ class sequence_simple_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     endtask
 endclass
 
-class sequence_full_speed_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_full_speed_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_object_param_utils(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) req;
+    sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) req;
 
     int unsigned max_transaction_count = 100;
     int unsigned min_transaction_count = 10;
@@ -91,7 +91,7 @@ class sequence_full_speed_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
             state = null;
         end
         // Generate transaction_count transactions
-        req = sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
+        req = sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
             // Create a request for sequence item
@@ -101,12 +101,12 @@ class sequence_full_speed_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endtask
 endclass
 
-class sequence_stop_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_avst::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_stop_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_object_param_utils(uvm_avst::sequence_stop_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
     // ------------------------------------------------------------------------
     // Variables
-    sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) req;
+    sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) req;
 
     int unsigned max_transaction_count = 50;
     int unsigned min_transaction_count = 10;
@@ -137,7 +137,7 @@ class sequence_stop_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int uns
             state = null;
         end
         // Generate transaction_count transactions
-        req = sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
+        req = sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
             // Create a request for sequence item
@@ -150,9 +150,9 @@ endclass
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
-class sequence_lib_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_library#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-  `uvm_object_param_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_lib_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_library#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+  `uvm_object_param_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+  `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
   function new(string name = "sequence_lib_tx");
     super.new(name);
@@ -163,15 +163,15 @@ class sequence_lib_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsi
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_avst::sequence_simple_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_avst::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_avst::sequence_simple_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_avst::sequence_stop_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 
-class sequence_lib_tx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-  `uvm_object_param_utils(    uvm_avst::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_lib_tx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH);
+  `uvm_object_param_utils(    uvm_avst::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+  `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
   function new(string name = "sequence_lib_tx_speed");
     super.new(name);
@@ -182,7 +182,7 @@ class sequence_lib_tx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, in
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 

@@ -5,8 +5,8 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_subscriber#(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_component_param_utils(uvm_avst::statistic#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_subscriber#(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_component_param_utils(uvm_avst::statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
 
 
     // SPEED mesures
@@ -19,12 +19,12 @@ class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
         speed          = new();
     endfunction
 
-    function void write(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) t);
+    function void write(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) t);
         int unsigned data_size = 0;
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
             if (t.valid[it]) begin
-                data_size += REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
+                data_size += REGION_SIZE*ITEM_WIDTH;
 
                 if (t.eop[it]) begin
                     data_size -= t.empty[it]*ITEM_WIDTH;
@@ -49,7 +49,7 @@ class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
                 step_speed_start_time = step_speed_end_time;
 
                 #(10us);
-                step_speed_end_time = $time();
+                step_speed_end_time = $time;
                 //if (speed_data == 0) begin
                 //    $write("SPEED 0\n\t%s\n\t%0dns %0dns\n",this.get_full_name(), speed_start_time/1ns, speed_end_time/1ns);
                 //end

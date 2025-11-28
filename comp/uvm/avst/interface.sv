@@ -5,20 +5,22 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mfb interface.
-interface avst_if #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) (input logic CLK);
-    initial VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && BLOCK_SIZE > 0 && ITEM_WIDTH > 0);
+interface avst_if #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) (
+    input logic CLK
+);
 
-    // ------------------------------------------------------------------------
-    // Parameters
-    localparam WORD_WIDTH = REGIONS * REGION_SIZE * BLOCK_SIZE * ITEM_WIDTH;
-    localparam META_WORD_WIDTH = REGIONS * META_WIDTH;
-    localparam EMPTY_WIDTH = REGIONS * $clog2(REGION_SIZE * BLOCK_SIZE);
+    initial VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && ITEM_WIDTH > 0);
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb
-    wire logic [WORD_WIDTH       -1 : 0] DATA;
-    wire logic [META_WORD_WIDTH  -1 : 0] META;
-    wire logic [EMPTY_WIDTH      -1 : 0] EMPTY;
+    wire logic [REGION_SIZE * ITEM_WIDTH-1 : 0] DATA [REGIONS];
+    wire logic [META_WIDTH-1 : 0]               META [REGIONS];
+    wire logic [$clog2(REGION_SIZE) -1 : 0]     EMPTY[REGIONS];
     wire logic [REGIONS          -1 : 0] SOP;
     wire logic [REGIONS          -1 : 0] EOP;
     wire logic [REGIONS          -1 : 0] VALID;
