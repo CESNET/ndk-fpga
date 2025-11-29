@@ -38,3 +38,6 @@ class MvbTrClassicWithMeta(MvbTransaction):
 class MvbTrAddressWithMeta(MvbTransaction):
     addr : int = 0
     meta : int = 0
+
+#  Please do not add any more Transaction types here.
+#  They belong in transaction.py of the specific test that needs them.

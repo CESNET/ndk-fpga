@@ -15,6 +15,10 @@ class MVBMonitor(BusMonitor):
     """
     Master monitor intended for monitoring the MVB bus.
 
+    In case your MVB bus contains optional signals different from those defined in the
+    _optional_signals class attribute, please create your own monitor class inheriting from this
+    one with your custom _optional_signals list.
+
     Atributes:
         _tr_type: specifies the type of transactions that are output from the Monitor.
                   Options: bytes (depracated - supported only for backward compatibility),

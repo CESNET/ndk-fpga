@@ -603,6 +603,12 @@ cocotbext.ofm.mvb
 
 Drivers, monitors, and transactions for MVB (Multi Value Bus).
 
+This bus (its interface) can be quite versatile from the point of different data signals.
+Other than ports for data data (and metadata), components can implement ports such as length, address, discard, and many more with possible different aliases.
+
+If the current driver, monitor, or MVB transactions do not implement the necessary signals, it is advisable to
+create your own (sub)classes for your specific usecase in your local Cocotb test directory.
+
 .. rubric:: drivers.MVBDriver
 
 Driver intended for the MVB bus used for sending transactions to the bus.
