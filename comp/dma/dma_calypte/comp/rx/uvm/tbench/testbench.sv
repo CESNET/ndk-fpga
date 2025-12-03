@@ -10,16 +10,46 @@ import test::*;
 
 module testbench;
 
+    localparam PTR_UPD_REQ_MVB_ITEM_W = 2*POINTER_WIDTH + 1 + SW_ADDR_WIDTH;
+
     //TESTS
-    typedef test::base#(test::USER_REGIONS, test::USER_REGION_SIZE, test::USER_BLOCK_SIZE, test::USER_ITEM_WIDTH,
-                           test::PCIE_UP_REGIONS, test::PCIE_UP_REGION_SIZE, test::PCIE_UP_BLOCK_SIZE, test::PCIE_UP_ITEM_WIDTH, test::PCIE_UP_META_WIDTH,
-                           test::CHANNELS, test::PKT_SIZE_MAX, test::MI_WIDTH, test::DEVICE) base;
+    typedef test::base #(
+        .USR_MFB_REGIONS     (test::USR_MFB_REGIONS),
+        .USR_MFB_REGION_SIZE (test::USR_MFB_REGION_SIZE),
+        .USR_MFB_BLOCK_SIZE  (test::USR_MFB_BLOCK_SIZE),
+        .USR_MFB_ITEM_WIDTH  (test::USR_MFB_ITEM_WIDTH),
+        .PCIE_RQ_REGIONS     (test::PCIE_RQ_REGIONS),
+        .PCIE_RQ_REGION_SIZE (test::PCIE_RQ_REGION_SIZE),
+        .PCIE_RQ_BLOCK_SIZE  (test::PCIE_RQ_BLOCK_SIZE),
+        .PCIE_RQ_ITEM_WIDTH  (test::PCIE_RQ_ITEM_WIDTH),
+        .PCIE_RQ_META_WIDTH  (test::PCIE_RQ_META_WIDTH),
+        .CHANNELS            (test::CHANNELS),
+        .PKT_SIZE_MAX        (test::PKT_SIZE_MAX),
+        .MI_WIDTH            (test::MI_WIDTH),
+        .DEVICE              (test::DEVICE),
+        .POINTER_WIDTH       (POINTER_WIDTH),
+        .SW_ADDR_WIDTH       (SW_ADDR_WIDTH)
+    ) base;
 
-    typedef test::speed#(test::USER_REGIONS, test::USER_REGION_SIZE, test::USER_BLOCK_SIZE, test::USER_ITEM_WIDTH,
-                            test::PCIE_UP_REGIONS, test::PCIE_UP_REGION_SIZE, test::PCIE_UP_BLOCK_SIZE, test::PCIE_UP_ITEM_WIDTH, test::PCIE_UP_META_WIDTH,
-                            test::CHANNELS, test::PKT_SIZE_MAX, test::MI_WIDTH, test::DEVICE) speed;
+    typedef test::speed #(
+        .USR_MFB_REGIONS     (test::USR_MFB_REGIONS),
+        .USR_MFB_REGION_SIZE (test::USR_MFB_REGION_SIZE),
+        .USR_MFB_BLOCK_SIZE  (test::USR_MFB_BLOCK_SIZE),
+        .USR_MFB_ITEM_WIDTH  (test::USR_MFB_ITEM_WIDTH),
+        .PCIE_RQ_REGIONS     (test::PCIE_RQ_REGIONS),
+        .PCIE_RQ_REGION_SIZE (test::PCIE_RQ_REGION_SIZE),
+        .PCIE_RQ_BLOCK_SIZE  (test::PCIE_RQ_BLOCK_SIZE),
+        .PCIE_RQ_ITEM_WIDTH  (test::PCIE_RQ_ITEM_WIDTH),
+        .PCIE_RQ_META_WIDTH  (test::PCIE_RQ_META_WIDTH),
+        .CHANNELS            (test::CHANNELS),
+        .PKT_SIZE_MAX        (test::PKT_SIZE_MAX),
+        .MI_WIDTH            (test::MI_WIDTH),
+        .DEVICE              (test::DEVICE),
+        .POINTER_WIDTH       (POINTER_WIDTH),
+        .SW_ADDR_WIDTH       (SW_ADDR_WIDTH)
+    ) speed;
 
-    localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
+    localparam USR_MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
@@ -28,16 +58,69 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
-    reset_if                                                                                                   reset(CLK);
-    mfb_if #(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, USER_META_WIDTH)                mfb_rx(CLK);
-    mfb_if #(PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH) mfb_tx(CLK);
-    mvb_if #(1, 1)                                                                                             mvb_dma(CLK);
-    mi_if #(MI_WIDTH, MI_WIDTH) mi_config(CLK);
+    reset_if reset(CLK);
+    mfb_if #(
+        .REGIONS     (USR_MFB_REGIONS),
+        .REGION_SIZE (USR_MFB_REGION_SIZE),
+        .BLOCK_SIZE  (USR_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (USR_MFB_ITEM_WIDTH),
+        .META_WIDTH  (USR_MFB_META_WIDTH)
+    ) usr_mfb (
+        .CLK(CLK)
+    );
+
+    mfb_if #(
+        .REGIONS     (PCIE_RQ_REGIONS),
+        .REGION_SIZE (PCIE_RQ_REGION_SIZE),
+        .BLOCK_SIZE  (PCIE_RQ_BLOCK_SIZE),
+        .ITEM_WIDTH  (PCIE_RQ_ITEM_WIDTH),
+        .META_WIDTH  (PCIE_RQ_META_WIDTH)
+    ) pcie_rq_mfb (
+        .CLK(CLK)
+    );
+
+    mfb_if #(
+        .REGIONS     (PCIE_RQ_REGIONS),
+        .REGION_SIZE (PCIE_RQ_REGION_SIZE),
+        .BLOCK_SIZE  (PCIE_RQ_BLOCK_SIZE),
+        .ITEM_WIDTH  (PCIE_RQ_ITEM_WIDTH),
+        .META_WIDTH  (PCIE_RQ_META_WIDTH)
+    ) ptr_upd_mfb (
+        .CLK(CLK)
+    );
+
+    mvb_if #(
+        .ITEMS(1),
+        .ITEM_WIDTH(PTR_UPD_REQ_MVB_ITEM_W)
+    ) ptr_upd_req_mvb (
+        .CLK(CLK)
+    );
+
+    mvb_if #(
+        .ITEMS(1),
+        .ITEM_WIDTH(1)
+    ) pkt_disc_mvb (
+        .CLK(CLK)
+    );
+
+    mi_if #(
+        .DATA_WIDTH(MI_WIDTH),
+        .ADDR_WIDTH(MI_WIDTH)
+    ) mi_config(
+        .CLK(CLK)
+    );
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD/2) CLK = ~CLK;
-    initial #(10ns) RST <= 0;
+    always begin
+        #(CLK_PERIOD/2)
+        CLK = ~CLK;
+    end
+
+    initial begin
+        #(10ns)
+        RST <= 0;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -45,11 +128,46 @@ module testbench;
         uvm_root m_root;
 
         // Configuration of database
-        uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(test::USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, USER_META_WIDTH))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH))::set(null, "", "vif_tx", mfb_tx);
-        uvm_config_db#(virtual mvb_if #(1, 1))::set(null, "", "vif_dma", mvb_dma);
-        uvm_config_db#(virtual mi_if #(MI_WIDTH, MI_WIDTH))::set(null, "", "vif_mi", mi_config);
+        uvm_config_db#(virtual reset_if)::set(null, "", "reset_vif", reset);
+
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS(test::USR_MFB_REGIONS),
+            .REGION_SIZE(USR_MFB_REGION_SIZE),
+            .BLOCK_SIZE(USR_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(USR_MFB_ITEM_WIDTH),
+            .META_WIDTH(USR_MFB_META_WIDTH)
+        ))::set(null, "", "usr_mfb_vif", usr_mfb);
+
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (PCIE_RQ_REGIONS),
+            .REGION_SIZE (PCIE_RQ_REGION_SIZE),
+            .BLOCK_SIZE  (PCIE_RQ_BLOCK_SIZE),
+            .ITEM_WIDTH  (PCIE_RQ_ITEM_WIDTH),
+            .META_WIDTH  (PCIE_RQ_META_WIDTH)
+        ))::set(null, "", "pcie_rq_mfb_vif", pcie_rq_mfb);
+
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (PCIE_RQ_REGIONS),
+            .REGION_SIZE (PCIE_RQ_REGION_SIZE),
+            .BLOCK_SIZE  (PCIE_RQ_BLOCK_SIZE),
+            .ITEM_WIDTH  (PCIE_RQ_ITEM_WIDTH),
+            .META_WIDTH  (PCIE_RQ_META_WIDTH)
+        ))::set(null, "", "ptr_upd_mfb_vif", ptr_upd_mfb);
+
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS(1),
+            .ITEM_WIDTH(PTR_UPD_REQ_MVB_ITEM_W)
+        ))::set(null, "", "ptr_upd_req_mvb_vif", ptr_upd_req_mvb);
+
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS(1),
+            .ITEM_WIDTH(1)
+        ))::set(null, "", "pkt_disc_mvb_vif", pkt_disc_mvb);
+
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH(MI_WIDTH),
+            .ADDR_WIDTH(MI_WIDTH)
+        ))::set(null, "", "config_mi_vif", mi_config);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -66,16 +184,16 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // DUT
-    DMA_LL_DUT #(
+    dut #(
         .DEVICE              (test::DEVICE),
-        .USER_REGIONS        (test::USER_REGIONS),
-        .USER_REGION_SIZE    (test::USER_REGION_SIZE   ),
-        .USER_BLOCK_SIZE     (test::USER_BLOCK_SIZE    ),
-        .USER_ITEM_WIDTH     (test::USER_ITEM_WIDTH    ),
-        .PCIE_UP_REGIONS     (test::PCIE_UP_REGIONS    ),
-        .PCIE_UP_REGION_SIZE (test::PCIE_UP_REGION_SIZE),
-        .PCIE_UP_BLOCK_SIZE  (test::PCIE_UP_BLOCK_SIZE ),
-        .PCIE_UP_ITEM_WIDTH  (test::PCIE_UP_ITEM_WIDTH ),
+        .USR_MFB_REGIONS     (test::USR_MFB_REGIONS),
+        .USR_MFB_REGION_SIZE (test::USR_MFB_REGION_SIZE),
+        .USR_MFB_BLOCK_SIZE  (test::USR_MFB_BLOCK_SIZE ),
+        .USR_MFB_ITEM_WIDTH  (test::USR_MFB_ITEM_WIDTH ),
+        .PCIE_RQ_REGIONS     (test::PCIE_RQ_REGIONS    ),
+        .PCIE_RQ_REGION_SIZE (test::PCIE_RQ_REGION_SIZE),
+        .PCIE_RQ_BLOCK_SIZE  (test::PCIE_RQ_BLOCK_SIZE ),
+        .PCIE_RQ_ITEM_WIDTH  (test::PCIE_RQ_ITEM_WIDTH ),
         .CHANNELS            (test::CHANNELS),
         .PKT_SIZE_MAX        (test::PKT_SIZE_MAX),
         .SW_ADDR_WIDTH       (test::SW_ADDR_WIDTH),
@@ -83,44 +201,45 @@ module testbench;
         .CNTRS_WIDTH         (test::CNTRS_WIDTH),
         .TRBUF_REG_EN        (test::TRBUF_REG_EN),
         .PERF_CNTR_EN        (test::PERF_CNTR_EN)
-    )
-    DUT_U (
-        .CLK        (CLK),
-        .RST        (RST | reset.RESET),
-        .mfb_rx     (mfb_rx),
-        .mfb_tx     (mfb_tx),
-        .config_mi  (mi_config)
+    ) dut_i (
+        .CLK             (CLK),
+        .RST             (RST | reset.RESET),
+        .usr_mfb         (usr_mfb),
+        .pcie_rq_mfb     (pcie_rq_mfb),
+        .ptr_upd_mfb     (ptr_upd_mfb),
+        .ptr_upd_req_mvb (ptr_upd_req_mvb),
+        .config_mi       (mi_config)
     );
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Properties
-    DMA_LL_PROPERTY #(
+    rx_calypte_property #(
         .DEVICE              (test::DEVICE),
-        .USER_REGIONS        (test::USER_REGIONS),
-        .USER_REGION_SIZE    (test::USER_REGION_SIZE   ),
-        .USER_BLOCK_SIZE     (test::USER_BLOCK_SIZE    ),
-        .USER_ITEM_WIDTH     (test::USER_ITEM_WIDTH    ),
-        .PCIE_UP_REGIONS     (test::PCIE_UP_REGIONS    ),
-        .PCIE_UP_REGION_SIZE (test::PCIE_UP_REGION_SIZE),
-        .PCIE_UP_BLOCK_SIZE  (test::PCIE_UP_BLOCK_SIZE ),
-        .PCIE_UP_ITEM_WIDTH  (test::PCIE_UP_ITEM_WIDTH ),
+        .USR_MFB_REGIONS     (test::USR_MFB_REGIONS),
+        .USR_MFB_REGION_SIZE (test::USR_MFB_REGION_SIZE),
+        .USR_MFB_BLOCK_SIZE  (test::USR_MFB_BLOCK_SIZE ),
+        .USR_MFB_ITEM_WIDTH  (test::USR_MFB_ITEM_WIDTH ),
+        .PCIE_RQ_REGIONS     (test::PCIE_RQ_REGIONS    ),
+        .PCIE_RQ_REGION_SIZE (test::PCIE_RQ_REGION_SIZE),
+        .PCIE_RQ_BLOCK_SIZE  (test::PCIE_RQ_BLOCK_SIZE ),
+        .PCIE_RQ_ITEM_WIDTH  (test::PCIE_RQ_ITEM_WIDTH ),
         .CHANNELS            (test::CHANNELS           ),
         .PKT_SIZE_MAX        (test::PKT_SIZE_MAX       )
-    )
-    PROPERTY_U (
-        .RESET      (RST | reset.RESET),
-        .mfb_rx     (mfb_rx),
-        .mfb_tx     (mfb_tx),
-        .config_mi  (mi_config)
+    ) rx_calypte_property_i (
+        .RESET       (RST | reset.RESET),
+        .usr_mfb     (usr_mfb),
+        .pcie_rq_mfb (pcie_rq_mfb),
+        .ptr_upd_mfb (ptr_upd_mfb),
+        .config_mi   (mi_config)
     );
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // GRAY BOX CONNECTION
-    assign mvb_dma.DATA = DUT_U.VHDL_DUT_U.rx_dma_hdr_manager_i.DMA_DISCARD;
-    assign mvb_dma.VLD  = '1;
-    assign mvb_dma.SRC_RDY = DUT_U.VHDL_DUT_U.rx_dma_hdr_manager_i.DMA_HDR_SRC_RDY;
-    assign mvb_dma.DST_RDY = DUT_U.VHDL_DUT_U.rx_dma_hdr_manager_i.DMA_HDR_DST_RDY;
+    assign pkt_disc_mvb.DATA = dut_i.VHDL_DUT_U.rx_dma_hdr_manager_i.DMA_DISCARD;
+    assign pkt_disc_mvb.VLD  = '1;
+    assign pkt_disc_mvb.SRC_RDY = dut_i.VHDL_DUT_U.rx_dma_hdr_manager_i.DMA_HDR_SRC_RDY;
+    assign pkt_disc_mvb.DST_RDY = dut_i.VHDL_DUT_U.rx_dma_hdr_manager_i.DMA_HDR_DST_RDY;
 
 endmodule

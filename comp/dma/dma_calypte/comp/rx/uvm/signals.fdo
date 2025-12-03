@@ -32,7 +32,6 @@ proc ints {PATH} {
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/stop_*
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/hdrm_*
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/mfb_*
-    add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/trbuf_fifo_*
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/data_path_dst_rdy
     add_wave [list -noupdate -hex -group "INTERNALS"] $PATH/hdr_log_dst_rdy
 }
@@ -61,6 +60,10 @@ proc high_level_view {PATH} {
     add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "pcie_hdr_dma_hdr_tran_fifo_status"] $PATH/rx_dma_hdr_manager_i/pcie_hdr_dma_hdr_tran_fifo_i/STATUS
     add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD"] $PATH/rx_dma_hdr_manager_i/dma_hdr_fifo_status
     add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "input_fifo_status"] $PATH/rx_dma_hdr_manager_i/input_mvb_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "discard_fifo_status"] $PATH/rx_dma_hdr_manager_i/dma_discard_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "pkt_size_fifo_status"] $PATH/rx_dma_hdr_manager_i/pkt_size_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "hdr_meta_fifo_status"] $PATH/rx_dma_hdr_manager_i/hdr_meta_fifo_i/STATUS
+    add_wave [list -noupdate -hex -group "HIGH LEVEL DASHBOARD" -label "ptr_fifo_status"] $PATH/rx_dma_hdr_manager_i/ptr_fifo_i/STATUS
 }
 
 proc hdr_ins {PATH} {
@@ -75,6 +78,7 @@ proc hdr_ins {PATH} {
     add_wave [list -noupdate -hex -group "HDR_INSERTOR" -group "DATA_SHIFTED_4"] "$PATH/rx_dma_hdr_insertor_i/RX_MFB_DATA(127 downto 0)"
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_SOF
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_EOF
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_EOF_POS
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_SRC_RDY
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/RX_MFB_DST_RDY
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/TX_*
@@ -83,12 +87,16 @@ proc hdr_ins {PATH} {
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(255 downto 128)"
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] "$PATH/rx_dma_hdr_insertor_i/bshifter_data_out(127 downto 0)"
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/low_shift_val
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_pst
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_nst
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_sel_pst
-    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_sel_nst
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_pst
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/high_shift_val_nst
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/tprocess_pst
     add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/tprocess_nst
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/init_shift
+    add_wave [list -noupdate -hex -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/shift_inc
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var1
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var2
+    add_wave [list -noupdate -unsigned -group "HDR_INSERTOR"] $PATH/rx_dma_hdr_insertor_i/temp_var3
 }
 
 proc inp_buff {PATH} {
@@ -96,7 +104,7 @@ proc inp_buff {PATH} {
 }
 
 proc trans_buff {PATH} {
-    add_wave [list -noupdate -hex -group "TRANSACTION_BUFFER"] $PATH/tr_buff_g/transaction_buffer_i/*
+    add_wave [list -noupdate -hex -group "TRANSACTION_BUFFER"] $PATH/transaction_buffer_i/*
 }
 
 proc hdr_mgr {PATH} {
@@ -113,8 +121,8 @@ proc sw_mgr {PATH} {
 
 proc conf_regs {PATH} {
 
-    set regs [list "R_CONTROL" "R_STATUS" "R_SDP" "R_SHP" "R_HDP" "R_HHP" "R_DADDR_LOW" "R_DADDR_HIGH" "R_HADDR_LOW" "R_HADDR_HIGH" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
-    set reg_idxs [list 0 1 4 5 6 7 16 17 18 19 22 23 24 25 26 27 28 29 30 31]
+    set regs [list "R_CONTROL" "R_STATUS" "R_EXP" "R_SDP" "R_SHP" "R_HDP" "R_HHP" "R_UPDATE_TIMEOUT" "R_DADDR_LOW" "R_DADDR_HIGH" "R_HADDR_LOW" "R_HADDR_HIGH" "R_UPD_ADDR_L" "R_UPD_ADDR_H" "R_DPM" "R_HPM" "R_SENT_PKTS_LOW" "R_SENT_PKTS_HIGH" "R_SENT_BYTES_LOW" "R_SENT_BYTES_HIGH" "R_DISC_PKTS_LOW" "R_DISC_PKTS_HIGH" "R_DISC_BYTES_LOW" "R_DISC_BYTES_HIGH"]
+    set reg_idxs [list 0 1 2 4 5 6 7 8 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31]
 
     foreach {n} $regs {i} $reg_idxs {
         add_wave [list -noupdate -hex -group "CONFIGURATION REGISTERS" -label "${n}_0"] $PATH/rx_dma_sw_manager_i/reg_gen(${i})/reg_i/memg(0)/lutram_i/distmem
@@ -123,6 +131,10 @@ proc conf_regs {PATH} {
             add_wave [list -noupdate -hex -group "CONFIGURATION REGISTERS" -label "${n}_1"] $PATH/rx_dma_sw_manager_i/reg_gen(${i})/reg_i/memg(1)/lutram_i/distmem
         }
     }
+}
+
+proc ptr_updater {PATH} {
+    add_wave [list -noupdate -hex -group "POINTER_UPDATER"] $PATH/dma_ptr_updater_i/*
 }
 
 proc pkt_cntrs {PATH} {

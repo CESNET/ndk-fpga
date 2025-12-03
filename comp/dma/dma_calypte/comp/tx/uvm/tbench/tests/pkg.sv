@@ -38,6 +38,8 @@ package test;
     // Parameters that set min and max size of PCIE transaction
     parameter PCIE_LEN_MAX            = 256;
 
+    parameter UPD_THRESHOLD           = PKT_SIZE_MAX;
+
     parameter CLK_PERIOD              = 4ns;
 
     `include "sequence.sv"

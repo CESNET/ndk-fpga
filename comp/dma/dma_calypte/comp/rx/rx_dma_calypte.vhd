@@ -72,6 +72,16 @@ entity RX_DMA_CALYPTE is
         MI_ARDY : out std_logic;
         MI_DRDY : out std_logic;
 
+        -- =========================================================================================
+        -- Pointer update interface
+        -- =========================================================================================
+        PTR_UPD_BUFF_BA  : out std_logic_vector(SW_ADDR_WIDTH -1 downto 0);
+        PTR_UPD_P2P_EN   : out std_logic;
+        PTR_UPD_HDP      : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_HHP      : out std_logic_vector(POINTER_WIDTH -1 downto 0);
+        PTR_UPD_DISP_EN  : out std_logic;
+        PTR_UPD_DISP_ACK : in  std_logic;
+
         -- =========================================================================================================
         -- User MFB interface
         --
@@ -144,6 +154,9 @@ architecture FULL of RX_DMA_CALYPTE is
     signal mi_split_ardy : std_logic_vector(MI_SPLIT_PORTS -1 downto 0);
     signal mi_split_drdy : std_logic_vector(MI_SPLIT_PORTS -1 downto 0);
 
+    -- =============================================================================================
+    -- SW Manager ---> Header Manager
+    -- =============================================================================================
     signal start_req_chan : std_logic_vector((log2(CHANNELS)-1) downto 0);
     signal start_req_vld  : std_logic;
     signal start_req_done : std_logic;
@@ -160,6 +173,7 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_hpm_rd_data  : std_logic_vector(POINTER_WIDTH-1 downto 0);
     signal hdrm_sdp_rd_data  : std_logic_vector(POINTER_WIDTH-1 downto 0);
     signal hdrm_shp_rd_data  : std_logic_vector(POINTER_WIDTH-1 downto 0);
+    signal hdrm_p2p_en_data  : std_logic;
 
     signal hdrm_hdp_update_chan : std_logic_vector(log2(CHANNELS)-1 downto 0);
     signal hdrm_hdp_update_data : std_logic_vector(POINTER_WIDTH-1 downto 0);
@@ -186,8 +200,10 @@ architecture FULL of RX_DMA_CALYPTE is
     signal hdrm_pkt_disc_inc   : std_logic;
     signal hdrm_pkt_sent_bytes : std_logic_vector((log2(PKT_SIZE_MAX+1)-1) downto 0);
 
+    -- =============================================================================================
+    -- Transaction Buffer ---> Header Insertor
+    -- =============================================================================================
     signal mfb_data_trbuf    : std_logic_vector(MFB_REGION_SIZE_TRBUF2INS*MFB_BLOCK_SIZE_TRBUF2INS*MFB_ITEM_WIDTH_TRBUF2INS-1 downto 0);
-    signal mfb_sof_pos_trbuf : std_logic_vector (max(1, log2(MFB_REGION_SIZE_TRBUF2INS))-1 downto 0);
     signal mfb_eof_pos_trbuf : std_logic_vector (max(1, log2(MFB_REGION_SIZE_TRBUF2INS*MFB_BLOCK_SIZE_TRBUF2INS))-1 downto 0);
     signal mfb_sof_trbuf     : std_logic;
     signal mfb_eof_trbuf     : std_logic;
@@ -471,9 +487,6 @@ begin
         START_REQ_VLD  => start_req_vld,
         START_REQ_ACK  => start_req_done,
 
-        STOP_FORCE_CHAN => open,
-        STOP_FORCE      => open,
-
         STOP_REQ_CHAN => stop_req_chan,
         STOP_REQ_VLD  => stop_req_vld,
         STOP_REQ_ACK  => stop_req_done,
@@ -502,12 +515,21 @@ begin
         HPM_RD_CHAN => hdrm_hdr_rd_chan,
         HPM_RD_DATA => hdrm_hpm_rd_data,
 
+        P2P_EN_CHAN => hdrm_hdr_rd_chan,
+        P2P_EN_DATA => hdrm_p2p_en_data,
+
+        PTR_UPD_BUFF_BA  => PTR_UPD_BUFF_BA,
+        PTR_UPD_P2P_EN   => PTR_UPD_P2P_EN,
+        PTR_UPD_HDP      => PTR_UPD_HDP,
+        PTR_UPD_HHP      => PTR_UPD_HHP,
+        PTR_UPD_DISP_EN  => PTR_UPD_DISP_EN,
+        PTR_UPD_DISP_ACK => PTR_UPD_DISP_ACK,
+
         DATA_BUFF_FULL_CHAN         => data_buff_full_chan,
         DATA_BUFF_FULL_CNTR_INCR    => data_buff_full_cntr_incr,
         DMA_HDR_BUFF_FULL_CHAN      => dma_hdr_buff_full_chan,
         DMA_HDR_BUFF_FULL_CNTR_INCR => dma_hdr_buff_full_cntr_incr
     );
-
 
     USER_RX_MFB_DST_RDY <= hdr_log_dst_rdy and data_path_dst_rdy;
 
@@ -549,6 +571,7 @@ begin
         ADDR_HEADER_BASE       => hdrm_hba_rd_data,
         ADDR_HEADER_MASK       => hdrm_hpm_rd_data,
         ADDR_HEADER_SW_POINTER => hdrm_shp_rd_data,
+        ADDR_HEADER_P2P_EN     => hdrm_p2p_en_data,
 
         INF_META     => USER_RX_MFB_META_HDR_META,
         INF_CHANNEL  => USER_RX_MFB_META_CHAN,
@@ -605,6 +628,7 @@ begin
         RX_MFB_DATA    => mfb_data_trbuf,
         RX_MFB_SOF     => mfb_sof_trbuf,
         RX_MFB_EOF     => mfb_eof_trbuf,
+        RX_MFB_EOF_POS => mfb_eof_pos_trbuf,
         RX_MFB_SRC_RDY => mfb_src_rdy_trbuf,
         RX_MFB_DST_RDY => mfb_dst_rdy_trbuf,
 
@@ -652,7 +676,7 @@ begin
         RX_MFB_DST_RDY => mfb_dst_rdy_lng_check,
 
         TX_MFB_DATA    => mfb_data_trbuf,
-        TX_MFB_SOF_POS => mfb_sof_pos_trbuf,
+        TX_MFB_SOF_POS => open,
         TX_MFB_EOF_POS => mfb_eof_pos_trbuf,
         TX_MFB_SOF     => mfb_sof_trbuf,
         TX_MFB_EOF     => mfb_eof_trbuf,

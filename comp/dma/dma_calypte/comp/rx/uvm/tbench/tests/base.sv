@@ -5,12 +5,35 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class base#(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE) extends uvm_test;
-    typedef uvm_component_registry#(test::base#(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE), "test::base") type_id;
+class base #(
+    int unsigned USR_MFB_REGIONS,
+    int unsigned USR_MFB_REGION_SIZE,
+    int unsigned USR_MFB_BLOCK_SIZE,
+    int unsigned USR_MFB_ITEM_WIDTH,
+    int unsigned PCIE_RQ_REGIONS,
+    int unsigned PCIE_RQ_REGION_SIZE,
+    int unsigned PCIE_RQ_BLOCK_SIZE,
+    int unsigned PCIE_RQ_ITEM_WIDTH,
+    int unsigned PCIE_RQ_META_WIDTH,
+    int unsigned CHANNELS,
+    int unsigned PKT_SIZE_MAX,
+    int unsigned MI_WIDTH,
+    string DEVICE,
+    int unsigned POINTER_WIDTH,
+    int unsigned SW_ADDR_WIDTH
+) extends uvm_test;
+
+    typedef uvm_component_registry #(test::base #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE,
+                                                  USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
+                                                  PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS,
+                                                  PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH),
+                                     "test::base") type_id;
 
 
-    uvm_dma_ll::env #(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE) m_env;
-    localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
+    uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS,
+                      PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS,
+                      PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) m_env;
+    localparam USR_MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     // ------------------------------------------------------------------------
     // Functions
@@ -27,14 +50,18 @@ class base#(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PC
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_dma_ll::env #(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE)::type_id::create("m_env", this);
+        m_env = uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
+                                  PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+                                  PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH,
+                                  SW_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences o their sequencers
     virtual task run_phase(uvm_phase phase);
         time end_time;
-        virt_seq #(USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH, CHANNELS) m_vseq;
+        virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
+                   PCIE_RQ_META_WIDTH, CHANNELS) m_vseq;
         uvm_reg_data_t pkt_cnt          [CHANNELS];
         uvm_reg_data_t byte_cnt         [CHANNELS];
         uvm_reg_data_t discard_pkt_cnt  [CHANNELS];
@@ -42,7 +69,8 @@ class base#(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PC
         uvm_status_e   status_r;
 
         //CREATE SEQUENCES
-        m_vseq = virt_seq #(USER_ITEM_WIDTH, PCIE_UP_REGIONS, PCIE_UP_REGION_SIZE, PCIE_UP_BLOCK_SIZE, PCIE_UP_ITEM_WIDTH, PCIE_UP_META_WIDTH, CHANNELS)::type_id::create("m_vseq");
+        m_vseq = virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                            PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS)::type_id::create("m_vseq");
 
         //RISE OBJECTION
         phase.raise_objection(this);
@@ -52,10 +80,11 @@ class base#(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PC
         m_vseq.start(m_env.m_sequencer);
 
         end_time = $time();
-        `uvm_info(this.get_full_name(), $sformatf("\n\tVirtual sequence finished (%0d ns). Environment used: %0d", end_time/1ns, m_env.used()), UVM_LOW);
+        `uvm_info(this.get_full_name(), $sformatf("\n\tVirtual sequence finished (%0d ns). Environment used: %0d",
+                                                  end_time/1ns, m_env.used()), UVM_LOW);
 
-        #(2us); //wait to send last packet to DUT. This prevent when last packet is not DUT yet and m_env.used() is called.
-        // The last packet can be stored in MFB sequence and environment doesnt have to see it.
+        #(2us); //wait to send last packet to DUT. This prevent when last packet is not DUT yet and m_env.used()
+        // is called. The last packet can be stored in MFB sequence and environment doesnt have to see it.
         // this means that m_env.used() can return 0 and last packet can be send to DUT.
         while((end_time + 200us) > $time() && m_env.used() != 0) begin
             #(600ns);
@@ -73,10 +102,10 @@ class base#(USER_REGIONS, USER_REGION_SIZE, USER_BLOCK_SIZE, USER_ITEM_WIDTH, PC
             m_env.m_regmodel.m_regmodel.channel[chan].disc_bytes_cnt.write(status_r, {32'h1, 32'h1});
             m_env.m_regmodel.m_regmodel.channel[chan].disc_bytes_cnt.read(status_r, discard_byte_cnt[chan]);
 
-            m_env.sc.pkt_cnt[chan]          = pkt_cnt[chan];
-            m_env.sc.byte_cnt[chan]         = byte_cnt[chan];
-            m_env.sc.discard_pkt_cnt[chan]  = discard_pkt_cnt[chan];
-            m_env.sc.discard_byte_cnt[chan] = discard_byte_cnt[chan];
+            m_env.m_scoreboard.m_pkt_cnt[chan]          = pkt_cnt[chan];
+            m_env.m_scoreboard.m_byte_cnt[chan]         = byte_cnt[chan];
+            m_env.m_scoreboard.m_discard_pkt_cnt[chan]  = discard_pkt_cnt[chan];
+            m_env.m_scoreboard.m_discard_byte_cnt[chan] = discard_byte_cnt[chan];
         end
 
         phase.drop_objection(this);

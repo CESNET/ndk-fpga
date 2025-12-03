@@ -13,6 +13,7 @@ lappend COMPONENTS \
       [ list "SV_LOGIC_VECTOR_ARRAY_MFB" "$UVM_PATH/logic_vector_array_mfb" "FULL"] \
       [ list "SV_LOGIC_VECTOR_MVB"       "$UVM_PATH/logic_vector_mvb"       "FULL"] \
       [ list "SV_MI"                     "$UVM_PATH/mi"                     "FULL"] \
+      [ list "PCIE"                      "$UVM_PATH/pcie"                   "FULL"]
 
 lappend MOD "$OFM_PATH/comp/base/pkg/pcie_meta_pack.sv"
 lappend MOD "$OFM_PATH/comp/base/pkg/dma_bus_pack.sv"
@@ -23,5 +24,5 @@ lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/tests/pkg.sv"
 
 lappend MOD "$ENTITY_BASE/tbench/dut.sv"
-lappend MOD "$ENTITY_BASE/tbench/property.sv"
+lappend MOD "$ENTITY_BASE/tbench/tx_dma_calypte_property.sv"
 lappend MOD "$ENTITY_BASE/tbench/testbench.sv"
