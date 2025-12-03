@@ -333,7 +333,7 @@ FIFO shared among multiple channels. This pointer is to determine the depth of t
 <tr class="row-even"><td><p>=====</p></td>
 <td><p>Channel status interface</p></td>
 <td><p>=====</p></td>
-<td><p>To signal initiation of a start/stop routine to other components</p></td>
+<td><p>To signal initiation of a start/stop routine to START_STOP_CTRL</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-start_req_chan"><td><p>START_REQ_CHAN</p></td>
 <td><p>std_logic_vector(log2(CHANNELS)-1 downto 0)</p></td>
@@ -369,6 +369,76 @@ FIFO shared among multiple channels. This pointer is to determine the depth of t
 <td><p>std_logic_vector(CHANNELS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Mask of active channels</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Runtime updates of a pointer within Pointer Updater</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-rt_upd_ch"><td><p>RT_UPD_CH</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-rt_upd_buff_ba"><td><p>RT_UPD_BUFF_BA</p></td>
+<td><p>std_logic_vector(64 -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-rt_upd_p2p_en"><td><p>RT_UPD_P2P_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Stopping/starting a channel within Pointer Updater</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_start_req_ch"><td><p>PTR_UPD_START_REQ_CH</p></td>
+<td><p>std_logic_vector(log2(CHANNELS) -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_start_req_vld"><td><p>PTR_UPD_START_REQ_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_start_req_ack"><td><p>PTR_UPD_START_REQ_ACK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_stop_req_buff_ba"><td><p>PTR_UPD_STOP_REQ_BUFF_BA</p></td>
+<td><p>std_logic_vector(64 -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_stop_req_p2p_en"><td><p>PTR_UPD_STOP_REQ_P2P_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_stop_req_hdp"><td><p>PTR_UPD_STOP_REQ_HDP</p></td>
+<td><p>std_logic_vector(DATA_POINTER_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_stop_req_hhp"><td><p>PTR_UPD_STOP_REQ_HHP</p></td>
+<td><p>std_logic_vector(DMA_HDR_POINTER_WIDTH -1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_stop_req_en"><td><p>PTR_UPD_STOP_REQ_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-tx_dma_sw_manager-ptr_upd_stop_req_ack"><td><p>PTR_UPD_STOP_REQ_ACK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
 <td><p>Pointer update interface</p></td>
