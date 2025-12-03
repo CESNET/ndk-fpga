@@ -8,7 +8,7 @@
 # the description of this file, visit the Parametrization section in the
 # documentation of the NDK-CORE repostiory
 
-set CARD_NAME        "FB2CDG1"
+set CARD_NAME        "FB2CDG1-VAR$BOARD_VARIANT"
 # Achitecture of Clock generator
 set CLOCK_GEN_ARCH   "INTEL"
 # Achitecture of PCIe module

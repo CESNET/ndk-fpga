@@ -9,10 +9,13 @@ COMBO_BASE = ../../../..
 CARD_BASE = $(COMBO_BASE)/cards/silicom/fb2cdg1
 APP_CONF = app_conf.tcl
 
+BOARD_VARIANT ?= 1
+export BOARD_VARIANT
+
 PCIE_CONF ?= 1xgen5x8x8
 export PCIE_CONF
 
-OUTPUT_NAME = fb2cdg1-minimal-pcie$(PCIE_CONF)
+OUTPUT_NAME = fb2cdg1-var$(BOARD_VARIANT)-minimal-pcie$(PCIE_CONF)
 
 .PHONY: all 400g2
 

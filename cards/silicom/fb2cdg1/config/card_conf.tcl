@@ -88,3 +88,4 @@ set MEM_PORTS 0
 # Other parameters:
 # ------------------------------------------------------------------------------
 set TSU_ENABLE true
+set BOARD_VARIANT $env(BOARD_VARIANT)
