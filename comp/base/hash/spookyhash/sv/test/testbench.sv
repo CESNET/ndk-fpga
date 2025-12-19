@@ -1,7 +1,6 @@
-
 /*!
  * \file testbench.sv
- * \brief SystemVerilog implementation of short version of SpookyHash non-cryptographic hash function.
+ * \brief Testbench for the SystemVerilog implementation of SpookyHash non-cryptographic function.
  * \author Ondrej Schwarz <ondrejschwarz@cesnet.cz>
  * \date 2025
  */
@@ -71,7 +70,7 @@ module testbench #(KEY_WIDTH = KEY_WIDTH, KEY_CNT=10000);
             seed2[32-1 :  0] = $urandom();
             seed2[64-1 : 32] = $urandom();
 
-            $display("generated key=%h, seed1=%d, seed2=%d", key, seed1, seed2);
+            $display("generated key=%x, seed1=%x, seed2=%x", key, seed1, seed2);
 
             // comparing 32-bit hashes
             hash[32-1 : 0] = SpookyHash #(KEY_WIDTH)::Hash32(key, seed1);
@@ -80,7 +79,7 @@ module testbench #(KEY_WIDTH = KEY_WIDTH, KEY_CNT=10000);
             assert (hash[32-1 : 0] == c_hash32)
             else
             begin
-                $fatal(1, "Hash32: Expected: %h, but got %h", c_hash32, hash[32-1 : 0]);
+                $fatal(1, "Hash32: Expected: %x, but got %x", c_hash32, hash[32-1 : 0]);
             end
 
             // comparing 64-bit hashes
@@ -90,7 +89,7 @@ module testbench #(KEY_WIDTH = KEY_WIDTH, KEY_CNT=10000);
             assert (hash[64-1 : 0] == c_hash64_1)
             else
             begin
-                $fatal(1, "Hash64: Expected %h, but got %h", c_hash64_1, hash[64-1 : 0]);
+                $fatal(1, "Hash64: Expected %x, but got %x", c_hash64_1, hash[64-1 : 0]);
             end
 
             // comparing 128-bit hashes
@@ -103,7 +102,7 @@ module testbench #(KEY_WIDTH = KEY_WIDTH, KEY_CNT=10000);
             assert (hash[64-1 : 0] == c_hash64_1 && hash[128-1 : 64] == c_hash64_2)
             else
             begin
-                $fatal(1, "Hash128: Expected %h%h, but got %h", c_hash64_2, c_hash64_1, hash);
+                $fatal(1, "Hash128: Expected %x%x, but got %x", c_hash64_2, c_hash64_1, hash);
             end
         end
     end

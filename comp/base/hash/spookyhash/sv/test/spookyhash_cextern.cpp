@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 #include "../../sw/SpookyV2.h"
-#include "spooky_dpi.h"
+#include "spookyhash_dpi.h"
 
 extern "C" {
     void svLogicVecVal_to_bytearray(const svLogicVecVal* vec, uint64_t length, uint8_t* bytearray)
