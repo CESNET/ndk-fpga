@@ -4,11 +4,8 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class valuer #(META_WIDTH) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(META_WIDTH));
-    `uvm_component_param_utils(uvm_pcie_intel_r_tile::valuer #(META_WIDTH))
-
-    localparam int unsigned HDR_WIDTH    = 128;
-    localparam int unsigned PREFIX_WIDTH = 32;
+class valuer extends uvm_subscriber #(uvm_pcie::header);
+    `uvm_component_param_utils(uvm_pcie_intel_r_tile::valuer)
 
     // Output
     uvm_analysis_port #(balance_item) analysis_port;
@@ -20,45 +17,25 @@ class valuer #(META_WIDTH) extends uvm_subscriber #(uvm_logic_vector::sequence_i
         analysis_port = new("analysis_port", this);
     endfunction
 
-    function void write(uvm_logic_vector::sequence_item #(META_WIDTH) t);
+    function void write(uvm_pcie::header t);
         balance_item cost = get_transaction_cost(t);
         analysis_port.write(cost);
     endfunction
 
-    function balance_item get_transaction_cost(uvm_logic_vector::sequence_item #(META_WIDTH) item);
+    function balance_item get_transaction_cost(uvm_pcie::header hdr);
         balance_item cost;
-
-        logic [HDR_WIDTH   -1 : 0] hdr;
-        logic [PREFIX_WIDTH-1 : 0] prefix;
-        logic [1           -1 : 0] error;
-        logic [3           -1 : 0] fmt;
-        logic [5           -1 : 0] pcie_type;
-        logic [1           -1 : 0] r0;
-        logic [3           -1 : 0] tc;
-        logic [1           -1 : 0] r1;
-        logic [1           -1 : 0] attr0;
-        logic [1           -1 : 0] r2;
-        logic [1           -1 : 0] th;
-        logic [1           -1 : 0] td;
-        logic [1           -1 : 0] ep;
-        logic [2           -1 : 0] attr1;
-        logic [2           -1 : 0] at;
-        logic [10          -1 : 0] length;
-
-        { error, prefix, hdr } = item.data;
-        { fmt, pcie_type, r0, tc, r1, attr0, r2, th, td, ep, attr1, at, length } = hdr[32*4-1 -: 32];
 
         cost = balance_item::type_id::create("cost");
 
         // Completion with Data
-        if ({ fmt, pcie_type } === 8'b01001010) begin
+        if ({ hdr.fmt, hdr.pcie_type } === 8'b01001010) begin
             cost.header.cpl = 1;
-            cost.data  .cpl = get_data_cost(length);
+            cost.data  .cpl = get_data_cost(hdr.length_get());
         end
         // Request with Data
-        else if (fmt[2 : 1] === 2'b01) begin
+        else if (hdr.fmt[2 : 1] === 2'b01) begin
             cost.header.p = 1;
-            cost.data  .p = get_data_cost(length);
+            cost.data  .p = get_data_cost(hdr.length_get());
         end
         // Request without Data
         else begin
@@ -68,8 +45,7 @@ class valuer #(META_WIDTH) extends uvm_subscriber #(uvm_logic_vector::sequence_i
         return cost;
     endfunction
 
-    function int unsigned get_data_cost(logic [10-1 : 0] length);
-        return ((((length === 10'b0) ? 1024 : length) - 1) / 4) + 1; // TLP length => credit value
+    function int unsigned get_data_cost(int unsigned length);
+        return ((length + 3) / 4); // TLP length => credit value
     endfunction
-
 endclass

@@ -12,23 +12,23 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
     localparam ENDPOINT_TYPE = "DUMMY";
 
     //PCIE
-    uvm_analysis_export   #(uvm_pcie::request_header)   pcie_rq[PCIE_ENDPOINTS];
-    uvm_analysis_export   #(uvm_pcie::completer_header) pcie_rc[PCIE_ENDPOINTS];
-    uvm_tlm_analysis_fifo #(uvm_pcie::request_header)   pcie_cq[PCIE_ENDPOINTS];
-    uvm_analysis_export   #(uvm_pcie::completer_header) pcie_cc[PCIE_ENDPOINTS];
+    uvm_analysis_export   #(uvm_pcie::header) pcie_rq[PCIE_ENDPOINTS];
+    uvm_analysis_export   #(uvm_pcie::header) pcie_rc[PCIE_ENDPOINTS];
+    uvm_tlm_analysis_fifo #(uvm_pcie::header) pcie_cq[PCIE_ENDPOINTS];
+    uvm_analysis_export   #(uvm_pcie::header) pcie_cc[PCIE_ENDPOINTS];
 
     uvm_analysis_export   #(uvm_dma::sequence_item_rq) dma_rq[PCIE_ENDPOINTS][DMA_PORTS];
     uvm_analysis_export   #(uvm_dma::sequence_item_rc) dma_rc[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_analysis_port     #(uvm_pcie::request_header)  dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_tlm_analysis_fifo #(uvm_pcie::completer_header)dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_analysis_port     #(uvm_pcie::header)  dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_tlm_analysis_fifo #(uvm_pcie::header)  dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     ////
     //MI
     uvm_analysis_export #(uvm_mi::sequence_item_response #(32))        mi_rsp[PCIE_ENDPOINTS];
     uvm_analysis_export #(uvm_mi::sequence_item_request #(32, 32, 0))  mi_req[PCIE_ENDPOINTS];
 
-    protected model_mtc #(32, 32)                        mtc[PCIE_ENDPOINTS];
-    protected model_ptc#(REGIONS, DMA_PORTS, ITEM_WIDTH) ptc[PCIE_ENDPOINTS];
+    protected model_mtc #(32, 32)                 mtc[PCIE_ENDPOINTS];
+    protected uvm_ptc::model#(REGIONS, DMA_PORTS) ptc[PCIE_ENDPOINTS];
     protected uvm_pcie::bar_config bar_cfg;
 
     function new(string name = "model_base", uvm_component parent = null);
@@ -56,6 +56,13 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
         end
         bar_cfg = null;
     endfunction
+
+    function void mi_resp_width_set(int unsigned width);
+        for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
+            mtc[it].resp_width_set(width);
+        end
+    endfunction
+
 
     virtual function void config_set(uvm_pcie::bar_config cfg);
         for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
@@ -86,14 +93,14 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
     function void build_phase(uvm_phase phase);
         for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
             const string pcie_str = $sformatf("_%0d", it);
-            model_ptc_config ptc_cfg;
+            uvm_ptc::model_ptc_config ptc_cfg;
 
             mtc[it] = model_mtc #(32, 32)::type_id::create({"mtc", pcie_str}, this);
 
             ptc_cfg = new();
             ptc_cfg.path = $sformatf("testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[%0d].pcie_ctrl_i.ptc_g.ptc_i", it);
-            uvm_config_db #(model_ptc_config)::set(this, {"ptc", pcie_str}, "m_config", ptc_cfg);
-            ptc[it] = model_ptc#(REGIONS, DMA_PORTS, ITEM_WIDTH)::type_id::create({"ptc", pcie_str}, this);
+            uvm_config_db #(uvm_ptc::model_ptc_config)::set(this, {"ptc", pcie_str}, "m_config", ptc_cfg);
+            ptc[it] = uvm_ptc::model#(REGIONS, DMA_PORTS)::type_id::create({"ptc", pcie_str}, this);
         end
     endfunction
 
@@ -117,19 +124,20 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
     endfunction
 
     task run_pcie_cq(uvm_phase phase, int unsigned port);
-        uvm_pcie::request_header request;
+        uvm_pcie::header hdr;
         forever begin
-            pcie_cq[port].get(request);
+            uvm_pcie::request_header request;
+            pcie_cq[port].get(hdr);
+            $cast(request, hdr);
+
 
             if (bar_cfg != null && request.fmt[0] == 1'b0) begin
+                logic [64-1:2] addr;
                 int unsigned bar = 0;
-                uvm_pcie_extend::request_header info_item;
 
+                addr = request.address;
+                bar_cfg.addr2bar(bar, addr);
 
-                assert ($cast(info_item, request)) else begin
-                    `uvm_fatal(this.get_full_name(), "\n\tCannocat cat request");
-                end
-                bar = info_item.bar;
                 if (DMA_BAR_ENABLE == 1 && bar == 2) begin
                     dma_cq[port][0].write(request);
                 end else begin
@@ -142,7 +150,7 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
     endtask
 
     task run_dma_cc(uvm_phase phase, int unsigned pcie_port, int unsigned dma_port);
-        uvm_pcie::completer_header request;
+        uvm_pcie::header request;
         forever begin
             dma_cc[pcie_port][dma_port].get(request);
             pcie_cc[pcie_port].write(request);

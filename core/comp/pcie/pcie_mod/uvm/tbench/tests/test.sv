@@ -8,11 +8,11 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     bit timeout;
-    uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_META_W,
-                                                   RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W,
-                                                   CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
-                                                   CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W,
-                                                   ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, DEVICE) m_env;
+    uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE,
+                        RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
+                        CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
+                        CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE,
+                        ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE, DEVICE) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -21,11 +21,11 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_META_W,
-                                                   RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W,
-                                                   CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
-                                                   CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W,
-                                                   ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, DEVICE)::type_id::create("m_env", this);
+        m_env = uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE,
+                                    RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
+                                    CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
+                                    CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE,
+                                    ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE, DEVICE)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
@@ -34,11 +34,11 @@ class ex_test extends uvm_test;
         time time_start;
 
 
-        uvm_pcie_top::sequence_base #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
-                                                         RQ_MFB_META_W,  CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS) m_virt_seq;
+        uvm_pcie_top::sequence_base #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE,
+                                      CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS) m_virt_seq;
 
-        m_virt_seq = uvm_pcie_top::sequence_base #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
-                                                         RQ_MFB_META_W,  CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, CC_MFB_META_W, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS)::type_id::create("m_vseq", this);
+        m_virt_seq = uvm_pcie_top::sequence_base #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE,  CQ_MFB_BLOCK_SIZE,
+                                                   CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, DMA_PORTS, PCIE_CONS, PCIE_ENDPOINTS)::type_id::create("m_vseq", this);
 
         //START TEST
         phase.raise_objection(this, "Start of rx sequence");
@@ -46,11 +46,22 @@ class ex_test extends uvm_test;
         assert(m_virt_seq.randomize());
         m_virt_seq.start(m_env.m_sequencer);
 
+        // Wait on all RQ transaction. Some can be stored in
+        // DUT and  Model
+        fork
+            begin
+                m_env.m_scoreboard.used();
+                m_virt_seq.stop_send();
+            end
+        join_none
+
         //STOP TEST
         time_start = $time();
-        while((time_start + 10ms) > $time() && m_env.m_scoreboard.used()) begin
+        while((time_start + 20ms) > $time() && m_env.m_scoreboard.used()) begin
             #(600ns);
         end
+
+
         phase.drop_objection(this, "End of rx sequence");
     endtask
 

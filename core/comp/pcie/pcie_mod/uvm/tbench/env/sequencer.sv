@@ -9,33 +9,26 @@ class sequencer#(
     int unsigned RC_MFB_REGIONS,
     int unsigned RC_MFB_REGION_SIZE,
     int unsigned RC_MFB_BLOCK_SIZE,
-    int unsigned RC_MFB_META_W,
 
     int unsigned CQ_MFB_REGIONS,
     int unsigned CQ_MFB_REGION_SIZE,
     int unsigned CQ_MFB_BLOCK_SIZE,
-    int unsigned CQ_MFB_META_W,
 
     int unsigned ITEM_WIDTH,
 
-    int unsigned RQ_MFB_META_W,
-    int unsigned CC_MFB_META_W,
     int unsigned DMA_PORTS,
     int unsigned PCIE_ENDPOINTS
 ) extends uvm_sequencer;
-    `uvm_component_param_utils(uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_META_W,
-                                                        CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, CQ_MFB_META_W,
-                                                        ITEM_WIDTH, RQ_MFB_META_W, CC_MFB_META_W, DMA_PORTS, PCIE_ENDPOINTS))
+    `uvm_component_param_utils(uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
+                                                        CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
+                                                        ITEM_WIDTH, DMA_PORTS, PCIE_ENDPOINTS))
 
     // RQ DMA
     uvm_dma::sequencer  m_dma_rq[PCIE_ENDPOINTS][DMA_PORTS];
-
     // RC DMA
-    uvm_mfb::sequencer #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, RC_MFB_META_W) m_dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_mvb::sequencer #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH) m_dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS];
 
     //DMA CQ
-    uvm_mfb::sequencer #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W) m_dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
+    //uvm_mfb::sequencer #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W) m_dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
     //DMA CC
     uvm_pcie::sequencer m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS]; //its very simular to pcie but only support pcie response transactions.
 
@@ -43,7 +36,8 @@ class sequencer#(
     uvm_mi::sequencer_master#(32, 32)                     m_mi_sqr[PCIE_ENDPOINTS];
 
     //PCIE sequencer
-    uvm_pcie::sequencer                                   m_pcie[PCIE_ENDPOINTS];
+    uvm_pcie::sequencer m_pcie_rc[PCIE_ENDPOINTS];
+    uvm_pcie::sequencer m_pcie_cq[PCIE_ENDPOINTS];
 
     // Reset sequencer
     uvm_reset::sequencer m_dma_reset;

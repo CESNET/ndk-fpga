@@ -20,10 +20,6 @@ SETTINGS = {
         "CC_MFB_REGION_SIZE"   : "1"                 ,
         "CC_MFB_BLOCK_SIZE"    : "8"                 ,
 
-        "AXI_CQUSER_WIDTH"     : "183"               ,
-        "AXI_CCUSER_WIDTH"     : "81"                ,
-        "AXI_RQUSER_WIDTH"     : "137"               ,
-        "AXI_RCUSER_WIDTH"     : "161"               ,
         "AXI_STRADDLING"       : "0"                 ,
 
         "DMA_BAR_ENABLE"       : 0,
@@ -184,11 +180,6 @@ SETTINGS = {
         "CC_MFB_REGION_SIZE"   : "1"                 ,
         "CC_MFB_BLOCK_SIZE"    : "8"                 ,
 
-
-        "AXI_CQUSER_WIDTH"     : "183"               ,
-        "AXI_CCUSER_WIDTH"     : "81"                ,
-        "AXI_RQUSER_WIDTH"     : "137"               ,
-        "AXI_RCUSER_WIDTH"     : "161"               ,
         "AXI_STRADDLING"       : "0"                 ,
 
         "DEVICE"               : "\\\"ULTRASCALE\\\"",

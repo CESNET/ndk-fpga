@@ -14,9 +14,7 @@ package uvm_pcie_top;
 
     `include "sequencer.sv"
     `include "sequence_mi.sv"
-    `include "sequence_dma_rq.sv"
     `include "sequence.sv"
-    `include "model_ptc.sv"
     `include "model_mtc.sv"
     `include "model_base.sv"
     `include "scoreboard.sv"

@@ -15,7 +15,20 @@ all PCIE /testbench/DUT_U/VHDL_DUT_U
 all PCIE_CORE testbench/DUT_U/VHDL_DUT_U/pcie_core_i
 
 for {set it 0} {$it < 4} {incr it} {
-    all PCIE_ADAPTER\[$it\] testbench/DUT_U/VHDL_DUT_U/pcie_core_i/pcie_adapter_g($it)/pcie_adapter_i
-    all PTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/ptc_g/ptc_i
-    all MTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/mtc_i
+#    all PCIE_ADAPTER\[$it\] testbench/DUT_U/VHDL_DUT_U/pcie_core_i/pcie_adapter_g($it)/pcie_adapter_i
+#    all PTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/ptc_g/ptc_i
+#    all MTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/mtc_i
+#    all CRDT\[$it\] testbench/DUT_U/VHDL_DUT_U/pcie_core_i/crdt_g($it)/crdt_i
+     add_wave "-group {CRDT\[$it\]}           -noupdate -hex" testbench/DUT_U/VHDL_DUT_U/pcie_core_i/crdt_g($it)/crdt_i/*
+     add_wave "-group {PCIE_AVST_DOWN\[$it\]} -noupdate -hex" testbench/DUT_U/VHDL_DUT_U/pcie_core_i/pcie_adapter_g($it)/pcie_adapter_i.AVST_DOWN*
 }
+
+all CLK  testbench/DUT_U/VHDL_DUT_U/pcie_core_i/pcie_clk
+
+
+
+#for {set it 0} {$it < 4} {incr it} {
+#    all PCIE_ADAPTER\[$it\] testbench/DUT_U/VHDL_DUT_U/pcie_core_i/pcie_adapter_g($it)/pcie_adapter_i
+#    all PTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/ptc_g/ptc_i
+#    all MTC\[$it\] testbench/DUT_U//VHDL_DUT_U/pcie_ctrl_g($it)/pcie_ctrl_i/mtc_i
+#}

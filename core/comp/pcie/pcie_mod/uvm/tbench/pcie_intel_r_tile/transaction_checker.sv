@@ -11,7 +11,7 @@ class transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_W
     localparam int unsigned PREFIX_WIDTH = 32;
 
     // Inputs
-    uvm_tlm_analysis_fifo #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)) avst_in;
+    uvm_tlm_analysis_fifo #(uvm_pcie::header) avst_in;
 
     uvm_tlm_analysis_fifo #(uvm_avst_crdt::sequence_item #(2)) avst_crdt_hdr_in [3];
     uvm_tlm_analysis_fifo #(uvm_avst_crdt::sequence_item #(4)) avst_crdt_data_in[3];
@@ -19,8 +19,8 @@ class transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_W
     balance_counter m_balance_counter;
 
     // AVST items => logic vector items => balance items converting logic
-    protected uvm_logic_vector_array_avst::monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) m_monitor;
-    protected valuer #(META_WIDTH) m_valuer;
+    //protected uvm_logic_vector_array_avst::monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) m_monitor;
+    protected valuer  m_valuer;
     protected uvm_tlm_analysis_fifo #(balance_item) cost_fifo;
 
     // Constructor
@@ -40,19 +40,19 @@ class transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_W
         super.build_phase(phase);
 
         m_balance_counter = balance_counter::type_id::create("m_balance_counter", this);
-        m_valuer = valuer #(META_WIDTH)::type_id::create("m_valuer", this);
-        m_monitor = uvm_logic_vector_array_avst::monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("m_monitor", this);
+        m_valuer = valuer::type_id::create("m_valuer", this);
+        //m_monitor = uvm_logic_vector_array_avst::monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("m_monitor", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
 
-        m_monitor.analysis_port.connect(m_valuer.analysis_export);
+        //m_monitor.analysis_port.connect(m_valuer.analysis_export);
         m_valuer.analysis_port.connect(cost_fifo.analysis_export);
     endfunction
 
     task run_phase(uvm_phase phase);
-        uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) avst_item;
+        uvm_pcie::header avst_item;
 
         uvm_avst_crdt::sequence_item #(2) avst_crdt_hdr_item [3];
         uvm_avst_crdt::sequence_item #(4) avst_crdt_data_item[3];
@@ -73,7 +73,7 @@ class transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_W
             total_cost.reset();
 
             // Write AVST item to monitor
-            m_monitor.write(avst_item);
+            //m_monitor.write(avst_item);
             while (cost_fifo.used() > 0) begin // Get all balance items
                 cost_fifo.get(item_cost);
 
