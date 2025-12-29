@@ -34,11 +34,19 @@ module testbench;
     // ------ //
 
     reset_if rst_usr           (CLK_USR);
+    pullup(rst_usr.RESET);
     reset_if rst_eth[ETH_PORTS](CLK_ETH[0]);
+    for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin : rst_gen
+        pullup(rst_eth[eth_it].RESET);
+    end
     reset_if rst_mi            (CLK_MI);
+    pullup(rst_mi.RESET);
     reset_if rst_mi_phy        (CLK_MI_PHY);
+    pullup(rst_mi_phy.RESET);
     reset_if rst_mi_pmd        (CLK_MI_PMD);
+    pullup(rst_mi_pmd.RESET);
     reset_if rst_tsu           (CLK_TSU);
+    pullup(rst_tsu.RESET);
 
     // ---------- //
     // Interfaces //

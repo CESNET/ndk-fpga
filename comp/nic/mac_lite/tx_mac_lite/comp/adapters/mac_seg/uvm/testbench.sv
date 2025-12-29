@@ -19,6 +19,7 @@ module testbench;
     intel_mac_seg_if #(test::SEGMENTS) tx_mac_seg(CLK);
     mfb_if #(test::REGIONS, test::REGION_SIZE, 8, 8, 1) rx_mac_seg(CLK);
     reset_if                           reset(CLK);
+    pullup(reset.RESET);
 
     always #(test::CLK_PERIOD/2) CLK = ~CLK;
 

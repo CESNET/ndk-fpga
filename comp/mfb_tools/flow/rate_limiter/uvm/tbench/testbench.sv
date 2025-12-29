@@ -16,6 +16,8 @@ module testbench;
 
     // Interfaces
     reset_if reset(CLK);
+    pullup(reset.RESET);
+
     mi_if  #(MI_DATA_WIDTH, MI_ADDR_WIDTH) mi(CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_rx(CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_tx(CLK);

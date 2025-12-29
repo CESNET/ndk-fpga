@@ -14,6 +14,7 @@ module testbench;
     // ---------------- //
 
     logic CLK = 0;
+    pullup(reset.RESET);
 
     always #(CLK_PERIOD) CLK = ~CLK;
 
