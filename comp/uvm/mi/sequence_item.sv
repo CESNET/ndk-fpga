@@ -88,7 +88,7 @@ class sequence_item_request #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, 
     function string convert2string();
         string s = "";
 
-        $sformat(s, {"MI REQUEST :\n\taddr: h%0h\n\tBE: '%b\n\twrite %b\n\tdwr: 'h%0h\n\tmeta: 'h%0h\n\tread %b\n\tardy %b\n"},
+        $sformat(s, {"\nMI REQUEST :\n\taddr: h%0h\n\tBE: '%b\n\twrite %b\n\tdwr: 'h%0h\n\tmeta: 'h%0h\n\tread %b\n\tardy %b\n"},
             addr,
             be,
             wr,
@@ -155,7 +155,7 @@ class sequence_item_response #(int unsigned DATA_WIDTH) extends uvm_common::sequ
     function string convert2string();
         string s = "";
 
-        $sformat(s, {"MI RESPONSE :\n\tdrd: h%0h\n\tardy: %b\n\tdrdy %b"},
+        $sformat(s, {"\nMI RESPONSE :\n\tdrd: h%0h\n\tardy: %b\n\tdrdy %b"},
             drd,
             ardy,
             drdy
