@@ -82,18 +82,25 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
 
     // Visualize the sequence item to string
     function string convert2string();
-        string output_string = "";
+        string ret = "";
 
-        $sformat(output_string, {"\n\tSRC_RDY: %b\n\tDST_RDY: %b\n"},
+        $sformat(ret, {"\n\tSRC_RDY: %b\n\tDST_RDY: %b\n"},
             src_rdy,
             dst_rdy
         );
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
-            output_string = {output_string, $sformatf("\n\t-- id %0d\n\tEOF %b EOF_POS %0d\n\tSOF %b SOF_POS %0d\n\tDATA %h\n\tMETA %h\n",  it, eof[it], eof_pos[it], sof[it], sof_pos[it], data[it], meta[it])};
+            ret = {ret, $sformatf("\n\t-- id %0d\n\tEOF %b EOF_POS %0d\n\tSOF %b SOF_POS %0d\n\tMETA %h\n",  it, eof[it], eof_pos[it], sof[it], sof_pos[it], meta[it])};
+            ret = {ret, "\tDATA"};
+            for (int unsigned jt = 0; jt < REGION_SIZE*BLOCK_SIZE; jt++) begin
+                if (jt % 8 == 0) begin
+                    ret = {ret, "\n\t"};
+                end
+                ret = {ret, $sformatf("%h  ", data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
+            end
         end
 
-        return output_string;
+        return ret;
     endfunction
 
 endclass
