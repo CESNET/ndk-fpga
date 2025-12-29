@@ -16,7 +16,6 @@ module DUT (
     mvb_if.dut_rx   UP_MVB[DMA_PORTS]  ,
     mfb_if.dut_tx   RQ_MFB             ,
     mvb_if.dut_tx   RQ_MVB             ,
-    mvb_if.dut_tx   RQ_PREFIX_MVB      ,
     //reset_if.dut    RST             //,
     // DOWNSTREAM
     mfb_if.dut_rx   RC_MFB             ,

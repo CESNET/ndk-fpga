@@ -289,7 +289,6 @@ class scoreboard #(META_WIDTH, MFB_DOWN_REGIONS, MFB_UP_REGIONS, DMA_MVB_UP_ITEM
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(32))           rq_mfb_out;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(PCIE_UPHDR_WIDTH))   rq_mvb_out;
-    uvm_analysis_export #(uvm_logic_vector::sequence_item #(PCIE_PREFIX_WIDTH))  rq_prefix_mvb_out;
     uvm_analysis_port   #(uvm_logic_vector::sequence_item #(HDR_USER_WIDTH))     rq_hdr_user_out;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(RQ_TUSER_WIDTH))     rq_axi_meta_out;
 
@@ -310,7 +309,6 @@ class scoreboard #(META_WIDTH, MFB_DOWN_REGIONS, MFB_UP_REGIONS, DMA_MVB_UP_ITEM
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(32))           dut_rq_mfb_out;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(PCIE_UPHDR_WIDTH))   dut_rq_mvb_out;
-    uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(PCIE_PREFIX_WIDTH))  dut_rq_prefix_mvb_out;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(RQ_TUSER_WIDTH))     dut_rq_axi_meta_out;
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(32))           dut_rc_mfb_out;
@@ -342,13 +340,11 @@ class scoreboard #(META_WIDTH, MFB_DOWN_REGIONS, MFB_UP_REGIONS, DMA_MVB_UP_ITEM
         rq_mfb_out            = new("rq_mfb_out",            this);
         rq_axi_meta_out       = new("rq_axi_meta_out",       this);
         rq_mvb_out            = new("rq_mvb_out",            this);
-        rq_prefix_mvb_out     = new("rq_prefix_mvb_out",     this);
         rq_hdr_user_out       = new("rq_hdr_user_out",       this);
 
         dut_rq_mfb_out        = new("dut_rq_mfb_out",        this);
         dut_rq_axi_meta_out   = new("dut_rq_axi_meta_out",   this);
         dut_rq_mvb_out        = new("dut_rq_mvb_out",        this);
-        dut_rq_prefix_mvb_out = new("dut_rq_prefix_mvb_out", this);
 
         model_up = new("model_up", this);
 
@@ -438,7 +434,6 @@ class scoreboard #(META_WIDTH, MFB_DOWN_REGIONS, MFB_UP_REGIONS, DMA_MVB_UP_ITEM
         rq_mfb_out.connect(dut_rq_mfb_out.analysis_export);
         rq_axi_meta_out.connect(dut_rq_axi_meta_out.analysis_export);
         rq_mvb_out.connect(dut_rq_mvb_out.analysis_export);
-        rq_prefix_mvb_out.connect(dut_rq_prefix_mvb_out.analysis_export);
 
         // Model outputs
         for (int it = 0; it < DMA_PORTS; it++) begin

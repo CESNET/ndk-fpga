@@ -25,7 +25,6 @@ class env #(DMA_MFB_UP_REGIONS, MFB_UP_REGIONS, MFB_UP_REG_SIZE,
     uvm_dma_up::env              #(DMA_MVB_UP_ITEMS, DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MFB_UP_ITEM_WIDTH, DMA_PORTS) m_env_up[DMA_PORTS];
     uvm_logic_vector_array_mfb::env_tx   #(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, 32, 0)                                      m_env_rq_mfb;
     uvm_logic_vector_mvb::env_tx #(MFB_UP_REGIONS, PCIE_UPHDR_WIDTH)                                                                       m_env_rq_mvb;
-    uvm_logic_vector_mvb::env_tx #(MFB_UP_REGIONS, PCIE_PREFIX_WIDTH)                                                                      m_env_rq_prefix_mvb;
     uvm_logic_vector_array_axi::env_tx #(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH, 32, MFB_UP_REGIONS, MFB_UP_BLOCK_SIZE, 1)                         m_env_rq_axi;
     // DOWNSTREAM
     uvm_logic_vector_array_mfb::env_tx   #(DMA_MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, MFB_DOWN_ITEM_WIDTH, 0)           m_env_down_mfb[DMA_PORTS];
@@ -48,7 +47,6 @@ class env #(DMA_MFB_UP_REGIONS, MFB_UP_REGIONS, MFB_UP_REG_SIZE,
         uvm_dma_up::config_item #(DMA_PORTS)    m_config_up[DMA_PORTS];
         uvm_logic_vector_array_mfb::config_item m_config_rq_mfb;
         uvm_logic_vector_mvb::config_item       m_config_rq_mvb;
-        uvm_logic_vector_mvb::config_item       m_config_rq_prefix_mvb;
         uvm_logic_vector_array_axi::config_item m_config_rq_axi;
         // DOWNSTREAM
         uvm_logic_vector_array_mfb::config_item m_config_down_mfb[DMA_PORTS];
@@ -92,10 +90,6 @@ class env #(DMA_MFB_UP_REGIONS, MFB_UP_REGIONS, MFB_UP_REG_SIZE,
         m_config_rq_mvb.active                = UVM_PASSIVE;
         m_config_rq_mvb.interface_name        = "vif_rq_mvb";
 
-        m_config_rq_prefix_mvb                = new;
-        m_config_rq_prefix_mvb.active         = UVM_PASSIVE;
-        m_config_rq_prefix_mvb.interface_name = "vif_rq_prefix_mvb";
-
         m_config_rq_axi                       = new;
         m_config_rq_axi.active                = UVM_ACTIVE;
         m_config_rq_axi.interface_name        = "vif_rq";
@@ -104,12 +98,10 @@ class env #(DMA_MFB_UP_REGIONS, MFB_UP_REGIONS, MFB_UP_REG_SIZE,
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rq_mfb", "m_config", m_config_rq_mfb);
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_rq_mvb", "m_config", m_config_rq_mvb);
-        uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_rq_prefix_mvb", "m_config", m_config_rq_prefix_mvb);
         uvm_config_db #(uvm_logic_vector_array_axi::config_item)::set(this, "m_env_rq_axi", "m_config", m_config_rq_axi);
 
         m_env_rq_mfb        = uvm_logic_vector_array_mfb::env_tx   #(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, 32, 0)::type_id::create("m_env_rq_mfb", this);
         m_env_rq_mvb        = uvm_logic_vector_mvb::env_tx #(MFB_UP_REGIONS, PCIE_UPHDR_WIDTH)::type_id::create("m_env_rq_mvb", this);
-        m_env_rq_prefix_mvb = uvm_logic_vector_mvb::env_tx #(MFB_UP_REGIONS, PCIE_PREFIX_WIDTH)::type_id::create("m_env_rq_prefix_mvb", this);
         m_env_rq_axi        = uvm_logic_vector_array_axi::env_tx#(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH, 32, MFB_UP_REGIONS, MFB_UP_BLOCK_SIZE, 1)::type_id::create("m_env_rq_axi", this);
 
         //m_config_reset = new;
@@ -168,7 +160,6 @@ class env #(DMA_MFB_UP_REGIONS, MFB_UP_REGIONS, MFB_UP_REG_SIZE,
         // m_env_rq_mvb.analysis_port.connect(m_env_rc.m_monitor.analysis_export);
         sc.rq_hdr_user_out.connect(m_env_rc.m_monitor.analysis_export);
         m_env_rq_mvb.analysis_port.connect(sc.rq_mvb_out);
-        m_env_rq_prefix_mvb.analysis_port.connect(sc.rq_prefix_mvb_out);
 
         if (DEVICE == "STRATIX10" || DEVICE == "AGILEX") begin
             m_env_rq_mfb.analysis_port_data.connect(sc.rq_mfb_out);
