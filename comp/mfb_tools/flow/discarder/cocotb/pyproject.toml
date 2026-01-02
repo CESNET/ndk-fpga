@@ -1,0 +1,11 @@
+[project]
+name = "cocotb-hash-table-simple-test"
+version = "0.1.0"
+dependencies = [
+    "cocotbext-ofm[nfb] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+    "setuptools",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
