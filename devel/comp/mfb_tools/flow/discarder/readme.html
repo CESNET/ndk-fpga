@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MFB Discarder &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MFB Discarder</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mfb_tools/flow/discarder/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mfb-discarder">
+<span id="id1"></span><h1>MFB Discarder<a class="headerlink" href="#mfb-discarder" title="Link to this heading"></a></h1>
+<p>MFB Discarder discards selected packets, consisting of MFB and associated MVB words, on the input interface.
+It is controlled by the <code class="docutils literal notranslate"><span class="pre">RX_MVB_DISCARD</span></code> input port / flag.
+Packets with <code class="docutils literal notranslate"><span class="pre">RX_MVB_DISCARD</span></code> set to 1 are discarded (dropped) by the component, while packets with <code class="docutils literal notranslate"><span class="pre">RX_MVB_DISCARD</span></code> set to 0 are passed to the output interface.</p>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<p>The architecture utilizes an MFB splitter with 2 output ports, with the <code class="docutils literal notranslate"><span class="pre">RX_MVB_DISCARD</span></code> connected to the <code class="docutils literal notranslate"><span class="pre">RX_MVB_SWITCH</span></code>. This signal thus selects the output port of the switch for each packet. The first switch’s output port is connected to the output port of the Discarder component, which is where the packets with <code class="docutils literal notranslate"><span class="pre">RX_MVB_DISCARD</span></code> set to 0 end up. The second switch’s output port is not connected (ready signal are tied to 1) and is used for the actual discarding.</p>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_discarder">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_DISCARDER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_discarder" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-regions"><td><p>REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>4</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-mvb_item_width"><td><p>MVB_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>MVB</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-mfb_reg_size"><td><p>MFB_REG_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>MFB</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-output_fifo_size"><td><p>OUTPUT_FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Size of output MVB FIFOs (in words)
+Minimum value is 2!</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Device</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-clk"><td><p>CLK</p></td>
+<td><p>in  std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>CLOCK AND RESET</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-reset"><td><p>RESET</p></td>
+<td><p>in  std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<td><p>in  std_logic_vector(REGIONS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>RX INTERFACE</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_discard"><td><p>RX_MVB_DISCARD</p></td>
+<td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>in  std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>out std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<td><p>in  std_logic_vector(REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<td><p>in  std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>in  std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<td><p>in  std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>out std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>out std_logic_vector(REGIONS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td><p>TX INTERFACE</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>out std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>out std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>in  std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>out std_logic_vector(REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>out std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>out std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>out std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>out std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>out std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>in  std_logic</p></td>
+<td><p>UNDEFINED</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
