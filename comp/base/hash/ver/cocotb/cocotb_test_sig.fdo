@@ -5,6 +5,6 @@
 view wave
 delete wave *
 
-add_wave -group {ALL} -noupdate -hex /spookyhash/*
+add_wave -group {ALL} -noupdate -hex /hash_wrapper/*
 
 config wave -signalnamewidth 1
