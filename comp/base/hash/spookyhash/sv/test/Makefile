@@ -11,35 +11,44 @@
 
 TOP_LEVEL=testbench
 TESTBENCH=testbench.sv
-MTI_HOME=/usr/local/fpga/modelsim/2024.1/questasim
+MTI_HOME=$(dir $(shell which vsim))..
+HASH_NAME=spookyhash
+CPP=../../sw/SpookyV2.cpp
+CEXTERN=${HASH_NAME}_cextern
+DPI=${HASH_NAME}_dpi.h
+
 CC=g++
 CFLAGS=-shared -fPIC -I. -I${MTI_HOME}/include -I../../sw
 SVC=vlog
 SVC_FLAGS=-sv
 SIM=vsim
-SIM_FLAGS=-c -sv_lib spooky_cextern -do "run -all; quit"
+SIM_FLAGS=-c -sv_lib ${CEXTERN} -do "run -all; quit"
 
 KEY_WIDTH=40 # passed to testbench.sv package
 
-all: testbench spooky_cextern.so
+all: ${TOP_LEVEL} ${CEXTERN}.so
 
-run: testbench spooky_cextern.so
-	$(SIM) $(SIM_FLAGS) $(TOP_LEVEL)
+run: ${TOP_LEVEL} ${CEXTERN}.so
+	${SIM} ${SIM_FLAGS} ${TOP_LEVEL}
 
-test: testbench spooky_cextern.so test.py
-	pytest test.py
+test: ${TOP_LEVEL} ${CEXTERN}.so test.py
+	python3 -m venv test_venv; \
+	. test_venv/bin/activate;  \
+	pip install pytest;        \
+	pytest test.py;            \
+	rm -fr test_venv
 
-testbench: $(TESTBENCH) spookyhash
-	$(SVC) $(SVC_FLAGS) $< +define+KEY_WIDTH=${KEY_WIDTH}
+${TOP_LEVEL}: ${TESTBENCH} ${HASH_NAME}
+	${SVC} ${SVC_FLAGS} $< +define+KEY_WIDTH=${KEY_WIDTH}
 
-spookyhash: ../spookyhash.sv
-	$(SVC) $(SVC_FLAGS) $^
+${HASH_NAME}: ../${HASH_NAME}.sv
+	${SVC} ${SVC_FLAGS} $^
 
-spooky_cextern.so: spooky_cextern.cpp ../../sw/SpookyV2.cpp spooky_dpi.h
+${CEXTERN}.so: ${CEXTERN}.cpp ${CPP} ${DPI}
 	${CC} ${CFLAGS} $^ -o $@
 
-spooky_dpi.h: $(TESTBENCH)
-	$(SVC) $(SVC_FLAGS) -dpiheader spooky_dpi.h $(TESTBENCH) +define+KEY_WIDTH=${KEY_WIDTH}
+${DPI}: ${TESTBENCH}
+	${SVC} ${SVC_FLAGS} -dpiheader ${DPI} ${TESTBENCH} +define+KEY_WIDTH=${KEY_WIDTH}
 
 clean:
-	@rm -r spooky_cextern.so spooky_dpi.h transcript work test_logs __pycache__
+	@rm -r ${CEXTERN}.so ${DPI} transcript work test_logs __pycache__

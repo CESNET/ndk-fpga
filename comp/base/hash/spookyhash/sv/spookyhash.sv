@@ -1,6 +1,6 @@
 /*!
  * \file spookyhash.sv
- * \brief Test for SystemVerilog implementation of short version of SpookyHash non-cryptographic hash function.
+ * \brief SystemVerilog implementation of short version of SpookyHash non-cryptographic hash function.
  * \author Ondrej Schwarz <ondrejschwarz@cesnet.cz>
  * \date 2025
  */
