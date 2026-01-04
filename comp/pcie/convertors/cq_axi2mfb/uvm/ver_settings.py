@@ -7,8 +7,6 @@ SETTINGS = {
         "MFB_REGIONS"     : "2"                 ,
         "MFB_REGION_SIZE" : "1"                 ,
         "MFB_BLOCK_SIZE"  : "8"                 ,
-        "MFB_ITEM_WIDTH"  : "32"                ,
-        "RQ_TUSER_WIDTH"  : "183"               ,
         "STRADDLING"      : "1"                 ,
         "DEVICE"          : "\\\"ULTRASCALE\\\"",
     },
@@ -16,12 +14,9 @@ SETTINGS = {
         "MFB_REGIONS"     : "1"                 ,
         "MFB_REGION_SIZE" : "1"                 ,
         "MFB_BLOCK_SIZE"  : "8"                 ,
-        "MFB_ITEM_WIDTH"  : "32"                ,
-        "RQ_TUSER_WIDTH"  : "88"                ,
         "STRADDLING"      : "0"                 ,
     },
     "axi_virtex" : {
-        "RQ_TUSER_WIDTH"  : "85"                ,
         "DEVICE"          : "\\\"VIRTEX7\\\""   ,
     },
     "axi_straddling_off" : {

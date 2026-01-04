@@ -15,12 +15,8 @@ package test;
     parameter MFB_REGIONS      = 2;
     parameter MFB_REGION_SIZE  = 1;
     parameter MFB_BLOCK_SIZE   = 8;
-    parameter MFB_ITEM_WIDTH   = 32;
-    parameter MFB_REGION_WIDTH = MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
 
-    parameter RQ_TUSER_WIDTH   = 183;
-    parameter RQ_TDATA_WIDTH   = MFB_REGIONS*MFB_REGION_WIDTH;
-    parameter STRADDLING       = 1;
+    parameter STRADDLING       = 0;
     parameter DEVICE           = "ULTRASCALE";
 
     parameter CLK_PERIOD = 5ns;
