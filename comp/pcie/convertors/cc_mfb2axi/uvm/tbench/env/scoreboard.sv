@@ -5,51 +5,33 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class scoreboard_cmp #(
-    int unsigned ITEM_WIDTH
-) extends uvm_common::comparer_base_ordered#(
-    uvm_logic_vector_array::sequence_item#(ITEM_WIDTH), 
+class scoreboard_cmp extends uvm_common::comparer_base_ordered#(
+    uvm_logic_vector_array::sequence_item#(32),
     uvm_pcie::header
 );
-    `uvm_component_param_utils(uvm_pcie_cc_mfb2axi::scoreboard_cmp#(ITEM_WIDTH))
+    `uvm_component_param_utils(uvm_pcie_cc_mfb2axi::scoreboard_cmp)
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
-    virtual function string model_item2string(MODEL_ITEM   tr);
-        uvm_pcie::completer_header hdr = new();
-        uvm_pcie_axi::get_comp_hdr(hdr, tr.data);
-
-        return hdr.convert2string();
-    endfunction
-
-
     virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
-        uvm_pcie::completer_header hdr = new();
-
-        uvm_pcie_axi::get_comp_hdr(hdr, tr_model.data);
-
-        //for (int unsigned it = 0; it < tr_dut.data.size(); it++) begin
-        //    if ((tr_dut.data[it] ==? tr_model.data[it]) === 1'b1 ) begin
-        //        return 1;
-        //    end
-        //end
+        uvm_pcie::completer_header hdr;
+        hdr = uvm_pcie_axi::hdr_cc_get(tr_model.data);
         return hdr.compare(tr_dut);
     endfunction
 
 endclass
 
-class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
+class scoreboard extends uvm_scoreboard;
+    `uvm_component_utils(uvm_pcie_cc_mfb2axi::scoreboard)
 
-    `uvm_component_utils(uvm_pcie_cc_mfb2axi::scoreboard #(ITEM_WIDTH))
+    localparam ITEM_WIDTH = 32;
 
     // Analysis components.
     uvm_analysis_export#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_imp_mfb_cc;
 
-    uvm_pcie_cc_mfb2axi::scoreboard_cmp#(ITEM_WIDTH) cmp;
-
-    protected uvm_pcie_mfb2avst::model#(ITEM_WIDTH, 0) m_model;
+    uvm_pcie_cc_mfb2axi::scoreboard_cmp cmp;
 
     // Contructor of scoreboard.
     function new(string name, uvm_component parent);
@@ -64,15 +46,12 @@ class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_model = uvm_pcie_mfb2avst::model #(ITEM_WIDTH, 0)::type_id::create("m_model", this);
-
-        cmp = uvm_pcie_cc_mfb2axi::scoreboard_cmp#(ITEM_WIDTH)::type_id::create("cmp", this);
+        cmp = uvm_pcie_cc_mfb2axi::scoreboard_cmp::type_id::create("cmp", this);
         cmp.model_tr_timeout_set(10ns);
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        analysis_imp_mfb_cc.connect(m_model.data_in.analysis_export);
-        m_model.data_out.connect(cmp.analysis_imp_model);
+        analysis_imp_mfb_cc.connect(cmp.analysis_imp_model);
     endfunction
 
     virtual function void report_phase(uvm_phase phase);

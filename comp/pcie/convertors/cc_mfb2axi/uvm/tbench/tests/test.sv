@@ -8,7 +8,7 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     bit timeout;
-    uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ITEMS, STRADDLING) m_env;
+    uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, DEVICE, STRADDLING) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -17,7 +17,7 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ITEMS, STRADDLING)::type_id::create("m_env", this);
+        m_env = uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, DEVICE, STRADDLING)::type_id::create("m_env", this);
     endfunction
 
     task test_wait_timeout(int unsigned time_length);
@@ -34,11 +34,11 @@ class ex_test extends uvm_test;
     // ------------------------------------------------------------------------
     // Create environment and Run sequences o their sequencers
     task run_seq_rx(uvm_phase phase);
-        virt_sequence#(MFB_ITEM_WIDTH) m_vseq;
+        virt_sequence m_vseq;
 
         phase.raise_objection(this, "Start of rx sequence");
 
-        m_vseq = virt_sequence#(MFB_ITEM_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence::type_id::create("m_vseq");
         assert(m_vseq.randomize());
         m_vseq.start(m_env.vscr);
 

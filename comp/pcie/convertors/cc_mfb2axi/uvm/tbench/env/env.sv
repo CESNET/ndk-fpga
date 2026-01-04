@@ -6,18 +6,27 @@
 
 // Environment for functional verification of encode.
 // This environment containts two mii agents.
-class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_ITEMS, STRADDLING) extends uvm_env;
+class env #(
+    int unsigned MFB_REGIONS,
+    int unsigned MFB_REGION_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    string DEVICE,
+    logic STRADDLING
+) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_ITEMS, STRADDLING));
+    `uvm_component_param_utils(uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, DEVICE, STRADDLING));
 
-    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_cc_env;
-    uvm_pcie_axi::env_tx #(PCIE_ITEMS, uvm_pcie_axi::AXI_CC, STRADDLING)                           axi_cc_env;
+    localparam ITEM_WIDTH = 32;
+    localparam PCIE_ITEMS = MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
 
-    uvm_pcie_cc_mfb2axi::virt_sequencer#(MFB_ITEM_WIDTH) vscr;
+    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0) mfb_cc_env;
+    uvm_pcie_axi::env_tx #(PCIE_ITEMS, uvm_pcie_axi::AXI_CC, DEVICE, STRADDLING)                      axi_cc_env;
+
+    uvm_pcie_cc_mfb2axi::virt_sequencer vscr;
     uvm_reset::agent       m_reset;
     uvm_reset::config_item m_config_reset;
 
-    scoreboard #(MFB_ITEM_WIDTH) m_scoreboard;
+    scoreboard m_scoreboard;
 
 
     // Constructor of environment.
@@ -53,11 +62,11 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_I
         uvm_config_db #(uvm_pcie::config_item)::set(this, "axi_cc_env", "m_config", axi_cc_cfg);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_cc_env", "m_config", mfb_cc_cfg);
 
-        axi_cc_env    = uvm_pcie_axi::env_tx #(PCIE_ITEMS, uvm_pcie_axi::AXI_CC, STRADDLING)::type_id::create("axi_cc_env", this);
-        mfb_cc_env    = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_cc_env", this);
+        axi_cc_env    = uvm_pcie_axi::env_tx #(PCIE_ITEMS, uvm_pcie_axi::AXI_CC, DEVICE, STRADDLING)::type_id::create("axi_cc_env", this);
+        mfb_cc_env    = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("mfb_cc_env", this);
 
-        m_scoreboard = scoreboard #(MFB_ITEM_WIDTH)::type_id::create("m_scoreboard", this);
-        vscr         = uvm_pcie_cc_mfb2axi::virt_sequencer#(MFB_ITEM_WIDTH)::type_id::create("vscr",this);
+        m_scoreboard = scoreboard::type_id::create("m_scoreboard", this);
+        vscr         = uvm_pcie_cc_mfb2axi::virt_sequencer::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

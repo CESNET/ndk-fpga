@@ -7,7 +7,6 @@
 import test::*;
 
 module DUT #(
-    int unsigned ITEMS,
     logic        STRADDLING
 )
 (
@@ -18,6 +17,7 @@ module DUT #(
 );
 
     localparam ITEM_WIDTH  = 32;
+    localparam ITEMS       = MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
     localparam TUSER_WIDTH = uvm_pcie_axi::tuser_width_get(ITEMS, uvm_pcie_axi::AXI_CC);
     logic [((MFB_REGION_SIZE != 1) ? MFB_REGIONS*$clog2(MFB_REGION_SIZE) : MFB_REGIONS)-1 : 0] cc_sof_pos;
 
@@ -27,7 +27,7 @@ module DUT #(
         .MFB_REGIONS       (MFB_REGIONS),
         .MFB_REGION_SIZE   (MFB_REGION_SIZE),
         .MFB_BLOCK_SIZE    (MFB_BLOCK_SIZE),
-        .MFB_ITEM_WIDTH    (MFB_ITEM_WIDTH),
+        .MFB_ITEM_WIDTH    (ITEM_WIDTH),
         .AXI_CCUSER_WIDTH  (TUSER_WIDTH),
         .AXI_DATA_WIDTH    (ITEMS*ITEM_WIDTH),
         .STRADDLING        (STRADDLING)
