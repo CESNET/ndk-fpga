@@ -4,14 +4,14 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_logic_vector_array::monitor #(ITEM_WIDTH);
-    `uvm_component_param_utils(uvm_logic_vector_array_avst::monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_logic_vector_array::monitor #(ITEM_WIDTH);
+    `uvm_component_param_utils(uvm_logic_vector_array_avst::monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
     // Analysis port
-    typedef monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) this_type;
-    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
+    typedef monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) this_type;
+    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
 
-    localparam EMPTY_WIDTH = $clog2(REGION_SIZE * BLOCK_SIZE);
+    localparam EMPTY_WIDTH = $clog2(REGION_SIZE);
 
     uvm_reset::sync_terminate                                 reset_sync;
     local uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) hi_tr;
@@ -29,7 +29,7 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
         reset_sync = new();
     endfunction
 
-    virtual function void write(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
+    virtual function void write(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) tr);
 
         logic [EMPTY_WIDTH-1 : 0] eop_pos[REGIONS];
         int unsigned pos_end = 0;
@@ -62,7 +62,7 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
             if (tr.valid[it]) begin
 
                 eop_pos[it] = ~tr.empty[it];
-                pos_end = tr.eop[it] ? eop_pos[it] : (REGION_SIZE*BLOCK_SIZE-1);
+                pos_end = tr.eop[it] ? eop_pos[it] : (REGION_SIZE-1);
 
                 if (tr.sop[it]) begin
                     if (hi_tr != null) begin
@@ -99,12 +99,12 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
     endfunction
 endclass
 
-class monitor_logic_vector #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_logic_vector::monitor#(META_WIDTH);
-    `uvm_component_param_utils(uvm_logic_vector_array_avst::monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class monitor_logic_vector #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_logic_vector::monitor#(META_WIDTH);
+    `uvm_component_param_utils(uvm_logic_vector_array_avst::monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
-    typedef monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) this_type;
+    typedef monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) this_type;
     // Analysis port
-    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
+    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
 
     uvm_reset::sync_terminate reset_sync;
     config_item::meta_type    meta_behav;
@@ -120,7 +120,7 @@ class monitor_logic_vector #(int unsigned REGIONS, int unsigned REGION_SIZE, int
         reset_sync = new();
     endfunction
 
-    virtual function void write(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
+    virtual function void write(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) tr);
         logic inframe = 1'b0;
 
         if (READY_LATENCY != 0) begin
