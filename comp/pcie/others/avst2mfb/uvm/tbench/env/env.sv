@@ -12,7 +12,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
 
     uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)  mfb_tx_env;
     uvm_logic_vector_array_mfb::config_item                                                                         mfb_tx_cfg;
-    uvm_logic_vector_array_avst::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY) avst_env;
+    uvm_logic_vector_array_avst::env_rx #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY) avst_env;
     uvm_logic_vector_array_avst::config_item                                                                        avst_cfg;
 
     uvm_pcie_avst2mfb::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) vscr;
@@ -58,7 +58,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
         uvm_config_db #(uvm_logic_vector_array_avst::config_item)::set(this, "avst_env", "m_config", avst_cfg);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_tx_env", "m_config", mfb_tx_cfg);
 
-        avst_env  = uvm_logic_vector_array_avst::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_env", this);
+        avst_env  = uvm_logic_vector_array_avst::env_rx #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_env", this);
         mfb_tx_env    = uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_tx_env", this);
 
         m_scoreboard = scoreboard #(MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("m_scoreboard", this);

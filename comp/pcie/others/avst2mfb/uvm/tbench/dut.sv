@@ -13,7 +13,19 @@ module DUT (
     avst_if.dut_rx  mfb_avst
     );
 
+    localparam AVST_ITEMS = MFB_REGION_SIZE*MFB_BLOCK_SIZE;
+    logic [MFB_REGIONS*AVST_ITEMS*MFB_ITEM_WIDTH-1:0] avst_data;
+    logic [MFB_REGIONS*META_WIDTH-1:0]                avst_meta;
+    logic [MFB_REGIONS*$clog2(AVST_ITEMS)-1:0]        avst_empty;
+
     assign mfb_rx.SOF_POS = '0;
+    generate
+        for (genvar it = 0; it < MFB_REGIONS; it++) begin
+            assign avst_data [(it+1)*AVST_ITEMS*MFB_ITEM_WIDTH -1 -: AVST_ITEMS*MFB_ITEM_WIDTH] = mfb_avst.DATA[it];
+            assign avst_meta [(it+1)*META_WIDTH -1                -: META_WIDTH]                = mfb_avst.META[it];
+            assign avst_empty[(it+1)*$clog2(AVST_ITEMS) -1         -: $clog2(AVST_ITEMS)]       = mfb_avst.EMPTY[it];
+        end
+    endgenerate
 
     PCIE_AVST2MFB #(
         .REGIONS            (MFB_REGIONS),
@@ -30,11 +42,11 @@ module DUT (
         .CLK            (CLK),
         .RST            (RST),
 
-        .RX_AVST_DATA    (mfb_avst.DATA),
-        .RX_AVST_META    (mfb_avst.META),
+        .RX_AVST_DATA    (avst_data),
+        .RX_AVST_META    (avst_meta),
         .RX_AVST_SOP     (mfb_avst.SOP),
         .RX_AVST_EOP     (mfb_avst.EOP),
-        .RX_AVST_EMPTY   (mfb_avst.EMPTY),
+        .RX_AVST_EMPTY   (avst_empty),
         .RX_AVST_VALID   (mfb_avst.VALID),
         .RX_AVST_READY   (mfb_avst.READY),
 
