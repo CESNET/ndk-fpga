@@ -1,0 +1,52 @@
+# general.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): Denis Kurka <kurka@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+# Main device/configuration
+# ==============================================================================
+
+set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "AVST X8"
+set_global_assignment -name PWRMGT_DEVICE_ADDRESS_IN_PMBUS_SLAVE_MODE 01
+set_global_assignment -name PWRMGT_VOLTAGE_OUTPUT_FORMAT "LINEAR FORMAT"
+set_global_assignment -name PWRMGT_LINEAR_FORMAT_N "-12"
+
+set_global_assignment -name VID_OPERATION_MODE "PMBUS SLAVE"
+set_global_assignment -name USE_PWRMGT_SCL SDM_IO0
+set_global_assignment -name USE_PWRMGT_SDA SDM_IO12
+set_global_assignment -name USE_PWRMGT_ALERT SDM_IO9
+set_global_assignment -name USE_INIT_DONE SDM_IO5
+set_global_assignment -name USE_CONF_DONE SDM_IO16
+set_global_assignment -name USE_HPS_COLD_RESET SDM_IO7
+set_global_assignment -name DEVICE_INITIALIZATION_CLOCK OSC_CLK_1_125MHZ
+
+set_global_assignment -name GENERATE_PR_RBF_FILE ON
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
+set_global_assignment -name GENERATE_COMPRESSED_SOF ON
+set_global_assignment -name AUTO_RESTART_CONFIGURATION OFF
+set_global_assignment -name MINIMUM_SEU_INTERVAL 0
+
+set_global_assignment -name FLOW_ENABLE_HYPER_RETIMER_FAST_FORWARD ON
+set_global_assignment -name OPTIMIZATION_MODE "SUPERIOR PERFORMANCE"
+set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON
+
+# ==============================================================================
+# Clocks
+# ==============================================================================
+
+set_location_assignment PIN_FJ58 -to SYSCLK_100_P
+set_location_assignment PIN_FH57 -to "SYSCLK_100_P(n)"
+set_instance_assignment -name IO_STANDARD "1.2V TRUE DIFFERENTIAL SIGNALING" -to SYSCLK_100_P
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SYSCLK_100_P
+
+# ==============================================================================
+# Startup singals
+# ==============================================================================
+
+set_location_assignment PIN_FU60 -to MCIO_GPIO_EN_L
+set_location_assignment PIN_GA60 -to EXT_GPIO_EN_L
+
+set_instance_assignment -name IO_STANDARD 1.2V -to MCIO_GPIO_EN_L
+set_instance_assignment -name IO_STANDARD 1.2V -to EXT_GPIO_EN_L

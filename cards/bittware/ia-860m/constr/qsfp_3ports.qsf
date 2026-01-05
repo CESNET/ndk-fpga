@@ -1,0 +1,150 @@
+# qsfp_3port.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): Denis Kurka <kurka@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ---------------------
+# F-Tile 12A, QSFPDD0
+# ---------------------
+# Reference Clock
+# Refclk #5 - PIN_DK59
+set_location_assignment PIN_DK59 -to QSFP0_REFCLK
+set_location_assignment PIN_DJ60 -to "QSFP0_REFCLK(n)"
+
+# QSFPDD0 Recovered Clock from the FPGA
+# Refclk #9 - PIN_CR60
+# set_location_assignment PIN_CR60 -to RECV0_CLK
+# set_location_assignment PIN_CT59 -to "RECV0_CLK(n)"
+
+# F-Tile 12A, Quad3 Lanes 0-3
+# F-Tile 12A, Quad2 Lanes 4-7
+set_location_assignment PIN_CM69 -to QSFP0_RX_P[0]
+set_location_assignment PIN_CL68 -to QSFP0_RX_N[0]
+set_location_assignment PIN_CT69 -to QSFP0_RX_P[1]
+set_location_assignment PIN_CR68 -to QSFP0_RX_N[1]
+set_location_assignment PIN_CY69 -to QSFP0_RX_P[2]
+set_location_assignment PIN_CW68 -to QSFP0_RX_N[2]
+set_location_assignment PIN_DD69 -to QSFP0_RX_P[3]
+set_location_assignment PIN_DC68 -to QSFP0_RX_N[3]
+set_location_assignment PIN_DH69 -to QSFP0_RX_P[4]
+set_location_assignment PIN_DG68 -to QSFP0_RX_N[4]
+set_location_assignment PIN_DJ66 -to QSFP0_RX_P[5]
+set_location_assignment PIN_DK65 -to QSFP0_RX_N[5]
+set_location_assignment PIN_DM69 -to QSFP0_RX_P[6]
+set_location_assignment PIN_DL68 -to QSFP0_RX_N[6]
+set_location_assignment PIN_DN66 -to QSFP0_RX_P[7]
+set_location_assignment PIN_DP65 -to QSFP0_RX_N[7]
+set_location_assignment PIN_CM63 -to QSFP0_TX_P[0]
+set_location_assignment PIN_CL62 -to QSFP0_TX_N[0]
+set_location_assignment PIN_CN66 -to QSFP0_TX_P[1]
+set_location_assignment PIN_CP65 -to QSFP0_TX_N[1]
+set_location_assignment PIN_CT63 -to QSFP0_TX_P[2]
+set_location_assignment PIN_CR62 -to QSFP0_TX_N[2]
+set_location_assignment PIN_CU66 -to QSFP0_TX_P[3]
+set_location_assignment PIN_CV65 -to QSFP0_TX_N[3]
+set_location_assignment PIN_CY63 -to QSFP0_TX_P[4]
+set_location_assignment PIN_CW62 -to QSFP0_TX_N[4]
+set_location_assignment PIN_DA66 -to QSFP0_TX_P[5]
+set_location_assignment PIN_DB65 -to QSFP0_TX_N[5]
+set_location_assignment PIN_DD63 -to QSFP0_TX_P[6]
+set_location_assignment PIN_DC62 -to QSFP0_TX_N[6]
+set_location_assignment PIN_DE66 -to QSFP0_TX_P[7]
+set_location_assignment PIN_DF65 -to QSFP0_TX_N[7]
+
+# ---------------------
+# F-Tile 13A, QSFPDD1
+# ---------------------
+# Reference Clock
+# Refclk #5 - PIN_DE14
+set_location_assignment PIN_DE14 -to QSFP1_REFCLK
+set_location_assignment PIN_DF13 -to "QSFP1_REFCLK(n)"
+
+# QSFPDD1 Recovered Clock from the FPGA
+# Refclk #9 - PIN_DY13
+# set_location_assignment PIN_DY13 -to RECV1_CLK
+# set_location_assignment PIN_EA14 -to RECV1_CLK(n)
+
+# F-Tile 13A, Quad3 Lanes 0-3
+# F-Tile 13A, Quad2 Lanes 4-7
+set_location_assignment PIN_EC4  -to QSFP1_RX_P[0]
+set_location_assignment PIN_ED5  -to QSFP1_RX_N[0]
+set_location_assignment PIN_EB1  -to QSFP1_RX_P[1]
+set_location_assignment PIN_EA2  -to QSFP1_RX_N[1]
+set_location_assignment PIN_DW4  -to QSFP1_RX_P[2]
+set_location_assignment PIN_DY5  -to QSFP1_RX_N[2]
+set_location_assignment PIN_DV1  -to QSFP1_RX_P[3]
+set_location_assignment PIN_DU2  -to QSFP1_RX_N[3]
+set_location_assignment PIN_DR4  -to QSFP1_RX_P[4]
+set_location_assignment PIN_DT5  -to QSFP1_RX_N[4]
+set_location_assignment PIN_DP1  -to QSFP1_RX_P[5]
+set_location_assignment PIN_DN2  -to QSFP1_RX_N[5]
+set_location_assignment PIN_DL4  -to QSFP1_RX_P[6]
+set_location_assignment PIN_DM5  -to QSFP1_RX_N[6]
+set_location_assignment PIN_DK1  -to QSFP1_RX_P[7]
+set_location_assignment PIN_DJ2  -to QSFP1_RX_N[7]
+set_location_assignment PIN_EB7  -to QSFP1_TX_P[0]
+set_location_assignment PIN_EA8  -to QSFP1_TX_N[0]
+set_location_assignment PIN_DW10 -to QSFP1_TX_P[1]
+set_location_assignment PIN_DY11 -to QSFP1_TX_N[1]
+set_location_assignment PIN_DV7  -to QSFP1_TX_P[2]
+set_location_assignment PIN_DU8  -to QSFP1_TX_N[2]
+set_location_assignment PIN_DR10 -to QSFP1_TX_P[3]
+set_location_assignment PIN_DT11 -to QSFP1_TX_N[3]
+set_location_assignment PIN_DP7  -to QSFP1_TX_P[4]
+set_location_assignment PIN_DN8  -to QSFP1_TX_N[4]
+set_location_assignment PIN_DL10 -to QSFP1_TX_P[5]
+set_location_assignment PIN_DM11 -to QSFP1_TX_N[5]
+set_location_assignment PIN_DK7  -to QSFP1_TX_P[6]
+set_location_assignment PIN_DJ8  -to QSFP1_TX_N[6]
+set_location_assignment PIN_DG10 -to QSFP1_TX_P[7]
+set_location_assignment PIN_DH11 -to QSFP1_TX_N[7]
+
+# ---------------------
+# F-Tile 13C, QSFPDD2
+# ---------------------
+# Reference Clock
+# Refclk #5 - PIN_BW14
+set_location_assignment PIN_BW14 -to QSFP2_REFCLK
+set_location_assignment PIN_BY13 -to "QSFP2_REFCLK(n)"
+
+# QSFPDD2 Recovered Clock from the FPGA
+# Refclk #9 - PIN_BT11
+# set_location_assignment PIN_BT11 -to RECV2_CLK
+# set_location_assignment PIN_BU10 -to "RECV2_CLK(n)"
+
+# F-Tile 13C, Quad3 Lanes 0-3
+# F-Tile 13C, Quad2 Lanes 4-7
+set_location_assignment PIN_BK1 -to QSFP2_RX_P[0]
+set_location_assignment PIN_BL2 -to QSFP2_RX_N[0]
+set_location_assignment PIN_BF1 -to QSFP2_RX_P[1]
+set_location_assignment PIN_BG2 -to QSFP2_RX_N[1]
+set_location_assignment PIN_BJ4 -to QSFP2_RX_P[2]
+set_location_assignment PIN_BH5 -to QSFP2_RX_N[2]
+set_location_assignment PIN_BB1 -to QSFP2_RX_P[3]
+set_location_assignment PIN_BC2 -to QSFP2_RX_N[3]
+set_location_assignment PIN_BE4 -to QSFP2_RX_P[4]
+set_location_assignment PIN_BD5 -to QSFP2_RX_N[4]
+set_location_assignment PIN_AV1 -to QSFP2_RX_P[5]
+set_location_assignment PIN_AW2 -to QSFP2_RX_N[5]
+set_location_assignment PIN_BA4 -to QSFP2_RX_P[6]
+set_location_assignment PIN_AY5 -to QSFP2_RX_N[6]
+set_location_assignment PIN_AP1 -to QSFP2_RX_P[7]
+set_location_assignment PIN_AR2 -to QSFP2_RX_N[7]
+set_location_assignment PIN_BP7  -to QSFP2_TX_P[0]
+set_location_assignment PIN_BR8  -to QSFP2_TX_N[0]
+set_location_assignment PIN_BK7  -to QSFP2_TX_P[1]
+set_location_assignment PIN_BL8  -to QSFP2_TX_N[1]
+set_location_assignment PIN_BJ10 -to QSFP2_TX_P[2]
+set_location_assignment PIN_BH11 -to QSFP2_TX_N[2]
+set_location_assignment PIN_BF7  -to QSFP2_TX_P[3]
+set_location_assignment PIN_BG8  -to QSFP2_TX_N[3]
+set_location_assignment PIN_BE10 -to QSFP2_TX_P[4]
+set_location_assignment PIN_BD11 -to QSFP2_TX_N[4]
+set_location_assignment PIN_BB7  -to QSFP2_TX_P[5]
+set_location_assignment PIN_BC8  -to QSFP2_TX_N[5]
+set_location_assignment PIN_BA10 -to QSFP2_TX_P[6]
+set_location_assignment PIN_AY11 -to QSFP2_TX_N[6]
+set_location_assignment PIN_AV7  -to QSFP2_TX_P[7]
+set_location_assignment PIN_AW8  -to QSFP2_TX_N[7]
+
