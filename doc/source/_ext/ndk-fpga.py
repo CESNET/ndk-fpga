@@ -4,26 +4,33 @@
 #            Martin Spinler <spinler@cesnet.cz>
 
 import os
+from pathlib import Path
+
+
+_symlink_dirs = {
+    "apps": "ndk_apps",
+    "core": "ndk_core",
+    "build": "ndk_build",
+    "cards": "ndk_cards",
+    "extra": "ndk_extra",
+    "comp": "comp",
+    "tests": "tests",
+}
 
 
 def build_init(app):
-    os.symlink(app.srcdir + '/../../apps', app.srcdir + '/ndk_apps')
-    os.symlink(app.srcdir + '/../../core', app.srcdir + '/ndk_core')
-    os.symlink(app.srcdir + '/../../build', app.srcdir + '/ndk_build')
-    os.symlink(app.srcdir + '/../../cards', app.srcdir + '/ndk_cards')
-    os.symlink(app.srcdir + '/../../extra', app.srcdir + '/ndk_extra')
-    os.symlink(app.srcdir + '/../../comp', app.srcdir + '/comp')
-    os.symlink(app.srcdir + '/../../tests', app.srcdir + '/tests')
+    srcdir = Path(app.srcdir)
+    for k, v in _symlink_dirs.items():
+        try:
+            os.symlink(srcdir / '../..' / k, srcdir / v)
+        except FileExistsError:
+            pass
 
 
 def build_finish(app, exception):
-    os.remove(app.srcdir + '/ndk_apps')
-    os.remove(app.srcdir + '/ndk_core')
-    os.remove(app.srcdir + '/ndk_build')
-    os.remove(app.srcdir + '/ndk_cards')
-    os.remove(app.srcdir + '/ndk_extra')
-    os.remove(app.srcdir + '/comp')
-    os.remove(app.srcdir + '/tests')
+    srcdir = Path(app.srcdir)
+    for v in _symlink_dirs.values():
+        os.remove(srcdir / v)
 
 
 def setup(app):
