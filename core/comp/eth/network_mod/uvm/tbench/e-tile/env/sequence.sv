@@ -12,7 +12,7 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
 
     uvm_sequence #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) eth_rx_data;
     uvm_sequence #(uvm_logic_vector::sequence_item #(6))                eth_rx_meta;
-    uvm_sequence #(uvm_avst::sequence_item #(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)) eth_tx;
+    uvm_sequence #(uvm_avst::sequence_item #(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)) eth_tx;
 
     protected uvm_common::sequences_cfg_sync#(2) seq_sync_eth_rx;
 
@@ -34,7 +34,7 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
 
     task pre_body();
         uvm_packet_generators::sequence_flowtest #(ITEM_WIDTH)                                                 lib_eth_rx_data;
-        uvm_avst::sequence_lib_tx                #(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1) lib_eth_tx;
+        uvm_avst::sequence_lib_tx                #(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1) lib_eth_tx;
 
         super.pre_body();
 
@@ -52,7 +52,7 @@ class virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIO
 
         // ETH SEQURENCE TX
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx, "", "state", seq_sync_end);
-        lib_eth_tx = uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)::type_id::create("eth_tx", p_sequencer.eth_tx);
+        lib_eth_tx = uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)::type_id::create("eth_tx", p_sequencer.eth_tx);
         lib_eth_tx.init_sequence();
         lib_eth_tx.max_random_count = 20;
         lib_eth_tx.min_random_count = 10;
@@ -213,7 +213,7 @@ class virt_sequence_port_stop #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, 
 
     uvm_sequence #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) eth_rx_data;
     uvm_sequence #(uvm_logic_vector::sequence_item #(6))                eth_rx_meta;
-    uvm_sequence #(uvm_avst::sequence_item #(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)) eth_tx;
+    uvm_sequence #(uvm_avst::sequence_item #(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)) eth_tx;
 
     protected uvm_common::sequences_cfg_sync#(2) seq_sync_eth_rx;
 
@@ -236,7 +236,7 @@ class virt_sequence_port_stop #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, 
     task pre_body();
         uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)                           lib_eth_rx_data;
         //uvm_logic_vector::sequence_simple#(6)                                       lib_eth_rx_meta;
-        uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)  lib_eth_tx;
+        uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)  lib_eth_tx;
 
         super.pre_body();
 
@@ -255,7 +255,7 @@ class virt_sequence_port_stop #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, 
 
         // ETH SEQURENCE TX
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.eth_tx, "", "state", seq_sync_end);
-        lib_eth_tx = uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)::type_id::create("eth_tx", p_sequencer.eth_tx);
+        lib_eth_tx = uvm_avst::sequence_lib_tx#(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH,  1)::type_id::create("eth_tx", p_sequencer.eth_tx);
         lib_eth_tx.init_sequence();
         lib_eth_tx.max_random_count = 20;
         lib_eth_tx.min_random_count = 10;

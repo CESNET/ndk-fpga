@@ -45,8 +45,8 @@ module testbench;
 
     //intel_mac_seg_if #(SEGMENTS) eth_rx[ETH_PORTS] (CLK_ETH);
     // dut.sv turn data from LSB to MSB.
-    avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6) eth_rx[ETH_PORTS] (CLK_ETH[0]);
-    avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1) eth_tx[ETH_PORTS] (CLK_ETH[0]);
+    avst_if #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6) eth_rx[ETH_PORTS] (CLK_ETH[0]);
+    avst_if #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1) eth_tx[ETH_PORTS] (CLK_ETH[0]);
 
     mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH) usr_rx     [ETH_PORTS](CLK_USR);
     mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                              usr_tx_data[ETH_PORTS](CLK_USR);
@@ -88,8 +88,8 @@ module testbench;
         automatic virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH) vif_usr_rx     [ETH_PORTS] = usr_rx;
         automatic virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                              vif_usr_tx_data[ETH_PORTS] = usr_tx_data;
         automatic virtual mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                                                                vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
-        automatic virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6)                vif_eth_rx     [ETH_PORTS] = eth_rx;
-        automatic virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)                vif_eth_tx     [ETH_PORTS] = eth_tx;
+        automatic virtual avst_if #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6)                vif_eth_rx     [ETH_PORTS] = eth_rx;
+        automatic virtual avst_if #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1)                vif_eth_tx     [ETH_PORTS] = eth_tx;
 
         // SET INTERFACE
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_rst_usr", rst_usr);
@@ -105,8 +105,8 @@ module testbench;
             uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                             )::set(null, "", $sformatf("vif_usr_tx_data_%0d", it), vif_usr_tx_data[it]);
             uvm_config_db#(virtual mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                                                               )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
 
-            uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6))::set(null, "", $sformatf("vif_eth_rx_%0d", it) , vif_eth_rx[it]);
-            uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], 1, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1))::set(null, "", $sformatf("vif_eth_tx_%0d", it) , vif_eth_tx[it]);
+            uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6))::set(null, "", $sformatf("vif_eth_rx_%0d", it) , vif_eth_rx[it]);
+            uvm_config_db#(virtual avst_if #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1))::set(null, "", $sformatf("vif_eth_tx_%0d", it) , vif_eth_tx[it]);
         end
         uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi"    , mi);
         uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi_phy", mi_phy);
