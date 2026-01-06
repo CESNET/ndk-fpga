@@ -16,9 +16,6 @@ SETTINGS = {
         "MFB_BLOCK_SIZE"  : "8"                 ,
         "STRADDLING"      : "0"                 ,
     },
-    "axi_virtex" : {
-        "DEVICE"          : "\\\"VIRTEX7\\\""   ,
-    },
     "axi_straddling_off" : {
         "STRADDLING"      : "0"                 ,
     },
@@ -26,6 +23,5 @@ SETTINGS = {
     (), # Works the same as '("default",),' as the "default" is applied in every combination
     ("axi_straddling_off"   ,),
     ("axi_256b"              ,),
-    ("axi_256b", "axi_virtex",),
     ),
 }
