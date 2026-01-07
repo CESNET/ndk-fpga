@@ -26,9 +26,20 @@ How to build an FPGA firmware with an NDK-based application
 List of make parameters:
 ------------------------
 
-- ``PCIE_CONF`` -- Allows you to set the PCIe configuration, for example: ``make PCIE_CONF=1xGen4x16``. More information can be found in the :ref:`documentation of the PCIe module <ndk_pcie_mod>`.
-- ``DMA_TYPE``  -- Allows you to select the DMA controller, for example ``make DMA_TYPE=4``. More information and allowed values can be found in the :ref:`documentation of the DMA module <ndk_dma>`.
-- ``BOARD_VARIANT`` -- Allows you to set the board variant number, for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card (for example Bittware IA-440i). Alternatively, it may also encounter a similar parameter ``BOARD_REV``.
+.. envvar:: PCIE_CONF
+
+   Allows to set the PCIe configuration, for example: ``make PCIE_CONF=1xGen4x16``. More information can be found in the :ref:`documentation of the PCIe module <ndk_pcie_mod>`.
+
+.. envvar:: DMA_TYPE
+
+   Allows to select the DMA controller, for example ``make DMA_TYPE=4``. More information and allowed values can be found in the :ref:`documentation of the DMA module <ndk_dma>`.
+
+.. _BOARD_VARIANT:
+
+.. envvar:: BOARD_VARIANT
+
+   Allows setting the board variant number for correct firmware settings. This parameter is not available for all FPGA cards. You can find the allowed values in the NDK documentation for the specific card (for example, Bittware IA-440i). Alternatively, you may also encounter a similar parameter: ``BOARD_REV``.
+
 
 How to prepare the FPGA card and the host PC
 ============================================

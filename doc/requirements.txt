@@ -1,0 +1,4 @@
+GitPython
+sphinx
+sphinx-vhdl
+sphinx-rtd-theme

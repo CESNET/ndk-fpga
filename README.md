@@ -61,17 +61,16 @@ We use a documentation system based on the [Sphinx tool](https://www.sphinx-doc.
 
 ### How to manually build documentation
 
-First, you need to install a few Python packages:
-```
-$ pip3 install --user GitPython
-$ pip3 install --user sphinx
-$ pip3 install --user sphinx-vhdl
-$ pip3 install --user sphinx-rtd-theme
-```
-
-Then the documentation is generated simply by issuing these two commands:
+First, you need to prepare the environment:
 ```
 $ cd doc
+$ python3 -m venv venv-doc
+$ source venv-doc/bin/activate
+$ pip install -r requirements.txt
+```
+
+Then the documentation is generated simply by issuing this command:
+```
 $ make html
 ```
 
