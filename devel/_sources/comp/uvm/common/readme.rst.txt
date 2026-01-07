@@ -178,6 +178,8 @@ You can do this by reimplementing pure virtual functions:
         endfunction
     endclass
 
+.. _uvm_common_fifo:
+
 fifo
 ----
 

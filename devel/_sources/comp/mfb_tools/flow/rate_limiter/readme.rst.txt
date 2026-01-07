@@ -90,7 +90,7 @@ The data registers correspond with the information given in paragraph 'Generic p
 |              4 | limiting type (W: 1 = packet limiting, 0 = byte limiting - default) (RW)  |
 +----------------+---------------------------------------------------------------------------+
 
-.. _usage:
+.. _rate_limiter_usage:
 
 Usage
 ^^^^^

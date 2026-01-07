@@ -1222,7 +1222,7 @@ has one disadvantage. You cannot simply have two models because they can have sl
 outputs and inputs. This can make it impossible to connect two models. For this reason,
 the model should use the uvm_common::fifo#(FIFO_TYPE) component for the inputs. The model doesn't create
 the FIFO, it just creates a value, and the FIFO will be created by a higher component. More info
-is in the components documentation in the FIFO section. :ref:`uvm_common::fifo<_uvm_common#fifo>`
+is in the components documentation in the FIFO section. :ref:`uvm_common::fifo<_uvm_common_fifo>`
 
 Sometimes it is required to pass meta-information through models. The uvm_common::model_item#(TYPE_ITEM)
 class is created for some information. This class provides three variables.

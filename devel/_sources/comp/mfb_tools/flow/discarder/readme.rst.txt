@@ -1,7 +1,7 @@
 .. _mfb_discarder:
 
 MFB Discarder
------------
+-------------
 
 MFB Discarder discards selected packets, consisting of MFB and associated MVB words, on the input interface.
 It is controlled by the ``RX_MVB_DISCARD`` input port / flag.
