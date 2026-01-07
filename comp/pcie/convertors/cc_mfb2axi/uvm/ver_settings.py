@@ -14,8 +14,14 @@ SETTINGS = {
         "MFB_REGION_SIZE" : "1"                 ,
         "MFB_BLOCK_SIZE"  : "8"                 ,
     },
+    "straddling_on" : {
+        "STRADDLING"      : "1"                 ,
+    },
     "_combinations_" : (
     (), # Works the same as '("default",),' as the "default" is applied in every combination
+    ("default", "straddling_on"), # Works the same as '("default",),' as the "default" is applied in every combination
     ("axi_256b",),
+    # NOT IMPLEMENTED
+    #("axi_256b", "straddling_on"),
     ),
 }
