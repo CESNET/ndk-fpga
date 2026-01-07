@@ -40,7 +40,7 @@ class sequence_simple_rx_base #(
         return $sformatf("uvm_logic_vector_mvb::sequence_simple_rx_base #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
-    function tr_init(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH) tr);
+    function void tr_init(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH) tr);
         case (cfg.generate_invalid)
             config_sequence::INVALID_ZERO  :
                 begin
