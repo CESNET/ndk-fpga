@@ -19,12 +19,13 @@ module testbench;
     // Signals
     logic RX_CLK = 0;
     logic TX_CLK = 0;
-    logic RST = 1;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if reset_rx(RX_CLK);
     reset_if reset_tx(TX_CLK);
+    pullup(reset_rx.RESET);
+    pullup(reset_tx.RESET);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_rx(RX_CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_tx(TX_CLK);
     mvb_if #(MFB_REGIONS, MFB_META_WIDTH) mvb_tx(TX_CLK);
@@ -35,7 +36,6 @@ module testbench;
     // Define clock ticking
     always #(RX_CLK_PERIOD) RX_CLK = ~RX_CLK;
     always #(TX_CLK_PERIOD) TX_CLK = ~TX_CLK;
-    initial #(10ns) RST <= 0;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -71,9 +71,9 @@ module testbench;
         .DEVICE           (DEVICE)
     ) DUT_U (
         .RX_CLK     (RX_CLK),
-        .RX_RST     (RST | reset_rx.RESET),
+        .RX_RST     (reset_rx.RESET == 1'b1 ? 1'b1 : 1'b0),
         .TX_CLK     (TX_CLK),
-        .TX_RST     (RST | reset_tx.RESET),
+        .TX_RST     (reset_tx.RESET == 1'b1 ? 1'b1 : 1'b0),
         .mfb_rx     (mfb_rx),
         .mvb_tx     (mvb_tx),
         .mfb_tx     (mfb_tx)

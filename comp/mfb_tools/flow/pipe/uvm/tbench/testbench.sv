@@ -12,6 +12,7 @@ module testbench;
 
     //Signals
     logic CLK = 0;
+    pullup(reset.RESET);
 
     //Interfaces
     reset_if reset(CLK);

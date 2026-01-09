@@ -18,15 +18,11 @@ module mfb_property #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
         mfb_if vif
     );
     string module_name = "";
-    logic START = 1'b1;
 
     ///////////////////
     // Start check properties after first clock
     initial begin
         $sformat(module_name, "%m");
-        @(posedge vif.CLK)
-        #(10ps)
-        START = 1'b0;
     end
 
 
@@ -37,7 +33,7 @@ module mfb_property #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     // This property check if SRC_RDY does not does low until DST_RDY is low
     property src_rdy_high_until_dst_rdy_high;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         $rose(vif.SRC_RDY) |-> (vif.SRC_RDY until vif.DST_RDY);
     endproperty
 
@@ -45,13 +41,13 @@ module mfb_property #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     // SRC_RDY have to be allways valid
     property src_rdy_undefined;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         !$isunknown(vif.SRC_RDY);
     endproperty
 
     property dst_rdy_undefined;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         !$isunknown(vif.DST_RDY);
     endproperty
 
@@ -59,14 +55,14 @@ module mfb_property #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     // SOF
     property sof_undefined;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         vif.SRC_RDY |-> !$isunknown(vif.SOF);
     endproperty
 
     generate if (REGION_SIZE > 1) begin
         property sof_pos_undefined (int unsigned region);
             @(posedge vif.CLK)
-            disable iff(RESET || START)
+            disable iff(RESET)
             (vif.SRC_RDY && vif.SOF[region]) |-> !$isunknown(vif.SOF_POS[(region+1)*$clog2(REGION_SIZE) -1 -: $clog2(REGION_SIZE)]);
         endproperty
 
@@ -87,7 +83,7 @@ module mfb_property #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     // EOF
     property eof_undefined;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         vif.SRC_RDY |-> !$isunknown(vif.EOF);
     endproperty
 
@@ -95,7 +91,7 @@ module mfb_property #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     generate if (REGION_SIZE * BLOCK_SIZE > 1) begin
         property eof_pos_undefined (int unsigned region);
             @(posedge vif.CLK)
-            disable iff(RESET || START)
+            disable iff(RESET)
             (vif.SRC_RDY && vif.EOF[region]) |-> !$isunknown(vif.EOF_POS[(region+1)*$clog2(REGION_SIZE * BLOCK_SIZE) -1 -: $clog2(REGION_SIZE * BLOCK_SIZE)]);
         endproperty
 
