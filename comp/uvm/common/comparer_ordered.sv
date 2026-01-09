@@ -49,7 +49,7 @@ virtual class comparer_base_ordered #(type MODEL_ITEM, type DUT_ITEM = MODEL_ITE
             item = dut_items.pop_front();
             if (this.compare(tr, item) == 0) begin
                 errors++;
-                `uvm_error(this.get_full_name(), $sformatf("\n\tTransaction %0d doesn't match.\nMODEL ITEM : %s\nDUT ITEM : %s\n", item.get_transaction_id(), model_item2string(tr), dut_item2string(item)));
+                `uvm_error(this.get_full_name(), $sformatf("\n\tTransaction %0d doesn't match.\n\tErrors/Compared %0d/%0d\nMODEL ITEM : %s\nDUT ITEM : %s\n", item.get_transaction_id(), errors, compared, model_item2string(tr), dut_item2string(item)));
             end else begin
                 compared++;
             end

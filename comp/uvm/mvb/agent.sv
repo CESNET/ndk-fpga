@@ -138,7 +138,7 @@ class agent_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_agent;
 
         // Get interface instance
         if(!uvm_config_db #(virtual mvb_if #(ITEMS, ITEM_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
-            `uvm_fatal(this.get_full_name(), "Cannot find 'mvb_if' inside uvm_config_db, probably not set!")
+            `uvm_fatal(this.get_full_name(), {"Cannot find 'mvb_if' inside uvm_config_db with name ", m_config.interface_name, ", probably not set!"})
         end
 
         // Connect driver if the agent is active

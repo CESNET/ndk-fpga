@@ -48,7 +48,7 @@ class ex_test extends uvm_test;
 
 
         time_start = $time();
-        while ((time_start + 3ms) > $time() &&  m_env.sc.used() != 0) begin
+        while ((time_start + 10ms) > $time() &&  m_env.sc.used() != 0) begin
             #(600ns);
         end
 

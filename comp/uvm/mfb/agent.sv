@@ -146,7 +146,7 @@ class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BL
 
         // Get interface instance
         if(!uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
-            `uvm_fatal(this.get_full_name(), "Cannot find 'mfb_if' inside uvm_config_db, probably not set!")
+            `uvm_fatal(this.get_full_name(), {"Cannot find 'mfb_if' '", m_config.interface_name, "', probably not set!"});
         end
 
         // Connect driver if the agent is active
