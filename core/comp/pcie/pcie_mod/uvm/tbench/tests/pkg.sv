@@ -87,7 +87,7 @@ package test;
     // AXI META WIDTH
     // =====================================================================
     // AXI configuration
-    parameter AXI_STRADDLING     = 0;
+    parameter STRADDLING     = 0;
     parameter RCB                = 1'b0;
     // latency for H-Tile is 18 cycles (20 cycles for safe)
     // latency for P-Tile is 27 cycles (30 cycles for safe)

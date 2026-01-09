@@ -20,7 +20,7 @@ SETTINGS = {
         "CC_MFB_REGION_SIZE"   : "1"                 ,
         "CC_MFB_BLOCK_SIZE"    : "8"                 ,
 
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"       : "0"                 ,
 
         "DMA_BAR_ENABLE"       : 0,
         "DMA_PORTS"            : 1,
@@ -180,7 +180,7 @@ SETTINGS = {
         "CC_MFB_REGION_SIZE"   : "1"                 ,
         "CC_MFB_BLOCK_SIZE"    : "8"                 ,
 
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"       : "0"                 ,
 
         "DEVICE"               : "\\\"ULTRASCALE\\\"",
         "PCIE_ENDPOINT_TYPE"   : "\\\"DUMMY\\\""     ,

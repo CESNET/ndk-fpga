@@ -161,7 +161,7 @@ module testbench;
             uvm_pcie_axi::root#(
                 CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE,
                 DEVICE,
-                AXI_STRADDLING
+                STRADDLING
             )::get_type(), "uvm_test_top.*"
         );
 

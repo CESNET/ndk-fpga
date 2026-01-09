@@ -160,7 +160,7 @@ module testbench;
 
         //REWRITE PCIE
         uvm_pcie::root::type_id::set_inst_override(uvm_pcie_avst::root#(
-            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, 27, AXI_STRADDLING)::get_type(), "uvm_test_top.*" );
+            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, 27, STRADDLING)::get_type(), "uvm_test_top.*" );
 
         run_test();
         $stop(2);

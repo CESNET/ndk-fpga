@@ -174,7 +174,7 @@ module testbench;
 
         // Rewrite PCIe environment
         uvm_pcie::root::type_id::set_inst_override(
-            uvm_pcie_intel_r_tile::root #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, 27, AXI_STRADDLING)::get_type(),
+            uvm_pcie_intel_r_tile::root #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, 27, STRADDLING)::get_type(),
             "uvm_test_top.*"
         );
 
