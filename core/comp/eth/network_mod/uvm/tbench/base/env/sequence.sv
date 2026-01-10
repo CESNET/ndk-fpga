@@ -138,7 +138,6 @@ class virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_
     uvm_sequence#(uvm_reset::sequence_item) mi_rst;
     uvm_sequence#(uvm_reset::sequence_item) mi_phy_rst;
     uvm_sequence#(uvm_reset::sequence_item) mi_pmd_rst;
-    uvm_sequence#(uvm_reset::sequence_item) tsu_rst;
 
     //uvm_pkg::
     virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) port[ETH_PORTS];
@@ -174,8 +173,6 @@ class virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.mi_pmd_rst, "", "state", seq_sync_end);
         mi_pmd_rst = uvm_reset::sequence_start::type_id::create("mi_pmd_rst", p_sequencer.mi_pmd_rst);
 
-        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.tsu_rst, "", "state", seq_sync_end);
-        tsu_rst    = uvm_reset::sequence_start::type_id::create("tsu_rst"   , p_sequencer.tsu_rst);
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             port[it] = virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create($sformatf("port_%0d", it), p_sequencer.port[it]);
             port[it].packet_size_set(usr_rx_seq_cfg[it]);
@@ -204,7 +201,6 @@ class virt_sequence_stop#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WI
     uvm_sequence#(uvm_reset::sequence_item) mi_rst;
     uvm_sequence#(uvm_reset::sequence_item) mi_phy_rst;
     uvm_sequence#(uvm_reset::sequence_item) mi_pmd_rst;
-    uvm_sequence#(uvm_reset::sequence_item) tsu_rst;
 
     //uvm_pkg::
     virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) port[ETH_PORTS];
@@ -233,9 +229,6 @@ class virt_sequence_stop#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WI
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.mi_pmd_rst, "", "state", seq_sync_end);
         mi_pmd_rst = uvm_reset::sequence_run::type_id::create("mi_pmd_rst", p_sequencer.mi_pmd_rst);
 
-        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.tsu_rst, "", "state", seq_sync_end);
-        tsu_rst    = uvm_reset::sequence_run::type_id::create("tsu_rst"   , p_sequencer.tsu_rst);
-
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.port[it], "", "state", seq_sync_end);
             port[it] = virt_sequence_port_stop#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create($sformatf("port_%0d", it), p_sequencer.port[it]);
@@ -250,7 +243,6 @@ class virt_sequence_stop#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WI
         assert(mi_rst.randomize());
         assert(mi_phy_rst.randomize());
         assert(mi_pmd_rst.randomize());
-        assert(tsu_rst.randomize());
 
         fork
             while (!seq_sync_end.stopped()) begin
@@ -264,9 +256,6 @@ class virt_sequence_stop#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WI
             end
             while (!seq_sync_end.stopped()) begin
                 mi_pmd_rst.start(p_sequencer.mi_pmd_rst, this);
-            end
-            while (!seq_sync_end.stopped()) begin
-                tsu_rst.start(p_sequencer.tsu_rst, this);
             end
         join_none
 
@@ -298,7 +287,6 @@ class virt_sequence_stop#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WI
         mi_rst.wait_for_sequence_state(UVM_FINISHED);
         mi_phy_rst.wait_for_sequence_state(UVM_FINISHED);
         mi_pmd_rst.wait_for_sequence_state(UVM_FINISHED);
-        tsu_rst.wait_for_sequence_state(UVM_FINISHED);
     endtask
 endclass
 

@@ -349,14 +349,12 @@ class virt_sequence_simple #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM
         assert(mi_rst.randomize());
         assert(mi_phy_rst.randomize());
         assert(mi_pmd_rst.randomize());
-        assert(tsu_rst.randomize());
 
         fork
             usr_rst.start(p_sequencer.usr_rst);
             mi_rst.start(p_sequencer.mi_rst);
             mi_phy_rst.start(p_sequencer.mi_phy_rst);
             mi_pmd_rst.start(p_sequencer.mi_pmd_rst);
-            tsu_rst.start(p_sequencer.tsu_rst);
         join_none
 
         fork
@@ -403,7 +401,6 @@ class virt_sequence_simple #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM
         mi_rst.wait_for_sequence_state(UVM_FINISHED);
         mi_phy_rst.wait_for_sequence_state(UVM_FINISHED);
         mi_pmd_rst.wait_for_sequence_state(UVM_FINISHED);
-        tsu_rst.wait_for_sequence_state(UVM_FINISHED);
     endtask
 
 endclass
@@ -435,7 +432,6 @@ class virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_W
         assert(mi_rst.randomize());
         assert(mi_phy_rst.randomize());
         assert(mi_pmd_rst.randomize());
-        assert(tsu_rst.randomize());
 
         fork
             do begin
@@ -449,9 +445,6 @@ class virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_W
             end while (!seq_sync_end.stopped());
             do begin
                 mi_pmd_rst.start(p_sequencer.mi_pmd_rst, this);
-            end while (!seq_sync_end.stopped());
-            do begin
-                tsu_rst.start(p_sequencer.tsu_rst, this);
             end while (!seq_sync_end.stopped());
         join_none
 
@@ -483,7 +476,6 @@ class virt_sequence_stop #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_W
         mi_rst.wait_for_sequence_state(UVM_FINISHED);
         mi_phy_rst.wait_for_sequence_state(UVM_FINISHED);
         mi_pmd_rst.wait_for_sequence_state(UVM_FINISHED);
-        tsu_rst.wait_for_sequence_state(UVM_FINISHED);
     endtask
 
 endclass
