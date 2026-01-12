@@ -13,16 +13,18 @@ package uvm_pcie_adapter;
     import uvm_pkg::*;
 
     `include "sequencer.sv"
-    `include "tr_planner.sv"
-    `include "monitor.sv"
-    `include "sequence.sv"
-    `include "generator.sv"
-    `include "model_base.sv"
-    `include "model_xilinx.sv"
-    `include "model_intel.sv"
-    `include "scoreboard_cmp.sv"
+    //`include "tr_planner.sv"
+    //`include "monitor.sv"
+    //`include "sequence.sv"
+    //`include "generator.sv"
+    `include "model.sv"
+    //`include "model_xilinx.sv"
+    //`include "model_intel.sv"
+    //`include "scoreboard_cmp.sv"
     `include "scoreboard.sv"
     `include "env.sv"
+
+    `include "sequence.sv"
 
 endpackage
 

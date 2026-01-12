@@ -5,56 +5,33 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH))
-    `uvm_declare_p_sequencer(uvm_cq_mfb2axi::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH))
+class virt_sequence extends uvm_sequence;
+    `uvm_object_param_utils(test::virt_sequence)
+    `uvm_declare_p_sequencer(uvm_cq_mfb2axi::sequencer)
 
     function new (string name = "virt_sequence");
         super.new(name);
     endfunction
 
-    uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)                                      m_logic_vector_array_sq_lib;
-    uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) m_pcie_lib;
+    uvm_pcie::sequence_request_lib m_cq_seq;
 
     virtual function void init();
 
-        m_logic_vector_array_sq_lib = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("m_logic_vector_array_sq_lib");
-        m_pcie_lib              = uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("m_pcie_lib");
+        m_cq_seq = uvm_pcie::sequence_request_lib::type_id::create("m_cq_seq");
 
-        m_logic_vector_array_sq_lib.init_sequence();
-        m_logic_vector_array_sq_lib.min_random_count = 50;
-        m_logic_vector_array_sq_lib.max_random_count = 100;
-        m_logic_vector_array_sq_lib.randomize();
-
-        m_pcie_lib.init_sequence();
-        m_pcie_lib.min_random_count = 100;
-        m_pcie_lib.max_random_count = 200;
-
+        m_cq_seq.init_sequence();
+        m_cq_seq.min_random_count = 50;
+        m_cq_seq.max_random_count = 100;
     endfunction
-
-    virtual task run_mfb();
-        forever begin
-            assert(m_pcie_lib.randomize());
-            m_pcie_lib.start(p_sequencer.m_pcie);
-        end
-    endtask
 
     task body();
 
         init();
 
-        fork
-            run_mfb();
-        join_none
-
-        fork
-            run_axi_data();
-        join_any
-
-    endtask
-
-    virtual task run_axi_data();
-        m_logic_vector_array_sq_lib.start(p_sequencer.m_logic_vector_array_scr);
+        for (int unsigned it = 0; it < 15; it++) begin
+            assert(m_cq_seq.randomize());
+            m_cq_seq.start(p_sequencer.m_cq);
+        end
     endtask
 
 endclass

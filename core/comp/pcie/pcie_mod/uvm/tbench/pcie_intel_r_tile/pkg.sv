@@ -24,6 +24,7 @@ package uvm_pcie_intel_r_tile;
     `include "sequencer.sv"
     `include "sequence.sv"
     `include "env.sv"
+    `include "root.sv"
 
 endpackage
 

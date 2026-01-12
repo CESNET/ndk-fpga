@@ -19,7 +19,7 @@ lappend COMPONENTS \
 # Disable Code Coverage
 set SIM_FLAGS(CODE_COVERAGE) false
 set SIM_FLAGS(UVM_ENABLE) true
-#set SIM_FLAGS(UVM_TEST) "test::ex_test"
+set SIM_FLAGS(UVM_TEST) "test::ex_test"
 set SIM_FLAGS(UVM_VERBOSITY) "UVM_NONE"
 
 # Global include file for compilation
@@ -30,14 +30,13 @@ puts "Std Arith Warnings - Disabled"
 set StdArithNoWarnings 1
 # Bug in MFB_GET_ITEMS, bad generation of data for simulation when data are not valid.
 #set NumericStdNoWarnings 1
-nb_sim_run
-#coverage save -assert -directive -cvg -code bcefst -verbose actual.ucdb
 
+nb_sim_run
 # Reports
-if {$SIM_FLAGS(CODE_COVERAGE)} {
-    coverage save -instance /testbench/DUT_U -assert -directive -cvg -code bcefst -verbose actual.ucdb
-    vcover merge final.ucdb final.ucdb actual.ucdb
-    # vcover report -html -output cov_html -details -threshL 50 -threshH 90 final.ucdb
-}
+#if {$SIM_FLAGS(CODE_COVERAGE)} {
+#    coverage save -instance /testbench/DUT_U -assert -directive -cvg -code bcefst -verbose actual.ucdb
+#    vcover merge final.ucdb final.ucdb actual.ucdb
+#    # vcover report -html -output cov_html -details -threshL 50 -threshH 90 final.ucdb
+#}
 
 

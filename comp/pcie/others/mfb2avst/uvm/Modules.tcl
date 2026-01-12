@@ -7,8 +7,6 @@
 # Set paths
 
 lappend COMPONENTS [ list "SV_MFB_UVM_BASE"        "$OFM_PATH/comp/uvm/mfb"                     "FULL"]
-lappend COMPONENTS [ list "SV_AXI_UVM_BASE"        "$OFM_PATH/comp/uvm/axi"                     "FULL"]
-lappend COMPONENTS [ list "SV_LOGIC_VECTROR_ARRAY" "$OFM_PATH/comp/uvm/logic_vector_array"      "FULL"]
 lappend COMPONENTS [ list "SV_LOGIC_VECTROR_MFB"   "$OFM_PATH/comp/uvm/logic_vector_array_mfb"  "FULL"]
 lappend COMPONENTS [ list "SV_LOGIC_VECTROR_AVST"  "$OFM_PATH/comp/uvm/logic_vector_array_avst" "FULL"]
 

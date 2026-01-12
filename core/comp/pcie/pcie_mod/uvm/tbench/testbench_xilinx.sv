@@ -10,11 +10,11 @@ import test::*;
 
 module testbench;
 
+    localparam ITEM_WIDTH      = 32;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     localparam HDR_WIDTH       = 128;
     localparam PREFIX_WIDTH    = 32;
     localparam BAR_RANGE_WIDTH = 3;
-    localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
 
     localparam CQ_DATA_WIDTH  = CQ_MFB_REGIONS * CQ_MFB_REGION_SIZE * CQ_MFB_BLOCK_SIZE*ITEM_WIDTH;
     localparam CC_DATA_WIDTH  = CC_MFB_REGIONS * CC_MFB_REGION_SIZE * CC_MFB_BLOCK_SIZE*ITEM_WIDTH;
@@ -50,18 +50,19 @@ module testbench;
     reset_if  mi_reset(MI_CLK);
     reset_if  dma_reset(DMA_CLK);
     // For Xilinx (AXI)
-    axi_if #(CQ_DATA_WIDTH, AXI_CQUSER_WIDTH) cq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    axi_if #(CC_DATA_WIDTH, AXI_CCUSER_WIDTH) cc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    axi_if #(RQ_DATA_WIDTH, AXI_RQUSER_WIDTH) rq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    axi_if #(RC_DATA_WIDTH, AXI_RCUSER_WIDTH) rc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    localparam int unsigned AXI_ITEMS = CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
+    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)) cq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)) cc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)) rq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)) rc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
     // For Intel and Xilinx (MFB)
-    mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, RQ_MFB_META_W)  dma_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                                  dma_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, RC_MFB_META_W)  dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                                dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0)  dma_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                      dma_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0)  dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                    dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
 
-    mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W)  dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, CC_MFB_META_W)  dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)  dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH)  dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
     mi_if  #(32, 32) config_mi[PCIE_ENDPOINTS] (MI_CLK);
 
     //bind TAG_PROBE : DUT_U.VHDL_DUT_U. pcie_ctrl_g[it].pcie_ctrl_i.ptc_i  probe_inf #(2*REGIONS) probe_drop({tagm_mvb_out_src_rdy & tagm_mvb_out_src_rdy},
@@ -101,19 +102,19 @@ module testbench;
     initial begin
         uvm_root m_root;
         // DMA
-        automatic virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, RQ_MFB_META_W) v_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mfb;
+        automatic virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0) v_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mfb;
         automatic virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                                 v_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mvb;
-        automatic virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, RC_MFB_META_W) v_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mfb;
+        automatic virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0) v_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mfb;
         automatic virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                               v_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mvb;
 
-        automatic virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W) v_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cq_mfb;
-        automatic virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, CC_MFB_META_W) v_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cc_mfb;
+        automatic virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) v_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cq_mfb;
+        automatic virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH) v_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cc_mfb;
 
         // AXI
-        automatic virtual axi_if #(CQ_DATA_WIDTH, AXI_CQUSER_WIDTH)                                                        v_cq_axi[PCIE_ENDPOINTS] = cq_axi;
-        automatic virtual axi_if #(CC_DATA_WIDTH, AXI_CCUSER_WIDTH)                                                        v_cc_axi[PCIE_ENDPOINTS] = cc_axi;
-        automatic virtual axi_if #(RQ_DATA_WIDTH, AXI_RQUSER_WIDTH)                                                        v_rq_axi[PCIE_ENDPOINTS] = rq_axi;
-        automatic virtual axi_if #(RC_DATA_WIDTH, AXI_RCUSER_WIDTH)                                                        v_rc_axi[PCIE_ENDPOINTS] = rc_axi;
+        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)) v_cq_axi[PCIE_ENDPOINTS] = cq_axi;
+        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)) v_cc_axi[PCIE_ENDPOINTS] = cc_axi;
+        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)) v_rq_axi[PCIE_ENDPOINTS] = rq_axi;
+        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)) v_rc_axi[PCIE_ENDPOINTS] = rc_axi;
 
         automatic virtual mi_if #(32, 32)                                                                                   v_mi_config[PCIE_ENDPOINTS]       = config_mi;
         automatic virtual reset_if                                                                                          v_pcie_user_reset[PCIE_ENDPOINTS] = pcie_user_reset;
@@ -127,21 +128,21 @@ module testbench;
             uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_sysrst_n_",i_string}, v_pcie_sysrst_n[pcie_e]);
 
             // AXI
-            uvm_config_db#(virtual axi_if #(CQ_DATA_WIDTH, AXI_CQUSER_WIDTH))::set(null, "", {"vif_pcie_", i_string, "_cq"}, v_cq_axi[pcie_e]);
-            uvm_config_db#(virtual axi_if #(CC_DATA_WIDTH, AXI_CCUSER_WIDTH))::set(null, "", {"vif_pcie_", i_string, "_cc"}, v_cc_axi[pcie_e]);
-            uvm_config_db#(virtual axi_if #(RQ_DATA_WIDTH, AXI_RQUSER_WIDTH))::set(null, "", {"vif_pcie_", i_string, "_rq"}, v_rq_axi[pcie_e]);
-            uvm_config_db#(virtual axi_if #(RC_DATA_WIDTH, AXI_RCUSER_WIDTH))::set(null, "", {"vif_pcie_", i_string, "_rc"}, v_rc_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)))::set(null, "", {"vif_pcie_", i_string, "_cq_axi"}, v_cq_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)))::set(null, "", {"vif_pcie_", i_string, "_cc_axi"}, v_cc_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)))::set(null, "", {"vif_pcie_", i_string, "_rq_axi"}, v_rq_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)))::set(null, "", {"vif_pcie_", i_string, "_rc_axi"}, v_rc_axi[pcie_e]);
 
             for (int dma = 0; dma < DMA_PORTS; dma++) begin
                 string dma_string;
                 dma_string = $sformatf("%0d_%0d", pcie_e, dma);
-                uvm_config_db#(virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, RQ_MFB_META_W))::set(null, "", {"vif_rq_mfb_",dma_string}, v_rq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH))::set(null, "", {"vif_rq_mvb_",dma_string}, v_rq_mvb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, RC_MFB_META_W))::set(null, "", {"vif_rc_mfb_",dma_string}, v_rc_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))::set(null, "", {"vif_rc_mvb_",dma_string}, v_rc_mvb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",dma_string, "_rq_mfb"}, v_rq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH))::set(null, "", {"vif_dma_", dma_string, "_rq_mvb"}, v_rq_mvb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",dma_string, "_rc_mfb"}, v_rc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))::set(null, "", {"vif_dma_",dma_string, "_rc_mvb"}, v_rc_mvb[pcie_e][dma]);
 
-                uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W))::set(null, "", {"vif_dma_",dma_string, "_cq"}, v_cq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, CC_MFB_META_W))::set(null, "", {"vif_dma_",dma_string, "_cc"}, v_cc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))::set(null, "", {"vif_dma_cq_",dma_string, "_mfb"}, v_cq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH))::set(null, "", {"vif_dma_cc_",dma_string, "_mfb"}, v_cc_mfb[pcie_e][dma]);
             end
         end
 
@@ -156,13 +157,13 @@ module testbench;
         uvm_config_db#(uvm_bitstream_t)::set(null, "", "recording_detail", 0);
 
         //REWRITE PCIE
-        uvm_pcie::env::type_id::set_inst_override(
-            uvm_pcie_xilinx::env#(
-                CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, AXI_CQUSER_WIDTH,
-                CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, AXI_CCUSER_WIDTH,
-                RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, AXI_RQUSER_WIDTH,
-                RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, AXI_RCUSER_WIDTH,
-                AXI_STRADDLING)::get_type(), "uvm_test_top.*" );
+        uvm_pcie::root::type_id::set_inst_override(
+            uvm_pcie_axi::root#(
+                CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE,
+                DEVICE,
+                STRADDLING
+            )::get_type(), "uvm_test_top.*"
+        );
 
         run_test();
         $stop(2);

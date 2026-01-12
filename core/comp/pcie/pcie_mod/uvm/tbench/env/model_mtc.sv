@@ -14,7 +14,7 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
     //RESPONSE (MI -> PCIE)
     uvm_tlm_analysis_fifo #(uvm_mi::sequence_item_response #(MI_DATA_WIDTH))  mi_rsp;
-    uvm_analysis_port     #(uvm_pcie::completer_header)                       pcie_cc;
+    uvm_analysis_port     #(uvm_pcie::header)                                 pcie_cc;
 
     protected int unsigned pcie_cq_cnt;
     protected int unsigned pcie_cc_cnt;
@@ -22,6 +22,9 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
     //Store request
     protected uvm_pcie::request_header request_rd[$];
     protected uvm_pcie::bar_config     bar_cfg;
+
+    //CONFIG
+    protected int unsigned resp_width = 32;
 
     function new (string name, uvm_component parent = null);
         super.new(name, parent);
@@ -33,6 +36,10 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
         pcie_cq_cnt = 0;
         pcie_cc_cnt = 0;
+    endfunction
+
+    function void resp_width_set(int unsigned width);
+        resp_width = width;
     endfunction
 
     virtual function void bar_register(uvm_pcie::bar_config cfg);
@@ -96,28 +103,31 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
         forever begin
             logic  [MI_ADDR_WIDTH-1:0] mi_addr;
-            uvm_pcie_extend::request_header                    info_item;
+            logic  [64-1:2] addr;
+            logic  [64-1:2] mi_base_addr;
+            int unsigned bar;
             uvm_pcie::request_header info;
 
             pcie_cq.get(info);
             pcie_cq_cnt++;
             `uvm_info(this.get_full_name(), $sformatf("\nMI Request %0d%s\n", pcie_cq_cnt, info.convert2string()), UVM_MEDIUM);
 
-            if ($cast(info_item, info) ) begin
-                logic  [64-1:2] mi_base_addr;
-                tlp_addr_mask = '0;
-                for (int unsigned it = 0; it < info_item.bar_aperture; it++) begin
-                    tlp_addr_mask[it] = 1'b1;
-                end
-
-                mi_base_addr = 0;
-                bar_cfg.bar2addr(info_item.bar, mi_base_addr);
-                mi_addr = {mi_base_addr, 2'b00};
-            end else begin
-                `uvm_fatal(this.get_full_name(), "\nUnsupported header");
-                tlp_addr_mask = 26'h3ffffff;
-                mi_addr       = 'h0;
+            tlp_addr_mask = 0;
+            for (int unsigned it = 0; it < 26; it++) begin
+                tlp_addr_mask[it] = 1'b1;
             end
+
+            // GET BAR
+            addr = info.address;
+            if (info.fmt[0] == 1'b0) begin
+                bar_cfg.addr2bar(bar, addr);
+            end else begin
+                bar = 0;
+            end
+
+            // GET BASE ADDR
+            mi_base_addr = 0;
+            bar_cfg.bar2addr(bar, mi_base_addr);
 
             //Write request || READ request
              case ({info.fmt[3-1:1], info.pcie_type})
@@ -127,7 +137,7 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
             endcase
 
             if (wr == 1'b1 || rd == 1'b1) begin
-                mi_addr += ({info.address, 2'b00} & tlp_addr_mask);
+                mi_addr =  {mi_base_addr, 2'b00} + ({addr, 2'b00} & tlp_addr_mask);
 
                 for (int unsigned it = 0; it < info.length_get(); it++) begin
                     logic read;
@@ -162,6 +172,7 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
         forever begin
             logic wr, rd;
+            int unsigned length;
 
             uvm_mi::sequence_item_response #(MI_DATA_WIDTH) mi_cc_tr;
             uvm_pcie::request_header   info;
@@ -169,52 +180,71 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
             wait(request_rd.size() != 0);
             info = request_rd.pop_front();
-             case ({info.fmt[3-1:1], info.pcie_type})
+            case ({info.fmt[3-1:1], info.pcie_type})
                  {2'b00, 5'b00000}  : begin rd = 1; wr = 0; end
                  {2'b01, 5'b00000}  : begin rd = 0; wr = 1; end
-                default             : begin rd = 0; wr = 0; end
+                 default            : begin rd = 0; wr = 0; end
             endcase
 
-            data_fifo = {};
+            length = info.length_get();
 
             if (rd == 1'b1) begin
-                if (rd == 1'b1 || wr == 1'b1) begin
-                    for (int unsigned it = 0; it < info.length_get(); it++) begin
+                logic [4-1:0] lbe = info.length != 1 ? info.lbe : info.fbe;
+                logic [4-1:0] fbe = info.fbe;
+                logic [7-1:2] lower_address = info.address[7-1 : 2];
+
+                do begin
+                    int unsigned it_end;
+                    data_fifo = {};
+
+                    //check if this is last response
+                    if (length > resp_width) begin
+                        it_end  = resp_width;
+                    end else begin
+                        it_end  = length;
+                    end
+
+                    for (int unsigned it = 0; it < it_end; it++) begin
                         do begin
                             mi_rsp.get(mi_cc_tr);
                         end while(mi_cc_tr.drdy !== 1);
                         data_fifo.push_back(mi_cc_tr.drd);
                     end
-                end
-            end
 
-            if (rd == 1'b1) begin
-                logic [4-1:0] lbe = info.length != 1 ? info.lbe : info.fbe;
+                    rsp = uvm_pcie::completer_header::type_id::create("rsp", this);
+                    rsp.start = info.start;
+                    rsp.fmt               = 3'b010;
+                    rsp.pcie_type         = 5'b01010;
+                    rsp.traffic_class     = info.traffic_class;
+                    rsp.id_based_ordering = info.id_based_ordering;
+                    rsp.relaxed_ordering  = info.relaxed_ordering;
+                    rsp.no_snoop          = info.no_snoop;
+                    rsp.th                = info.th;
+                    rsp.td                = info.td;
+                    rsp.ep                = info.ep;
+                    rsp.at                = info.at;
+                    rsp.length            = data_fifo.size() != 1024 ? data_fifo.size() : 0;
+                    rsp.data              = data_fifo;
+                    rsp.completer_id      = 0;
+                    rsp.bcm               = 0;
+                    if (length == 1 && fbe == 0 && lbe == 0) begin
+                        rsp.byte_count =  1;
+                    end else begin
+                        rsp.byte_count =  unsigned'(length * 4) - unsigned'(uvm_pcie::encode_fbe(fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(lbe)));
+                    end
+                    rsp.requester_id      = info.requester_id;
+                    rsp.tag               = info.tag;
+                    rsp.compl_status  = 3'b000;
+                    rsp.lower_address = {lower_address, 2'b00} + uvm_pcie::encode_fbe(fbe);
 
-                rsp = uvm_pcie::completer_header::type_id::create("rsp", this);
-                rsp.start = info.start;
-                rsp.fmt               = 3'b010;
-                rsp.pcie_type         = 5'b01010;
-                rsp.traffic_class     = info.traffic_class;
-                rsp.id_based_ordering = info.id_based_ordering;
-                rsp.relaxed_ordering  = info.relaxed_ordering;
-                rsp.no_snoop          = info.no_snoop;
-                rsp.th                = info.th;
-                rsp.td                = info.td;
-                rsp.ep                = info.ep;
-                rsp.at                = info.at;
-                rsp.length            = data_fifo.size() != 1024 ? data_fifo.size() : 0;
-                rsp.data              = data_fifo;
-                rsp.completer_id      = 0;
-                rsp.bcm               = 0;
-                rsp.byte_count        =  unsigned'(data_fifo.size() * 4) - unsigned'(uvm_pcie::encode_fbe(info.fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(lbe)));
-                rsp.requester_id      = info.requester_id;
-                rsp.tag               = info.tag;
-                rsp.compl_status  = 3'b000;
-                rsp.lower_address = {info.address[7-1 : 2], 2'b0} + uvm_pcie::encode_fbe(info.fbe);
+                    pcie_cc_cnt++;
+                    pcie_cc.write(rsp);
 
-                pcie_cc_cnt++;
-                pcie_cc.write(rsp);
+                    fbe = '1;
+                    lower_address += data_fifo.size();
+
+                    length -= it_end;
+                end while(length != 0);
             end else if (wr == 1'b1) begin
                 // dont respons to write transactions
             end else begin //error not supported transaction
@@ -222,7 +252,6 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
                 rsp = uvm_pcie::completer_header::type_id::create("rsp", this);
                 rsp.start = info.start;
-                rsp = uvm_pcie::completer_header::type_id::create("rsp", this);
                 rsp.fmt               = 0;
                 rsp.pcie_type         = 5'b01010;
                 rsp.traffic_class     = info.traffic_class;
@@ -237,7 +266,7 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
                 rsp.data              = {}; //data_fifo;
                 rsp.completer_id      = 0;
                 rsp.bcm               = 0;
-                rsp.byte_count        = unsigned'(data_fifo.size() * 4) - unsigned'(uvm_pcie::encode_fbe(info.fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(lbe)));
+                rsp.byte_count        = unsigned'(length * 4) - unsigned'(uvm_pcie::encode_fbe(info.fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(lbe)));
                 rsp.requester_id      = info.requester_id;
                 rsp.tag               = info.tag;
                 rsp.compl_status  = 3'b001;

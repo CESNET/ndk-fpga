@@ -4,22 +4,21 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_item #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_common::sequence_item;
+class sequence_item #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_common::sequence_item;
 
     // ------------------------------------------------------------------------
     // Registration of object tools
-    `uvm_object_param_utils(uvm_axi::sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
-
-    // ------------------------------------------------------------------------
-    // Member attributes, equivalent with interface pins
-    localparam ITEM_WIDTH = 32;
-    localparam TKEEP_WIDTH = DATA_WIDTH/ITEM_WIDTH;
+    `uvm_object_param_utils(uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb
-    rand logic [DATA_WIDTH/REGIONS  -1 : 0] tdata [REGIONS];
+    rand logic [ITEMS*ITEM_WIDTH -1 : 0] tdata;
     rand logic [TUSER_WIDTH -1 : 0] tuser;
-    rand logic [TKEEP_WIDTH -1 : 0] tkeep;
+    rand logic [ITEMS -1 : 0]       tkeep;
     rand logic                      tlast;
     rand logic                      tvalid;
     rand logic                      tready;
@@ -36,7 +35,7 @@ class sequence_item #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int uns
 
     // Properly copy all transaction attributes.
     function void do_copy(uvm_object rhs);
-        sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS) rhs_;
+        sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) rhs_;
 
         if(!$cast(rhs_, rhs)) begin
             `uvm_fatal( "axi::sequence_item::do_copy:", "Failed to cast transaction object." )
@@ -55,7 +54,7 @@ class sequence_item #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int uns
 
     // Properly compare all transaction attributes representing output pins.
     function bit do_compare(uvm_object rhs, uvm_comparer comparer);
-        sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS) rhs_;
+        sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) rhs_;
 
         if(!$cast(rhs_, rhs)) begin
             `uvm_fatal("do_compare:", "Failed to cast transaction object.")
@@ -75,22 +74,27 @@ class sequence_item #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int uns
 
     // Visualize the sequence item to string
     function string convert2string();
-        string output_string = "";
+        string ret = "";
 
-        output_string = $sformatf({"\n\tTDATA: %b\n\tTUSER: %b\n\tTKEEP: %b\n\tTLAST: %b\n\tTVALID: %b\n\tTREADY: %b\n"},
-            tdata,
+        ret = {ret, "\n\tTDATA :"};
+        for (int unsigned it = 0; it < ITEMS; it++) begin
+            if (it % 8 == 0) begin
+                ret = {ret, "\n\t"};
+            end
+
+            ret = {ret, $sformatf("%0h  ", tdata[(it+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
+        end
+
+
+        ret = {ret, $sformatf({"\n\tTUSER: %h\n\tTKEEP: %b\n\tTLAST: %b\n\tTVALID: %b\n\tTREADY: %b\n"},
             tuser,
             tkeep,
             tlast,
             tvalid,
             tready
-        );
+        )};
 
-        for (int unsigned it = 0; it < REGIONS; it++) begin
-            output_string = {output_string, $sformatf("\n\t-- id %0d\n\tDATA %h\n",  it, tdata[it])};
-        end
-
-        return output_string;
+        return ret;
     endfunction
 
 endclass

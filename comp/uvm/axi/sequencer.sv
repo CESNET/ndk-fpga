@@ -4,10 +4,14 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequencer #(int unsigned DATA_WIDTH, int unsigned TUSER_WIDTH, int unsigned REGIONS) extends uvm_sequencer #(uvm_axi::sequence_item #(DATA_WIDTH, TUSER_WIDTH, REGIONS));
+class sequencer #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
+) extends uvm_sequencer #(uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH));
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_axi::sequencer #(DATA_WIDTH, TUSER_WIDTH, REGIONS))
+    `uvm_component_param_utils(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
 
     uvm_reset::sync_terminate reset_sync;
 

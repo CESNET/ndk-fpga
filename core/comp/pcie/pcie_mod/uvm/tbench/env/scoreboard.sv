@@ -4,8 +4,32 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_pcie_top::scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE))
+class mi_req_comparer extends uvm_common::comparer_ordered#(uvm_mi::sequence_item_request #(32, 32));
+    `uvm_component_param_utils(uvm_pcie_top::mi_req_comparer)
+
+
+    function new (string name, uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+
+    virtual function void write_dut(DUT_ITEM tr);
+        if (tr.ardy && (tr.wr || tr.rd)) begin
+            super.write_dut(tr);
+        end
+    endfunction
+endclass
+
+
+class scoreboard #(
+    int unsigned REGIONS,
+    int unsigned PCIE_ENDPOINTS,
+    int unsigned DMA_PORTS,
+    int unsigned ITEM_WIDTH,
+    logic DMA_BAR_ENABLE,
+    string PCIE_ENDPOINT_TYPE
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(uvm_pcie_top::scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE))
 
 
     ////////////////////////
@@ -14,34 +38,33 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
 
     ////////////////////////
     //NEW INTERFACE
-    uvm_analysis_export#(uvm_pcie::request_header)      pcie_rq[PCIE_ENDPOINTS];
-    uvm_analysis_export#(uvm_pcie::completer_header)    pcie_rc[PCIE_ENDPOINTS];
-    uvm_analysis_export#(uvm_pcie::request_header)      pcie_cq[PCIE_ENDPOINTS];
-    uvm_analysis_export#(uvm_pcie::completer_header)    pcie_cc[PCIE_ENDPOINTS];
+    uvm_analysis_export#(uvm_pcie::header) pcie_rq[PCIE_ENDPOINTS];
+    uvm_analysis_export#(uvm_pcie::header) pcie_rc[PCIE_ENDPOINTS];
+    uvm_analysis_export#(uvm_pcie::header) pcie_cq[PCIE_ENDPOINTS];
+    uvm_analysis_export#(uvm_pcie::header) pcie_cc[PCIE_ENDPOINTS];
 
     uvm_analysis_export#(uvm_dma::sequence_item_rq) dma_rq[PCIE_ENDPOINTS][DMA_PORTS];
     uvm_analysis_export#(uvm_dma::sequence_item_rc) dma_rc[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_analysis_export#(uvm_pcie::request_header) dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
-    uvm_analysis_export#(uvm_pcie::completer_header)dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_analysis_export#(uvm_pcie::header) dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_analysis_export#(uvm_pcie::header) dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     //////////////////
     //MI
-    uvm_analysis_export#(uvm_mi::sequence_item_response #(32)) mi_rsp[PCIE_ENDPOINTS];
-    uvm_mtc::mi_subscriber #(32, 32)                           mi_req[PCIE_ENDPOINTS];
+    uvm_analysis_export#(uvm_mi::sequence_item_response #(32))    mi_rsp[PCIE_ENDPOINTS];
+    uvm_analysis_export#(uvm_mi::sequence_item_request #(32, 32)) mi_req[PCIE_ENDPOINTS];
 
     // MODEL
     protected model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) m_model;
 
     //////////////////
     //COMPARATORS
-    protected uvm_common::comparer_unordered#(uvm_pcie::request_header)   pcie_rq_cmp[PCIE_ENDPOINTS];
-    protected uvm_common::comparer_unordered#(uvm_pcie::completer_header) pcie_cc_cmp[PCIE_ENDPOINTS];
+    protected uvm_common::comparer_base#(uvm_pcie::header) pcie_rq_cmp[PCIE_ENDPOINTS];
+    protected uvm_common::comparer_base#(uvm_pcie::header) pcie_cc_cmp[PCIE_ENDPOINTS];
 
     protected uvm_common::comparer_ordered#(uvm_dma::sequence_item_rc)                  dma_rc_cmp[PCIE_ENDPOINTS][DMA_PORTS];
-    protected uvm_common::comparer_ordered#(uvm_mi::sequence_item_request #(32, 32, 0)) mi_rq_cmp[PCIE_ENDPOINTS]; //CQ
+    protected mi_req_comparer                                                           mi_rq_cmp[PCIE_ENDPOINTS]; //CQ
 
-    localparam DEVICE = "AGILEX";
-    protected uvm_common::comparer_ordered#(uvm_pcie::request_header)      dma_cq_cmp[PCIE_ENDPOINTS][DMA_PORTS];
+    protected uvm_common::comparer_ordered#(uvm_pcie::header)  dma_cq_cmp[PCIE_ENDPOINTS][DMA_PORTS];
 
     // Contructor of scoreboard.
     function new(string name, uvm_component parent);
@@ -61,6 +84,7 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
             end
 
             mi_rsp[it] = new({"mi_rsp_", i_string}, this);
+            mi_req[it] = new({"mi_req_", i_string}, this);
         end
     endfunction
 
@@ -108,12 +132,19 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
             pcie_rc[pcie] = new({"pcie_rc_", i_string}, this);
             pcie_cq[pcie] = new({"pcie_cq_", i_string}, this);
 
-            mi_req[pcie] = uvm_mtc::mi_subscriber #(32, 32)::type_id::create({"mi_rq_", i_string}, this);
+            //mi_req[pcie] = uvm_mtc::mi_subscriber #(32, 32)::type_id::create({"mi_rq_", i_string}, this);
 
-            pcie_rq_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::request_header)  ::type_id::create({"pcie_rq_cmp_", i_string}, this);
-            pcie_cc_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::completer_header)::type_id::create({"pcie_cc_cmp_", i_string}, this);
+            if (DMA_PORTS > 1) begin
+                pcie_rq_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::header)::type_id::create({"pcie_rq_cmp_", i_string}, this);
+                pcie_cc_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::header)::type_id::create({"pcie_cc_cmp_", i_string}, this);
+            end else begin
+                // When there are only one DMA port then all transaction on
+                // PCIE have to be ordered
+                pcie_rq_cmp[pcie] = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"pcie_rq_cmp_", i_string}, this);
+                pcie_cc_cmp[pcie] = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"pcie_cc_cmp_", i_string}, this);
+            end
 
-            mi_rq_cmp[pcie] = uvm_common::comparer_ordered#(uvm_mi::sequence_item_request #(32, 32, 0))::type_id::create({"mi_rq_cmp", i_string}, this);
+            mi_rq_cmp[pcie] = mi_req_comparer::type_id::create({"mi_rq_cmp", i_string}, this);
             mi_rq_cmp[pcie].model_tr_timeout_set(1ms);
 
             for (int unsigned dma = 0; dma < DMA_PORTS; dma++) begin
@@ -125,7 +156,7 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
                 dma_rc_cmp[pcie][dma] = uvm_common::comparer_ordered#(uvm_dma::sequence_item_rc)::type_id::create({"dma_rc_cmp_", i_string, "_", dma_string}, this);
 
                 // CQ and CC
-                dma_cq_cmp[pcie][dma]  = uvm_common::comparer_ordered#(uvm_pcie::request_header)::type_id::create({"dma_cq_cmp_", i_string, "_", dma_string}, this);
+                dma_cq_cmp[pcie][dma]  = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"dma_cq_cmp_", i_string, "_", dma_string}, this);
             end
         end
     endfunction
@@ -143,7 +174,7 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
 
             mi_rsp[pcie].connect(m_model.mi_rsp[pcie]);
             m_model.mi_req[pcie].connect(mi_rq_cmp[pcie].analysis_imp_model);
-            mi_req[pcie].port.connect(mi_rq_cmp[pcie].analysis_imp_dut);
+            mi_req[pcie].connect(mi_rq_cmp[pcie].analysis_imp_dut);
 
             for (int unsigned it = 0; it < DMA_PORTS; it++) begin
                 dma_rq[pcie][it].connect(m_model.dma_rq[pcie][it]);
@@ -155,6 +186,14 @@ class scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABL
                 m_model.dma_cq[pcie][it].connect(dma_cq_cmp[pcie][it].analysis_imp_model);
                 dma_cq[pcie][it].connect(dma_cq_cmp[pcie][it].analysis_imp_dut);
             end
+        end
+
+        if (PCIE_ENDPOINT_TYPE == "P_TILE") begin
+            m_model.mi_resp_width_set(32);
+        end else if (PCIE_ENDPOINT_TYPE == "R_TILE") begin
+            m_model.mi_resp_width_set(64);
+        end else begin
+            m_model.mi_resp_width_set(32);
         end
     endfunction
 

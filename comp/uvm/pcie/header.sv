@@ -9,6 +9,8 @@ class header extends uvm_common::sequence_item;
     // Registration of object tools.
     `uvm_object_utils(uvm_pcie::header)
 
+    //TODO: remove hdr_type and change it to function
+    // function hdr_type pcie_type_get(); return RQ_HDR
     enum {RQ_HDR, COMPLETER_HDR} hdr_type;
     rand logic [3-1:0]  fmt;
     rand logic [5-1:0]  pcie_type;
@@ -64,6 +66,7 @@ class header extends uvm_common::sequence_item;
         ep            = rhs_.ep; // poisoned
         at            = rhs_.at;
         length        = rhs_.length; //dwords
+        data          = rhs_.data;
     endfunction: do_copy
 
     function bit do_compare(uvm_object rhs, uvm_comparer comparer);
@@ -71,7 +74,6 @@ class header extends uvm_common::sequence_item;
         header rhs_;
 
         if(!$cast(rhs_, rhs)) begin
-            `uvm_fatal("do_compare:", "Failed to cast transaction object.")
             return 0;
         end
 
@@ -86,6 +88,7 @@ class header extends uvm_common::sequence_item;
         ret &= ep            === rhs_.ep; // poisoned
         ret &= at            === rhs_.at;
         ret &= length        === rhs_.length; //dwords
+        ret &= data          === rhs_.data;
         // Using simple equivalence operator (faster).
         return ret;
     endfunction: do_compare
@@ -156,14 +159,11 @@ class request_header extends header;
         ph         = rhs_.ph;
     endfunction: do_copy
 
-
-
     function bit do_compare(uvm_object rhs, uvm_comparer comparer);
         bit ret = 1;
         request_header rhs_;
 
         if(!$cast(rhs_, rhs)) begin
-            `uvm_fatal("do_compare:", "Failed to cast transaction object.")
             return 0;
         end
 
@@ -232,7 +232,6 @@ class completer_header extends header;
         completer_header rhs_;
 
         if(!$cast(rhs_, rhs)) begin
-            `uvm_fatal("do_compare:", "Failed to cast transaction object.")
             return 0;
         end
 

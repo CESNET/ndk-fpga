@@ -4,14 +4,20 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class virt_sequencer extends uvm_sequencer;
+class sequencer#(
+    int unsigned DMA_PORTS
+) extends uvm_sequencer;
+    `uvm_component_param_utils(uvm_ptc::sequencer#(DMA_PORTS))
 
-    `uvm_component_utils(uvm_ptc::virt_sequencer)
+    uvm_reset::sequencer m_reset;
+    uvm_reset::sequencer m_dma_reset;
 
-    uvm_dma_up::sequencer m_packet;
+    uvm_pcie::sequencer m_pcie_rc;
+    uvm_dma::sequencer  m_dma[DMA_PORTS];
+    //uvm_dma_up::sequencer m_packet;
     //uvm_reset::sequencer  m_reset;
 
-    function new(string name = "virt_sequencer", uvm_component parent);
+    function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction
 

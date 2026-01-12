@@ -13,6 +13,10 @@ module DUT (
     mfb_if.dut_tx   mfb_cq
     );
 
+    localparam ITEM_WIDTH = 32;
+    localparam AXI_ITEMS  = MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
+
+
     logic [((MFB_REGION_SIZE != 1) ? MFB_REGIONS*$clog2(MFB_REGION_SIZE) : MFB_REGIONS)-1 : 0] cq_sof_pos;
 
     assign mfb_cq.SOF_POS = cq_sof_pos;
@@ -21,9 +25,9 @@ module DUT (
         .MFB_REGIONS       (MFB_REGIONS),
         .MFB_REGION_SIZE   (MFB_REGION_SIZE),
         .MFB_BLOCK_SIZE    (MFB_BLOCK_SIZE),
-        .MFB_ITEM_WIDTH    (MFB_ITEM_WIDTH),
-        .AXI_CQUSER_WIDTH  (RQ_TUSER_WIDTH),
-        .AXI_DATA_WIDTH    (RQ_TDATA_WIDTH),
+        .MFB_ITEM_WIDTH    (ITEM_WIDTH),
+        .AXI_CQUSER_WIDTH  (uvm_pcie_axi::tuser_width_get(AXI_ITEMS,   uvm_pcie_axi::AXI_CQ)),
+        .AXI_DATA_WIDTH    (AXI_ITEMS*ITEM_WIDTH),
         .STRADDLING        (STRADDLING),
         .DEVICE            (DEVICE)
     ) VHDL_DUT_U (

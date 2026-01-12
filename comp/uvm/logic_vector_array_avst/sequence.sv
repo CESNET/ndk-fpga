@@ -5,9 +5,9 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This low level sequence define bus functionality
-virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_common::sequence_base#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_simple_rx_base#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
-    `uvm_declare_p_sequencer(uvm_avst::sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_common::sequence_base#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_simple_rx_base#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+    `uvm_declare_p_sequencer(uvm_avst::sequencer#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
 
     int unsigned space_size = 0;
     int unsigned data_index;
@@ -15,7 +15,7 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
 
     uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)                                  data;
     uvm_logic_vector::sequence_item #(META_WIDTH)                                       meta;
-    uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) gen;
+    uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) gen;
 
     typedef enum {state_last, state_next, state_reset, state_overflow, state_latency} state_t;
 
@@ -143,8 +143,8 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
         space_size = 0;
         state_packet = state_packet_space_new;
 
-        req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
-        gen = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("reg");
+        req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
+        gen = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("reg");
 
         //send empty frame to get first response
         send_empty_frame();
@@ -160,8 +160,8 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
     endtask
 endclass
 
-class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
     uvm_common::rand_length   rand_space_size; //burst set to 0
 
     //cfg.space_size
@@ -235,7 +235,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
     endfunction
 
     virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+        return $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
@@ -289,11 +289,13 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
                  // Check if packet can size in and if straddling is set then put data
                  // on first or when previous packet end in previous region
 
-                 st_new = 1;
                  // if straddling is enabled then previous packet have to end in previous region
                  // to start new packet in on first region.
-                 if (it != 0 && cfg.straddling == 0)
-                    st_new = gen.eop[it-1];
+                 if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                     st_new = 0;
+                 end else begin
+                    st_new = 1;
+                 end
 
                  // Check if packet can be put in actual region.
                  if (gen.sop[it] == 0 && st_new == 1 && gen.eop[it] == 0) begin
@@ -307,7 +309,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 
 
              if (state_packet == state_packet_data) begin
-                 int unsigned loop_end   = REGION_SIZE*BLOCK_SIZE < (data.data.size() - data_index) ? REGION_SIZE*BLOCK_SIZE : (data.data.size() - data_index);
+                 int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
                  gen.valid[it] = 1;
 
                  for (int unsigned jt = 0; jt < loop_end; jt++) begin
@@ -320,7 +322,7 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
                          gen.meta[it] = meta.data;
                      end
                      gen.eop[it]     = 1'b1;
-                     gen.empty[it] = REGION_SIZE*BLOCK_SIZE - loop_end;
+                     gen.empty[it] = REGION_SIZE - loop_end;
                      item_done();
                      state_packet = state_packet_space_new;
                  end
@@ -337,8 +339,8 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 endclass
 
 
-class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
     uvm_common::rand_length   rand_burst_size; //burst set to 1
     uvm_common::rand_length   rand_space_size; //burst set to 0
 
@@ -371,7 +373,7 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endfunction
 
     virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+        return $sformatf("uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
@@ -411,112 +413,10 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
             if (burst_state == SPACE) begin
                 gen.data[it] = 'x;
             end else if (burst_state == PACKET) begin
-                int unsigned index = 0;
-                while (index < REGION_SIZE && burst_state == PACKET) begin
-                    if (state_packet == state_packet_space_new) begin
-                        space_size   = cfg.space_size_min + $urandom_range(0, REGION_SIZE);
-                        state_packet = state_packet_space;
-                    end
-
-                    if (state_packet == state_packet_space) begin
-                        if (space_size != 0) begin
-                            space_size--;
-                        end else begin
-                            state_packet = state_packet_none;
-                        end
-                    end
-
-                    if (state_packet == state_packet_none) begin
-                        try_get();
-                    end
-
-                    if (state_packet == state_packet_new) begin
-                        // Check SOP and EOP
-                        if (gen.sop[it] == 1 || (gen.eop[it] == 1'b1)) begin
-                            break;
-                        end
-
-                        if (index != 0 || (it != 0 && cfg.straddling == 0))
-                            break;
-
-                        gen.sop[it]     = 1'b1;
-                        if (hl_sqr.meta_behav == config_item::META_SOF && META_WIDTH != 0) begin
-                            gen.meta[it] = meta.data;
-                        end
-                        state_packet = state_packet_data;
-                    end
-
-                    if (state_packet == state_packet_data) begin
-                        int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
-                        gen.valid[it] = 1;
-
-                        for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
-                            gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
-                            data_index++;
-                        end
-
-                        // End of packet
-                        if (data.data.size() <= data_index) begin
-                            if (hl_sqr.meta_behav == config_item::META_EOF && META_WIDTH != 0) begin
-                                gen.meta[it] = meta.data;
-                            end
-                            gen.eop[it]     = 1'b1;
-                            gen.empty[it] = ~(index*BLOCK_SIZE + loop_end-1);
-                            item_done();
-                            state_packet = state_packet_space_new;
-                        end
-                    end
-                    index++;
-                //while end
-                end
-            //end if burst_packet == PACKET
-            end
-        end
-    endtask
-
-    task body;
-        const int unsigned coeficient = REGION_SIZE; //This is just some magic number. which modified length of burst.
-        int unsigned probability_min;
-        int unsigned probability_max;
-
-        probability_min = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_min)/100;
-        probability_max = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_max)/100;
-
-        rand_burst_size.bound_set(probability_min*coeficient, probability_max*coeficient);
-        rand_space_size.bound_set((100 - probability_max) *coeficient,  (100 - probability_min) *coeficient);
-
-        super.body();
-    endtask
-endclass
-
-class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
-
-    function new (string name = "sequence_full_speed_pcie_rx");
-        super.new(name);
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    endfunction
-
-    /////////
-    // CREATE uvm_intel_mac_seg::Sequence_item
-    virtual task create_sequence_item();
-        int unsigned index = 0;
-        gen.randomize();
-
-        gen.valid = '0;
-        gen.sop   = '0;
-        gen.eop   = '0;
-        for (int unsigned it = 0; it < REGIONS; it++) begin
-            int unsigned index = 0;
-            while (index < REGION_SIZE) begin
                 if (state_packet == state_packet_space_new) begin
+                    space_size   = cfg.space_size_min + $urandom_range(0, REGION_SIZE);
                     state_packet = state_packet_space;
-                    space_size   = cfg.space_size_min;
                 end
-
 
                 if (state_packet == state_packet_space) begin
                     if (space_size != 0) begin
@@ -536,37 +436,135 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
                         break;
                     end
 
-                    if (index != 0 || (it != 0 && cfg.straddling == 0))
+                    // Break when straddling is enable and previous eof is
+                    // not set
+                    if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
                         break;
+                    end
 
                     gen.sop[it]     = 1'b1;
-                    if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
+                    if (hl_sqr.meta_behav == config_item::META_SOF && META_WIDTH != 0) begin
                         gen.meta[it] = meta.data;
                     end
                     state_packet = state_packet_data;
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
                     gen.valid[it] = 1;
 
-                    for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
+                    for (int unsigned jt = 0; jt < loop_end; jt++) begin
                         gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
                         data_index++;
                     end
 
                     // End of packet
                     if (data.data.size() <= data_index) begin
-                        if (hl_sqr.meta_behav ==  config_item::META_EOF && META_WIDTH != 0) begin
+                        if (hl_sqr.meta_behav == config_item::META_EOF && META_WIDTH != 0) begin
                             gen.meta[it] = meta.data;
                         end
                         gen.eop[it]     = 1'b1;
-                        gen.empty[it] = ~(index*BLOCK_SIZE + loop_end-1);
+                        gen.empty[it] = ~(loop_end-1);
                         item_done();
                         state_packet = state_packet_space_new;
                     end
                 end
-                index++;
+            end
+        end
+    endtask
+
+    task body;
+        const int unsigned coeficient = REGION_SIZE; //This is just some magic number. which modified length of burst.
+        int unsigned probability_min;
+        int unsigned probability_max;
+
+        probability_min = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_min)/100;
+        probability_max = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_max)/100;
+
+        rand_burst_size.bound_set(probability_min*coeficient, probability_max*coeficient);
+        rand_space_size.bound_set((100 - probability_max) *coeficient,  (100 - probability_min) *coeficient);
+
+        super.body();
+    endtask
+endclass
+
+class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+
+    function new (string name = "sequence_full_speed_pcie_rx");
+        super.new(name);
+    endfunction
+
+    virtual function string get_type_name();
+        return $sformatf("uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    endfunction
+
+    /////////
+    // CREATE uvm_intel_mac_seg::Sequence_item
+    virtual task create_sequence_item();
+        int unsigned index = 0;
+        gen.randomize();
+
+        gen.valid = '0;
+        gen.sop   = '0;
+        gen.eop   = '0;
+        for (int unsigned it = 0; it < REGIONS; it++) begin
+            if (state_packet == state_packet_space_new) begin
+                state_packet = state_packet_space;
+                space_size   = cfg.space_size_min;
+            end
+
+
+            if (state_packet == state_packet_space) begin
+                if (space_size != 0) begin
+                    space_size--;
+                end else begin
+                    state_packet = state_packet_none;
+                end
+            end
+
+            if (state_packet == state_packet_none) begin
+                try_get();
+            end
+
+            if (state_packet == state_packet_new) begin
+                // Check SOP and EOP
+                if (gen.sop[it] == 1 || (gen.eop[it] == 1'b1)) begin
+                    break;
+                end
+
+                // Break when straddling is enable and previous eof is
+                // not set
+                if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                    break;
+                end
+
+                gen.sop[it]     = 1'b1;
+                if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
+                    gen.meta[it] = meta.data;
+                end
+                state_packet = state_packet_data;
+            end
+
+            if (state_packet == state_packet_data) begin
+                int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
+                gen.valid[it] = 1;
+
+                for (int unsigned jt = 0; jt < (loop_end); jt++) begin
+                    gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
+                    data_index++;
+                end
+
+                // End of packet
+                if (data.data.size() <= data_index) begin
+                    if (hl_sqr.meta_behav ==  config_item::META_EOF && META_WIDTH != 0) begin
+                        gen.meta[it] = meta.data;
+                    end
+                    gen.eop[it]     = 1'b1;
+                    gen.empty[it] = ~(loop_end-1);
+                    item_done();
+                    state_packet = state_packet_space_new;
+                end
             end
         end
     endtask
@@ -575,8 +573,8 @@ endclass
 
 // This is only a slight modification of the sequence_full_speed_rx class where no gaps inside frame are inserted.
 // But there are abitrary long gaps getween frames.
-class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `uvm_object_param_utils(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
     uvm_common::rand_length   rdy_length;
     uvm_common::rand_rdy      rdy_rdy;
@@ -588,76 +586,74 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endfunction
 
     virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+        return $sformatf("uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
     // CREATE uvm_intel_mac_seg::Sequence_item
     virtual task create_sequence_item();
-        int unsigned index       = 0;
         gen.randomize();
 
         gen.valid = '0;
         gen.sop   = '0;
         gen.eop   = '0;
         for (int unsigned it = 0; it < REGIONS; it++) begin
-            int unsigned index = 0;
-            while (index < REGION_SIZE) begin
-                if (state_packet == state_packet_space_new) begin
-                    void'(rdy_length.randomize());
-                    space_size   = rdy_length.m_value;
-                    state_packet = state_packet_space;
+            if (state_packet == state_packet_space_new) begin
+                void'(rdy_length.randomize());
+                space_size   = rdy_length.m_value;
+                state_packet = state_packet_space;
+            end
+
+            if (state_packet == state_packet_space) begin
+                if (space_size != 0) begin
+                    space_size--;
+                end else begin
+                    state_packet = state_packet_none;
+                end
+            end
+
+            if (state_packet == state_packet_none) begin
+                try_get();
+            end
+
+            if (state_packet == state_packet_new) begin
+                // Check SOP and EOP position
+                if (gen.sop[it] == 1 || (gen.eop[it] == 1'b1)) begin
+                    break;
                 end
 
-                if (state_packet == state_packet_space) begin
-                    if (space_size != 0) begin
-                        space_size--;
-                    end else begin
-                        state_packet = state_packet_none;
-                    end
+                // Break when straddling is enable and previous eof is
+                // not set
+                if (it > 0 && ((gen.eop[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                    break;
                 end
 
-                if (state_packet == state_packet_none) begin
-                    try_get();
+                gen.sop[it]     = 1'b1;
+                if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
+                    gen.meta[it] = meta.data;
+                end
+                state_packet = state_packet_data;
+            end
+
+            if (state_packet == state_packet_data) begin
+                int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
+                gen.valid[it] = 1;
+
+                for (int unsigned jt = 0; jt < (loop_end); jt++) begin
+                    gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
+                    data_index++;
                 end
 
-                if (state_packet == state_packet_new) begin
-                    // Check SOP and EOP position
-                    if (gen.sop[it] && gen.eop[it]) begin
-                        break;
-                    end
-
-                    if (index != 0 || (it != 0 && cfg.straddling == 0))
-                        break;
-
-                    gen.sop[it]     = 1'b1;
-                    if (hl_sqr.meta_behav ==  config_item::META_SOF && META_WIDTH != 0) begin
+                // End of packet
+                if (data.data.size() <= data_index) begin
+                    if (hl_sqr.meta_behav ==  config_item::META_EOF && META_WIDTH != 0) begin
                         gen.meta[it] = meta.data;
                     end
-                    state_packet = state_packet_data;
+                    gen.eop[it]     = 1'b1;
+                    gen.empty[it] = ~(loop_end-1);
+                    item_done();
+                    state_packet = state_packet_space_new;
                 end
-
-                if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
-                    gen.valid[it] = 1;
-
-                    for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
-                        gen.data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH] = data.data[data_index];
-                        data_index++;
-                    end
-
-                    // End of packet
-                    if (data.data.size() <= data_index) begin
-                        if (hl_sqr.meta_behav ==  config_item::META_EOF && META_WIDTH != 0) begin
-                            gen.meta[it] = meta.data;
-                        end
-                        gen.eop[it]     = 1'b1;
-                        gen.empty[it] = ~(index*BLOCK_SIZE + loop_end-1);
-                        item_done();
-                        state_packet = state_packet_space_new;
-                    end
-                end
-                index++;
             end
         end
     endtask
@@ -670,8 +666,8 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endtask
 endclass
 
-class sequence_stop_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class sequence_stop_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
     int unsigned hl_transactions_step;
 
@@ -690,7 +686,7 @@ class sequence_stop_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, in
     endfunction
 
     virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(%0d, %0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+        return $sformatf("uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(%0d, %0d, %0d, %0d, %0d)", REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     endfunction
 
     /////////
@@ -713,9 +709,9 @@ endclass
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
 
-class sequence_lib_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_common::sequence_library#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-  `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
-  `uvm_sequence_library_utils(uvm_logic_vector_array_avst::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class sequence_lib_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_common::sequence_library#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+  `uvm_object_param_utils(uvm_logic_vector_array_avst::sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+  `uvm_sequence_library_utils(uvm_logic_vector_array_avst::sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -726,17 +722,17 @@ class sequence_lib_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsi
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
     endfunction
 endclass
 
-class sequence_lib_rx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-  `uvm_object_param_utils(    uvm_logic_vector_array_avst::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
-  `uvm_sequence_library_utils(uvm_logic_vector_array_avst::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class sequence_lib_rx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+  `uvm_object_param_utils(    uvm_logic_vector_array_avst::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+  `uvm_sequence_library_utils(uvm_logic_vector_array_avst::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
   function new(string name = "sequence_lib_rx_speed");
     super.new(name);
@@ -747,7 +743,7 @@ class sequence_lib_rx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, in
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
     endfunction
 endclass
 

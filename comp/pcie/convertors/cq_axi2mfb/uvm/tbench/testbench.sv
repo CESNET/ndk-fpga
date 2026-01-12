@@ -10,28 +10,21 @@ import test::*;
 
 module testbench;
 
+    localparam AXI_ITEMS = MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
+    localparam ITEM_WIDTH = 32;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
     logic CLK = 0;
-    logic RST = 0;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    axi_if #(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH) axi_cq(CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_cq(CLK);
+    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS,   uvm_pcie_axi::AXI_CQ)) axi_cq(CLK);
+    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0) mfb_cq(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
     always #(CLK_PERIOD) CLK = ~CLK;
-
-    // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // Initial reset
-    initial begin
-        RST = 1;
-        #(RESET_CLKS*CLK_PERIOD)
-        RST = 0;
-    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -39,8 +32,8 @@ module testbench;
         uvm_root m_root;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual axi_if #(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH))::set(null, "", "vif_rx", axi_cq);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_cq);
+        uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS,   uvm_pcie_axi::AXI_CQ)))::set(null, "", "vif_rx_axi", axi_cq);
+        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_cq);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

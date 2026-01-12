@@ -4,11 +4,12 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class driver extends uvm_pcie_intel::driver;
-    `uvm_component_param_utils(uvm_pcie_intel_r_tile::driver);
-
-    localparam int unsigned HDR_WIDTH    = 128;
-    localparam int unsigned PREFIX_WIDTH = 32;
+class driver#(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned META_WIDTH
+) extends uvm_pcie_avst::driver#(REGIONS, REGION_SIZE, META_WIDTH);
+    `uvm_component_param_utils(uvm_pcie_intel_r_tile::driver#(REGIONS, REGION_SIZE, META_WIDTH));
 
     mailbox #(balance_item) m_mailbox;
     event approve;
@@ -17,18 +18,7 @@ class driver extends uvm_pcie_intel::driver;
         super.new(name, parent);
     endfunction
 
-    function void end_of_elaboration_phase(uvm_phase phase);
-        super.end_of_elaboration_phase(phase);
-
-        assert(uvm_config_db #(uvm_pcie_intel::req_fifo #(uvm_pcie::header))::get(this, "", "seq_fifo_data", fifo_data))
-        else begin
-            `uvm_fatal(this.get_full_name(), "\n\tCannot get request header fifo");
-        end
-        assert(uvm_config_db #(uvm_pcie_intel::req_fifo #(uvm_pcie::header))::get(this, "", "seq_fifo_meta", fifo_meta))
-        else begin
-            `uvm_fatal(this.get_full_name(), "\n\tCannot get request header fifo");
-        end
-
+    task run_phase(uvm_phase phase);
         assert(uvm_config_db #(mailbox #(balance_item))::get(this, "", "mailbox", m_mailbox))
         else begin
             `uvm_fatal(this.get_full_name(), "\n\tCannot get mailbox");
@@ -37,25 +27,21 @@ class driver extends uvm_pcie_intel::driver;
         else begin
             `uvm_fatal(this.get_full_name(), "\n\tCannot get approve event");
         end
-    endfunction
 
-    task run_phase(uvm_phase phase);
         forever begin
+            // TODO: THING ABOUT IT
+            wait(fifo.size() < REGIONS);
             seq_item_port.get_next_item(req);
-
-            wait((fifo_meta.size() == 0 || fifo_data.size()) && fifo_meta.size() < 10 || fifo_data.size() < 10);
-
             wait_for_approval(req);
 
-            fifo_meta.push_back(req);
-            fifo_data.push_back(req);
-
+            fifo.push_back(req);
             seq_item_port.item_done();
         end
     endtask
 
     task wait_for_approval(uvm_pcie::header header);
         balance_item cost = get_transaction_cost(header);
+
         m_mailbox.put(cost);
         wait(approve.triggered);
     endtask
@@ -87,8 +73,8 @@ class driver extends uvm_pcie_intel::driver;
         return cost;
     endfunction
 
-    function int unsigned get_data_cost(logic [10-1 : 0] length);
-        return ((length - 1) / 4) + 1; // TLP length => credit value
+    function int unsigned get_data_cost(int unsigned length);
+        return ((length + 3) / 4); // TLP length => credit value
     endfunction
 
 endclass

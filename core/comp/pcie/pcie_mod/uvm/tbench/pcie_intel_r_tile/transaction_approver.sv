@@ -8,8 +8,8 @@ class transaction_approver extends uvm_component;
     `uvm_component_utils(uvm_pcie_intel_r_tile::transaction_approver)
 
     // Input fifos
-    uvm_tlm_analysis_fifo #(uvm_avst_crdt::sequence_item #(2)) avst_crdt_hdr_in [3];
-    uvm_tlm_analysis_fifo #(uvm_avst_crdt::sequence_item #(4)) avst_crdt_data_in[3];
+    uvm_analysis_export #(uvm_avst_crdt::sequence_item #(2)) avst_crdt_hdr_in [3];
+    uvm_analysis_export #(uvm_avst_crdt::sequence_item #(4)) avst_crdt_data_in[3];
 
     // ---------------------------- //
     // Approval handshake variables //
@@ -25,6 +25,10 @@ class transaction_approver extends uvm_component;
         super.new(name, parent);
 
         m_mailbox = new(1);
+        for (int unsigned i = 0; i < 3; i++) begin
+            avst_crdt_hdr_in [i] = new($sformatf("avst_crdt_hdr_in_%0d", i), this);
+            avst_crdt_data_in[i] = new($sformatf("avst_crdt_data_in%0d", i), this);
+        end
     endfunction
 
     function void build_phase(uvm_phase phase);
@@ -35,10 +39,9 @@ class transaction_approver extends uvm_component;
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
-
         for (int unsigned i = 0; i < 3; i++) begin
-            avst_crdt_hdr_in [i] = m_balance_counter.avst_crdt_hdr_in [i];
-            avst_crdt_data_in[i] = m_balance_counter.avst_crdt_data_in[i];
+            avst_crdt_hdr_in [i].connect(m_balance_counter.avst_crdt_hdr_in [i].analysis_export);
+            avst_crdt_data_in[i].connect(m_balance_counter.avst_crdt_data_in[i].analysis_export);
         end
     endfunction
 
@@ -46,7 +49,7 @@ class transaction_approver extends uvm_component;
         balance_item cost;
 
         forever begin
-            wait(m_mailbox.num() == 1);
+            //wait(m_mailbox.num() == 1);
             m_mailbox.get(cost);
             m_balance_counter.wait_for_init_done();
             m_balance_counter.reduce_balance(cost);

@@ -12,15 +12,15 @@ package test;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 
-    parameter MFB_REGIONS      = 1;
+    parameter MFB_REGIONS      = 2;
     parameter MFB_REGION_SIZE  = 1;
     parameter MFB_BLOCK_SIZE   = 8;
-    parameter MFB_ITEM_WIDTH   = 32;
-    parameter MFB_REGION_WIDTH = MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+    //parameter MFB_ITEM_WIDTH   = 32;
+    //parameter MFB_REGION_WIDTH = MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
 
-    parameter CC_TUSER_WIDTH   = 33;
-    parameter CC_TDATA_WIDTH   = MFB_REGIONS*MFB_REGION_WIDTH;
-    parameter STRADDLING       = 0;
+    //parameter CC_TDATA_WIDTH   = MFB_REGIONS*MFB_REGION_WIDTH;
+    //parameter ITEMS            = 512/32;
+    parameter STRADDLING       = 1;
     parameter DEVICE           = "ULTRASCALE";
 
     parameter CLK_PERIOD = 5ns;

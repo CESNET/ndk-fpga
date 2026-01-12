@@ -22,8 +22,13 @@ package uvm_pcie;
     `include "monitor.sv"
     `include "meter.sv"
     `include "env.sv"
+    `include "root.sv"
 
-    `include "sequence.sv"
+    `include "dev.sv"
+
+    //`include "sequence.sv"
+    `include "sequence_request.sv"
+    `include "sequence_comp.sv"
 
 endpackage
 

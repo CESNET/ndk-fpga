@@ -28,7 +28,6 @@ class virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDT
         m_logic_vector_array_sq_lib.init_sequence();
         m_logic_vector_array_sq_lib.min_random_count = 50;
         m_logic_vector_array_sq_lib.max_random_count = 100;
-        m_logic_vector_array_sq_lib.randomize();
 
         m_pcie_lib.init_sequence();
         m_pcie_lib.min_random_count = 100;
@@ -74,7 +73,10 @@ class virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDT
     endtask
 
     virtual task run_avalon_data();
-        m_logic_vector_array_sq_lib.start(p_sequencer.m_logic_vector_array_scr);
+        for (int unsigned it = 0; it < 3; it++) begin
+            assert(m_logic_vector_array_sq_lib.randomize());
+            m_logic_vector_array_sq_lib.start(p_sequencer.m_logic_vector_array_scr);
+        end
     endtask
 
 endclass

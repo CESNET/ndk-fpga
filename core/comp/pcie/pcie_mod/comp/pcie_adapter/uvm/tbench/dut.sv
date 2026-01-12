@@ -25,12 +25,15 @@ module DUT (
     mfb_if.dut_tx rc_mfb,
     mfb_if.dut_tx cq_mfb,
     mfb_if.dut_rx cc_mfb
-    );
+);
 
-    localparam RC_SOF_POS_WIDTH   = ((RC_MFB_REGION_SIZE*RC_MFB_REGIONS) == RC_MFB_REGIONS) ? RC_MFB_REGIONS : (RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE));
-    localparam CC_SOF_POS_WIDTH   = ((CC_MFB_REGION_SIZE*CC_MFB_REGIONS) == CC_MFB_REGIONS) ? CC_MFB_REGIONS : (CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE));
-    localparam RQ_SOF_POS_WIDTH   = ((RQ_MFB_REGION_SIZE*RQ_MFB_REGIONS) == RQ_MFB_REGIONS) ? RQ_MFB_REGIONS : (RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE));
-    localparam CQ_SOF_POS_WIDTH   = ((CQ_MFB_REGION_SIZE*CQ_MFB_REGIONS) == CQ_MFB_REGIONS) ? CQ_MFB_REGIONS : (CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE));
+    localparam AXI_ITEMS     = CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
+    localparam IS_INTEL_DEV  = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
+
+    localparam RC_SOF_POS_WIDTH   = (RC_MFB_REGION_SIZE == 1) ? RC_MFB_REGIONS : (RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE));
+    localparam CC_SOF_POS_WIDTH   = (CC_MFB_REGION_SIZE == 1) ? CC_MFB_REGIONS : (CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE));
+    localparam RQ_SOF_POS_WIDTH   = (RQ_MFB_REGION_SIZE == 1) ? RQ_MFB_REGIONS : (RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE));
+    localparam CQ_SOF_POS_WIDTH   = (CQ_MFB_REGION_SIZE == 1) ? CQ_MFB_REGIONS : (CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE));
     localparam HDR_WIDTH       = 128;
     localparam PREFIX_WIDTH    = 32;
     localparam BAR_RANGE_WIDTH = 3;
@@ -39,23 +42,37 @@ module DUT (
     logic [CC_SOF_POS_WIDTH-1 : 0]   cc_sof_pos    ;
     logic [RQ_SOF_POS_WIDTH-1 : 0]   rq_sof_pos    ;
     logic [CQ_SOF_POS_WIDTH-1 : 0]   cq_sof_pos    ;
+
+    logic [CQ_MFB_REGIONS*256-1 : 0] down_data;
     logic [CQ_MFB_REGIONS*128-1 : 0] down_hdr      ;
     logic [CQ_MFB_REGIONS*32-1  : 0] down_prefix   ;
     logic [CQ_MFB_REGIONS*3-1   : 0] down_bar_range;
+    logic [CQ_MFB_REGIONS*3-1   : 0] down_empty;
     logic [CQ_MFB_REGIONS-1:0]       down_valid;
 
+
+    logic [CC_MFB_REGIONS*256-1 : 0] up_data;
     logic [CC_MFB_REGIONS*128-1 : 0] up_hdr;
     logic [CC_MFB_REGIONS*32-1  : 0] up_prefix;
     logic [CC_MFB_REGIONS-1     : 0] up_error;
     logic down_ready;
 
 
+    initial assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 && CC_MFB_ITEM_WIDTH == 32) else begin
+        $error("SUPPORT ONLY 32 ITEM_WIDTH\n");
+        $stop();
+    end
+
     assign avst_down.READY = down_ready;
     generate
         for (genvar r = 0; r < CQ_MFB_REGIONS; r++) begin
-            assign down_bar_range [(r+1)*BAR_RANGE_WIDTH-1 : r*BAR_RANGE_WIDTH] = avst_down.META[(r+1)*(AVST_DOWN_META_W)-1                                : (r+1)*AVST_DOWN_META_W - BAR_RANGE_WIDTH];
-            assign down_prefix    [(r+1)*PREFIX_WIDTH-1    : r*PREFIX_WIDTH]    = avst_down.META[(r+1)*AVST_DOWN_META_W - BAR_RANGE_WIDTH-1                : (r+1)*AVST_DOWN_META_W - PREFIX_WIDTH - BAR_RANGE_WIDTH];
-            assign down_hdr       [(r+1)*HDR_WIDTH-1       : r*HDR_WIDTH]       = avst_down.META[(r+1)*AVST_DOWN_META_W - PREFIX_WIDTH - BAR_RANGE_WIDTH-1 : (r+1)*AVST_DOWN_META_W - HDR_WIDTH - PREFIX_WIDTH - BAR_RANGE_WIDTH];
+            assign {down_bar_range [(r+1)*BAR_RANGE_WIDTH-1 -: BAR_RANGE_WIDTH],
+                    down_prefix    [(r+1)*PREFIX_WIDTH-1    -: PREFIX_WIDTH],
+                    down_hdr       [(r+1)*HDR_WIDTH-1       -: HDR_WIDTH]
+                } = avst_down.META[r];
+
+            assign down_data[(r+1)*256-1 -: 256] = avst_down.DATA[r] ;
+            assign down_empty[(r+1)*3-1 -: 3]    = avst_down.EMPTY[r];
 
             if (ENDPOINT_TYPE == "R_TILE") begin
                 assign down_valid[r] = avst_down.VALID[r] & down_ready;
@@ -65,9 +82,15 @@ module DUT (
         end
 
         for (genvar r = 0; r < CC_MFB_REGIONS; r++) begin
-            assign avst_up.META[(r+1)*(AVST_UP_META_W)-1                  : (r+1)*AVST_UP_META_W - 1]                            = up_error  [r];
-            assign avst_up.META[(r+1)*AVST_UP_META_W - 1-1                : (r+1)*AVST_UP_META_W - PREFIX_WIDTH - 1]             = up_prefix [(r+1)*PREFIX_WIDTH-1    : r*PREFIX_WIDTH];
-            assign avst_up.META[(r+1)*AVST_UP_META_W - PREFIX_WIDTH - 1-1 : (r+1)*AVST_UP_META_W - HDR_WIDTH - PREFIX_WIDTH - 1] = up_hdr    [(r+1)*HDR_WIDTH-1       : r*HDR_WIDTH];
+            assign avst_up.META[r] = {
+                    up_error  [r],
+                    up_prefix [(r+1)*PREFIX_WIDTH-1    : r*PREFIX_WIDTH],
+                    up_hdr    [(r+1)*HDR_WIDTH-1       : r*HDR_WIDTH]
+                };
+
+            assign avst_up.DATA[r] = IS_INTEL_DEV == 1'b1 ?  up_data[(r+1)*256-1 -: 256] : 'x;
+
+            assign avst_up.EMPTY[r]  = '0;
         end
     endgenerate
 
@@ -75,7 +98,6 @@ module DUT (
     assign rq_sof_pos     = rq_mfb.SOF_POS;
     assign cq_mfb.SOF_POS = cq_sof_pos;
     assign cc_sof_pos     = cc_mfb.SOF_POS;
-    assign avst_up.EMPTY  = '0;
 
     PCIE_ADAPTER #(
         // =====================================================================
@@ -118,16 +140,16 @@ module DUT (
         // AXI configuration
         // =====================================================================
 
-        .AXI_DATA_WIDTH     (CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE*CQ_MFB_ITEM_WIDTH),
+        .AXI_DATA_WIDTH     (AXI_ITEMS*CQ_MFB_ITEM_WIDTH),
         // Allowed values: 183 (USP Gen3x16), 88 (USP Gen3x8), 85 (V7 Gen3x8)
-        .AXI_CQUSER_WIDTH   (AXI_CQUSER_WIDTH),
+        .AXI_CQUSER_WIDTH   (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)),
         // Allowed values: 81 (USP Gen3x16), 33 (USP Gen3x8), 33 (V7 Gen3x8)
-        .AXI_CCUSER_WIDTH   (AXI_CCUSER_WIDTH),
+        .AXI_CCUSER_WIDTH   (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)),
         // Allowed values: 137 (USP Gen3x16), 62 (USP Gen3x8), 60 (V7 Gen3x8)
-        .AXI_RQUSER_WIDTH   (AXI_RQUSER_WIDTH),
+        .AXI_RQUSER_WIDTH   (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)),
         // Allowed values: 161 (USP Gen3x16), 75 (USP Gen3x8), 75 (V7 Gen3x8)
-        .AXI_RCUSER_WIDTH   (AXI_RCUSER_WIDTH),
-        .AXI_STRADDLING     (AXI_STRADDLING),
+        .AXI_RCUSER_WIDTH   (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)),
+        .AXI_STRADDLING     (STRADDLING),
 
         // =====================================================================
         // AVST configuration (set automatically)
@@ -142,12 +164,12 @@ module DUT (
         // =====================================================================
         // Avalon-ST DOWN (CQ+RC) Interface - Intel FPGA Only
         // =====================================================================
-        .AVST_DOWN_DATA      (avst_down.DATA),
+        .AVST_DOWN_DATA      (down_data),
         .AVST_DOWN_HDR       (down_hdr),
         .AVST_DOWN_PREFIX    (down_prefix),
         .AVST_DOWN_SOP       (avst_down.SOP),
         .AVST_DOWN_EOP       (avst_down.EOP),
-        .AVST_DOWN_EMPTY     (avst_down.EMPTY),
+        .AVST_DOWN_EMPTY     (down_empty),
         .AVST_DOWN_BAR_RANGE (down_bar_range),
         .AVST_DOWN_VALID     (down_valid),
         .AVST_DOWN_READY     (down_ready),
@@ -155,7 +177,7 @@ module DUT (
         // =====================================================================
         // Avalon-ST UP (CC+RQ) Interface - Intel FPGA Only
         // =====================================================================
-        .AVST_UP_DATA        (avst_up.DATA),
+        .AVST_UP_DATA        (up_data),
         .AVST_UP_HDR         (up_hdr),
         .AVST_UP_PREFIX      (up_prefix),
         .AVST_UP_SOP         (avst_up.SOP),

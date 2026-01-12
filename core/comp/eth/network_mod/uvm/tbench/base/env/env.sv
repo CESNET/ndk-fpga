@@ -124,7 +124,7 @@ class env #(
         m_mi_pmd_rst = uvm_reset::agent::type_id::create("m_mi_pmd_rst", this);
 
         cfg_rst = new();
-        cfg_rst.active = UVM_ACTIVE;
+        cfg_rst.active = UVM_PASSIVE;
         cfg_rst.interface_name = "vif_rst_tsu";
         uvm_config_db #(uvm_reset::config_item)::set(this, "m_tsu_rst", "m_config", cfg_rst);
         m_tsu_rst = uvm_reset::agent::type_id::create("m_tsu_rst", this);
@@ -210,7 +210,6 @@ class env #(
         m_sequencer.mi_rst = m_mi_rst.m_sequencer;
         m_sequencer.mi_phy_rst = m_mi_phy_rst.m_sequencer;
         m_sequencer.mi_pmd_rst = m_mi_pmd_rst.m_sequencer;
-        m_sequencer.tsu_rst    = m_tsu_rst.m_sequencer;
         m_sequencer.set_regmodel(m_regmodel.m_regmodel);
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             m_sequencer.port[it].eth_rst     = m_eth_rst[it].m_sequencer;

@@ -45,14 +45,11 @@ module PROPERTY #(
 );
 
     string module_name = "";
-    logic START = 1'b1;
 
     ///////////////////
     // Start check properties after first clock
     initial begin
         module_name = $sformatf("%m");
-        #(10ps)
-        START = 1'b0;
     end
 
     ////////////////////////////////////
@@ -85,7 +82,7 @@ module PROPERTY #(
 
     generate if (ENDPOINT_TYPE == "R_TILE") begin
         property no_fall_init;
-            @(posedge avst_down.CLK) disable iff(RST || START)
+            @(posedge avst_down.CLK) disable iff(RST)
             $rose(avst_down.READY) |=> always avst_down.READY;
         endproperty
 

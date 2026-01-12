@@ -19,7 +19,7 @@ module testbench;
     // Interfaces
     reset_if  reset(CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)  mfb_rx(CLK);
-    avst_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) mfb_avst(CLK);
+    avst_if #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) mfb_avst(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
@@ -40,7 +40,7 @@ module testbench;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
         uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual avst_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_tx", mfb_avst);
+        uvm_config_db#(virtual avst_if #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_tx", mfb_avst);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

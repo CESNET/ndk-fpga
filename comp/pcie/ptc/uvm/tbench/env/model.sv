@@ -1,293 +1,358 @@
-//-- model.sv: Model of implementation
-//-- Copyright (C) 2022 CESNET z. s. p. o.
-//-- Author(s): Daniel Kříž  <xkrizd01@vutbr.cz>
+// model_ptc.sv: Model of ptc
+// Copyright (C) 2024 CESNET z. s. p. o.
+// Author(s): Radek Iša <isa@cesnet.cz>
 
-//-- SPDX-License-Identifier: BSD-3-Clause
+// SPDX-License-Identifier: BSD-3-Clause
 
-virtual class model_rc #(DMA_PORTS, PCIE_UPHDR_WIDTH) extends uvm_component;
-    //`uvm_component_param_utils(uvm_ptc::model_rc#(DMA_PORTS, PCIE_UPHDR_WIDTH))
 
-    // Model inputs
-    uvm_common::fifo#(dma_header_rq) model_up[DMA_PORTS];
+class tag_register#(int unsigned TAG_WIDTH) extends uvm_object;
+    `uvm_object_param_utils(uvm_ptc::tag_register#(TAG_WIDTH))
 
-    // Model outputs
-    uvm_analysis_port #(pcie_data#(PCIE_UPHDR_WIDTH))  model_down;
+    typedef struct {
+        int unsigned port;
+        int unsigned length;
+        int unsigned unit_id;
+        logic [TAG_WIDTH] tag;
+    } dma_info_t;
 
-    function new(string name = "model", uvm_component parent = null);
-        super.new(name, parent);
+    //TAGS
+    protected logic [TAG_WIDTH-1:0] dma2pcie[logic [8+TAG_WIDTH-1:0]];
+    protected dma_info_t            pcie2dma[logic [TAG_WIDTH-1:0]];
 
-        for (int unsigned it = 0; it < DMA_PORTS; it++) begin
-            string str_it;
-
-            str_it.itoa(it);
-            model_up[it] = null;
-        end
-        model_down = new("model_down", this);
+    function new(string name = "tag_register");
+        super.new(name);
     endfunction
 
-    typedef struct packed {
-        logic [sv_dma_bus_pack::DMA_REQUEST_GLOBAL_W-1 : 0]    global_id;
-        // Padding                            "00"
-        logic [2-1 : 0]                       padd_1;
-        logic [(sv_dma_bus_pack::DMA_REQUEST_TAG_W + 8)-1 : 0] req_id; // requester ID |vfid|"00000000"(MSB)|
-        logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1 : 0]       tag; // tag
-        logic [4-1 : 0]                       lastbe; // last byte enable
-        logic [4-1 : 0]                       firstbe; // first byte enable
-        logic [3-1 : 0]                       fmt; // Request type |0|read_write|hdr_type ('1' for 4DWORD '0' for 3DWORD)
-        logic [5-1 : 0]                       type_n;
-        logic [1-1 : 0]                       tag_9;
+    function void register_pcie_tag(int unsigned type_tr, int unsigned length, logic [8-1:0] unit_id, logic [TAG_WIDTH-1:0] dma_tag, logic [TAG_WIDTH-1:0] pcie_tag);
+        dma_info_t info;
 
-        logic [3-1 : 0]                       tc; // Traffic Class
-        logic [1-1 : 0]                       tag_8;
-        // Padding                            "0000"
-        logic [3-1 : 0]                       padd_0;
-        logic [1-1 : 0]                       td; // ECRC
-        logic [1-1 : 0]                       ep; // Poisoned request
-        logic [sv_dma_bus_pack::DMA_REQUEST_RELAXED_W-1 : 0]   relaxed; // Relaxed bit
-        logic [1-1 : 0]                       snoop; // Snoop bit
-        logic [2-1 : 0]                       at;
-        logic [10-1 : 0]                      len; // LSB (Paket size in DWORD)
-    } pcie_header_rq;
-
-    virtual function pcie_data#(PCIE_UPHDR_WIDTH) create_data(pcie_header_rq pcie_header_out,  dma_header_rq header_rq);
-        `uvm_fatal(this.get_full_name(), "\n\tThis function is not implemented");
-    endfunction
-
-    task parse(int index);
-
-        logic [4-1 : 0] fbe;
-        logic [4-1 : 0] lbe;
-        logic [8-1 : 0] be;
-        logic [1-1 : 0] hdr_type;
-        // DMA HEADER
-        dma_header_rq header_rq;
-        // PCIE HEADER
-        pcie_header_rq pcie_header_out;
-
-        model_up[index].get(header_rq);
-
-        fbe = sv_dma_bus_pack::decode_fbe(header_rq.hdr.firstib);
-        lbe = sv_dma_bus_pack::decode_lbe(header_rq.hdr.lastib);
-        if (header_rq.hdr.length == 0)
-            be = '0;
-        else if (header_rq.hdr.length == 1)
-            be = {4'h0, (fbe & lbe)};
-        else
-            be = {lbe, fbe};
-
-        pcie_header_out.len     = header_rq.hdr.length[10-1 : 0];
-        pcie_header_out.at      = '0;
-        pcie_header_out.relaxed = header_rq.hdr.relaxed;
-        // no snoop
-        pcie_header_out.snoop  = '0;
-        // EP
-        pcie_header_out.ep     = '0;
-        // TD
-        pcie_header_out.td     = '0;
-        // Padding "000"
-        pcie_header_out.padd_0 = '0;
-        pcie_header_out.tag_8  = (sv_dma_bus_pack::DMA_COMPLETION_TAG_W == 9);
-        // TC
-        pcie_header_out.tc    = '0;
-        pcie_header_out.tag_9 = (sv_dma_bus_pack::DMA_COMPLETION_TAG_W == 10);
-        // TYPE
-        pcie_header_out.type_n = '0;
-        // Upravit pro 3DW (vrchnich 32 bitu global id jsou 0) hlavičku (tam bude posledni bit 0)
-        // Navodit takovy stav
-        if (|header_rq.hdr.global_id[64-1 : 32]) begin
-            pcie_header_out.fmt = {1'b0, header_rq.hdr.type_ide, 1'b1};
-        end else
-            pcie_header_out.fmt = {1'b0, header_rq.hdr.type_ide, 1'b0};
-
-        pcie_header_out.firstbe = be[4-1 : 0];
-        pcie_header_out.lastbe  = be[8-1 : 4];
-
-        if (header_rq.hdr.type_ide == 1'b0) begin
-            pcie_header_out.tag = header_rq.hdr.tag;
-        end else
-            pcie_header_out.tag = '0;
-
-        pcie_header_out.req_id = {8'h00, header_rq.hdr.vfid};
-        pcie_header_out.padd_1 = '0;
-
-        if (|header_rq.hdr.global_id[64-1 : 32]) begin
-            pcie_header_out.global_id = {header_rq.hdr.global_id[32-1 : 2], pcie_header_out.padd_1, header_rq.hdr.global_id[64-1 : 32]};
-        end else begin
-            pcie_header_out.global_id = {header_rq.hdr.global_id[32-1 : 2], pcie_header_out.padd_1, 32'h0000};
-        end
-
-        model_down.write(create_data(pcie_header_out, header_rq));
-    endtask
-
-    task run_phase(uvm_phase phase);
-        for (int i = 0; i < DMA_PORTS; i++) begin
-            fork
-                automatic int unsigned index = i;
-                forever begin
-                    parse(index);
-                end
-            join_none;
-        end
-    endtask
-endclass
-
-class model_rc_intel #(DMA_PORTS, PCIE_UPHDR_WIDTH, TYLE) extends model_rc #(DMA_PORTS, PCIE_UPHDR_WIDTH);
-    `uvm_component_param_utils(uvm_ptc::model_rc_intel#(DMA_PORTS, PCIE_UPHDR_WIDTH, TYLE))
-
-    function new(string name = "model", uvm_component parent = null);
-        super.new(name, parent);
-    endfunction
-
-    virtual function pcie_data#(PCIE_UPHDR_WIDTH) create_data(pcie_header_rq pcie_header_out,  dma_header_rq header_rq);
-        pcie_data#(PCIE_UPHDR_WIDTH) ret;
-
-        ret = pcie_data#(PCIE_UPHDR_WIDTH)::type_id::create("ret", this);
-        ret.meta = {pcie_header_out.global_id, pcie_header_out.req_id, pcie_header_out.tag,
-                    pcie_header_out.lastbe, pcie_header_out.firstbe, pcie_header_out.fmt, pcie_header_out.type_n,
-                    pcie_header_out.tag_9, pcie_header_out.tc, pcie_header_out.tag_8, pcie_header_out.padd_0,
-                    pcie_header_out.td, pcie_header_out.ep, pcie_header_out.relaxed, pcie_header_out.snoop,
-                    pcie_header_out.at, pcie_header_out.len};
-
-        if (header_rq.data.size() != 0) begin
-            if (TYLE == "H_TILE") begin
-                if (header_rq.hdr.type_ide == 1'b1) begin
-                    ret.data = new[header_rq.data.size() + 4];
-                end else
-                    ret.data = new[4];
-
-                ret.data[0 : 4-1] = {<<32{ret.meta}};
-
-                if (header_rq.hdr.type_ide == 1'b1) begin
-                    for (int j = 0; j < header_rq.data.size; j++) begin
-                        ret.data[j+4] = header_rq.data[j];
-                    end
-                end
+        `uvm_info(this.get_full_name(), $sformatf("\nTAG REGISTER\n\tTYPE %0d\n\tlength %0d\n\tunit ID %0d(0x%h)\n\tdma tag %0d(0x%h)\n\tpcie tag %0d(0x%h)",
+                                        type_tr, length, unit_id, unit_id, dma_tag, dma_tag, pcie_tag, pcie_tag), UVM_DEBUG);
+        if (type_tr == 0) begin
+            //check if there isnt
+            if (pcie2dma.exists(pcie_tag)) begin
+                `uvm_error(this.get_full_name(), $sformatf("\n\tPCIE tag %0d(0x%h) already exists", pcie_tag, pcie_tag));
+            end else if (dma2pcie.exists({unit_id, dma_tag})) begin
+                `uvm_error(this.get_full_name(), $sformatf("\n\tDMA unit id 0x%h tag %0d(0x%h) already exists", unit_id, dma_tag, dma_tag));
             end else begin
-                ret.data = new[header_rq.data.size()];
+                //dma to pcie
+                dma2pcie[{unit_id, dma_tag}] = pcie_tag;
 
-                for (int j = 0; j < header_rq.data.size(); j++) begin
-                    ret.data[j] = header_rq.data[j];
-                end
+                //pcie to dma
+                info.port    = -1;
+                info.length  = length;
+                info.unit_id = unit_id;
+                info.tag     = dma_tag;
+
+                pcie2dma[pcie_tag] = info;
             end
+        end
+    endfunction
+
+    task get_dma2pcie(input logic type_tr, int unsigned dma_port, logic [TAG_WIDTH-1:0] dma_tag, logic [8-1:0] dma_unit_id, output logic [TAG_WIDTH-1:0] pcie_tag);
+        `uvm_info(this.get_full_name(), $sformatf("\nTAG TRANSLATE DMA TO PCIE\n\ttype %0d\n\tdma port %0d \n\tdma tag %0d(0x%h)\n\tunit id %0d(0x%h)",
+                                                 type_tr, dma_port, dma_tag, dma_tag, dma_unit_id, dma_unit_id), UVM_FULL);
+        if (type_tr == 0) begin
+            wait(dma2pcie.exists({dma_unit_id, dma_tag}));
+            pcie_tag = dma2pcie[{dma_unit_id, dma_tag}];
+            pcie2dma[pcie_tag].port = dma_port;
         end else begin
-            ret.data    = new[1];
-            ret.data[0] = 32'h12345678;
+            pcie_tag = 0;
+        end
+    endtask
+
+    function dma_info_t get_pcie2dma(logic [TAG_WIDTH-1:0] pcie_tag, int unsigned last);
+        dma_info_t info;
+
+        `uvm_info(this.get_full_name(), $sformatf("\nTAG TRANSLATE PCIE TO DMA \n\tpcie tag %0d(0x%h)\n\tlast %0d", pcie_tag, pcie_tag, last), UVM_FULL);
+
+        if (!pcie2dma.exists(pcie_tag)) begin
+            `uvm_error(this.get_full_name(), $sformatf("\n\tPCIE tag doesnt exist %0d(0x%h)", pcie_tag, pcie_tag));
+        end else begin
+            info = pcie2dma[pcie_tag];
+            if (last) begin
+                pcie2dma.delete(pcie_tag);
+                dma2pcie.delete({info.unit_id, info.tag});
+            end
         end
 
-        return ret;
-    endfunction
-endclass
-
-class model_rc_xilinx #(DMA_PORTS, PCIE_UPHDR_WIDTH) extends model_rc #(DMA_PORTS, PCIE_UPHDR_WIDTH);
-    `uvm_component_param_utils(uvm_ptc::model_rc_xilinx#(DMA_PORTS, PCIE_UPHDR_WIDTH))
-
-    function new(string name = "model", uvm_component parent = null);
-        super.new(name, parent);
+        return info;
     endfunction
 
-    virtual function pcie_data#(PCIE_UPHDR_WIDTH) create_data(pcie_header_rq pcie_header_out,  dma_header_rq header_rq);
-        pcie_data#(PCIE_UPHDR_WIDTH) ret;
-
-        ret = pcie_data#(PCIE_UPHDR_WIDTH)::type_id::create("ret", this);
-        ret.meta = {1'b0, pcie_header_out.relaxed, 21'b000000000000000000000, pcie_header_out.tag,
-                       pcie_header_out.req_id, 1'b0, 3'b000, header_rq.hdr.type_ide, header_rq.hdr.length,
-                       header_rq.hdr.global_id[63 : 2], 2'b00};
-        // padding    [end : 126] ('0)
-        // TAG        [103 : 96]
-        // REQUEST ID [95 : 80]
-        // padding    [79 : 79]
-        // TYPE       [78 : 75]
-        // SIZE       [74 : 64]
-        // ADDRESS    [63 : 2]
-        // padding    [1 : 0]
-
-        if (header_rq.data.size() != 0) begin
-            if (header_rq.hdr.type_ide == 1'b1) begin
-                ret.data = new[header_rq.data.size() + 4];
-            end else
-                ret.data = new[4];
-
-            ret.data[0 : 4-1] = {<<32{ret.meta}};
-
-            if (header_rq.hdr.type_ide == 1'b1) begin
-                for (int j = 0; j < header_rq.data.size; j++) begin
-                    ret.data[j+4] = header_rq.data[j];
-                end
-            end
-        end else begin
-            ret.data    = new[1];
-            ret.data[0] = 32'h12345678;
-        end
-
-
-        return ret;
+    //---------------------------------------
+    // OTHERS METHODS
+    //---------------------------------------
+    function int unsigned used();
+        return (dma2pcie.size() != 0 || pcie2dma.size() != 0);
     endfunction
+
+
 endclass
 
 
-class down_model #(DMA_PORTS) extends uvm_component;
-    `uvm_component_param_utils(uvm_ptc::down_model#(DMA_PORTS))
+////////////////////////////////////////////////////
+//This is probe which probe transating from dma tag to pcie tag
+class tag_cbs #(int unsigned REGIONS, int unsigned TAG_WIDTH) extends uvm_event_callback;
+    `uvm_object_param_utils(uvm_ptc::tag_cbs #(REGIONS, TAG_WIDTH))
 
-    localparam PORTS_W_FIX = (DMA_PORTS > 1) ? $clog2(DMA_PORTS) : 1;
+    uvm_ptc::tag_register#(TAG_WIDTH) registration;
+    //protected logic [TAG_WIDTH-1:0] tag_translation[logic [8+TAG_WIDTH-1:0]];
 
-    // Model inputs
-    uvm_common::fifo#(dma_header_rc) model_rc;
+    protected int unsigned transactions;
+    function new(string name = "");
+        super.new(name);
+        transactions = 0;
+    endfunction
 
-    uvm_analysis_port #(pcie_data#(sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))  model_down[DMA_PORTS];
+    //---------------------------------------
+    // pre trigger method
+    //---------------------------------------
+    virtual function bit pre_trigger(uvm_event e, uvm_object data);
+        return 0;
+    endfunction
 
-    function new(string name = "model", uvm_component parent = null);
+    //---------------------------------------
+    // post trigger method
+    //---------------------------------------
+    virtual function void post_trigger(uvm_event e, uvm_object data);
+        uvm_probe::data#(REGIONS*(1 + TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) c_data;
+        logic [REGIONS-1:0]           vld;
+        logic [REGIONS*TAG_WIDTH-1:0] tags;
+        logic [REGIONS*sv_dma_bus_pack::DMA_UPHDR_WIDTH-1:0] dma_hdr;
+
+        $cast(c_data, data);
+        {dma_hdr, tags, vld} = c_data.data;
+        for (int unsigned it = 0; it < REGIONS; it++) begin
+            if (vld[it] == 1) begin
+                logic [TAG_WIDTH-1:0] tag_act                            = tags   [(it+1)*TAG_WIDTH-1 -: TAG_WIDTH];
+                logic [sv_dma_bus_pack::DMA_UPHDR_WIDTH-1:0] dma_hdr_act = dma_hdr[(it+1)*sv_dma_bus_pack::DMA_UPHDR_WIDTH-1 -: sv_dma_bus_pack::DMA_UPHDR_WIDTH];
+                uvm_dma::sequence_item_rq act_dma_hdr;
+
+                act_dma_hdr = new();
+                act_dma_hdr.relaxed     = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_W-1 : sv_dma_bus_pack::DMA_REQUEST_RELAXED_O];
+                act_dma_hdr.pasidvld    = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASIDVLD_O];
+                act_dma_hdr.pasid       = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASID_O];
+                act_dma_hdr.vfid        = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASID_O-1 : sv_dma_bus_pack::DMA_REQUEST_VFID_O];
+                act_dma_hdr.global_id   = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_VFID_O-1 : sv_dma_bus_pack::DMA_REQUEST_GLOBAL_O];
+                act_dma_hdr.unitid      = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_GLOBAL_O-1 : sv_dma_bus_pack::DMA_REQUEST_UNITID_O];
+                act_dma_hdr.tag         = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_UNITID_O-1 : sv_dma_bus_pack::DMA_REQUEST_TAG_O];
+                act_dma_hdr.lastib      = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_TAG_O-1 : sv_dma_bus_pack::DMA_REQUEST_LASTIB_O];
+                act_dma_hdr.firstib     = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_LASTIB_O-1 : sv_dma_bus_pack::DMA_REQUEST_FIRSTIB_O];
+                act_dma_hdr.type_ide    = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_FIRSTIB_O-1 : sv_dma_bus_pack::DMA_REQUEST_TYPE_O];
+                act_dma_hdr.length      = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_TYPE_O-1 : sv_dma_bus_pack::DMA_REQUEST_LENGTH_O]; // Size in DWORDS
+
+                transactions++;
+                `uvm_info(this.get_full_name(), $sformatf("\n\tTag translaction %0d WR(%0d) DMA TAG : 0x%h DMA ID : 0x%h => PCIE tag 0x%h", transactions, act_dma_hdr.type_ide, act_dma_hdr.tag, act_dma_hdr.unitid, tag_act), UVM_HIGH);
+
+                if ($isunknown(tag_act)) begin
+                    `uvm_error(this.get_full_name(), $sformatf("\n\tUndefined Value in TAG assigment 0x%h", tag_act));
+                end
+
+                registration.register_pcie_tag(act_dma_hdr.type_ide, act_dma_hdr.length*4, act_dma_hdr.unitid, act_dma_hdr.tag, tag_act);
+            end
+        end
+    endfunction
+endclass
+
+
+class model_ptc_config;
+    string path;
+endclass
+
+class model#(
+    int unsigned RQ_MVB_ITEMS,
+    int unsigned DMA_PORTS
+) extends uvm_component;
+    `uvm_component_param_utils(uvm_ptc::model#(RQ_MVB_ITEMS, DMA_PORTS))
+
+    localparam int unsigned PTC_TAG_WIDTH = sv_dma_bus_pack::DMA_REQUEST_TAG_W;
+
+    uvm_analysis_port     #(uvm_pcie::header) pcie_rq;
+    uvm_tlm_analysis_fifo #(uvm_pcie::header) pcie_rc;
+
+    uvm_tlm_analysis_fifo #(uvm_dma::sequence_item_rq) dma_rq[DMA_PORTS];
+    uvm_analysis_port     #(uvm_dma::sequence_item_rc) dma_rc[DMA_PORTS];
+
+    protected uvm_ptc::tag_cbs #(RQ_MVB_ITEMS, PTC_TAG_WIDTH) tags_cbs;
+    protected uvm_ptc::tag_register#(PTC_TAG_WIDTH)  tags;
+    protected int unsigned rq_transactions[DMA_PORTS];
+    protected int unsigned rc_transactions;
+    protected model_ptc_config cfg;
+
+    function new(string name, uvm_component parent = null);
         super.new(name, parent);
-        model_rc = null;
+
+        pcie_rq = new("pcie_rq", this);
+        pcie_rc = new("pcie_rc", this);
+        rc_transactions = 0;
+
+        for (int dma = 0; dma < DMA_PORTS; dma++) begin
+            string i_string;
+            i_string.itoa(dma);
+
+            dma_rq[dma] = new({"dma_rq_", i_string}, this);
+            dma_rc[dma] = new({"dma_rc_", i_string}, this);
+            rq_transactions[dma] = 0;
+        end
+    endfunction
+
+    function int unsigned used();
+        int unsigned ret = 0;
+        ret |= (pcie_rc.used() != 0);
 
         for (int unsigned it = 0; it < DMA_PORTS; it++) begin
-            string str_it;
-
-            str_it.itoa(it);
-            model_down[it] = new({"model_down_", str_it}, this);
+            ret |= (dma_rq[it].used()  != 0);
         end
+        return ret;
     endfunction
 
-    task run_phase(uvm_phase phase);
-        dma_header_rc           tr_rc;
-        pcie_data#(sv_dma_bus_pack::DMA_DOWNHDR_WIDTH) tr_out;
+    function int unsigned success();
+        int unsigned ret = 1;
+        return ret;
+    endfunction
 
-        if (model_rc == null) begin
-            `uvm_fatal(this.get_full_name(), "\n\t input port model_rc is null");
+
+    function void build_phase(uvm_phase phase);
+        if (!uvm_config_db #(model_ptc_config)::get(this, "", "m_config", cfg)) begin
+            `uvm_fatal(this.get_full_name(), "\n\tCannot get configuration object");
         end
+
+        tags_cbs = uvm_ptc::tag_cbs #(RQ_MVB_ITEMS, PTC_TAG_WIDTH)::type_id::create("tags_cbs", this);
+        tags     = uvm_ptc::tag_register#(PTC_TAG_WIDTH)::type_id::create("tags", this);
+    endfunction
+
+    function void connect_phase(uvm_phase phase);
+        uvm_probe::pool::get_global_pool().get({ "probe_event_component_", cfg.path, ".probe_tag" }).add_callback(tags_cbs);
+        tags_cbs.registration = tags;
+    endfunction
+
+    task run_rc();
+        uvm_pcie::header          hdr;
+        uvm_dma::sequence_item_rc dma_tr;
+        logic completed;
+        logic [PTC_TAG_WIDTH-1:0] pcie_tag;
+        int unsigned move;
 
         forever begin
-            string debug_msg = "";
+            uvm_pcie::completer_header pcie_tr;
+            tag_register#(PTC_TAG_WIDTH)::dma_info_t dma_info;
 
-            model_rc.get(tr_rc);
+            pcie_rc.get(hdr);
+            $cast(pcie_tr, hdr);
 
-            tr_out = pcie_data#(sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)::type_id::create("tr_out", this);
+            dma_tr = uvm_dma::sequence_item_rc::type_id::create("dma_tr", this);
+            dma_tr.start = pcie_tr.start;
 
-            tr_out.data = tr_rc.data;
-            tr_out.meta[11-1:0]  = tr_rc.length;
-            tr_out.meta[12-1]    = tr_rc.completed;
-            tr_out.meta[20-1:12] = tr_rc.tag;
-            tr_out.meta[28-1:20] = tr_rc.unit_id;
+            rc_transactions++;
+            `uvm_info(this.get_full_name(), $sformatf("\nGET PCIE RC TRANSACTION %0d %s", rc_transactions, pcie_tr.convert2string()), UVM_FULL);
 
-            if (tr_rc.port < DMA_PORTS) begin
-                model_down[tr_rc.port].write(tr_out);
-            end else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tPort %0d is out of range [0:%0d]", tr_rc.port, DMA_PORTS));
+            move       = pcie_tr.lower_address & 2'b11;
+            pcie_tag   = pcie_tr.tag;
+            completed  = (pcie_tr.byte_count <= (pcie_tr.length*4 - move));
+
+            dma_info         = tags.get_pcie2dma(pcie_tag, completed);
+            dma_tr.length    = pcie_tr.length;
+            dma_tr.completed = completed;
+            dma_tr.tag       = dma_info.tag;
+            dma_tr.unit_id   = dma_info.unit_id;
+            if (DMA_PORTS > 1) begin
+                dma_tr.unit_id[$clog2(DMA_PORTS)-1:0] = 0;
+            end
+            dma_tr.data      = pcie_tr.data;
+            `uvm_info(this.get_full_name(), $sformatf("\nDMA RC PORT %0d %s", dma_info.port, dma_tr.convert2string()), UVM_FULL);
+
+            dma_rc[dma_info.port].write(dma_tr);
+        end
+
+    endtask
+
+    task run_rq(int unsigned dma);
+        uvm_dma::sequence_item_rq rq_tr;
+        uvm_pcie::request_header  rsp_tr;
+        int unsigned rq_tr_tmp;
+
+        forever begin
+            logic [sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1:0] unitid;
+            dma_rq[dma].get(rq_tr);
+
+            rsp_tr       = uvm_pcie::request_header::type_id::create("rsp_tr", this);
+            rsp_tr.start = rq_tr.start;
+
+            rq_transactions[dma]++;
+            rq_tr_tmp = rq_transactions[dma];
+
+            rsp_tr.fmt        = {1'b0, rq_tr.type_ide, rq_tr.global_id[64-1:0] != 32'b0 ? 1'b1 : 1'b0};
+            rsp_tr.pcie_type  = 5'b0;
+
+
+            `uvm_info(this.get_full_name(), $sformatf("\nGET DMA RX [%0d] TRANSACTION %0d %s", dma, rq_tr_tmp, rq_tr.convert2string()), UVM_FULL);
+
+            rsp_tr.traffic_class     = 0;
+            rsp_tr.id_based_ordering = 0;
+            rsp_tr.relaxed_ordering  = rq_tr.relaxed;
+            rsp_tr.no_snoop          = 0;
+            rsp_tr.th                = 0;
+            rsp_tr.td                = 0;
+            rsp_tr.ep                = 0;
+            rsp_tr.at                = 0;
+            rsp_tr.length            = rq_tr.length;
+            rsp_tr.data              = rq_tr.type_ide == 1'b1 ? rq_tr.data : {};
+            rsp_tr.requester_id      = {8'b0,  rq_tr.vfid};
+            unitid = rq_tr.unitid;
+            if (DMA_PORTS > 1) begin
+                 unitid[$clog2(DMA_PORTS)-1:0] = dma;
             end
 
-            debug_msg = {debug_msg, $sformatf("\n\t ================ DOWN MODEL =============== \n")};
-            if (this.get_report_verbosity_level() >= UVM_FULL) begin
-                debug_msg = {debug_msg, $sformatf("\t PORT:                %0d\n",  tr_rc.port)};
-                debug_msg = {debug_msg, $sformatf("\t LENGTH:              %0d\n",  tr_rc.length)};
-                debug_msg = {debug_msg, $sformatf("\t COMPLETED:           %0d\n",  tr_rc.completed)};
-                debug_msg = {debug_msg, $sformatf("\t TAG:                 %0d\n",  tr_rc.tag)};
-                debug_msg = {debug_msg, $sformatf("\t UNIT ID:             %0d\n",  tr_rc.unit_id)};
-                debug_msg = {debug_msg, $sformatf("\t DATA:                %p\n",  tr_rc.data)};
-            end
+            tags.get_dma2pcie(rq_tr.type_ide, dma, rq_tr.tag, unitid, rsp_tr.tag);
+            case(rq_tr.lastib)
+                0 : rsp_tr.lbe = 4'b1111;
+                1 : rsp_tr.lbe = 4'b0111;
+                2 : rsp_tr.lbe = 4'b0011;
+                3 : rsp_tr.lbe = 4'b0001;
+                default : rsp_tr.lbe = 'x;
+            endcase
+            case(rq_tr.firstib)
+                0 : rsp_tr.fbe = 4'b1111;
+                1 : rsp_tr.fbe = 4'b1110;
+                2 : rsp_tr.fbe = 4'b1100;
+                3 : rsp_tr.fbe = 4'b1000;
+                default : rsp_tr.lbe = 'x;
+            endcase
+            rsp_tr.lbe               = (rsp_tr.length != 1) ? rsp_tr.lbe : 0;
+            rsp_tr.address           = rq_tr.global_id[64-1:2];
+            rsp_tr.ph                = 0;
 
-            debug_msg = {debug_msg, $sformatf("\t DOWN MODEL META IN:  %h\n",  tr_out.meta)};
-            debug_msg = {debug_msg, $sformatf("\t DOWN MODEL MFB IN:   %p\n",  tr_out.data)};
-            `uvm_info(this.get_full_name(), debug_msg ,UVM_HIGH);
-
+            `uvm_info(this.get_full_name(), $sformatf("\nPCIE RQ transaction %0d %s", rq_tr_tmp,  rsp_tr.convert2string()), UVM_MEDIUM);
+            //change tag and pic
+            pcie_rq.write(rsp_tr);
         end
     endtask
+
+    task run_phase(uvm_phase phase);
+        fork
+             run_rc();
+        join_none
+
+        for (int dma = 0; dma < DMA_PORTS; dma++) begin
+            fork
+                automatic int unsigned index = dma;
+                run_rq(index);
+            join_none
+        end
+    endtask
+
+    function void check_phase(uvm_phase phase);
+        string msg;
+
+        if (this.success() == 0 || this.used()) begin
+            msg = $sformatf("\n\tSuccess %0d Transaction in\n\t\tPcie RC : %0d", this.success(), pcie_rc.used());
+
+            for (int unsigned it = 0; it < DMA_PORTS; it++) begin
+                msg = {msg, $sformatf("\n\t\tdma rq [%0d] : %0d (processed %0d)", it,  dma_rq[it].used(), rq_transactions[it])};
+            end
+            `uvm_error(this.get_full_name(), msg);
+        end
+    endfunction
 endclass
+
+

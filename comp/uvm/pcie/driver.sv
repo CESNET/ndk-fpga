@@ -12,8 +12,9 @@ class driver extends uvm_driver#(uvm_pcie::header);
         super.new(name, parent);
     endfunction
 
-    task run_phase(uvm_phase phase);
-    endtask
+    function int unsigned used();
+        return 0;
+    endfunction
 
 endclass
 

@@ -42,8 +42,6 @@ set SIM_FLAGS(CODE_COVERAGE) false
 set SIM_FLAGS(UVM_ENABLE) true
 set SIM_FLAGS(UVM_TEST) "test::ex_test"
 set SIM_FLAGS(UVM_VERBOSITY) "UVM_NONE"
-#set SIM_FLAGS(DEBUG) true
-#set SIM_FLAGS(RAND_SEED) 1940230263
 
 # Global include file for compilation
 source "$OFM_PATH/build/Modelsim.inc.fdo"
@@ -53,4 +51,4 @@ puts "Std Arith Warnings - Disabled"
 set StdArithNoWarnings 1
 set NumericStdNoWarnings 1
 nb_sim_run
-
+#nb_sim_run 2825ns

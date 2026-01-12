@@ -7,6 +7,9 @@
 # Set paths
 set SV_UVM_BASE                     "$OFM_PATH/comp/uvm"
 
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/pcie_meta_pack.sv"
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.sv"
+
 set COMPONENTS [list \
       [ list "UVM_BASE"                           "$OFM_PATH/comp/ver"                    "FULL"] \
       [ list "SV_RESET"                           "$SV_UVM_BASE/reset"                    "FULL"] \
@@ -15,15 +18,22 @@ set COMPONENTS [list \
       [ list "SV_LOGIC_VECTOR_UVM_BASE"           "$SV_UVM_BASE/logic_vector"             "FULL"] \
       [ list "SV_BYTE_ARRAY_MFB_UVM_BASE"         "$SV_UVM_BASE/logic_vector_array_mfb"   "FULL"] \
       [ list "SV_LOGIC_VECTOR_MVB_UVM_BASE"       "$SV_UVM_BASE/logic_vector_mvb"         "FULL"] \
-      [ list "SV_LOGIC_VECTOR_ARRAY_AXI_UVM_BASE" "$SV_UVM_BASE/logic_vector_array_axi"   "FULL"] \
 ]
 
-set MOD "$MOD $OFM_PATH/comp/base/pkg/dma_bus_pack.sv"
+lappend COMPONENTS [ list "RESET"  "$SV_UVM_BASE/reset"    "FULL"]
+lappend COMPONENTS [ list "PCIE"  "$SV_UVM_BASE/pcie"      "FULL"]
+lappend COMPONENTS [ list "PCIE"  "$SV_UVM_BASE/pcie_axi"  "FULL"]
+lappend COMPONENTS [ list "PCIE"  "$SV_UVM_BASE/pcie_mfb"  "FULL"]
+lappend COMPONENTS [ list "PROBE" "$SV_UVM_BASE/probe"     "FULL"]
+#set MOD "$MOD $OFM_PATH/comp/base/pkg/dma_bus_pack.sv"
+#
+#set MOD "$MOD $ENTITY_BASE/tbench/info/pkg.sv"
+#set MOD "$MOD $ENTITY_BASE/tbench/dma_up_env/pkg.sv"
+#set MOD "$MOD $ENTITY_BASE/tbench/info_rc/pkg.sv"
+#set MOD "$MOD $ENTITY_BASE/tbench/pcie_rc/pkg.sv"
 
-set MOD "$MOD $ENTITY_BASE/tbench/info/pkg.sv"
-set MOD "$MOD $ENTITY_BASE/tbench/dma_up_env/pkg.sv"
-set MOD "$MOD $ENTITY_BASE/tbench/info_rc/pkg.sv"
-set MOD "$MOD $ENTITY_BASE/tbench/pcie_rc/pkg.sv"
+set MOD "$MOD $ENTITY_BASE/tbench/dma/pkg.sv"
+
 set MOD "$MOD $ENTITY_BASE/tbench/env/pkg.sv"
 set MOD "$MOD $ENTITY_BASE/tbench/tests/pkg.sv"
 set MOD "$MOD $ENTITY_BASE/tbench/property.sv"

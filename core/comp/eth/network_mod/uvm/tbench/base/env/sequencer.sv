@@ -32,7 +32,6 @@ class sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGI
     uvm_reset::sequencer mi_rst;
     uvm_reset::sequencer mi_phy_rst;
     uvm_reset::sequencer mi_pmd_rst;
-    uvm_reset::sequencer tsu_rst;
     uvm_network_mod_env::regmodel #(ETH_PORTS, ETH_PORT_CHAN) regmodel;
 
     sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) port[ETH_PORTS];

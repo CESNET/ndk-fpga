@@ -20,11 +20,7 @@ SETTINGS = {
         "CC_MFB_REGION_SIZE"   : "1"                 ,
         "CC_MFB_BLOCK_SIZE"    : "8"                 ,
 
-        "AXI_CQUSER_WIDTH"     : "183"               ,
-        "AXI_CCUSER_WIDTH"     : "81"                ,
-        "AXI_RQUSER_WIDTH"     : "137"               ,
-        "AXI_RCUSER_WIDTH"     : "161"               ,
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"       : "0"                 ,
 
         "DMA_BAR_ENABLE"       : 0,
         "DMA_PORTS"            : 1,
@@ -184,18 +180,15 @@ SETTINGS = {
         "CC_MFB_REGION_SIZE"   : "1"                 ,
         "CC_MFB_BLOCK_SIZE"    : "8"                 ,
 
-
-        "AXI_CQUSER_WIDTH"     : "183"               ,
-        "AXI_CCUSER_WIDTH"     : "81"                ,
-        "AXI_RQUSER_WIDTH"     : "137"               ,
-        "AXI_RCUSER_WIDTH"     : "161"               ,
-        "AXI_STRADDLING"       : "0"                 ,
+        "STRADDLING"       : "0"                 ,
 
         "DEVICE"               : "\\\"ULTRASCALE\\\"",
         "PCIE_ENDPOINT_TYPE"   : "\\\"DUMMY\\\""     ,
         "__core_params__"          : {"PCIE_TYPE" : "USP"}     ,
     },
-
+    "straddling_on" : {
+        "STRADDLING"           : "1",
+    },
     "dma_ports_1" : {
         "DMA_PORTS"            : 1,
     },
@@ -209,14 +202,18 @@ SETTINGS = {
 
     "_combinations_" : {
         "P_TILE_512"           : ("intel_p_tile_512",              ),
+        "P_TILE_512"           : ("intel_p_tile_512", "straddling_on"),
         "P_TILE_256_BIF"       : ("intel_p_tile_256_bif",          ),
         "R_TILE_1024"          : ("intel_r_tile_1024",             ),
+        "R_TILE_1024"          : ("intel_r_tile_1024", "straddling_on"),
         "R_TILE_512_BIF"       : ("intel_r_tile_512_bif",          ),
         "R_TILE_512_BIF_2CONS" : ("intel_r_tile_512_bif_2cons",    ),
         "USP_512"              : ("xilinx_usp_512",                ),
+        "USP_512"              : ("xilinx_usp_512", "straddling_on", ),
         "USP_512_DMA_2"        : ("xilinx_usp_512", "dma_ports_2", ),
 
         "P_TILE_512_CQ"  : ("intel_p_tile_512" , "dma_ports_1", "bar_enable"),
+        "P_TILE_512_CQ"  : ("intel_p_tile_512" , "dma_ports_1", "bar_enable", "straddling_on"),
         "R_TILE_1024_CQ" : ("intel_r_tile_1024", "dma_ports_1", "bar_enable"),
         "USP_512_CQ"     : ("xilinx_usp_512"   , "dma_ports_1", "bar_enable"),
 

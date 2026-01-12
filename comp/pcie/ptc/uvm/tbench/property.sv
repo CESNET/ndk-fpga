@@ -8,9 +8,9 @@
 import uvm_pkg::*;
 
 module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MFB_UP_ITEM_WIDTH,
-                      DMA_MVB_UP_ITEMS, MFB_UP_REGIONS, PCIE_UPHDR_WIDTH,
+                      DMA_MVB_UP_ITEMS, MFB_UP_REGIONS, PCIE_UP_META_WIDTH,
                       MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, MFB_DOWN_ITEM_WIDTH,
-                      PCIE_DOWNHDR_WIDTH, DMA_MFB_DOWN_REGIONS, DMA_MVB_DOWN_ITEMS, META_WIDTH, DMA_PORTS, DEVICE)
+                      PCIE_DOWN_META_WIDTH, DMA_MFB_DOWN_REGIONS, DMA_MVB_DOWN_ITEMS, DMA_PORTS, DEVICE)
     (
         input RESET,
         input RESET_DMA,
@@ -24,6 +24,11 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
         axi_if rq_axi_vif,
         axi_if rc_axi_vif
     );
+
+
+    localparam RQ_AXI_ITEMS = MFB_UP_REGIONS*MFB_UP_REG_SIZE*MFB_UP_BLOCK_SIZE;
+    localparam RC_AXI_ITEMS = MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE;
+
     string module_name = "";
     logic START = 1'b1;
 
@@ -42,7 +47,7 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
             .REGION_SIZE  (MFB_UP_REG_SIZE),
             .BLOCK_SIZE   (MFB_UP_BLOCK_SIZE),
             .ITEM_WIDTH   (MFB_UP_ITEM_WIDTH),
-            .META_WIDTH   (META_WIDTH)
+            .META_WIDTH   (0)
         )
         up_mfb_prop (
             .RESET (RESET_DMA),
@@ -80,23 +85,24 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
         );
     end
 
-    mvb_property #(
-        .ITEMS      (MFB_UP_REGIONS),
-        .ITEM_WIDTH (PCIE_UPHDR_WIDTH)
-    )
-    rq_mvb_prop (
-        .RESET (RESET),
-        .vif   (rq_mvb_vif)
-    );
 
     generate
         if (DEVICE == "AGILEX" || DEVICE == "STRATIX10") begin
+            mvb_property #(
+                .ITEMS      (MFB_UP_REGIONS),
+                .ITEM_WIDTH (PCIE_UP_META_WIDTH)
+            )
+            rq_mvb_prop (
+                .RESET (RESET),
+                .vif   (rq_mvb_vif)
+            );
+
             mfb_property #(
                 .REGIONS      (MFB_DOWN_REGIONS),
                 .REGION_SIZE  (MFB_DOWN_REG_SIZE),
                 .BLOCK_SIZE   (MFB_DOWN_BLOCK_SIZE),
                 .ITEM_WIDTH   (MFB_DOWN_ITEM_WIDTH),
-                .META_WIDTH   (META_WIDTH)
+                .META_WIDTH   (0)
             )
             rc_mfb_prop (
                 .RESET (RESET),
@@ -108,18 +114,26 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
                 .REGION_SIZE  (MFB_UP_REG_SIZE),
                 .BLOCK_SIZE   (MFB_UP_BLOCK_SIZE),
                 .ITEM_WIDTH   (MFB_UP_ITEM_WIDTH),
-                .META_WIDTH   (META_WIDTH)
+                .META_WIDTH   (0)
             )
             rq_mfb_prop (
                 .RESET (RESET),
                 .vif   (rq_mfb_vif)
             );
         end else begin
-            axi_property AXI_RQ (
+            axi_property #(
+                RQ_AXI_ITEMS,
+                32,
+                uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)
+            ) AXI_RQ (
                 .RESET (RESET),
                 .vif   (rq_axi_vif)
             );
-            axi_property AXI_RC (
+            axi_property  #(
+                RC_AXI_ITEMS,
+                32,
+                uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)
+            ) AXI_RC (
                 .RESET (RESET_DMA),
                 .vif   (rc_axi_vif)
             );

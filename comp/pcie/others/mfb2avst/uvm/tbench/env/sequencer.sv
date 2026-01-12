@@ -11,7 +11,7 @@ class virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
     uvm_reset::sequencer                                                                            m_reset;
     uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH)                                              m_logic_vector_array_scr;
     uvm_logic_vector::sequencer#(META_WIDTH)                                                        m_logic_vector_scr;
-    uvm_avst::sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) m_pcie;
+    uvm_avst::sequencer #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) m_pcie;
 
     function new(string name = "virt_sequencer", uvm_component parent);
         super.new(name, parent);
