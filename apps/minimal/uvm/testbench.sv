@@ -47,14 +47,22 @@ module testbench;
     // INTERFACESS
     // INPUT INTERFACE
     reset_if     reset_user_x1(CLK_USER_X1);
+    pullup(reset_user_x1.RESET);
     reset_if     reset_user_x2(CLK_USER_X2);
+    pullup(reset_user_x2.RESET);
     reset_if     reset_user_x3(CLK_USER_X3);
+    pullup(reset_user_x3.RESET);
     reset_if     reset_user_x4(CLK_USER_X4);
+    pullup(reset_user_x4.RESET);
     // OUTPUT INTERFACE
     reset_if     reset_mi(MI_CLK);
+    pullup(reset_mi.RESET);
     reset_if     reset_dma_x1(DMA_CLK_X1);
+    pullup(reset_dma_x1.RESET);
     reset_if     reset_dma_x2(DMA_CLK_X2);
+    pullup(reset_dma_x2.RESET);
     reset_if     reset_app(APP_CLK);
+    pullup(reset_app.RESET);
 
     // ETHERNET I/O INTERFACE
     mvb_if #(test_pkg::REGIONS,  test_pkg::ETH_RX_HDR_WIDTH)                                                                            eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
