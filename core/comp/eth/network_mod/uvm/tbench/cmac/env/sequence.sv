@@ -165,7 +165,7 @@ class virt_sequence_port #(
         seq_sync_usr_rx.send_stop();
         seq_sync_eth_tx.send_stop();
 
-        #(300ns);
+        #(1us);
 
         // Read statistics
         for (int unsigned it = 0; it < ETH_PORT_CHAN; it++) begin
@@ -178,23 +178,19 @@ class virt_sequence_port #(
             tx_stats.set_regmodel(p_sequencer.regmodel.channel[it].tx_mac);
 
             fork
-                rx_stats.start(null);
-                tx_stats.start(null);
-            join
+                begin
+                    rx_stats.start(null);
+                   `uvm_info(m_sequencer.get_full_name(), $sformatf("RX channel[%0d] STATS\n\t%s\n", it, rx_stats.convert2string()), UVM_LOW);
+                    rx_stats.reset();
+                    rx_stats.start(null);
+                end
 
-            `uvm_info(m_sequencer.get_full_name(), $sformatf("RX channel[%0d] STATS\n\t%s\n", it, rx_stats.convert2string()), UVM_LOW);
-            `uvm_info(m_sequencer.get_full_name(), $sformatf("TX channel[%0d] STATS\n\t%s\n", it, tx_stats.convert2string()), UVM_LOW);
-
-            fork
-                rx_stats.reset();
-                tx_stats.reset();
-            join
-
-            #(40ns);
-
-            fork
-                rx_stats.start(null);
-                tx_stats.start(null);
+                begin
+                    tx_stats.start(null);
+                    `uvm_info(m_sequencer.get_full_name(), $sformatf("TX channel[%0d] STATS\n\t%s\n", it, tx_stats.convert2string()), UVM_LOW);
+                    tx_stats.reset();
+                    tx_stats.start(null);
+                end
             join
 
             `uvm_info(m_sequencer.get_full_name(), $sformatf("RX channel[%0d] STATS AFTER RESET\n\t%s\n", it, rx_stats.convert2string()), UVM_LOW);
