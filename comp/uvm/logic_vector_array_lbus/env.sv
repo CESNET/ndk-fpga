@@ -5,11 +5,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // ======= //
-// TX side //
+// RX side //
 // ======= //
 
-class env_tx extends uvm_env;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::env_tx);
+class env_rx extends uvm_env;
+    `uvm_component_utils(uvm_logic_vector_array_lbus::env_rx);
 
     // -------------- //
     // Analysis ports //
@@ -23,7 +23,7 @@ class env_tx extends uvm_env;
     // ------------------ //
 
     // Main sequencer
-    sequencer_tx m_sequencer;
+    sequencer_rx m_sequencer;
 
     // Logic vector array agent
     uvm_logic_vector_array::agent #(8) m_logic_vector_array_agent;
@@ -34,7 +34,7 @@ class env_tx extends uvm_env;
     uvm_logic_vector::config_item m_logic_vector_agent_cfg;
 
     // LBUS agent
-    uvm_lbus::agent_tx m_lbus_agent;
+    uvm_lbus::agent_rx m_lbus_agent;
     uvm_lbus::config_item m_lbus_agent_cfg;
 
     // Configuration object
@@ -44,7 +44,7 @@ class env_tx extends uvm_env;
     uvm_reset::sync_cbs reset_sync;
 
     // Constructor
-    function new(string name = "env_tx", uvm_component parent = null);
+    function new(string name = "env_rx", uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
@@ -101,11 +101,11 @@ class env_tx extends uvm_env;
         m_lbus_agent_cfg.interface_name = m_config.interface_name;
         uvm_config_db #(uvm_lbus::config_item)::set(this, "m_lbus_agent", "m_config", m_lbus_agent_cfg);
         // Build
-        m_lbus_agent = uvm_lbus::agent_tx::type_id::create("m_lbus_agent", this);
+        m_lbus_agent = uvm_lbus::agent_rx::type_id::create("m_lbus_agent", this);
 
         // Build of main sequencer
         if (m_config.active == UVM_ACTIVE) begin
-            m_sequencer = sequencer_tx::type_id::create("m_sequencer", this);
+            m_sequencer = sequencer_rx::type_id::create("m_sequencer", this);
         end
 
         // Build of reset
@@ -132,7 +132,7 @@ class env_tx extends uvm_env;
         if (m_config.active == UVM_ACTIVE) begin
             m_sequencer.packet = m_logic_vector_array_agent.m_sequencer;
             m_sequencer.error  = m_logic_vector_agent.m_sequencer;
-            uvm_config_db #(sequencer_tx)::set(this, "m_lbus_agent.m_sequencer", "hl_sequencer", m_sequencer);
+            uvm_config_db #(sequencer_rx)::set(this, "m_lbus_agent.m_sequencer", "hl_sequencer", m_sequencer);
 
             // Reset connection
             reset_sync.push_back(m_sequencer.reset_sync);
@@ -146,7 +146,7 @@ class env_tx extends uvm_env;
 
     task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
-            uvm_logic_vector_array_lbus::sequence_library_tx lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_tx::type_id::create("lbus_sequence_library", this);
+            uvm_logic_vector_array_lbus::sequence_library_rx lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx::type_id::create("lbus_sequence_library", this);
             lbus_sequence_library.min_random_count = 20;
             lbus_sequence_library.max_random_count = 100;
 
@@ -163,11 +163,11 @@ class env_tx extends uvm_env;
 endclass
 
 // ======= //
-// RX side //
+// TX side //
 // ======= //
 
-class env_rx extends uvm_env;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::env_rx);
+class env_tx extends uvm_env;
+    `uvm_component_utils(uvm_logic_vector_array_lbus::env_tx);
 
     // -------------- //
     // Analysis ports //
@@ -189,7 +189,7 @@ class env_rx extends uvm_env;
     uvm_logic_vector::config_item m_logic_vector_agent_cfg;
 
     // LBUS agent
-    uvm_lbus::agent_rx m_lbus_agent;
+    uvm_lbus::agent_tx m_lbus_agent;
     uvm_lbus::config_item m_lbus_agent_cfg;
 
     // Configuration object
@@ -199,7 +199,7 @@ class env_rx extends uvm_env;
     uvm_reset::sync_cbs reset_sync;
 
     // Constructor
-    function new(string name = "env_rx", uvm_component parent = null);
+    function new(string name = "env_tx", uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
@@ -256,7 +256,7 @@ class env_rx extends uvm_env;
         m_lbus_agent_cfg.interface_name = m_config.interface_name;
         uvm_config_db #(uvm_lbus::config_item)::set(this, "m_lbus_agent", "m_config", m_lbus_agent_cfg);
         // Build
-        m_lbus_agent = uvm_lbus::agent_rx::type_id::create("m_lbus_agent", this);
+        m_lbus_agent = uvm_lbus::agent_tx::type_id::create("m_lbus_agent", this);
 
         // Build of reset
         reset_sync = new();
@@ -284,7 +284,7 @@ class env_rx extends uvm_env;
     endfunction
 
     task run_phase(uvm_phase phase);
-        uvm_lbus::sequence_library_rx lbus_seq;
+        uvm_lbus::sequence_library_tx lbus_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
             lbus_seq = uvm_lbus::sequence_library_tx::type_id::create("lbus_seq", this);

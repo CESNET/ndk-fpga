@@ -118,8 +118,8 @@ endclass
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
 class sequence_lib_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_library#(config_sequence, sequence_item #(SEGMENTS));
-  `uvm_object_param_utils(uvm_intel_mac_seg::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(uvm_intel_mac_seg::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+  `uvm_object_param_utils(uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS))
+  `uvm_sequence_library_utils(uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS))
 
   function new(string name = "sequence_lib_tx");
     super.new(name);

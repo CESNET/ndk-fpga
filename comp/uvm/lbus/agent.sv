@@ -8,8 +8,8 @@
 // TX side //
 // ======= //
 
-class agent_tx extends uvm_agent;
-    `uvm_component_utils(uvm_lbus::agent_tx)
+class agent_rx extends uvm_agent;
+    `uvm_component_utils(uvm_lbus::agent_rx)
 
     // Analysis port
     uvm_analysis_port #(sequence_item) analysis_port;
@@ -19,14 +19,14 @@ class agent_tx extends uvm_agent;
     // ------------------ //
 
     sequencer   m_sequencer;
-    driver_tx   m_driver;
+    driver_rx   m_driver;
     monitor     m_monitor;
     statistics  m_statistics;
     coverage    m_coverage;
     config_item m_config;
 
     // Constructor
-    function new(string name = "agent_tx", uvm_component parent = null);
+    function new(string name = "agent_rx", uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
@@ -46,7 +46,7 @@ class agent_tx extends uvm_agent;
         // Create a sequencer and a driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
             m_sequencer = sequencer::type_id::create("m_sequencer", this);
-            m_driver    = driver_tx::type_id::create("m_driver",    this);
+            m_driver    = driver_rx::type_id::create("m_driver",    this);
         end
 
         // Create a monitor
@@ -90,8 +90,8 @@ endclass
 // RX side //
 // ======= //
 
-class agent_rx extends uvm_agent;
-    `uvm_component_utils(uvm_lbus::agent_rx)
+class agent_tx extends uvm_agent;
+    `uvm_component_utils(uvm_lbus::agent_tx)
 
     // Analysis port
     uvm_analysis_port #(sequence_item) analysis_port;
@@ -101,14 +101,14 @@ class agent_rx extends uvm_agent;
     // ------------------ //
 
     sequencer   m_sequencer;
-    driver_rx   m_driver;
+    driver_tx   m_driver;
     monitor     m_monitor;
     statistics  m_statistics;
     coverage    m_coverage;
     config_item m_config;
 
     // Constructor
-    function new(string name = "agent_rx", uvm_component parent = null);
+    function new(string name = "agent_tx", uvm_component parent = null);
         super.new(name, parent);
     endfunction
 
@@ -128,7 +128,7 @@ class agent_rx extends uvm_agent;
         // Create a sequencer and a driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
             m_sequencer = sequencer::type_id::create("m_sequencer", this);
-            m_driver    = driver_rx::type_id::create("m_driver",    this);
+            m_driver    = driver_tx::type_id::create("m_driver",    this);
         end
 
         // Create a monitor

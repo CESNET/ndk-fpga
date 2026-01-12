@@ -8,8 +8,8 @@
 // Sequences //
 // ========= //
 
-class sequence_rx extends uvm_common::sequence_base #(config_sequence, sequence_item);
-    `uvm_object_utils(uvm_lbus::sequence_rx)
+class sequence_tx extends uvm_common::sequence_base #(config_sequence, sequence_item);
+    `uvm_object_utils(uvm_lbus::sequence_tx)
 
     // Ready utils
     uvm_common::rand_rdy rdy;
@@ -25,7 +25,7 @@ class sequence_rx extends uvm_common::sequence_base #(config_sequence, sequence_
     constraint c_transaction_count { transaction_count inside {[transaction_count_min : transaction_count_max]}; }
 
     // Constructor
-    function new(string name = "sequence_rx");
+    function new(string name = "sequence_tx");
         super.new(name);
 
         rdy = new();
@@ -69,11 +69,11 @@ class sequence_rx extends uvm_common::sequence_base #(config_sequence, sequence_
 
 endclass
 
-class sequence_rx_stop extends sequence_rx;
-    `uvm_object_utils(uvm_lbus::sequence_rx_stop)
+class sequence_tx_stop extends sequence_tx;
+    `uvm_object_utils(uvm_lbus::sequence_tx_stop)
 
     // Constructor
-    function new(string name = "sequence_rx_stop");
+    function new(string name = "sequence_tx_stop");
         super.new(name);
     endfunction
 
@@ -92,11 +92,11 @@ class sequence_rx_stop extends sequence_rx;
 
 endclass
 
-class sequence_rx_fullspeed extends sequence_rx;
-    `uvm_object_utils(uvm_lbus::sequence_rx_fullspeed)
+class sequence_tx_fullspeed extends sequence_tx;
+    `uvm_object_utils(uvm_lbus::sequence_tx_fullspeed)
 
     // Constructor
-    function new(string name = "sequence_rx_fullspeed");
+    function new(string name = "sequence_tx_fullspeed");
         super.new(name);
     endfunction
 
@@ -119,38 +119,38 @@ endclass
 // Sequence libraries //
 // ================== //
 
-class sequence_library_rx extends uvm_common::sequence_library #(config_sequence, sequence_item);
-    `uvm_object_utils(uvm_lbus::sequence_library_rx)
-    `uvm_sequence_library_utils(uvm_lbus::sequence_library_rx)
+class sequence_library_tx extends uvm_common::sequence_library #(config_sequence, sequence_item);
+    `uvm_object_utils(uvm_lbus::sequence_library_tx)
+    `uvm_sequence_library_utils(uvm_lbus::sequence_library_tx)
 
     // Constructor
-    function new(string name = "sequence_library_rx");
+    function new(string name = "sequence_library_tx");
         super.new(name);
         init_sequence_library();
     endfunction
 
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        add_sequence(sequence_rx          ::get_type());
-        add_sequence(sequence_rx_stop     ::get_type());
-        add_sequence(sequence_rx_fullspeed::get_type());
+        add_sequence(sequence_tx          ::get_type());
+        add_sequence(sequence_tx_stop     ::get_type());
+        add_sequence(sequence_tx_fullspeed::get_type());
     endfunction
 
 endclass
 
-class sequence_library_rx_fullspeed extends sequence_library_rx;
-    `uvm_object_utils(uvm_lbus::sequence_library_rx_fullspeed)
-    `uvm_sequence_library_utils(uvm_lbus::sequence_library_rx_fullspeed)
+class sequence_library_tx_fullspeed extends sequence_library_tx;
+    `uvm_object_utils(uvm_lbus::sequence_library_tx_fullspeed)
+    `uvm_sequence_library_utils(uvm_lbus::sequence_library_tx_fullspeed)
 
     // Constructor
-    function new(string name = "sequence_library_rx_fullspeed");
+    function new(string name = "sequence_library_tx_fullspeed");
         super.new(name);
         init_sequence_library();
     endfunction
 
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        add_sequence(sequence_rx_fullspeed::get_type());
+        add_sequence(sequence_tx_fullspeed::get_type());
     endfunction
 
 endclass

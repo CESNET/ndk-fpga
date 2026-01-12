@@ -8,12 +8,12 @@
 // Sequences //
 // ========= //
 
-class sequence_tx extends uvm_sequence #(uvm_lbus::sequence_item);
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_tx)
+class sequence_rx extends uvm_sequence #(uvm_lbus::sequence_item);
+    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_rx)
     `uvm_declare_p_sequencer(uvm_lbus::sequencer)
 
     // High-level sequencer
-    protected sequencer_tx hl_sequencer;
+    protected sequencer_rx hl_sequencer;
 
     // ---------- //
     // Parameters //
@@ -28,12 +28,12 @@ class sequence_tx extends uvm_sequence #(uvm_lbus::sequence_item);
     }
 
     // Constructor
-    function new(string name = "sequence_tx");
+    function new(string name = "sequence_rx");
         super.new(name);
     endfunction
 
     task body;
-        assert(uvm_config_db #(sequencer_tx)::get(p_sequencer, "", "hl_sequencer", hl_sequencer))
+        assert(uvm_config_db #(sequencer_rx)::get(p_sequencer, "", "hl_sequencer", hl_sequencer))
         else begin
             `uvm_fatal(p_sequencer.get_full_name(), "\n\tCannot get a high-level sequencer");
         end
@@ -104,8 +104,8 @@ class sequence_tx extends uvm_sequence #(uvm_lbus::sequence_item);
 
 endclass
 
-class sequence_tx_stop extends sequence_tx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_tx_stop)
+class sequence_rx_stop extends sequence_rx;
+    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_rx_stop)
 
     // ---------- //
     // Parameters //
@@ -120,7 +120,7 @@ class sequence_tx_stop extends sequence_tx;
     }
 
     // Constructor
-    function new(string name = "sequence_tx_stop");
+    function new(string name = "sequence_rx_stop");
         super.new(name);
     endfunction
 
@@ -134,8 +134,8 @@ class sequence_tx_stop extends sequence_tx;
 
 endclass
 
-class sequence_tx_bursting extends sequence_tx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_tx_bursting)
+class sequence_rx_bursting extends sequence_rx;
+    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_rx_bursting)
 
     // ---------- //
     // Parameters //
@@ -160,7 +160,7 @@ class sequence_tx_bursting extends sequence_tx;
     }
 
     // Constructor
-    function new(string name = "sequence_tx_bursting");
+    function new(string name = "sequence_rx_bursting");
         super.new(name);
     endfunction
 
@@ -189,30 +189,30 @@ endclass
 // Sequence libraries //
 // ================== //
 
-class sequence_library_tx extends uvm_sequence_library #(uvm_lbus::sequence_item);
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_tx)
-    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_tx)
+class sequence_library_rx extends uvm_sequence_library #(uvm_lbus::sequence_item);
+    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx)
+    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx)
 
-    function new(string name = "sequence_library_tx");
+    function new(string name = "sequence_library_rx");
         super.new(name);
         init_sequence_library();
 
-        add_sequence(sequence_tx         ::get_type());
-        add_sequence(sequence_tx_stop    ::get_type());
-        add_sequence(sequence_tx_bursting::get_type());
+        add_sequence(sequence_rx         ::get_type());
+        add_sequence(sequence_rx_stop    ::get_type());
+        add_sequence(sequence_rx_bursting::get_type());
     endfunction
 
 endclass
 
-class sequence_library_tx_fullspeed extends sequence_library_tx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_tx_fullspeed)
-    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_tx_fullspeed)
+class sequence_library_rx_fullspeed extends sequence_library_rx;
+    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed)
+    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed)
 
-    function new(string name = "sequence_library_tx_fullspeed");
+    function new(string name = "sequence_library_rx_fullspeed");
         super.new(name);
         init_sequence_library();
 
-        add_sequence(sequence_tx::get_type());
+        add_sequence(sequence_rx::get_type());
     endfunction
 
 endclass

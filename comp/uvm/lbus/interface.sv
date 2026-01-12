@@ -19,13 +19,13 @@ interface lbus_if (input logic CLK);
     wire logic               RDY;
 
     // TX driver clocking block
-    clocking driver_tx_cb @(posedge CLK);
+    clocking driver_rx_cb @(posedge CLK);
         input RDY;
         output DATA, ENA, SOP, EOP, ERR, MTY;
     endclocking
 
     // RX driver clocking block
-    clocking driver_rx_cb @(posedge CLK);
+    clocking driver_tx_cb @(posedge CLK);
         input DATA, ENA, SOP, EOP, ERR, MTY;
         output RDY;
     endclocking
@@ -36,21 +36,21 @@ interface lbus_if (input logic CLK);
     endclocking
 
     // TX connection to DUT
-    modport dut_tx(
+    modport dut_rx(
         input DATA, ENA, SOP, EOP, ERR, MTY,
         output RDY
     );
 
     // RX connection to DUT
-    modport dut_rx(
+    modport dut_tx(
         input RDY,
         output DATA, ENA, SOP, EOP, ERR, MTY
     );
 
     // TX driver module port
-    modport driver_tx(clocking driver_tx_cb);
-    // RX driver module port
     modport driver_rx(clocking driver_rx_cb);
+    // RX driver module port
+    modport driver_tx(clocking driver_tx_cb);
     // Monitor module port
     modport monitor(clocking monitor_cb);
 
