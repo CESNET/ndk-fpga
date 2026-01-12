@@ -1,5 +1,5 @@
 # pcie4_uscale_plus.ip.tcl: generation script for the PCIe IP
-# Copyright 2025 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
+# Copyright 2026 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
 # Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -76,38 +76,51 @@ set config_list [list \
     CONFIG.pf0_msi_enabled {false} \
 ]
 
-if {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
-    # x8_low_latency properties
-    lappend config_list \
-        CONFIG.pcie_blk_locn {X1Y1} \
-        CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s} \
-        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8} \
-        CONFIG.axisten_if_width {256_bit} \
-        CONFIG.coreclk_freq {500}
+if {$PARAMS(PCIE_GEN) == 4} {
+    lappend config_list CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {16.0_GT/s} 
 } else {
-    if {$PARAMS(PCIE_ENDPOINT_MODE) == 1} {
-        if {$endpoint_idx == 0} {
-            lappend config_list CONFIG.pcie_blk_locn {X1Y1}
-        } else {
-            lappend config_list CONFIG.pcie_blk_locn {X1Y0}
-        }
+    lappend config_list CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s}
+}
 
-        lappend config_list \
-            CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {16.0_GT/s} \
-            CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8}
-    } else {
-        lappend config_list \
-            CONFIG.pcie_blk_locn {X1Y1} \
-            CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s} \
-            CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X16}
-    }
-
-    # x16 properties
+# x16 endpoint
+if {$PARAMS(PCIE_ENDPOINT_MODE) == 0} {
     lappend config_list \
+        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X16} \
+        CONFIG.pcie_blk_locn {X1Y1} \
         CONFIG.AXISTEN_IF_EXT_512_CQ_STRADDLE {false} \
         CONFIG.AXISTEN_IF_EXT_512_RC_4TLP_STRADDLE {true} \
         CONFIG.AXISTEN_IF_EXT_512_RQ_STRADDLE {true} \
         CONFIG.axisten_if_width {512_bit}
+
+# x8x8 bifurcated endpoint
+} elseif {$PARAMS(PCIE_ENDPOINT_MODE) == 1} {
+    if {$endpoint_idx == 0} {
+        lappend config_list CONFIG.pcie_blk_locn {X1Y1}
+    } else {
+        lappend config_list CONFIG.pcie_blk_locn {X1Y0}
+    }
+
+    lappend config_list \
+        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8} \
+        CONFIG.AXISTEN_IF_EXT_512_CQ_STRADDLE {false} \
+        CONFIG.AXISTEN_IF_EXT_512_RC_4TLP_STRADDLE {true} \
+        CONFIG.AXISTEN_IF_EXT_512_RQ_STRADDLE {true} \
+        CONFIG.axisten_if_width {512_bit}
+
+# x8 low-latency endpoint
+} elseif {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
+    lappend config_list \
+        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8} \
+        CONFIG.pcie_blk_locn {X1Y1} \
+        CONFIG.axisten_if_width {256_bit} \
+        CONFIG.coreclk_freq {500}
+
+# x4 endpoint
+} else {
+    lappend config_list \
+        CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X4} \
+        CONFIG.pcie_blk_locn {X1Y0} \
+        CONFIG.axisten_if_width {256_bit}
 }
 
 # set PCIE IDs, must be in last set_property

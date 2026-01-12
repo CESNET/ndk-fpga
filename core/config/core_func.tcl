@@ -28,6 +28,8 @@ proc ParsePcieConf {PCIE_CONF} {
         set pcie_eps [expr 2 * $pcie_eps]
     } elseif {[string compare -nocase $pcie_const2 "x8LL"] == 0} {
         set pcie_mode 2
+    } elseif {[string compare -nocase $pcie_const2 "x4"] == 0} {
+        set pcie_mode 3
     } else {
         error "Parsing error PCIE_MODE in PCIE_CONF = $PCIE_CONF! Don't know what to enter? \nTry this PCIe configuration: PCIE_CONF=1xGen4x16\n"
     }

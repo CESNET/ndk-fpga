@@ -1,4 +1,4 @@
-# pcie_full.xdc: the second half of the PCIe endpoint
+# pcie_x16.xdc: pinout for the PCIe lanes on a full endpoint
 # Copyright (C) 2023 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
 #
