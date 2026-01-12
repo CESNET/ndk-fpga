@@ -118,6 +118,8 @@ if {$PARAMS(PCIE_ENDPOINT_MODE) == 0} {
 # x4 endpoint
 } else {
     lappend config_list \
+        CONFIG.en_gt_selection {true} \
+        CONFIG.select_quad {GTY_Quad_224} \
         CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X4} \
         CONFIG.pcie_blk_locn {X1Y0} \
         CONFIG.axisten_if_width {256_bit}
