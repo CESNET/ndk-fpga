@@ -44,7 +44,7 @@ set config_list [list \
     CONFIG.extended_tag_field {true} \
     CONFIG.plltype {QPLL0} \
     CONFIG.axisten_freq {250} \
-    CONFIG.AXISTEN_IF_ENABLE_CLIENT_TAG {true} \
+    CONFIG.axisten_if_enable_client_tag {true} \
     CONFIG.pf0_dev_cap_max_payload {512_bytes} \
     CONFIG.PF0_Use_Class_Code_Lookup_Assistant {false} \
     CONFIG.PF0_CLASS_CODE {020000} \
