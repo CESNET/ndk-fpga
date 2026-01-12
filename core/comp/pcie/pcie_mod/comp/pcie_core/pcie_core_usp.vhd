@@ -28,7 +28,7 @@ architecture USP of PCIE_CORE is
     constant XVC_BASE_ADDRESS  : natural := tsel(ENDPOINT_TYPE = "USP_PCIE4C", 16#EA0#, 16#4A0#);
     constant DTB_NEXT_POINTER  : natural := tsel(XVC_ENABLE, XVC_BASE_ADDRESS, 0);
 
-    constant PCIE_HIPS         : natural := tsel((ENDPOINT_MODE = 0 or ENDPOINT_MODE = 1 or ENDPOINT_MODE = 2),PCIE_ENDPOINTS,PCIE_ENDPOINTS/2);
+    constant PCIE_HIPS         : natural := PCIE_ENDPOINTS;
     constant PCIE_IP_LANES     : natural := tsel(ENDPOINT_MODE = 1, PCIE_LANES/2, PCIE_LANES);
     constant AXI_DATA_WIDTH    : natural := CQ_MFB_REGIONS*256;
     constant AXI_CQUSER_WIDTH  : natural := tsel((ENDPOINT_MODE = 0 or ENDPOINT_MODE = 1), 183, 88);
@@ -408,8 +408,8 @@ architecture USP of PCIE_CORE is
 
 begin
 
-    assert (ENDPOINT_MODE = 0 or ENDPOINT_MODE = 1 or ENDPOINT_MODE = 2)
-        report "Xilinx USP PCIe Wrapper: Only values 0, 1 and 2 are supported for parameter ENDPOINT_MODE!"
+    assert (ENDPOINT_MODE = 0 or ENDPOINT_MODE = 1 or ENDPOINT_MODE = 2 or ENDPOINT_MODE = 3)
+        report "Xilinx USP PCIe Wrapper: Only values 0, 1, 2 or 3 are supported for parameter ENDPOINT_MODE!"
         severity failure;
 
     assert (PCIE_ENDPOINTS = 1 or PCIE_ENDPOINTS = 2)
@@ -424,7 +424,7 @@ begin
     --  PCIE IP CORE
     -- =========================================================================
 
-    pcie_mode_0_2_g : if (ENDPOINT_MODE = 0 or ENDPOINT_MODE = 2) generate
+    pcie_mode_0_2_g : if (ENDPOINT_MODE = 0 or ENDPOINT_MODE = 2 or ENDPOINT_MODE = 3) generate
 
         pcie_hip_g : for i in 0 to PCIE_HIPS-1 generate
             pcie_ibuf_i : component ibufds_gte4
