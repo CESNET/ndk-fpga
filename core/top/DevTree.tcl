@@ -165,14 +165,13 @@ proc dts_ndp_core_main_mi {DTS} {
     }
 }
 
-proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_EP_IDX CHAN_PER_EP} {
+proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_EP_IDX CHAN_PER_EP dma_tx_data_ptr_w} {
     upvar 1 $DTS ret
 
     # -------------------------------------------------
     # These two widths are changeable
     # -------------------------------------------------
-    global DMA_TX_DATA_PTR_W
-    set DATA_PTR_W   $DMA_TX_DATA_PTR_W
+    set DATA_PTR_W   $dma_tx_data_ptr_w
     set HDR_PTR_W    [expr $DATA_PTR_W - 3]
 
     # -------------------------------------------------
@@ -206,7 +205,9 @@ proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_EP_IDX CHAN_PER_EP} {
     }
 }
 
-proc dts_build_netcope {} {
+proc dts_build_netcope {dts_main_proc pcie_eps dma_type dma_tx_chans dma_rx_chans dma_rx_frame_size_max \
+                            dma_tx_frame_size_max dma_rx_frame_size_min dma_tx_frame_size_min dma_debug_en \
+                            pcie_debug_en pcie_endpoint_mode pcie_mod_arch dma_gen_loop_en dma_tx_data_ptr_w} {
     # =========================================================================
     # Top level Device tree file
     # =========================================================================
@@ -216,25 +217,25 @@ proc dts_build_netcope {} {
     dts_ndk_core_info ret
 
     # Create MI bus nodes for each PCIe endpoint
-    global PCIE_ENDPOINTS DMA_TYPE DMA_TX_CHANNELS
-    foreach pcie [nb_range $PCIE_ENDPOINTS] {
+    foreach pcie [nb_range $pcie_eps] {
         dts_create_default_mi_bar_node ret $pcie 0 {
             if {$pcie == 0} {
-                dts_ndp_core_main_mi ret
+                $dts_main_proc ret $dma_gen_loop_en $pcie_eps $pcie_debug_en $pcie_endpoint_mode $pcie_mod_arch
             }
 
             # DMA module
-            global DMA_RX_CHANNELS DMA_RX_FRAME_SIZE_MAX DMA_TX_FRAME_SIZE_MAX DMA_RX_FRAME_SIZE_MIN DMA_TX_FRAME_SIZE_MIN DMA_DEBUG_ENABLE
-            if {$DMA_TYPE != 0} {
-                append ret [dts_dmamod_open $NdkCore::ADDR_DMA_MOD $DMA_TYPE [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS] [expr $DMA_TX_CHANNELS / $PCIE_ENDPOINTS] $pcie $DMA_RX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN $DMA_DEBUG_ENABLE]
+            if {$dma_type != 0} {
+                append ret [dts_dmamod_open $NdkCore::ADDR_DMA_MOD $dma_type [expr $dma_rx_chans / $pcie_eps] \
+                                [expr $dma_tx_chans / $pcie_eps] $pcie $dma_rx_frame_size_max $dma_tx_frame_size_max \
+                                $dma_rx_frame_size_min $dma_tx_frame_size_min $dma_debug_en]
             }
         }
 
         dts_create_default_mi_bar_node ret $pcie 2 {
             append ret "map-as-wc;"
             # Creating separate space for MI bus when DMA Calypte are used, the core uses additional BAR for its function
-            if {$DMA_TYPE == 4} {
-                dts_ndk_core_dma_calypte_tx_buffers ret $pcie [expr $DMA_RX_CHANNELS / $PCIE_ENDPOINTS]
+            if {$dma_type == 4} {
+                dts_ndk_core_dma_calypte_tx_buffers ret $pcie [expr $dma_rx_chans / $pcie_eps] $dma_tx_data_ptr_w
             }
         }
     }
