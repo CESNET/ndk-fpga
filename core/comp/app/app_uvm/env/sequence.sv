@@ -93,6 +93,8 @@ class sequence_main #(
     int unsigned pkt_size_min;
     int unsigned pkt_size_max;
 
+    time run_time_min;
+    time run_time_max;
 
     function new (string name = "uvm_app_core::sequencer");
         super.new(name);
@@ -102,7 +104,8 @@ class sequence_main #(
         max_random_count = 150;
         pkt_size_min = 60;
         pkt_size_max = DMA_PKT_MTU;
-
+        run_time_min = 40us;
+        run_time_max = 400us;
     endfunction
 
     virtual task eth_tx_sequence(int unsigned index);
@@ -188,7 +191,7 @@ class sequence_main #(
         packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
-        if (!rx_status.stopped()) begin
+        while (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_eth_rx[index]);
         end
@@ -206,7 +209,7 @@ class sequence_main #(
         );
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_rx[index], "", "state", rx_status);
-        if (!rx_status.stopped()) begin
+        while (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_dma_rx[index]);
         end
@@ -216,6 +219,7 @@ class sequence_main #(
 
 
     task body;
+        time run_time;
         rx_status.clear();
         tx_status.clear();
         event_eth_rx_end = '{ETH_STREAMS {1'b1}};
@@ -237,7 +241,12 @@ class sequence_main #(
             join_none;
         end
 
-        wait (event_dma_rx_end != '1 || event_eth_rx_end != '1);
+        assert(std::randomize(run_time) with {run_time inside {[run_time_min:run_time_max]};}) else begin
+            `uvm_fatal(m_sequencer.get_full_name(),
+                $sformatf("\n\tCannot randomize run time [%0dns:%0dns]", run_time_min,run_time_max)
+            );
+        end
+        #(run_time);
         rx_status.send_stop();
 
         wait(event_dma_rx_end === 0);
