@@ -90,7 +90,6 @@ entity DMA is
         -- =====================================================================
         --  Card-to-Host DMA 
         -- =====================================================================
-        C2H_DMA_MFB_META_PKT_SIZE : in slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*log2(PKT_SIZE_MAX+1) -1 downto 0);
         C2H_DMA_MFB_META_HDR_META : in slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*HDR_META_WIDTH -1 downto 0);
         C2H_DMA_MFB_META_CHAN     : in slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*log2(C2H_CHANNELS) -1 downto 0);
 

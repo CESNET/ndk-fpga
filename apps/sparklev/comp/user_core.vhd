@@ -96,7 +96,7 @@ entity USER_CORE is
         H2C_DMA_MFB_META_CHAN     : in slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*log2(H2C_DMA_CHANNELS)-1 downto 0);
 
         -- bus word with packet data 
-        H2C_DMA_MFB_DATA    : in  slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        H2C_DMA_MFB_DATA    : in  slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*DMA_MFB_BLOCK_SIZE*DMA_MFB_ITEM_WIDTH-1 downto 0);
         -- Start Of Frame (SOF) flag for each MFB region
         H2C_DMA_MFB_SOF     : in  slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS-1 downto 0);
         -- End Of Frame (EOF) flag for each MFB region
@@ -104,7 +104,7 @@ entity USER_CORE is
         -- SOF position for each MFB region in MFB blocks
         H2C_DMA_MFB_SOF_POS : in  slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*max(1, log2(DMA_MFB_REGION_SIZE))-1 downto 0);
         -- EOF position for each MFB region in MFB items
-        H2C_DMA_MFB_EOF_POS : in  slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*max(1, log2(DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        H2C_DMA_MFB_EOF_POS : in  slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*max(1, log2(DMA_MFB_REGION_SIZE*DMA_MFB_BLOCK_SIZE))-1 downto 0);
         -- source ready of each MFB bus
         H2C_DMA_MFB_SRC_RDY : in  std_logic_vector(DMA_STREAMS-1 downto 0);
         -- destination ready of each MFB bus
@@ -119,7 +119,7 @@ entity USER_CORE is
         C2H_DMA_MFB_META_CHAN     : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*log2(C2H_DMA_CHANNELS)-1 downto 0);
 
         -- bus word with packet data 
-        C2H_DMA_MFB_DATA    : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        C2H_DMA_MFB_DATA    : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*DMA_MFB_BLOCK_SIZE*DMA_MFB_ITEM_WIDTH-1 downto 0);
         -- Start Of Frame (SOF) flag for each MFB region
         C2H_DMA_MFB_SOF     : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS-1 downto 0);
         -- End Of Frame (EOF) flag for each MFB region
@@ -127,7 +127,7 @@ entity USER_CORE is
         -- SOF position for each MFB region in MFB blocks
         C2H_DMA_MFB_SOF_POS : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*max(1, log2(DMA_MFB_REGION_SIZE))-1 downto 0);
         -- EOF position for each MFB region in MFB items
-        C2H_DMA_MFB_EOF_POS : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*max(1, log2(DMA_MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        C2H_DMA_MFB_EOF_POS : out slv_array_t(DMA_STREAMS-1 downto 0)(DMA_MFB_REGIONS*max(1, log2(DMA_MFB_REGION_SIZE*DMA_MFB_BLOCK_SIZE))-1 downto 0);
         -- source ready of each MFB bus
         C2H_DMA_MFB_SRC_RDY : out std_logic_vector(DMA_STREAMS-1 downto 0);
         -- destination ready of each MFB bus
@@ -182,11 +182,11 @@ entity USER_CORE is
         -- Status signals
         -- =========================================================================================
         -- driven by USR_CLK
-        PCIE_LINK_UP : in std_logic;
+        PCIE_LINK_UP : in std_logic_vector(DMA_STREAMS -1 downto 0);
         -- driven by MI_CLK
         FPGA_ID      : in std_logic_vector(FPGA_ID_WIDTH -1 downto 0);
         -- driven by MI_CLK
-        FPGA_ID_VLD  : in std_logic;
+        FPGA_ID_VLD  : in std_logic
     );
 end entity;
 

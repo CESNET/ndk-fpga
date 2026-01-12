@@ -46,7 +46,7 @@ proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max
     }
 
     if {$type == 4} {
-        dts_calypte_test_core ret [expr $base + "0x300000"] $dma_debug_enable
+        dts_calypte_test_core ret [expr $base + "0x300000"] $dbg_en
     }
 
     append ret "};"

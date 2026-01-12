@@ -1,10 +1,8 @@
 -- card_top.vhd: Alveo U55C board top level entity and architecture
--- Copyright (C) 2023 CESNET z. s. p. o.
--- Copyright 2026 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
--- Author(s): Jakub Cabal <cabal@cesnet.cz>
---            Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
+-- Copyright (C) 2026 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
+-- Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
 --
--- SPDX-License-Identifier: BSD-3-Clause OR CERN-OHL-P-2.0
+-- SPDX-License-Identifier: CERN-OHL-P-2.0
 
 library ieee;
 library unisim;
@@ -21,16 +19,18 @@ use work.combo_user_const.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
+library unisim;
 use unisim.vcomponents.IBUFDS;
 use unisim.vcomponents.BUFG;
+use unisim.vcomponents.ICAPE3;
 
 entity CARD_TOP is
     port (
         -- 100 MHz external clocks
         SYSCLK2_P : in std_logic;
         SYSCLK2_N : in std_logic;
-        SYSCLK3_P : in std_logic;
-        SYSCLK3_N : in std_logic;
+        HBM_REFCLK_P : in std_logic;
+        HBM_REFCLK_N : in std_logic;
 
         -- PCIe
         PCIE_SYSCLK0_P : in std_logic;
@@ -60,8 +60,8 @@ architecture FULL of CARD_TOP is
     signal sysrst_cnt  : unsigned(4 downto 0) := (others => '0');
     signal sysrst      : std_logic            := '1';
 
-    signal pcie_ref_clk_p : std_logic_vector(PCIE_CLKS-1 downto 0);
-    signal pcie_ref_clk_n : std_logic_vector(PCIE_CLKS-1 downto 0);
+    signal pcie_ref_clk_p : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
+    signal pcie_ref_clk_n : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
 
     signal boot_mi_clk   : std_logic;
     signal boot_mi_reset : std_logic;
@@ -238,23 +238,29 @@ begin
             PCIE_CONS          => PCIE_CONS,
             PCIE_LANES         => PCIE_LANES,
             PCIE_ENDPOINTS     => PCIE_ENDPOINTS,
-            PCIE_ENDPOINT_TYPE => PCIE_ENDPOINT_TYPE,
+            PCIE_MOD_ARCH      => PCIE_MOD_ARCH,
             PCIE_ENDPOINT_MODE => PCIE_ENDPOINT_MODE,
 
-            STATUS_LEDS => 2,
-
+            C2H_DMA_PTR_WIDTH => C2H_DMA_PTR_WIDTH,
+            H2C_DMA_PTR_WIDTH => H2C_DMA_PTR_WIDTH,
             C2H_DMA_CHANNELS => C2H_DMA_CHANNELS,
             H2C_DMA_CHANNELS => H2C_DMA_CHANNELS,
-
-            MISC_IN_WIDTH  => MISC_IN_WIDTH,
-            MISC_OUT_WIDTH => MISC_OUT_WIDTH
+            DMA_PKT_SIZE_MAX => DMA_PKT_SIZE_MAX,
+            DMA_GEN_LOOP_EN  => DMA_GEN_LOOP_EN,
+            C2H_DMA_GEN_EN  => C2H_DMA_GEN_EN,
+            H2C_DMA_GEN_EN  => H2C_DMA_GEN_EN,
+            
+            STATUS_LEDS_NUM  => 2,
+            DMA_DEBUG_ENABLE => DMA_DEBUG_ENABLE,
+            MISC_IN_WIDTH    => MISC_IN_WIDTH,
+            MISC_OUT_WIDTH   => MISC_OUT_WIDTH
         )
         port map(
             SYSCLK => sysclk_bufg,
             SYSRST => sysrst,
 
-            HBM_REFCLK_P => SYSCLK3_P,
-            HBM_REFCLK_N => SYSCLK3_N,
+            HBM_REFCLK_P => HBM_REFCLK_P,
+            HBM_REFCLK_N => HBM_REFCLK_N,
 
             PCIE_SYSCLK_P => pcie_ref_clk_p,
             PCIE_SYSCLK_N => pcie_ref_clk_n,
@@ -265,9 +271,6 @@ begin
             PCIE_TX_N     => PCIE_TX_N,
 
             STATUS_LEDS => open,
-
-            PCIE_CLK   => open,
-            PCIE_RESET => open,
 
             BOOT_MI_CLK   => boot_mi_clk,
             BOOT_MI_RESET => boot_mi_reset,

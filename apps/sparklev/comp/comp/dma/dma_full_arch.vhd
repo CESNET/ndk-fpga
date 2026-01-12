@@ -186,11 +186,11 @@ begin
             C2H_CHANNELS  => C2H_CHANNELS,
             C2H_PTR_WIDTH => C2H_PTR_WIDTH,
 
-            TX_CHANNELS  => H2C_CHANNELS,
-            TX_PTR_WIDTH => H2C_PTR_WIDTH,
+            H2C_CHANNELS  => H2C_CHANNELS,
+            H2C_PTR_WIDTH => H2C_PTR_WIDTH,
 
             C2H_GEN_EN => C2H_GEN_EN,
-            TX_GEN_EN  => H2C_GEN_EN,
+            H2C_GEN_EN => H2C_GEN_EN,
 
             DMA_DEBUG_ENABLE => DMA_DEBUG_ENABLE,
             MI_WIDTH         => 32
@@ -333,7 +333,7 @@ begin
                     RESET => DMA_RESET(stream),
 
                     RX_MFB_DATA    => C2H_DMA_MFB_DATA(stream),
-                    RX_MFB_META    => C2H_DMA_MFB_META_PKT_SIZE(stream) & C2H_DMA_MFB_META_HDR_META(stream) & C2H_DMA_MFB_META_CHAN(stream),
+                    RX_MFB_META    => (log2(PKT_SIZE_MAX+1) -1 downto 0 => '0') & C2H_DMA_MFB_META_HDR_META(stream) & C2H_DMA_MFB_META_CHAN(stream),
                     RX_MFB_SOF     => C2H_DMA_MFB_SOF(stream),
                     RX_MFB_EOF     => C2H_DMA_MFB_EOF(stream),
                     RX_MFB_SOF_POS => C2H_DMA_MFB_SOF_POS(stream),
@@ -588,7 +588,7 @@ begin
                     TX_MFB_DST_RDY => h2c_dma_mfb_dst_rdy_ext(stream));
 
         else generate
-            c2h_dma_mfb_meta_pkt_size_ins(stream) <= C2H_DMA_MFB_META_PKT_SIZE(stream);
+            c2h_dma_mfb_meta_pkt_size_ins(stream) <= (others => '0');
             c2h_dma_mfb_meta_hdr_meta_ins(stream) <= C2H_DMA_MFB_META_HDR_META(stream);
             c2h_dma_mfb_meta_chan_ins(stream)     <= C2H_DMA_MFB_META_CHAN(stream);
 
