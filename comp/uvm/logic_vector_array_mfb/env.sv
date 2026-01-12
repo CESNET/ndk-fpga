@@ -130,7 +130,6 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     //localparam  ITEM_WIDTH = 32;
 
     //Access component
-    uvm_mfb::sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_sequencer;
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_port_data;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(META_WIDTH)) analysis_port_meta;
     uvm_reset::sync_cbs                                               reset_sync;
@@ -200,8 +199,26 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         m_logic_vector_monitor.meta_behav = m_config.meta_behav;
         analysis_port_meta = m_logic_vector_agent.m_monitor.analysis_port;
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
-
-        m_sequencer = m_mfb_agent.m_sequencer;
     endfunction
+
+    task run_phase(uvm_phase phase);
+        uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_seq;
+
+
+        if (m_config.active == UVM_ACTIVE) begin
+            mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+            mfb_seq.init_sequence();
+            mfb_seq.min_random_count =  100;
+            mfb_seq.max_random_count = 2000;
+
+            forever begin
+                assert(mfb_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                mfb_seq.start(m_mfb_agent.m_sequencer);
+            end
+        end
+    endtask
+
 endclass
 

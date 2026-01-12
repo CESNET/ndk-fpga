@@ -180,9 +180,6 @@ class env_rx extends uvm_env;
     // Agent's components //
     // ------------------ //
 
-    // Main sequencer
-    uvm_lbus::sequencer m_sequencer;
-
     // Logic vector array agent
     uvm_logic_vector_array::agent #(8) m_logic_vector_array_agent;
     uvm_logic_vector_array::config_item m_logic_vector_array_agent_cfg;
@@ -281,12 +278,26 @@ class env_rx extends uvm_env;
         m_lbus_agent.analysis_port.connect(m_logic_vector_monitor.analysis_export);
         analysis_port_error = m_logic_vector_agent.m_monitor.analysis_port;
 
-        // Main sequencer connection
-        m_sequencer = m_lbus_agent.m_sequencer;
-
         // Reset connection
         reset_sync.push_back(m_logic_vector_array_monitor.reset_sync);
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
     endfunction
 
+    task run_phase(uvm_phase phase);
+        uvm_lbus::sequence_library_rx lbus_seq;
+
+        if (m_config.active == UVM_ACTIVE) begin
+            lbus_seq = uvm_lbus::sequence_library_tx::type_id::create("lbus_seq", this);
+            lbus_seq.init_sequence();
+            lbus_seq.min_random_count =  100;
+            lbus_seq.max_random_count = 2000;
+
+            forever begin
+                assert(lbus_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                lbus_seq.start(m_lbus_agent.m_sequencer);
+            end
+        end
+    endtask
 endclass

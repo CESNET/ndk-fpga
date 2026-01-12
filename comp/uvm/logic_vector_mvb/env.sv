@@ -105,7 +105,6 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     `uvm_component_param_utils(uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH));
 
     //Access component
-    uvm_mvb::sequencer #(ITEMS, ITEM_WIDTH) m_sequencer;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;
     uvm_reset::sync_cbs                                               reset_sync;
 
@@ -167,8 +166,25 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         analysis_port = m_logic_vector_agent.m_monitor.analysis_port;
         analysis_port.connect(m_meter.analysis_export);
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
-
-        m_sequencer = m_mvb_agent.m_sequencer;
     endfunction
+
+    task run_phase(uvm_phase phase);
+        uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH) mvb_seq;
+
+        if (m_config.active == UVM_ACTIVE) begin
+            mvb_seq = uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+            mvb_seq.init_sequence();
+            mvb_seq.min_random_count =  100;
+            mvb_seq.max_random_count = 2000;
+
+            forever begin
+                assert(mvb_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                mvb_seq.start(m_mvb_agent.m_sequencer);
+            end
+        end
+    endtask
+
 endclass
 
