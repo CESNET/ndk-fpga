@@ -206,7 +206,7 @@ class sequence_fifo #(
         packet_seq.init_sequence(seq_cfg);
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_rx[index], "", "state", rx_status);
-        if (!rx_status.stopped()) begin
+        while (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_eth_rx[index]);
         end
@@ -224,7 +224,7 @@ class sequence_fifo #(
         );
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_rx[index], "", "state", rx_status);
-        if (!rx_status.stopped()) begin
+        while (!rx_status.stopped()) begin
             assert(packet_seq.randomize());
             packet_seq.start(p_sequencer.m_dma_rx[index]);
         end
