@@ -228,11 +228,11 @@ begin
             DEVICE => DEVICE,
 
             SYSCLK_PERIOD  => 10.0,
-            PLL_MULT_F     => 12.0,
+            PLL_MULT_F     => 9.0,
             PLL_MASTER_DIV => 1,
-            PLL_OUT0_DIV_F => 3.0,
+            PLL_OUT0_DIV_F => 2.0,
             PLL_OUT1_DIV   => 4,
-            PLL_OUT2_DIV   => 6,
+            PLL_OUT2_DIV   => 9,
             PLL_OUT3_DIV   => 12,
 
             PCIE_CONS          => PCIE_CONS,
