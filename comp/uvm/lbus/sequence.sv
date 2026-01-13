@@ -53,7 +53,9 @@ class sequence_tx extends uvm_common::sequence_base #(config_sequence, sequence_
     // Generate transactions
     virtual task body;
         uvm_common::sequence_cfg state;
-        assert(uvm_config_db #(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state));
+        if(!uvm_config_db #(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
 
         repeat (transaction_count) begin
             if (state != null) begin
