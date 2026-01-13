@@ -63,5 +63,5 @@ proc dts_app_minimal_core {index base reg_size} {
 }
 
 proc dts_build_project {} {
-    return [dts_build_netcope]
+    return [dts_build_netcope dts_ndp_core_main_mi]
 }
