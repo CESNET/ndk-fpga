@@ -14,6 +14,7 @@ APP_CONF=app_conf.tcl
 
 PCIE_CONF=1xGen4x4
 DMA_TYPE=4
+USR_CORE_ARCH=TEST
 
 USER_ENV?=
 

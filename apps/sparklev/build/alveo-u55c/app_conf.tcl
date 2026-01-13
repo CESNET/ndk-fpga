@@ -65,6 +65,8 @@ set PROJECT_VERSION [exec cat ../../../../VERSION]
 set DMA_DEBUG_ENABLE       $env(DMA_DEBUG_ENABLE)
 # Enables debug probes and counters in the PCIe Module (PCIe Core arch: USP and P-Tile and PCIe Ctrl)
 set PCIE_DEBUG_ENABLE false
+# Select architecture of the user core
+set USR_CORE_ARCH $env(USR_CORE_ARCH)
 
 # ------------------------------------------------------------------------------
 # Constant parameters (do not change)
