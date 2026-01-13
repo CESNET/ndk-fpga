@@ -13,14 +13,10 @@ module lbus_property
         lbus_if vif
     );
     string module_name = "";
-    logic START = 1'b1;
 
     // Start check properties after first clock
     initial begin
         $sformat(module_name, "%m");
-        @(posedge vif.CLK)
-        #(10ps)
-        START = 1'b0;
     end
 
     // ========== //
@@ -34,49 +30,49 @@ module lbus_property
     // RDY must be always valid
     property valid_rdy;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         !$isunknown(vif.RDY);
     endproperty
 
     // ENA must be always valid if the RDY is valid
     property valid_ena;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         vif.RDY |-> !$isunknown(vif.ENA);
     endproperty
 
     // DATA must be always valid if the ENA is valid
     property valid_data (int unsigned segment);
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         (vif.RDY && vif.ENA[segment]) |-> !$isunknown(vif.DATA[128*(segment+1)-1 -: 128]);
     endproperty
 
     // SOP must be always valid if the ENA is valid
     property valid_sop (int unsigned segment);
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         (vif.RDY && vif.ENA[segment]) |-> !$isunknown(vif.SOP[segment]);
     endproperty
 
     // EOP must be always valid if the ENA is valid
     property valid_eop (int unsigned segment);
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         (vif.RDY && vif.ENA[segment]) |-> !$isunknown(vif.EOP[segment]);
     endproperty
 
     // ERR must be always valid if the EOP is valid
     property valid_err (int unsigned segment);
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         (vif.RDY && vif.ENA[segment] && vif.EOP[segment]) |-> !$isunknown(vif.ERR[segment]);
     endproperty
 
     // MTY must be always valid if the EOP is valid
     property valid_mty (int unsigned segment);
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         (vif.RDY && vif.ENA[segment] && vif.EOP[segment]) |-> !$isunknown(vif.MTY[4*(segment+1)-1 -: 4]);
     endproperty
 
@@ -87,21 +83,21 @@ module lbus_property
     // Gaps between valid segments are prohibited
     property no_gaps (int unsigned segment);
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         vif.RDY |-> (vif.ENA[segment] |-> vif.ENA[segment-1]);
     endproperty
 
     // It is forbidden to have multiple SOPs during one transaction
     property no_multiple_sops;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         vif.RDY |-> $onehot0(vif.ENA & vif.SOP);
     endproperty
 
     // It is forbidden to have multiple EOPs during one transaction
     property no_multiple_eops;
         @(posedge vif.CLK)
-        disable iff(RESET || START)
+        disable iff(RESET)
         vif.RDY |-> $onehot0(vif.ENA & vif.EOP);
     endproperty
 
