@@ -6,5 +6,6 @@
 
 create_pblock pblock_pcie_i
 resize_pblock pblock_pcie_i -add CLOCKREGION_X0Y0:CLOCKREGION_X7Y0
+resize_pblock pblock_pcie_i -add CLOCKREGION_X7Y1
 
-add_cells_to_pblock pblock_pcie_i [get_cells [list {core_logic_i/pcie_i} {core_logic_i/dma_i}]] -clear_locs
+add_cells_to_pblock pblock_pcie_i [get_cells [list {core_logic_i/pcie_i} {core_logic_i/dma_i} {core_logic_i/user_core_i}]] -clear_locs
