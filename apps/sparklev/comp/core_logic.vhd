@@ -1968,6 +1968,7 @@ begin
 
             MI_DWR  => mi_adc_dwr(MI_ADC_PORT_USERAPP),
             MI_ADDR => mi_adc_addr(MI_ADC_PORT_USERAPP),
+            MI_BE   => mi_adc_be(MI_ADC_PORT_USERAPP),
             MI_RD   => mi_adc_rd(MI_ADC_PORT_USERAPP),
             MI_WR   => mi_adc_wr(MI_ADC_PORT_USERAPP),
             MI_DRD  => mi_adc_drd(MI_ADC_PORT_USERAPP),
