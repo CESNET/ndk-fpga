@@ -625,7 +625,7 @@ Transaction for the MVB bus consisting of data and metadata.
 
 .. rubric:: transaction.MvbTrAddressWithMeta
 
-Transaction for the MVB bus consisting of an address (could be also a key, hash, etc.) and metadata.
+Transaction for the MVB bus consisting of an address and metadata.
 
 .. note:: For example use of drivers and monitors, see ``ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py``.
 
