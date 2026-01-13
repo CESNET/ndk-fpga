@@ -15,11 +15,11 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;
     uvm_reset::sync_cbs            reset_sync;
 
-    uvm_logic_vector::agent#(ITEM_WIDTH)   m_logic_vector_agent;
-    uvm_logic_vector::meter#(ITEM_WIDTH)   m_meter;
-    uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
+    protected uvm_logic_vector::agent#(ITEM_WIDTH)   m_logic_vector_agent;
+    protected uvm_logic_vector::meter#(ITEM_WIDTH)   m_meter;
+    protected uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
 
-    local config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -111,15 +111,15 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     // ------------------------------------------------------------------------
     // Definition of agents
 
-    uvm_logic_vector::agent#(ITEM_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::meter#(ITEM_WIDTH) m_meter;
+    protected uvm_logic_vector::agent#(ITEM_WIDTH) m_logic_vector_agent;
+    protected uvm_logic_vector::meter#(ITEM_WIDTH) m_meter;
 
     //uvm_logic_vector::config_item logic_vector_agent_cfg;
 
-    uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
+    protected uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
     //uvm_mvb::config_item mvb_agent_cfg;
 
-    local config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);

@@ -17,31 +17,26 @@ class env_rx extends uvm_env;
 
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item #(8)) analysis_port_packet;
     uvm_analysis_port #(uvm_logic_vector::sequence_item       #(1)) analysis_port_error;
+    // Main sequencer
+    sequencer_rx m_sequencer;
+    // Reset
+    uvm_reset::sync_cbs reset_sync;
 
     // ------------------ //
     // Agent's components //
     // ------------------ //
 
-    // Main sequencer
-    sequencer_rx m_sequencer;
-
     // Logic vector array agent
-    uvm_logic_vector_array::agent #(8) m_logic_vector_array_agent;
-    uvm_logic_vector_array::config_item m_logic_vector_array_agent_cfg;
-
+    protected uvm_logic_vector_array::agent #(8) m_logic_vector_array_agent;
     // Logic vector agent
-    uvm_logic_vector::agent #(1) m_logic_vector_agent;
-    uvm_logic_vector::config_item m_logic_vector_agent_cfg;
+    protected uvm_logic_vector::agent #(1) m_logic_vector_agent;
 
     // LBUS agent
-    uvm_lbus::agent_rx m_lbus_agent;
-    uvm_lbus::config_item m_lbus_agent_cfg;
+    protected uvm_lbus::agent_rx m_lbus_agent;
 
     // Configuration object
-    config_item m_config;
+    protected config_item m_config;
 
-    // Reset
-    uvm_reset::sync_cbs reset_sync;
 
     // Constructor
     function new(string name = "env_rx", uvm_component parent = null);
@@ -49,7 +44,11 @@ class env_rx extends uvm_env;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        super.build_phase(phase);
+        uvm_logic_vector_array::config_item m_logic_vector_array_agent_cfg;
+        uvm_logic_vector::config_item m_logic_vector_agent_cfg;
+        uvm_lbus::config_item m_lbus_agent_cfg;
+
+       super.build_phase(phase);
 
         // Get a configuration object from the database
         assert(uvm_config_db #(config_item)::get(this, "", "m_config", m_config))
@@ -175,28 +174,24 @@ class env_tx extends uvm_env;
 
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item #(8)) analysis_port_packet;
     uvm_analysis_port #(uvm_logic_vector::sequence_item       #(1)) analysis_port_error;
+    // Reset
+    uvm_reset::sync_cbs reset_sync;
 
     // ------------------ //
     // Agent's components //
     // ------------------ //
 
     // Logic vector array agent
-    uvm_logic_vector_array::agent #(8) m_logic_vector_array_agent;
-    uvm_logic_vector_array::config_item m_logic_vector_array_agent_cfg;
-
+    protected uvm_logic_vector_array::agent #(8) m_logic_vector_array_agent;
     // Logic vector agent
-    uvm_logic_vector::agent #(1) m_logic_vector_agent;
-    uvm_logic_vector::config_item m_logic_vector_agent_cfg;
+    protected uvm_logic_vector::agent #(1) m_logic_vector_agent;
 
     // LBUS agent
-    uvm_lbus::agent_tx m_lbus_agent;
-    uvm_lbus::config_item m_lbus_agent_cfg;
+    protected uvm_lbus::agent_tx m_lbus_agent;
 
     // Configuration object
-    config_item m_config;
+    protected config_item m_config;
 
-    // Reset
-    uvm_reset::sync_cbs reset_sync;
 
     // Constructor
     function new(string name = "env_tx", uvm_component parent = null);
@@ -204,6 +199,10 @@ class env_tx extends uvm_env;
     endfunction
 
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item m_logic_vector_array_agent_cfg;
+        uvm_logic_vector::config_item m_logic_vector_agent_cfg;
+        uvm_lbus::config_item m_lbus_agent_cfg;
+
         super.build_phase(phase);
 
         // Get a configuration object from the database
