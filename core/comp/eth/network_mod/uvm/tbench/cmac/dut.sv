@@ -142,20 +142,20 @@ module DUT #(
             for (genvar slice = 0; slice < 4; slice++) begin : slice_tx
                 initial begin
                     // verilog_lint: waive line-length
-                    force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_data[slice] = eth_tx[eth_it].DATA[128*(slice+1)-1 -: 128]; // Byte reordering
+                    force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_data[slice] = eth_rx[eth_it].DATA[128*(slice+1)-1 -: 128]; // Byte reordering
                     // verilog_lint: waive line-length
-                    force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_mty [slice] = eth_tx[eth_it].MTY[4*(slice+1)-1 -: 4];
+                    force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_mty [slice] = eth_rx[eth_it].MTY[4*(slice+1)-1 -: 4];
                 end
             end
 
             initial begin
-                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_ena = eth_tx[eth_it].ENA;
-                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_sop = eth_tx[eth_it].SOP;
-                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_eop = eth_tx[eth_it].EOP;
-                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_err = eth_tx[eth_it].ERR;
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_ena = eth_rx[eth_it].ENA;
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_sop = eth_rx[eth_it].SOP;
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_eop = eth_rx[eth_it].EOP;
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_rx_lbus_err = eth_rx[eth_it].ERR;
             end
 
-            assign eth_tx[eth_it].RDY = 1'b1; // Always ready
+            assign eth_rx[eth_it].RDY = 1'b1; // Always ready
 
             // ------- //
             // RX side //
@@ -163,19 +163,19 @@ module DUT #(
 
             for (genvar segment = 0; segment < 4; segment++) begin : slice_rx
                 // verilog_lint: waive line-length
-                assign eth_rx[eth_it].DATA[128*(segment+1)-1 -: 128] = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_data[segment]; // Byte reordering
+                assign eth_tx[eth_it].DATA[128*(segment+1)-1 -: 128] = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_data[segment]; // Byte reordering
                 // verilog_lint: waive line-length
-                assign eth_rx[eth_it].MTY[4*(segment+1)-1 -: 4]      = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_mty[segment];
+                assign eth_tx[eth_it].MTY[4*(segment+1)-1 -: 4]      = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_mty[segment];
             end
 
-            assign eth_rx[eth_it].ENA = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_ena;
-            assign eth_rx[eth_it].SOP = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_sop;
-            assign eth_rx[eth_it].EOP = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_eop;
-            assign eth_rx[eth_it].ERR = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_err;
+            assign eth_tx[eth_it].ENA = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_ena;
+            assign eth_tx[eth_it].SOP = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_sop;
+            assign eth_tx[eth_it].EOP = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_eop;
+            assign eth_tx[eth_it].ERR = DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_err;
 
             // verilog_lint: waive line-length
             initial begin
-                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_rdy = eth_rx[eth_it].RDY;
+                force DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.cmac_tx_lbus_rdy = eth_tx[eth_it].RDY;
             end
 
             // ----- //

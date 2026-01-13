@@ -11,8 +11,6 @@ class sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, R
 
     uvm_logic_vector_array::sequencer#(ITEM_WIDTH)  usr_rx_data;
     uvm_logic_vector::sequencer#(ETH_TX_HDR_WIDTH)  usr_rx_meta;
-    uvm_mfb::sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) usr_tx_data;
-    uvm_mvb::sequencer #(REGIONS, ETH_RX_HDR_WIDTH)                       usr_tx_hdr;
 
     reg_model_port#(ETH_PORT_CHAN) regmodel;
 
