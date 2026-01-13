@@ -11,7 +11,6 @@ class ex_test extends uvm_test;
     bit timeout;
     uvm_asfifox::env #(ITEM_WIDTH)                 m_env;
     uvm_logic_vector::sequence_simple#(ITEM_WIDTH) h_seq_rx;
-    uvm_mvb::sequence_simple_tx #(1, ITEM_WIDTH)   h_seq_tx;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -48,7 +47,7 @@ class ex_test extends uvm_test;
         phase.raise_objection(this, "Start of rx sequence");
         for(int i = 0; i < 100; i++) begin
             h_seq_rx.randomize();
-            h_seq_rx.start(m_env.rx_env.m_logic_vector_agent.m_sequencer);
+            h_seq_rx.start(m_env.rx_env.m_sequencer);
         end
 
         timeout = 1;
@@ -61,18 +60,9 @@ class ex_test extends uvm_test;
     endtask
 
 
-    task run_seq_tx(uvm_phase phase);
-        forever begin
-            h_seq_tx.randomize();
-            h_seq_tx.start(m_env.tx_env.m_mvb_agent.m_sequencer);
-        end
-    endtask
-
     virtual task run_phase(uvm_phase phase);
 
         h_seq_rx = uvm_logic_vector::sequence_simple#(ITEM_WIDTH)::type_id::create("h_seq_rx");
-
-        h_seq_tx = uvm_mvb::sequence_simple_tx #(1, ITEM_WIDTH)::type_id::create("h_seq_tx");
 
         fork
             run_reset(phase, m_env.rx_reset);
@@ -80,7 +70,6 @@ class ex_test extends uvm_test;
         join_none
 
         fork
-            run_seq_tx(phase);
             run_seq_rx(phase);
         join
     endtask
