@@ -4,15 +4,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-proc dts_application {DTS base} {
+proc dts_application {DTS base arch_type} {
     upvar 1 $DTS dts
 
-    dts_create_node dts "sparklev_conf_space" {
-        dts_appendprop_comp_node dts $base 0x300 "ziti,sparklev,conf_space"
+    dts_create_node dts "user_core" {
+        if {$arch_type eq "FULL"} {
+            dts_create_node dts "sparklev_conf_space" {
+                dts_appendprop_comp_node dts $base 0x300 "ziti,sparklev,conf_space"
+            }
+        } elseif {$arch_type eq "TEST"} {
+            append dts [dts_hbm_tester "hbm_tester" $base]
+        }
     }
 }
 
-proc dts_sparklev_main_mi {DTS dma_gen_loop_en pcie_eps pcie_debug_en pcie_endpoint_mode pcie_mod_arch} {
+proc dts_sparklev_main_mi {DTS dma_gen_loop_en pcie_eps pcie_debug_en pcie_endpoint_mode pcie_mod_arch usr_core_arch} {
     upvar 1 $DTS ret
 
     # Boot module
@@ -21,7 +27,7 @@ proc dts_sparklev_main_mi {DTS dma_gen_loop_en pcie_eps pcie_debug_en pcie_endpo
     # MI test space
     append ret [dts_mi_test_space "mi_test_space" $NdkCore::ADDR_TEST_SPACE]
 
-    dts_application ret $NdkCore::ADDR_USERAPP
+    dts_application ret $NdkCore::ADDR_USERAPP $usr_core_arch
 
     # Gen Loop Switch debug modules for each DMA stream/module
     if {$dma_gen_loop_en} {
@@ -42,8 +48,8 @@ proc dts_sparklev_main_mi {DTS dma_gen_loop_en pcie_eps pcie_debug_en pcie_endpo
 
 proc dts_build_project {} {
     global PCIE_ENDPOINTS H2C_DMA_CHANNELS C2H_DMA_CHANNELS DMA_PKT_SIZE_MAX DMA_DEBUG_ENABLE PCIE_DEBUG_ENABLE \
-              PCIE_ENDPOINT_MODE PCIE_MOD_ARCH DMA_GEN_LOOP_EN H2C_DMA_PTR_WIDTH
+              PCIE_ENDPOINT_MODE PCIE_MOD_ARCH DMA_GEN_LOOP_EN H2C_DMA_PTR_WIDTH USR_CORE_ARCH
     return [dts_build_netcope dts_sparklev_main_mi $PCIE_ENDPOINTS 4 $H2C_DMA_CHANNELS $C2H_DMA_CHANNELS $DMA_PKT_SIZE_MAX \
                 $DMA_PKT_SIZE_MAX 60 60 $DMA_DEBUG_ENABLE $PCIE_DEBUG_ENABLE $PCIE_ENDPOINT_MODE $PCIE_MOD_ARCH \
-                $DMA_GEN_LOOP_EN $H2C_DMA_PTR_WIDTH]
+                $DMA_GEN_LOOP_EN $H2C_DMA_PTR_WIDTH $USR_CORE_ARCH]
 }

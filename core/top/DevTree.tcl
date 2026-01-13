@@ -207,7 +207,8 @@ proc dts_ndk_core_dma_calypte_tx_buffers {DTS PCIE_EP_IDX CHAN_PER_EP dma_tx_dat
 
 proc dts_build_netcope {dts_main_proc pcie_eps dma_type dma_tx_chans dma_rx_chans dma_rx_frame_size_max \
                             dma_tx_frame_size_max dma_rx_frame_size_min dma_tx_frame_size_min dma_debug_en \
-                            pcie_debug_en pcie_endpoint_mode pcie_mod_arch dma_gen_loop_en dma_tx_data_ptr_w} {
+                            pcie_debug_en pcie_endpoint_mode pcie_mod_arch dma_gen_loop_en dma_tx_data_ptr_w \
+                            usr_core_arch} {
     # =========================================================================
     # Top level Device tree file
     # =========================================================================
@@ -220,7 +221,7 @@ proc dts_build_netcope {dts_main_proc pcie_eps dma_type dma_tx_chans dma_rx_chan
     foreach pcie [nb_range $pcie_eps] {
         dts_create_default_mi_bar_node ret $pcie 0 {
             if {$pcie == 0} {
-                $dts_main_proc ret $dma_gen_loop_en $pcie_eps $pcie_debug_en $pcie_endpoint_mode $pcie_mod_arch
+                $dts_main_proc ret $dma_gen_loop_en $pcie_eps $pcie_debug_en $pcie_endpoint_mode $pcie_mod_arch $usr_core_arch
             }
 
             # DMA module

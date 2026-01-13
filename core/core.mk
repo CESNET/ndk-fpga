@@ -27,6 +27,7 @@ DMA_DEBUG_ENABLE?=false
 NET_MOD_ENABLE?=true
 APP_CORE_ENABLE?=true
 BMC_ENABLE?=true
+USR_CORE_ARCH?=FULL
 
 include $(CORE_BASE)/ndk_paths.mk
 
@@ -47,6 +48,7 @@ NETCOPE_ENV += \
 	NET_MOD_ENABLE=$(NET_MOD_ENABLE) \
 	APP_CORE_ENABLE=$(APP_CORE_ENABLE) \
 	PCIE_CONF=$(PCIE_CONF) \
+	USR_CORE_ARCH=$(USR_CORE_ARCH) \
 	$(USER_ENV)
 
 include $(OFM_PATH)/build/Makefile.Vivado.inc

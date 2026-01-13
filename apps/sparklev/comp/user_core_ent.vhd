@@ -1,4 +1,4 @@
--- user_core.vhd: User application core
+-- user_core_ent.vhd: Entity declaration of the user core to ensure consistent port names
 -- Copyright 2026 Universitaet Heidelberg, Institut fuer Technische Informatik (ZITI)
 -- Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
 --
@@ -74,6 +74,8 @@ entity USER_CORE is
         MI_DWR  : in  std_logic_vector(MI_DATA_WIDTH-1 downto 0);
         -- slave address
         MI_ADDR : in  std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
+        -- byte enable for write data
+        MI_BE   : in  std_logic_vector((MI_DATA_WIDTH/8)-1 downto 0);
         -- read request
         MI_RD   : in  std_logic;
         -- write request
@@ -189,16 +191,3 @@ entity USER_CORE is
         FPGA_ID_VLD  : in std_logic
     );
 end entity;
-
-architecture FULL of USER_CORE is
-    signal sync_mi_dwr  : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    signal sync_mi_addr : std_logic_vector(MI_ADDR_WIDTH-1 downto 0);
-    signal sync_mi_be   : std_logic_vector(MI_DATA_WIDTH/8-1 downto 0);
-    signal sync_mi_rd   : std_logic;
-    signal sync_mi_wr   : std_logic;
-    signal sync_mi_drd  : std_logic_vector(MI_DATA_WIDTH-1 downto 0);
-    signal sync_mi_ardy : std_logic;
-    signal sync_mi_drdy : std_logic;
-begin
-
-end architecture;

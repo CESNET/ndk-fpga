@@ -20,6 +20,8 @@ set HWID_BASE                "$OFM_PATH/comp/base/misc/hwid"
 set DMA_BASE                 "$ENTITY_BASE/comp/dma"
 set BOOT_CTRL_BASE           "$OFM_PATH/core/comp/misc/boot_ctrl"
 set AXI_QSPI_FLASH_CTRL_BASE "$OFM_PATH/cards/silicom/fb2cghh/src/comp/axi_quad_flash_controller"
+set HBM_TESTER_BASE          "$OFM_PATH/comp/mem_tools/debug/hbm_tester"
+set MFB_PIPE_BASE            "$OFM_PATH/comp/mfb_tools/flow/pipe"
 
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -50,7 +52,16 @@ lappend IP_COMPONENTS [list "mem"  "axi_quad_spi"    "axi_quad_spi_0"    0 1]
 
 lappend MOD {*}[get_ip_mod_files $IP_COMPONENTS [array get ARCHGRP_ARR]]
 
-lappend MOD "$ENTITY_BASE/user_core.vhd"
+lappend MOD "$ENTITY_BASE/user_core_ent.vhd"
+if {$ARCHGRP_ARR(USR_CORE_ARCH) == "FULL"} {
+    lappend MOD "$ENTITY_BASE/user_core_full_arch.vhd"
+} elseif {$ARCHGRP_ARR(USR_CORE_ARCH) == "TEST"} {
+    lappend COMPONENTS [ list "HBM_TESTER"  $HBM_TESTER_BASE  "FULL" ]
+    lappend COMPONENTS [ list "MFB_PIPE"    $MFB_PIPE_BASE    "FULL" ]
+
+    lappend MOD "$ENTITY_BASE/user_core_test_arch.vhd"
+}
+
 lappend MOD "$ENTITY_BASE/core_logic.vhd"
 lappend MOD "$ARCHGRP_ARR(CORE_BASE)/top/DevTree.tcl"
 lappend MOD "$ENTITY_BASE/DevTree.tcl"
