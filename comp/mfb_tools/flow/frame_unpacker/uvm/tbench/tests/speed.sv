@@ -4,21 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq_full_speed#(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH) extends virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH);
-    `uvm_object_param_utils(test::virt_seq_full_speed#(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH))
-    `uvm_declare_p_sequencer(uvm_superunpacketer::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH, HEADER_SIZE))
-
-    function new (string name = "virt_seq_full_speed");
-        super.new(name);
-    endfunction
-
-    virtual function void init(uvm_phase phase);
-        super.init(phase);
-        m_mfb_seq = uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("m_mfb_seq");
-        m_mvb_seq = uvm_mvb::sequence_full_speed_tx #(MFB_REGIONS, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("m_mvb_seq");
-    endfunction
-endclass
-
 class mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, 0);
   `uvm_object_param_utils(test::mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, META_WIDTH))
   `uvm_sequence_library_utils(test::mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, META_WIDTH))
@@ -62,46 +47,44 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
-        {this.get_full_name(), ".m_env.m_env_rx.*"});
+        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
+                mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+                {this.get_full_name(), ".m_env.m_env_rx.*"}
+        );
+
+        uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::set_inst_override(
+                uvm_mfb::sequence_lib_tx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)::get_type(),
+                {this.get_full_name(), ".m_env.m_env_tx.*"}
+        );
+
+        uvm_mvb::sequence_lib_tx#(MFB_REGIONS, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::set_inst_override(
+                uvm_mvb::sequence_lib_tx_speed #(MFB_REGIONS, HEADER_SIZE+MVB_ITEM_WIDTH)::get_type(),
+                {this.get_full_name(), ".m_env.m_env_tx_mvb.*"}
+        );
 
         // Initializing the reference to the environment
         m_env = uvm_superunpacketer::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH, VERBOSITY, PKT_MTU, MIN_SIZE, META_OUT_MODE, UNPACKING_STAGES)::type_id::create("m_env", this);
     endfunction
 
-    // ------------------------------------------------------------------------
-    // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
-        virt_seq_full_speed #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH) m_vseq;
-        m_vseq = virt_seq_full_speed #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH)::type_id::create("m_vseq");
+        time time_start;
+        virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH) m_vseq;
+        m_vseq = virt_sequence#(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH)::type_id::create("m_vseq");
 
         phase.raise_objection(this);
-
         m_vseq.init(phase);
 
         //RUN MFB RX SEQUENCE
         m_vseq.randomize();
         m_vseq.start(m_env.vscr);
 
-        timeout = 1;
-        fork
-            test_wait_timeout(1000);
-            test_wait_result();
-        join_any;
+
+        time_start = $time();
+        while ((time_start + 10ms) > $time() &&  m_env.sc.used() != 0) begin
+            #(600ns);
+        end
 
         phase.drop_objection(this);
-
-    endtask
-
-    task test_wait_timeout(int unsigned time_length);
-        #(time_length*1us);
-    endtask
-
-    task test_wait_result();
-        do begin
-            #(600ns);
-        end while (m_env.sc.used() != 0);
-        timeout = 0;
     endtask
 
     function void report_phase(uvm_phase phase);

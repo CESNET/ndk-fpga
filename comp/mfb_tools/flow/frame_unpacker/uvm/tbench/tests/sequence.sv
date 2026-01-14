@@ -14,13 +14,9 @@ class virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_
     endfunction
 
     uvm_reset::sequence_start                                                                                                        m_reset;
-    uvm_sequence#(uvm_mfb::sequence_item#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)) m_mfb_seq;
-    uvm_sequence#(uvm_mvb::sequence_item#(MFB_REGIONS, HEADER_SIZE+MVB_ITEM_WIDTH))                                                  m_mvb_seq;
     uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)                                                                           m_byte_array_sq_lib;
     uvm_superpacket_header::sequence_simple #(MVB_ITEM_WIDTH, HEADER_SIZE)                                                           m_info;
     uvm_superpacket_size::sequence_lib#(MIN_SIZE, PKT_MTU)                                                                           m_size_sq_lib;
-    uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)              m_mfb_seq_lib;
-    uvm_mvb::sequence_lib_tx#(MFB_REGIONS, HEADER_SIZE+MVB_ITEM_WIDTH)                                                               m_mvb_seq_lib;
     uvm_phase phase;
 
     virtual function void init(uvm_phase phase);
@@ -29,8 +25,6 @@ class virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_
         m_byte_array_sq_lib = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_byte_array_seq_lib");
         m_info              = uvm_superpacket_header::sequence_simple#(MVB_ITEM_WIDTH, HEADER_SIZE)::type_id::create("m_info");
         m_size_sq_lib       = uvm_superpacket_size::sequence_lib#(MIN_SIZE, PKT_MTU)::type_id::create("m_size_seq_lib");
-        m_mvb_seq_lib       = uvm_mvb::sequence_lib_tx#(MFB_REGIONS, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("m_mvb_seq_lib");
-        m_mfb_seq_lib       = uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("m_mfb_seq_lib");
 
         m_byte_array_sq_lib.init_sequence();
         m_byte_array_sq_lib.cfg = new();
@@ -44,34 +38,8 @@ class virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_
         m_size_sq_lib.max_random_count = 200;
         m_size_sq_lib.randomize();
 
-        m_mvb_seq_lib.init_sequence();
-        m_mvb_seq_lib.min_random_count = 100;
-        m_mvb_seq_lib.max_random_count = 200;
-        m_mvb_seq = m_mvb_seq_lib;
-
-        m_mfb_seq_lib.init_sequence();
-        m_mfb_seq_lib.min_random_count = 100;
-        m_mfb_seq_lib.max_random_count = 200;
-        m_mfb_seq = m_mfb_seq_lib;
-
         this.phase = phase;
-
     endfunction
-
-    virtual task tx_seq();
-        //RUN TX Sequencer
-        forever begin
-            m_mfb_seq.randomize();
-            m_mfb_seq.start(p_sequencer.m_mfb);
-        end
-    endtask
-
-    virtual task tx_m_mvb_seq();
-        forever begin
-            m_mvb_seq.randomize();
-            m_mvb_seq.start(p_sequencer.m_mvb_tx);
-        end
-    endtask
 
 
     virtual task run_reset();
@@ -81,8 +49,6 @@ class virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_
 
     task body();
 
-        p_sequencer.m_mfb.set_report_verbosity_level(UVM_NONE);
-        p_sequencer.m_mvb_tx.set_report_verbosity_level(UVM_NONE);
         p_sequencer.m_info.set_report_verbosity_level(UVM_NONE);
         p_sequencer.m_size.set_report_verbosity_level(UVM_NONE);
         p_sequencer.m_byte_array_scr.set_report_verbosity_level(UVM_NONE);
@@ -94,11 +60,6 @@ class virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_
         #(100ns);
 
         //RUN MFB and MVB TX SEQUENCE
-        fork
-            tx_seq();
-            tx_m_mvb_seq();
-        join_none
-
         fork
             m_byte_array_sq_lib.start(p_sequencer.m_byte_array_scr);
             forever begin
