@@ -24,35 +24,12 @@ class ex_test extends uvm_test;
         m_env = uvm_mfb_fifox::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_env", this);
     endfunction
 
-    virtual task tx_seq(uvm_phase phase);
-
-        // Declaring the sequence library reference and initializing it
-        uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_seq;
-        mfb_seq = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_tx_seq", this);
-
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 100;
-        mfb_seq.max_random_count = 500;
-
-        //RUN TX Sequencer
-        forever begin
-            mfb_seq.randomize();
-            mfb_seq.start(m_env.m_env_tx.m_sequencer);
-        end
-
-    endtask
-
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
         virt_sequence m_vseq;
 
         phase.raise_objection(this);
-
-        //RUN MFB TX SEQUENCE
-        fork
-            tx_seq(phase);
-        join_none
 
         //RUN MFB RX SEQUENCE
         m_vseq = virt_sequence::type_id::create("m_vseq");
