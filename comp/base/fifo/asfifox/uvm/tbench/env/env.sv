@@ -18,9 +18,6 @@ class env #(ITEM_WIDTH) extends uvm_env;
 
     protected uvm_analysis_imp#(uvm_reset::sequence_item, env #(ITEM_WIDTH)) analysis_reset;
     scoreboard #(ITEM_WIDTH) m_scoreboard;
-    protected uvm_mvb::coverage #(1, ITEM_WIDTH) m_cover_rx;
-    protected uvm_mvb::coverage #(1, ITEM_WIDTH) m_cover_tx;
-
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -41,8 +38,6 @@ class env #(ITEM_WIDTH) extends uvm_env;
         uvm_logic_vector_mvb::config_item cfg_tx;
         uvm_reset::config_item cfg_rst_tx;
 
-        m_cover_rx = new("m_cover_rx");
-        m_cover_tx = new("m_cover_tx");
         cfg_tx     = new();
         cfg_rst_tx = new();
         cfg_rx = new();
@@ -57,6 +52,9 @@ class env #(ITEM_WIDTH) extends uvm_env;
         cfg_rst_tx.interface_name = "reset_if_tx";
         cfg_rx.interface_name = "vif_rx";
         cfg_rst_rx.interface_name = "reset_if_rx";
+
+        cfg_tx.coverage = 1;
+        cfg_rx.coverage = 1;
 
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "tx_env", "m_config", cfg_tx);
         uvm_config_db #(uvm_reset::config_item)::set(this, "tx_reset", "m_config", cfg_rst_tx);
@@ -76,9 +74,6 @@ class env #(ITEM_WIDTH) extends uvm_env;
 
         rx_env.analysis_port.connect(m_scoreboard.analysis_imp_mvb_rx);
         tx_env.analysis_port.connect(m_scoreboard.analysis_imp_mvb_tx);
-
-        rx_env.m_mvb_agent.analysis_port.connect(m_cover_rx.analysis_export);
-        rx_env.m_mvb_agent.analysis_port.connect(m_cover_tx.analysis_export);
 
         rx_reset.analysis_port.connect(analysis_reset);
         rx_reset.sync_connect(rx_env.reset_sync);
