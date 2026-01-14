@@ -41,21 +41,6 @@ class ex_test extends uvm_test;
         end
     endtask
 
-    virtual task tx_seq(uvm_phase phase, int unsigned index);
-        uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_seq;
-
-        mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE,  ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_eth_tx_seq", this);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = 100;
-        mfb_seq.max_random_count = 200;
-
-        //RUN ETH
-        forever begin
-            mfb_seq.randomize();
-            mfb_seq.start(m_env.m_env_tx[index].m_sequencer);
-        end
-    endtask
-
     // ------------------------------------------------------------------------
     // Create environment and Run sequences o their sequencers
     virtual task run_phase(uvm_phase phase);
@@ -68,14 +53,6 @@ class ex_test extends uvm_test;
             run_reset(phase);
         join_none;
 
-
-        //RUN MFB TX SEQUENCE
-        for (int unsigned it = 0; it < SPLITTER_OUTPUTS; it++) begin
-            fork
-                automatic int unsigned index = it;
-                tx_seq(phase, index);
-            join_none
-        end
 
         //RUN MFB RX SEQUENCE
         m_vseq = virt_seq #(ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS)::type_id::create("m_vseq");
