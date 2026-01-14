@@ -16,13 +16,6 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
     // TX environments
     uvm_logic_vector_mvb::env_tx #(READ_PORTS, DATA_WIDTH) m_env_mvb_tx;
     uvm_logic_vector_mvb::env_tx #(1, 2)                   m_env_mvb_status;
-
-    // Coverages
-    uvm_mvb::coverage #(WRITE_PORTS, DATA_WIDTH) m_cover_mvb_rx;
-    uvm_mvb::coverage #(READ_PORTS, DATA_WIDTH)  m_cover_mvb_tx;
-    uvm_mvb::coverage #(READ_PORTS, 1)           m_cover_mvb_rd;
-    uvm_mvb::coverage #(1, 2)                    m_cover_mvb_status;
-
     // Scoreboard
     scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN) sc;
     // Virtual sequencer
@@ -31,13 +24,6 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
-
-        // Creation of the coverages
-        m_cover_mvb_rx     = new("m_cover_mvb_rx"    );
-        m_cover_mvb_rd     = new("m_cover_mvb_rd"    );
-        m_cover_mvb_tx     = new("m_cover_mvb_tx"    );
-        m_cover_mvb_status = new("m_cover_mvb_status");
-
     endfunction
 
     // Create base components of environment.
@@ -62,6 +48,7 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         m_config_mvb_rx                = new;
         m_config_mvb_rx.active         = UVM_ACTIVE;
         m_config_mvb_rx.interface_name = "vif_mvb_rx";
+        m_config_mvb_rx.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_rx", "m_config", m_config_mvb_rx);
         // Creation of the m_env_mvb_rx
         m_env_mvb_rx = uvm_logic_vector_mvb::env_rx #(WRITE_PORTS, DATA_WIDTH)::type_id::create("m_env_mvb_rx", this);
@@ -70,6 +57,7 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         m_config_mvb_rd                = new;
         m_config_mvb_rd.active         = UVM_ACTIVE;
         m_config_mvb_rd.interface_name = "vif_mvb_rd";
+        m_config_mvb_rd.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_rd", "m_config", m_config_mvb_rd);
         // Creation of the m_env_mvb_rd
         m_env_mvb_rd = uvm_logic_vector_mvb::env_rx #(READ_PORTS, 1)::type_id::create("m_env_mvb_rd", this);
@@ -78,6 +66,7 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         m_config_mvb_tx                = new;
         m_config_mvb_tx.active         = UVM_PASSIVE;
         m_config_mvb_tx.interface_name = "vif_mvb_tx";
+        m_config_mvb_tx.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_tx", "m_config", m_config_mvb_tx);
         // Creation of the m_env_mvb_tx
         m_env_mvb_tx = uvm_logic_vector_mvb::env_tx #(READ_PORTS, DATA_WIDTH)::type_id::create("m_env_mvb_tx", this);
@@ -86,6 +75,7 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         m_config_mvb_status                = new;
         m_config_mvb_status.active         = UVM_PASSIVE;
         m_config_mvb_status.interface_name = "vif_mvb_status";
+        m_config_mvb_status.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_status", "m_config", m_config_mvb_status);
         // Creation of the m_env_mvb_status
         m_env_mvb_status = uvm_logic_vector_mvb::env_tx #(1, 2)::type_id::create("m_env_mvb_status", this);
@@ -112,13 +102,6 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         // TX environments connection
         m_env_mvb_tx.analysis_port.connect(sc.analysis_imp_mvb_tx);
         if (!IMPL_SHAKEDOWN) m_env_mvb_status.analysis_port.connect(sc.analysis_imp_mvb_status);
-
-        // Connections of the coverages
-        m_env_mvb_rx    .m_mvb_agent.analysis_port.connect(m_cover_mvb_rx    .analysis_export);
-        m_env_mvb_rd    .m_mvb_agent.analysis_port.connect(m_cover_mvb_rd    .analysis_export);
-        m_env_mvb_tx    .m_mvb_agent.analysis_port.connect(m_cover_mvb_tx    .analysis_export);
-        m_env_mvb_status.m_mvb_agent.analysis_port.connect(m_cover_mvb_status.analysis_export);
-
         // Passing the sequencers to the virtual sequencer
         vscr.m_reset = m_reset.m_sequencer;
         vscr.m_mvb_rx_sqr = m_env_mvb_rx.m_sequencer;
