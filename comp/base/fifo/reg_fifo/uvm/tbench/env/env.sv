@@ -75,6 +75,5 @@ class env #(DATA_WIDTH, ITEMS) extends uvm_env;
         // Passing the sequencers to the virtual sequencer
         vscr.m_reset = m_reset.m_sequencer;
         vscr.m_mvb_rx_sqr = m_env_mvb_rx.m_sequencer;
-        vscr.m_mvb_tx_sqr = m_env_mvb_tx.m_sequencer;
     endfunction
 endclass
