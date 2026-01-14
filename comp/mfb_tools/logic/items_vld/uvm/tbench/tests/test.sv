@@ -10,7 +10,6 @@ class ex_test extends uvm_test;
     // declare the Environment reference variable
     uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_env;
     uvm_reset::sequence_start                              m_reset;
-    uvm_mvb::sequence_lib_tx#(MVB_ITEMS, MVB_DATA_WIDTH)   m_mvb_seq;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -34,13 +33,6 @@ class ex_test extends uvm_test;
         m_env = uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_env", this);
     endfunction
 
-    virtual task tx_mvb_seq();
-        forever begin
-            m_mvb_seq.randomize();
-            m_mvb_seq.start(m_env.m_env_tx_mvb.m_sequencer);
-        end
-    endtask
-
     virtual task run_reset();
         m_reset.randomize();
         m_reset.start(m_env.m_reset.m_sequencer);
@@ -49,12 +41,6 @@ class ex_test extends uvm_test;
     virtual function void init();
 
         m_reset   = uvm_reset::sequence_start::type_id::create("m_reset_seq");
-        m_mvb_seq = uvm_mvb::sequence_lib_tx#(MVB_ITEMS, MVB_DATA_WIDTH)::type_id::create("m_mvb_seq");
-
-        m_mvb_seq.init_sequence();
-        m_mvb_seq.min_random_count = 100;
-        m_mvb_seq.max_random_count = 200;
-
     endfunction
 
     // ------------------------------------------------------------------------
@@ -77,10 +63,6 @@ class ex_test extends uvm_test;
         #(100ns);
 
         //RUN VSEQ and MVB TX SEQUENCE
-        fork
-            tx_mvb_seq();
-        join_none
-
         m_vseq.randomize();
         m_vseq.start(m_env.vscr);
 
