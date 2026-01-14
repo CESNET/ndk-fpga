@@ -13,11 +13,7 @@ class virt_sequence #(DATA_WIDTH, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) 
     endfunction
 
     uvm_reset::sequence_start m_reset;
-
     uvm_logic_vector::sequence_simple #(DATA_WIDTH) m_mvb_rx_seq;
-
-    uvm_sequence #(uvm_mvb::sequence_item #(1, DATA_WIDTH)) m_mvb_tx_seq;
-    uvm_mvb::sequence_lib_tx #(1, DATA_WIDTH) m_mvb_tx_seq_lib;
 
     uvm_phase phase;
 
@@ -26,12 +22,6 @@ class virt_sequence #(DATA_WIDTH, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) 
         m_mvb_rx_seq = uvm_logic_vector::sequence_simple #(DATA_WIDTH)::type_id::create("m_mvb_rx_seq");
         m_mvb_rx_seq.transaction_count_min = MIN_TRANSACTION_COUNT;
         m_mvb_rx_seq.transaction_count_max = MAX_TRANSACTION_COUNT;
-
-        m_mvb_tx_seq_lib = uvm_mvb::sequence_lib_tx #(1, DATA_WIDTH)::type_id::create("m_mvb_tx_seq_lib");
-        m_mvb_tx_seq_lib.init_sequence();
-        m_mvb_tx_seq_lib.min_random_count = 100;
-        m_mvb_tx_seq_lib.max_random_count = 200;
-        m_mvb_tx_seq = m_mvb_tx_seq_lib;
 
         m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
 
@@ -43,15 +33,6 @@ class virt_sequence #(DATA_WIDTH, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) 
 
         m_reset.randomize();
         m_reset.start(p_sequencer.m_reset);
-
-    endtask
-
-    virtual task run_mvb_tx_seq();
-
-        forever begin
-            m_mvb_tx_seq.randomize();
-            m_mvb_tx_seq.start(p_sequencer.m_mvb_tx_sqr);
-        end
 
     endtask
 
@@ -69,11 +50,6 @@ class virt_sequence #(DATA_WIDTH, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) 
         join_none
 
         #(100ns);
-
-        fork
-            // Run TX Sequencer
-            run_mvb_tx_seq();
-        join_none
 
         // Run RX Sequencer
         run_mvb_rx_seq();
