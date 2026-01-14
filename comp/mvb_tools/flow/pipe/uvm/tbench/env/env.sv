@@ -21,8 +21,6 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
 
     scoreboard #(ITEM_WIDTH) m_scoreboard;
 
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover_rx;
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover_tx;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -32,13 +30,13 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
 
-        m_cover_rx = new("m_cover_rx");
-        m_cover_tx = new("m_cover_tx");
         cfg_tx = new;
         cfg_rx = new;
 
         cfg_tx.active = UVM_ACTIVE;
+        cfg_tx.coverage = 1;
         cfg_rx.active = UVM_ACTIVE;
+        cfg_rx.coverage = 1;
 
         cfg_tx.interface_name = "vif_tx";
         cfg_rx.interface_name = "vif_rx";
@@ -72,8 +70,6 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
         m_reset.sync_connect(rx_env.reset_sync);
         m_reset.sync_connect(tx_env.reset_sync);
 
-        rx_env.m_mvb_agent.analysis_port.connect(m_cover_rx.analysis_export);
-        tx_env.m_mvb_agent.analysis_port.connect(m_cover_tx.analysis_export);
 
         vscr.m_reset            = m_reset.m_sequencer;
         vscr.m_logic_vector_scr = rx_env.m_sequencer;
