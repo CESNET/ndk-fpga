@@ -110,7 +110,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER
         if (META_OUT_MODE == 2) begin
             m_env_tx_mvb.analysis_port.connect(sc.out_meta);
         end else
-            m_env_tx.m_logic_vector_agent.analysis_port.connect(sc.out_meta);
+            m_env_tx.analysis_port_meta.connect(sc.out_meta);
 
         m_reset.sync_connect(m_env_rx.reset_sync);
         m_reset.sync_connect(m_env_rx_mvb.reset_sync);
