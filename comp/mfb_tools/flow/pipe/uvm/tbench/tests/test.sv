@@ -8,9 +8,7 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     bit timeout;
-    uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)           m_env;
-
-    uvm_sequence #(uvm_mfb::sequence_item#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)) h_seq_tx;
+    uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USE_DST_RDY)  m_env;
 
     //Functions
     function new(string name, uvm_component parent);
@@ -18,7 +16,9 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_mfb_pipe::env #(
+                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USE_DST_RDY
+        )::type_id::create("m_env", this);
     endfunction
 
     task test_wait_timeout(int unsigned time_length);
@@ -34,11 +34,11 @@ class ex_test extends uvm_test;
 
     // Create environment and Run sequences o their sequencers
     task run_seq_rx(uvm_phase phase);
-        virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_vseq;
+        virt_sequence#(ITEM_WIDTH, META_WIDTH) m_vseq;
 
         phase.raise_objection(this, "Start of rx sequence");
 
-        m_vseq = virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence#(ITEM_WIDTH, META_WIDTH)::type_id::create("m_vseq");
         assert(m_vseq.randomize());
         m_vseq.start(m_env.vscr);
 
@@ -51,29 +51,8 @@ class ex_test extends uvm_test;
         phase.drop_objection(this, "End of rx sequence");
     endtask
 
-    task run_seq_tx(uvm_phase phase);
-        forever begin
-            h_seq_tx.randomize();
-            h_seq_tx.start(m_env.mfb_tx_env.m_mfb_agent.m_sequencer);
-        end
-    endtask
-
     virtual task run_phase(uvm_phase phase);
-        if (USE_DST_RDY == 0) begin
-            uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) h_seq_speed_tx;
-            h_seq_speed_tx = uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("h_seq_speed_tx");
-            h_seq_tx = h_seq_speed_tx;
-        end else begin
-            uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) h_seq_lib_tx;
-            h_seq_lib_tx = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("h_seq_lib_tx");
-            h_seq_lib_tx.init_sequence();
-            h_seq_lib_tx.min_random_count = 200;
-            h_seq_lib_tx.max_random_count = 500;
-            h_seq_tx = h_seq_lib_tx;
-        end
-
         fork
-            run_seq_tx(phase);
             run_seq_rx(phase);
         join
     endtask
