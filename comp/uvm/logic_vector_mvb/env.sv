@@ -17,7 +17,9 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
 
     protected uvm_logic_vector::agent#(ITEM_WIDTH)   m_logic_vector_agent;
     protected uvm_logic_vector::meter#(ITEM_WIDTH)   m_meter;
+
     protected uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
+    protected uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover;
 
     protected config_item m_config;
 
@@ -57,6 +59,12 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
             m_sequencer = uvm_logic_vector::sequencer#(ITEM_WIDTH)::type_id::create("m_sequencer", this);
         end
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mvb::coverage #(ITEMS, ITEM_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -75,6 +83,10 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
             m_sequencer = m_logic_vector_agent.m_sequencer;
             reset_sync.push_back(m_mvb_agent.m_sequencer.reset_sync);
             uvm_config_db #(uvm_logic_vector::sequencer#(ITEM_WIDTH))::set(this, "m_mvb_agent.m_sequencer", "hi_sqr", m_sequencer);
+        end
+
+        if (m_config.coverage == 1) begin
+            m_mvb_agent.analysis_port.connect(m_cover.analysis_export);
         end
     endfunction
 
@@ -117,7 +129,7 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     //uvm_logic_vector::config_item logic_vector_agent_cfg;
 
     protected uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
-    //uvm_mvb::config_item mvb_agent_cfg;
+    protected uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover;
 
     protected config_item m_config;
 
@@ -153,6 +165,12 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         m_logic_vector_agent = uvm_logic_vector::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_agent", this);
         m_mvb_agent        = uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH)::type_id::create("m_mvb_agent", this);
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mvb::coverage #(ITEMS, ITEM_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -166,6 +184,10 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         analysis_port = m_logic_vector_agent.m_monitor.analysis_port;
         analysis_port.connect(m_meter.analysis_export);
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
+
+        if (m_config.coverage == 1) begin
+            m_mvb_agent.analysis_port.connect(m_cover.analysis_export);
+        end
     endfunction
 
     task run_phase(uvm_phase phase);

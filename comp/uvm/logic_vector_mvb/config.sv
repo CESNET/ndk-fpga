@@ -35,6 +35,7 @@ class config_item extends uvm_object;
     // ------------------------------------------------------------------------
     // configuration variables
     uvm_active_passive_enum active;
+    logic coverage;
     string interface_name;
 
     //Just for RX
@@ -44,5 +45,6 @@ class config_item extends uvm_object;
     function new (string name = "");
         super.new(name);
         seq_cfg = null;
+        coverage = 0;
     endfunction
 endclass
