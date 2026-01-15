@@ -23,31 +23,11 @@ class mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE
     endfunction
 endclass
 
-class mvb_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH) extends uvm_mvb::sequence_lib_tx#(MFB_REGIONS, MVB_DATA_WIDTH);
-  `uvm_object_param_utils(test::mvb_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH))
-  `uvm_sequence_library_utils(test::mvb_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH))
-
-    function new(string name = "mvb_tx_speed");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_mvb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(uvm_mvb::sequence_full_speed_tx #(MFB_REGIONS, MVB_DATA_WIDTH)::get_type());
-    endfunction
-endclass
-
 class speed extends uvm_test;
      typedef uvm_component_registry#(test::speed, "test::speed") type_id;
 
     // declare the Environment reference variable
     uvm_checksum_calculator::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH) m_env;
-    test::mvb_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH+1+MFB_META_WIDTH)                                                                                  mvb_tx_speed;
     uvm_reset::sequence_start                                                                                                           m_reset;
     int unsigned timeout;
 
@@ -70,16 +50,15 @@ class speed extends uvm_test;
     function void build_phase(uvm_phase phase);
         uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::set_inst_override(mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::get_type(),
         {this.get_full_name(), ".m_env.m_env_rx.*"});
+
+        uvm_mvb::sequence_lib_tx#(MFB_REGIONS, MVB_DATA_WIDTH)::type_id::set_inst_override(
+                uvm_mvb::sequence_lib_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH)::get_type(),
+                {this.get_full_name(), ".m_env.m_env_rx.*"}
+        );
+
         // Initializing the reference to the environment
         m_env = uvm_checksum_calculator::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH)::type_id::create("m_env", this);
     endfunction
-
-    virtual task tx_mvb_seq();
-        forever begin
-            mvb_tx_speed.randomize();
-            mvb_tx_speed.start(m_env.m_env_tx_mvb.m_sequencer);
-        end
-    endtask
 
     virtual task run_reset();
         m_reset.randomize();
@@ -89,12 +68,6 @@ class speed extends uvm_test;
     virtual function void init();
 
         m_reset      = uvm_reset::sequence_start::type_id::create("m_reset_seq");
-        mvb_tx_speed = test::mvb_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH+1+MFB_META_WIDTH)::type_id::create("mvb_tx_speed");
-
-        mvb_tx_speed.init_sequence();
-        mvb_tx_speed.min_random_count = 100;
-        mvb_tx_speed.max_random_count = 200;
-
     endfunction
 
 
@@ -116,10 +89,6 @@ class speed extends uvm_test;
         #(100ns);
 
         //RUN VSEQ and MVB TX SEQUENCE
-        fork
-            tx_mvb_seq();
-        join_none
-
         m_vseq.randomize();
         m_vseq.start(m_env.vscr);
 

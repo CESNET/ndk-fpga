@@ -7,7 +7,7 @@
 
 class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence;
     `uvm_object_param_utils(test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
-    `uvm_declare_p_sequencer(uvm_checksum_calculator::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
+    `uvm_declare_p_sequencer(uvm_checksum_calculator::virt_sequencer #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
     function new (string name = "virt_sequence");
         super.new(name);
