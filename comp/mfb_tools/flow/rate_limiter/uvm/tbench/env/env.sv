@@ -11,7 +11,7 @@ class env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK
     uvm_mi::regmodel                   #(regmodel#(INTERVAL_COUNT), MI_DATA_WIDTH, MI_ADDR_WIDTH)                      m_regmodel;
     uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_rx;
     uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_tx;
-    uvm_rate_limiter::virt_sequencer   #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_sequencer;
+    uvm_rate_limiter::virt_sequencer   #(MFB_ITEM_WIDTH, MFB_META_WIDTH) m_sequencer;
     scoreboard                         #(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD)     sc;
 
     function new(string name, uvm_component parent);
@@ -51,7 +51,7 @@ class env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
         m_env_tx = uvm_logic_vector_array_mfb::env_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_tx", this);
 
-        m_sequencer = uvm_rate_limiter::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_sequencer", this);
+        m_sequencer = uvm_rate_limiter::virt_sequencer#(MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_sequencer", this);
 
         sc = scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD)::type_id::create("sc", this);
     endfunction
@@ -66,7 +66,6 @@ class env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK
         m_reset.sync_connect(m_env_tx.reset_sync);
 
         m_sequencer.m_reset       = m_reset.m_sequencer;
-        m_sequencer.m_mfb_tx      = m_env_tx.m_sequencer;
         m_sequencer.m_mfb_rx_data = m_env_rx.m_sequencer.m_data;
         m_sequencer.m_mfb_rx_meta = m_env_rx.m_sequencer.m_meta;
 
