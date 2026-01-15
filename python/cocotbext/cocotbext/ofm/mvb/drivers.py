@@ -17,6 +17,10 @@ from .transaction import MvbTrClassic
 class MVBDriver(BusDriver):
     """Driver intended for the MVB bus used for sending transactions to the bus.
 
+    In case your MVB bus contains optional signals different from those defined in the
+    _optional_signals class attribute, please create your own driver class inheriting from this
+    one with your custom _optional_signals list.
+
     Atributes:
        _item_cnt(int): number of ready items in the current word.
        _data(dict): dictionary where "keys" are the names of the (optional) signals on the bus

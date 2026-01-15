@@ -71,6 +71,7 @@ it also provides converters:
     :maxdepth: 1
     :caption: Reusable Modules Library
 
+    axi
     base
     ctrls
     mi

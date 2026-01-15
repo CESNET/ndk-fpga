@@ -1,0 +1,17 @@
+# coctb_test_sig.fdo : Include file with signals
+# Copyright (C) 2025 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {PPW Top} -noupdate -hex /pcie_pkt_writer/*
+add_wave -group {PPW INSTR_GEN} -group {PAGE_BREAK_PLANNER} -noupdate -hex /pcie_pkt_writer/instr_gen_i/page_break_planner_i/*
+add_wave -group {PPW INSTR_GEN} -group {MTU_BREAK_PLANNER} -noupdate -hex /pcie_pkt_writer/instr_gen_i/mtu_break_planner_i/*
+add_wave -group {PPW PKT_BREAKER} -group {AXIS FRAME_FRACTURER} -noupdate -hex /pcie_pkt_writer/packet_breaker_i/pkt_breaker_i/*
+add_wave -group {PPW PKT_BREAKER} -noupdate -hex /pcie_pkt_writer/packet_breaker_i/*
+
+
+config wave -signalnamewidth 1

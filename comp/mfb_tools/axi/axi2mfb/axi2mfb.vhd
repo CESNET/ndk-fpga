@@ -319,7 +319,7 @@ begin
     -----------------------------------------------------------------------------
     -- AXI stream empty data transaction
     -- psl assert_tkeep :
-    --      assert always (RX_AXI_TVALID = '1' and OR(RX_AXI_TKEEP) /= '0') abort (RESET) @rising_edge(CLK)
+    --      assert always (RX_AXI_TVALID = '0' or OR(RX_AXI_TKEEP) /= '0') abort (RST) @rising_edge(CLK)
     --      report "AXI2MFB: RX_AXI_TKEEP == 0 while RX_AXI_TVALID == 1";
 
     -- pragma synthesis_off
