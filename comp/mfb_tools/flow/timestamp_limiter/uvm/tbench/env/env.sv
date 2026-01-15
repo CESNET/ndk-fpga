@@ -11,7 +11,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB
     uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB_META_WIDTH) m_env_rx;
     uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, TX_MFB_META_WIDTH) m_env_tx;
 
-    uvm_timestamp_limiter::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, QUEUES) vscr;
+    uvm_timestamp_limiter::virt_sequencer #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, QUEUES) vscr;
 
     uvm_reset::agent                               m_reset;
     uvm_logic_vector_array::agent#(MFB_ITEM_WIDTH) m_logic_vector_array_agent;
@@ -71,7 +71,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB
         m_regmodel = uvm_mi::regmodel#(uvm_timestamp_limiter::regmodel#(QUEUES), MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);
 
         sc   = scoreboard#(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTAMP_WIDTH, QUEUES, TIMESTAMP_FORMAT)::type_id::create("sc", this);
-        vscr = uvm_timestamp_limiter::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, QUEUES)::type_id::create("vscr",this);
+        vscr = uvm_timestamp_limiter::virt_sequencer#(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, QUEUES)::type_id::create("vscr",this);
 
     endfunction
 
@@ -88,7 +88,6 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB
         m_reset.sync_connect(m_env_tx.reset_sync);
 
         vscr.m_reset_sqr       = m_reset.m_sequencer;
-        vscr.m_mfb_rdy_sqr     = m_env_tx.m_sequencer;
         vscr.m_mfb_data_sqr    = m_env_rx.m_sequencer.m_data;
         vscr.m_mfb_meta_sqr    = m_env_rx.m_sequencer.m_meta;
         vscr.m_regmodel        = m_regmodel.m_regmodel;
