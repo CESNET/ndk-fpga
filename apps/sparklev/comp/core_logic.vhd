@@ -81,9 +81,6 @@ entity CORE_LOGIC is
         SYSCLK : in std_logic;
         SYSRST : in std_logic;
 
-        HBM_REFCLK_P : in std_logic;
-        HBM_REFCLK_N : in std_logic;
-
         -- PCIe interface
         PCIE_SYSCLK_P : in  std_logic_vector(PCIE_CONS*PCIE_ENDPOINTS-1 downto 0);
         PCIE_SYSCLK_N : in  std_logic_vector(PCIE_CONS*PCIE_ENDPOINTS-1 downto 0);
@@ -308,10 +305,6 @@ architecture FULL of CORE_LOGIC is
     constant HBM_SIZE_WIDTH  : natural := 3;
     constant HBM_RESP_WIDTH  : natural := 2;
 
-    signal hbm_refclk_ibuf  : std_logic;
-    signal hbm_refclk_bufg  : std_logic;
-    signal hbm_refclk       : std_logic;
-    signal hbm_rst          : std_logic;
     signal hbm_axi_aclk     : std_logic_vector(HBM_PORTS -1 downto 0);
     signal hbm_axi_areset_n : std_logic_vector(HBM_PORTS -1 downto 0);
     signal hbm_ready        : std_logic_vector(1 downto 0);
@@ -1501,7 +1494,7 @@ begin
     -- usefull clocks for boot control in top-level
     MISC_OUT(0) <= usr_clks(MI_CLK_IDX);    -- AXI SPI clock (around 100 MHz)
     MISC_OUT(1) <= usr_rsts(MI_CLK_IDX)(0);
-    MISC_OUT(2) <= usr_clks(BOOT_CLK_IDX);  -- BOOT_CTRL clock (around 200 MHz)
+    MISC_OUT(2) <= usr_clks(BOOT_CLK_IDX);  -- BOOT_CTRL clock (up to 200 MHz)
     MISC_OUT(3) <= usr_rsts(BOOT_CLK_IDX)(0);
 
     -- =========================================================================
@@ -2069,40 +2062,10 @@ begin
     -- =============================================================================================
     -- HBM Memory Instance
     -- =============================================================================================
-    hbm_refclk_ibuf_i : IBUFDS
-        port map (
-            I  => HBM_REFCLK_P,
-            IB => HBM_REFCLK_N,
-            O  => hbm_refclk_ibuf
-        );
-
-    hbm_refclk_bufg_i : BUFG
-        port map (
-            I => hbm_refclk_ibuf,
-            O => hbm_refclk
-        );
-
-    hbm_refclk_rst_i : xpm_cdc_async_rst
-        generic map (
-            DEST_SYNC_FF    => 4,
-            INIT_SYNC_FF    => 1,
-            RST_ACTIVE_HIGH => 1
-        )
-        port map (
-            src_arst  => SYSRST,
-            dest_clk  => hbm_refclk,
-            dest_arst => hbm_rst
-        );
-
     -- Assign clock and reset for each HBM port's AXI interface
     hbm_axi_clk_rst_assign_g : for i in 0 to HBM_PORTS-1 generate
-        hbm_axi_aclk(i) <= app_hbm_clk(i);
-        hbm_axi_rst_reg_p : process (hbm_axi_aclk(i))
-        begin
-            if (rising_edge(hbm_axi_aclk(i))) then
-                hbm_axi_areset_n(i) <= not app_hbm_rst(i);
-            end if;
-        end process;
+        hbm_axi_aclk(i)     <= app_hbm_clk(i);
+        hbm_axi_areset_n(i) <= app_hbm_rst(i);
     end generate;
 
     hbm_ready_sync_g : for i in 0 to 1 generate
@@ -2116,7 +2079,7 @@ begin
             port map (
                 dest_out => hbm_ready_sync(i),
                 dest_clk => app_hbm_clk(i),
-                src_clk  => hbm_refclk,
+                src_clk  => SYSCLK,
                 src_in   => hbm_ready(i)
             );
     end generate;
@@ -2126,12 +2089,12 @@ begin
 
     hbm_i : hbm_ip
         port map (
-            HBM_REF_CLK_0       => hbm_refclk,
-            HBM_REF_CLK_1       => hbm_refclk,
-            APB_0_PCLK          => hbm_refclk,
-            APB_0_PRESET_N      => not hbm_rst,
-            APB_1_PCLK          => hbm_refclk,
-            APB_1_PRESET_N      => not hbm_rst,
+            HBM_REF_CLK_0       => SYSCLK,
+            HBM_REF_CLK_1       => SYSCLK,
+            APB_0_PCLK          => SYSCLK,
+            APB_0_PRESET_N      => not SYSRST,
+            APB_1_PCLK          => SYSCLK,
+            APB_1_PRESET_N      => not SYSRST,
             APB_COMPLETE_0      => hbm_ready(0),
             APB_COMPLETE_1      => hbm_ready(1),
             DRAM_0_STAT_CATTRIP => hbm_cattrip_int(0),

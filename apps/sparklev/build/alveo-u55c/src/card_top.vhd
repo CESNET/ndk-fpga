@@ -27,10 +27,8 @@ use unisim.vcomponents.ICAPE3;
 entity CARD_TOP is
     port (
         -- 100 MHz external clocks
-        SYSCLK2_P : in std_logic;
-        SYSCLK2_N : in std_logic;
-        HBM_REFCLK_P : in std_logic;
-        HBM_REFCLK_N : in std_logic;
+        SYSCLK3_P : in std_logic;
+        SYSCLK3_N : in std_logic;
 
         -- PCIe
         PCIE_SYSCLK0_P : in std_logic;
@@ -99,8 +97,8 @@ architecture FULL of CARD_TOP is
 begin
     sysclk_ibuf_i : IBUFDS
         port map (
-            I  => SYSCLK2_P,
-            IB => SYSCLK2_N,
+            I  => SYSCLK3_P,
+            IB => SYSCLK3_N,
             O  => sysclk_ibuf
         );
 
@@ -231,7 +229,7 @@ begin
             PLL_MULT_F     => 9.0,
             PLL_MASTER_DIV => 1,
             PLL_OUT0_DIV_F => 2.0,
-            PLL_OUT1_DIV   => 4,
+            PLL_OUT1_DIV   => 5,
             PLL_OUT2_DIV   => 9,
             PLL_OUT3_DIV   => 12,
 
@@ -258,9 +256,6 @@ begin
         port map(
             SYSCLK => sysclk_bufg,
             SYSRST => sysrst,
-
-            HBM_REFCLK_P => HBM_REFCLK_P,
-            HBM_REFCLK_N => HBM_REFCLK_N,
 
             PCIE_SYSCLK_P => pcie_ref_clk_p,
             PCIE_SYSCLK_N => pcie_ref_clk_n,

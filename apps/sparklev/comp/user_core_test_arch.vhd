@@ -11,7 +11,11 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
+library unisim;
+use unisim.vcomponents.BUFG;
+
 architecture TEST of USER_CORE is
+    signal hbm_rst_bufg : std_logic;
     signal c2h_dma_mfb_data_int : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*DMA_MFB_REGION_SIZE*DMA_MFB_BLOCK_SIZE*DMA_MFB_ITEM_WIDTH -1 downto 0);
     signal c2h_dma_mfb_meta_int : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_HDR_META_WIDTH+log2(maximum(C2H_DMA_CHANNELS, H2C_DMA_CHANNELS)) -1 downto 0);
     constant CNTR_WIDTH : natural := 64;
@@ -82,7 +86,13 @@ begin
     -- HBM memory tester
     -- =============================================================================================
     HBM_AXI_CLK   <= (others => USR_CLK);
-    HBM_AXI_RESET <= (others => USR_RST);
+
+    sysclk_bufg_i : BUFG
+    port map (
+        I => not USR_RST,
+        O => hbm_rst_bufg
+    );
+    HBM_AXI_RESET <= (others => hbm_rst_bufg);
 
     hbm_tester_i : entity work.HBM_TESTER
     generic map (
@@ -109,7 +119,7 @@ begin
     )
     port map (
         HBM_CLK             => USR_CLK,
-        HBM_RESET           => USR_RST,
+        HBM_RESET           => hbm_rst_bufg,
 
         MI_CLK              => MI_CLK,
         MI_RESET            => MI_RST,

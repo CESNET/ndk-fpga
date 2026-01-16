@@ -27,20 +27,23 @@ set_operating_conditions -design_power_budget 100
 # ==============================================================================
 
 # System Clock for HBM (100 MHz) - onboard SYSCLK3 Clock
-set_property PACKAGE_PIN BK44 [get_ports "HBM_REFCLK_N"];
-set_property PACKAGE_PIN BK43 [get_ports "HBM_REFCLK_P"];
-set_property IOSTANDARD  LVDS [get_ports "HBM_REFCLK_*"];
-create_clock -period 10       [get_ports {HBM_REFCLK_P}]
+set_property PACKAGE_PIN BK43 [get_ports SYSCLK3_P]
+set_property PACKAGE_PIN BK44 [get_ports SYSCLK3_N]
+set_property IOSTANDARD LVDS [get_ports SYSCLK3_P]
+set_property IOSTANDARD LVDS [get_ports SYSCLK3_N]
+create_clock -period 10.000 [get_ports SYSCLK3_P]
 
 # System Clock for LOGIC (100 MHz) - onboard SYSCLK2 Clock
-set_property PACKAGE_PIN BL10 [get_ports "SYSCLK2_N"];
-set_property PACKAGE_PIN BK10 [get_ports "SYSCLK2_P"];
-set_property IOSTANDARD  LVDS [get_ports "SYSCLK2_*"];
-create_clock -period 10       [get_ports {SYSCLK2_P}]
+# set_property PACKAGE_PIN BK10 [get_ports SYSCLK2_P]
+# set_property PACKAGE_PIN BL10 [get_ports SYSCLK2_N]
+# set_property IOSTANDARD LVDS [get_ports SYSCLK2_P]
+# set_property IOSTANDARD LVDS [get_ports SYSCLK2_N]
+# create_clock -period 10.000 [get_ports SYSCLK2_P]
 
 # HBM CATTRIP
-set_property PACKAGE_PIN BE45     [get_ports "HBM_CATTRIP"];
-set_property IOSTANDARD  LVCMOS18 [get_ports "HBM_CATTRIP"];
+set_property PACKAGE_PIN BE45 [get_ports HBM_CATTRIP]
+set_property IOSTANDARD LVCMOS18 [get_ports HBM_CATTRIP]
 
 # Lock DNA_PORT2E to X0Y0 due to different Chip ID in each SLRs!!!
 set_property LOC CONFIG_SITE_X0Y0 [get_cells core_logic_i/hwid_i/usp_g.dna_port_i]
+
