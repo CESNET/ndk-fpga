@@ -100,17 +100,24 @@ architecture FULL of QSFP_CTRL is
     signal qsfp_modsel_r         : std_logic_vector(QSFP_PORTS-1 downto 0) := (0 => '1', others => '0');
     signal qsfp_i2c_scl_in       : std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
     signal qsfp_i2c_scl_int      : std_logic;
+    signal qsfp_i2c_scl_int_str  : std_logic;
     signal qsfp_i2c_sda_in       : std_logic_vector(QSFP_I2C_PORTS-1 downto 0);
     signal qsfp_i2c_sda_int      : std_logic;
     signal qsfp_status           : std_logic_vector(QSFP_PORTS*QSFP_STATUS_W-1 downto 0);
 
     signal qsfp_mi_sel_i         : natural;
+    signal qsfp_sel_r            : natural;
 
-    signal qsfp_modprs_n_sync    : std_logic_vector(QSFP_PORTS-1 downto 0);
-    signal qsfp_modprs_n_sync2   : std_logic_vector(QSFP_PORTS-1 downto 0);
-    signal qsfp_insert_detect    : std_logic_vector(QSFP_PORTS-1 downto 0);
-    signal qsfp_rst_start        : std_logic_vector(QSFP_PORTS-1 downto 0);
-    signal qsfp_rst_timer        : u_array_t (QSFP_PORTS-1 downto 0)(QSFP_RST_W-1 downto 0);
+    signal qsfp_modprs_n_sync     : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_modprs_n_sync2    : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_insert_detect     : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_rst_start         : std_logic_vector(QSFP_PORTS-1 downto 0);
+    signal qsfp_rst_timer         : u_array_t (QSFP_PORTS-1 downto 0)(QSFP_RST_W-1 downto 0);
+    signal qsfp_modsel_switch     : std_logic;
+    -- 2ms setup timer  (250MHz CLK -> 500 000 clock cycles ~ 2^19)
+    signal qsfp_setup_timer_start : std_logic;
+    signal qsfp_setup_timer       : unsigned(21-1 downto 0);
+    signal qsfp_setup_satisfied   : std_logic := '0';
 
 begin
 
@@ -161,7 +168,8 @@ begin
     i2c_regs_wr_p : process (MI_CLK_PHY)
     begin
         if (rising_edge(MI_CLK_PHY)) then
-            i2c_qsfp_sel <= MI_ADDR_PHY(8);
+            i2c_qsfp_sel        <= MI_ADDR_PHY(8);
+            qsfp_modsel_switch  <= '0';
             if (i2c_mi_wr = '1') then
                 if (MI_ADDR_PHY(3 downto 2) = "11") then -- 0x1C - QSFP control reg
                     trans_ctrl(qsfp_mi_sel_i*3+2 downto qsfp_mi_sel_i*3) <= MI_DWR_PHY(3 downto 1);
@@ -170,6 +178,10 @@ begin
                 -- Turn on module select on targeted QSFP
                 qsfp_modsel_r                <= (others => '0');
                 qsfp_modsel_r(qsfp_mi_sel_i) <= '1';
+                qsfp_sel_r                   <= qsfp_mi_sel_i;
+                if (qsfp_modsel_r(qsfp_mi_sel_i) = '0') then
+                    qsfp_modsel_switch  <= '1';
+                end if;
             end if;
 
             if (RST = '1') then
@@ -337,7 +349,7 @@ begin
         RST_SYNC     => '0',
         RST_ASYNC    => MI_RESET_PHY,
         -- I2C interfaces
-        SCL_PAD_I    => qsfp_i2c_scl_int,
+        SCL_PAD_I    => qsfp_i2c_scl_int_str,
         SCL_PAD_O    => i2c_qsfp_scl_o,
         SCL_PADOEN_O => i2c_qsfp_scl_oen,
         SDA_PAD_I    => qsfp_i2c_sda_int,
@@ -358,6 +370,9 @@ begin
         qsfp_i2c_sda_in <= QSFP_I2C_SDA_I;
         qsfp_i2c_scl_in <= QSFP_I2C_SCL_I;
     end generate;
+
+    --  SCL stretched - held down during the module setup time
+    qsfp_i2c_scl_int_str <= qsfp_i2c_scl_int and qsfp_setup_satisfied;
 
     i2c_mux_g : if QSFP_I2C_PORTS = 1 generate
         qsfp_i2c_sda_int   <= qsfp_i2c_sda_in(0);
@@ -447,6 +462,26 @@ begin
             end if;
         end process;
     end generate;
+
+    -- A timer that enables I2C bus clock stretching during module setup time to suspend the
+    -- communication until the module is ready.
+    -- Quote from the SFF 8436 section "Management Interface Timing Specification":
+    -- "Before initiating a 2-wire serial bus communication, the host shall provide setup time
+    -- (Host_select_setup) on the ModSelL line of all modules on the 2-wire bus."
+    qsfp_setup_timer_start <= qsfp_modsel_switch or not QSFP_RESET_N(qsfp_sel_r);
+
+    process (MI_CLK_PHY)
+    begin
+        if (rising_edge(MI_CLK_PHY)) then
+            if (qsfp_setup_timer_start = '1') then
+                qsfp_setup_timer <= (others => '0');
+            elsif (qsfp_setup_timer(qsfp_setup_timer'high) = '0') then
+                qsfp_setup_timer <= qsfp_setup_timer + 1;
+            end if;
+            qsfp_setup_satisfied <= qsfp_setup_timer(qsfp_setup_timer'high);
+        end if;
+    end process;
+
 
     ----------------------------------------------------------------------------
     -- Assign outputs
