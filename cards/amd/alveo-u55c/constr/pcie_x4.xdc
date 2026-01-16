@@ -24,15 +24,17 @@
 # set_property PACKAGE_PIN AP8     [get_ports {PCIE_TX_N[3]}]
 # set_property PACKAGE_PIN AP9     [get_ports {PCIE_TX_P[3]}]
 
-set_property PACKAGE_PIN BF41    [get_ports {PCIE_SYSRST_N}]
-set_property IOSTANDARD LVCMOS18 [get_ports {PCIE_SYSRST_N}]
-set_property PULLUP true         [get_ports {PCIE_SYSRST_N}]
+set_property PACKAGE_PIN BF41    [get_ports PCIE_SYSRST_N]
+set_property IOSTANDARD LVCMOS18 [get_ports PCIE_SYSRST_N]
+set_property PULLTYPE PULLUP     [get_ports PCIE_SYSRST_N]
 
-set_property PACKAGE_PIN AL15    [get_ports {PCIE_SYSCLK0_P}]
-set_property PACKAGE_PIN AL14    [get_ports {PCIE_SYSCLK0_N}]
+set_property PACKAGE_PIN AL15 [get_ports PCIE_SYSCLK0_P]
+set_property PACKAGE_PIN AL14 [get_ports PCIE_SYSCLK0_N]
 
-set_property PACKAGE_PIN AR15    [get_ports {PCIE_SYSCLK1_P}]
-set_property PACKAGE_PIN AR14    [get_ports {PCIE_SYSCLK1_N}]
+set_property PACKAGE_PIN AR14 [get_ports PCIE_SYSCLK1_N]
+set_property PACKAGE_PIN AR15 [get_ports PCIE_SYSCLK1_P]
 
-create_clock -period 10.000 -name pcie_clk0_p -waveform {0.000 5.000} [get_ports {PCIE_SYSCLK0_P}]
-create_clock -period 10.000 -name pcie_clk1_p -waveform {0.000 5.000} [get_ports {PCIE_SYSCLK1_P}]
+create_clock -period 10.000 -name pcie_clk0_p -waveform {0.000 5.000} [get_ports PCIE_SYSCLK0_P]
+create_clock -period 10.000 -name pcie_clk1_p -waveform {0.000 5.000} [get_ports PCIE_SYSCLK1_P]
+
+
