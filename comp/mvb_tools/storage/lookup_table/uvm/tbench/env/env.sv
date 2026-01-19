@@ -20,10 +20,7 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH) exten
     uvm_reset::config_item            m_config_reset;
     uvm_mi::regmodel_config           m_mi_config;
 
-    uvm_mvb::coverage #(ITEMS, REG_DEPTH-SLICE_WIDTH) m_cover_rx;
-    uvm_mvb::coverage #(ITEMS, LUT_WIDTH)             m_cover_tx;
-
-    uvm_lookup_table::virt_sequencer#(ITEMS, LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH) vscr;
+    uvm_lookup_table::virt_sequencer#(REG_DEPTH, SLICE_WIDTH, SW_WIDTH) vscr;
     scoreboard #(LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH, LUT_DEPTH)                  m_scoreboard;
 
     // Constructor of environment.
@@ -34,8 +31,6 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH) exten
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
 
-        m_cover_rx = new("m_cover_rx");
-        m_cover_tx = new("m_cover_tx");
         m_mfb_tx_config = new;
         m_mfb_rx_config = new;
 
@@ -62,14 +57,17 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH) exten
         uvm_config_db #(uvm_reset::config_item)::set(this, "m_reset_agent", "m_config", m_config_reset);
         m_reset_agent = uvm_reset::agent::type_id::create("m_reset_agent", this);
 
+        m_mfb_tx_config.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_mfb_tx_env", "m_config", m_mfb_tx_config);
+
+        m_mfb_rx_config.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_mfb_rx_env", "m_config", m_mfb_rx_config);
 
         m_mfb_tx_env    = uvm_logic_vector_mvb::env_tx #(ITEMS, LUT_WIDTH)::type_id::create("m_mfb_tx_env", this);
         m_mfb_rx_env    = uvm_logic_vector_mvb::env_rx #(ITEMS, REG_DEPTH-SLICE_WIDTH)::type_id::create("m_mfb_rx_env", this);
 
         m_scoreboard  = scoreboard #(LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH, LUT_DEPTH)::type_id::create("m_scoreboard", this);
-        vscr          = uvm_lookup_table::virt_sequencer#(ITEMS, LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH)::type_id::create("vscr",this);
+        vscr          = uvm_lookup_table::virt_sequencer#(REG_DEPTH, SLICE_WIDTH, SW_WIDTH)::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
@@ -82,13 +80,10 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH) exten
         m_reset_agent.sync_connect(m_mfb_tx_env.reset_sync);
         vscr.m_regmodel = m_regmodel.m_regmodel;
 
-        m_mfb_rx_env.m_mvb_agent.analysis_port.connect(m_cover_rx.analysis_export);
-        m_mfb_tx_env.m_mvb_agent.analysis_port.connect(m_cover_tx.analysis_export);
         m_scoreboard.regmodel_set(m_regmodel.m_regmodel);
 
         vscr.m_reset_sqr        = m_reset_agent.m_sequencer;
         vscr.m_logic_vector_scr = m_mfb_rx_env.m_sequencer;
-        vscr.m_tx_sqr           = m_mfb_tx_env.m_sequencer;
 
     endfunction
 endclass
