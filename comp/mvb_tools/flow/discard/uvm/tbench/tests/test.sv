@@ -10,7 +10,6 @@ class ex_test extends uvm_test;
 
     bit timeout;
     uvm_discard::env #(ITEMS, ITEM_WIDTH)             m_env;
-    uvm_mvb::sequence_lib_tx#(ITEMS, ITEM_WIDTH)   h_seq_tx;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -53,25 +52,8 @@ class ex_test extends uvm_test;
         phase.drop_objection(this, "End of rx sequence");
     endtask
 
-
-    task run_seq_tx(uvm_phase phase);
-        forever begin
-            h_seq_tx.randomize();
-            h_seq_tx.start(m_env.tx_env.m_mvb_agent.m_sequencer);
-        end
-    endtask
-
     virtual task run_phase(uvm_phase phase);
-
-        h_seq_tx = uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH)::type_id::create("h_seq_tx");
-        h_seq_tx.init_sequence();
-        h_seq_tx.cfg.probability_set(60, 100);
-        h_seq_tx.min_random_count = 200;
-        h_seq_tx.max_random_count = 500;
-
-
         fork
-            run_seq_tx(phase);
             run_seq_rx(phase);
         join
     endtask
