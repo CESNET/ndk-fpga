@@ -4,38 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq_full_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX) extends virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX);
-    `uvm_object_param_utils(test::virt_seq_full_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
-    `uvm_declare_p_sequencer(uvm_rx_mac_lite_buffer::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
-
-    function new (string name = "virt_seq_full_speed");
-        super.new(name);
-    endfunction
-
-    virtual function void init(uvm_phase phase);
-        super.init(phase);
-        m_mfb_rdy_seq = uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("m_mfb_rdy_seq");
-    endfunction
-endclass
-
-class mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH);
-  `uvm_object_param_utils(test::mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH))
-
-    function new(string name = "mfb_rx_speed");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH)::get_type());
-    endfunction
-endclass
 
 class speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_test;
      typedef uvm_component_registry#(test::speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH), "test::speed") type_id;
@@ -62,8 +30,20 @@ class speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_M
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
-        {this.get_full_name(), ".m_env.m_env_rx.*"});
+        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
+            {this.get_full_name(), ".m_env.m_env_rx.*"}
+        );
+
+        uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+            "m_env.m_env_tx_mfb.*", this
+        );
+
+        //uvm_mvb::sequence_lib_tx#(MFB_REGIONS, MFB_META_WIDTH)::type_id::set_inst_override(
+        //    uvm_mvb::sequence_full_speed_tx #(MFB_REGIONS, MFB_META_WIDTH)::get_type(),
+        //    "m_env.m_env_tx_mvb.*", this
+        //);
 
         // Initializing the reference to the environment
         m_env = uvm_rx_mac_lite_buffer::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, DUT_PATH)::type_id::create("m_env", this);
@@ -73,8 +53,8 @@ class speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_M
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
         time time_start;
-        virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, test_param::FRAME_SIZE_MIN, test_param::FRAME_SIZE_MAX) m_vseq;
-        m_vseq = virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, test_param::FRAME_SIZE_MIN, test_param::FRAME_SIZE_MAX)::type_id::create("m_vseq");
+        virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, test_param::FRAME_SIZE_MIN, test_param::FRAME_SIZE_MAX) m_vseq;
+        m_vseq = virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, test_param::FRAME_SIZE_MIN, test_param::FRAME_SIZE_MAX)::type_id::create("m_vseq");
 
         phase.raise_objection(this);
 
