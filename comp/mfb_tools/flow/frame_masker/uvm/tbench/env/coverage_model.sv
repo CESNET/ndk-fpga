@@ -7,17 +7,11 @@ class coverage_model #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, i
     `uvm_component_param_utils(frame_masker::coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
     `uvm_analysis_imp_decl(_discard)
-    `uvm_analysis_imp_decl(_frame)
 
     uvm_analysis_imp_discard #(
         bit,
         frame_masker::coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)
     ) input_discard;
-
-    uvm_analysis_imp_frame #(
-        uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH),
-        frame_masker::coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)
-    ) input_frame;
 
     // ----------- //
     // Covergroups //
@@ -38,27 +32,12 @@ class coverage_model #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, i
 
     endgroup
 
-    covergroup frame_count_covergroup(string name = "frame_count_covergroup") with function sample(int unsigned frame_count);
-        option.name = name;
-
-        // =========== //
-        // Coverpoints //
-        // =========== //
-
-        coverpoint frame_count
-        {
-            bins frame_count[] = { [0 : MFB_REGIONS] };
-        }
-    endgroup
-
     function new(string name = "coverage_model", uvm_component parent = null);
         super.new(name, parent);
 
         input_discard = new("input_discard", this);
-        input_frame   = new("input_frame", this);
 
         discard_covergroup     = new("discard_covergroup");
-        frame_count_covergroup = new("frame_count_covergroup");
     endfunction
 
     function void start_of_simulation_phase(uvm_phase phase);
@@ -73,17 +52,6 @@ class coverage_model #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, i
 
     function void write_discard(bit t);
         discard_covergroup.sample(t);
-    endfunction
-
-    function void write_frame(uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) t);
-        int unsigned frame_count;
-
-        if (t.src_rdy !== 1'b1 || t.dst_rdy !== 1'b1) begin
-            return;
-        end
-
-        frame_count = $countones(t.sof);
-        frame_count_covergroup.sample(frame_count);
     endfunction
 
 endclass
