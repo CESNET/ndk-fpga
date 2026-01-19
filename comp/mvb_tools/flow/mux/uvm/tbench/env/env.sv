@@ -21,9 +21,6 @@ class env #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_env;
 
     scoreboard #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) m_scoreboard;
 
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover_rx;
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover_tx;
-
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -31,9 +28,6 @@ class env #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_env;
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
-
-        m_cover_rx            = new("m_cover_rx");
-        m_cover_tx            = new("m_cover_tx");
 
         cfg_tx                = new;
         cfg_tx.active         = UVM_ACTIVE;
@@ -47,10 +41,11 @@ class env #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_env;
             cfg_rx[port]                = new;
             cfg_rx[port].active         = UVM_ACTIVE;
             cfg_rx[port].interface_name = $sformatf("rx_vif_%0d", port);
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("rx_env_%0d", port), "m_config", cfg_rx[port]);
-            rx_env[port] = uvm_logic_vector_mvb::env_rx #(ITEMS, ITEM_WIDTH)::type_id::create($sformatf("rx_env_%0d", port), this);
             cfg_rx[port].seq_cfg        = new();
             cfg_rx[port].seq_cfg.space_size_set(0, 5);
+            cfg_rx[port].coverage       = 1;
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("rx_env_%0d", port), "m_config", cfg_rx[port]);
+            rx_env[port] = uvm_logic_vector_mvb::env_rx #(ITEMS, ITEM_WIDTH)::type_id::create($sformatf("rx_env_%0d", port), this);
         end
 
         m_config_reset                = new;
@@ -60,6 +55,7 @@ class env #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_env;
         uvm_config_db #(uvm_reset::config_item)::set(this, "m_reset", "m_config", m_config_reset);
         m_reset = uvm_reset::agent::type_id::create("m_reset", this);
 
+        cfg_tx.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "tx_env", "m_config", cfg_tx);
         tx_env       = uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH)::type_id::create("tx_env", this);
 
@@ -78,14 +74,11 @@ class env #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_env;
 
         for (int port = 0; port < RX_MVB_CNT; port++) begin
             m_reset.sync_connect(rx_env[port].reset_sync);
-            rx_env[port].m_mvb_agent.analysis_port.connect(m_cover_rx.analysis_export);
             rx_env[port].m_mvb_agent.analysis_port.connect(m_scoreboard.analysis_imp_mvb_rx[port]);
         end
 
         m_reset.sync_connect(tx_env.reset_sync);
         m_reset.sync_connect(rx_sel_env.reset_sync);
-
-        tx_env.m_mvb_agent.analysis_port.connect(m_cover_tx.analysis_export);
 
         vscr.m_reset = m_reset.m_sequencer;
 
