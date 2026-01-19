@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AxiS Frame Fracturer &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Basic Tools" href="../../../../base.html" />
+    <link rel="prev" title="AXI Tools" href="../../../../axi.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../axi.html">AXI Tools</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AxiS Frame Fracturer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#diagrams-and-notes">Diagrams and notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../axi.html">AXI Tools</a></li>
+      <li class="breadcrumb-item active">AxiS Frame Fracturer</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/axis_tools/flow/frame_fracturer/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="axis-frame-fracturer">
+<span id="id1"></span><h1>AxiS Frame Fracturer<a class="headerlink" href="#axis-frame-fracturer" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-axis_frame_fracturer">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">AXIS_FRAME_FRACTURER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-axis_frame_fracturer" title="Link to this definition"></a></dt>
+<dd><p>This module divides packets in the current word at offset specified by the RX_FRACTURE_OFFSET signal.
+New packets are aligned to the start of the word as expected by the AXI-Stream protocol.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>While RX_AXI_TLAST and RX_FRACTURE_EN are active, RX_FRACTURE_OFFSET must be within the frame’s range (within valid bytes specified by RX_AXI_TKEEP)!</p>
+</div>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<p>This component’s code may be somewhat confusing due to the FSM and its complicated state transition conditions and state logic.
+However, the overall architecture is quite simple.
+The component consists of three main blocks:</p>
+<ul class="simple">
+<li><p>Input shift register (two or more stages according to the <code class="xref vhdl vhdl-genconstant docutils literal notranslate"><span class="pre">INPUT_REGS</span></code> generic)</p></li>
+<li><p><a class="reference internal" href="../../../base/logic/barrel_shifter/readme.html#barrel-shifter"><span class="std std-ref">Barrel Shifter</span></a> (BS)</p></li>
+<li><p>Output AXI Stream FIFO</p></li>
+</ul>
+<p>The core of the component is the FSM that</p>
+<ul class="simple">
+<li><p>aligns new frames after breaking to the start of the word (with the help of the BS),</p></li>
+<li><p>sets the BS’s output TLAST and TKEEP, effectively breaking the frames, and</p></li>
+<li><p>pauses the input shift register when data need to be stored a little longer.</p></li>
+</ul>
+<p>In case you need to understand this component’s code or modify it, see this <a class="reference internal" href="#axis-frfr-diagrams-and-notes"><span class="std std-ref">section</span></a> below.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-axis_frame_fracturer-axi_tdata_width"><td><p>AXI_TDATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>AXI-Stream data bus width in bits; must be a multiple of 8.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axis_frame_fracturer-input_regs"><td><p>INPUT_REGS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of input registers, must be at least 2.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axis_frame_fracturer-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>Target device.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-axis_frame_fracturer-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX Interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-rx_axi_tdata"><td><p>RX_AXI_TDATA</p></td>
+<td><p>std_logic_vector(AXI_TDATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_frame_fracturer-rx_axi_tkeep"><td><p>RX_AXI_TKEEP</p></td>
+<td><p>std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-rx_axi_tlast"><td><p>RX_AXI_TLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_frame_fracturer-rx_axi_tvalid"><td><p>RX_AXI_TVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-rx_axi_tready"><td><p>RX_AXI_TREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_frame_fracturer-rx_fracture_en"><td><p>RX_FRACTURE_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Fracture enable. Valid with RX_AXI_TVALID.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-rx_fracture_offset"><td><p>RX_FRACTURE_OFFSET</p></td>
+<td><p>std_logic_vector(log2(AXI_TDATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Fracture offset specifies the last byte of the current frame.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TX Interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-tx_axi_tdata"><td><p>TX_AXI_TDATA</p></td>
+<td><p>std_logic_vector(AXI_TDATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_frame_fracturer-tx_axi_tkeep"><td><p>TX_AXI_TKEEP</p></td>
+<td><p>std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-tx_axi_tlast"><td><p>TX_AXI_TLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axis_frame_fracturer-tx_axi_tvalid"><td><p>TX_AXI_TVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axis_frame_fracturer-tx_axi_tready"><td><p>TX_AXI_TREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</dd></dl>
+
+<section id="diagrams-and-notes">
+<span id="axis-frfr-diagrams-and-notes"></span><h2>Diagrams and notes<a class="headerlink" href="#diagrams-and-notes" title="Link to this heading"></a></h2>
+<p>The following diagrams illustrate various example scenarios of frame breaking.
+Sadly, due to the complexity of the component, not all possible scenarios are covered here (e.g., WAIT state transitions).
+Points to note:</p>
+<ul class="simple">
+<li><p>In the present state, the logic of the current state takes into account the word limited by the current shift signal (<cite>bs_shift</cite>).</p></li>
+<li><p>In the next state, the logic considers the word limited by the next shift signal (<cite>bs_shift_next</cite>).
+It also takes into account the current stage (<cite>stg</cite>) as, e.g., breaking in the top-most stage, requires the FSM to look at the top and second-top stages, while in some other cases (like FLOW), it needs to look further into the future.</p></li>
+<li><p>The Pause is issued only in the FRACTURE state and only when the breaking occurs in the top-most stage of the shift register.</p></li>
+</ul>
+<p>In the 1st example below, a Fracture is set for each word (except the last).
+However, note how the present state switches between FLOW and FRACTURE states, rather than being only in the FRACTURE state.
+A scenario where the present state remains in the FRACTURE state for two cycles is shown in the <a class="reference internal" href="#axis-frfr-schematic3"><span class="std std-ref">3rd example</span></a>.</p>
+<figure class="align-center" id="id2">
+<span id="axis-frfr-schematic"></span><a class="reference internal image-reference" href="../../../../_images/axis_frame_fracturer_schematic.drawio.svg"><img alt="../../../../_images/axis_frame_fracturer_schematic.drawio.svg" src="../../../../_images/axis_frame_fracturer_schematic.drawio.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Example 1: A single packet with Fracture in each word</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The 2nd example doesn’t issue a Fracture in the 2nd word, however, note how the state sequence switches between the FLOW and FRACTURE states very much like in the 1st example.
+Also, note how when the last valid word arrives at the top-most stage, the output is invalid.
+That is due to the present state already being in the IDLE state as this part of the packet has been sent in the previous cycle.
+Just another thing to take into account when messing with the state transition logic.</p>
+<figure class="align-center" id="id3">
+<span id="axis-frfr-schematic2"></span><a class="reference internal image-reference" href="../../../../_images/axis_frame_fracturer_schematic2.drawio.svg"><img alt="../../../../_images/axis_frame_fracturer_schematic2.drawio.svg" src="../../../../_images/axis_frame_fracturer_schematic2.drawio.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Example 2: A single packet with no Fracture in the 2nd word</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The 3rd example displays a scenario of two packets following one right after another.
+It also shows how a word with the end of the packet (TLAST) also has a fracture in it.
+This results in a different TX_TKEEP calculation (signals <cite>keep_msb_idx</cite> -&gt; <cite>bs_tx_axi_tkeep</cite>).
+A situation not shown—and which could occur—is with a break in the last word of the packet where the end is also seen by the next state logic.
+It would occur if the first packet ended on the 3rd item (RX_TKEEP = “11110000”) or 4th (RX_TKEEP = “11111000”).
+However, this is only important for state transition logic—TX_TKEEP calculation is the same.</p>
+<figure class="align-center" id="id4">
+<span id="axis-frfr-schematic3"></span><a class="reference internal image-reference" href="../../../../_images/axis_frame_fracturer_schematic3.drawio.svg"><img alt="../../../../_images/axis_frame_fracturer_schematic3.drawio.svg" src="../../../../_images/axis_frame_fracturer_schematic3.drawio.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Example 3: Two packets with fractures in the last word</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../../axi.html" class="btn btn-neutral float-left" title="AXI Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../base.html" class="btn btn-neutral float-right" title="Basic Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
