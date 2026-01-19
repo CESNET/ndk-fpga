@@ -22,6 +22,7 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
     protected uvm_mfb::agent_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_mfb_agent;
+    protected uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_cover;
 
     protected config_item m_config;
 
@@ -65,6 +66,12 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
             m_sequencer = sequencer_rx #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
         end
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -91,6 +98,10 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
             m_sequencer.meta_behav = m_config.meta_behav;
             reset_sync.push_back(m_mfb_agent.m_sequencer.reset_sync);
             uvm_config_db #(sequencer_rx #(ITEM_WIDTH, META_WIDTH))::set(this, "m_mfb_agent.m_sequencer", "hl_sqr", m_sequencer);
+        end
+
+        if (m_config.coverage == 1) begin
+            m_mfb_agent.analysis_port.connect(m_cover.analysis_export);
         end
     endfunction
 
@@ -139,6 +150,7 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
     protected uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_mfb_agent;
+    protected uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_cover;
 
     protected config_item m_config;
 
@@ -178,6 +190,12 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         m_logic_vector_agent = uvm_logic_vector::agent#(META_WIDTH)::type_id::create("m_logic_vector_agent", this);
         m_mfb_agent        = uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb_agent", this);
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -197,6 +215,10 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         m_logic_vector_monitor.meta_behav = m_config.meta_behav;
         analysis_port_meta = m_logic_vector_agent.m_monitor.analysis_port;
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
+
+        if (m_config.coverage == 1) begin
+            m_mfb_agent.analysis_port.connect(m_cover.analysis_export);
+        end
     endfunction
 
     task run_phase(uvm_phase phase);
