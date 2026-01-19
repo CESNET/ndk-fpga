@@ -29,11 +29,19 @@ class test_speed #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int u
             this
         );
 
-        virtual_sequence_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)::type_id::set_inst_override(
-            virtual_sequence_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)::get_type(),
-            "m_virtual_sequence",
+
+        uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, USERMETA_WIDTH)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, USERMETA_WIDTH)::get_type(),
+            "m_env.m_env_tx_mfb.mfb_seq",
             this
         );
+
+        uvm_mvb::sequence_lib_tx #(MFB_REGIONS, USERMETA_WIDTH)::type_id::set_inst_override(
+            uvm_mvb::sequence_lib_tx_speed #(MFB_REGIONS, USERMETA_WIDTH)::get_type(),
+            "m_env.m_env_tx_mvb.mvb_seq",
+            this
+        );
+
 
         super.build_phase(phase);
     endfunction

@@ -29,7 +29,6 @@ package test;
     `include "extension_sequences.sv"
     `include "virtual_sequence_base.sv"
     `include "test_base.sv"
-    `include "virtual_sequence_speed.sv"
     `include "test_speed.sv"
 
 endpackage
