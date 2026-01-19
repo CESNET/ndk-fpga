@@ -4,22 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, PKT_MTU) extends virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, PKT_MTU);
-    `uvm_object_param_utils (test::virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, PKT_MTU))
-    uvm_framepacker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX, RX_CHANNELS, USR_RX_PKT_SIZE_MAX, HDR_META_WIDTH) m_env;
-
-    function new (string name = "virt_seq_full_speed");
-        super.new(name);
-    endfunction
-
-    virtual function void init(int unsigned frame_size_min, int unsigned frame_size_max);
-        super.init(frame_size_min, frame_size_max);
-        m_mfb_rdy_seq = uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("m_mfb_rdy_seq");
-        m_mvb_rdy_seq = uvm_mvb::sequence_full_speed_tx #(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + HDR_META_WIDTH + 1)::type_id::create("m_mvb_rdy_seq");
-    endfunction
-
-endclass
-
 class mvb_rx_speed#(MFB_REGIONS, MVB_ITEM_WIDTH) extends uvm_logic_vector_mvb::sequence_lib_rx#(MFB_REGIONS, MVB_ITEM_WIDTH);
   `uvm_object_param_utils(test::mvb_rx_speed#(MFB_REGIONS, MVB_ITEM_WIDTH))
   `uvm_sequence_library_utils(test::mvb_rx_speed#(MFB_REGIONS, MVB_ITEM_WIDTH))
@@ -67,32 +51,43 @@ class speed extends uvm_test;
         uvm_logic_vector_mvb::sequence_lib_rx#(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1))::type_id::set_inst_override(mvb_rx_speed#(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1))::get_type(),
         {this.get_full_name(), ".m_env.mvb_rx_env.*"});
 
+        uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
+            uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+            {this.get_full_name(), ".m_env.mfb_tx_env.*"}
+        );
+        uvm_mvb::sequence_lib_tx #(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + 1)::type_id::set_inst_override(
+            uvm_mvb::sequence_full_speed_tx #(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + 1)::get_type(),
+            {this.get_full_name(), ".m_env.mvb_tx_env.*"}
+        );
+
         // Initializing the reference to the environment
         m_env = uvm_framepacker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX, RX_CHANNELS, USR_RX_PKT_SIZE_MAX, HDR_META_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
-    virtual task run_phase(uvm_phase phase);
+    task run_seq(uvm_phase phase);
         time timeout;
-        virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, USR_RX_PKT_SIZE_MAX) m_vseq;
-        m_vseq = virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, USR_RX_PKT_SIZE_MAX)::type_id::create("m_vseq");
+        virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, USR_RX_PKT_SIZE_MAX) m_vseq;
+        m_vseq = virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, USR_RX_PKT_SIZE_MAX)::type_id::create("m_vseq");
 
-        phase.raise_objection(this);
-
+        phase.raise_objection(this, "Start of rx sequence");
         m_vseq.init(FRAME_SIZE_MIN, FRAME_SIZE_MAX);
 
-        //RUN MFB RX SEQUENCE
+         //RUN MFB RX SEQUENCE
         m_vseq.randomize();
         m_vseq.start(m_env.vscr);
-
 
         timeout =  $time();
         while ((timeout + 0.5ms) > $time() && m_env.m_scoreboard.used() != 0) begin
             #(600ns);
         end
 
-        phase.drop_objection(this);
+        phase.drop_objection(this, "End of rx sequence");
+    endtask
+
+    virtual task run_phase(uvm_phase phase);
+        run_seq(phase);
     endtask
 
     function void report_phase(uvm_phase phase);

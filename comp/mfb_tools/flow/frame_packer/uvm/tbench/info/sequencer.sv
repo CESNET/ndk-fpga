@@ -4,7 +4,11 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequencer #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequencer #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+class sequencer #(
+    int unsigned USR_RX_PKT_SIZE_MAX,
+    int unsigned RX_CHANNELS,
+    int unsigned HDR_META_WIDTH
+) extends uvm_sequencer #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
     `uvm_component_param_utils(uvm_meta::sequencer #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 
     uvm_reset::sync_terminate reset_sync;
