@@ -30,6 +30,13 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
         uvm_logic_vector_array_intel_mac_seg::config_item m_env_rx_cfg;
         uvm_logic_vector_array_mfb::config_item           m_env_tx_cfg;
 
+
+        uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, 8, 8, 1)::type_id::set_inst_override(
+                uvm_mfb::sequence_lib_tx_speed #(REGIONS, REGION_SIZE, 8, 8, 1)::get_type(),
+                "m_env_tx*", this
+        );
+
+
         //reset
         m_reset_cfg = new();
         m_reset_cfg.active = UVM_ACTIVE;
@@ -68,22 +75,5 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
 
         m_reset.sync_connect(m_env_rx.reset_sync);
     endfunction
-
-    task run_tx_seq();
-        //TX have to allways ready
-        uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, 8, 8, 1) tx_seq;
-        tx_seq = uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, 8, 8, 1)::type_id::create("tx_seq");
-
-        forever begin
-            tx_seq.randomize();
-            tx_seq.start(m_env_tx.m_sequencer);
-        end
-    endtask
-
-    task run_phase(uvm_phase phase);
-        fork
-            run_tx_seq();
-        join_none
-    endtask
 endclass
 
