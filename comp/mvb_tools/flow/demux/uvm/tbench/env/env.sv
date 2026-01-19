@@ -20,9 +20,6 @@ class env #(ITEMS, ITEM_WIDTH, TX_PORTS) extends uvm_env;
 
     scoreboard #(ITEM_WIDTH, TX_PORTS) m_scoreboard;
 
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS))  m_rx_mvb_cover;
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH)                     m_tx_mvb_cover;
-
     function new(string name, uvm_component parent);
         super.new(name, parent);
     endfunction
@@ -38,6 +35,7 @@ class env #(ITEMS, ITEM_WIDTH, TX_PORTS) extends uvm_env;
         m_rx_mvb_config                = new;
         m_rx_mvb_config.active         = UVM_ACTIVE;
         m_rx_mvb_config.interface_name = "rx_mvb_vif";
+        m_rx_mvb_config.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_rx_mvb_env", "m_config", m_rx_mvb_config);
         m_rx_mvb_env = uvm_logic_vector_mvb::env_rx #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS))::type_id::create("m_rx_mvb_env", this);
 
@@ -45,6 +43,7 @@ class env #(ITEMS, ITEM_WIDTH, TX_PORTS) extends uvm_env;
             m_tx_mvb_config[i]                = new;
             m_tx_mvb_config[i].active         = UVM_ACTIVE;
             m_tx_mvb_config[i].interface_name = $sformatf("tx_mvb_vif_%0d", i);
+            m_tx_mvb_config[i].coverage       = 1;
             uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_tx_mvb_env_%0d", i), "m_config" , m_tx_mvb_config[i]);
             m_tx_mvb_env[i] = uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH)::type_id::create($sformatf("m_tx_mvb_env_%0d", i), this);
         end
@@ -52,9 +51,6 @@ class env #(ITEMS, ITEM_WIDTH, TX_PORTS) extends uvm_env;
         m_virt_sqcr = uvm_mvb_demux::virt_sequencer#(ITEM_WIDTH, TX_PORTS)::type_id::create("m_virt_sqcr",this);
 
         m_scoreboard  = scoreboard #(ITEM_WIDTH, TX_PORTS)::type_id::create("m_scoreboard", this);
-
-        m_rx_mvb_cover = uvm_mvb::coverage #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS))::type_id::create("m_rx_mvb_cover", this);
-        m_tx_mvb_cover = uvm_mvb::coverage #(ITEMS, ITEM_WIDTH)::type_id::create("m_tx_mvb_cover", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
@@ -70,12 +66,6 @@ class env #(ITEMS, ITEM_WIDTH, TX_PORTS) extends uvm_env;
         m_rx_mvb_env.analysis_port        .connect(m_scoreboard.rx_mvb_analysis_imp);
         for (int i = 0; i < TX_PORTS; i++) begin
             m_tx_mvb_env[i].analysis_port .connect(m_scoreboard.tx_mvb_analysis_exp[i]);
-        end
-
-        // Connect coverages
-        m_rx_mvb_env.m_mvb_agent        .analysis_port.connect(m_rx_mvb_cover.analysis_export);
-        for (int i = 0; i < TX_PORTS; i++) begin
-            m_tx_mvb_env[i].m_mvb_agent .analysis_port.connect(m_tx_mvb_cover.analysis_export);
         end
 
         // Connect sequencers to the virtual sequencer
