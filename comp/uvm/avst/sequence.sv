@@ -168,15 +168,14 @@ endclass
 class sequence_lib_tx #(
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
-    int unsigned BLOCK_SIZE,
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_common::sequence_library#(
-        config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
 );
 
-  `uvm_object_param_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-  `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+  `uvm_object_param_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+  `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
   function new(string name = "sequence_lib_tx");
     super.new(name);
