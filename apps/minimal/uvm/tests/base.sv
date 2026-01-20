@@ -224,23 +224,6 @@ class base #(
             MEM_DATA_WIDTH,
             MEM_BURST_WIDTH
         ) main_seq;
-        uvm_app_core::sequence_stop #(
-            DMA_RX_CHANNELS,
-            DMA_TX_CHANNELS,
-            DMA_PKT_MTU,
-            DMA_HDR_META_WIDTH,
-            DMA_STREAMS,
-            ETH_TX_HDR_WIDTH,
-            MFB_ITEM_WIDTH,
-            ETH_STREAMS,
-            REGIONS,
-            MFB_REG_SIZE,
-            MFB_BLOCK_SIZE,
-            MEM_PORTS,
-            MEM_ADDR_WIDTH,
-            MEM_DATA_WIDTH,
-            MEM_BURST_WIDTH
-        ) stop_seq;
         time end_time;
         int rdy2end;
 
@@ -261,23 +244,6 @@ class base #(
             MEM_DATA_WIDTH,
             MEM_BURST_WIDTH
         )::type_id::create("main_seq", m_env.m_sequencer);
-        stop_seq = uvm_app_core::sequence_stop #(
-            DMA_RX_CHANNELS,
-            DMA_TX_CHANNELS,
-            DMA_PKT_MTU,
-            DMA_HDR_META_WIDTH,
-            DMA_STREAMS,
-            ETH_TX_HDR_WIDTH,
-            MFB_ITEM_WIDTH,
-            ETH_STREAMS,
-            REGIONS,
-            MFB_REG_SIZE,
-            MFB_BLOCK_SIZE,
-            MEM_PORTS,
-            MEM_ADDR_WIDTH,
-            MEM_DATA_WIDTH,
-            MEM_BURST_WIDTH
-        )::type_id::create("stop_seq", m_env.m_sequencer);
 
         phase.raise_objection(this);
 
@@ -310,15 +276,6 @@ class base #(
             main_seq.time_start = tsu_seq.time_start;
             main_seq.start(m_env.m_sequencer);
 
-            assert(stop_seq.randomize())
-            else begin
-                `uvm_fatal(m_env.m_sequencer.get_full_name(), "\n\tCannot randomize main sequence");
-            end
-
-            fork
-                stop_seq.start(m_env.m_sequencer);
-            join_none;
-
             end_time = $time() + 50ms; // Prevents verification from freezing after a very long time!
             rdy2end = 0;
             while (end_time > $time() && rdy2end < 5) begin
@@ -339,8 +296,6 @@ class base #(
                     )
                 );
             end
-
-            stop_seq.done_set();
         end
 
         phase.drop_objection(this);

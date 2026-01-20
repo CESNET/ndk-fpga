@@ -22,8 +22,9 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
     typedef uvm_app_core_top_agent::sequence_dma_item#(DMA_TX_CHANNELS, $clog2(DMA_PKT_MTU+1), DMA_HDR_META_WIDTH, MFB_ITEM_WIDTH) sequence_item_dma_rx;
 
     //TOP Sequencer
-    uvm_app_core::sequencer#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                             ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) m_sequencer;
+    uvm_app_core::sequencer#(DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH,DMA_STREAMS,
+            MFB_ITEM_WIDTH, ETH_STREAMS, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH
+    ) m_sequencer;
 
     // ETHERNET I/O
     uvm_app_core_top_agent::agent#(sequence_item_eth_rx, MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)                        m_eth_rx[ETH_STREAMS];
@@ -86,8 +87,9 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
         uvm_app_core_top_agent::config_item    m_dma_rx_config;
         uvm_logic_vector_mvb::config_item      m_tsu_config;
 
-        m_sequencer = uvm_app_core::sequencer#(DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, ETH_TX_HDR_WIDTH,  MFB_ITEM_WIDTH,
-                             ETH_STREAMS, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create("m_sequencer", this);
+        m_sequencer = uvm_app_core::sequencer#(DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH,DMA_STREAMS,
+            MFB_ITEM_WIDTH, ETH_STREAMS, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH
+        )::type_id::create("m_sequencer", this);
 
         ///////////////
         // ETH CONFIG
@@ -287,7 +289,6 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
             m_resets_app.sync_connect(m_eth_mfb_tx[it].reset_sync);
 
             m_sequencer.m_eth_rx[it] = m_eth_rx[it].m_sequencer;
-            m_sequencer.m_eth_tx[it] = m_eth_mfb_tx[it].m_sequencer;
        end
 
         for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
@@ -310,8 +311,6 @@ class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_ST
             m_resets_app.sync_connect(m_dma_mvb_tx[it].reset_sync);
 
             m_sequencer.m_dma_rx    [it] = m_dma_rx    [it].m_sequencer;
-            m_sequencer.m_dma_mvb_tx[it] = m_dma_mvb_tx[it].m_sequencer;
-            m_sequencer.m_dma_mfb_tx[it] = m_dma_mfb_tx[it].m_sequencer;
         end
 
         for (int unsigned it = 0; it < MEM_PORTS; it++) begin

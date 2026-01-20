@@ -62,17 +62,12 @@ class sequence_main #(
 
     `uvm_declare_p_sequencer(
         uvm_app_core::sequencer #(
-            DMA_TX_CHANNELS,
             DMA_RX_CHANNELS,
             DMA_PKT_MTU,
             DMA_HDR_META_WIDTH,
             DMA_STREAMS,
-            ETH_TX_HDR_WIDTH,
             MFB_ITEM_WIDTH,
             ETH_STREAMS,
-            REGIONS,
-            MFB_REG_SIZE,
-            MFB_BLOCK_SIZE,
             MEM_PORTS,
             MEM_ADDR_WIDTH,
             MEM_DATA_WIDTH,
@@ -81,8 +76,6 @@ class sequence_main #(
     )
 
     protected uvm_common::sequence_cfg_signal rx_status;
-    protected uvm_common::sequence_cfg_signal tx_status;
-    //protected logic tx_done;
     protected logic [ETH_STREAMS-1:0] event_eth_rx_end;
     protected logic [DMA_STREAMS-1:0] event_dma_rx_end;
     rand time time_start;
@@ -98,7 +91,6 @@ class sequence_main #(
 
     function new (string name = "uvm_app_core::sequencer");
         super.new(name);
-        tx_status = new();
         rx_status = new();
         min_random_count = 50;
         max_random_count = 150;
@@ -107,71 +99,6 @@ class sequence_main #(
         run_time_min = 40us;
         run_time_max = 400us;
     endfunction
-
-    virtual task eth_tx_sequence(int unsigned index);
-        uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH) mfb_seq;
-
-        mfb_seq = uvm_mfb::sequence_lib_tx #(
-            REGIONS,
-            MFB_REG_SIZE,
-            MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH,
-            ETH_TX_HDR_WIDTH
-        )::type_id::create("mfb_seq", p_sequencer.m_eth_tx[index]);
-        mfb_seq.init_sequence();
-        mfb_seq.min_random_count = min_random_count;
-        mfb_seq.max_random_count = max_random_count;
-
-        //RUN ETH
-        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_eth_tx[index], "", "state", tx_status);
-        while (!tx_status.stopped()) begin
-            mfb_seq.randomize();
-            mfb_seq.start(p_sequencer.m_eth_tx[index]);
-        end
-
-    endtask
-
-    virtual task dma_tx_sequence(int unsigned index);
-        uvm_mfb::sequence_lib_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_seq;
-        uvm_mvb::sequence_lib_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                mvb_seq;
-
-        mvb_seq = uvm_mvb::sequence_lib_tx #(
-            REGIONS,
-            DMA_TX_MVB_WIDTH
-        )::type_id::create("mvb_seq", p_sequencer.m_dma_mvb_tx[index]);
-        mvb_seq.min_random_count = min_random_count;
-        mvb_seq.max_random_count = max_random_count;
-        mvb_seq.init_sequence();
-
-        mfb_seq = uvm_mfb::sequence_lib_tx #(
-            REGIONS,
-            MFB_REG_SIZE,
-            MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH,
-            0
-        )::type_id::create("mfb_seq", p_sequencer.m_dma_mfb_tx[index]);
-        mfb_seq.min_random_count = min_random_count;
-        mfb_seq.max_random_count = max_random_count;
-        mfb_seq.init_sequence();
-
-
-        //RUN ETH
-        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_mvb_tx[index], "", "state", tx_status);
-        uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.m_dma_mfb_tx[index], "", "state", tx_status);
-        fork
-            while (!tx_status.stopped()) begin
-                //mvb_seq.set_starting_phase(phase);
-                void'(mvb_seq.randomize());
-                mvb_seq.start(p_sequencer.m_dma_mvb_tx[index]);
-            end
-            while (!tx_status.stopped()) begin
-                //mfb_seq.set_starting_phase(phase);
-                void'(mfb_seq.randomize());
-                mfb_seq.start(p_sequencer.m_dma_mfb_tx[index]);
-            end
-        join;
-    endtask
-
 
 
     virtual task eth_rx_sequence(int unsigned index);
@@ -221,7 +148,6 @@ class sequence_main #(
     task body;
         time run_time;
         rx_status.clear();
-        tx_status.clear();
         event_eth_rx_end = '{ETH_STREAMS {1'b1}};
         event_dma_rx_end = '{DMA_STREAMS {1'b1}};
 
@@ -229,7 +155,6 @@ class sequence_main #(
             fork
                 automatic int index = it;
                 dma_rx_sequence(index);
-                dma_tx_sequence(index);
             join_none;
         end
 
@@ -237,7 +162,6 @@ class sequence_main #(
             fork
                 automatic int index = it;
                 eth_rx_sequence(index);
-                eth_tx_sequence(index);
             join_none;
         end
 
@@ -251,95 +175,8 @@ class sequence_main #(
 
         wait(event_dma_rx_end === 0);
         wait(event_eth_rx_end === 0);
-        tx_status.send_stop();
     endtask
 
 endclass
 
-
-class sequence_stop #(
-    int unsigned DMA_TX_CHANNELS,
-    int unsigned DMA_RX_CHANNELS,
-    int unsigned DMA_PKT_MTU,
-    int unsigned DMA_HDR_META_WIDTH,
-    int unsigned DMA_STREAMS,
-    int unsigned ETH_TX_HDR_WIDTH,
-    int unsigned MFB_ITEM_WIDTH,
-    int unsigned ETH_STREAMS,
-    int unsigned REGIONS,
-    int unsigned MFB_REG_SIZE,
-    int unsigned MFB_BLOCK_SIZE,
-    int unsigned MEM_PORTS,
-    int unsigned MEM_ADDR_WIDTH,
-    int unsigned MEM_DATA_WIDTH,
-    int unsigned MEM_BURST_WIDTH
-) extends uvm_app_core::sequence_main #(
-    DMA_TX_CHANNELS,
-    DMA_RX_CHANNELS,
-    DMA_PKT_MTU,
-    DMA_HDR_META_WIDTH,
-    DMA_STREAMS,
-    ETH_TX_HDR_WIDTH,
-    MFB_ITEM_WIDTH,
-    ETH_STREAMS,
-    REGIONS,
-    MFB_REG_SIZE,
-    MFB_BLOCK_SIZE,
-    MEM_PORTS,
-    MEM_ADDR_WIDTH,
-    MEM_DATA_WIDTH,
-    MEM_BURST_WIDTH
-);
-    `uvm_object_param_utils(
-        uvm_app_core::sequence_stop #(
-            DMA_TX_CHANNELS,
-            DMA_RX_CHANNELS,
-            DMA_PKT_MTU,
-            DMA_HDR_META_WIDTH,
-            DMA_STREAMS,
-            ETH_TX_HDR_WIDTH,
-            MFB_ITEM_WIDTH,
-            ETH_STREAMS,
-            REGIONS,
-            MFB_REG_SIZE,
-            MFB_BLOCK_SIZE,
-            MEM_PORTS,
-            MEM_ADDR_WIDTH,
-            MEM_DATA_WIDTH,
-            MEM_BURST_WIDTH
-        )
-    )
-
-
-    // Constructor - creates new instance of this class
-    function new(string name = "sequence");
-        super.new(name);
-    endfunction
-
-    function void done_set();
-        tx_status.send_stop();
-    endfunction
-
-    task body;
-        tx_status.clear();
-        for (int unsigned it = 0; it < DMA_STREAMS; it++) begin
-            fork
-                automatic int index = it;
-                dma_tx_sequence(index);
-            join_none;
-        end
-
-        for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
-            fork
-                automatic int index = it;
-                eth_tx_sequence(index);
-            join_none;
-        end
-
-        while (tx_status.stopped() == 0) begin
-            #(30ns);
-        end
-    endtask
-
-endclass
 
