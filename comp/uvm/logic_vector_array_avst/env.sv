@@ -18,7 +18,7 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
     protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
-    protected uvm_avst::agent_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
+    protected uvm_avst::agent_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
 
     protected config_item m_config;
 
@@ -132,7 +132,7 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
     protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
-    protected uvm_avst::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
+    protected uvm_avst::agent_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
 
     protected config_item m_config;
 
@@ -194,10 +194,10 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     endfunction
 
     task run_phase(uvm_phase phase);
-        uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) avst_seq;
+        uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) avst_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
-            avst_seq = uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+            avst_seq = uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
             avst_seq.init_sequence();
             avst_seq.min_random_count =  100;
             avst_seq.max_random_count = 2000;
