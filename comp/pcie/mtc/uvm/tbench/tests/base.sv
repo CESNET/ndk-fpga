@@ -23,10 +23,10 @@ endclass
 class base extends uvm_test;
     typedef uvm_component_registry#(test::base, "test::base") type_id;
 
+    localparam CC_MFB_META_WIDTH = sv_pcie_meta_pack::PCIE_CC_META_WIDTH;
     localparam CQ_MFB_META_WIDTH = sv_pcie_meta_pack::PCIE_CQ_META_WIDTH;
 
     uvm_mtc::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
-    virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN, PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_vseq;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -49,18 +49,18 @@ class base extends uvm_test;
                                                                                                                     )::get_type(),{this.get_full_name(), ".m_env.m_env_cq.*"});
 
         m_env = uvm_mtc::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_env", this);
-        m_vseq = virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN, PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_vseq");
     endfunction
 
-    // ------------------------------------------------------------------------
-    // Create environment and Run sequences o their sequencers
     virtual task run_phase(uvm_phase phase);
+        virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN, PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_vseq;
         time time_start;
+
+        m_vseq = virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN, PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_vseq", this);
 
         //RISE OBJECTION
         phase.raise_objection(this);
 
-        m_vseq.init(phase, m_env.tag_sync);
+        m_vseq.init(m_env.tag_sync);
         m_vseq.randomize();
         m_vseq.start(m_env.m_sequencer);
 

@@ -14,7 +14,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE
     localparam CC_MFB_META_WIDTH = sv_pcie_meta_pack::PCIE_CC_META_WIDTH;
     localparam CQ_MFB_META_WIDTH = sv_pcie_meta_pack::PCIE_CQ_META_WIDTH;
 
-    sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequencer;
+    sequencer#(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequencer;
 
     uvm_reset::agent                                                                                                          m_reset;
     uvm_pcie_cq::env                   #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE) m_env_cq;
@@ -66,7 +66,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE
         //change Select devices
         set_type_override_by_type(uvm_mtc::model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(), uvm_mtc::model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type());
         sc          = scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("sc", this);
-        m_sequencer = sequencer  #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequencer", this);
+        m_sequencer = sequencer  #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequencer", this);
 
         tag_sync  = uvm_pcie_hdr::sync_tag::type_id::create("tag_sync", this);
         m_monitor = monitor #(MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_monitor", this);
@@ -78,7 +78,6 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE
     function void connect_phase(uvm_phase phase);
         m_sequencer.m_reset  = m_reset.m_sequencer;
         m_sequencer.m_packet = m_env_cq.m_pcie_hdr_agent.m_sequencer;
-        m_sequencer.m_pcie   = m_env_cc.m_sequencer;
         m_sequencer.m_mi_sqr = m_mi_agent.m_sequencer;
 
         m_env_cq.m_env_rx.analysis_port_data.connect(sc.analysis_export_cq_data);
