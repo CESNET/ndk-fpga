@@ -97,6 +97,7 @@ begin
     dma_uphdr_data(DMA_REQUEST_PASID   ) <= (others => '0');
     dma_uphdr_data(DMA_REQUEST_PASIDVLD) <= (others => '0');
     dma_uphdr_data(DMA_REQUEST_RELAXED ) <= (others => '0');
+
     -- =====================================================================
     --  Output register
     -- =====================================================================
