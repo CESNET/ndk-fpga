@@ -15,10 +15,13 @@ use work.type_pack.all;
 -- It accepts original packet Address and Length and, according to packet boundaries, it splits them into multiple transactions with adjusted addresses and lengths.
 -- Last transaction for a packet is indicated by the LAST signal (this and all previous instructions belong to a single packet on MFB).
 --
+-- Is able to transfer metadata: metadata of the original instruction are duplicated for all partial instructions.
+--
 entity PPW_INSTR_GEN is
     generic (
         -- Number of MVB Items in a word, can't handle more than 1.
         MVB_ITEMS      : natural := 1;
+        MVB_META_WIDTH : natural := 0;
         -- Maximum packet size (in bytes).
         PKT_MTU        : integer := 2**12;
         PCIE_MPS_WIDTH : integer := 15;
@@ -39,6 +42,7 @@ entity PPW_INSTR_GEN is
         -- RX Interface
         -- ========================================================
 
+        RX_MVB_META    : in  std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0) := (others => '0');
         RX_MVB_ADDRESS : in  std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
         RX_MVB_LENGTH  : in  std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         RX_MVB_VALID   : in  std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -49,6 +53,7 @@ entity PPW_INSTR_GEN is
         -- TX Interface
         -- ========================================================
 
+        TX_MVB_META    : out std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
         TX_MVB_ADDRESS : out std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
         TX_MVB_LENGTH  : out std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         -- Indicates final MVB Item for a packet.
@@ -69,6 +74,7 @@ architecture FULL of PPW_INSTR_GEN is
     --                                 SIGNALS
     -- =====================================================================
 
+    signal mvb_meta        : std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
     signal mvb_address     : std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
     signal mvb_length      : std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
     signal mvb_last        : std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -84,22 +90,25 @@ begin
 
     page_break_planner_i : entity work.PPW_PAGE_BREAK_PLANNER
     generic map (
-        MVB_ITEMS     => MVB_ITEMS,
-        PKT_MTU       => PKT_MTU,
-        ADDRESS_WIDTH => ADDRESS_WIDTH,
-        PAGE_SIZE     => PAGE_SIZE,
-        DEVICE        => DEVICE
+        MVB_ITEMS      => MVB_ITEMS,
+        MVB_META_WIDTH => MVB_META_WIDTH,
+        PKT_MTU        => PKT_MTU,
+        ADDRESS_WIDTH  => ADDRESS_WIDTH,
+        PAGE_SIZE      => PAGE_SIZE,
+        DEVICE         => DEVICE
     )
     port map (
         CLK            => CLK,
         RESET          => RESET,
 
+        RX_MVB_META    => RX_MVB_META,
         RX_MVB_ADDRESS => RX_MVB_ADDRESS,
         RX_MVB_LENGTH  => RX_MVB_LENGTH,
         RX_MVB_VALID   => RX_MVB_VALID,
         RX_MVB_SRC_RDY => RX_MVB_SRC_RDY,
         RX_MVB_DST_RDY => RX_MVB_DST_RDY,
 
+        TX_MVB_META    => mvb_meta,
         TX_MVB_ADDRESS => mvb_address,
         TX_MVB_LENGTH  => mvb_length,
         TX_MVB_LAST    => mvb_last,
@@ -115,6 +124,7 @@ begin
     mtu_break_planner_i : entity work.PPW_MTU_BREAK_PLANNER
     generic map (
         MVB_ITEMS      => MVB_ITEMS,
+        MVB_META_WIDTH => MVB_META_WIDTH,
         PKT_MTU        => PKT_MTU,
         ADDRESS_WIDTH  => ADDRESS_WIDTH,
         PCIE_MPS_WIDTH => PCIE_MPS_WIDTH,
@@ -126,6 +136,7 @@ begin
 
         PCIE_MPS       => PCIE_MPS,
 
+        RX_MVB_META    => mvb_meta,
         RX_MVB_ADDRESS => mvb_address,
         RX_MVB_LENGTH  => mvb_length,
         RX_MVB_LAST    => mvb_last,
@@ -133,6 +144,7 @@ begin
         RX_MVB_SRC_RDY => mvb_src_rdy,
         RX_MVB_DST_RDY => mvb_dst_rdy,
 
+        TX_MVB_META    => TX_MVB_META,
         TX_MVB_ADDRESS => TX_MVB_ADDRESS,
         TX_MVB_LENGTH  => TX_MVB_LENGTH,
         TX_MVB_LAST    => TX_MVB_LAST,
