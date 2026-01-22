@@ -409,13 +409,12 @@ architecture ETILE of NETWORK_MOD_CORE is
     -- =========================================================================
     constant LANES_PER_CHANNEL : natural := LANES/ETH_PORT_CHAN;
 
-    constant MFB2AVST_FIFO_DEPTH    : natural := 512;
-
     -- AVST interface:
     constant AVST_DATA_WIDTH        : natural := tsel(ETH_PORT_SPEED = 100, 512, 64); -- 512 bits for "100g1" mode (one channel), 64 bits per channel for modes "25g4" and "10g4"
     constant AVST_EMPTY_WIDTH       : natural := tsel(ETH_PORT_SPEED = 100, 6, 3 );   -- 6   bits for "100g1" mode (one channel), 3  bits per channel for modes "25g4" and "10g4"
     -- 6 bits per channel, it is not ETH_PORT_SPEED dependent
     constant RX_AVST_ERROR_WIDTH    : natural := 6;
+    constant MFB2AVST_FIFO_DEPTH    : natural := max(512, ((8*16384)/AVST_DATA_WIDTH)); -- 512 words or enough to hold 16KB of data
 
     -- Number of MI Indirect Access' output interfaces
     --                                           eth inf       + xcvr inf + rsfec in case of 100g1 or 25g4
