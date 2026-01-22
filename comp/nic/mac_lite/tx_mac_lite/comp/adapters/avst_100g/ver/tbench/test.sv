@@ -27,9 +27,9 @@ program TEST (
 
     MfbTransaction #(8) blueprint;
     Generator generator;
-    MfbDriver    #(1,8,8,8) driver;
-    MfbResponder #(1,1,64,8) responder;
-    MfbMonitor   #(1,1,64,8) monitor;
+    MfbDriver    #(1,BLOCK_SIZE,8,8) driver;
+    MfbResponder #(1,1,8*BLOCK_SIZE,8) responder;
+    MfbMonitor   #(1,1,8*BLOCK_SIZE,8) monitor;
     Scoreboard scoreboard;
 
 
@@ -91,9 +91,9 @@ program TEST (
 
 
     initial begin
-        resetDesign();
         createGeneratorEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
         createEnvironment();
+        resetDesign();
         test1();
         $write("Verification finished successfully!\n");
         $stop();

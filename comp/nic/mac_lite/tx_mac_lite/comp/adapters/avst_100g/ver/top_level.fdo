@@ -20,6 +20,7 @@ set COMPONENTS [list \
 
 # Disable Code Coverage
 set CODE_COVERAGE "false"
+#set SIM_FLAGS(DEBUG) true
 
 # Global include file for compilation
 source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"

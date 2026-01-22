@@ -19,8 +19,8 @@ module testbench;
 
     logic CLK = 0;
     logic RESET;
-    iMfbRx #(1,8,8,8)  RX(CLK, RESET);
-    iMfbTx #(1,1,64,8) TX(CLK, RESET);
+    iMfbRx #(1,BLOCK_SIZE,8,8)  RX(CLK, RESET);
+    iMfbTx #(1,1,8*BLOCK_SIZE,8) TX(CLK, RESET);
 
     always #(CLK_PERIOD/2) CLK = ~CLK;
 
