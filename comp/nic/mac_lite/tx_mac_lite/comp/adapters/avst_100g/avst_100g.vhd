@@ -49,6 +49,8 @@ architecture FULL of TX_MAC_LITE_ADAPTER_AVST_100G is
     constant PKT_CNT_WIDTH         : natural := 6;
     constant PKT_CNT_INC_DLY_WIDTH : natural := 10;
 
+    signal rx_mfb_sof_pos_fix : std_logic_vector(SOP_POS_WIDTH-1 downto 0);
+
     signal fl_sof_n      : std_logic;
     signal fl_eof_n      : std_logic;
     signal fl_src_rdy_n  : std_logic;
@@ -91,6 +93,12 @@ architecture FULL of TX_MAC_LITE_ADAPTER_AVST_100G is
 
 begin
 
+    sop_pos_g : if (DATA_WIDTH/64 = 1) generate
+        rx_mfb_sof_pos_fix <= (others => '0');
+    else generate
+        rx_mfb_sof_pos_fix <= RX_MFB_SOF_POS;
+    end generate;
+
     flu2fl : entity work.FLU2FL
     generic map (
         DATA_WIDTH      => DATA_WIDTH,
@@ -104,7 +112,7 @@ begin
         RESET           => RESET,
 
         RX_DATA         => RX_MFB_DATA,
-        RX_SOP_POS      => RX_MFB_SOF_POS,
+        RX_SOP_POS      => rx_mfb_sof_pos_fix,
         RX_EOP_POS      => RX_MFB_EOF_POS,
         RX_SOP          => RX_MFB_SOF(0),
         RX_EOP          => RX_MFB_EOF(0),
