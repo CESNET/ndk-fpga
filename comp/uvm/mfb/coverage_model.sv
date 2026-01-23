@@ -3,7 +3,13 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class coverage_model #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_subscriber #(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+class coverage_model #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_subscriber #(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
     `uvm_component_param_utils(uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
     localparam int unsigned SOF_POS_WIDTH = ($clog2(REGION_SIZE) > 1)            ? $clog2(REGION_SIZE)            : 1;
@@ -14,8 +20,8 @@ class coverage_model #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsig
     // ----------- //
 
     // READY covergroup
-    covergroup ready_covergroup(string name = "ready_covergroup") with function sample(logic src_rdy, logic dst_rdy);
-        option.name = name;
+    covergroup ready_covergroup with function sample(logic src_rdy, logic dst_rdy);
+        option.name = {this.get_full_name(), ".ready"};
         option.per_instance = 1;
 
         // =========== //
@@ -50,104 +56,86 @@ class coverage_model #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsig
         }
     endgroup
 
+    covergroup packets with function sample (logic [REGIONS-1:0] sof, logic [REGIONS-1:0] eof, logic [REGIONS-1:0] sof_before);
+        option.name = {this.get_full_name(), ".packets"};
+
+        sof_num : coverpoint $countones(sof)
+        {
+            bins sofs[] = {[0 : REGIONS]};
+        }
+
+        eof_num : coverpoint $countones(eof)
+        {
+            bins eofs[] = {[0 : REGIONS]};
+        }
+
+        sof_before_eof : coverpoint $countones(sof & eof & sof_before)
+        {
+            bins sof_before[] = {[0 : REGIONS]};
+        }
+
+        sof_after_eof : coverpoint $countones(sof & eof & (~sof_before))
+        {
+            bins sof_after[] = {[0 : REGIONS]};
+        }
+    endgroup
+
     // SOF covergroup
-    covergroup sof_covergroup(string name = "sof_covergroup") with function sample(int unsigned sof_region, logic [SOF_POS_WIDTH-1 : 0] sof_pos);
-        option.name = name;
-        option.per_instance = 1;
+    covergroup region with function sample(int unsigned region_num, logic sof, logic eof, int unsigned sof_pos, int unsigned eof_pos);
+        option.name = {this.get_full_name(), ".region"};
 
-        // =========== //
-        // Coverpoints //
-        // =========== //
-
-        // SOF
-        sof_region : coverpoint sof_region
-        {
-            bins sof_region[] = { [0 : REGIONS-1] };
+        cov_sof_after_eof : coverpoint sof & eof & (sof_pos*BLOCK_SIZE > eof_pos) {
+            bins sof_before = {1};
+            bins sof_after  = {0};
         }
 
-        // SOF_POS
-        sof_pos : coverpoint sof_pos
-        {
-            bins sof_pos[] = { [0 : (2**SOF_POS_WIDTH)-1] };
+        cov_sof_position : coverpoint sof_pos iff sof === 1 {
+            bins position [] = {[0:REGION_SIZE]};
         }
+
+        cov_eof_position : coverpoint eof_pos iff eof === 1 {
+            bins position [] = {[0:REGION_SIZE*BLOCK_SIZE]};
+        }
+
+        cov_region_num : coverpoint region_num {
+            bins region [] = {[0:REGION_SIZE-1]};
+        }
+
+
 
         // SOF x SOF_POS
-        sof_region_x_sof_pos : cross sof_region, sof_pos;
+        cov_reg_sof : cross cov_region_num, cov_sof_after_eof iff sof === 1;
     endgroup
 
-    // EOF covergroup
-    covergroup eof_covergroup(string name = "eof_covergroup") with function sample(int unsigned eof_region, logic [EOF_POS_WIDTH-1 : 0] eof_pos);
-        option.name = name;
-        option.per_instance = 1;
-
-        // =========== //
-        // Coverpoints //
-        // =========== //
-
-        // EOF
-        eof_region : coverpoint eof_region
-        {
-            bins eof[] = { [0 : REGIONS-1] };
-        }
-
-        // EOF_POS
-        eof_pos : coverpoint eof_pos
-        {
-            bins eof_pos[] = { [0 : (2**EOF_POS_WIDTH)-1] };
-        }
-
-        // EOF x EOF_POS
-        eof_region_x_eof_pos : cross eof_region, eof_pos;
-    endgroup
-
-    // Count of SOFs and EOFs within a data word
-    covergroup count_sof_eof_covergroup(string name = "count_sof_eof_covergroup") with function sample(int unsigned sof_count, int unsigned eof_count);
-        option.name = name;
-        option.per_instance = 1;
-
-        // =========== //
-        // Coverpoints //
-        // =========== //
-
-        // SOF count
-        sof_count : coverpoint sof_count
-        {
-            bins count[] = { [0 : REGIONS] };
-        }
-
-        // EOF count
-        eof_count : coverpoint eof_count
-        {
-            bins count[] = { [0 : REGIONS] };
-        }
-    endgroup
-
-    function string convert_to_full_name(string name);
-        return { get_full_name(), ".", name };
-    endfunction
 
     function new(string name = "coverage_model", uvm_component parent = null);
         super.new(name, parent);
 
-        ready_covergroup         = new(convert_to_full_name("ready_covergroup"));
-        sof_covergroup           = new(convert_to_full_name("sof_covergroup"));
-        eof_covergroup           = new(convert_to_full_name("eof_covergroup"));
-        count_sof_eof_covergroup = new(convert_to_full_name("count_sof_eof_covergroup"));
+        ready_covergroup  = new();
+        packets           = new();
+        region            = new();
     endfunction
 
     function void write(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) t);
+        logic [REGIONS-1:0] sof_before;
+
         ready_covergroup.sample(t.src_rdy, t.dst_rdy);
 
-        if (t.src_rdy === 1'b1 && t.dst_rdy === 1'b1) begin
-            count_sof_eof_covergroup.sample($countones(t.sof), $countones(t.eof));
 
-            for (int unsigned i = 0; i < REGIONS; i++) begin
-                if (t.sof[i] === 1'b1) begin
-                    sof_covergroup.sample(i, t.sof_pos[i]);
-                end
-                if (t.eof[i] === 1'b1) begin
-                    eof_covergroup.sample(i, t.eof_pos[i]);
-                end
+        if (t.src_rdy === 1'b1 && t.dst_rdy === 1'b1) begin
+             for (int unsigned it = 0; it < REGIONS; it++) begin
+                 // Sof is after active eof
+                 if (t.sof[it] == 1 && t.eof[it] == 1 && t.sof_pos[it]*BLOCK_SIZE > t.eof_pos[it]) begin
+                    sof_before[it] = 0;
+                 end else begin
+                    sof_before[it] = 1;
+                 end
+             end
+
+            packets.sample(t.sof, t.eof, sof_before);
+
+            for (int unsigned it = 0; it < REGIONS; it++) begin
+                region.sample(it, t.sof[it], t.eof[it], t.sof_pos[it], t.eof_pos[it]);
             end
         end
     endfunction
