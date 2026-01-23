@@ -3,14 +3,18 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virtual_sequence_base #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends uvm_sequence;
+class virtual_sequence_base #(
+    int unsigned MVB_ITEMS,
+    int unsigned MVB_ITEM_WIDTH,
+    int unsigned RX_STREAMS
+) extends uvm_sequence;
     `uvm_object_param_utils(test::virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS))
     `uvm_declare_p_sequencer(uvm_mvb_merge_streams::virtual_sequencer #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS))
 
     uvm_reset::sequence_start                              m_reset;
     data_sequence            #(MVB_ITEM_WIDTH, RX_STREAMS) m_rx_mvb[RX_STREAMS];
-    uvm_mvb::sequence_lib_tx #(MVB_ITEMS, MVB_ITEM_WIDTH)  m_tx_mvb;
 
+    protected logic [RX_STREAMS-1:0] m_rx_mvb_active;
     function new(string name = "virtual_sequence_base");
         super.new(name);
     endfunction
@@ -31,20 +35,12 @@ class virtual_sequence_base #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDT
             m_rx_mvb[i].transaction_count_min = 300;
             m_rx_mvb[i].transaction_count_max = 500;
         end
-
-        // --------------- //
-        // TX MVB sequence //
-        // --------------- //
-
-        // Create the TX MVB sequence
-        m_tx_mvb = uvm_mvb::sequence_lib_tx #(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::create("m_tx_mvb");
-        // Configure the TX MVB sequence
-        m_tx_mvb.init_sequence();
-        m_tx_mvb.min_random_count = 150;
-        m_tx_mvb.max_random_count = 200;
     endfunction
 
     task body();
+
+        m_rx_mvb_active = '1;
+
         // Run the reset sequence
         fork
             begin
@@ -55,29 +51,19 @@ class virtual_sequence_base #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDT
 
         #(100ns);
 
-        // Run the TX MVB sequence
-        fork
-            forever begin
-                assert(m_tx_mvb.randomize());
-                m_tx_mvb.start(p_sequencer.m_tx_mvb);
-            end
-        join_none
-
         // Run the RX MVB sequences
-        fork
-            begin
-                for (int unsigned i = 0; i < RX_STREAMS; i++) begin
-                    fork
-                        int unsigned i_local = i;
-                        begin
-                            assert(m_rx_mvb[i_local].randomize());
-                            m_rx_mvb[i_local].start(p_sequencer.m_rx_mvb[i_local]);
-                        end
-                    join_none
+        for (int unsigned i = 0; i < RX_STREAMS; i++) begin
+            fork
+                int unsigned i_local = i;
+                begin
+                    assert(m_rx_mvb[i_local].randomize());
+                    m_rx_mvb[i_local].start(p_sequencer.m_rx_mvb[i_local]);
+                    m_rx_mvb_active[i_local] = 0;
                 end
-                wait fork;
-            end
-        join
+            join_none
+        end
+
+        wait (m_rx_mvb_active == 0);
     endtask
 
 endclass
