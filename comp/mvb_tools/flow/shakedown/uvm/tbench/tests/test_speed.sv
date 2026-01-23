@@ -23,9 +23,9 @@ class test_speed #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
             this
         );
 
-        virtual_sequence_base #(TX_ITEMS, ITEM_WIDTH)::type_id::set_inst_override(
-            virtual_sequence_speed #(TX_ITEMS, ITEM_WIDTH)::get_type(),
-            "m_virtual_sequence",
+        uvm_mvb::sequence_lib_tx #(1, ITEM_WIDTH)::type_id::set_inst_override(
+            uvm_mvb::sequence_lib_tx_speed #(1, ITEM_WIDTH)::get_type(),
+            "m_env.*",
             this
         );
 

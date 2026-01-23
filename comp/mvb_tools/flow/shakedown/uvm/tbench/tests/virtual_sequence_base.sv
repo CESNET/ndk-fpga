@@ -9,7 +9,6 @@ class virtual_sequence_base #(int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) ex
 
     uvm_reset::sequence_start                          m_reset;
     uvm_logic_vector::sequence_simple #(ITEM_WIDTH)    m_rx_mvb;
-    uvm_mvb::sequence_lib_tx          #(1, ITEM_WIDTH) m_tx_mvb[TX_ITEMS];
 
     function new(string name = "virtual_sequence_base");
         super.new(name);
@@ -28,19 +27,6 @@ class virtual_sequence_base #(int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) ex
         // Configure the RX MVB sequence
         m_rx_mvb.transaction_count_min = TX_ITEMS*300;
         m_rx_mvb.transaction_count_max = TX_ITEMS*500;
-
-        // ---------------- //
-        // TX MVB sequences //
-        // ---------------- //
-
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            // Create the TX MVB sequence
-            m_tx_mvb[i] = uvm_mvb::sequence_lib_tx #(1, ITEM_WIDTH)::type_id::create($sformatf("m_tx_mvb_%0d", i));
-            // Configure the TX MVB sequence
-            m_tx_mvb[i].init_sequence();
-            m_tx_mvb[i].min_random_count = 150;
-            m_tx_mvb[i].max_random_count = 200;
-        end
     endfunction
 
     task body();
@@ -53,17 +39,6 @@ class virtual_sequence_base #(int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) ex
         join_none
 
         #(100ns);
-
-        // Run the TX MVB sequences
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            fork
-                int unsigned i_local = i;
-                forever begin
-                    assert(m_tx_mvb[i_local].randomize());
-                    m_tx_mvb[i_local].start(p_sequencer.m_tx_mvb[i_local]);
-                end
-            join_none
-        end
 
         // Run the RX MVB sequence
         begin

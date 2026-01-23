@@ -3,6 +3,26 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
+class lv_mvb#(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH);
+    `uvm_component_param_utils(uvm_mvb_shakedown::lv_mvb #(ITEMS, ITEM_WIDTH));
+
+     uvm_analysis_port #(uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH)) analysis_port_mvb;
+
+    // Constructor of environment.
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
+    function void connect_phase(uvm_phase phase);
+        analysis_port_mvb = m_mvb_agent.analysis_port;
+        super.connect_phase(phase);
+    endfunction
+endclass
+
+
 class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     `uvm_component_param_utils(uvm_mvb_shakedown::env #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH))
 
@@ -13,12 +33,10 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
     uvm_logic_vector_mvb::env_rx #(RX_ITEMS, ITEM_WIDTH) m_env_rx_mvb;
 
     // TX environments
-    uvm_logic_vector_mvb::env_tx #(1, ITEM_WIDTH) m_env_tx_mvb[TX_ITEMS];
+    lv_mvb#(1, ITEM_WIDTH) m_env_tx_mvb[TX_ITEMS];
 
     // Coverage models
     ll_coverage_model #(TX_ITEMS, ITEM_WIDTH) m_coverage_model;
-    uvm_mvb::coverage #(RX_ITEMS, ITEM_WIDTH) m_coverage_rx_mvb;
-    uvm_mvb::coverage #(1, ITEM_WIDTH)        m_coverage_tx_mvb[TX_ITEMS];
 
     // Scoreboard
     scoreboard #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH) m_scoreboard;
@@ -55,6 +73,7 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
         m_config_rx_mvb                = new;
         m_config_rx_mvb.active         = UVM_ACTIVE;
         m_config_rx_mvb.interface_name = "vif_rx_mvb";
+        m_config_rx_mvb.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_rx_mvb", "m_config", m_config_rx_mvb);
         m_env_rx_mvb = uvm_logic_vector_mvb::env_rx #(RX_ITEMS, ITEM_WIDTH)::type_id::create("m_env_rx_mvb", this);
 
@@ -63,8 +82,9 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
             m_config_tx_mvb[i]                = new;
             m_config_tx_mvb[i].active         = UVM_ACTIVE;
             m_config_tx_mvb[i].interface_name = $sformatf("vif_tx_mvb_%0d", i);
+            m_config_rx_mvb.coverage          = 1;
             uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_env_tx_mvb_%0d", i), "m_config", m_config_tx_mvb[i]);
-            m_env_tx_mvb[i] = uvm_logic_vector_mvb::env_tx #(1, ITEM_WIDTH)::type_id::create($sformatf("m_env_tx_mvb_%0d", i), this);
+            m_env_tx_mvb[i] = lv_mvb #(1, ITEM_WIDTH)::type_id::create($sformatf("m_env_tx_mvb_%0d", i), this);
         end
 
         // ----------------------- //
@@ -72,10 +92,6 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
         // ----------------------- //
 
         m_coverage_model = ll_coverage_model #(TX_ITEMS, ITEM_WIDTH)::type_id::create("m_coverage_model", this);
-        m_coverage_rx_mvb = new("m_coverage_rx_mvb");
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            m_coverage_tx_mvb[i] = new($sformatf("m_coverage_tx_mvb_%0d", i));
-        end
 
         m_scoreboard        = scoreboard        #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH)::type_id::create("m_scoreboard", this);
         m_virtual_sequencer = virtual_sequencer #(TX_ITEMS, ITEM_WIDTH)          ::type_id::create("m_virtual_sequencer", this);
@@ -109,12 +125,7 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
         // ------------------------- //
 
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            m_env_tx_mvb[i].m_mvb_agent.analysis_port.connect(m_coverage_model.in[i].analysis_export);
-        end
-
-        m_env_rx_mvb.m_mvb_agent.analysis_port.connect(m_coverage_rx_mvb.analysis_export);
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            m_env_tx_mvb[i].m_mvb_agent.analysis_port.connect(m_coverage_tx_mvb[i].analysis_export);
+            m_env_tx_mvb[i].analysis_port_mvb.connect(m_coverage_model.in[i].analysis_export);
         end
 
         // ---------------------------- //
@@ -123,16 +134,13 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
 
         m_virtual_sequencer.m_reset  = m_reset.m_sequencer;
         m_virtual_sequencer.m_rx_mvb = m_env_rx_mvb.m_sequencer;
-        for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            m_virtual_sequencer.m_tx_mvb[i] = m_env_tx_mvb[i].m_sequencer;
-        end
 
         // ---------------------------- //
         // Activity Detector connection //
         // ---------------------------- //
 
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            m_env_tx_mvb[i].m_mvb_agent.analysis_port.connect(m_activity_detector.in[i].analysis_export);
+            m_env_tx_mvb[i].analysis_port_mvb.connect(m_activity_detector.in[i].analysis_export);
         end
         m_activity_detector.analysis_port.connect(m_scoreboard.analysis_export_tx_read_command);
     endfunction
