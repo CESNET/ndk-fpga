@@ -91,7 +91,6 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
         m_reset.sync_connect(m_env_rx_mvb.reset_sync);
 
         vscr.m_reset_sqr    = m_reset.m_sequencer;
-        vscr.m_mfb_rdy_sqr  = m_env_tx.m_sequencer;
         vscr.m_mvb_data_sqr = m_env_rx_mvb.m_sequencer;
         vscr.m_mfb_data_sqr = m_env_rx.m_sequencer.m_data;
         vscr.m_mfb_meta_sqr = m_env_rx.m_sequencer.m_meta;

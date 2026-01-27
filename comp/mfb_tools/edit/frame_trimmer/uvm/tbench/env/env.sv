@@ -18,7 +18,7 @@ class env #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_S
     // Scoreboard
     scoreboard #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) m_scoreboard;
     // Virtual sequencer
-    virtual_sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) m_virtual_sequencer;
+    virtual_sequencer #(ITEM_WIDTH, META_WIDTH, PKT_MTU) m_virtual_sequencer;
 
     // Constructor
     function new(string name = "env", uvm_component parent = null);
@@ -70,7 +70,7 @@ class env #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_S
         m_env_tx_mfb = uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_env_tx_mfb", this);
 
         m_scoreboard        = scoreboard        #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_scoreboard", this);
-        m_virtual_sequencer = virtual_sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_virtual_sequencer", this);
+        m_virtual_sequencer = virtual_sequencer #(ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_virtual_sequencer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -99,7 +99,6 @@ class env #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_S
 
         m_virtual_sequencer.m_reset       = m_reset.m_sequencer;
         m_virtual_sequencer.m_rx_mfb_meta = m_env_rx_mfb.m_sequencer.m_meta;
-        m_virtual_sequencer.m_tx_mfb      = m_env_tx_mfb.m_sequencer;
 
         assert($cast(m_virtual_sequencer.m_rx_mfb_data, m_env_rx_mfb.m_sequencer.m_data))
         else begin

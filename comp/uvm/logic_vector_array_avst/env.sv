@@ -15,16 +15,12 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(META_WIDTH))       analysis_port_meta;
     uvm_reset::sync_cbs reset_sync;
 
-    uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
-    uvm_logic_vector_array::config_item        logic_vector_array_agent_cfg;
+    protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
+    protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
-    uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::config_item        logic_vector_agent_cfg;
+    protected uvm_avst::agent_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
 
-    uvm_avst::agent_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
-    uvm_avst::config_item avst_agent_cfg;
-
-    config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -33,6 +29,9 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item  logic_vector_array_agent_cfg;
+        uvm_logic_vector::config_item        logic_vector_agent_cfg;
+        uvm_avst::config_item                avst_agent_cfg;
 
         if(!uvm_config_db #(config_item)::get(this, "", "m_config", m_config)) begin
             `uvm_fatal(get_type_name(), "Unable to get configuration object")
@@ -124,23 +123,18 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     `uvm_component_param_utils(uvm_logic_vector_array_avst::env_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY));
 
     //Access component
-    uvm_avst::sequencer #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_sequencer;
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_port_data;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(META_WIDTH)) analysis_port_meta;
     uvm_reset::sync_cbs                                               reset_sync;
 
     // ------------------------------------------------------------------------
     // Definition of agents
-    uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
-    uvm_logic_vector_array::config_item logic_vector_array_agent_cfg;
+    protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
+    protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
-    uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::config_item logic_vector_agent_cfg;
+    protected uvm_avst::agent_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
 
-    uvm_avst::agent_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) m_avst_agent;
-    uvm_avst::config_item avst_agent_cfg;
-
-    config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -149,6 +143,9 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item logic_vector_array_agent_cfg;
+        uvm_logic_vector::config_item       logic_vector_agent_cfg;
+        uvm_avst::config_item                avst_agent_cfg;
 
         if(!uvm_config_db #(config_item)::get(this, "", "m_config", m_config)) begin
             `uvm_fatal(get_type_name(), "Unable to get configuration object")
@@ -194,8 +191,24 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
         m_logic_vector_monitor.meta_behav = m_config.meta_behav;
         analysis_port_meta = m_logic_vector_agent.m_monitor.analysis_port;
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
-
-        m_sequencer = m_avst_agent.m_sequencer;
     endfunction
+
+    task run_phase(uvm_phase phase);
+        uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) avst_seq;
+
+        if (m_config.active == UVM_ACTIVE) begin
+            avst_seq = uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+            avst_seq.init_sequence();
+            avst_seq.min_random_count =  100;
+            avst_seq.max_random_count = 2000;
+
+            forever begin
+                assert(avst_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                avst_seq.start(m_avst_agent.m_sequencer);
+            end
+        end
+    endtask
 endclass
 

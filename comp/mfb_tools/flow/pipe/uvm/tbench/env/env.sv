@@ -6,17 +6,24 @@
 
 // Environment for functional verification of encode.
 
-class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_env;
+class env #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    META_WIDTH,
+    USE_DST_RDY
+) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+    `uvm_component_param_utils(uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USE_DST_RDY));
+
+    uvm_mfb_pipe::virt_sequencer#(ITEM_WIDTH, META_WIDTH) vscr;
 
     uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_rx_env;
     uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_tx_env;
 
     uvm_reset::agent        m_reset;
     uvm_reset::config_item  m_config_reset;
-
-    uvm_mfb_pipe::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) vscr;
 
     scoreboard #(ITEM_WIDTH, META_WIDTH) m_scoreboard;
 
@@ -34,7 +41,11 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uv
         mfb_tx_cfg = new;
 
         mfb_rx_cfg.active = UVM_ACTIVE;
-        mfb_tx_cfg.active = UVM_ACTIVE;
+        if (USE_DST_RDY == 1) begin
+            mfb_tx_cfg.active = UVM_ACTIVE;
+        end else begin
+            mfb_tx_cfg.active = UVM_PASSIVE;
+        end
 
         mfb_rx_cfg.interface_name = "vif_rx";
         mfb_tx_cfg.interface_name = "vif_tx";
@@ -56,7 +67,7 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uv
         mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_tx_env", this);
 
         m_scoreboard  = scoreboard #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_scoreboard", this);
-        vscr   = uvm_mfb_pipe::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);
+        vscr   = uvm_mfb_pipe::virt_sequencer#(ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);
     endfunction
 
      // Connect agent's ports with ports from scoreboard.

@@ -12,10 +12,6 @@ class env #(DATA_WIDTH, ITEMS) extends uvm_env;
     uvm_logic_vector_mvb::env_rx #(1, DATA_WIDTH) m_env_mvb_rx;
     uvm_logic_vector_mvb::env_tx #(1, DATA_WIDTH) m_env_mvb_tx;
 
-    // Coverages
-    uvm_mvb::coverage #(1, DATA_WIDTH) m_cover_mvb_rx;
-    uvm_mvb::coverage #(1, DATA_WIDTH) m_cover_mvb_tx;
-
     // Scoreboard
     scoreboard #(DATA_WIDTH, ITEMS) sc;
     // Virtual sequencer
@@ -23,9 +19,6 @@ class env #(DATA_WIDTH, ITEMS) extends uvm_env;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
-        // Creation of the coverages
-        m_cover_mvb_rx     = new("m_cover_mvb_rx");
-        m_cover_mvb_tx     = new("m_cover_mvb_tx");
     endfunction
 
     function void build_phase(uvm_phase phase);
@@ -46,6 +39,7 @@ class env #(DATA_WIDTH, ITEMS) extends uvm_env;
         m_config_mvb_rx                = new;
         m_config_mvb_rx.active         = UVM_ACTIVE;
         m_config_mvb_rx.interface_name = "vif_mvb_rx";
+        m_config_mvb_rx.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_rx", "m_config", m_config_mvb_rx);
         // Creation of the m_env_mvb_rx
         m_env_mvb_rx = uvm_logic_vector_mvb::env_rx #(1, DATA_WIDTH)::type_id::create("m_env_mvb_rx", this);
@@ -54,6 +48,7 @@ class env #(DATA_WIDTH, ITEMS) extends uvm_env;
         m_config_mvb_tx                = new;
         m_config_mvb_tx.active         = UVM_ACTIVE;
         m_config_mvb_tx.interface_name = "vif_mvb_tx";
+        m_config_mvb_tx.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_tx", "m_config", m_config_mvb_tx);
         // Creation of the m_env_mvb_tx
         m_env_mvb_tx = uvm_logic_vector_mvb::env_tx #(1, DATA_WIDTH)::type_id::create("m_env_mvb_tx", this);
@@ -77,13 +72,8 @@ class env #(DATA_WIDTH, ITEMS) extends uvm_env;
         // TX environments connection
         m_env_mvb_tx.analysis_port.connect(sc.analysis_imp_mvb_tx);
 
-        // Connections of the coverages
-        m_env_mvb_rx    .m_mvb_agent.analysis_port.connect(m_cover_mvb_rx    .analysis_export);
-        m_env_mvb_tx    .m_mvb_agent.analysis_port.connect(m_cover_mvb_tx    .analysis_export);
-
         // Passing the sequencers to the virtual sequencer
         vscr.m_reset = m_reset.m_sequencer;
         vscr.m_mvb_rx_sqr = m_env_mvb_rx.m_sequencer;
-        vscr.m_mvb_tx_sqr = m_env_mvb_tx.m_sequencer;
     endfunction
 endclass

@@ -6,7 +6,11 @@
 
 
 // This class represents high level transaction, which can be reusable for other components.
-class sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequence_item;
+class sequence_item #(
+    int unsigned USR_RX_PKT_SIZE_MAX,
+    int unsigned RX_CHANNELS,
+    int unsigned HDR_META_WIDTH
+) extends uvm_sequence_item;
     // Registration of object tools.
     `uvm_object_param_utils(uvm_meta::sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 

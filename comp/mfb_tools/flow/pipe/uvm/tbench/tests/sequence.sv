@@ -4,10 +4,10 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uvm_sequence;
+class virt_sequence#(ITEM_WIDTH, META_WIDTH) extends uvm_sequence;
 
-    `uvm_object_param_utils(test::virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
-    `uvm_declare_p_sequencer(uvm_mfb_pipe::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `uvm_object_param_utils(test::virt_sequence#(ITEM_WIDTH, META_WIDTH))
+    `uvm_declare_p_sequencer(uvm_mfb_pipe::virt_sequencer#(ITEM_WIDTH, META_WIDTH))
 
     function new (string name = "virt_sequence");
         super.new(name);

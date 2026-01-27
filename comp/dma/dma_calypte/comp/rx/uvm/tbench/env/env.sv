@@ -30,8 +30,7 @@ class env #(
     localparam INPUT_META_WIDTH       = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
     localparam PTR_UPD_REQ_MVB_ITEM_W = 2*POINTER_WIDTH + 1 + SW_ADDR_WIDTH;
 
-    sequencer #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
-                PCIE_RQ_META_WIDTH, CHANNELS)                                                     m_sequencer;
+    sequencer #(USR_MFB_ITEM_WIDTH, CHANNELS)                                                     m_sequencer;
     uvm_reset::agent                                                                              m_reset_agent;
     uvm_dma_ll_rx::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS,
                          PKT_SIZE_MAX)                                                            m_usr_mfb_env;
@@ -126,9 +125,7 @@ class env #(
         m_scoreboard = scoreboard #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX, PCIE_RQ_META_WIDTH, DEVICE,
                                     POINTER_WIDTH, SW_ADDR_WIDTH)::type_id::create("m_scoreboard", this);
 
-        m_sequencer = sequencer #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
-                                 PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS)::type_id
-                      ::create("m_sequencer", this);
+        m_sequencer = sequencer #(USR_MFB_ITEM_WIDTH, CHANNELS)::type_id::create("m_sequencer", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
@@ -137,8 +134,6 @@ class env #(
         m_usr_mfb_env.m_env_rx.analysis_port_meta.connect(m_scoreboard.m_usr_mfb_meta_exp);
         m_sequencer.m_reset_sqcr       = m_reset_agent.m_sequencer;
         m_sequencer.m_usr_mfb_sqcr     = m_usr_mfb_env.m_sequencer;
-        m_sequencer.m_ptr_upd_mfb_sqcr = m_ptr_upd_mfb_env.m_sequencer;
-        m_sequencer.m_pcie_rq_mfb_sqcr = m_pcie_rq_mfb_env.m_sequencer;
         m_sequencer.m_regmodel_sqcr    = m_regmodel.m_regmodel;
         m_scoreboard.regmodel_set(m_regmodel.m_regmodel);
         m_reset_agent.sync_connect(m_usr_mfb_env.reset_sync);

@@ -110,15 +110,13 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER
         if (META_OUT_MODE == 2) begin
             m_env_tx_mvb.analysis_port.connect(sc.out_meta);
         end else
-            m_env_tx.m_logic_vector_agent.analysis_port.connect(sc.out_meta);
+            m_env_tx.analysis_port_meta.connect(sc.out_meta);
 
         m_reset.sync_connect(m_env_rx.reset_sync);
         m_reset.sync_connect(m_env_rx_mvb.reset_sync);
         m_reset.sync_connect(m_env_tx.reset_sync);
 
         vscr.m_reset          = m_reset.m_sequencer;
-        vscr.m_mfb            = m_env_tx.m_sequencer;
-        vscr.m_mvb_tx         = m_env_tx_mvb.m_sequencer;
         vscr.m_byte_array_scr = m_byte_array_agent.m_sequencer;
         vscr.m_info           = m_info_agent.m_sequencer;
         vscr.m_size           = m_size_agent.m_sequencer;

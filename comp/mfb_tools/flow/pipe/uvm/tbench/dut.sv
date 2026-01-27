@@ -56,4 +56,8 @@ module DUT(
         .TX_DST_RDY     (mfb_rd.DST_RDY)
     );
 
+    if (USE_DST_RDY == 0) begin
+        assign mfb_rd.DST_RDY = 1;
+    end
+
 endmodule

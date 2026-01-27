@@ -24,11 +24,6 @@ class env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_env;
     // Virtual sequencer
     uvm_mvb_merge_streams_ordered::virt_sequencer #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) m_virt_sqcr;
 
-    // Coverages
-    uvm_mvb::coverage #(MVB_ITEMS, MVB_ITEM_WIDTH)                 m_rx_mvb_cover;
-    uvm_mvb::coverage #(MVB_ITEMS*RX_STREAMS, $clog2(RX_STREAMS))  m_rx_sel_mvb_cover;
-    uvm_mvb::coverage #(MVB_ITEMS*RX_STREAMS, MVB_ITEM_WIDTH)      m_tx_mvb_cover;
-
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -50,6 +45,7 @@ class env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_env;
             m_rx_mvb_config[port]                 = new;
             m_rx_mvb_config[port].active          = UVM_ACTIVE;
             m_rx_mvb_config[port].interface_name  = $sformatf("rx_mvb_vif_%0d", port);
+            m_rx_mvb_config[port].coverage        = 1;
             uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_rx_mvb_env_%0d", port), "m_config", m_rx_mvb_config[port]);
             // Creation of the RX_MVB environment
             m_rx_mvb_env[port]      = uvm_logic_vector_mvb::env_rx #(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::create($sformatf("m_rx_mvb_env_%0d", port), this);
@@ -59,6 +55,7 @@ class env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_env;
         m_rx_sel_mvb_config                 = new;
         m_rx_sel_mvb_config.active          = UVM_ACTIVE;
         m_rx_sel_mvb_config.interface_name  = "rx_sel_mvb_vif";
+        m_rx_sel_mvb_config.coverage        = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_rx_sel_mvb_env", "m_config", m_rx_sel_mvb_config);
         // Creation of the RX SEL MVB environment
         m_rx_sel_mvb_env  = uvm_logic_vector_mvb::env_rx #(MVB_ITEMS*RX_STREAMS, $clog2(RX_STREAMS))::type_id::create("m_rx_sel_mvb_env", this);
@@ -67,14 +64,10 @@ class env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_env;
         m_tx_mvb_config                     = new;
         m_tx_mvb_config.active              = UVM_ACTIVE;
         m_tx_mvb_config.interface_name      = "tx_mvb_vif";
+        m_tx_mvb_config.coverage            = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_tx_mvb_env", "m_config", m_tx_mvb_config);
         // Creation of TX MVB environment
         m_tx_mvb_env      = uvm_logic_vector_mvb::env_tx #(MVB_ITEMS*RX_STREAMS,MVB_ITEM_WIDTH)::type_id::create("m_tx_mvb_env", this);
-
-        // Creation of the coverages
-        m_rx_mvb_cover     = new("m_rx_mvb_cover");
-        m_rx_sel_mvb_cover = new("m_rx_sel_mvb_cover");
-        m_tx_mvb_cover     = new("m_tx_mvb_cover");
 
         // Creation of the scoreboard
         m_scbrd = scoreboard #(MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_scbrd", this);
@@ -101,19 +94,11 @@ class env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_env;
         // TX environment connection
         m_tx_mvb_env.analysis_port.connect(m_scbrd.tx_mvb_analysis_exp);
 
-        // Connections of the coverages
-        for (int port = 0; port < RX_STREAMS; port++) begin
-            m_rx_mvb_env[port].m_mvb_agent.analysis_port.connect(m_rx_mvb_cover    .analysis_export);
-        end
-        m_rx_sel_mvb_env      .m_mvb_agent.analysis_port.connect(m_rx_sel_mvb_cover.analysis_export);
-        m_tx_mvb_env          .m_mvb_agent.analysis_port.connect(m_tx_mvb_cover    .analysis_export);
-
         // Passing the sequencers to the virtual sequencer
         m_virt_sqcr.m_reset_sqcr            = m_reset_agent     .m_sequencer;
         for (int port = 0; port < RX_STREAMS; port++) begin
             m_virt_sqcr.m_rx_mvb_sqcr[port] = m_rx_mvb_env[port].m_sequencer;
         end
         m_virt_sqcr.m_rx_sel_mvb_sqcr       = m_rx_sel_mvb_env  .m_sequencer;
-        m_virt_sqcr.m_tx_mvb_sqcr           = m_tx_mvb_env      .m_sequencer;
     endfunction
 endclass

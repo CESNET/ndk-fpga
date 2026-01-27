@@ -8,6 +8,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
+class config_sequence extends uvm_object;
+
+    function new (string name = "");
+        super.new(name);
+    endfunction
+endclass
+
 class config_item extends uvm_object;
 
     // ------------------------------------------------------------------------

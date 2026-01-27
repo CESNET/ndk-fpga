@@ -47,14 +47,6 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
 
     endfunction
 
-    virtual task mfb_rdy_seq();
-        //RUN TX Sequencer
-        forever begin
-            m_mfb_rdy_seq.randomize();
-            m_mfb_rdy_seq.start(p_sequencer.m_mfb_rdy_sqr);
-        end
-    endtask
-
     virtual task run_reset();
         m_reset.randomize();
         m_reset.start(p_sequencer.m_reset_sqr);
@@ -69,9 +61,6 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
         #(100ns);
 
         //RUN MFB and MVB TX SEQUENCE
-        fork
-            mfb_rdy_seq();
-        join_none
 
         fork
             m_mfb_data_sq_lib.start(p_sequencer.m_mfb_data_sqr);

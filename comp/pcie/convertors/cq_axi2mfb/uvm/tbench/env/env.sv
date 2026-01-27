@@ -75,18 +75,4 @@ class env #(
         m_sequencer.m_reset = m_reset.m_sequencer;
         m_sequencer.m_cq    = axi_cq.m_sequencer;
     endfunction
-
-    task run_phase(uvm_phase phase);
-        uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) m_mfb_seq;
-
-        m_mfb_seq = uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("m_mfb_seq", this);
-        m_mfb_seq.init_sequence();
-        m_mfb_seq.min_random_count = 50;
-        m_mfb_seq.max_random_count = 100;
-
-        forever begin
-            assert(m_mfb_seq.randomize());
-            m_mfb_seq.start(mfb_cq_env.m_sequencer);
-        end
-    endtask
 endclass

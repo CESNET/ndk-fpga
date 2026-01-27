@@ -39,13 +39,6 @@ class virt_sequence #(DATA_WIDTH, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) 
         m_reset.start(p_sequencer.m_reset);
     endtask
 
-    virtual task run_mvb_tx_seq();
-        forever begin
-            m_mvb_tx_seq.randomize();
-            m_mvb_tx_seq.start(p_sequencer.m_mvb_tx_sqr);
-        end
-    endtask
-
     virtual task run_mvb_rx_seq();
         m_mvb_rx_seq.randomize();
         m_mvb_rx_seq.start(p_sequencer.m_mvb_rx_sqr);
@@ -57,11 +50,6 @@ class virt_sequence #(DATA_WIDTH, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) 
         join_none
 
         #(100ns);
-
-        fork
-            // Run TX Sequencer
-            run_mvb_tx_seq();
-        join_none
 
         // Run RX Sequencer
         run_mvb_rx_seq();

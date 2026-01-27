@@ -11,7 +11,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
     uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) m_env_rx;
     uvm_logic_vector_mvb::env_tx       #(MFB_REGIONS, MVB_DATA_WIDTH+1+MFB_META_WIDTH)                             m_env_tx_mvb;
 
-    uvm_checksum_calculator::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) vscr;
+    uvm_checksum_calculator::virt_sequencer #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) vscr;
 
     driver#(MFB_ITEM_WIDTH, META_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_driver;
 
@@ -63,7 +63,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
 
         sc       = scoreboard#(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH)::type_id::create("sc", this);
         m_driver = driver #(MFB_ITEM_WIDTH, META_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_driver", this);
-        vscr     = uvm_checksum_calculator::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("vscr",this);
+        vscr     = uvm_checksum_calculator::virt_sequencer#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("vscr",this);
 
     endfunction
 

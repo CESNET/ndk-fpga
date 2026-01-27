@@ -22,7 +22,10 @@ class test_base #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsig
 
     task run_phase(uvm_phase phase);
         time end_time;
-        virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) m_virtual_sequence = virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_virtual_sequence", this);
+        virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) m_virtual_sequence;
+
+
+        m_virtual_sequence = virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_virtual_sequence", this);
 
         // Raise objection
         phase.raise_objection(this);

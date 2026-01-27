@@ -215,8 +215,6 @@ class env #(
             m_sequencer.port[it].eth_rst     = m_eth_rst[it].m_sequencer;
             m_sequencer.port[it].usr_rx_data = m_usr_rx[it].m_sequencer.m_data;
             m_sequencer.port[it].usr_rx_meta = m_usr_rx[it].m_sequencer.m_meta;
-            m_sequencer.port[it].usr_tx_data = m_usr_tx_data[it].m_sequencer;
-            m_sequencer.port[it].usr_tx_hdr  = m_usr_tx_hdr[it].m_sequencer;
         end
         m_sequencer.tsu = m_tsu.m_sequencer;
 

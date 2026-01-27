@@ -8,8 +8,8 @@
 // TX side //
 // ======= //
 
-class sequencer_tx extends uvm_sequencer;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::sequencer_tx);
+class sequencer_rx extends uvm_sequencer;
+    `uvm_component_utils(uvm_logic_vector_array_lbus::sequencer_rx);
 
     // A lower limit of the request queue to start accepting new items from high-level sequences
     localparam int unsigned REQUEST_QUEUE_SATURATION_THRESHOLD = 10;
@@ -25,7 +25,7 @@ class sequencer_tx extends uvm_sequencer;
     uvm_lbus::sequence_item request_queue[$];
 
     // Constructor
-    function new(string name = "sequencer_tx", uvm_component parent = null);
+    function new(string name = "sequencer_rx", uvm_component parent = null);
         super.new(name, parent);
         reset_sync = new();
     endfunction

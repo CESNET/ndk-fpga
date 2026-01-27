@@ -50,6 +50,7 @@ class config_item extends uvm_object;
     // configuration variables
     uvm_active_passive_enum active;
     string interface_name;
+    logic coverage;
     // Type of sequence library
     // Valid is only MFB or PCIE
     string seq_type      = "MFB";
@@ -65,5 +66,6 @@ class config_item extends uvm_object;
     // functions
     function new (string name = "");
         super.new(name);
+        coverage = 0;
     endfunction
 endclass

@@ -42,13 +42,9 @@ class virt_seq#(
         test::virt_seq#(
             SECTION_LENGTH, INTERVAL_LENGTH, INTERVAL_COUNT, SHAPING_TYPE, OUTPUT_SPEED,
             MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
-    `uvm_declare_p_sequencer(
-        uvm_rate_limiter::virt_sequencer#(
-            MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
+    `uvm_declare_p_sequencer(uvm_rate_limiter::virt_sequencer#(MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
     uvm_reset::sequence_start                                                         m_reset;
-    uvm_mfb::sequence_full_speed_tx#(
-        MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_mfb_tx_seq;
     uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)                             m_mfb_rx_data_seq;
     uvm_logic_vector::sequence_endless#(MFB_META_WIDTH)                               m_mfb_rx_meta_seq;
     uvm_rate_limiter::regmodel#(INTERVAL_COUNT)                                       m_regmodel;
@@ -69,9 +65,6 @@ class virt_seq#(
 
     function void init();
         m_reset           = uvm_reset::sequence_start::type_id::create("m_reset");
-        m_mfb_tx_seq      = uvm_mfb::sequence_full_speed_tx#(
-                                MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH
-                            )::type_id::create("m_mfb_tx_seq");
         m_mfb_rx_data_seq = uvm_logic_vector_array::sequence_lib#(
                                 MFB_ITEM_WIDTH
                             )::type_id::create("m_mfb_rx_data_seq");
@@ -106,13 +99,6 @@ class virt_seq#(
         m_regmodel.status.write(status, 'h04);
     endtask
 
-    task run_mfb_tx();
-        forever begin
-            void'(m_mfb_tx_seq.randomize());
-            m_mfb_tx_seq.start(p_sequencer.m_mfb_tx);
-        end
-    endtask
-
     task run_mfb_rx_data();
         forever begin
             void'(m_mfb_rx_data_seq.randomize());
@@ -145,7 +131,6 @@ class virt_seq#(
         join_none
 
         fork
-            run_mfb_tx();
             run_mfb_rx_data();
             run_mfb_rx_meta();
         join_any

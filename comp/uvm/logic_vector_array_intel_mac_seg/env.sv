@@ -23,17 +23,12 @@ class env_rx #(int unsigned SEGMENTS) extends uvm_env;
     uvm_reset::sync_cbs                                reset_sync;
 
     // high level agent
-    uvm_logic_vector_array::agent#(ITEM_WIDTH)       m_byte_array_agent;
-    uvm_logic_vector_array::config_item m_byte_array_cfg;
-
-    uvm_logic_vector::agent #(LOGIC_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::config_item         m_logic_vector_cfg;
+    protected uvm_logic_vector_array::agent#(ITEM_WIDTH)       m_byte_array_agent;
+    protected uvm_logic_vector::agent #(LOGIC_WIDTH) m_logic_vector_agent;
 
     // low level aget
-    uvm_intel_mac_seg::agent_rx #(SEGMENTS) m_intel_mac_seg_agent;
-    uvm_intel_mac_seg::config_item          m_intel_mac_seg_cfg;
-
-    config_item m_config;
+    protected uvm_intel_mac_seg::agent_rx #(SEGMENTS) m_intel_mac_seg_agent;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -41,6 +36,10 @@ class env_rx #(int unsigned SEGMENTS) extends uvm_env;
     endfunction
 
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item m_byte_array_cfg;
+        uvm_logic_vector::config_item       m_logic_vector_cfg;
+        uvm_intel_mac_seg::config_item      m_intel_mac_seg_cfg;
+
         if(!uvm_config_db #(config_item)::get(this, "", "m_config", m_config)) begin
             `uvm_fatal(this.get_full_name(), "Unable to get configuration object")
         end
@@ -124,23 +123,17 @@ class env_tx #(int unsigned SEGMENTS) extends uvm_env;
 
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))                 analysis_port_packet;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(LOGIC_WIDTH)) analysis_port_error;
-
-    uvm_intel_mac_seg::sequencer#(SEGMENTS)            m_sequencer;
+    uvm_reset::sync_cbs reset_sync;
 
     //high level agents
-    uvm_logic_vector_array::agent#(ITEM_WIDTH)       m_byte_array_agent;
-    uvm_logic_vector_array::config_item              m_byte_array_cfg;
-
-    uvm_logic_vector::agent#(LOGIC_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::config_item         m_logic_vector_cfg;
+    protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_byte_array_agent;
+    protected uvm_logic_vector::agent#(LOGIC_WIDTH)      m_logic_vector_agent;
     //RESET
-    uvm_reset::sync_cbs                                reset_sync;
 
     // Definition of agents, LII agents are used on both sides.
-    uvm_intel_mac_seg::agent_tx #(SEGMENTS) m_intel_mac_seg_agent;
-    uvm_intel_mac_seg::config_item          m_intel_mac_seg_cfg;
+    protected uvm_intel_mac_seg::agent_tx #(SEGMENTS) m_intel_mac_seg_agent;
 
-    config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -148,6 +141,10 @@ class env_tx #(int unsigned SEGMENTS) extends uvm_env;
     endfunction
 
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item   m_byte_array_cfg;
+        uvm_logic_vector::config_item         m_logic_vector_cfg;
+        uvm_intel_mac_seg::config_item        m_intel_mac_seg_cfg;
+
         if(!uvm_config_db #(config_item)::get(this, "", "m_config", m_config)) begin
             `uvm_fatal(this.get_full_name(), "Unable to get configuration object")
         end
@@ -194,7 +191,25 @@ class env_tx #(int unsigned SEGMENTS) extends uvm_env;
         analysis_port_error  = m_logic_vector_agent.analysis_port;
         if (m_config.active == UVM_ACTIVE) begin
             reset_sync.push_back(m_intel_mac_seg_agent.m_sequencer.reset_sync);
-            m_sequencer = m_intel_mac_seg_agent.m_sequencer;
         end
     endfunction
+
+    task run_phase(uvm_phase phase);
+        uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS) mac_seq;
+
+        if (m_config.active == UVM_ACTIVE) begin
+            mac_seq = uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS)::type_id::create("mac_seq", this);
+            mac_seq.init_sequence();
+            mac_seq.min_random_count =  100;
+            mac_seq.max_random_count = 2000;
+
+            forever begin
+                assert(mac_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                mac_seq.start(m_intel_mac_seg_agent.m_sequencer);
+            end
+        end
+    endtask
+
 endclass

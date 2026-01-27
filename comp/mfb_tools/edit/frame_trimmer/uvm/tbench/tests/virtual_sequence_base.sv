@@ -5,12 +5,11 @@
 
 class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_sequence;
     `uvm_object_param_utils(test::virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
-    `uvm_declare_p_sequencer(uvm_mfb_frame_trimmer::virtual_sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
+    `uvm_declare_p_sequencer(uvm_mfb_frame_trimmer::virtual_sequencer #(ITEM_WIDTH, META_WIDTH, PKT_MTU))
 
     uvm_reset::sequence_start                                                            m_reset;
     uvm_logic_vector_array::sequence_lib #(ITEM_WIDTH)                                   m_rx_mfb_data;
     trim_sequence_library    #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)              m_rx_mfb_meta;
-    uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_tx_mfb;
 
     function new(string name = "virtual_sequence_base");
         super.new(name);
@@ -48,17 +47,6 @@ class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, in
         m_rx_mfb_meta.init_sequence();
         m_rx_mfb_meta.min_random_count = 15;
         m_rx_mfb_meta.max_random_count = 25;
-
-        // --------------- //
-        // TX MFB sequence //
-        // --------------- //
-
-        // Create the TX MFB sequence
-        m_tx_mfb = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_tx_mfb");
-        // Configure the TX MFB sequence
-        m_tx_mfb.init_sequence();
-        m_tx_mfb.min_random_count = 150;
-        m_tx_mfb.max_random_count = 200;
     endfunction
 
     task body();
@@ -73,14 +61,6 @@ class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, in
         join_none
 
         #(100ns);
-
-        // Run the TX MFB sequence
-        fork
-            forever begin
-                assert(m_tx_mfb.randomize());
-                m_tx_mfb.start(p_sequencer.m_tx_mfb);
-            end
-        join_none
 
         // Run the RX MFB meta sequence
         fork

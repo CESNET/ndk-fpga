@@ -66,9 +66,6 @@ class env #(
         ADDR_WIDTH
     ) m_scoreboard;
 
-    uvm_mvb::coverage #(1, REQ_WIDTH)  m_cover_req;
-    uvm_mvb::coverage #(1, RESP_WIDTH) m_cover_resp;
-
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -76,10 +73,6 @@ class env #(
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
-
-        m_cover_req                 = new("m_cover_req");
-        m_cover_resp                = new("m_cover_resp");
-
         cfg_req                     = new;
         cfg_resp                    = new;
 
@@ -96,7 +89,10 @@ class env #(
         uvm_config_db #(uvm_reset::config_item)::set(this, "m_reset", "m_config", m_config_reset);
         m_reset = uvm_reset::agent::type_id::create("m_reset", this);
 
+        cfg_req.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "req_env",    "m_config", cfg_req);
+
+        cfg_resp.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "resp_env",   "m_config", cfg_resp);
 
         req_env    = uvm_logic_vector_mvb::env_rx #(1, REQ_WIDTH) ::type_id::create("req_env",  this);
@@ -132,10 +128,7 @@ class env #(
     function void connect_phase(uvm_phase phase);
 
         req_env.analysis_port.connect(m_scoreboard.in_data);
-        resp_env.m_logic_vector_agent.analysis_port.connect(m_scoreboard.out_data);
-
-        req_env.m_mvb_agent.analysis_port.connect(m_cover_req.analysis_export);
-        resp_env.m_mvb_agent.analysis_port.connect(m_cover_resp.analysis_export);
+        resp_env.analysis_port.connect(m_scoreboard.out_data);
 
         m_reset.sync_connect(req_env.reset_sync);
         m_reset.sync_connect(resp_env.reset_sync);

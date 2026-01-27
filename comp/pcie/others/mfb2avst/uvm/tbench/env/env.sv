@@ -15,7 +15,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
     uvm_logic_vector_array_avst::env_tx #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY) avst_env;
     uvm_logic_vector_array_avst::config_item                                                                                       avst_cfg;
 
-    uvm_pcie_mfb2avst::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) vscr;
+    uvm_pcie_mfb2avst::virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH) vscr;
     uvm_reset::agent                                                                                             m_reset;
     uvm_reset::config_item                                                                                       m_config_reset;
 
@@ -60,7 +60,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
         mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rx_env", this);
 
         m_scoreboard = scoreboard #(MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("m_scoreboard", this);
-        vscr         = uvm_pcie_mfb2avst::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);
+        vscr         = uvm_pcie_mfb2avst::virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
@@ -77,7 +77,6 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
         vscr.m_reset                  = m_reset.m_sequencer;
         vscr.m_logic_vector_array_scr = mfb_rx_env.m_sequencer.m_data;
         vscr.m_logic_vector_scr       = mfb_rx_env.m_sequencer.m_meta;
-        vscr.m_pcie                   = avst_env.m_sequencer;
 
     endfunction
 endclass

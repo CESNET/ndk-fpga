@@ -12,7 +12,6 @@ class virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
     uvm_logic_vector_array::sequencer #(MFB_ITEM_WIDTH)                                                                 m_mfb_data_sqr;
     uvm_logic_vector::sequencer #(MFB_META_WIDTH)                                                                       m_mfb_meta_sqr;
     uvm_logic_vector::sequencer #(MVB_ITEM_WIDTH)                                                                       m_mvb_data_sqr;
-    uvm_mfb::sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, (MFB_META_WIDTH+MVB_ITEM_WIDTH)) m_mfb_rdy_sqr;
 
     function new(string name = "virt_sequencer", uvm_component parent);
         super.new(name, parent);

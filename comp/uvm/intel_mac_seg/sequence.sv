@@ -65,7 +65,7 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends uvm_sequence #(sequenc
 endclass
 
 
-class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_sequence #(sequence_item #(SEGMENTS));
+class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_base #(config_sequence, sequence_item #(SEGMENTS));
     `uvm_object_param_utils(uvm_intel_mac_seg::sequence_simple_tx #(SEGMENTS))
 
     // ------------------------------------------------------------------------
@@ -113,4 +113,26 @@ class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_sequence #(sequenc
         end
     endtask
 endclass
+
+
+/////////////////////////////////////////////////////////////////////////
+// SEQUENCE LIBRARY RX
+class sequence_lib_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_library#(config_sequence, sequence_item #(SEGMENTS));
+  `uvm_object_param_utils(uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS))
+  `uvm_sequence_library_utils(uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS))
+
+  function new(string name = "sequence_lib_tx");
+    super.new(name);
+    init_sequence_library();
+  endfunction
+
+    // subclass can redefine and change run sequences
+    // can be useful in specific tests
+    virtual function void init_sequence(config_sequence param_cfg = null);
+        uvm_common::sequence_library::init_sequence(param_cfg);
+        this.add_sequence(uvm_intel_mac_seg::sequence_simple_tx#(SEGMENTS)::get_type());
+    endfunction
+endclass
+
+
 

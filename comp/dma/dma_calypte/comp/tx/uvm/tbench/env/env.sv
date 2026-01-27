@@ -53,10 +53,8 @@ class env #(
     localparam UPD_STOP_REQ_MVB_ITEM_W = (DATA_POINTER_WIDTH-3) + DATA_POINTER_WIDTH + 1 + 64;
     localparam RT_UPD_MVB_ITEM_W       = (DATA_POINTER_WIDTH-3) + DATA_POINTER_WIDTH + $clog2(CHANNELS);
 
-    sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, CHANNELS, HDR_META_WIDTH,
-                PKT_SIZE_MAX, DATA_POINTER_WIDTH, PCIE_CQ_MFB_REGIONS, PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE,
-                PCIE_CQ_MFB_ITEM_WIDTH)                                                        m_sequencer;
-    uvm_reset::agent                                                                           m_reset_agent;
+    sequencer #(CHANNELS, DATA_POINTER_WIDTH)        m_sequencer;
+    uvm_reset::agent                                 m_reset_agent;
 
     // ----------------------------------------------------------
     // TX DMA interfaces
@@ -79,15 +77,12 @@ class env #(
 
     uvm_mi::regmodel #(uvm_tx_dma_calypte_regs::regmodel_top #(CHANNELS, DATA_POINTER_WIDTH), MI_WIDTH,
                        MI_WIDTH)                                                               m_regmodel_top;
-    coverage #(PCIE_CQ_MFB_REGIONS, PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH,
-               sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)                                          m_coverage;
     scoreboard #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, USR_MFB_META_WIDTH,
                  DEVICE, UPD_THRESHOLD)                                                        m_scoreboard;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
-        m_coverage = new("m_coverage");
     endfunction
 
     // Create base components of environment.
@@ -111,6 +106,7 @@ class env #(
         m_cq_mfb_env_cfg                = new;
         m_cq_mfb_env_cfg.active         = UVM_ACTIVE;
         m_cq_mfb_env_cfg.interface_name = "cq_mfb_vif";
+        m_cq_mfb_env_cfg.coverage       = 1;
         uvm_config_db #(uvm_tx_dma_calypte_cq::config_item)::set(this, "m_cq_mfb_env", "m_config", m_cq_mfb_env_cfg);
         m_cq_mfb_env = uvm_tx_dma_calypte_cq::env #(DEVICE, PCIE_CQ_MFB_REGIONS, PCIE_CQ_MFB_REGION_SIZE,
                                                     PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS,
@@ -128,10 +124,7 @@ class env #(
         m_scoreboard  = scoreboard #(USR_MFB_ITEM_WIDTH, PCIE_CQ_MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH,
                                      USR_MFB_META_WIDTH, DEVICE, UPD_THRESHOLD)::type_id::create("m_scoreboard", this);
 
-        m_sequencer = sequencer #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
-                                  CHANNELS, HDR_META_WIDTH, PKT_SIZE_MAX, DATA_POINTER_WIDTH, PCIE_CQ_MFB_REGIONS,
-                                  PCIE_CQ_MFB_REGION_SIZE, PCIE_CQ_MFB_BLOCK_SIZE, PCIE_CQ_MFB_ITEM_WIDTH )::type_id
-                      ::create("m_sequencer", this);
+        m_sequencer = sequencer #(CHANNELS, DATA_POINTER_WIDTH)::type_id::create("m_sequencer", this);
 
         m_tx_mfb_env_cfg                = new;
         m_tx_mfb_env_cfg.active         = UVM_ACTIVE;
@@ -193,8 +186,6 @@ class env #(
         for (int unsigned chan = 0; chan < CHANNELS; chan++) begin
             m_sequencer.m_packet_sqcr[chan]   = m_cq_mfb_env.m_sequencer[chan];
         end
-        m_sequencer.m_usr_mfb_sqcr            = m_tx_mfb_env.m_sequencer;
-        m_sequencer.m_ptr_upd_mfb_sqcr        = m_ptr_upd_mfb_env.m_sequencer;
 
         m_cq_mfb_env.m_rx_mfb_env.analysis_port_data.connect(m_scoreboard.m_pcie_cq_data_exp);
         m_cq_mfb_env.m_rx_mfb_env.analysis_port_meta.connect(m_scoreboard.m_pcie_cq_meta_exp);
@@ -211,7 +202,6 @@ class env #(
         m_scoreboard.regmodel_set(m_regmodel_top.m_regmodel);
         m_cq_mfb_env.regmodel_set(m_regmodel_top.m_regmodel);
 
-        m_cq_mfb_env.m_rx_mfb_env.m_mfb_agent.analysis_port.connect(m_coverage.analysis_export);
         m_reset_agent.sync_connect(m_cq_mfb_env.m_reset_sync);
     endfunction
 endclass

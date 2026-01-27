@@ -21,9 +21,6 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
 
     scoreboard #(ITEM_WIDTH) m_scoreboard;
 
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH+1) m_cover_rx;
-    uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover_tx;
-
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -31,9 +28,6 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
-
-        m_cover_rx = new("m_cover_rx");
-        m_cover_tx = new("m_cover_tx");
         cfg_tx = new;
         cfg_rx = new;
 
@@ -53,7 +47,9 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
         uvm_config_db #(uvm_reset::config_item)::set(this, "m_reset", "m_config", m_config_reset);
         m_reset = uvm_reset::agent::type_id::create("m_reset", this);
 
+        cfg_tx.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "tx_env", "m_config", cfg_tx);
+        cfg_rx.coverage = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "rx_env", "m_config", cfg_rx);
 
         tx_env    = uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH)::type_id::create("tx_env", this);
@@ -71,9 +67,6 @@ class env #(ITEMS, ITEM_WIDTH) extends uvm_env;
 
         m_reset.sync_connect(rx_env.reset_sync);
         m_reset.sync_connect(tx_env.reset_sync);
-
-        rx_env.m_mvb_agent.analysis_port.connect(m_cover_rx.analysis_export);
-        tx_env.m_mvb_agent.analysis_port.connect(m_cover_tx.analysis_export);
 
         vscr.m_reset            = m_reset.m_sequencer;
         vscr.m_logic_vector_scr = rx_env.m_sequencer;

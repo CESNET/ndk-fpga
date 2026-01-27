@@ -8,7 +8,6 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     uvm_mvb_merge_streams_ordered::env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)             m_env;
-    uvm_mvb                      ::sequence_lib_tx #(MVB_ITEMS*RX_STREAMS, MVB_ITEM_WIDTH)  tx_mvb_seq_lib;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -43,28 +42,7 @@ class ex_test extends uvm_test;
         phase.drop_objection(this, "End of rx sequence");
     endtask
 
-    task run_seq_port_tx(uvm_phase phase);
-        forever begin
-            tx_mvb_seq_lib.randomize();
-            tx_mvb_seq_lib.start(m_env.m_tx_mvb_env.m_sequencer);
-        end
-    endtask
-
-    task run_seq_tx(uvm_phase phase);
-        fork
-            run_seq_port_tx(phase);
-        join_none;
-    endtask
-
     virtual task run_phase(uvm_phase phase);
-
-        tx_mvb_seq_lib = uvm_mvb::sequence_lib_tx #(MVB_ITEMS*RX_STREAMS, MVB_ITEM_WIDTH)::type_id::create("tx_mvb_seq_lib");
-        tx_mvb_seq_lib.init_sequence();
-        tx_mvb_seq_lib.cfg.probability_set(60, 100);
-        tx_mvb_seq_lib.min_random_count = 200;
-        tx_mvb_seq_lib.max_random_count = 500;
-
-        run_seq_tx(phase);
         run_seq_rx(phase);
     endtask
 

@@ -9,8 +9,10 @@ class config_item extends uvm_object;
 
     uvm_active_passive_enum active;
     string interface_name;
+    logic coverage;
 
     function new (string name = "");
         super.new(name);
+        coverage = 0;
     endfunction
 endclass

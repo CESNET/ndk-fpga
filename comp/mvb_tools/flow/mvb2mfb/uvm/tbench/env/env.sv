@@ -12,7 +12,7 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
     uvm_logic_vector_mvb::env_rx       #(MVB_ITEMS, MVB_ITEM_WIDTH)                                                                     m_env_rx_mvb;
 
 
-    uvm_mvb2mfb::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH) vscr;
+    uvm_mvb2mfb::virt_sequencer #(MVB_ITEM_WIDTH) vscr;
 
     uvm_reset::agent                               m_reset;
     uvm_logic_vector_array::agent#(MFB_ITEM_WIDTH) m_logic_vector_array_agent;
@@ -64,7 +64,7 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
         m_env_rx_mvb = uvm_logic_vector_mvb::env_rx#(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::create("m_env_rx_mvb", this);
 
         sc   = scoreboard#(MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("sc", this);
-        vscr = uvm_mvb2mfb::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH)::type_id::create("vscr",this);
+        vscr = uvm_mvb2mfb::virt_sequencer#(MVB_ITEM_WIDTH)::type_id::create("vscr",this);
 
     endfunction
 
@@ -79,9 +79,7 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
         m_reset.sync_connect(m_env_rx_mvb.reset_sync);
 
         vscr.m_reset_sqr    = m_reset.m_sequencer;
-        vscr.m_mfb_rdy_sqr  = m_env_tx.m_sequencer;
         vscr.m_mvb_data_sqr = m_env_rx_mvb.m_sequencer;
-
     endfunction
 
 endclass

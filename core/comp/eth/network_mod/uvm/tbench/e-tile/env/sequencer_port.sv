@@ -9,7 +9,6 @@ class sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, 
 
     uvm_logic_vector_array::sequencer#(ITEM_WIDTH)  eth_rx_data;
     uvm_logic_vector::sequencer#(6)                 eth_rx_meta;
-    uvm_avst::sequencer #(ETH_PORT_CHAN, REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 1) eth_tx;
 
     function new(string name = "sequencer_port", uvm_component parent = null);
         super.new(name, parent);

@@ -28,7 +28,7 @@ endclass
 
 class sequence_simple_1#(SEGMENTS) extends uvm_sequence;
     `uvm_object_param_utils(uvm_mac_seg_tx::sequence_simple_1#(SEGMENTS))
-    `uvm_declare_p_sequencer(uvm_mac_seg_tx::sequencer#(SEGMENTS));
+    `uvm_declare_p_sequencer(uvm_mac_seg_tx::sequencer);
 
     localparam ITEM_WIDTH = 8;
 
@@ -36,7 +36,6 @@ class sequence_simple_1#(SEGMENTS) extends uvm_sequence;
 	uvm_sequence#(uvm_reset::sequence_item)          reset_seq;
     uvm_sequence #(uvm_logic_vector::sequence_item #(1)) rx_seq_meta;
     uvm_sequence #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_seq_data;
-    uvm_intel_mac_seg::sequence_simple_tx#(SEGMENTS) tx_seq;
 
     //////////////////////////////////
     // functions
@@ -55,18 +54,10 @@ class sequence_simple_1#(SEGMENTS) extends uvm_sequence;
         rx_seq_data_lib.cfg = new();
 
         reset_seq   = uvm_reset::sequence_start::type_id::create("reset_simple");
-        tx_seq      = uvm_intel_mac_seg::sequence_simple_tx#(SEGMENTS)::type_id::create("intel_mac_tx_seq");
 
         rx_seq_data = rx_seq_data_lib;
         //rx_seq_data = uvm_logic_vector_array::sequence_simple#(ITEM_WIDTH)::type_id::create("seq_data");
     endfunction
-
-	task intel_mac_seg_tx();
-        forever begin
-	        tx_seq.randomize();
-            tx_seq.start(p_sequencer.tx_sequencer);
-        end
-	endtask
 
 	task meta_rx();
         forever begin
@@ -87,7 +78,6 @@ class sequence_simple_1#(SEGMENTS) extends uvm_sequence;
     task body;
 		fork
 			reset();
-			intel_mac_seg_tx();
 			meta_rx();
 		join_none
 

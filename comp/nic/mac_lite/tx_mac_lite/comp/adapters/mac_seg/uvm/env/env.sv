@@ -12,7 +12,7 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
    `uvm_component_param_utils(uvm_mac_seg_tx::env#(SEGMENTS, REGIONS, REGION_SIZE))
 
     //sequnecer
-    sequencer#(SEGMENTS) m_sequencer;
+    sequencer m_sequencer;
 
     uvm_reset::agent                                m_reset;
     uvm_logic_vector_array_mfb::env_rx#(REGIONS, REGION_SIZE, 8, 8, 1) m_env_rx;
@@ -55,7 +55,7 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
 
         sc       = scoreboard::type_id::create("sc", this);
 
-		m_sequencer = sequencer#(SEGMENTS)::type_id::create("m_sequencer", this);
+		m_sequencer = sequencer::type_id::create("m_sequencer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -65,7 +65,6 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
         m_env_rx.analysis_port_data.connect(sc.analysis_export_rx_packet);
         m_env_rx.analysis_port_meta.connect(sc.analysis_export_rx_error);
 
-        m_sequencer.tx_sequencer    = m_env_tx.m_sequencer;
         m_sequencer.rx_sequencer    = m_env_rx.m_sequencer;
         m_sequencer.reset_sequencer = m_reset.m_sequencer;
 

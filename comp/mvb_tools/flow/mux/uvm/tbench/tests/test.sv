@@ -59,8 +59,8 @@ class ex_test extends uvm_test;
 
     task run_seq_port_tx(uvm_phase phase);
         forever begin
-            h_seq_tx.randomize();
-            h_seq_tx.start(m_env.tx_env.m_mvb_agent.m_sequencer);
+            assert(h_seq_tx.randomize());
+            h_seq_tx.start(m_env.tx_env.m_sequencer);
         end
     endtask
 

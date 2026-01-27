@@ -10,7 +10,6 @@ class virt_sequencer #(DATA_WIDTH) extends uvm_sequencer;
     uvm_reset::sequencer m_reset;
 
     uvm_logic_vector::sequencer #(DATA_WIDTH)    m_mvb_rx_sqr;
-    uvm_mvb::sequencer          #(1, DATA_WIDTH) m_mvb_tx_sqr;
 
     function new(string name = "virt_sequencer", uvm_component parent);
         super.new(name, parent);

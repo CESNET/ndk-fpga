@@ -136,37 +136,16 @@ class env#(
     task run_phase(uvm_phase phase);
         sequence_void#(uvm_logic_vector_array::sequence_item#(32) ) mfb_data_seq;
         sequence_void#(uvm_logic_vector::sequence_item#(DMA_UPHDR_WIDTH)) mvb_seq;
-        // GENERATE RDY
-        uvm_mfb::sequence_lib_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, RC_MFB_META_WIDTH)  m_rc_seq_mfb;
-        uvm_mvb::sequence_lib_tx #(RC_MVB_ITEMS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                                      m_rc_seq_mvb;
 
 
         mfb_data_seq = sequence_void#(uvm_logic_vector_array::sequence_item#(32) )::type_id::create("mfb_data_seq", m_rq_mfb_env.m_sequencer.m_data);
         assert(mfb_data_seq.randomize()) else begin `uvm_fatal(this.get_full_name(), "\n\t Cannot randomize sequence") end
         mvb_seq = sequence_void#(uvm_logic_vector::sequence_item#(DMA_UPHDR_WIDTH))::type_id::create("mvb_seq", m_rq_mvb_env.m_sequencer);
         assert(mvb_seq.randomize()) else begin `uvm_fatal(this.get_full_name(), "\n\t Cannot randomize sequence") end
-        //GEN RDY
-        m_rc_seq_mfb = uvm_mfb::sequence_lib_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, RC_MFB_META_WIDTH)::type_id::create("m_rc_seq_mfb", this);
-        m_rc_seq_mfb.init_sequence();
-        m_rc_seq_mfb.min_random_count = 100;
-        m_rc_seq_mfb.max_random_count = 200;
-
-        m_rc_seq_mvb = uvm_mvb::sequence_lib_tx #(RC_MVB_ITEMS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                                    ::type_id::create("m_rc_seq_mvb", this);
-        m_rc_seq_mvb.init_sequence();
-        m_rc_seq_mvb.min_random_count = 100;
-        m_rc_seq_mvb.max_random_count = 200;
 
         fork
             mfb_data_seq.start(m_rq_mfb_env.m_sequencer.m_data);
             mvb_seq     .start(m_rq_mvb_env.m_sequencer);
-            forever begin
-                assert(m_rc_seq_mfb.randomize());
-                m_rc_seq_mfb.start(m_rc_mfb_env.m_sequencer);
-            end
-            forever begin
-                assert(m_rc_seq_mvb.randomize());
-                m_rc_seq_mvb.start(m_rc_mvb_env.m_sequencer);
-            end
         join;
     endtask
 endclass

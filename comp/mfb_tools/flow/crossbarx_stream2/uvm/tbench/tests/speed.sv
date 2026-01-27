@@ -4,21 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq_full_speed#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX) extends virt_sequence #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX);
-    `uvm_object_param_utils(test::virt_seq_full_speed#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
-    `uvm_declare_p_sequencer(uvm_mfb_crossbarx_stream2::virt_sequencer#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W))
-
-    function new (string name = "virt_seq_full_speed");
-        super.new(name);
-    endfunction
-
-    virtual function void init(uvm_phase phase);
-        super.init(phase);
-        m_mfb_rdy_seq = uvm_mfb::sequence_full_speed_tx #(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W)::type_id::create("m_mfb_rdy_seq");
-        m_mvb_rdy_seq = uvm_mvb::sequence_full_speed_tx #(TX_MFB_REGIONS, USERMETA_W)::type_id::create("m_mvb_rdy_seq");
-    endfunction
-endclass
-
 class mvb_rx_speed#(RX_MFB_REGIONS, RX_MVB_ITEM_W) extends uvm_logic_vector_mvb::sequence_lib_rx#(RX_MFB_REGIONS, RX_MVB_ITEM_W);
   `uvm_object_param_utils(test::mvb_rx_speed#(RX_MFB_REGIONS, RX_MVB_ITEM_W))
   `uvm_sequence_library_utils(test::mvb_rx_speed#(RX_MFB_REGIONS, RX_MVB_ITEM_W))
@@ -83,8 +68,19 @@ class speed extends uvm_test;
     function void build_phase(uvm_phase phase);
         uvm_logic_vector_array_mfb::sequence_lib_rx#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, USERMETA_W)::type_id::set_inst_override(mfb_rx_speed#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, USERMETA_W)::get_type(),
         {this.get_full_name(), ".m_env.m_env_rx.*"});
+
         uvm_logic_vector_mvb::sequence_lib_rx#(RX_MFB_REGIONS, RX_MVB_ITEM_W)::type_id::set_inst_override(mvb_rx_speed#(RX_MFB_REGIONS, RX_MVB_ITEM_W)::get_type(),
         {this.get_full_name(), ".m_env.m_env_rx_mvb.*"});
+
+        uvm_mfb::sequence_lib_tx #(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W)::type_id::set_inst_override(
+                uvm_mfb::sequence_lib_tx_speed #(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W)::get_type(),
+                {this.get_full_name(), ".m_env.m_env_tx.*"}
+        );
+
+        uvm_mvb::sequence_lib_tx #(TX_MFB_REGIONS, USERMETA_W)::type_id::set_inst_override(
+                uvm_mvb::sequence_lib_tx_speed #(TX_MFB_REGIONS, USERMETA_W)::get_type(),
+                {this.get_full_name(), ".m_env.m_env_tx_mvb.*"}
+        );
 
         // Initializing the reference to the environment
         m_env = uvm_mfb_crossbarx_stream2::env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W)::type_id::create("m_env", this);
@@ -93,11 +89,10 @@ class speed extends uvm_test;
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
-        virt_seq_full_speed #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX) m_vseq;
-        m_vseq = virt_seq_full_speed #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX)::type_id::create("m_vseq");
+        virt_sequence #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX) m_vseq;
+        m_vseq = virt_sequence#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX)::type_id::create("m_vseq");
 
         phase.raise_objection(this);
-
         m_vseq.init(phase);
 
         //RUN MFB RX SEQUENCE

@@ -13,7 +13,7 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
     uvm_logic_vector_mvb::env_rx       #(RX_MFB_REGIONS, RX_MVB_ITEM_W)                                              m_env_rx_mvb;
     uvm_logic_vector_mvb::env_tx       #(TX_MFB_REGIONS, USERMETA_W)                                                 m_env_tx_mvb;
 
-    uvm_mfb_crossbarx_stream2::virt_sequencer #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W) vscr;
+    uvm_mfb_crossbarx_stream2::virt_sequencer #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W) vscr;
 
     uvm_reset::agent                              m_reset;
     uvm_logic_vector_array::agent#(RX_MFB_ITEM_W) m_logic_vector_array_agent;
@@ -79,7 +79,7 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
         m_env_tx_mvb = uvm_logic_vector_mvb::env_tx#(TX_MFB_REGIONS, USERMETA_W)::type_id::create("m_env_tx_mvb", this);
 
         sc   = scoreboard#(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W)::type_id::create("sc", this);
-        vscr = uvm_mfb_crossbarx_stream2::virt_sequencer#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W)::type_id::create("vscr",this);
+        vscr = uvm_mfb_crossbarx_stream2::virt_sequencer#(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W)::type_id::create("vscr",this);
 
     endfunction
 
@@ -99,8 +99,6 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
         m_reset.sync_connect(m_env_tx_mvb.reset_sync);
 
         vscr.m_reset_sqr    = m_reset.m_sequencer;
-        vscr.m_mfb_rdy_sqr  = m_env_tx.m_sequencer;
-        vscr.m_mvb_rdy_sqr  = m_env_tx_mvb.m_sequencer;
         vscr.m_mvb_data_sqr = m_env_rx_mvb.m_sequencer;
         vscr.m_mfb_data_sqr = m_env_rx.m_sequencer.m_data;
         vscr.m_mfb_meta_sqr = m_env_rx.m_sequencer.m_meta;

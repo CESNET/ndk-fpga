@@ -18,16 +18,13 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     uvm_reset::sync_cbs            reset_sync;
 
 
-    uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
-    uvm_logic_vector_array::config_item logic_vector_array_agent_cfg;
+    protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
+    protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
-    uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::config_item logic_vector_agent_cfg;
+    protected uvm_mfb::agent_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_mfb_agent;
+    protected uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_cover;
 
-    uvm_mfb::agent_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_mfb_agent;
-    uvm_mfb::config_item mfb_agent_cfg;
-
-    config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -36,6 +33,9 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item logic_vector_array_agent_cfg;
+        uvm_logic_vector::config_item logic_vector_agent_cfg;
+        uvm_mfb::config_item mfb_agent_cfg;
 
         if(!uvm_config_db #(config_item)::get(this, "", "m_config", m_config)) begin
             `uvm_fatal(get_type_name(), "Unable to get configuration object")
@@ -66,6 +66,12 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
             m_sequencer = sequencer_rx #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
         end
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -92,6 +98,10 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
             m_sequencer.meta_behav = m_config.meta_behav;
             reset_sync.push_back(m_mfb_agent.m_sequencer.reset_sync);
             uvm_config_db #(sequencer_rx #(ITEM_WIDTH, META_WIDTH))::set(this, "m_mfb_agent.m_sequencer", "hl_sqr", m_sequencer);
+        end
+
+        if (m_config.coverage == 1) begin
+            m_mfb_agent.analysis_port.connect(m_cover.analysis_export);
         end
     endfunction
 
@@ -130,23 +140,19 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     //localparam  ITEM_WIDTH = 32;
 
     //Access component
-    uvm_mfb::sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_sequencer;
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_port_data;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(META_WIDTH)) analysis_port_meta;
     uvm_reset::sync_cbs                                               reset_sync;
 
     // ------------------------------------------------------------------------
     // Definition of agents
-    uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
-    uvm_logic_vector_array::config_item logic_vector_array_agent_cfg;
+    protected uvm_logic_vector_array::agent#(ITEM_WIDTH) m_logic_vector_array_agent;
+    protected uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
 
-    uvm_logic_vector::agent#(META_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::config_item logic_vector_agent_cfg;
+    protected uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_mfb_agent;
+    protected uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_cover;
 
-    uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_mfb_agent;
-    uvm_mfb::config_item mfb_agent_cfg;
-
-    config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -155,6 +161,9 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
 
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_array::config_item logic_vector_array_agent_cfg;
+        uvm_logic_vector::config_item logic_vector_agent_cfg;
+        uvm_mfb::config_item mfb_agent_cfg;
 
         if(!uvm_config_db #(config_item)::get(this, "", "m_config", m_config)) begin
             `uvm_fatal(get_type_name(), "Unable to get configuration object")
@@ -181,6 +190,12 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         m_logic_vector_agent = uvm_logic_vector::agent#(META_WIDTH)::type_id::create("m_logic_vector_agent", this);
         m_mfb_agent        = uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb_agent", this);
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -201,7 +216,29 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         analysis_port_meta = m_logic_vector_agent.m_monitor.analysis_port;
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
 
-        m_sequencer = m_mfb_agent.m_sequencer;
+        if (m_config.coverage == 1) begin
+            m_mfb_agent.analysis_port.connect(m_cover.analysis_export);
+        end
     endfunction
+
+    task run_phase(uvm_phase phase);
+        uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_seq;
+
+
+        if (m_config.active == UVM_ACTIVE) begin
+            mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+            mfb_seq.init_sequence();
+            mfb_seq.min_random_count =  100;
+            mfb_seq.max_random_count = 2000;
+
+            forever begin
+                assert(mfb_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                mfb_seq.start(m_mfb_agent.m_sequencer);
+            end
+        end
+    endtask
+
 endclass
 

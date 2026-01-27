@@ -24,13 +24,4 @@ class test_all_pass_and_one_frame extends test_all_pass;
 
         super.build_phase(phase);
     endfunction
-
-    function void start_of_simulation_phase(uvm_phase phase);
-        super.start_of_simulation_phase(phase);
-
-        // It doesn't make sense in this test
-        m_env.m_coverage_model.frame_count_covergroup.option.weight      = 0;
-        m_env.m_coverage_model.frame_count_covergroup.type_option.weight = 0;
-    endfunction
-
 endclass

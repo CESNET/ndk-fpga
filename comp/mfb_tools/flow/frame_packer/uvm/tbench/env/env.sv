@@ -6,7 +6,19 @@
 
 // Environment for functional verification of encode.
 
-class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX, RX_CHANNELS, PKT_MTU, HDR_META_WIDTH) extends uvm_env;
+class env #(
+    int unsigned MFB_REGIONS,
+    int unsigned MFB_REGION_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned SPACE_SIZE_MIN_RX,
+    int unsigned SPACE_SIZE_MAX_RX,
+    int unsigned SPACE_SIZE_MIN_TX,
+    int unsigned  SPACE_SIZE_MAX_TX,
+    int unsigned RX_CHANNELS,
+    int unsigned PKT_MTU,
+    int unsigned HDR_META_WIDTH
+) extends uvm_env;
     //MACROS
     `uvm_component_param_utils(uvm_framepacker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX, RX_CHANNELS, PKT_MTU, HDR_META_WIDTH));
 
@@ -39,7 +51,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_
     scoreboard #(RX_CHANNELS, PKT_MTU, HDR_META_WIDTH,  MFB_ITEM_WIDTH) m_scoreboard;
 
     //Virtual sequencer
-    uvm_framepacker::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH) vscr;
+    uvm_framepacker::virt_sequencer#(MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH) vscr;
 
     //Reset
     uvm_reset::agent m_reset;
@@ -137,7 +149,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_
         m_reset            = uvm_reset::agent::type_id::create("m_reset", this);
         m_generator        = uvm_framepacker::generator #(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH, MFB_ITEM_WIDTH)::type_id::create("m_generator", this);
         m_scoreboard       = scoreboard #(RX_CHANNELS, PKT_MTU, HDR_META_WIDTH,  MFB_ITEM_WIDTH)::type_id::create("m_scoreboard", this);
-        vscr               = uvm_framepacker::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("mfb_vscr",this);
+        vscr               = uvm_framepacker::virt_sequencer#(MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("mfb_vscr",this);
         for (int unsigned it = 0; it < RX_CHANNELS; it++) begin
             m_flow_ctrl[it] = uvm_logic_vector_mvb::env_tx #(1, 2)::type_id::create($sformatf("m_flow_ctrl_%0d", it), this);
         end
@@ -176,8 +188,6 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_
         m_reset.sync_connect(mvb_tx_env.reset_sync);
 
         //Virtual sequencer
-        vscr.m_mfb_tx_sqr   = mfb_tx_env.m_sequencer;
-        vscr.m_mvb_tx_sqr   = mvb_tx_env.m_sequencer;
         vscr.m_mfb_data_sqr = m_byte_array_agent.m_sequencer;
         vscr.m_info         = m_info.m_sequencer;
         vscr.m_reset        = m_reset.m_sequencer;

@@ -15,11 +15,13 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;
     uvm_reset::sync_cbs            reset_sync;
 
-    uvm_logic_vector::agent#(ITEM_WIDTH)   m_logic_vector_agent;
-    uvm_logic_vector::meter#(ITEM_WIDTH)   m_meter;
-    uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
+    protected uvm_logic_vector::agent#(ITEM_WIDTH)   m_logic_vector_agent;
+    protected uvm_logic_vector::meter#(ITEM_WIDTH)   m_meter;
 
-    local config_item m_config;
+    protected uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
+    protected uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover;
+
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -57,6 +59,12 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
             m_sequencer = uvm_logic_vector::sequencer#(ITEM_WIDTH)::type_id::create("m_sequencer", this);
         end
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mvb::coverage #(ITEMS, ITEM_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -75,6 +83,10 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
             m_sequencer = m_logic_vector_agent.m_sequencer;
             reset_sync.push_back(m_mvb_agent.m_sequencer.reset_sync);
             uvm_config_db #(uvm_logic_vector::sequencer#(ITEM_WIDTH))::set(this, "m_mvb_agent.m_sequencer", "hi_sqr", m_sequencer);
+        end
+
+        if (m_config.coverage == 1) begin
+            m_mvb_agent.analysis_port.connect(m_cover.analysis_export);
         end
     endfunction
 
@@ -105,22 +117,21 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
     `uvm_component_param_utils(uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH));
 
     //Access component
-    uvm_mvb::sequencer #(ITEMS, ITEM_WIDTH) m_sequencer;
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;
     uvm_reset::sync_cbs                                               reset_sync;
 
     // ------------------------------------------------------------------------
     // Definition of agents
 
-    uvm_logic_vector::agent#(ITEM_WIDTH) m_logic_vector_agent;
-    uvm_logic_vector::meter#(ITEM_WIDTH) m_meter;
+    protected uvm_logic_vector::agent#(ITEM_WIDTH) m_logic_vector_agent;
+    protected uvm_logic_vector::meter#(ITEM_WIDTH) m_meter;
 
     //uvm_logic_vector::config_item logic_vector_agent_cfg;
 
-    uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
-    //uvm_mvb::config_item mvb_agent_cfg;
+    protected uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH) m_mvb_agent;
+    protected uvm_mvb::coverage #(ITEMS, ITEM_WIDTH) m_cover;
 
-    local config_item m_config;
+    protected config_item m_config;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -154,6 +165,12 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         m_logic_vector_agent = uvm_logic_vector::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_agent", this);
         m_mvb_agent        = uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH)::type_id::create("m_mvb_agent", this);
 
+        if (m_config.coverage == 1) begin
+            m_cover = uvm_mvb::coverage #(ITEMS, ITEM_WIDTH)::type_id::create("m_cover", this);
+        end else begin
+            m_cover = null;
+        end
+
         reset_sync = new();
     endfunction
 
@@ -168,7 +185,28 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         analysis_port.connect(m_meter.analysis_export);
         reset_sync.push_back(m_logic_vector_monitor.reset_sync);
 
-        m_sequencer = m_mvb_agent.m_sequencer;
+        if (m_config.coverage == 1) begin
+            m_mvb_agent.analysis_port.connect(m_cover.analysis_export);
+        end
     endfunction
+
+    task run_phase(uvm_phase phase);
+        uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH) mvb_seq;
+
+        if (m_config.active == UVM_ACTIVE) begin
+            mvb_seq = uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+            mvb_seq.init_sequence();
+            mvb_seq.min_random_count =  100;
+            mvb_seq.max_random_count = 2000;
+
+            forever begin
+                assert(mvb_seq.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                end
+                mvb_seq.start(m_mvb_agent.m_sequencer);
+            end
+        end
+    endtask
+
 endclass
 
