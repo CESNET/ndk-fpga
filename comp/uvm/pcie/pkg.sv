@@ -26,7 +26,6 @@ package uvm_pcie;
 
     `include "dev.sv"
 
-    //`include "sequence.sv"
     `include "sequence_request.sv"
     `include "sequence_comp.sv"
 
