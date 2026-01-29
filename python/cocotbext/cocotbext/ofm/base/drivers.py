@@ -7,8 +7,12 @@ import cocotb_bus.drivers as cbd
 
 from cocotb.triggers import RisingEdge
 
+from .bus_fixup import do_fix
 from .transaction import IdleTransaction
 from .generators import IdleGenerator
+
+
+do_fix()
 
 
 class BusDriver(cbd.BusDriver):
