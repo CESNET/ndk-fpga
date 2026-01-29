@@ -135,7 +135,6 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
             req.received_time = $time;
             info.request_register(cq_hdr.requester_id, cq_hdr.tag, req);
         end
-
         return cq_hdr;
     endfunction
 
@@ -248,12 +247,148 @@ class sequence_request_base extends sequence_request;
                 std::randomize(tag); //actualy dont care
             end
 
-            req = request_hdr_randomize(dev_id_act, used_tag);
+            req = request_hdr_randomize(dev_id_act, {tag});
+
             start_item(req);
             finish_item(req);
 
             it++;
         end
+    endtask
+endclass
+
+
+class sequence_request_stop extends sequence_request;
+    `uvm_object_param_utils(uvm_pcie::sequence_request_stop)
+
+    rand int unsigned time_sleep; //in NS
+
+    constraint const_time {
+        time_sleep dist {
+            [10:20]  :/30,
+            [20:100] :/20,
+            [100:1000] :/5
+        };
+    }
+
+    function new(string name = "sequence_base");
+        super.new(name);
+    endfunction
+
+    task body;
+        //Just sleep
+        #(time_sleep*1ns);
+    endtask
+endclass
+
+
+// SEND REQUEST WITH SAME TAG BUT DIFFERENT REQUESTER ID
+class sequence_request_few_tag extends sequence_request;
+    `uvm_object_param_utils(uvm_pcie::sequence_request_few_tag)
+
+    rand logic [TAG_WIDTH-1:0] tags[];
+
+    constraint const_base {
+        transactions   inside {[50:100]};
+        bar_probability.size() == 7+1; // BAR number + 1
+        bar_probability.sum() > 0;
+        foreach(bar_probability[it]) {
+            bar_probability[it] <= 50;
+        }
+    }
+
+    constraint const_tag {
+        tags.size() inside {[1:5]};
+        //unique {tags}; // I dont know why but leads to error
+    }
+
+    //In Dwords
+    constraint c_length {
+        request_length_min <= request_length_max;
+        request_length_min dist {
+            [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
+        };
+        request_length_max dist {
+            [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
+        };
+
+        payload_length_min <= payload_length_max;
+        payload_length_min dist {
+            [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
+        };
+        payload_length_max dist {
+            [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
+        };
+    }
+
+
+    function new(string name = "sequence_request_few_tag");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        int unsigned it = 0;
+
+        if(!uvm_config_db #(pcie_info#(TAG_WIDTH))::get(m_sequencer, "", "pcie_info", info)) begin
+            `uvm_warning(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
+            info = null;
+        end;
+
+        if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+        while (it < transactions && (state == null || state.next())) begin
+            logic [16-1:0]        dev_id_act;
+            logic [TAG_WIDTH-1:0] tag;
+
+            assert(std::randomize(dev_id_act, tag) with {tag inside {tags};}) else begin
+                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize device id");
+            end
+
+            if (info != null) begin
+                info.requester_add(dev_id_act);
+                wait (info.request[dev_id_act].exists(tag) == 0);
+            end
+
+            req = request_hdr_randomize(dev_id_act, {tag});
+            start_item(req);
+            finish_item(req);
+
+            it++;
+        end
+    endtask
+endclass
 
 
 //requester_remove(logic [16-1:0] requester_id)
@@ -277,6 +412,8 @@ class sequence_request_lib extends uvm_common::sequence_library#(config_sequence
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
         this.add_sequence(uvm_pcie::sequence_request_base::get_type());
+        this.add_sequence(uvm_pcie::sequence_request_stop::get_type());
+        this.add_sequence(uvm_pcie::sequence_request_few_tag::get_type());
     endfunction
 endclass
 
