@@ -66,7 +66,7 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
         info = null;
     endfunction
 
-    function uvm_pcie::request_header request_hdr_randomize(logic [16-1:0] dev_id_act, logic [TAG_WIDTH-1:0] used_tag[]);
+    function uvm_pcie::request_header request_hdr_randomize(logic [16-1:0] dev_id_act, logic [TAG_WIDTH-1:0] tags[]);
         uvm_pcie::request_header cq_hdr;
 
         cq_hdr = uvm_pcie::request_header::type_id::create("cq_hdr", m_sequencer);
@@ -105,8 +105,7 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
                 cq_hdr.data.size() == 0;
                 request_length_max == 1024 -> cq_hdr.length inside {[request_length_min:request_length_max-1], 0};
                 request_length_max != 1024 -> cq_hdr.length inside {[request_length_min:request_length_max]};
-                cq_hdr.tag < 2**TAG_WIDTH;
-                !(cq_hdr.tag inside {used_tag});
+                cq_hdr.tag inside {tags};
             }
             //WRITE request
             if (cq_hdr.fmt[2:1] == 2'b01) {
@@ -226,18 +225,27 @@ class sequence_request_base extends sequence_request;
         it = 0;
         while (it < transactions && (state == null || state.next())) begin
             logic [16-1:0] dev_id_act;
-            logic [TAG_WIDTH-1:0]  used_tag[$];
+            logic [TAG_WIDTH-1:0]  tag;
 
             assert(std::randomize(dev_id_act) with {dev_id_act inside {dev_id};}) else begin
                 `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize device id");
             end
 
             if (info != null) begin
+                logic [TAG_WIDTH-1:0]  used_tag[$];
+
                 info.requester_add(dev_id_act);
                 wait (info.request[dev_id_act].size() < 2**TAG_WIDTH);
                 used_tag = info.request[dev_id_act].find_index() with (1'b1);
+
+                assert(std::randomize(tag) with {
+                        tag < 2**TAG_WIDTH;
+                        !(tag inside {used_tag});
+                    }
+                ) else begin `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie tag"); end
+
             end else begin
-                used_tag = {};
+                std::randomize(tag); //actualy dont care
             end
 
             req = request_hdr_randomize(dev_id_act, used_tag);
