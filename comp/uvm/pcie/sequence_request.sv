@@ -34,7 +34,32 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
     rand int unsigned payload_length_min;
     rand int unsigned payload_length_max;
 
+    // READ WRITE PROBUBILYTY
+    rand int unsigned read_prob;
+    rand int unsigned write_prob;
+
     protected pcie_info#(TAG_WIDTH) info;
+
+    constraint const_prob {
+        read_prob   dist {
+                        [0:9] :/ 20,
+                        [10:19] :/ 15,
+                        [20:39] :/ 15,
+                        [40:69] :/ 15,
+                        [70:89] :/ 15,
+                        [90:99] :/ 20
+        };
+        write_prob dist {
+                        [0:9] :/ 20,
+                        [10:19] :/ 15,
+                        [20:39] :/ 15,
+                        [40:69] :/ 15,
+                        [70:89] :/ 15,
+                        [90:99] :/ 20
+        };
+
+        (write_prob != 0 || read_prob != 0);
+    }
 
     function new(string name);
         super.new(name);
@@ -71,7 +96,7 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
             cq_hdr.fmt[0] dist {1'b0 :/ 70, 1'b1 :/ 30};
             //TODO: change to original
             //cq_hdr.fmt[2:1]  dist {2'b00 :/ 45, 2'b01 :/ 45, [2'b00:2'b11]  :/ 10}; // 2'b00 => read,  2'b01 => write
-            cq_hdr.fmt[2:1]  dist {2'b00 :/ 45, 2'b01 :/ 45}; // 2'b00 => read,  2'b01 => write
+            cq_hdr.fmt[2:1]  dist {2'b00 :/ read_prob, 2'b01 :/ write_prob}; // 2'b00 => read,  2'b01 => write
             //TODO: change to original
             //cq_hdr.pcie_type dist {5'b00000 :/ 95, [5'b00000:5'b11111] :/ 5};
             cq_hdr.pcie_type == 0;
