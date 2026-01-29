@@ -20,6 +20,7 @@ class sequence_comp extends uvm_common::sequence_base #(config_sequence, uvm_pci
     // BUT response on same RQ should be with same ID
     // rand logic [16-1:0] dev_id[];
 
+    rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
     rand int unsigned transactions;
     rand int unsigned length_max;
     rand int unsigned length_min;
@@ -95,8 +96,22 @@ class sequence_comp extends uvm_common::sequence_base #(config_sequence, uvm_pci
                 end while(devs_id.size() == 0);
 
                 assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
-                assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                if (tag_sel == TAG_SEL_RAND) begin
+                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                end else begin
+                    // FIND FIRST SEND TAG
+                    time min;
 
+                    info.request[dev_id].first(tag_gen);
+                    min = info.request[dev_id][tag_gen].received_time;
+                    foreach (info.request[dev_id][it]) begin
+                        const time tmp_time = info.request[dev_id][it].received_time;
+                        if (min > tmp_time) begin
+                            min = tmp_time;
+                            tag_gen = it;
+                        end
+                    end
+                end
                 rc_info = info.request[dev_id][tag_gen];
                 fbe_addr = uvm_pcie::encode_fbe(rc_info.fbe);
             end
