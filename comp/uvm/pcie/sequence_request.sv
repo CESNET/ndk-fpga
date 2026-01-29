@@ -197,6 +197,7 @@ class sequence_request extends uvm_common::sequence_base #(config_sequence, uvm_
                 req.fbe            = cq_hdr.fbe;
                 req.lbe            = cq_hdr.length != 1 ? cq_hdr.lbe : cq_hdr.fbe;
                 req.rest_length    = cq_hdr.length;
+                req.received_time = $time;
                 info.request_register(cq_hdr.requester_id, cq_hdr.tag, req);
             end
 

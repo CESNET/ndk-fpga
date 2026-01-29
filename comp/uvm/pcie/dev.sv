@@ -32,6 +32,7 @@ class pcie_info#(
         logic [4-1:0]  fbe;
         logic [4-1:0]  lbe;
         int unsigned   rest_length; // in DWORS
+        time           received_time; // simulation time when request have been received
     } req_info;
 
     req_info    request[logic [16-1:0]][logic [TAG_WIDTH-1:0]];
@@ -135,6 +136,7 @@ class dev extends uvm_component;
             info.fbe = req.fbe;
             info.lbe = req.lbe;
             info.rest_length = req.length_get();
+            info.received_time = $time;
 
             rx_info.request_register(req.requester_id, req.tag, info);
         end else if (tr.fmt[3-1:1] == 2'b01 && tr.pcie_type[5-1:0] == 5'b00000) begin
