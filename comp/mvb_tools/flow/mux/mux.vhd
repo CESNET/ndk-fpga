@@ -24,6 +24,8 @@ entity GEN_MVB_MUX is
 
         -- Depth of select FIFO
         FIFO_DEPTH      : natural := 2;
+        FAKE_FIFO       : boolean := false;
+
         DEVICE          : string  := "ULTRASCALE"
     );
     port (
@@ -122,6 +124,7 @@ begin  -- architecture behavioral
         ITEMS       => 1,
         ITEM_WIDTH  => SEL_WIDTH,
         FIFO_DEPTH  => FIFO_DEPTH,
+        FAKE_FIFO   => FAKE_FIFO,
         DEVICE      => DEVICE
     ) port map (
         CLK         => CLK,
