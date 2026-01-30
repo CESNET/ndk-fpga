@@ -239,6 +239,148 @@ class sequence_comp_stop extends uvm_common::sequence_base #(config_sequence, uv
 endclass
 
 /////////////////////////////////////////////////////////////////////////
+//SEND COPLETER WITH SMALL RESPONSES
+/////////////////////////////////////////////////////////////////////////
+class sequence_comp_small extends sequence_comp;
+    `uvm_object_param_utils(uvm_pcie::sequence_comp_small)
+
+    rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
+
+    constraint const_base {
+        transactions   inside {[10:250]};
+        //dev_id.size()  inside {[1:10]};
+    }
+
+    //cfg.payload_size_max
+    //In Dwords
+    constraint c_length {
+        length_min == cfg.payload_size_min;
+        length_max == cfg.payload_size_min;
+    }
+
+    function new(string name = "sequence_comp_small");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        int unsigned it = 0;
+
+        // GET information about request
+        if(!uvm_config_db #(pcie_info#(TAG_WIDTH))::get(m_sequencer, "", "pcie_info", info)) begin
+            info = null;
+            `uvm_warning(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
+        end;
+
+        // GET state
+        if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+        while (it < transactions && (state == null || state.next())) begin
+            logic [TAG_WIDTH-1:0] tag_gen;
+            logic [16-1:0] devs_id[];
+            logic [16-1:0] dev_id;
+            uvm_pcie::completer_header rc_hdr;
+
+            if (info != null) begin
+                do begin
+                    devs_id = info.request.find_index() with (item.size() > 0);
+                    if (devs_id.size() == 0) begin
+                        #(100ns);
+                    end
+                end while(devs_id.size() == 0);
+
+                assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
+                if (tag_sel == TAG_SEL_RAND) begin
+                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                end else begin
+                    // FIND FIRST SEND TAG
+                    tag_gen = reqs_tag_fist_get(dev_id);
+                end
+            end
+
+            req = comp_hdr_randomize(dev_id, tag_gen);
+            start_item(req);
+            finish_item(req);
+            it++;
+        end
+    endtask
+endclass
+
+/////////////////////////////////////////////////////////////////////////
+//SEND COPLETER WITH big
+/////////////////////////////////////////////////////////////////////////
+class sequence_comp_big extends sequence_comp;
+    `uvm_object_param_utils(uvm_pcie::sequence_comp_big)
+
+    rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
+
+    constraint const_base {
+        transactions   inside {[1:35]};
+        //dev_id.size()  inside {[1:10]};
+    }
+
+    //cfg.payload_size_max
+    //In Dwords
+    constraint c_length {
+        length_min == cfg.payload_size_max;
+        length_max == cfg.payload_size_max;
+    }
+
+    function new(string name = "sequence_comp_big");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        int unsigned it = 0;
+
+        // GET information about request
+        if(!uvm_config_db #(pcie_info#(TAG_WIDTH))::get(m_sequencer, "", "pcie_info", info)) begin
+            info = null;
+            `uvm_warning(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
+        end;
+
+        // GET state
+        if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+        while (it < transactions && (state == null || state.next())) begin
+            logic [TAG_WIDTH-1:0] tag_gen;
+            logic [16-1:0] devs_id[];
+            logic [16-1:0] dev_id;
+            uvm_pcie::completer_header rc_hdr;
+
+            if (info != null) begin
+                do begin
+                    devs_id = info.request.find_index() with (item.size() > 0);
+                    if (devs_id.size() == 0) begin
+                        #(100ns);
+                    end
+                end while(devs_id.size() == 0);
+
+                assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
+                if (tag_sel == TAG_SEL_RAND) begin
+                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                end else begin
+                    // FIND FIRST SEND TAG
+                    tag_gen = reqs_tag_fist_get(dev_id);
+                end
+            end
+
+            req = comp_hdr_randomize(dev_id, tag_gen);
+            start_item(req);
+            finish_item(req);
+            it++;
+        end
+    endtask
+endclass
+
+/////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY COMPL
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_lib extends uvm_common::sequence_library#(config_sequence, uvm_pcie::header);
@@ -256,6 +398,8 @@ class sequence_comp_lib extends uvm_common::sequence_library#(config_sequence, u
         uvm_common::sequence_library::init_sequence(param_cfg);
         this.add_sequence(uvm_pcie::sequence_comp_base::get_type());
         this.add_sequence(uvm_pcie::sequence_comp_stop::get_type());
+        this.add_sequence(uvm_pcie::sequence_comp_small::get_type());
+        this.add_sequence(uvm_pcie::sequence_comp_big::get_type());
     endfunction
 endclass
 
