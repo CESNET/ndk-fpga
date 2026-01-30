@@ -42,7 +42,7 @@ class sequence_base #(
     //RC
     //CQ
     //CC
-    uvm_sequence #(uvm_pcie::header)         m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
+    uvm_pcie::sequence_comp_lib m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     //MI
     uvm_pcie_top::mi_cc_sequence #(32, 32) mi_seq[PCIE_ENDPOINTS];
@@ -67,7 +67,7 @@ class sequence_base #(
     endfunction
 
     function void stop_send();
-        tx_stop = 0;
+        tx_stop = 1;
     endfunction
 
     virtual function void init(
@@ -95,9 +95,12 @@ class sequence_base #(
 
                 //CC
                 //m_dma_cc[pcie][dma] = uvm_pcie_dma_cq::sequence_resp::type_id::create({"m_dma_seq_", dma_string}, p_sequencer.m_dma_cc[pcie][dma]);
-                m_dma_cc[pcie][dma] = uvm_pcie::sequence_comp::type_id::create(
+                m_dma_cc[pcie][dma] = uvm_pcie::sequence_comp_lib::type_id::create(
                     {"m_dma_seq_", dma_string}, p_sequencer.m_dma_cc[pcie][dma]
                 );
+                m_dma_cc[pcie][dma].init_sequence();
+                m_dma_cc[pcie][dma].min_random_count = 100;
+                m_dma_cc[pcie][dma].max_random_count = 200;
              end
 
              //MI interface
@@ -130,36 +133,17 @@ class sequence_base #(
         rx_stop[pcie][dma] = 1;
     endtask
 
-    //RUN RC
-    virtual task run_rc(int unsigned pcie, int unsigned dma);
-    endtask
-
-    //RUN CQ
-    virtual task run_cq(int unsigned pcie, int unsigned dma);
-        //TX have its own RDY generator
-        //forever begin
-        //    assert(m_mfb_cq[pcie][dma].randomize()) else `uvm_fatal(p_sequencer.m_dma_cq[pcie][dma].get_full_name(), "\n\tCannot randomize sequence");;
-        //    m_mfb_cq[pcie][dma].start(p_sequencer.m_dma_cq[pcie][dma]);
-        //end
-    endtask
-
     virtual task run_cc(int unsigned pcie, int unsigned dma);
         uvm_pcie::pcie_info#(8)   pcie_rc_info;
 
         uvm_config_db #(uvm_pcie::pcie_info#(8))::get(p_sequencer.m_dma_cc[pcie][dma], "", "pcie_info", pcie_rc_info);
 
-        // TODO: DONT STOP IF THERE IS UNRESPONDED REQUEST
-        //while (p_sequencer.m_pcie[pcie].info.rq_hdr.size() != 0 || (& rx_stop[pcie]) == 0) begin
         while (tx_stop == 0 || pcie_rc_info.request_num() != 0) begin
             assert(m_dma_cc[pcie][dma].randomize()) else begin
                 `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie sequence");
             end
             m_dma_cc[pcie][dma].start(p_sequencer.m_dma_cc[pcie][dma]);
         end
-        //forever begin
-        //    assert(m_dma_cc[pcie][dma].randomize()) else `uvm_fatal(p_sequencer.m_dma_cc[pcie][dma].get_full_name(), "\n\tCannot randomize sequence");;
-        //    m_dma_cc[pcie][dma].start(p_sequencer.m_dma_cc[pcie][dma]);
-        //end
     endtask
 
     //RUN MI
@@ -224,9 +208,7 @@ class sequence_base #(
                     fork
                         automatic int unsigned index_dma = dma;
                         run_rq(index_pcie, index_dma);
-                        //run_rc(index_pcie, index_dma);
-                        run_cq(index_pcie, index_dma);
-                        //run_cc(index_pcie, index_dma);
+                        run_cc(index_pcie, index_dma);
                     join_none
                 end
                 run_pcie_cq(index_pcie);
