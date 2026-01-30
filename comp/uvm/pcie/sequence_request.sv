@@ -140,7 +140,9 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
 
 endclass
 
-
+//////////////////////////////////////////////////////////////////////
+// BASE SEQUENCE MOUST RANDOMIZED
+//////////////////////////////////////////////////////////////////////
 class sequence_request_base extends sequence_request;
     `uvm_object_param_utils(uvm_pcie::sequence_request_base)
 
@@ -258,6 +260,9 @@ class sequence_request_base extends sequence_request;
 endclass
 
 
+//////////////////////////////////////////////////////////////////////
+// DONT SEND ANY REQUESTS
+//////////////////////////////////////////////////////////////////////
 class sequence_request_stop extends sequence_request;
     `uvm_object_param_utils(uvm_pcie::sequence_request_stop)
 
@@ -282,7 +287,9 @@ class sequence_request_stop extends sequence_request;
 endclass
 
 
+//////////////////////////////////////////////////////////////////////
 // SEND REQUEST WITH SAME TAG BUT DIFFERENT REQUESTER ID
+//////////////////////////////////////////////////////////////////////
 class sequence_request_few_tag extends sequence_request;
     `uvm_object_param_utils(uvm_pcie::sequence_request_few_tag)
 
