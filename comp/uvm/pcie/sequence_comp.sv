@@ -380,6 +380,104 @@ class sequence_comp_big extends sequence_comp;
     endtask
 endclass
 
+
+/////////////////////////////////////////////////////////////////////////
+//SEND COPLETER WITH response on one tag
+/////////////////////////////////////////////////////////////////////////
+class sequence_comp_one_tag extends sequence_comp;
+    `uvm_object_param_utils(uvm_pcie::sequence_comp_one_tag)
+
+    rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
+
+    constraint const_base {
+        transactions   inside {[5:50]};
+        //dev_id.size()  inside {[1:10]};
+    }
+
+    //cfg.payload_size_max
+    //In Dwords
+    constraint c_length {
+        length_min <= length_max;
+        length_min dist {
+            [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
+        };
+        length_max dist {
+            [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
+        };
+    }
+
+    function new(string name = "sequence_comp_one_tag");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        int unsigned it = 0;
+
+        // GET information about request
+        if(!uvm_config_db #(pcie_info#(TAG_WIDTH))::get(m_sequencer, "", "pcie_info", info)) begin
+            info = null;
+            `uvm_warning(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
+        end;
+
+        // GET state
+        if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+        while (it < transactions && (state == null || state.next())) begin
+            logic [TAG_WIDTH-1:0] tag_gen;
+            logic [16-1:0] devs_id[];
+            logic [16-1:0] dev_id;
+            uvm_pcie::completer_header rc_hdr;
+
+            if (info != null) begin
+                do begin
+                    devs_id = info.request.find_index() with (item.size() > 0);
+                    if (devs_id.size() == 0) begin
+                        #(100ns);
+                    end
+                end while(devs_id.size() == 0);
+
+                assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
+                if (tag_sel == TAG_SEL_RAND) begin
+                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                end else begin
+                    // FIND FIRST SEND TAG
+                    tag_gen = reqs_tag_fist_get(dev_id);
+                end
+            end
+
+            // Until send All responses
+            // If there is no info then we dont care about matching request.
+            while ((info == null || info.request[dev_id].exists(tag_gen) == 1) &&
+                   it < transactions && (state == null || state.next())
+            ) begin
+                req = comp_hdr_randomize(dev_id, tag_gen);
+                start_item(req);
+                finish_item(req);
+                it++;
+            end
+        end
+    endtask
+endclass
+
+
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY COMPL
 /////////////////////////////////////////////////////////////////////////
@@ -400,6 +498,7 @@ class sequence_comp_lib extends uvm_common::sequence_library#(config_sequence, u
         this.add_sequence(uvm_pcie::sequence_comp_stop::get_type());
         this.add_sequence(uvm_pcie::sequence_comp_small::get_type());
         this.add_sequence(uvm_pcie::sequence_comp_big::get_type());
+        this.add_sequence(uvm_pcie::sequence_comp_one_tag::get_type());
     endfunction
 endclass
 
