@@ -213,6 +213,32 @@ class sequence_comp_base extends sequence_comp;
 endclass
 
 /////////////////////////////////////////////////////////////////////////
+// SEQUENCE DOESNT SEND ANY RESPONSES
+/////////////////////////////////////////////////////////////////////////
+class sequence_comp_stop extends uvm_common::sequence_base #(config_sequence, uvm_pcie::header);
+    `uvm_object_param_utils(uvm_pcie::sequence_comp_stop)
+
+    rand int unsigned time_sleep; //in NS
+
+    constraint const_base {
+        time_sleep dist {
+            [10:20]  :/30,
+            [20:100] :/20,
+            [100:1000] :/5
+        };
+    }
+
+    function new(string name = "sequence_comp_stop");
+        super.new(name);
+    endfunction
+
+    task body;
+        //Just sleep
+        #(time_sleep*1ns);
+    endtask
+endclass
+
+/////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY COMPL
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_lib extends uvm_common::sequence_library#(config_sequence, uvm_pcie::header);
@@ -229,6 +255,7 @@ class sequence_comp_lib extends uvm_common::sequence_library#(config_sequence, u
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
         this.add_sequence(uvm_pcie::sequence_comp_base::get_type());
+        this.add_sequence(uvm_pcie::sequence_comp_stop::get_type());
     endfunction
 endclass
 
