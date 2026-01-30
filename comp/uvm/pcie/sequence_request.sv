@@ -83,15 +83,16 @@ virtual class sequence_request extends uvm_common::sequence_base #(config_sequen
                 cq_hdr.lbe inside {4'b1111, 4'b0111, 4'b0011, 4'b0001};
             }
 
-            cq_hdr.fmt[0] == 1'b0 -> cq_hdr.address[32-1:2] dist {[0             :BAR0_BASE_ADDR] :/ bar_probability[0],
-                                                                  [BAR0_BASE_ADDR:BAR1_BASE_ADDR-1] :/ bar_probability[1],
-                                                                  [BAR1_BASE_ADDR:BAR2_BASE_ADDR-1] :/ bar_probability[2],
-                                                                  [BAR2_BASE_ADDR:BAR3_BASE_ADDR-1] :/ bar_probability[3],
-                                                                  [BAR3_BASE_ADDR:BAR4_BASE_ADDR-1] :/ bar_probability[4],
-                                                                  [BAR4_BASE_ADDR:BAR5_BASE_ADDR-1] :/ bar_probability[5],
-                                                                  [BAR5_BASE_ADDR:EXP_ROM_BASE_ADDR-1] :/ bar_probability[6],
-                                                                  [EXP_ROM_BASE_ADDR:32'hffffffff]  :/ bar_probability[7]
-                                                              };
+            cq_hdr.fmt[0] == 1'b0 -> cq_hdr.address[32-1:2] dist {
+                    [0             :BAR0_BASE_ADDR] :/ bar_probability[0],
+                    [BAR0_BASE_ADDR:BAR1_BASE_ADDR-1] :/ bar_probability[1],
+                    [BAR1_BASE_ADDR:BAR2_BASE_ADDR-1] :/ bar_probability[2],
+                    [BAR2_BASE_ADDR:BAR3_BASE_ADDR-1] :/ bar_probability[3],
+                    [BAR3_BASE_ADDR:BAR4_BASE_ADDR-1] :/ bar_probability[4],
+                    [BAR4_BASE_ADDR:BAR5_BASE_ADDR-1] :/ bar_probability[5],
+                    [BAR5_BASE_ADDR:EXP_ROM_BASE_ADDR-1] :/ bar_probability[6],
+                    [EXP_ROM_BASE_ADDR:32'hffffffff]  :/ bar_probability[7]
+            };
             cq_hdr.fmt[0] == 1'b0 -> cq_hdr.address[64-1:32] == 0;
             cq_hdr.fmt[0] dist {1'b0 :/ 70, 1'b1 :/ 30};
             //TODO: change to original
@@ -162,45 +163,77 @@ class sequence_request_base extends sequence_request;
     constraint c_length {
         request_length_min <= request_length_max;
         request_length_min dist {
+            // verilog_lint: waive line-length
             [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
         };
         request_length_max dist {
+            // verilog_lint: waive line-length
             [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
         };
 
         payload_length_min <= payload_length_max;
         payload_length_min dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
         payload_length_max dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
     }
@@ -313,45 +346,77 @@ class sequence_request_few_tag extends sequence_request;
     constraint c_length {
         request_length_min <= request_length_max;
         request_length_min dist {
+            // verilog_lint: waive line-length
             [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
         };
         request_length_max dist {
+            // verilog_lint: waive line-length
             [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
         };
 
         payload_length_min <= payload_length_max;
         payload_length_min dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
         payload_length_max dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
     }
@@ -418,45 +483,77 @@ class sequence_request_one_requester extends sequence_request;
     constraint c_length {
         request_length_min <= request_length_max;
         request_length_min dist {
+            // verilog_lint: waive line-length
             [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
         };
         request_length_max dist {
+            // verilog_lint: waive line-length
             [cfg.request_size_min                                                   : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*1/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*2/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*3/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*4/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*5/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*6/8 : cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.request_size_min + (cfg.request_size_max-cfg.request_size_min)*7/8 : cfg.request_size_max                                                  ] :/27
         };
 
         payload_length_min <= payload_length_max;
         payload_length_min dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
         payload_length_max dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
     }

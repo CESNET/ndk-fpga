@@ -55,7 +55,7 @@ virtual class sequence_comp extends uvm_common::sequence_base #(config_sequence,
         uvm_pcie::completer_header rc_hdr;
         pcie_info#(TAG_WIDTH)::req_info rc_info;
 
-        rc_hdr  = uvm_pcie::completer_header::type_id::create("res_hdr", m_sequencer);
+        rc_hdr  = uvm_pcie::completer_header::type_id::create("rc_hdr", m_sequencer);
 
         if (info != null) begin
             rc_info = info.request[dev_id][tag_gen];
@@ -71,6 +71,7 @@ virtual class sequence_comp extends uvm_common::sequence_base #(config_sequence,
                 rc_hdr.lower_address == {rc_info.lower_address, fbe_addr};
                 rc_hdr.data.size()   <= rc_info.rest_length;
                 (rc_info.rest_length <= length_min) -> rc_hdr.data.size() == rc_info.rest_length;
+                // verilog_lint: waive line-length
                 (rc_info.rest_length > length_min && rc_info.rest_length <= length_max) -> rc_hdr.data.size() inside {[length_min:rc_info.rest_length]};
                 (rc_info.rest_length > length_max) -> rc_hdr.data.size() inside {[length_min:length_max]};
                 rc_hdr.tag           == tag_gen;
@@ -102,7 +103,10 @@ virtual class sequence_comp extends uvm_common::sequence_base #(config_sequence,
             if (rc_info.rest_length == 1 && rc_info.fbe == 0 && rc_info.lbe == 0) begin
                 rc_hdr.byte_count =  1;
             end else begin
-                rc_hdr.byte_count =  unsigned'(rc_info.rest_length * 4) - unsigned'(uvm_pcie::encode_fbe(rc_info.fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(rc_info.lbe)));
+                const int unsigned len = unsigned'(rc_info.rest_length * 4);
+                const int unsigned fbe = unsigned'(uvm_pcie::encode_fbe(rc_info.fbe));
+                const int unsigned lbe = unsigned'(uvm_pcie::encode_lbe(rc_info.lbe));
+                rc_hdr.byte_count =  len - fbe - (4-lbe);
             end
 
             rc_info.fbe           = '1;
@@ -139,23 +143,39 @@ class sequence_comp_base extends sequence_comp;
     constraint c_length {
         length_min <= length_max;
         length_min dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
         length_max dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
     }
@@ -199,7 +219,11 @@ class sequence_comp_base extends sequence_comp;
 
                 assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
                 if (tag_sel == TAG_SEL_RAND) begin
-                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                    assert(std::randomize(tag_gen) with
+                        {
+                            tag_gen inside {info.request[dev_id].find_index() with (1'b1)};
+                        }
+                    );
                 end else begin
                     // FIND FIRST SEND TAG
                     tag_gen = reqs_tag_fist_get(dev_id);
@@ -305,7 +329,11 @@ class sequence_comp_small extends sequence_comp;
 
                 assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
                 if (tag_sel == TAG_SEL_RAND) begin
-                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                    assert(std::randomize(tag_gen) with
+                        {
+                            tag_gen inside {info.request[dev_id].find_index() with (1'b1)};
+                        }
+                    );
                 end else begin
                     // FIND FIRST SEND TAG
                     tag_gen = reqs_tag_fist_get(dev_id);
@@ -376,7 +404,11 @@ class sequence_comp_big extends sequence_comp;
 
                 assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
                 if (tag_sel == TAG_SEL_RAND) begin
-                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                    assert(std::randomize(tag_gen) with
+                        {
+                            tag_gen inside {info.request[dev_id].find_index() with (1'b1)};
+                        }
+                    );
                 end else begin
                     // FIND FIRST SEND TAG
                     tag_gen = reqs_tag_fist_get(dev_id);
@@ -410,23 +442,39 @@ class sequence_comp_one_tag extends sequence_comp;
     constraint c_length {
         length_min <= length_max;
         length_min dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
         length_max dist {
+            // verilog_lint: waive line-length
             [cfg.payload_size_min                                                   : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8] :/27,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*1/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*2/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8] :/5,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*3/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*4/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8] :/2,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*5/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8] :/8,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*6/8 : cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8] :/13,
+            // verilog_lint: waive line-length
             [cfg.payload_size_min + (cfg.payload_size_max-cfg.payload_size_min)*7/8 : cfg.payload_size_max                                                  ] :/27
         };
     }
@@ -467,7 +515,11 @@ class sequence_comp_one_tag extends sequence_comp;
 
                 assert(std::randomize(dev_id)  with {dev_id  inside {devs_id};});
                 if (tag_sel == TAG_SEL_RAND) begin
-                    assert(std::randomize(tag_gen) with {tag_gen inside {info.request[dev_id].find_index() with (1'b1)};});
+                    assert(std::randomize(tag_gen) with
+                        {
+                            tag_gen inside {info.request[dev_id].find_index() with (1'b1)};
+                        }
+                    );
                 end else begin
                     // FIND FIRST SEND TAG
                     tag_gen = reqs_tag_fist_get(dev_id);

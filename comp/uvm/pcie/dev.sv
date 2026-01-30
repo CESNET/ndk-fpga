@@ -141,7 +141,8 @@ class dev extends uvm_component;
                 tx_info.request_delete(comp.requester_id, comp.tag);
             end
         end else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tBehavioral for header is not implemented!!%s", tr.convert2string()));
+            const string msg = $sformatf("\n\tBehavioral for header is not implemented!!%s", tr.convert2string());
+            `uvm_fatal(this.get_full_name(), msg);
         end
     endfunction
 endclass
