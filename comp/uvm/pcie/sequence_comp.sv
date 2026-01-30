@@ -186,6 +186,8 @@ class sequence_comp_base extends sequence_comp;
             logic [16-1:0] devs_id[];
             logic [16-1:0] dev_id;
             uvm_pcie::completer_header rc_hdr;
+            int unsigned resp_num;
+            int unsigned resp_num_max;
 
             if (info != null) begin
                 do begin
@@ -204,10 +206,19 @@ class sequence_comp_base extends sequence_comp;
                 end
             end
 
-            req = comp_hdr_randomize(dev_id, tag_gen);
-            start_item(req);
-            finish_item(req);
-            it++;
+            std::randomize(resp_num_max) with {resp_num_max inside {[1:10]};};
+            resp_num = 0;
+
+            // If there is no info then we dont care about matching request.
+            while ((info == null || info.request[dev_id].exists(tag_gen) == 1) && resp_num < resp_num_max &&
+                   it < transactions && (state == null || state.next())
+            ) begin
+                req = comp_hdr_randomize(dev_id, tag_gen);
+                start_item(req);
+                finish_item(req);
+                it++;
+                resp_num++;
+            end
         end
     endtask
 endclass
