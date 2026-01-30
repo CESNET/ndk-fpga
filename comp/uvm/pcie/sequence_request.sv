@@ -500,14 +500,173 @@ class sequence_request_one_requester extends sequence_request;
 
             it++;
         end
+    endtask
+endclass
 
-//requester_remove(logic [16-1:0] requester_id)
+//////////////////////////////////////////////////////////////////////
+//SEND SMALL REQUEST
+//////////////////////////////////////////////////////////////////////
+class sequence_request_small extends sequence_request;
+    `uvm_object_param_utils(uvm_pcie::sequence_request_small)
+
+    rand logic [16-1:0] dev_id[];
+
+    constraint const_base {
+        transactions   inside {[10:200]};
+        dev_id.size()  inside {[1:10]};
+        bar_probability.size() == 7+1; // BAR number + 1
+        bar_probability.sum() > 0;
+        foreach(bar_probability[it]) {
+            bar_probability[it] <= 50;
+        }
+    }
+
+    //In Dwords
+    constraint c_length {
+        request_length_min == cfg.request_size_min;
+        request_length_max == cfg.request_size_min;
+        payload_length_min == cfg.payload_size_min;
+        payload_length_max == cfg.payload_size_min;
+    }
+
+
+    function new(string name = "sequence_request_small");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        int unsigned it = 0;
+
+        if(!uvm_config_db #(pcie_info#(TAG_WIDTH))::get(m_sequencer, "", "pcie_info", info)) begin
+            `uvm_warning(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
+            info = null;
+        end;
+
+        if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+        while (it < transactions && (state == null || state.next())) begin
+            logic [16-1:0] dev_id_act;
+            logic [TAG_WIDTH-1:0]  tag;
+
+            assert(std::randomize(dev_id_act) with {dev_id_act inside {dev_id};}) else begin
+                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize device id");
+            end
+
+            if (info != null) begin
+                logic [TAG_WIDTH-1:0]  used_tag[$];
+
+                info.requester_add(dev_id_act);
+                wait (info.request[dev_id_act].size() < 2**TAG_WIDTH);
+                used_tag = info.request[dev_id_act].find_index() with (1'b1);
+
+                assert(std::randomize(tag) with {
+                        tag < 2**TAG_WIDTH;
+                        !(tag inside {used_tag});
+                    }
+                ) else begin `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie tag"); end
+
+            end else begin
+                std::randomize(tag); //actualy dont care
+            end
+
+            req = request_hdr_randomize(dev_id_act, {tag});
+
+            start_item(req);
+            finish_item(req);
+
+            it++;
+        end
+    endtask
+endclass
+
+//////////////////////////////////////////////////////////////////////
+//SEND BIG REQUEST
+//////////////////////////////////////////////////////////////////////
+class sequence_request_big extends sequence_request;
+    `uvm_object_param_utils(uvm_pcie::sequence_request_big)
+
+    rand logic [16-1:0] dev_id[];
+
+    constraint const_base {
+        transactions   inside {[1:20]};
+        dev_id.size()  inside {[1:10]};
+        bar_probability.size() == 7+1; // BAR number + 1
+        bar_probability.sum() > 0;
+        foreach(bar_probability[it]) {
+            bar_probability[it] <= 50;
+        }
+    }
+
+    //In Dwords
+    constraint c_length {
+        request_length_min == cfg.request_size_max;
+        request_length_max == cfg.request_size_max;
+        payload_length_min == cfg.payload_size_max;
+        payload_length_max == cfg.payload_size_max;
+    }
+
+
+    function new(string name = "sequence_request_big");
+        super.new(name);
+    endfunction
+
+    task body;
+        uvm_common::sequence_cfg state;
+        int unsigned it = 0;
+
+        if(!uvm_config_db #(pcie_info#(TAG_WIDTH))::get(m_sequencer, "", "pcie_info", info)) begin
+            `uvm_warning(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
+            info = null;
+        end;
+
+        if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+        while (it < transactions && (state == null || state.next())) begin
+            logic [16-1:0] dev_id_act;
+            logic [TAG_WIDTH-1:0]  tag;
+
+            assert(std::randomize(dev_id_act) with {dev_id_act inside {dev_id};}) else begin
+                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize device id");
+            end
+
+            if (info != null) begin
+                logic [TAG_WIDTH-1:0]  used_tag[$];
+
+                info.requester_add(dev_id_act);
+                wait (info.request[dev_id_act].size() < 2**TAG_WIDTH);
+                used_tag = info.request[dev_id_act].find_index() with (1'b1);
+
+                assert(std::randomize(tag) with {
+                        tag < 2**TAG_WIDTH;
+                        !(tag inside {used_tag});
+                    }
+                ) else begin `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie tag"); end
+
+            end else begin
+                std::randomize(tag); //actualy dont care
+            end
+
+            req = request_hdr_randomize(dev_id_act, {tag});
+
+            start_item(req);
+            finish_item(req);
+
+            it++;
+        end
     endtask
 endclass
 
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY REQUEST
+/////////////////////////////////////////////////////////////////////////
 class sequence_request_lib extends uvm_common::sequence_library#(config_sequence, uvm_pcie::header);
   `uvm_object_param_utils(uvm_pcie::sequence_request_lib)
   `uvm_sequence_library_utils(uvm_pcie::sequence_request_lib)
@@ -525,6 +684,8 @@ class sequence_request_lib extends uvm_common::sequence_library#(config_sequence
         this.add_sequence(uvm_pcie::sequence_request_stop::get_type());
         this.add_sequence(uvm_pcie::sequence_request_few_tag::get_type());
         this.add_sequence(uvm_pcie::sequence_request_one_requester::get_type());
+        this.add_sequence(uvm_pcie::sequence_request_small::get_type());
+        this.add_sequence(uvm_pcie::sequence_request_big::get_type());
     endfunction
 endclass
 
