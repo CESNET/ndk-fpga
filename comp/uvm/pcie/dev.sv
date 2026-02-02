@@ -13,16 +13,6 @@ class pcie_info#(
     int unsigned TAG_WIDTH
 );
 
-    //typedef struct {
-    //    // This is info for sequece.
-    //    // Sequence keep track what is generated
-    //    logic [7-1:0]  lower_address;
-    //    int unsigned   byte_count;
-    //    int unsigned   rest_length; // in DWORS
-    //} req_info;
-    //req_info    request[logic [16-1:0]][logic [TAG_WIDTH-1:0]];
-
-
     typedef struct {
         // This is info for sequece.
         // Sequence keep track what is generated
@@ -32,6 +22,7 @@ class pcie_info#(
         logic [4-1:0]  fbe;
         logic [4-1:0]  lbe;
         int unsigned   rest_length; // in DWORS
+        time           received_time; // simulation time when request have been received
     } req_info;
 
     req_info    request[logic [16-1:0]][logic [TAG_WIDTH-1:0]];
@@ -50,9 +41,6 @@ class pcie_info#(
         end
         return ret;
     endfunction
-    //function void bar_register(bar_config cfg);
-    //    bar = cfg;
-    //endfunction
 
     function void request_register(logic [16-1:0] requester_id, logic [TAG_WIDTH-1:0] tag, req_info info);
         if (request.exists(requester_id) && request[requester_id].exists(tag)) begin
@@ -90,10 +78,8 @@ class pcie_info#(
     endfunction
 endclass
 
-//TODO: BASE DEV SHOULD DO NOTHING.
-//`uvm_analysis_imp_decl(_rx)
-//`uvm_analysis_imp_decl(_tx)
 
+//TODO: BASE DEV SHOULD DO NOTHING.
 class dev extends uvm_component;
     `uvm_component_param_utils(uvm_pcie::dev)
 
@@ -101,8 +87,6 @@ class dev extends uvm_component;
 
     typedef dev this_type;
     uvm_analysis_imp#(uvm_pcie::header, this_type) port_pcie;
-    //uvm_analysis_imp_rx#(uvm_pcie::header, this_type) analysis_imp_rx;
-    //uvm_analysis_imp_tx#(uvm_pcie::header, this_type) analysis_imp_tx;
 
     // TODO: RESET
     //uvm_reset::sync_terminate reset_sync;
@@ -135,6 +119,7 @@ class dev extends uvm_component;
             info.fbe = req.fbe;
             info.lbe = req.lbe;
             info.rest_length = req.length_get();
+            info.received_time = $time;
 
             rx_info.request_register(req.requester_id, req.tag, info);
         end else if (tr.fmt[3-1:1] == 2'b01 && tr.pcie_type[5-1:0] == 5'b00000) begin
@@ -156,7 +141,8 @@ class dev extends uvm_component;
                 tx_info.request_delete(comp.requester_id, comp.tag);
             end
         end else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tBehavioral for header is not implemented!!%s", tr.convert2string()));
+            const string msg = $sformatf("\n\tBehavioral for header is not implemented!!%s", tr.convert2string());
+            `uvm_fatal(this.get_full_name(), msg);
         end
     endfunction
 endclass
