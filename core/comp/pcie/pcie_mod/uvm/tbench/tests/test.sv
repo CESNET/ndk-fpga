@@ -50,7 +50,7 @@ class ex_test extends uvm_test;
         // DUT and  Model
         fork
             begin
-                m_env.m_scoreboard.used();
+                wait(m_env.m_scoreboard.used() == 0);
                 m_virt_seq.stop_send();
             end
         join_none
