@@ -1,0 +1,14 @@
+[project]
+name = "cocotb-spookyhash"
+version = "0.1.0"
+dependencies = [
+    "cocotbext-ofm @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+    "setuptools",
+    "spookyhash",
+    "siphash-cffi",
+    "pyuvm",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
