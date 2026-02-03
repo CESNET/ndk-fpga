@@ -26,16 +26,16 @@ begin
 
     v6_v7_gen : if DEVICE = "VIRTEX6" or DEVICE = "7SERIES" generate
 
-        constant I            : integer := tsel(
+        constant ITEMS_CEIL   : integer := tsel(
                                                 ITEMS <= 512,   512, tsel(
                                                                              ITEMS <= 1024, 1024, tsel(
                                                                                                           ITEMS <= 2048, 2048, tsel(
                                                                                                                                        ITEMS <= 4096, 4096, 8192
                                                                                                                                    ))));
-        constant DW36D        : integer := 32768 / I;
+        constant DW36D        : integer := 32768 / ITEMS_CEIL;
         constant DW36P        : integer := DW36D / 8;
         constant DW36         : integer := DW36D + DW36P;
-        constant DW18D        : integer := tsel(I = 8192, 0, 16384 / I);
+        constant DW18D        : integer := tsel(ITEMS_CEIL = 8192, 0, 16384 / ITEMS_CEIL);
         constant DW18P        : integer := DW18D / 8;
         constant DW18         : integer := DW18D + DW18P;
         constant ROWS         : integer := ((DATA_WIDTH-1) / DW36) + 1;
@@ -247,21 +247,21 @@ begin
 
     us_gen : if DEVICE = "ULTRASCALE" generate
 
-        constant I                : integer := tsel(
+        constant ITEMS_CEIL       : integer := tsel(
                                                     ITEMS <= 512,   512, tsel(
                                                                                  ITEMS <= 1024, 1024, tsel(
                                                                                                               ITEMS <= 2048, 2048, tsel(
                                                                                                                                            ITEMS <= 4096, 4096, 8192
                                                                                                                                        ))));
-        constant DW36D            : integer := 32768 / I;
+        constant DW36D            : integer := 32768 / ITEMS_CEIL;
         constant DW36P            : integer := DW36D / 8;
         constant DW36             : integer := DW36D + DW36P;
-        constant DW18D            : integer := tsel(I = 8192, 0, 16384 / I);
+        constant DW18D            : integer := tsel(ITEMS_CEIL = 8192, 0, 16384 / ITEMS_CEIL);
         constant DW18P            : integer := DW18D / 8;
         constant DW18             : integer := DW18D + DW18P;
         constant ROWS             : integer := ((DATA_WIDTH-1) / DW36) + 1;
         constant LAST18           : boolean := (DATA_WIDTH - ((ROWS-1)*DW36)) <= DW18;
-        constant PROG_FULL_THRESH : integer := I - ALMOST_FULL_OFFSET;
+        constant PROG_FULL_THRESH : integer := ITEMS_CEIL - ALMOST_FULL_OFFSET;
 
         signal di_rows       : std_logic_vector(DW36*ROWS-1 downto 0) := (others => '0');
         signal do_rows       : std_logic_vector(DW36*ROWS-1 downto 0) := (others => '0');
