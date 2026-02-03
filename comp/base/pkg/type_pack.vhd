@@ -236,7 +236,7 @@ package body type_pack is
         variable rv : std_logic_vector(ITEMS_X*DATA_WIDTH-1 downto 0);
     begin
         for i in 0 to ITEMS_X-1 loop
-            rv((i+1)*DATA_WIDTH-1 downto i*DATA_WIDTH) := slv_array(i);
+            rv((i+1)*DATA_WIDTH-1 downto i*DATA_WIDTH) := slv_array(slv_array'low+i);
         end loop;
         return rv;
     end function;
@@ -246,7 +246,7 @@ package body type_pack is
         if (slv_array'length = 0) then
             return (-1 downto 0 => 'X'); -- null std_logic_vector
         else
-            return slv_array_ser(slv_array,slv_array'length,slv_array(0)'length);
+            return slv_array_ser(slv_array,slv_array'length,slv_array(slv_array'low)'length);
         end if;
     end function;
 
