@@ -256,12 +256,12 @@ begin
                 signal array_pom_out : array_pom_out_t;
             begin
                 --! generate output registers
-                gen_reg_out: for i in 0 to ((DATA_WIDTH/48) + (1 mod ((DATA_WIDTH mod 48) +1)) - 2) generate
+                gen_reg_out: for y in 0 to ((DATA_WIDTH/48) + (1 mod ((DATA_WIDTH mod 48) +1)) - 2) generate
                     process (CLK)
                     begin
                         if ((CLK'event) and (CLK = '1')) then
-                            -- if (enable_p(2+I) = '1') then
-                            array_pom_out(I + 1) <= array_pom_out(I);
+                            -- if (enable_p(2+y) = '1') then
+                            array_pom_out(y + 1) <= array_pom_out(y);
                             -- end if;
                         end if;
                     end process;
@@ -269,12 +269,12 @@ begin
 
                 --! generate registers for DSP pattern output
                 gen_rst_logic: if (AUTO_RESET = 1) generate
-                    gen_reg_out: for i in 0 to ((DATA_WIDTH/48) + (1 mod ((DATA_WIDTH mod 48) +1)) - 2) generate
+                    gen_reg_out: for y in 0 to ((DATA_WIDTH/48) + (1 mod ((DATA_WIDTH mod 48) +1)) - 2) generate
                         process (CLK)
                         begin
                             if ((CLK'event) and (CLK = '1')) then
-                                -- if (enable_p(2+I) = '1') then
-                                pattern_pom(I + 1) <= pattern_pom(I);
+                                -- if (enable_p(2+y) = '1') then
+                                pattern_pom(y + 1) <= pattern_pom(y);
                                 -- end if;
                             end if;
                         end process;
@@ -321,8 +321,8 @@ begin
                     process (CLK)
                     begin
                         if ((CLK'event) and (CLK = '1')) then
-                            -- if (enable_p(I+2+Y) = '1') then
-                            array_pom_out(Y + 1) <= array_pom_out(Y);
+                            -- if (enable_p(I+2+y) = '1') then
+                            array_pom_out(y + 1) <= array_pom_out(y);
                             -- end if;
                         end if;
                     end process;
@@ -333,8 +333,8 @@ begin
                         process (CLK)
                         begin
                             if ((CLK'event) and (CLK = '1')) then
-                                -- if (enable_p(I+2+Y) = '1') then
-                                pattern_pom(Y + 1) <= pattern_pom(Y);
+                                -- if (enable_p(I+2+y) = '1') then
+                                pattern_pom(y + 1) <= pattern_pom(y);
                                 -- end if;
                             end if;
                         end process;
@@ -346,8 +346,8 @@ begin
                     process (CLK)
                     begin
                         if ((CLK'event) and (CLK = '1')) then
-                            -- if (enable_p(1+Y) = '1') then
-                            array_pom_in_A(Y + 1) <= array_pom_in_A(Y);
+                            -- if (enable_p(1+y) = '1') then
+                            array_pom_in_A(y + 1) <= array_pom_in_A(y);
                             -- end if;
                         end if;
                     end process;
@@ -359,8 +359,8 @@ begin
                         process (CLK)
                         begin
                             if ((CLK'event) and (CLK = '1')) then
-                                -- if (enable_p(1+Y) = '1') then
-                                array_pom_in_MAX(Y + 1) <= array_pom_in_MAX(Y);
+                                -- if (enable_p(1+y) = '1') then
+                                array_pom_in_MAX(y + 1) <= array_pom_in_MAX(y);
                                 -- end if;
                             end if;
                         end process;
@@ -407,8 +407,8 @@ begin
                     process (CLK)
                     begin
                         if ((CLK'event) and (CLK = '1')) then
-                            -- if (enable_p(1+Y) = '1') then
-                            array_pom_in_A(Y + 1) <= array_pom_in_A(Y);
+                            -- if (enable_p(1+y) = '1') then
+                            array_pom_in_A(y + 1) <= array_pom_in_A(y);
                             -- end if;
                         end if;
                     end process;
@@ -419,8 +419,8 @@ begin
                         process (CLK)
                         begin
                             if ((CLK'event) and (CLK = '1')) then
-                                -- if (enable_p(1+Y) = '1') then
-                                array_pom_in_MAX(Y + 1) <= array_pom_in_MAX(Y);
+                                -- if (enable_p(1+y) = '1') then
+                                array_pom_in_MAX(y + 1) <= array_pom_in_MAX(y);
                                 -- end if;
                             end if;
                         end process;
@@ -465,8 +465,8 @@ begin
                 process (CLK)
                 begin
                     if ((CLK'event) and (CLK = '1')) then
-                        -- if (enable_p(1+Y) = '1') then
-                        array_pom_in_A(Y + 1) <= array_pom_in_A(Y);
+                        -- if (enable_p(1+y) = '1') then
+                        array_pom_in_A(y + 1) <= array_pom_in_A(y);
                         -- end if;
                     end if;
                 end process;
@@ -477,8 +477,8 @@ begin
                     process (CLK)
                     begin
                         if ((CLK'event) and (CLK = '1')) then
-                            -- if (enable_p(1+Y) = '1') then
-                            array_pom_in_MAX(Y + 1) <= array_pom_in_MAX(Y);
+                            -- if (enable_p(1+y) = '1') then
+                            array_pom_in_MAX(y + 1) <= array_pom_in_MAX(y);
                             -- end if;
                         end if;
                     end process;
