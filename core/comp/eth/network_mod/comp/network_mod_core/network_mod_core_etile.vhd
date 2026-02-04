@@ -1364,6 +1364,8 @@ begin
         signal mfb2avst_rx_mfb_sof : std_logic_vector(1-1 downto 0);
         signal mfb2avst_rx_mfb_eof : std_logic_vector(1-1 downto 0);
 
+        signal rx_reset            : std_logic;
+
         signal tx_ad_avst_data   : std_logic_vector(AVST_DATA_WIDTH -1 downto 0);
         signal tx_ad_avst_sop    : std_logic;
         signal tx_ad_avst_eop    : std_logic;
@@ -1388,6 +1390,8 @@ begin
         -- JC: This assignment/renaming is necessary here to synchronize
         -- the delta delay (for simulators) between the clock and data signals!
         RX_MFB_DST_RDY(IT) <= mfb2avst_rx_mfb_dst_rdy(IT);
+
+        rx_reset <= RESET_ETH or (not rx_pcs_ready(IT));
 
         -- TX adaption
         mfb2avst_i : entity work.TX_MAC_LITE_ADAPTER_AVST_100G
@@ -1425,7 +1429,7 @@ begin
         )
         port map (
             CLK              => etile_clk_out,
-            RESET            => RESET_ETH,
+            RESET            => rx_reset,
 
             IN_AVST_DATA     => rx_avst_data_arr (IT),
             IN_AVST_SOP      => rx_avst_sop      (IT),
@@ -1463,7 +1467,7 @@ begin
             SEGMENTS => AVST_DATA_WIDTH/64
         )
         port map (
-            RST              => RESET_ETH,
+            RST              => rx_reset,
             CLK              => etile_clk_out,
             --
             IN_AVST_DATA     => rx_avst_data_arr(IT),
