@@ -69,6 +69,11 @@ entity NETWORK_MOD_CORE is
         -- Ethernet lanes polarity
         LANE_RX_POLARITY   : std_logic_vector(LANES-1 downto 0) := (others => '0');
         LANE_TX_POLARITY   : std_logic_vector(LANES-1 downto 0) := (others => '0');
+        -- Select VSR mode for F-Tile. Values:
+        --  - 00 means optical mode configuration (LR/SR) - default mode for most cards
+        --  - 01 means CR mode configuration
+        --  - 10 is for cards for which 00 doesn't work due to high loss
+        FTILE_VSR_MODE_SEL : std_logic_vector(1 downto 0) := (others => '0');
         -- Width of MISC signal between Top-Level FPGA design and NET_MOD core logic
         MISC_TOP2NET_WIDTH : natural := 1;
         -- Width of MISC signal between NET_MOD core logic and Top-Level FPGA design
