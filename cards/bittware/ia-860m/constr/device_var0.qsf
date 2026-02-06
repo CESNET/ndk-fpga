@@ -1,0 +1,49 @@
+# device.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): Denis Kurka <kurka@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# ==============================================================================
+#  Global assignments
+# ==============================================================================
+
+set_global_assignment -name DEVICE AGMF039R47A2E2VR0
+set_global_assignment -name FAMILY "Agilex 7"
+
+# ==============================================================================
+# Board Management Controller (BMC) Interface
+# ==============================================================================
+
+# BMC interface FPGA Egress SPI and IRQ
+set_location_assignment PIN_FR58 -to FPGA_EG_SPI_SCK
+set_location_assignment PIN_FF61 -to FPGA_EG_SPI_PCS0
+set_location_assignment PIN_FE62 -to FPGA_EG_SPI_MOSI
+set_location_assignment PIN_FP57 -to FPGA_EG_SPI_MISO
+set_location_assignment PIN_FE56 -to BMC_TO_FPGA_IRQ
+
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_EG_SPI_SCK
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_EG_SPI_PCS0
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_EG_SPI_MOSI
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_EG_SPI_MISO
+set_instance_assignment -name IO_STANDARD 1.2V -to BMC_TO_FPGA_IRQ
+
+# BMC interface FPGA Ingress SPI and IRQ
+set_location_assignment PIN_FJ62 -to FPGA_IG_SPI_SCK
+set_location_assignment PIN_FE60 -to FPGA_IG_SPI_PCS0
+set_location_assignment PIN_FF59 -to FPGA_IG_SPI_MOSI
+set_location_assignment PIN_FH61 -to FPGA_IG_SPI_MISO
+set_location_assignment PIN_FJ56 -to FPGA_TO_BMC_IRQ
+
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_IG_SPI_SCK
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_IG_SPI_PCS0
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_IG_SPI_MOSI
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_IG_SPI_MISO
+set_instance_assignment -name IO_STANDARD 1.2V -to FPGA_TO_BMC_IRQ
+
+# BMC interface present in FPGA design
+set_location_assignment PIN_FH55 -to BMC_IF_PRESENT_L
+set_instance_assignment -name IO_STANDARD 1.2V -to BMC_IF_PRESENT_L
+
+set_instance_assignment -name FAST_OUTPUT_REGISTER ON -to FPGA_IG_SPI_MISO
+set_instance_assignment -name FAST_INPUT_REGISTER ON -to FPGA_IG_SPI_MOSI
