@@ -97,12 +97,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../n6010/readme.html">Silicom N6010</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Silicom fb2CDg1&#64;AGM39D-2</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#board-variants">Board Variants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#board-variants"><span class="xref std std-ref">Board Variants</span></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#initial-boot-instructions">Initial Boot instructions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -199,14 +200,7 @@
 </div>
 </section>
 <section id="board-variants">
-<h2>Board Variants<a class="headerlink" href="#board-variants" title="Link to this heading"></a></h2>
-<p>This card exists in multiple variants.
-The correct variant for the firmware build can be selected using the Makefile parameter BOARD_VARIANT, for example as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;NDK-FPGA_root_directory&gt;/apps/minimal/build/fb2cdg1
-$ make BOARD_VARIANT=1
-</pre></div>
-</div>
-<p><strong>Allowed values of BOARD_VARIANT parameter</strong></p>
+<h2><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html#board-variant"><span class="std std-ref">Board Variants</span></a><a class="headerlink" href="#board-variants" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">BOARD_VARIANT=1</span></code> - The board uses FPGA part number <code class="docutils literal notranslate"><span class="pre">AGMF039R47A1E2VC</span></code> (Production sample).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">BOARD_VARIANT=0</span></code> - The board uses FPGA part number <code class="docutils literal notranslate"><span class="pre">AGMF039R47A2E2VR0</span></code> (Engineering sample).</p></li>

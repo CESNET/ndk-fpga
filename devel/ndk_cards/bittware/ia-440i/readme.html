@@ -19,7 +19,7 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="AMD Alveo U200" href="../../amd/alveo-u200/readme.html" />
+    <link rel="next" title="Bittware IA-860m" href="../ia-860m/readme.html" />
     <link rel="prev" title="Bittware IA-420F" href="../ia-420f/readme.html" /> 
 </head>
 
@@ -99,17 +99,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Bittware IA-440I</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#board-variants">Board Variants</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#general-boot-information">General boot information</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#bootstrap-instructions">Bootstrap instructions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#phase-1-let-the-nfb-driver-handle-the-device">Phase 1: Let the nfb driver handle the device</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#phase-2-flash-custom-image-and-check-for-boot">Phase 2: Flash custom image and check for boot</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#phase-3-replace-the-original-firmware">Phase 3: Replace the original firmware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#board-variants"><span class="xref std std-ref">Board Variants</span></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#usb-boot-instructions">USB boot instructions</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -204,138 +197,14 @@
 <p class="admonition-title">Note</p>
 <p>To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro installed, including a valid license.</p>
 </div>
+<p>Detailed boot information can be found in the <a class="reference internal" href="../bmc_3.x.html"><span class="doc">Common readme for BittWare cards with BMC 3.x</span></a></p>
 </section>
 <section id="board-variants">
-<h2>Board Variants<a class="headerlink" href="#board-variants" title="Link to this heading"></a></h2>
-<p>This card exists in multiple variants.
-The correct variant for the firmware build can be selected using the Makefile parameter BOARD_VARIANT, for example as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;NDK-FPGA_root_directory&gt;/apps/minimal/build/ia-440i
-$ make BOARD_VARIANT=1
-</pre></div>
-</div>
-<p><strong>Allowed values of BOARD_VARIANT parameter</strong></p>
+<h2><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html#board-variant"><span class="std std-ref">Board Variants</span></a><a class="headerlink" href="#board-variants" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">BOARD_VARIANT=1</span></code> - The board uses FPGA part number <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1VC</span></code> (C0 F-Tile).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">BOARD_VARIANT=0</span></code> - The board uses FPGA part number <code class="docutils literal notranslate"><span class="pre">AGIB023R18A1E1V</span></code>.</p></li>
 </ul>
-</section>
-<section id="general-boot-information">
-<h2>General boot information<a class="headerlink" href="#general-boot-information" title="Link to this heading"></a></h2>
-<p>The BMC on the card doesn’t store firmware images on fixed flash offsets. Instead, it uses filesystem-like access.
-The offsets can vary, and the software is responsible for positioning and allocating the space for the new image.
-This behaviour is adapted for NDK standard approach in <code class="docutils literal notranslate"><span class="pre">nfb</span></code> kernel driver like this:</p>
-<ul class="simple">
-<li><p>Slot ID 1 (recovery) is reserved for an (existing) image at flash offset 0.</p></li>
-<li><p>Slot ID 0 is reserved for the (existing) image right after Slot ID 1.</p></li>
-<li><p>All other images or empty slots are numbered from ID 2.</p></li>
-<li><p>The driver creates additional empty image slots between images.</p></li>
-<li><p>The slot IDs can be renumbered after any boot action.</p></li>
-<li><p>User can set boot priority for each image using the <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-P</span> <span class="pre">X,Y,Z</span></code>, where X, Y and Z are slot IDs.
-For example, <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-P</span> <span class="pre">4,2</span></code> sets priority 0 for the slot ID 4 and priority 1 for the slot ID 2 (other slot priorities will be untouched).
-The priorities are listed in the square brackets in the output of the <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-l</span></code> command (present just for the supported cards).
-Lower numbers means higher priority (except -1, which is undefined).
-Be aware that the priority numbers must be unique for each image and the empty slots can’t have priority.</p></li>
-<li><p>The non-empty slot with ID X can be deleted with command <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-D</span> <span class="pre">X</span></code>.</p></li>
-<li><p>The non-empty slots are represented also by image names.</p></li>
-<li><p>The non-empty slots can be directly written as usual. If the size of the already present (overwritten) image is insufficient, the driver will also try to consume the empty slot right after the selected slot. If that empty slot does not exist (is not empty), the boot fails.</p></li>
-</ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The boot priority should be set after writing a firmware, especially to Slot ID 1 (recovery), otherwise no image can be booted after Power-on. For the default NDK behaviour, the priority should be set with <code class="docutils literal notranslate"><span class="pre">nfb-boot</span> <span class="pre">-P</span> <span class="pre">1,0</span></code></p>
-</div>
-</section>
-<section id="bootstrap-instructions">
-<h2>Bootstrap instructions<a class="headerlink" href="#bootstrap-instructions" title="Link to this heading"></a></h2>
-<section id="phase-1-let-the-nfb-driver-handle-the-device">
-<h3>Phase 1: Let the nfb driver handle the device<a class="headerlink" href="#phase-1-let-the-nfb-driver-handle-the-device" title="Link to this heading"></a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate nfb-boostrap.dtb file; assuming the vendor OEM firmware is booted</span>
-sudo<span class="w"> </span>yum<span class="w"> </span>install<span class="w"> </span>python3-nfb-tools
-nfb-bootstrap<span class="w"> </span>-c<span class="w"> </span>IA-440I
-
-<span class="c1"># Find PCI address for device</span>
-<span class="nv">PCI_BFN</span><span class="o">=</span><span class="k">$(</span>lspci<span class="w"> </span>-d<span class="w"> </span>12ba:<span class="w"> </span>-D<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-n1<span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39; &#39;</span><span class="w"> </span>-f1<span class="k">)</span>
-
-<span class="c1"># Inject DTB to the driver and load the PCI device to the driver too</span>
-sudo<span class="w"> </span>modprobe<span class="w"> </span>nfb
-sudo<span class="w"> </span>nfb-boot<span class="w"> </span>-d<span class="w"> </span><span class="nv">$PCI_BFN</span><span class="w"> </span>-I<span class="w"> </span>nfb-bootstrap.dtb
-
-<span class="c1"># Set this device as default in current terminal for next commands</span>
-<span class="k">$(</span>nfb-info<span class="w"> </span>-q<span class="w"> </span>dd<span class="w"> </span>-d<span class="w"> </span>/dev/nfb/by-pci-slot/<span class="nv">$PCI_BFN</span><span class="k">)</span>
-</pre></div>
-</div>
-</section>
-<section id="phase-2-flash-custom-image-and-check-for-boot">
-<h3>Phase 2: Flash custom image and check for boot<a class="headerlink" href="#phase-2-flash-custom-image-and-check-for-boot" title="Link to this heading"></a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># check for original firmware slot (should be ID 1, the ID 0 may be present)</span>
-<span class="c1"># check for empty slot (should be nr. 2)</span>
-nfb-boot<span class="w"> </span>-l
-
-<span class="c1"># If you do not have the USB cable for the card, stay safe:</span>
-<span class="c1"># use an empty slot (probably with ID 2) or a non-empty slot with ID 0,</span>
-<span class="c1"># and do not overwrite original (ID 1) firmware yet, in case of failure</span>
-nfb-boot<span class="w"> </span>-w<span class="w"> </span><span class="m">0</span><span class="w"> </span>myfirmware.nfw
-nfb-boot<span class="w"> </span>-F<span class="w"> </span><span class="m">0</span>
-
-<span class="c1"># The firmware should be now uploaded and live.</span>
-<span class="c1"># The nfb-info reads device tree just from the PCI configuration space.</span>
-<span class="c1"># But if the machine, for example, cannot assign a PCI BAR resource,</span>
-<span class="c1"># the MI access to the BMC fails and the slot list will be empty.</span>
-<span class="c1"># The machine warm reboot should fix that (beware, cold reboot loads original firmware)</span>
-nfb-info
-nfb-boot<span class="w"> </span>-l
-
-<span class="c1"># If everything is OK, set the new firmware as the second priority (after the original):</span>
-nfb-boot<span class="w"> </span>-P<span class="w"> </span><span class="m">1</span>,0
-</pre></div>
-</div>
-</section>
-<section id="phase-3-replace-the-original-firmware">
-<h3>Phase 3: Replace the original firmware<a class="headerlink" href="#phase-3-replace-the-original-firmware" title="Link to this heading"></a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable write access to the recovery image (Slot ID 1)</span>
-sudo<span class="w"> </span>rmmod<span class="w"> </span>nfb<span class="p">;</span><span class="w"> </span>sudo<span class="w"> </span>modprobe<span class="w"> </span>nfb<span class="w"> </span><span class="nv">flash_recovery_ro</span><span class="o">=</span><span class="m">0</span>
-
-<span class="c1"># Replace OEM firmware by the custom firmware</span>
-nfb-boot<span class="w"> </span>-w1<span class="w"> </span>myfirmware.nfw
-<span class="c1"># Note: if the original image is smaller than the custom firmware,</span>
-<span class="c1"># this method will not work due to a space issue.</span>
-<span class="c1"># Try to flash the same firmware to the next empty slot (2),</span>
-<span class="c1"># modify the image priority sequence to 1,2 and then delete the first custom slot (0).</span>
-<span class="c1"># This creates sufficient empty slot for rewriting factory firmware (1) with custom firmware.</span>
-
-<span class="c1"># set again the new firmware the second priority (after original):</span>
-nfb-boot<span class="w"> </span>-P<span class="w"> </span><span class="m">1</span>,0
-</pre></div>
-</div>
-</section>
-</section>
-<section id="usb-boot-instructions">
-<h2>USB boot instructions<a class="headerlink" href="#usb-boot-instructions" title="Link to this heading"></a></h2>
-<p>Before you can work with the card, you will need to install Bittware’s SDK and IA-440i Card Support Package (CSP) on your host system.
-To be able to do that, you will also need Python 3 (version &gt;= 3.8) present on your system, so be sure to get that first.
-Next, proceed with the following steps:</p>
-<ul class="simple">
-<li><p>Download the Bittware SDK and IA-440i CSP installers from the <a class="reference external" href="https://developer.bittware.com">Bittware Developer Website</a> (version 2024.2).</p></li>
-<li><p>Install both downloaded packages by following the instructions in the Bittware SDK and CSP Installation manual (accessible on the same website).</p></li>
-<li><p>Connect your IA-440i card to the host using the dedicated USB cable.</p></li>
-</ul>
-<p>Once this is done, you can check the card status by issuing <code class="docutils literal notranslate"><span class="pre">bw_card_list</span> <span class="pre">-v</span></code>.
-If everything is OK (card has been found and is available via USB), you can use the <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span></code> utility to manage designs for your card.</p>
-<ul class="simple">
-<li><p>To get more info about the usage and available subprograms of the <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span></code> utility, type <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span> <span class="pre">-h</span></code>.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span> <span class="pre">table</span></code> to list all stored flash images.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span> <span class="pre">program</span> <span class="pre">&lt;ia-440i_design_name&gt;.rbf</span> <span class="pre">&lt;address&gt;</span></code> to write the image into the configuration flash on the given address.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span> <span class="pre">default</span> <span class="pre">&lt;ia-440i_design_name&gt;.rbf</span></code> to make your design the default boot option.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span> <span class="pre">load</span>&#160;&#160;&#160; <span class="pre">&lt;ia-440i_design_name&gt;.rbf</span></code> to configure the fpga with your design from the flash.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">bw_bmc_fpga_load</span> <span class="pre">stream</span>&#160; <span class="pre">&lt;ia-440i_design_name&gt;.rbf</span></code> to configure the fpga directly without writing it into the flash.</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>All designs stored inside the configuration flash (or directly loaded into the fpga) must be built using the same version of Quartus Prime Pro.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>So far, there are features of the nfb framework that are not yet fully supported for this card (e. g. <code class="docutils literal notranslate"><span class="pre">nfb-eth</span> <span class="pre">-T</span></code>).</p>
-</div>
 </section>
 </section>
 
@@ -344,7 +213,7 @@ If everything is OK (card has been found and is available via USB), you can use 
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../ia-420f/readme.html" class="btn btn-neutral float-left" title="Bittware IA-420F" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../amd/alveo-u200/readme.html" class="btn btn-neutral float-right" title="AMD Alveo U200" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../ia-860m/readme.html" class="btn btn-neutral float-right" title="Bittware IA-860m" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
