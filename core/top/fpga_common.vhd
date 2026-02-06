@@ -77,6 +77,11 @@ entity FPGA_COMMON is
         ETH_LANE_MAP            : integer_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => 0);
         ETH_LANE_RXPOLARITY     : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => '0');
         ETH_LANE_TXPOLARITY     : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0) := (others => '0');
+        -- Select VSR mode for F-Tile. Values:
+        --  - 00 means optical mode configuration (LR/SR) - default mode for most cards
+        --  - 01 means CR mode configuration
+        --  - 10 is for cards for which 00 doesn't work due to high loss
+        FTILE_VSR_MODE_SEL      : std_logic_vector(1 downto 0) := (others => '0');
         ETH_PORT_LEDS           : natural := 2;
         QSFP_PORTS              : natural := 2;
         QSFP_I2C_PORTS          : natural := 1;
@@ -1595,6 +1600,7 @@ begin
 
         LANE_RX_POLARITY   => ETH_LANE_RXPOLARITY,
         LANE_TX_POLARITY   => ETH_LANE_TXPOLARITY,
+        FTILE_VSR_MODE_SEL => FTILE_VSR_MODE_SEL,
         RESET_WIDTH        => 1,
         MISC_TOP2NET_WIDTH => MISC_TOP2NET_WIDTH,
         MISC_NET2TOP_WIDTH => MISC_NET2TOP_WIDTH,
