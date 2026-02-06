@@ -96,6 +96,8 @@ architecture FULL of FPGA is
     constant DMA_ENDPOINTS   : integer := tsel(DMA_TYPE=3, 4, 1);
     constant QSFP_PORTS      : natural := 2;
     constant DEVICE          : string  := "AGILEX";
+    -- VSR mode 00 (low loss) doesn't work for IA-860m. Therefore, mode 10 (VSR disabled) must be used.
+    constant VSR_MODE_SEL    : std_logic_vector(1 downto 0) := "10";
 
     --Ethernet
     signal eth_rx_p          : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
@@ -157,6 +159,7 @@ begin
         ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_PORT_LEDS           => 1,
         ETH_LANES               => ETH_LANES,
+        FTILE_VSR_MODE_SEL      => VSR_MODE_SEL,
 
         QSFP_PORTS              => QSFP_PORTS,
         QSFP_I2C_PORTS          => QSFP_PORTS,
