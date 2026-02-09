@@ -62,6 +62,7 @@ architecture FULL of PPW_DMA_UPHDR_GEN is
     -- =====================================================================
 
     signal tr_cnt         : unsigned(DMA_REQUEST_TAG_W-1 downto 0);
+    signal length_dwords  : unsigned(log2(PKT_MTU/4+1)-1 downto 0);
     signal dma_uphdr_data : std_logic_vector(DMA_UPHDR_WIDTH-1 downto 0);
 
 begin
@@ -81,7 +82,9 @@ begin
     end process;
 
     -- Convert to DWORDS
-    dma_uphdr_data(DMA_REQUEST_LENGTH  ) <= std_logic_vector(resize(unsigned(RX_MVB_LENGTH(RX_MVB_LENGTH'high downto 2)), DMA_REQUEST_LENGTH_W));
+    length_dwords <= unsigned(RX_MVB_LENGTH(RX_MVB_LENGTH'high downto 2)) + (or RX_MVB_LENGTH(1 downto 0));
+
+    dma_uphdr_data(DMA_REQUEST_LENGTH  ) <= std_logic_vector(resize(length_dwords, DMA_REQUEST_LENGTH_W));
     dma_uphdr_data(DMA_REQUEST_TYPE    ) <= DMA_TYPE_WRITE;
     -- Packets are aligned to the beginning of the word (hence also beginning of DWORD)
     dma_uphdr_data(DMA_REQUEST_FIRSTIB ) <= (others => '0');
