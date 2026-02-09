@@ -4,12 +4,9 @@
 #            Martin Spinler <spinler@cesnet.cz>
 #            Radek Isa <isa@cesnet.cz>
 
-import logging
-import cocotb
-from cocotb.queue import Queue
-
-from ..utils import concat, deconcat, numberOfSetBits, SerializableHeader
+from ..utils import deconcat, numberOfSetBits, SerializableHeader
 from .PcieHeaders import fbe2offset
+from .PcieRequester import PcieRequester
 
 
 class CompletionHeaderEmpty(SerializableHeader):
@@ -38,117 +35,64 @@ class CompletionHeader(SerializableHeader):
     ))
 
 
-class AvstBase:
-    def __init__(self, cdriver):
-        self._cdriver = cdriver
-        bus = cdriver.bus
+class AvstRequester(PcieRequester):
+    """Handles PCIe requests on the PCIe-specific AVST interface."""
 
-        try:
-            self._segs = len(bus.VALID)
-        except Exception:
-            self._segs = 1
-
-        self._empty_width = len(bus.EMPTY) // self._segs
-        self._hdr_width = len(bus.HDR) // self._segs
-        self._avst_width = len(bus.DATA) // 8
-
-    async def _send_frame(self, cb, data, header, header_empty):
-        _avst_width = self._avst_width // self._segs
-        orig_data = data
-        seg, dwr, sop, eop, emp, hdr = 0, 0, 0, 0, 0, 0
-        end = False
-        while not end:
-            length = min(_avst_width, len(data))
-            begin = len(data) == len(orig_data)
-            end = len(data) == length
-            dwr |= concat(list(zip(data[:length], [8] * length))) << (seg * _avst_width * 8)
-            emp |= (((_avst_width - length) // 4) if length else 0) << (seg * self._empty_width)
-            hdr |= (header.serialize() if begin else header_empty.serialize()) << (seg * self._hdr_width)
-            sop |= (1 if begin else 0) << seg
-            eop |= (1 if end else 0) << seg
-
-            seg += 1
-            if seg == self._segs or end:
-                await cb(
-                    {
-                        "DATA": dwr, "HDR": hdr, "SOP": sop, "EOP": eop, "EMPTY": emp, "PREFIX": 0, "BAR_RANGE": 0, "VALID": 2**seg - 1
-                    },
-                )
-                seg, dwr, sop, eop, emp, hdr = 0, 0, 0, 0, 0, 0
-            data = data[length:]
-
-
-class AvstRequester(AvstBase):
     def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
-        super().__init__(rc_driver)
-
-        self._ram = ram
-        self._rq = rq_driver
-        self._rc = rc_driver
-        self._rqm = rq_monitor
-
-        self._q = Queue()
-        self._rq_processing_frame = False
-        self._rq_frame = None
-        self._rq_pending = 0
-        self._rq_pending_dwords = 0
-        self._rq_pending_meta = ()
-
-        self._log = logging.getLogger(__name__)
-
-        rq_monitor.add_callback(self.handle_rq_transaction)
-
-        cocotb.start_soon(self.handle_response())
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor)
+        self._avst_tr_type = 1 # differentiates transactions for the driver; 0=CQ, 1=RC
 
     def handle_rq_transaction(self, transaction):
-        header_bytes, data_bytes = transaction
-        hdr = RequestHeader.deserialize(int.from_bytes(header_bytes, byteorder="big"))
-
-        # Process only if it is a request (DMA WR or RD)
-        if hdr.tlp_type == 0 and hdr.req_type in [0, 1]:
-            self.handle_request((hdr, data_bytes))
-
-    def handle_request(self, req):
-        header, payload = req
-        byte_count = header.dwords * 4
-
-        if header.addr_len == 0: # 32-bit address
-            addr_h, addr_l = deconcat([header.addr, 32, 32])
-            addr = addr_l
-        else: # 64-bit address
-            addr = header.addr
-
-        if header.req_type == 1: # write
-            self._ram.w(addr, payload)
-            self._log.debug(f"Write addr: {addr:#010x} dwords: {header.dwords: 3} payload: {payload.hex()}")
-        elif header.req_type == 0: # read
-            d = self._ram.r(addr, byte_count)
-            self._log.debug(f"Read  addr: {addr:#010x} dwords: {header.dwords: 3} payload: {d.hex()}")
-            self._q.put_nowait((header, d, addr))
+        """Parses the RQ header and writes to or reads from the memory accordingly."""
+        header, data_bytes = transaction
+        if isinstance(header, bytes):
+            hdr = RequestHeader.deserialize(int.from_bytes(header, byteorder="big"))
+        elif isinstance(header, RequestHeader):
+            hdr = header
         else:
             raise NotImplementedError
 
-    async def handle_response(self):
-        while True:
-            rq_hdr, data, addr = await self._q.get()
-            rq_fbe = rq_hdr.fbe
+        if hdr.addr_len == 0: # 32-bit address
+            addr_h, addr_l = deconcat([hdr.addr, 32, 32])
+            addr = addr_l
+        else: # 64-bit address
+            addr = hdr.addr
 
-            header_empty = CompletionHeaderEmpty()
-            header = CompletionHeader()
-            header.tag_l, header.tag_m, header.tag_h = rq_hdr.tag_l, rq_hdr.tag_m, rq_hdr.tag_h
-            header.fmt = int("010", base=2) # Completition with data: "010", Completition withOUT data: "000"
-            header.tlp_type = int("01010", base=2) # Completion for LOCKED Memory Read: "01011" (with/without data)
-            header.dwords = rq_hdr.dwords
+        # Fiter out MI responses - process if it is a request (DMA WR or RD)
+        if hdr.tlp_type == 0:
+            if hdr.req_type == 0:
+                self.handle_rd_request(hdr=hdr, addr=addr, length=hdr.dwords*4)
+            elif hdr.req_type == 1:
+                self.handle_wr_request(data=data_bytes, addr=addr)
+            else:
+                raise NotImplementedError(f"Unsupported REQ type {hdr.req_type}, expected: [0, 1]")
 
-            # TODO: Check IO and CFG transfers
-            header.byte_cnt = (
-                header.dwords * 4
-                - (4 - numberOfSetBits(rq_fbe))
-                - ((4 - numberOfSetBits(rq_fbe)) if header.dwords > 1 else 0)
-            )
+    def hdr_req2compl(self, rq_hdr):
+        """Creates a completion header from the given request header."""
+        rc_hdr = CompletionHeader()
+        rc_hdr.tag_l, rc_hdr.tag_m, rc_hdr.tag_h = rq_hdr.tag_l, rq_hdr.tag_m, rq_hdr.tag_h
+        rc_hdr.fmt = int("010", base=2) # Completition with data: "010", Completition withOUT data: "000"
+        rc_hdr.tlp_type = int("01010", base=2) # Completion for LOCKED Memory Read: "01011" (with/without data)
+        rc_hdr.dwords = rq_hdr.dwords
 
-            header.compl_stat = 1
-            # TODO: for multiple completions must be updated
-            #       FBE is only applied in first completion
-            header.low_addr = ((addr) + fbe2offset(rq_fbe)) & 0x7f
-            await self._send_frame(self._cdriver.write_rc, data, header, header_empty)
+        # TODO: Check IO and CFG transfers
+        rc_hdr.byte_cnt = (
+            rc_hdr.dwords * 4
+            - (4 - numberOfSetBits(rq_hdr.fbe))
+            - ((4 - numberOfSetBits(rq_hdr.fbe)) if rc_hdr.dwords > 1 else 0)
+        )
+
+        rc_hdr.compl_stat = 1
+        if rq_hdr.addr_len == 0: # 32-bit address
+            addr_h, addr_l = deconcat([rq_hdr.addr, 32, 32])
+            addr = addr_l
+        else: # 64-bit address
+            addr = rq_hdr.addr
+        # TODO: for multiple completions must be updated
+        #       FBE is only applied in first completion
+        rc_hdr.low_addr = ((addr) + fbe2offset(rq_hdr.fbe)) & 0x7f
+        return rc_hdr
+
+    def prep_response_tr(self, hdr, data, **kwargs):
+        """Allows the user to modifiy the response transaction sent to the driver."""
+        return hdr, data, self._avst_tr_type

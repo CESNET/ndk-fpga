@@ -9,7 +9,6 @@ import cocotb.queue
 from cocotb.triggers import Event, RisingEdge
 
 from ..utils import concat, deconcat, SerializableHeader
-from .AvstRequester import AvstBase
 
 
 class RequestHeaderEmpty(SerializableHeader):
@@ -34,16 +33,15 @@ class CompletionHeader(SerializableHeader):
     ))
 
 
-class AvstCompleter(AvstBase):
+class AvstCompleter():
     def __init__(self, cq_driver, cc_driver, cc_monitor):
-        super().__init__(cq_driver)
 
         self._cq = cq_driver
         self._cc = cc_driver
         self._ccm = cc_monitor
         self._queue_send = cocotb.queue.Queue()
         self._queue_recv = cocotb.queue.Queue()
-        self._avst_width = len(self._cq.bus.DATA) // 8
+        self._avst_tr_type = 0
 
         self._cc_inframe = None
         self._completions = {}
@@ -82,9 +80,6 @@ class AvstCompleter(AvstBase):
                 trigger.set(req_data)
             return
 
-        header_empty = RequestHeaderEmpty()
-        header = RequestHeader()
-
         if req_type == 1:
             assert len(data) == byte_count
             data = [0] * (addr % 4) + data + [0] * (-(addr + byte_count) % 4)
@@ -92,6 +87,7 @@ class AvstCompleter(AvstBase):
         dwords = (addr % 4 + byte_count + 3) // 4
         addr_l, addr_h = deconcat([addr, 32, 32])
 
+        header = RequestHeader()
         header.addr = concat([(addr_h, 32), (addr_l, 32)]) & ~3
         header.fbe = [0xF, 0xE, 0xC, 0x8][addr % 4]
         header.lbe = [0xF, 0x1, 0x3, 0x7][(addr + byte_count) % 4]
@@ -102,7 +98,7 @@ class AvstCompleter(AvstBase):
             header.tag_l, header.tag_m, header.tag_h = deconcat([tag, 8, 1, 1])
         header.req_t = req_type << 6
         header.length = dwords
-        await self._send_frame(self._cq.write_cq, data, header, header_empty)
+        self._cq.append((header, data, self._avst_tr_type))
 
     def _handle_cc_transaction(self, transaction):
         header_bytes, data_bytes = transaction
