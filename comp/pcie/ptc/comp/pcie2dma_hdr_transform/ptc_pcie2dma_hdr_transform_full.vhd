@@ -114,20 +114,18 @@ begin
         );
     end generate;
 
-    rx_sel_gen : for i in 0 to MVB_ITEMS-1 generate
-        tag_rel_reg_pr : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                for i in 0 to MVB_ITEMS-1 loop
-                    TAG(PCIE_TAG_WIDTH*(i+1)-1 downto PCIE_TAG_WIDTH*i)                          <= rx_mvb_pcie_tag(i)(PCIE_TAG_WIDTH-1 downto 0);
-                    TAG_COMPL_LOW_ADDR(PCIE_LOW_ADDR_WIDTH*(i+1)-1 downto PCIE_LOW_ADDR_WIDTH*i) <= rx_mvb_low_addr(i)(PCIE_LOW_ADDR_WIDTH-1 downto 0);
-                    TAG_COMPL_LEN(DMA_LEN_WIDTH*(i+1)-1 downto DMA_LEN_WIDTH*i)                  <= rx_mvb_len(i);
-                    TAG_RELEASE(i)                                                               <= rx_mvb_complete(i) and rx_mvb_vld_reg0(i);
-                    TAG_VLD(i)                                                                   <= rx_mvb_vld_reg0(i);
-                end loop;
-            end if;
-        end process;
-    end generate;
+    tag_rel_reg_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to MVB_ITEMS-1 loop
+                TAG(PCIE_TAG_WIDTH*(i+1)-1 downto PCIE_TAG_WIDTH*i)                          <= rx_mvb_pcie_tag(i)(PCIE_TAG_WIDTH-1 downto 0);
+                TAG_COMPL_LOW_ADDR(PCIE_LOW_ADDR_WIDTH*(i+1)-1 downto PCIE_LOW_ADDR_WIDTH*i) <= rx_mvb_low_addr(i)(PCIE_LOW_ADDR_WIDTH-1 downto 0);
+                TAG_COMPL_LEN(DMA_LEN_WIDTH*(i+1)-1 downto DMA_LEN_WIDTH*i)                  <= rx_mvb_len(i);
+                TAG_RELEASE(i)                                                               <= rx_mvb_complete(i) and rx_mvb_vld_reg0(i);
+                TAG_VLD(i)                                                                   <= rx_mvb_vld_reg0(i);
+            end loop;
+        end if;
+    end process;
 
     -- -------------------------------------------------------------------------
 
