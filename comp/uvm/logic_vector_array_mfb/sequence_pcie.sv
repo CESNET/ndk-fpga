@@ -101,7 +101,7 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                     // Break when straddling is enable and previous eof is
                     // not set. When straddling is not set then generate sof
                     // only to first region
-                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) || cfg.endpoint_type == config_sequence::PCIE)) begin
                         break;
                     end
 
@@ -202,7 +202,7 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
                     // Break when straddling is enable and previous eof is
                     // not set. When straddling is not set then generate sof
                     // only to first region
-                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) || cfg.endpoint_type == config_sequence::PCIE)) begin
                         break;
                     end
 
@@ -294,7 +294,7 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                     // Break when straddling is enable and previous eof is
                     // not set. When straddling is not set then generate sof
                     // only to first region
-                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.straddling == 1) || cfg.straddling == 0)) begin
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) || cfg.endpoint_type == config_sequence::PCIE)) begin
                         break;
                     end
 

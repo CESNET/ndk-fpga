@@ -55,9 +55,8 @@ class env_rx #(
         m_lva_cfg.interface_name = {m_config.interface_name, "_mfb"};
         m_lva_cfg.active         = m_config.active;
         m_lva_cfg.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
-        m_lva_cfg.seq_type       = "PCIE";
         m_lva_cfg.seq_cfg  = new();
-        m_lva_cfg.seq_cfg.straddling_set(STRADDLING); //Straddling enable automaticly by REGIONS > 1
+        m_lva_cfg.set_pcie(STRADDLING);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_lva", "m_config", m_lva_cfg);
         m_lva = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_lva", this);
     endfunction

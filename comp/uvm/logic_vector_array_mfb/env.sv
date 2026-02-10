@@ -85,6 +85,7 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         m_mfb_agent.analysis_port.connect(m_byte_arr_monitor.analysis_export);
         analysis_port_data = m_logic_vector_array_agent.m_monitor.analysis_port;
         reset_sync.push_back(m_byte_arr_monitor.reset_sync);
+        m_byte_arr_monitor.endpoint_type_set(m_config.seq_cfg.endpoint_type);
 
         $cast(m_logic_vector_monitor, m_logic_vector_agent.m_monitor);
         m_logic_vector_monitor.meta_behav = m_config.meta_behav;
@@ -108,12 +109,13 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
             uvm_common::sequence_library#(config_sequence, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)) mfb_seq;
-            if (m_config.seq_type == "MFB")
-                mfb_seq = sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-            else if (m_config.seq_type == "PCIE")
-                mfb_seq = sequence_lib_pcie_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-            else
-                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+
+            case (m_config.lib_type)
+                config_item::BASE  : mfb_seq = sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                config_item::PCIE  : mfb_seq = sequence_lib_rx_pcie#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                config_item::SPEED : mfb_seq = sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                default : begin `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type"); end
+            endcase
 
             mfb_seq.min_random_count = 20;
             mfb_seq.max_random_count = 100;
@@ -209,6 +211,7 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         m_mfb_agent.analysis_port.connect(m_byte_arr_monitor.analysis_export);
         analysis_port_data = m_logic_vector_array_agent.m_monitor.analysis_port;
         reset_sync.push_back(m_byte_arr_monitor.reset_sync);
+        m_byte_arr_monitor.endpoint_type_set(m_config.seq_cfg.endpoint_type);
 
         $cast(m_logic_vector_monitor, m_logic_vector_agent.m_monitor);
         m_mfb_agent.analysis_port.connect(m_logic_vector_monitor.analysis_export);
@@ -224,12 +227,17 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
     task run_phase(uvm_phase phase);
         uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_seq;
 
-
         if (m_config.active == UVM_ACTIVE) begin
-            mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-            mfb_seq.init_sequence();
+            case (m_config.lib_type)
+                config_item::BASE  : mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                config_item::PCIE  : mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                config_item::SPEED : mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                default : begin `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type"); end
+            endcase
+
             mfb_seq.min_random_count =  100;
             mfb_seq.max_random_count = 2000;
+            mfb_seq.init_sequence();
 
             forever begin
                 assert(mfb_seq.randomize()) else begin

@@ -14,9 +14,12 @@ class config_item extends uvm_object;
     uvm_active_passive_enum active;
     string interface_name;
 
+    enum {BASE, SPEED} lib_type;
+
     // Constructor
     function new(string name = "config_item");
         super.new(name);
+        lib_type = BASE;
     endfunction
 
 endclass

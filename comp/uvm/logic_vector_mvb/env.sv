@@ -92,7 +92,13 @@ class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
 
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
-            sequence_lib_rx#(ITEMS, ITEM_WIDTH) mvb_seq = sequence_lib_rx#(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+            sequence_lib_rx#(ITEMS, ITEM_WIDTH) mvb_seq;
+
+            case (m_config.lib_type)
+                config_item::BASE  : mvb_seq = sequence_lib_rx#(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+                config_item::SPEED : mvb_seq = sequence_lib_rx_speed#(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+                default : begin `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type"); end
+            endcase
 
             mvb_seq.min_random_count = 10;
             mvb_seq.max_random_count = 200;
@@ -194,7 +200,13 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH) mvb_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
-            mvb_seq = uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+
+            case (m_config.lib_type)
+                config_item::BASE  : mvb_seq = uvm_mvb::sequence_lib_tx #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+                config_item::SPEED : mvb_seq = uvm_mvb::sequence_lib_tx_speed #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_seq", this);
+                default : begin `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type"); end
+            endcase
+
             mvb_seq.init_sequence();
             mvb_seq.min_random_count =  100;
             mvb_seq.max_random_count = 2000;

@@ -52,11 +52,16 @@ class config_item extends uvm_object;
                                 // META_NONE DONT CARE IF META_WIDTH = 0
                                 // ------------------------------------------------
 
+    //SEQUENCE LIBRARY TYPE
+    enum {BASE, SPEED} lib_type;
     config_sequence seq_cfg;
+
 
     // ------------------------------------------------------------------------
     // functions
     function new (string name = "");
         super.new(name);
+        seq_cfg  = new();
+        lib_type = BASE;
     endfunction
 endclass

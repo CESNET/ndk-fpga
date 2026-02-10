@@ -71,9 +71,8 @@ class env#(
         m_rq_mfb_cfg.active = UVM_ACTIVE;
         m_rq_mfb_cfg.interface_name    = {m_config.interface_name, "_rq_mfb"};
         m_rq_mfb_cfg.meta_behav = uvm_logic_vector_array_mfb::config_item::META_NONE;
-        m_rq_mfb_cfg.seq_type = "PCIE";
         m_rq_mfb_cfg.seq_cfg  = new();
-        m_rq_mfb_cfg.seq_cfg.straddling_set(1);
+        m_rq_mfb_cfg.set_pcie(1);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_rq_mfb_env", "m_config", m_rq_mfb_cfg);
         m_rq_mfb_env = uvm_logic_vector_array_mfb::env_rx #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, RQ_MFB_ITEM_WIDTH, RQ_MFB_META_WIDTH)::type_id::create("m_rq_mfb_env", this);
 
@@ -87,9 +86,7 @@ class env#(
         m_rc_mfb_cfg.active = UVM_ACTIVE;
         m_rc_mfb_cfg.interface_name    = {m_config.interface_name, "_rc_mfb"};
         m_rc_mfb_cfg.meta_behav = uvm_logic_vector_array_mfb::config_item::META_NONE;
-        m_rc_mfb_cfg.seq_type = "PCIE";
         m_rc_mfb_cfg.seq_cfg  = new();
-        m_rc_mfb_cfg.seq_cfg.straddling_set(1);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_rc_mfb_env", "m_config", m_rc_mfb_cfg);
         m_rc_mfb_env = uvm_logic_vector_array_mfb::env_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, RC_MFB_ITEM_WIDTH, RC_MFB_META_WIDTH)::type_id::create("m_rc_mfb_env", this);
 

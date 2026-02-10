@@ -52,7 +52,7 @@ class env #(
     virtual function void eth_full_speed_set();
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             uvm_logic_vector_array_lbus::sequence_library_rx::type_id::set_inst_override(
-                uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed::get_type(),
+                uvm_logic_vector_array_lbus::sequence_library_rx_speed::get_type(),
                 $sformatf("m_eth_rx_%0d.*", it),
                 this
             );

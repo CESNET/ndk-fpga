@@ -16,6 +16,8 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
     protected int unsigned items;
     protected uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) hi_tr;
     protected logic [ITEM_WIDTH-1 : 0] data[$];
+    protected config_sequence::endpoin_type_t endpoint_type;
+
 
     function new (string name, uvm_component parent);
         super.new(name, parent);
@@ -23,6 +25,11 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
         hi_tr = null;
         items = 0;
         reset_sync = new();
+        endpoint_type = config_sequence::NORMAL;
+    endfunction
+
+    function void endpoint_type_set(config_sequence::endpoin_type_t endpoint_type);
+        this.endpoint_type = endpoint_type;
     endfunction
 
     virtual function void process_eof(int unsigned index, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
@@ -64,6 +71,14 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
                 //$write("MFB MON FIFO %h\n", tr.data[it]);
                 int unsigned sof_pos = SOF_POS_WIDTH != 0 ? BLOCK_SIZE*tr.sof_pos[it] : 0;
                 // Eop is before next packet start
+                assert(
+                    ((it == 0 || (it > 0 &&  tr.sof[it] == 0                      )) && endpoint_type == config_sequence::PCIE)            || // PCIE No straddling
+                    ((it == 0 || (it > 0 && (tr.sof[it] == 0 || tr.eof[it-1] == 1))) && endpoint_type == config_sequence::PCIE_STRADDLING) || // PCIE straddling
+                    (1'b1                                                            && endpoint_type == config_sequence::NORMAL)             // Normal sequence
+                ) else begin
+                    `uvm_fatal(this.get_full_name(), $sformatf("\n\tPCIE protocol error %s\n\t%s", endpoint_type, tr.convert2string()));
+                end
+
                 if (tr.sof[it] && tr.eof[it] && tr.eof_pos[it] < sof_pos) begin
                     inframe = 1;
                     for (int unsigned jt = 0; jt <= tr.eof_pos[it]; jt++) begin

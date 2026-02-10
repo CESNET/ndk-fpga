@@ -100,7 +100,12 @@ class env_rx #(int unsigned SEGMENTS) extends uvm_env;
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
             sequence_lib_rx#(SEGMENTS) intel_mac_seg;
-            intel_mac_seg = sequence_lib_rx#(SEGMENTS)::type_id::create("avalon_rx_seq_base", this);
+
+            if (m_config.lib_type == config_item::BASE) begin
+                intel_mac_seg = sequence_lib_rx#(SEGMENTS)::type_id::create("avalon_rx_seq_base", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
             intel_mac_seg.init_sequence();
             intel_mac_seg.min_random_count = 20;
             intel_mac_seg.max_random_count = 100;
@@ -198,7 +203,12 @@ class env_tx #(int unsigned SEGMENTS) extends uvm_env;
         uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS) mac_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
-            mac_seq = uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS)::type_id::create("mac_seq", this);
+            if (m_config.lib_type == config_item::BASE) begin
+                mac_seq = uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS)::type_id::create("mac_seq", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
+
             mac_seq.init_sequence();
             mac_seq.min_random_count =  100;
             mac_seq.max_random_count = 2000;

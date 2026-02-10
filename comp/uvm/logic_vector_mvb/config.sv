@@ -38,6 +38,7 @@ class config_item extends uvm_object;
     logic coverage;
     string interface_name;
 
+    enum {BASE, SPEED} lib_type;
     //Just for RX
     config_sequence seq_cfg;
 
@@ -46,5 +47,6 @@ class config_item extends uvm_object;
         super.new(name);
         seq_cfg = null;
         coverage = 0;
+        lib_type = BASE;
     endfunction
 endclass

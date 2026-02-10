@@ -98,7 +98,14 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
             sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) avst_seq;
-            avst_seq = sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
+
+            if (m_config.lib_type == config_item::BASE) begin
+                avst_seq = sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
+            end else if (m_config.lib_type == config_item::SPEED) begin
+                avst_seq = sequence_lib_rx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
 
             avst_seq.min_random_count = 20;
             avst_seq.max_random_count = 100;
@@ -197,7 +204,14 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
         uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH) avst_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
-            avst_seq = uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+            if (m_config.lib_type == config_item::BASE) begin
+                avst_seq = uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+            end else if (m_config.lib_type == config_item::SPEED) begin
+                avst_seq = uvm_avst::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
+
             avst_seq.init_sequence();
             avst_seq.min_random_count =  100;
             avst_seq.max_random_count = 2000;
