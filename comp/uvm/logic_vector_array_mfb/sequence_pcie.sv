@@ -4,8 +4,16 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_rx_pcie_burst #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_pcie_burst #(
+        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
     uvm_common::rand_length   rand_burst_size; //burst set to 1
     uvm_common::rand_length   rand_space_size; //burst set to 0
 
@@ -22,7 +30,7 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     fsm_t burst_state = SPACE;
     int unsigned size = 0;
 
-    function new (string name = "sequence_burst_pcie_rx");
+    function new (string name = "sequence_rx_pcie_burst");
         uvm_common::rand_length_rand  bound_burst;
         uvm_common::rand_length_rand  bound_space_size;
         uvm_common::rand_length_rand  bound_rdy;
@@ -156,10 +164,18 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endtask
 endclass
 
-class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_rx_pcie_full_speed #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed #(
+        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
-    function new (string name = "sequence_full_speed_pcie_rx");
+    function new (string name = "sequence_rx_pcie_full_speed");
         super.new(name);
     endfunction
 
@@ -241,15 +257,23 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
 
 endclass
 
-// This is only a slight modification of the sequence_full_speed_rx class where no gaps inside frame are inserted.
+// This is only a slight modification of the sequence_rx_full_speed class where no gaps inside frame are inserted.
 // But there are abitrary long gaps getween frames.
-class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+class sequence_rx_no_inframe_gap #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap #(
+        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     uvm_common::rand_length   rdy_length;
     uvm_common::rand_rdy      rdy_rdy;
 
-    function new (string name = "seqv_no_inframe_gap_rx");
+    function new (string name = "sequence_rx_no_inframe_gap");
         super.new(name);
         rdy_rdy    = uvm_common::rand_rdy_rand::new();
         rdy_length = uvm_common::rand_length_rand::new();

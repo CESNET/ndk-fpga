@@ -18,25 +18,6 @@ class virt_seq_full_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITE
     endfunction
 endclass
 
-class mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH);
-  `uvm_object_param_utils(test::mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH))
-
-    function new(string name = "mfb_rx_speed");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH)::get_type());
-    endfunction
-endclass
-
 class speed extends uvm_test;
      typedef uvm_component_registry#(test::speed, "test::speed") type_id;
 
@@ -61,8 +42,10 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(mfb_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
-        {this.get_full_name(), ".m_env.m_env_rx.*"});
+        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
+            {this.get_full_name(), ".m_env.m_env_rx.*"}
+        );
 
         // Initializing the reference to the environment
         m_env = uvm_metadata_insertor::env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, INSERT_MODE, MFB_META_ALIGNMENT)::type_id::create("m_env", this);

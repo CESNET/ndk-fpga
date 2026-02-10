@@ -4,25 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class mfb_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH);
-  `uvm_object_param_utils    (test::mfb_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH))
-  `uvm_sequence_library_utils(test::mfb_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH))
-
-    function new(string name = "mfb_rx_speed");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_full_speed_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_ITEM_WIDTH, MFB_BLOCK_SIZE, MFB_META_WIDTH)::get_type());
-    endfunction
-endclass
-
 class speed extends uvm_test;
      typedef uvm_component_registry #(test::speed, "test::speed") type_id;
 
@@ -58,8 +39,10 @@ class speed extends uvm_test;
             this
         );
 
-        uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
-            mfb_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
+        `ndk_override_params(
+            uvm_logic_vector_array_mfb::sequence_lib_rx,
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed,
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH),
             "m_env.m_env_rx.mfb_seq",
             this
         );

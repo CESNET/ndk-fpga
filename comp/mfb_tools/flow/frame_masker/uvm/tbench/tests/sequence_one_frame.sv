@@ -3,7 +3,13 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_one_frame #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int unsigned MFB_META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_simple_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH);
+class sequence_one_frame #(
+    int unsigned MFB_REGIONS,
+    int unsigned MFB_REGION_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned MFB_META_WIDTH
+) extends uvm_logic_vector_array_mfb::sequence_rx_simple #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH);
     `uvm_object_param_utils(test::sequence_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
     function new (string name = "sequence_one_frame");
