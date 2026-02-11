@@ -139,7 +139,8 @@ proc CompileModTail {VMAKE PSLARGS} {
         return
     } elseif {$FEXT in [list .sv .svp]} {
         regsub "/\[^/\]+\$" $FNAME "/" DIR
-        set CMD [list vlog -vmake {*}$COVER_PARAMS_SV -sv -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB +incdir+$DIR {*}$SIM_FLAGS(VLOG_SV_FLAGS) {*}$opt(VLOG_SV_FLAGS)]
+        set CMD_INCDIR +incdir+$DIR+[file normalize $::OFM_PATH/comp/uvm/]
+        set CMD [list vlog -vmake {*}$COVER_PARAMS_SV -sv -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB $CMD_INCDIR {*}$SIM_FLAGS(VLOG_SV_FLAGS) {*}$opt(VLOG_SV_FLAGS)]
     } else {
         set CMD [list vcom {*}$CMT_VMAKE -2008 -explicit {*}$COVER_PARAMS {*}$VCOM_PARAM {*}$CMT_PSLARGS -work $LIB]
     }
