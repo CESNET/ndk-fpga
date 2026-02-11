@@ -9,7 +9,7 @@ proc mi {} {
 }
 
 proc mfb {PATH} {
-    add wave -group "MFB RX" -noupdate -hex /testbench/mfb_rx/*         \
+    add_wave -group "MFB RX" -noupdate -hex /testbench/mfb_rx/*         \
                                             $PATH/rx_mfb_src_rdy_masked \
                                             $PATH/mfb_rx_src_rdy_shaped \
                                             $PATH/rx_mfb_eof_last       \
@@ -25,12 +25,12 @@ proc mfb {PATH} {
                                             $PATH/rx_mfb_sof_mask_auto  \
                                             $PATH/rx_mfb_sof_pos_deser  \
                                             $PATH/rx_mfb_eof_pos_deser
-    add wave -group "MFB TX" -noupdate -hex /testbench/mfb_tx/*         \
+    add_wave -group "MFB TX" -noupdate -hex /testbench/mfb_tx/*         \
                                             $PATH/mfb_tx_dst_rdy_shaped
 }
 
 proc fsm {PATH} {
-    add wave -group "FSM" -noupdate $PATH/p_state         \
+    add_wave -group "FSM" -noupdate $PATH/p_state         \
                                     $PATH/n_state         \
                                     $PATH/write_ctrl_flag \
                                     $PATH/write_aux_flag  \
@@ -43,24 +43,24 @@ proc fsm {PATH} {
 }
 
 proc reg_all {PATH} {
-    add wave -group "REGISTER ARRAY" -noupdate $PATH/mi_regs*
+    add_wave -group "REGISTER ARRAY" -noupdate $PATH/mi_regs*
 }
 
 proc reg_status {PATH} {
-    add wave -group "STATUS REGISTER" -noupdate $PATH/mi_status_reg*
+    add_wave -group "STATUS REGISTER" -noupdate $PATH/mi_status_reg*
 }
 
 proc reg_length {PATH} {
-    add wave -group "LENGTH REGISTERS" -noupdate $PATH/mi_sec_len_reg* \
+    add_wave -group "LENGTH REGISTERS" -noupdate $PATH/mi_sec_len_reg* \
                                                  $PATH/mi_int_len_reg*
 }
 
 proc reg_speed {PATH} {
-    add wave -group "SPEED REGISTER" -noupdate $PATH/mi_speed_regs*
+    add_wave -group "SPEED REGISTER" -noupdate $PATH/mi_speed_regs*
 }
 
 proc traffic {PATH} {
-    add wave -group "TRAFFIC" -noupdate $PATH/start_shaping     \
+    add_wave -group "TRAFFIC" -noupdate $PATH/start_shaping     \
                                         $PATH/next_speed_req    \
                                         $PATH/next_speed_vld    \
                                         $PATH/sec_len_cnt       \
