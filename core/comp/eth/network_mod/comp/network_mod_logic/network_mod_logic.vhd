@@ -536,18 +536,19 @@ begin
         -- Merge all ETH_CHANNELS into one ETH_STREAM from each RX MAC Lite
         mfb_merger_tree_i : entity work.MFB_MERGER_GEN
         generic map (
-            MERGER_INPUTS   => ETH_PORT_CHAN,
-            MVB_ITEMS       => USER_REGIONS,
-            MVB_ITEM_WIDTH  => ETH_RX_HDR_WIDTH,
-            MFB_REGIONS     => USER_REGIONS,
-            MFB_REG_SIZE    => USER_REGION_SIZE,
-            MFB_BLOCK_SIZE  => BLOCK_SIZE,
-            MFB_ITEM_WIDTH  => ITEM_WIDTH,
-            INPUT_FIFO_SIZE => 8,
-            RX_PAYLOAD_EN   => (others => true),
-            IN_PIPE_EN      => not LL_MODE,
-            OUT_PIPE_EN     => not LL_MODE,
-            DEVICE          => DEVICE
+            MERGER_INPUTS    => ETH_PORT_CHAN,
+            MVB_ITEMS        => USER_REGIONS,
+            MVB_ITEM_WIDTH   => ETH_RX_HDR_WIDTH,
+            MFB_REGIONS      => USER_REGIONS,
+            MFB_REG_SIZE     => USER_REGION_SIZE,
+            MFB_BLOCK_SIZE   => BLOCK_SIZE,
+            MFB_ITEM_WIDTH   => ITEM_WIDTH,
+            INPUT_FIFO_SIZE  => 512,
+            MID_MFB_FIFOS_EN => not LL_MODE,
+            RX_PAYLOAD_EN    => (others => true),
+            IN_PIPE_EN       => not LL_MODE,
+            OUT_PIPE_EN      => not LL_MODE,
+            DEVICE           => DEVICE
         )
         port map (
             CLK             => CLK_USER,
