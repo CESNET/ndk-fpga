@@ -45,11 +45,14 @@ entity RX_MAC_LITE is
         -- TX MFB: width of one item in bits, by default same as RX
         TX_ITEM_WIDTH   : natural := RX_ITEM_WIDTH;
 
-        -- If true, the MFB bus doubles data width (number of regions) before
-        -- the packet buffer (on RX_CLK). RESIZE_BUFFER feature is allowed only
-        -- when the MFB bus increases (TX MFB width >= 2x RX MFB width) and the
-        -- following conditions must apply: RX_BLOCK_SIZE=TX_BLOCK_SIZE, RX_ITEM_WIDTH=TX_ITEM_WIDTH
+        -- If true, the MFB bus resize data width before the packet buffer (on
+        -- RX_CLK). See also RESIZE_FULL for additional settings.
         RESIZE_BUFFER   : boolean := false;
+        -- This parameter is active only if RESIZE_BUFFER=True. If is set to True,
+        -- the bus before the buffer will be resized directly to the TX parameters,
+        -- otherwise only the number of regions will be doubled to 2*RX_REGIONS.
+        -- If True, packets smaller than 60B must not be sent to the RX input.
+        RESIZE_FULL     : boolean := false;
 
         -- =====================================================================
         -- OTHERS CONFIGURATION:
@@ -211,10 +214,16 @@ architecture FULL of RX_MAC_LITE is
     -- MFB configuration for packet buffer and next modules
     -- =====================================================================
 
-    constant BF_REGIONS               : natural := tsel(RESIZE_BUFFER,2*RX_REGIONS,RX_REGIONS);
-    constant BF_REGION_SIZE           : natural := RX_REGION_SIZE;
-    constant BF_BLOCK_SIZE            : natural := RX_BLOCK_SIZE;
-    constant BF_ITEM_WIDTH            : natural := RX_ITEM_WIDTH;
+    -- select resize values to 2x regions or to TX parameters
+    constant RS_REGIONS               : natural := tsel(RESIZE_FULL, TX_REGIONS, 2*RX_REGIONS);
+    constant RS_REGION_SIZE           : natural := tsel(RESIZE_FULL, TX_REGION_SIZE, RX_REGION_SIZE);
+    constant RS_BLOCK_SIZE            : natural := tsel(RESIZE_FULL, TX_BLOCK_SIZE, RX_BLOCK_SIZE);
+    constant RS_ITEM_WIDTH            : natural := tsel(RESIZE_FULL, TX_ITEM_WIDTH, RX_ITEM_WIDTH);
+    -- enable resize before buffer
+    constant BF_REGIONS               : natural := tsel(RESIZE_BUFFER, RS_REGIONS, RX_REGIONS);
+    constant BF_REGION_SIZE           : natural := tsel(RESIZE_BUFFER, RS_REGION_SIZE, RX_REGION_SIZE);
+    constant BF_BLOCK_SIZE            : natural := tsel(RESIZE_BUFFER, RS_BLOCK_SIZE, RX_BLOCK_SIZE);
+    constant BF_ITEM_WIDTH            : natural := tsel(RESIZE_BUFFER, RS_ITEM_WIDTH, RX_ITEM_WIDTH);
 
     -- =====================================================================
     -- Helper MFB constants
@@ -835,9 +844,10 @@ begin
         TX_BLOCK_SIZE         => BF_BLOCK_SIZE,
         TX_ITEM_WIDTH         => BF_ITEM_WIDTH,
         META_WIDTH            => ETH_RX_HDR_WIDTH,
+        META_MODE             => 1, -- metadata aligned to EOF
         FIFO_SIZE             => 32,
-        FRAMES_OVER_TX_BLOCK  => 0,
-        FRAMES_OVER_TX_REGION => 0,
+        FRAMES_OVER_TX_BLOCK  => 1,
+        FRAMES_OVER_TX_REGION => 1,
         DEVICE                => DEVICE
     )
     port map (
