@@ -81,7 +81,15 @@ architecture FULL of NETWORK_MOD is
     constant MFB_EOFP_WIDTH_CORE : natural := REGIONS_CORE*max(1,log2(REGION_SIZE_CORE*BLOCK_SIZE));
 
     constant FPC202_INIT_EN : boolean := (BOARD = "DK-DEV-1SDX-P" or BOARD = "DK-DEV-AGI027RES");
-    constant RESIZE_BUFFER  : boolean := (ETH_CORE_ARCH = "F_TILE" or (ETH_CORE_ARCH = "E_TILE" and ETH_CHANNELS = 4));
+
+    -- Change of MFB parameters (if APP and CORE MFB parameters are different)
+    -- is performed before RX MAC buffer on RX_CLK.
+    -- FIXME: add support for 10G4/25G4/40GE (USP), only RESIZE_FULL=True there
+    -- makes sense, but then packet on input of RX MAC must be >= 60B.
+    constant RESIZE_BUFFER : boolean := ETH_CORE_ARCH = "F_TILE" or ETH_CORE_ARCH = "E_TILE";
+    -- Use APP MFB configuration for bus resize before MAC buffer (True),
+    -- not just doubling the number of regions (False).
+    constant RESIZE_FULL   : boolean := True;
 
     constant IS_USP_10G4_25G4 : boolean := ETH_CORE_ARCH = "10G4" or ETH_CORE_ARCH = "25G4";
     constant IS_USP_40G2      : boolean := ETH_CORE_ARCH = "40GE";
@@ -408,6 +416,7 @@ begin
             RESET_USER_WIDTH => ETH_CHANNELS,
             RESET_CORE_WIDTH => logic_rst_arr(p)'length,
             RESIZE_BUFFER    => RESIZE_BUFFER,
+            RESIZE_FULL      => RESIZE_FULL,
             DEVICE           => DEVICE,
             BOARD            => BOARD
         )
