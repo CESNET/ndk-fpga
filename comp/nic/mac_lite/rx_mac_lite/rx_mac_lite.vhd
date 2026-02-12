@@ -425,6 +425,10 @@ architecture FULL of RX_MAC_LITE is
     signal s_cam_write_en             : std_logic;
     signal s_cam_write_rdy            : std_logic;
 
+    signal s_dbg_sync_pkt_cnt         : unsigned(64-1 downto 0);
+    signal s_dbg_bfin_pkt_cnt         : unsigned(64-1 downto 0);
+    signal s_dbg_buf_pkt_cnt          : unsigned(64-1 downto 0);
+
 begin
 
     LINK_UP <= ADAPTER_LINK_UP;
@@ -1204,5 +1208,55 @@ begin
         STAT_HIST_4096_8191     => s_stat_out_hist_4096_8191,
         STAT_HIST_OVER_8191     => s_stat_out_hist_over_8191
     );
+
+    -- pragma synthesis_off
+    process (RX_CLK)
+        variable dbg_pkt_cnt_v : unsigned(63 downto 0);
+    begin
+        dbg_pkt_cnt_v := (others => '0');
+        if (rising_edge(RX_CLK)) then
+            if (RX_RESET = '1') then
+                s_dbg_sync_pkt_cnt <= (others => '0');
+            elsif (s_sync_src_rdy = '1' and s_sync_dst_rdy_dbg = '1') then
+                for i in 0 to RX_REGIONS-1 loop
+                    dbg_pkt_cnt_v := dbg_pkt_cnt_v + s_sync_sof(i);
+                end loop;
+                s_dbg_sync_pkt_cnt <= s_dbg_sync_pkt_cnt + dbg_pkt_cnt_v;
+            end if;
+        end if;
+    end process;
+
+    process (RX_CLK)
+        variable dbg_pkt_cnt_v : unsigned(63 downto 0);
+    begin
+        dbg_pkt_cnt_v := (others => '0');
+        if (rising_edge(RX_CLK)) then
+            if (RX_RESET = '1') then
+                s_dbg_bfin_pkt_cnt <= (others => '0');
+            elsif (s_bfin_src_rdy = '1') then
+                for i in 0 to BF_REGIONS-1 loop
+                    dbg_pkt_cnt_v := dbg_pkt_cnt_v + s_bfin_sof(i);
+                end loop;
+                s_dbg_bfin_pkt_cnt <= s_dbg_bfin_pkt_cnt + dbg_pkt_cnt_v;
+            end if;
+        end if;
+    end process;
+
+    process (TX_CLK)
+        variable dbg_pkt_cnt_v : unsigned(63 downto 0);
+    begin
+        dbg_pkt_cnt_v := (others => '0');
+        if (rising_edge(TX_CLK)) then
+            if (TX_RESET = '1') then
+                s_dbg_buf_pkt_cnt <= (others => '0');
+            elsif (s_buf_mfb_src_rdy = '1' and s_buf_mfb_dst_rdy = '1') then
+                for i in 0 to TX_REGIONS-1 loop
+                    dbg_pkt_cnt_v := dbg_pkt_cnt_v + s_buf_mfb_sof(i);
+                end loop;
+                s_dbg_buf_pkt_cnt <= s_dbg_buf_pkt_cnt + dbg_pkt_cnt_v;
+            end if;
+        end if;
+    end process;
+    -- pragma synthesis_on
 
 end architecture;
