@@ -55,6 +55,12 @@ SETTINGS = {
     "function_halfsiphash_4_8": {
         "HASH_FUNCTION": "HALFSIPHASH_4_8",
     },
+    "function_chaskey": {
+        "HASH_FUNCTION": "CHASKEY",
+    },
+    "function_chaskey_lts": {
+        "HASH_FUNCTION": "CHASKEY_LTS",
+    },
 }
 
 options_128 = [(), ("hash_width_8b",), ("hash_width_16b",), ("hash_width_32b",), ("hash_width_64b",),
