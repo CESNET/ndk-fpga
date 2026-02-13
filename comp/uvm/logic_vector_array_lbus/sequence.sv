@@ -204,9 +204,9 @@ class sequence_library_rx extends uvm_sequence_library #(uvm_lbus::sequence_item
 
 endclass
 
-class sequence_library_rx_fullspeed extends sequence_library_rx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed)
-    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed)
+class sequence_library_rx_speed extends sequence_library_rx;
+    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx_speed)
+    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx_speed)
 
     function new(string name = "sequence_library_rx_speed");
         super.new(name);

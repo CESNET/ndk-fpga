@@ -150,7 +150,7 @@ class env_rx extends uvm_env;
             if (m_config.lib_type == config_item::BASE) begin
                 lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx::type_id::create("lbus_sequence_library", this);
             end else if (m_config.lib_type == config_item::SPEED) begin
-                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed::type_id::create("lbus_sequence_library", this);
+                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx_speed::type_id::create("lbus_sequence_library", this);
             end else begin
                 `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
             end

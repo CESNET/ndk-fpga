@@ -58,7 +58,7 @@ class env #(
             );
 
             uvm_lbus::sequence_library_tx::type_id::set_inst_override(
-                uvm_lbus::sequence_library_tx_fullspeed::get_type(),
+                uvm_lbus::sequence_library_tx_speed::get_type(),
                 $sformatf("m_eth_tx_%0d.*", it),
                 this
             );

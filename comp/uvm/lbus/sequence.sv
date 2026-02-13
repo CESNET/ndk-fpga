@@ -140,7 +140,7 @@ class sequence_library_tx extends uvm_common::sequence_library #(config_sequence
 
 endclass
 
-class sequence_library_tx_fullspeed extends sequence_library_tx;
+class sequence_library_tx_speed extends sequence_library_tx;
     `uvm_object_utils(uvm_lbus::sequence_library_tx_fullspeed)
     `uvm_sequence_library_utils(uvm_lbus::sequence_library_tx_fullspeed)
 
