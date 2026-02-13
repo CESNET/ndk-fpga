@@ -5,7 +5,7 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_logic_vector_array_mfb::config_sequence)
+    `ndk_object_utils(uvm_logic_vector_array_mfb::config_sequence)
 
     uvm_common::sequence_cfg state;
 
@@ -47,6 +47,7 @@ endclass
 
 
 class config_item extends uvm_object;
+    `ndk_object_utils(uvm_logic_vector_array_mfb::config_item)
 
     typedef enum {META_SOF, META_EOF, META_NONE} meta_type;
     // ------------------------------------------------------------------------

@@ -11,7 +11,10 @@
 class driver_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_driver #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
 
     // Register component to database.
-    `uvm_component_param_utils(uvm_mi::driver_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::driver_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::driver_slave#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     // Virtual interface of driver
     virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH).tb_slave vif;
@@ -72,7 +75,10 @@ endclass
 
 class driver_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_driver #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH));
     // Register component to database.
-    `uvm_component_param_utils(uvm_mi::driver_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::driver_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::driver_master#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     // Virtual interface of driver
     virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH).tb_master vif;

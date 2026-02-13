@@ -6,7 +6,10 @@
 
 
 class monitor #(type TR_TYPE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_monitor;
-    `uvm_component_param_utils(uvm_app_core_top_agent::monitor #(TR_TYPE, ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core_top_agent::monitor #(TR_TYPE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_app_core_top_agent::monitor#(%s,%0d,%0d)", $typename(TR_TYPE), ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     uvm_tlm_analysis_fifo#(uvm_logic_vector::sequence_item #(META_WIDTH))      mvb;

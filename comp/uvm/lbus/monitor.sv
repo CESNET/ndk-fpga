@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class monitor extends uvm_monitor;
-    `uvm_component_utils(uvm_lbus::monitor)
+    `ndk_component_utils(uvm_lbus::monitor)
 
     // Virtual interface
     virtual lbus_if.monitor vif;

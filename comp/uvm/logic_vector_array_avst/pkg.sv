@@ -9,6 +9,7 @@
 
 package uvm_logic_vector_array_avst;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

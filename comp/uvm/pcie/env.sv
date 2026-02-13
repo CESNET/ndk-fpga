@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class env_rx extends uvm_env;
-    `uvm_component_param_utils(uvm_pcie::env_rx);
+    `ndk_component_utils(uvm_pcie::env_rx);
 
     uvm_analysis_port #(uvm_pcie::header) analysis_port;
     sequencer                             m_sequencer;
@@ -67,7 +67,7 @@ endclass
 
 
 class env_tx extends uvm_env;
-    `uvm_component_param_utils(uvm_pcie::env_tx);
+    `ndk_component_utils(uvm_pcie::env_tx);
 
     uvm_analysis_port #(uvm_pcie::header) analysis_port;
     uvm_reset::sync_cbs                   reset_sync;

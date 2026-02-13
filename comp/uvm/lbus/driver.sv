@@ -9,7 +9,7 @@
 // ======= //
 
 class driver_rx extends uvm_driver #(sequence_item);
-    `uvm_component_utils(uvm_lbus::driver_rx)
+    `ndk_component_utils(uvm_lbus::driver_rx)
 
     // Virtual interface
     virtual lbus_if.driver_rx vif;
@@ -66,7 +66,7 @@ endclass
 // ======= //
 
 class driver_tx extends uvm_driver #(sequence_item);
-    `uvm_component_utils(uvm_lbus::driver_tx)
+    `ndk_component_utils(uvm_lbus::driver_tx)
 
     // Virtual interface
     virtual lbus_if.driver_tx vif;

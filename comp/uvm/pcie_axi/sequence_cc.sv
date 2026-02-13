@@ -14,7 +14,10 @@ class sequence_base_cc #(
     uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CC))
 );
 
-    `uvm_object_param_utils(uvm_pcie_axi::sequence_base_cc #(ITEMS, ITEM_WIDTH));
+    `ndk_object_param_utils(
+        uvm_pcie_axi::sequence_base_cc#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_pcie_axi::sequence_base_cc#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    );
 
     int unsigned transactions_min = 10;
     int unsigned transactions_max = 300;
@@ -51,7 +54,10 @@ class sequence_lib_cc #(
     uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CC))
 );
 
-  `uvm_object_param_utils(uvm_pcie_axi::sequence_lib_cc#(ITEMS, ITEM_WIDTH))
+  `ndk_object_param_utils(
+        uvm_pcie_axi::sequence_lib_cc#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_pcie_axi::sequence_lib_cc#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
   `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_cc#(ITEMS, ITEM_WIDTH))
 
   function new(string name = "sequence_lib_rx");

@@ -10,7 +10,10 @@ class coverage_model #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_subscriber #(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_component_param_utils(uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mfb::coverage_model#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_mfb::coverage_model#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     localparam int unsigned SOF_POS_WIDTH = ($clog2(REGION_SIZE) > 1)            ? $clog2(REGION_SIZE)            : 1;
     localparam int unsigned EOF_POS_WIDTH = ($clog2(REGION_SIZE*BLOCK_SIZE) > 1) ? $clog2(REGION_SIZE*BLOCK_SIZE) : 1;

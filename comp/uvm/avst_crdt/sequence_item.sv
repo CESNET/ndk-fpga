@@ -5,7 +5,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_item #(int unsigned UPDATE_CNT_WIDTH) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_avst_crdt::sequence_item #(UPDATE_CNT_WIDTH))
+    `ndk_object_param_utils(
+        uvm_avst_crdt::sequence_item #(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::sequence_item#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // ------------------------------- //
     // Bus structure of credit control //

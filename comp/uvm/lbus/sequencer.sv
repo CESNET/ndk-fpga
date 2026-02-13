@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequencer extends uvm_sequencer #(sequence_item);
-    `uvm_component_utils(uvm_lbus::sequencer)
+    `ndk_component_utils(uvm_lbus::sequencer)
 
     // Constructor
     function new(string name = "sequencer", uvm_component parent = null);

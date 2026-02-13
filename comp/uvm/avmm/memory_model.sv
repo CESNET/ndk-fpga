@@ -4,8 +4,16 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class memory_model #(longint unsigned ADDRESS_WIDTH, longint unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_avmm::memory_model #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class memory_model #(
+    longint unsigned ADDRESS_WIDTH,
+    longint unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_component;
+
+    `ndk_component_param_utils(
+        uvm_avmm::memory_model#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::memory_model#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     localparam DATA_WIDTH_BYTES = DATA_WIDTH / 8;
 

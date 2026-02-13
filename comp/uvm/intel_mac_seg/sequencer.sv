@@ -9,7 +9,10 @@
 */
 
 class sequencer #(int unsigned SEGMENTS) extends uvm_sequencer #(sequence_item #(SEGMENTS));
-    `uvm_component_param_utils(uvm_intel_mac_seg::sequencer #(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::sequencer#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::sequencer#(%0d)",SEGMENTS)
+    )
 
     uvm_reset::sync_terminate reset_sync;
 

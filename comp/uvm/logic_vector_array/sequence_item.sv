@@ -15,7 +15,10 @@
 class sequence_item #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_item;
 
     // Registration of object tools.
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_item#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_item#(%0d)",ITEM_WIDTH)
+    )
 
     // -----------------------
     // Variables.

@@ -22,10 +22,16 @@ class sequencer#(
     int unsigned MEM_DATA_WIDTH,
     int unsigned MEM_BURST_WIDTH
 ) extends uvm_sequencer;
-    `uvm_component_param_utils(uvm_app_core::sequencer#(DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH,
-            DMA_STREAMS, MFB_ITEM_WIDTH, ETH_STREAMS,
-            MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH
-    ))
+    `ndk_component_param_utils(
+        uvm_app_core::sequencer#(
+            DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, MFB_ITEM_WIDTH,
+            ETH_STREAMS, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH
+        ),
+        $sformatf("uvm_app_core::sequencer#(%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d)",
+            DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH, DMA_STREAMS, MFB_ITEM_WIDTH,
+            ETH_STREAMS, MEM_PORTS, MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH
+        )
+    )
 
     localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS);
 

@@ -6,7 +6,7 @@
 
 
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_axi::config_sequence)
+    `ndk_object_utils(uvm_axi::config_sequence)
 
     // configuration of probability of rdy signal in percentige
     int unsigned rdy_probability_min = 0;   // inside [0:100]
@@ -26,6 +26,7 @@ endclass
 
 
 class config_item extends uvm_object;
+    `ndk_object_utils(uvm_axi::config_item)
 
     // ------------------------------------------------------------------------
     // Configuration variables

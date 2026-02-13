@@ -11,7 +11,7 @@
 
 
 class driver extends uvm_driver#(sequence_item);
-    `uvm_component_utils(uvm_reset::driver);
+    `ndk_component_utils(uvm_reset::driver);
 
     sync  cbs[$];
     logic   reset_prev = 1'b0;

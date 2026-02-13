@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class config_item extends uvm_object;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::config_item)
+    `ndk_object_utils(uvm_logic_vector_array_lbus::config_item)
 
     // ----------------------- //
     // Configuration variables //

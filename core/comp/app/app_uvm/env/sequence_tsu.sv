@@ -10,7 +10,7 @@
 
 class sequence_tsu extends uvm_common::sequence_base #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(64));
 
-    `uvm_object_utils(uvm_app_core::sequence_tsu);
+    `ndk_object_utils(uvm_app_core::sequence_tsu);
 
     rand time time_start;
 

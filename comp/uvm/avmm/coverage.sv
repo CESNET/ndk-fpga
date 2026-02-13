@@ -4,8 +4,15 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class coverage #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_avmm::coverage #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class coverage #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_component;
+    `ndk_component_param_utils(
+        uvm_avmm::coverage#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::coverage#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // ----------- //
     // Input ports //

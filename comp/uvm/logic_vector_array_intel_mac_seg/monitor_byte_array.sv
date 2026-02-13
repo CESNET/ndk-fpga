@@ -10,7 +10,10 @@
 
 
 class monitor_byte_array #(int unsigned SEGMENTS) extends uvm_logic_vector_array::monitor#(8);
-    `uvm_component_param_utils(uvm_logic_vector_array_intel_mac_seg::monitor_byte_array#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::monitor_byte_array#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::monitor_byte_array#(%0d)",SEGMENTS)
+    )
 
     localparam ITEM_WIDTH = 8;
 

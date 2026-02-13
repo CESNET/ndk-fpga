@@ -12,7 +12,10 @@
 
 
 class env #(int unsigned RESETS) extends uvm_env;
-    `uvm_component_param_utils(uvm_reset::env#(RESETS));
+    `ndk_component_param_utils(
+        uvm_reset::env#(RESETS),
+        $sformatf("uvm_reset::env#(%0d)",RESETS)
+    );
 
     //high level
     env_config_item#(RESETS) m_config;

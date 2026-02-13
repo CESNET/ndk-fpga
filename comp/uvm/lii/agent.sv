@@ -15,7 +15,10 @@
 class agent_rx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_agent;
 
     // Registration of agent to databaze.
-    `uvm_component_param_utils(uvm_lii::agent_rx #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))
+    `ndk_component_param_utils(
+        uvm_lii::agent_rx#(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH),
+        $sformatf("uvm_lii::agent_rx#(%0d,%0d,%0d,%0d)",DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH)
+    )
 
     // -----------------------
     // Variables.
@@ -82,7 +85,10 @@ endclass
 class agent_tx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_agent;
 
     // Registration of agent to databaze.
-    `uvm_component_param_utils(uvm_lii::agent_tx #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))
+    `ndk_component_param_utils(
+        uvm_lii::agent_tx#(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH),
+        $sformatf("uvm_lii::agent_tx#(%0d,%0d,%0d,%0d)",DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH)
+    )
 
     // -----------------------
     // Variables.
@@ -149,7 +155,10 @@ endclass
 class agent_rx_eth_phy #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, logic MEAS, int unsigned SOF_WIDTH) extends uvm_agent;
 
     // Registration of agent to databaze.
-    `uvm_component_param_utils(uvm_lii::agent_rx_eth_phy #(DATA_WIDTH, FAST_SOF, META_WIDTH, MEAS, SOF_WIDTH))
+    `ndk_component_param_utils(
+        uvm_lii::agent_rx_eth_phy#(DATA_WIDTH, FAST_SOF, META_WIDTH, MEAS, SOF_WIDTH),
+        $sformatf("uvm_lii::agent_rx_eth_phy#(%0d,%0d,%0d,%0d,%0d)",DATA_WIDTH, FAST_SOF, META_WIDTH, MEAS, SOF_WIDTH)
+    )
     // Variables.
 
     uvm_analysis_port #(sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH)) analysis_port;

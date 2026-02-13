@@ -9,7 +9,7 @@
 */
 
 class sequencer extends uvm_sequencer;
-    `uvm_component_utils(uvm_logic_vector_array_intel_mac_seg::sequencer)
+    `ndk_component_utils(uvm_logic_vector_array_intel_mac_seg::sequencer)
     localparam LOGIC_WIDTH = 6;
     localparam ITEM_WIDTH  = 8;
 

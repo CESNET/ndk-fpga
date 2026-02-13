@@ -5,8 +5,14 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mvb environment
-class env_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_mvb::env_rx #(ITEMS, ITEM_WIDTH));
+class env_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_env;
+    `ndk_component_param_utils(
+        uvm_logic_vector_mvb::env_rx#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::env_rx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    );
 
     // ------------------------------------------------------------------------
     // Definition of agents
@@ -120,7 +126,10 @@ endclass
 
 
 class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH));
+    `ndk_component_param_utils(
+        uvm_logic_vector_mvb::env_tx#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::env_tx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    );
 
     //Access component
     uvm_analysis_port #(uvm_logic_vector::sequence_item#(ITEM_WIDTH)) analysis_port;

@@ -6,7 +6,7 @@
 
 
 class config_sequence extends uvm_axi::config_sequence;
-    `uvm_object_utils(uvm_pcie_axi::config_sequence)
+    `ndk_object_utils(uvm_pcie_axi::config_sequence)
 
     uvm_pcie::bar_config bar;
 

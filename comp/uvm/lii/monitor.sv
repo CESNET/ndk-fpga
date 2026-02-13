@@ -14,7 +14,10 @@
 // Definition of LII monitor
 class monitor #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_monitor;
 
-    `uvm_component_param_utils(uvm_lii::monitor #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))
+    `ndk_component_param_utils(
+        uvm_lii::monitor#(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH),
+        $sformatf("uvm_lii::monitor#(%0d,%0d,%0d,%0d)",DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH)
+    )
 
     sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH) tr;
     // Reference to the virtual interface, initialized during the connect phase by parent agent.

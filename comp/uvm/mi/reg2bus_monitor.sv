@@ -12,7 +12,7 @@
 `uvm_analysis_imp_decl(_rs)
 
 class reg2bus_class  extends uvm_sequence_item;
-    `uvm_object_utils(reg2bus_class)
+    `ndk_object_utils(reg2bus_class)
 
     uvm_reg_bus_op op;
 
@@ -34,7 +34,10 @@ endclass
 
 // Monitor convert bus transaction to reg transaction
 class reg2bus_monitor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_monitor;
-    `uvm_component_param_utils(uvm_mi::reg2bus_monitor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::reg2bus_monitor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::reg2bus_monitor#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     reg2bus_class rq_que[$];
     // Reference to the virtual interface, initialized during the connect phase by parent agent.

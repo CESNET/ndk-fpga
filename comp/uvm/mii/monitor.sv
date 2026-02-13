@@ -15,7 +15,10 @@ class monitor #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_monitor;
 
     // ------------------------------------------------------------------------
     // Registration of monitor to databaze
-    `uvm_component_param_utils(uvm_mii::monitor #(CHANNELS, WIDTH))
+    `ndk_component_param_utils(
+        uvm_mii::monitor#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::monitor#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

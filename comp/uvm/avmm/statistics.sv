@@ -4,8 +4,16 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class statistics #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_avmm::statistics #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
+class statistics #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_component;
+
+    `ndk_component_param_utils(
+        uvm_avmm::statistics#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::statistics#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    );
 
     // --------- //
     // Variables //

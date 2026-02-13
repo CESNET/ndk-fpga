@@ -10,7 +10,7 @@
 */
 
 class low_sequence extends uvm_sequence#(uvm_reset::sequence_item);
-    `uvm_object_utils(uvm_reset::low_sequence)
+    `ndk_object_utils(uvm_reset::low_sequence)
 
     env_driver driver;
 

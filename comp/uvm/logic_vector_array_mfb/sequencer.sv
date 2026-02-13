@@ -5,7 +5,10 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 class sequencer_rx #(int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_sequencer;
-    `uvm_component_param_utils(uvm_logic_vector_array_mfb::sequencer_rx #(ITEM_WIDTH, META_WIDTH));
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_mfb::sequencer_rx#(ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequencer_rx#(%0d,%0d)",ITEM_WIDTH, META_WIDTH)
+    );
 
     uvm_logic_vector::sequencer#(META_WIDTH)        m_meta;
     config_item::meta_type                          meta_behav;

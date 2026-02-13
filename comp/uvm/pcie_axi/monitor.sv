@@ -84,7 +84,10 @@ class monitor_CC #(
     int unsigned ITEMS,
     logic STRADDLING
 ) extends monitor#(ITEMS, AXI_CC);
-    `uvm_component_param_utils(uvm_pcie_axi::monitor_CC#(ITEMS, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::monitor_CC#(ITEMS, STRADDLING),
+        $sformatf("uvm_pcie_axi::monitor_CC#(%0d,%0d)",ITEMS, STRADDLING)
+    );
 
     localparam int unsigned PACKET_MAX = 2;
     localparam int unsigned SOF_INDEX  = 0;
@@ -188,7 +191,10 @@ class monitor_CQ #(
     int unsigned ITEMS,
     logic STRADDLING
 ) extends monitor#(ITEMS, AXI_CQ);
-    `uvm_component_param_utils(uvm_pcie_axi::monitor_CQ#(ITEMS, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::monitor_CQ#(ITEMS, STRADDLING),
+        $sformatf("uvm_pcie_axi::monitor_CQ#(%0d,%0d)",ITEMS, STRADDLING)
+    );
 
     localparam PACKET_MAX = 2;
     localparam SOF_INDEX  = 80;
@@ -307,7 +313,10 @@ class monitor_RQ #(
     int unsigned ITEMS,
     logic STRADDLING
 ) extends monitor#(ITEMS, AXI_RQ);
-    `uvm_component_param_utils(uvm_pcie_axi::monitor_RQ#(ITEMS, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::monitor_RQ#(ITEMS, STRADDLING),
+        $sformatf("uvm_pcie_axi::monitor_RQ#(%0d,%0d)",ITEMS, STRADDLING)
+    );
 
     localparam int unsigned PACKET_MAX = ITEMS < 16 ? 1 : 2;
     localparam int unsigned SOF_INDEX  = 20;
@@ -433,7 +442,10 @@ class monitor_RC #(
     int unsigned ITEMS,
     logic STRADDLING
 ) extends monitor#(ITEMS, AXI_RC);
-    `uvm_component_param_utils(uvm_pcie_axi::monitor_RC#(ITEMS, STRADDLING))
+    `ndk_component_param_utils(
+        uvm_pcie_axi::monitor_RC#(ITEMS, STRADDLING),
+        $sformatf("uvm_pcie_axi::monitor_RC#(%0d,%0d)",ITEMS, STRADDLING)
+    )
 
     localparam int unsigned PACKET_MAX = (ITEMS < 16) ? 2  : 4;
     localparam int unsigned SOF_INDEX  = (ITEMS < 16) ? 32 : 64;

@@ -9,6 +9,7 @@
 
 package uvm_pcie_mfb;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

@@ -15,7 +15,10 @@
 class driver #(int unsigned DATA_WIDTH) extends uvm_driver #(sequence_item #(DATA_WIDTH));
 
     // Register component to database.
-    `uvm_component_param_utils(uvm_pma::driver #(DATA_WIDTH))
+    `ndk_component_param_utils(
+        uvm_pma::driver#(DATA_WIDTH),
+        $sformatf("uvm_pma::driver#(%0d)",DATA_WIDTH)
+    )
 
     // Virtual interface of driver
     virtual pma_if #(DATA_WIDTH).driver_cb vif;

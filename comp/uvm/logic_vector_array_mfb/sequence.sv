@@ -16,9 +16,10 @@ class sequence_rx_base #(
 ) extends uvm_common::sequence_base#(config_sequence, uvm_mfb::sequence_item #(
                     REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
           ));
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_base#(
-                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-    ))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_base#(                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_base#(%0d,%0d,%0d,%0d,%0d)",                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_mfb::sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
 
     int unsigned space_size = 0;
@@ -200,9 +201,10 @@ class sequence_rx_simple #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_simple #(
-                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-    ))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_simple#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_simple#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     rand int unsigned space_size_min;
     rand int unsigned space_size_max;
@@ -279,12 +281,6 @@ class sequence_rx_simple #(
 
     function new (string name = "sequence_rx_simple");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_rx_simple #(%0d, %0d, %0d, %0d, %0d)",
-                                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-               );
     endfunction
 
     /////////
@@ -391,9 +387,10 @@ class sequence_rx_burst #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_burst #(
-                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-    ))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_burst#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_burst#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     rand int unsigned rdy_probability_min;
     rand int unsigned rdy_probability_max;
@@ -456,12 +453,6 @@ class sequence_rx_burst #(
 
     function new (string name = "sequence_rx_burst");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_rx_burst #(%0d, %0d, %0d, %0d, %0d)",
-                                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-               );
     endfunction
 
     /////////
@@ -588,9 +579,10 @@ class sequence_rx_position #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_position #(
-                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-    ))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_position#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_position#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     rand logic [REGION_SIZE-1:0] sof_pos;
     constraint sof_pos_c {sof_pos > 0;};
@@ -670,12 +662,6 @@ class sequence_rx_position #(
 
     function new (string name = "sequence_rx_simple");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_rx_position #(%0d, %0d, %0d, %0d, %0d)",
-                            REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-               );
     endfunction
 
     /////////
@@ -776,18 +762,13 @@ class sequence_rx_full_speed #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_full_speed #(
-            REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-    ))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_full_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_full_speed#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     function new (string name = "sequence_rx_full_speed");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_rx_full_speed #(%0d, %0d, %0d, %0d, %0d)",
-                        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-               );
     endfunction
 
     /////////
@@ -880,20 +861,15 @@ class sequence_rx_stop #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_stop #(
-        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-    ))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_stop#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_stop#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     function new (string name = "sequence_rx_stop");
         super.new(name);
         hl_transactions_min = 30;
         hl_transactions_max = 500;
-    endfunction
-
-    virtual function string get_type_name ();
-        return $sformatf("uvm_logic_vector_array_mfb::sequence_rx_stop #(%0d, %0d, %0d, %0d, %0d)",
-                            REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
-               );
     endfunction
 
     /////////

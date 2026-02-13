@@ -10,7 +10,10 @@
 
 class monitor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_monitor;
 
-    `uvm_component_param_utils(uvm_mi::monitor #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::monitor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::monitor#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     // Reference to the virtual interface, initialized during the connect phase by parent agent.
     virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH).monitor vif;

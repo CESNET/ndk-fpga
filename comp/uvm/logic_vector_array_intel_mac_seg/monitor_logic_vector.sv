@@ -10,7 +10,10 @@
 
 
 class monitor_logic_vector #(int unsigned WIDTH, int unsigned SEGMENTS) extends uvm_logic_vector::monitor #(WIDTH);
-    `uvm_component_param_utils(uvm_logic_vector_array_intel_mac_seg::monitor_logic_vector#(WIDTH, SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::monitor_logic_vector#(WIDTH, SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::monitor_logic_vector#(%0d,%0d)",WIDTH, SEGMENTS)
+    )
 
     uvm_analysis_imp #(uvm_intel_mac_seg::sequence_item #(SEGMENTS), monitor_logic_vector#(WIDTH, SEGMENTS)) analysis_export;
     uvm_logic_vector::sequence_item#(WIDTH) hl_tr;

@@ -145,7 +145,7 @@ endclass
 // BASE SEQUENCE MOUST RANDOMIZED
 //////////////////////////////////////////////////////////////////////
 class sequence_request_base extends sequence_request;
-    `uvm_object_param_utils(uvm_pcie::sequence_request_base)
+    `uvm_object_utils(uvm_pcie::sequence_request_base)
 
     rand logic [16-1:0] dev_id[];
 
@@ -297,7 +297,7 @@ endclass
 // DONT SEND ANY REQUESTS
 //////////////////////////////////////////////////////////////////////
 class sequence_request_stop extends sequence_request;
-    `uvm_object_param_utils(uvm_pcie::sequence_request_stop)
+    `uvm_object_utils(uvm_pcie::sequence_request_stop)
 
     rand int unsigned time_sleep; //in NS
 
@@ -324,7 +324,7 @@ endclass
 // SEND REQUEST WITH SAME TAG BUT DIFFERENT REQUESTER ID
 //////////////////////////////////////////////////////////////////////
 class sequence_request_few_tag extends sequence_request;
-    `uvm_object_param_utils(uvm_pcie::sequence_request_few_tag)
+    `uvm_object_utils(uvm_pcie::sequence_request_few_tag)
 
     rand logic [TAG_WIDTH-1:0] tags[];
 
@@ -466,7 +466,7 @@ endclass
 // SEND REQUEST ON FROM ONE REQUESTER
 //////////////////////////////////////////////////////////////////////
 class sequence_request_one_requester extends sequence_request;
-    `uvm_object_param_utils(uvm_pcie::sequence_request_one_requester)
+    `uvm_object_utils(uvm_pcie::sequence_request_one_requester)
 
     rand logic [16-1:0] dev_id;
 
@@ -611,7 +611,7 @@ endclass
 //SEND SMALL REQUEST
 //////////////////////////////////////////////////////////////////////
 class sequence_request_small extends sequence_request;
-    `uvm_object_param_utils(uvm_pcie::sequence_request_small)
+    `uvm_object_utils(uvm_pcie::sequence_request_small)
 
     rand logic [16-1:0] dev_id[];
 
@@ -691,7 +691,7 @@ endclass
 //SEND BIG REQUEST
 //////////////////////////////////////////////////////////////////////
 class sequence_request_big extends sequence_request;
-    `uvm_object_param_utils(uvm_pcie::sequence_request_big)
+    `uvm_object_utils(uvm_pcie::sequence_request_big)
 
     rand logic [16-1:0] dev_id[];
 
@@ -772,7 +772,7 @@ endclass
 // SEQUENCE LIBRARY REQUEST
 /////////////////////////////////////////////////////////////////////////
 class sequence_request_lib extends uvm_common::sequence_library#(config_sequence, uvm_pcie::header);
-  `uvm_object_param_utils(uvm_pcie::sequence_request_lib)
+  `uvm_object_utils(uvm_pcie::sequence_request_lib)
   `uvm_sequence_library_utils(uvm_pcie::sequence_request_lib)
 
   function new(string name = "sequence_lib_tx");

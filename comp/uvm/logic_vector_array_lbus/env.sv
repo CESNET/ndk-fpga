@@ -9,7 +9,7 @@
 // ======= //
 
 class env_rx extends uvm_env;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::env_rx);
+    `ndk_component_utils(uvm_logic_vector_array_lbus::env_rx);
 
     // -------------- //
     // Analysis ports //
@@ -175,7 +175,7 @@ endclass
 // ======= //
 
 class env_tx extends uvm_env;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::env_tx);
+    `ndk_component_utils(uvm_logic_vector_array_lbus::env_tx);
 
     // -------------- //
     // Analysis ports //

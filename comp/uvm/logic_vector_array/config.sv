@@ -13,7 +13,7 @@
 
 
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_logic_vector_array::config_sequence)
+    `ndk_object_utils(uvm_logic_vector_array::config_sequence)
 
     // Default value is ethernet MTU (64-1500)
     int unsigned array_size_min = 64;   // size have to be bigger than zero

@@ -9,10 +9,41 @@
 */
 
 
-class env #(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_env;
-    `uvm_component_param_utils(uvm_app_core::env#(ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU,
-            REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+class env #(
+    int unsigned ETH_STREAMS,
+    int unsigned ETH_PKT_MTU,
+    int unsigned ETH_RX_HDR_WIDTH,
+    int unsigned ETH_TX_HDR_WIDTH,
+    int unsigned DMA_STREAMS,
+    int unsigned DMA_RX_CHANNELS,
+    int unsigned DMA_TX_CHANNELS,
+    int unsigned DMA_HDR_META_WIDTH,
+    int unsigned DMA_PKT_MTU,
+    int unsigned REGIONS,
+    int unsigned MFB_REG_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned MEM_PORTS,
+    int unsigned MEM_ADDR_WIDTH,
+    int unsigned MEM_BURST_WIDTH,
+    int unsigned MEM_DATA_WIDTH,
+    int unsigned MI_DATA_WIDTH,
+    int unsigned MI_ADDR_WIDTH
+) extends uvm_env;
+
+    `ndk_component_param_utils(
+        uvm_app_core::env#(
+            ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH
+        ),
+
+        $sformatf("uvm_app_core::env#(%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d)",
+            ETH_STREAMS, ETH_PKT_MTU, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH, MEM_PORTS, MEM_ADDR_WIDTH, MEM_BURST_WIDTH, MEM_DATA_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH
+        )
+    )
 
     localparam DMA_RX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_RX_CHANNELS);
     localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS) + 1;

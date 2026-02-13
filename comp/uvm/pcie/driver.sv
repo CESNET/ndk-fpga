@@ -6,7 +6,7 @@
 
 
 class driver extends uvm_driver#(uvm_pcie::header);
-    `uvm_component_param_utils(uvm_pcie::driver);
+    `ndk_component_utils(uvm_pcie::driver);
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);

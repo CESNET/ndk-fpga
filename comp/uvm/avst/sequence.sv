@@ -10,7 +10,10 @@ class sequence_simple_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_avst::sequence_simple_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_avst::sequence_simple_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_avst::sequence_simple_tx#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -66,7 +69,10 @@ class sequence_full_speed_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_avst::sequence_full_speed_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_avst::sequence_full_speed_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_avst::sequence_full_speed_tx#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -117,7 +123,10 @@ class sequence_stop_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_object_param_utils(uvm_avst::sequence_stop_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_avst::sequence_stop_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_avst::sequence_stop_tx#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -174,7 +183,10 @@ class sequence_lib_tx #(
         config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
 );
 
-  `uvm_object_param_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
+  `ndk_object_param_utils(
+        uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_avst::sequence_lib_tx#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
+   )
   `uvm_sequence_library_utils(uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))
 
   function new(string name = "sequence_lib_tx");

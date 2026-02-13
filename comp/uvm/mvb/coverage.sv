@@ -5,7 +5,10 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 class coverage #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_subscriber#(sequence_item #(ITEMS, ITEM_WIDTH));
-    `uvm_component_param_utils(uvm_mvb::coverage #(ITEMS, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mvb::coverage#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::coverage#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     sequence_item #(ITEMS, ITEM_WIDTH) seq_item;
     logic [ITEM_WIDTH-1 : 0] item;

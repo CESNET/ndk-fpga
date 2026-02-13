@@ -13,6 +13,7 @@
 
 package uvm_mii;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

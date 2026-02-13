@@ -6,7 +6,10 @@
 
 // Definition of mfb monitor
 class meter #(int unsigned ITEM_WIDTH) extends uvm_subscriber#(sequence_item #(ITEM_WIDTH));
-    `uvm_component_param_utils(uvm_logic_vector_array::meter #(ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array::meter#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::meter#(%0d)",ITEM_WIDTH)
+    )
 
     localparam KOEF = ITEM_WIDTH;
 

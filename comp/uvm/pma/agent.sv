@@ -15,7 +15,10 @@
 class agent #(int unsigned DATA_WIDTH) extends uvm_agent;
 
     // Registration of agent to databaze.
-    `uvm_component_param_utils(uvm_pma::agent #(DATA_WIDTH))
+    `ndk_component_param_utils(
+        uvm_pma::agent#(DATA_WIDTH),
+        $sformatf("uvm_pma::agent#(%0d)",DATA_WIDTH)
+    )
 
     // -----------------------
     // Variables.

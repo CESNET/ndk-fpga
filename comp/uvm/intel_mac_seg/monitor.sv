@@ -10,7 +10,10 @@
 
 // Definition of mvb monitor
 class monitor #(int unsigned SEGMENTS) extends uvm_monitor;
-    `uvm_component_param_utils(uvm_intel_mac_seg::monitor#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::monitor#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::monitor#(%0d)",SEGMENTS)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

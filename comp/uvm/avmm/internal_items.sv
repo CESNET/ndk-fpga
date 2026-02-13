@@ -5,8 +5,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Request
-class request_item #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_avmm::request_item #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class request_item #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_common::sequence_item;
+    `ndk_object_param_utils(
+        uvm_avmm::request_item#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::request_item#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     request_item_type_e         request_type;
     logic [ADDRESS_WIDTH-1 : 0] address;
@@ -75,8 +82,14 @@ class request_item #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int un
 endclass
 
 // Response
-class response_item #(int unsigned DATA_WIDTH) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_avmm::response_item #(DATA_WIDTH))
+class response_item #(
+    int unsigned DATA_WIDTH
+) extends uvm_common::sequence_item;
+
+    `ndk_object_param_utils(
+        uvm_avmm::response_item#(DATA_WIDTH),
+        $sformatf("uvm_avmm::response_item#(%0d)",DATA_WIDTH)
+    )
 
     logic [DATA_WIDTH-1 : 0] readdata;
     time timestamp;

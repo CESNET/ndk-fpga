@@ -10,11 +10,15 @@
 `include "uvm_macros.svh"
 import uvm_pkg::*;
 
-module avmm_property #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH)
-    (
-        input RESET,
-        avmm_if vif
-    );
+module avmm_property #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) (
+    input RESET,
+    avmm_if vif
+);
+
     string module_name = "";
     logic START = 1'b1;
 

@@ -14,7 +14,12 @@ class sequence_eth#(
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_app_core::sequence_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core::sequence_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
+        $sformatf("uvm_app_core::sequence_eth#(%0d,%0d,%0d)",
+            CHANNELS, LENGTH_WIDTH, ITEM_WIDTH
+        )
+    )
 
     int unsigned transaction_min = 100;
     int unsigned transaction_max = 300;
@@ -71,7 +76,12 @@ class sequence_flowtest_eth #(
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_app_core::sequence_flowtest_eth #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core::sequence_flowtest_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
+        $sformatf("uvm_app_core::sequence_flowtest_eth#(%0d,%0d,%0d)",
+            CHANNELS, LENGTH_WIDTH, ITEM_WIDTH
+        )
+    )
 
     // Packet size configuration options
     int unsigned forward_packet_number_min = 10;
@@ -430,7 +440,12 @@ class sequence_search_eth  #(
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_app_core::sequence_search_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core::sequence_search_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
+        $sformatf("uvm_app_core::sequence_search_eth#(%0d,%0d,%0d)",
+            CHANNELS, LENGTH_WIDTH, ITEM_WIDTH
+        )
+    )
 
     string config_json = "./filter.json";
     rand int unsigned transaction_count;
@@ -710,7 +725,12 @@ class sequence_library_eth #(
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
 ) extends uvm_common::sequence_library #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
-    `uvm_object_param_utils(    uvm_app_core::sequence_library_eth #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core::sequence_library_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
+        $sformatf("uvm_app_core::sequence_library_eth#(%0d,%0d,%0d)",
+            CHANNELS, LENGTH_WIDTH, ITEM_WIDTH
+        )
+    )
     `uvm_sequence_library_utils(uvm_app_core::sequence_library_eth #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH))
 
     function new(string name = "packet_generator_sequence_library");

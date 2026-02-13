@@ -8,7 +8,7 @@
 class sequence_data  extends uvm_sequence#(
     uvm_logic_vector_array::sequence_item #(32)
 );
-    `uvm_object_param_utils(uvm_pcie_mfb::sequence_data);
+    `ndk_object_utils(uvm_pcie_mfb::sequence_data);
 
     uvm_common::fifo#(uvm_logic_vector_array::sequence_item #(32))            fifo;
 
@@ -36,7 +36,10 @@ class sequence_meta#(
 ) extends uvm_sequence#(
     uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))
 );
-    `uvm_object_param_utils(uvm_pcie_mfb::sequence_meta#(DIR, DEVICE));
+    `ndk_object_param_utils(
+        uvm_pcie_mfb::sequence_meta#(DIR, DEVICE),
+        $sformatf("uvm_pcie_mfb::sequence_meta#(%s,%s)",DIR, DEVICE)
+    );
 
     uvm_common::fifo#(uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))) fifo;
 

@@ -62,7 +62,10 @@ class root#(
     int unsigned RDY_LATENCY,
     logic STRADDLING
 ) extends uvm_pcie::root;
-    `uvm_component_param_utils(uvm_pcie_avst::root#(REGIONS, REGIONS_SIZE, RDY_LATENCY, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_avst::root#(REGIONS, REGIONS_SIZE, RDY_LATENCY, STRADDLING),
+        $sformatf("uvm_pcie_avst::root#(%0d,%0d,%0d,%0d)",REGIONS, REGIONS_SIZE, RDY_LATENCY, STRADDLING)
+    );
 
     parameter AVST_META_UP   = 128 + 32 + 1; //HDR + PREFIX + ERROR
     parameter AVST_META_DOWN = 128 + 32 + 3; //HDR + PREFIX + BAR

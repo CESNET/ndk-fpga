@@ -10,7 +10,10 @@
 
 
 class sequence_simple_rx #(int unsigned SEGMENTS) extends uvm_sequence #(sequence_item #(SEGMENTS));
-    `uvm_object_param_utils(uvm_intel_mac_seg::sequence_simple_rx #(SEGMENTS))
+    `ndk_object_param_utils(
+        uvm_intel_mac_seg::sequence_simple_rx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::sequence_simple_rx#(%0d)",SEGMENTS)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -66,7 +69,10 @@ endclass
 
 
 class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_base #(config_sequence, sequence_item #(SEGMENTS));
-    `uvm_object_param_utils(uvm_intel_mac_seg::sequence_simple_tx #(SEGMENTS))
+    `ndk_object_param_utils(
+        uvm_intel_mac_seg::sequence_simple_tx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::sequence_simple_tx#(%0d)",SEGMENTS)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -118,7 +124,10 @@ endclass
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
 class sequence_lib_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_library#(config_sequence, sequence_item #(SEGMENTS));
-  `uvm_object_param_utils(uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS))
+  `ndk_object_param_utils(
+        uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::sequence_lib_tx#(%0d)",SEGMENTS)
+    )
   `uvm_sequence_library_utils(uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS))
 
   function new(string name = "sequence_lib_tx");

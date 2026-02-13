@@ -6,7 +6,7 @@
 
 
 class root extends uvm_env;
-    `uvm_component_param_utils(uvm_pcie::root);
+    `uvm_component_utils(uvm_pcie::root);
 
     uvm_analysis_port #(uvm_pcie::header) analysis_port_cq;
     uvm_analysis_port #(uvm_pcie::header) analysis_port_cc;

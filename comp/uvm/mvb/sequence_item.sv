@@ -11,7 +11,10 @@ class sequence_item #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_c
 
     // ------------------------------------------------------------------------
     // Registration of object tools
-    `uvm_object_param_utils(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::sequence_item#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Member attributes, equivalent with interface pins

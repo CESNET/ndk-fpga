@@ -9,6 +9,7 @@
 
 package uvm_app_core_top_agent;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

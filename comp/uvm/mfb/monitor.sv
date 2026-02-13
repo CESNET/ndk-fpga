@@ -9,7 +9,10 @@ class monitor #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLO
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_mfb::monitor #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mfb::monitor#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_mfb::monitor#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Parameters

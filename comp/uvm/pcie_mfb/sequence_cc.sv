@@ -12,7 +12,10 @@ class sequence_base_mfb_cc #(
     uvm_mfb::config_sequence,
     uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, (META_TYPE !=  MFB_META_NONE) ? meta_width_get(MFB_CC) : 0)
 );
-    `uvm_object_param_utils(uvm_pcie_mfb::sequence_base_mfb_cc #(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE));
+    `ndk_object_utils(
+        uvm_pcie_mfb::sequence_base_mfb_cc#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE),
+        $sformatf("uvm_pcie_mfb::sequence_base_mfb_cc#(%0d,%0d,%0d,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE)
+    );
 
     int unsigned transactions_min = 10;
     int unsigned transactions_max = 300;
@@ -48,7 +51,10 @@ class sequence_lib_mfb_cc #(
     uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, (META_TYPE !=  MFB_META_NONE) ? meta_width_get(MFB_CC) : 0)
 );
 
-    `uvm_object_param_utils(uvm_pcie_mfb::sequence_lib_mfb_cc#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE))
+    `ndk_object_utils(
+        uvm_pcie_mfb::sequence_lib_mfb_cc#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE),
+        $sformatf("uvm_pcie_mfb::sequence_lib_mfb_cc#(%0d,%0d,%0d,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE)
+    )
     `uvm_sequence_library_utils(uvm_pcie_mfb::sequence_lib_mfb_cc#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE))
 
     function new(string name = "sequence_lib_rx");

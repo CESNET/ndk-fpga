@@ -10,7 +10,10 @@
 
 
 class driver_rx #(int unsigned SEGMENTS) extends uvm_driver #(sequence_item #(SEGMENTS));
-    `uvm_component_param_utils(uvm_intel_mac_seg::driver_rx #(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::driver_rx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::driver_rx#(%0d)",SEGMENTS)
+    )
 
     // Virtual interface of rx driver
     virtual intel_mac_seg_if #(SEGMENTS).driver_rx vif;
@@ -58,7 +61,10 @@ endclass
 
 
 class driver_tx #(int unsigned SEGMENTS) extends uvm_driver #(sequence_item #(SEGMENTS));
-    `uvm_component_param_utils(uvm_intel_mac_seg::driver_tx #(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::driver_tx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::driver_tx#(%0d)",SEGMENTS)
+    )
 
     // Virtual interface of rx driver
     virtual intel_mac_seg_if #(SEGMENTS).driver_tx vif;

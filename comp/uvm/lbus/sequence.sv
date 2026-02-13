@@ -9,7 +9,7 @@
 // ========= //
 
 class sequence_tx extends uvm_common::sequence_base #(config_sequence, sequence_item);
-    `uvm_object_utils(uvm_lbus::sequence_tx)
+    `ndk_object_utils(uvm_lbus::sequence_tx)
 
     // Ready utils
     uvm_common::rand_rdy rdy;
@@ -72,7 +72,7 @@ class sequence_tx extends uvm_common::sequence_base #(config_sequence, sequence_
 endclass
 
 class sequence_tx_stop extends sequence_tx;
-    `uvm_object_utils(uvm_lbus::sequence_tx_stop)
+    `ndk_object_utils(uvm_lbus::sequence_tx_stop)
 
     // Constructor
     function new(string name = "sequence_tx_stop");
@@ -95,7 +95,7 @@ class sequence_tx_stop extends sequence_tx;
 endclass
 
 class sequence_tx_fullspeed extends sequence_tx;
-    `uvm_object_utils(uvm_lbus::sequence_tx_fullspeed)
+    `ndk_object_utils(uvm_lbus::sequence_tx_fullspeed)
 
     // Constructor
     function new(string name = "sequence_tx_fullspeed");
@@ -122,7 +122,7 @@ endclass
 // ================== //
 
 class sequence_library_tx extends uvm_common::sequence_library #(config_sequence, sequence_item);
-    `uvm_object_utils(uvm_lbus::sequence_library_tx)
+    `ndk_object_utils(uvm_lbus::sequence_library_tx)
     `uvm_sequence_library_utils(uvm_lbus::sequence_library_tx)
 
     // Constructor
@@ -141,8 +141,8 @@ class sequence_library_tx extends uvm_common::sequence_library #(config_sequence
 endclass
 
 class sequence_library_tx_speed extends sequence_library_tx;
-    `uvm_object_utils(uvm_lbus::sequence_library_tx_fullspeed)
-    `uvm_sequence_library_utils(uvm_lbus::sequence_library_tx_fullspeed)
+    `ndk_object_utils(uvm_lbus::sequence_library_tx_speed)
+    `uvm_sequence_library_utils(sequence_library_tx_speed)
 
     // Constructor
     function new(string name = "sequence_library_tx_fullspeed");

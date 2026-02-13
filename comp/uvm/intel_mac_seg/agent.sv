@@ -9,7 +9,10 @@
 */
 
 class agent_rx #(int unsigned SEGMENTS) extends uvm_agent;
-    `uvm_component_param_utils(uvm_intel_mac_seg::agent_rx#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::agent_rx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::agent_rx#(%0d)",SEGMENTS)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -79,7 +82,10 @@ endclass
 
 
 class agent_tx #(int unsigned SEGMENTS) extends uvm_agent;
-    `uvm_component_param_utils(uvm_intel_mac_seg::agent_tx#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::agent_tx#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::agent_tx#(%0d)",SEGMENTS)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

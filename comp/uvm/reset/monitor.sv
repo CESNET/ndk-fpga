@@ -10,7 +10,7 @@
 
 
 class monitor extends uvm_monitor;
-    `uvm_component_utils(uvm_reset::monitor);
+    `ndk_component_utils(uvm_reset::monitor);
 
     virtual reset_if.monitor vif;
 

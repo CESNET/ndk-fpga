@@ -11,8 +11,9 @@ class sequence_rx_pcie_burst #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_pcie_burst #(
-        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_pcie_burst#(        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_pcie_burst#(%0d,%0d,%0d,%0d,%0d)",        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
     uvm_common::rand_length   rand_burst_size; //burst set to 1
     uvm_common::rand_length   rand_space_size; //burst set to 0
@@ -171,8 +172,9 @@ class sequence_rx_pcie_full_speed #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed #(
-        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     function new (string name = "sequence_rx_pcie_full_speed");
@@ -266,8 +268,9 @@ class sequence_rx_no_inframe_gap #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap #(
-        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap#(        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap#(%0d,%0d,%0d,%0d,%0d)",        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     uvm_common::rand_length   rdy_length;

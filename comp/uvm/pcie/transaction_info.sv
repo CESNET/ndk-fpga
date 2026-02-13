@@ -6,7 +6,7 @@
 
 
 class transaction_info extends uvm_component;
-    `uvm_component_param_utils(uvm_pcie::transaction_info);
+    `ndk_component_utils(uvm_pcie::transaction_info);
 
     uvm_tlm_analysis_fifo #(uvm_pcie::header) fifo_cc;
     uvm_tlm_analysis_fifo #(uvm_pcie::header) fifo_rq;

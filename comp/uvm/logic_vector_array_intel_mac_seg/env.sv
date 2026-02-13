@@ -10,7 +10,10 @@
 
 
 class env_rx #(int unsigned SEGMENTS) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_array_intel_mac_seg::env_rx#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::env_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::env_rx#(%0d)",SEGMENTS)
+    )
 
     // fcs_error, tr.error, tr.status_data
     localparam LOGIC_WIDTH = 6;
@@ -120,7 +123,10 @@ endclass
 
 
 class env_tx #(int unsigned SEGMENTS) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_array_intel_mac_seg::env_tx#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::env_tx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::env_tx#(%0d)",SEGMENTS)
+    )
 
     // fcs_error, tr.error, tr.status_data
     localparam LOGIC_WIDTH = 6;

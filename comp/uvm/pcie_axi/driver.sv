@@ -9,7 +9,10 @@ class driver#(
     int unsigned ITEMS,
     direction_t dir
 ) extends uvm_pcie::driver;
-    `uvm_component_param_utils(uvm_pcie_axi::driver #(ITEMS, dir));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::driver#(ITEMS, dir),
+        $sformatf("uvm_pcie_axi::driver#(%0d,%s)",ITEMS, dir)
+    );
 
     // LOCAL PARAMETERS
     localparam int unsigned ITEM_WIDTH = 32; //as all pcie devices

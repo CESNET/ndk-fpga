@@ -9,7 +9,10 @@
 // ======= //
 
 class agent_rx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_avst_crdt::agent_rx #(UPDATE_CNT_WIDTH))
+    `ndk_component_param_utils(
+        uvm_avst_crdt::agent_rx #(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::agent_rx#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // Analysis port
     uvm_analysis_port #(sequence_item #(UPDATE_CNT_WIDTH)) analysis_port;
@@ -77,7 +80,7 @@ class agent_rx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_agent;
 endclass
 
 class agent_rx_hdr extends agent_rx #(2);
-    `uvm_component_utils(uvm_avst_crdt::agent_rx_hdr)
+    `ndk_component_utils(uvm_avst_crdt::agent_rx_hdr)
 
     // Constructor
     function new(string name = "agent_rx_hdr", uvm_component parent = null);
@@ -87,7 +90,7 @@ class agent_rx_hdr extends agent_rx #(2);
 endclass
 
 class agent_rx_data extends agent_rx #(4);
-    `uvm_component_utils(uvm_avst_crdt::agent_rx_data)
+    `ndk_component_utils(uvm_avst_crdt::agent_rx_data)
 
     // Constructor
     function new(string name = "agent_rx_data", uvm_component parent = null);
@@ -101,7 +104,10 @@ endclass
 // ======= //
 
 class agent_tx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_avst_crdt::agent_tx #(UPDATE_CNT_WIDTH))
+    `ndk_component_param_utils(
+        uvm_avst_crdt::agent_tx #(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::agent_tx#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // Analysis port
     uvm_analysis_port #(sequence_item #(UPDATE_CNT_WIDTH)) analysis_port;
@@ -169,7 +175,7 @@ class agent_tx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_agent;
 endclass
 
 class agent_tx_hdr extends agent_tx #(2);
-    `uvm_component_utils(uvm_avst_crdt::agent_tx_hdr)
+    `ndk_component_utils(uvm_avst_crdt::agent_tx_hdr)
 
     // Constructor
     function new(string name = "agent_tx_hdr", uvm_component parent = null);
@@ -179,7 +185,7 @@ class agent_tx_hdr extends agent_tx #(2);
 endclass
 
 class agent_tx_data extends agent_tx #(4);
-    `uvm_component_utils(uvm_avst_crdt::agent_tx_data)
+    `ndk_component_utils(uvm_avst_crdt::agent_tx_data)
 
     // Constructor
     function new(string name = "agent_tx_data", uvm_component parent = null);

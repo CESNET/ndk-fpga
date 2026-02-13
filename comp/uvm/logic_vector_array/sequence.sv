@@ -11,8 +11,10 @@
 
 // Reusable high level sequence. Contains transaction, which has only data part.
 class sequence_simple #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_simple#(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_simple);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_simple#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_simple#(%0d)",ITEM_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned transaction_count_min = 10;
@@ -84,8 +86,10 @@ endclass
 // High level sequence with same size.
 
 class sequence_simple_const #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_simple_const#(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_simple_const);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_simple_const#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_simple_const#(%0d)",ITEM_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned transaction_count_min = 10;
@@ -141,8 +145,10 @@ endclass
 // High level sequence with Gaussian distribution.
 
 class sequence_simple_gauss #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_simple_gauss#(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_simple_gauss);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_simple_gauss#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_simple_gauss#(%0d)",ITEM_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned transaction_count_min = 10;
@@ -217,8 +223,10 @@ endclass
 // High level sequence with increment size.
 
 class sequence_simple_inc #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_simple_inc#(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_simple_inc);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_simple_inc#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_simple_inc#(%0d)",ITEM_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned transaction_count_min = 10;
@@ -267,8 +275,10 @@ endclass
 // High level sequence with decrement size.
 
 class sequence_simple_dec #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_simple_dec#(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_simple_dec);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_simple_dec#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_simple_dec#(%0d)",ITEM_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned transaction_count_min = 10;
@@ -317,8 +327,10 @@ endclass
 
 // High level sequence which is used for measuring
 class sequence_simple_meas #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_simple_meas#(ITEM_WIDTH));
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_simple_meas);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_simple_meas#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_simple_meas#(%0d)",ITEM_WIDTH)
+    );
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer#(ITEM_WIDTH));
 
     int unsigned transaction_count = 370;
@@ -365,8 +377,10 @@ class sequence_simple_meas #(int unsigned ITEM_WIDTH) extends uvm_common::sequen
 endclass
 
 class sequence_min_max #(int unsigned ITEM_WIDTH) extends sequence_simple #(ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_min_max #(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_min_max);
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_min_max#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_min_max#(%0d)",ITEM_WIDTH)
+    )
 
     // Constructor
     function new(string name = "sequence_min_max");
@@ -395,8 +409,10 @@ class sequence_min_max #(int unsigned ITEM_WIDTH) extends sequence_simple #(ITEM
 endclass
 
 class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple #(ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_array::sequence_inverted_gauss #(ITEM_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector_array::sequence_inverted_gauss)
+    `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_inverted_gauss#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_inverted_gauss#(%0d)",ITEM_WIDTH)
+    )
 
     int unsigned mean;
     rand int unsigned data_size_min;
@@ -489,7 +505,10 @@ endclass
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY
 class sequence_lib #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_library#(config_sequence, sequence_item#(ITEM_WIDTH));
-  `uvm_object_param_utils(uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH))
+  `ndk_object_param_utils(
+        uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::sequence_lib#(%0d)",ITEM_WIDTH)
+    )
   `uvm_sequence_library_utils(uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH))
 
     function new(string name = "sequence_library");

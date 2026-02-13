@@ -13,6 +13,7 @@
 
 package uvm_app_core;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

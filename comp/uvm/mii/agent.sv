@@ -13,7 +13,10 @@
 
 // This is MII agent, which declares basic components.
 class agent_rx #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_mii::agent_rx #(CHANNELS, WIDTH))
+    `ndk_component_param_utils(
+        uvm_mii::agent_rx#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::agent_rx#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -85,7 +88,10 @@ endclass
 
 // This is MII agent, which declares basic components.
 class agent_tx #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_mii::agent_tx #(CHANNELS, WIDTH))
+    `ndk_component_param_utils(
+        uvm_mii::agent_tx#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::agent_tx#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

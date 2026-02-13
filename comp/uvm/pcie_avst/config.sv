@@ -5,7 +5,7 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 class config_sequence extends uvm_avst::config_sequence;
-    `uvm_object_utils(uvm_pcie_avst::config_sequence)
+    `ndk_object_utils(uvm_pcie_avst::config_sequence)
 
     int unsigned rdy_latency;
     uvm_pcie::bar_config bar;

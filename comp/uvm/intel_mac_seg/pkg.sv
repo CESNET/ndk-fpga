@@ -9,6 +9,7 @@
 
 package uvm_intel_mac_seg;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

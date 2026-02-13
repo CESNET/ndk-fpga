@@ -9,7 +9,7 @@
 */
 
 class regmodel extends uvm_reg_block;
-    `uvm_object_utils(uvm_app_core::regmodel)
+    `ndk_object_utils(uvm_app_core::regmodel)
 
     function new(string name = "reg_block");
         super.new(name, build_coverage(UVM_NO_COVERAGE));

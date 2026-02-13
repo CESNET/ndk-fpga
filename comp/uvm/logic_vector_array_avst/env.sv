@@ -6,7 +6,10 @@
 
 // Definition of mfb environment
 class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_array_avst::env_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY));
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_avst::env_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+        $sformatf("uvm_logic_vector_array_avst::env_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+    );
 
     // ------------------------------------------------------------------------
     // Definition of agents
@@ -127,7 +130,10 @@ endclass
 
 
 class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_array_avst::env_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY));
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_avst::env_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+        $sformatf("uvm_logic_vector_array_avst::env_tx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+    );
 
     //Access component
     uvm_analysis_port #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) analysis_port_data;

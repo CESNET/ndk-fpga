@@ -6,7 +6,10 @@
 
 
 class statistic #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_subscriber#(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_component_param_utils(uvm_avst::statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `ndk_component_param_utils(
+        uvm_avst::statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_avst::statistic#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)
+    );
 
 
     // SPEED mesures

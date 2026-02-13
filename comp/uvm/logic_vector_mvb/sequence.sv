@@ -9,7 +9,10 @@ class sequence_rx_base #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_base #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_base#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_base#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
     `uvm_declare_p_sequencer(uvm_mvb::sequencer #(ITEMS, ITEM_WIDTH))
 
     uvm_logic_vector::sequencer #(ITEM_WIDTH)     hi_sqr;
@@ -34,10 +37,6 @@ class sequence_rx_base #(
     function new(string name = "sequence_rx_base");
         super.new(name);
         this.name = name;
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_base #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     function void tr_init(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH) tr);
@@ -131,7 +130,10 @@ class sequence_rx_rand #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_rand #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_rand#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_rand#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // coeficient is used because we want to use more random distributors
     // uvm_common::rand_length use constant size instead relative ranges
@@ -143,10 +145,6 @@ class sequence_rx_rand #(
     function new(string name = "sequence_rx_rand");
         super.new(name);
         rdy = uvm_common::rand_length_rand::new();
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_rand #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -197,7 +195,10 @@ class sequence_rx_burst #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_burst #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_burst#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_burst#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     uvm_common::rand_length   rand_burst_length;
     uvm_common::rand_length   rand_space_length;
@@ -231,10 +232,6 @@ class sequence_rx_burst #(
         //first in body is decision so the first mode will be MODE_SPACE
         burst_mode         = MODE_BURST;
    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_burst #(%0d, %0d)", ITEMS, ITEM_WIDTH);
-    endfunction
 
     virtual task create_sequence_item();
         logic src_rdy;
@@ -311,16 +308,15 @@ class sequence_rx_full_speed #(
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
 
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_full_speed #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_full_speed#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_full_speed#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     int unsigned space = 0;
     // Constructor - creates new instance of this class
     function new(string name = "sequence_rx_full_speed");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_full_speed #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -369,15 +365,14 @@ class sequence_rx_stop #(
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
 
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_stop #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_stop#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_stop#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_rx_stop");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_stop #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -404,7 +399,10 @@ class sequence_rx_const_space #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_const_space #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_const_space#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_const_space#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     rand int unsigned space_size = 10;
 
@@ -424,10 +422,6 @@ class sequence_rx_const_space #(
 
     function new(string name = "sequence_rx_full_speed");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_const_space #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -476,7 +470,10 @@ class sequence_rx_const_possition #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_const_possition #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_const_possition#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_const_possition#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     rand logic [ITEMS-1:0] pos_valid = 1'b1;
     int unsigned space = 0;
@@ -488,10 +485,6 @@ class sequence_rx_const_possition #(
 
     function new(string name = "sequence_rx_full_speed");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_const_possition #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();
@@ -541,16 +534,15 @@ class sequence_lib_rx #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends uvm_common::sequence_library#(config_sequence, uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
-  `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_lib_rx#(ITEMS, ITEM_WIDTH))
+  `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_lib_rx#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_lib_rx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
   `uvm_sequence_library_utils(uvm_logic_vector_mvb::sequence_lib_rx#(ITEMS, ITEM_WIDTH))
 
     function new(string name = "");
         super.new(name);
         init_sequence_library();
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_lib_rx #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     // subclass can redefine and change run sequences
@@ -571,16 +563,15 @@ class sequence_lib_rx_speed #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
 ) extends sequence_lib_rx#(ITEMS, ITEM_WIDTH);
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_lib_rx_speed#(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_lib_rx_speed#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_lib_rx_speed#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
     `uvm_sequence_library_utils(uvm_logic_vector_mvb::sequence_lib_rx_speed#(ITEMS, ITEM_WIDTH))
 
     function new(string name = "");
         super.new(name);
         init_sequence_library();
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_lib_rx_speed #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     // subclass can redefine and change run sequences
@@ -602,15 +593,14 @@ class sequence_rx_simple #(
     int unsigned ITEM_WIDTH
 ) extends sequence_rx_base #(ITEMS, ITEM_WIDTH);
 
-    `uvm_object_param_utils(uvm_logic_vector_mvb::sequence_rx_simple #(ITEMS, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_logic_vector_mvb::sequence_rx_simple#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_mvb::sequence_rx_simple#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence_rx_simple");
         super.new(name);
-    endfunction
-
-    virtual function string get_type_name();
-        return $sformatf("uvm_logic_vector_mvb::sequence_rx_simple #(%0d, %0d)", ITEMS, ITEM_WIDTH);
     endfunction
 
     virtual task create_sequence_item();

@@ -11,7 +11,10 @@ class sequence_base_rc #(
     config_sequence,
     uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC))
 );
-    `uvm_object_param_utils(uvm_pcie_axi::sequence_base_rc #(ITEMS, ITEM_WIDTH, STRADDLING));
+    `ndk_object_param_utils(
+        uvm_pcie_axi::sequence_base_rc#(ITEMS, ITEM_WIDTH, STRADDLING),
+        $sformatf("uvm_pcie_axi::sequence_base_rc#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, STRADDLING)
+    );
     `uvm_declare_p_sequencer(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC)));
 
     localparam PACKET_MAX_STRADDLING = ITEMS < 16 ? 2 : 4;
@@ -342,7 +345,10 @@ class sequence_lib_rc #(
     uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC))
 );
 
-  `uvm_object_param_utils(uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING))
+  `ndk_object_param_utils(
+        uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING),
+        $sformatf("uvm_pcie_axi::sequence_lib_rc#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, STRADDLING)
+    )
   `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING))
 
   function new(string name = "sequence_lib_rx");

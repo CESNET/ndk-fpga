@@ -6,7 +6,7 @@
 
 
 class bar_config extends uvm_object;
-    `uvm_object_utils(uvm_pcie::bar_config)
+    `ndk_object_utils(uvm_pcie::bar_config)
 
     protected int unsigned  addr2bar_register[logic[64-1:2]];
     protected logic[64-1:2] bar2addr_register[int unsigned];

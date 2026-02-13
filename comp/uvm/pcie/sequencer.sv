@@ -7,7 +7,7 @@
 class sequencer extends uvm_sequencer #(uvm_pcie::header);
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_pcie::sequencer)
+    `ndk_component_utils(uvm_pcie::sequencer)
 
     uvm_reset::sync_terminate reset_sync;
 

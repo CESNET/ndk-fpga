@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_item extends uvm_sequence_item;
-    `uvm_object_utils(uvm_lbus::sequence_item)
+    `ndk_object_utils(uvm_lbus::sequence_item)
 
     // ------------------------------- //
     // Structure of LBUS sequence item //
