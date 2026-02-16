@@ -11,7 +11,7 @@ from cocotbext.ofm.mfb.transaction import MfbTransaction
 from math import log2
 from copy import copy
 
-# NOTE remove line 46 while/after reimplementing MFB driver !!!
+# NOTE remove line 48 while/after reimplementing MFB driver !!!
 
 
 class MFBProtocolError(Exception):
@@ -28,20 +28,22 @@ class MFBMonitor(BusMonitor):
                     Consider using a child class of `MfbTransaction` for more structured data.
 
         meta_valid_with: Specifies which signal indicates the validity of metadata
-                         if the 'meta' signal is present. Must be either "sof" (start of frame)
+                         if the 'meta' or similar signal is present. Must be either "sof" (start of frame)
                          or "eof" (end of frame).
     """
 
     _signals = ["data", "sof_pos", "eof_pos", "sof", "eof", "src_rdy", "dst_rdy"]
     _optional_signals = ["meta"]
 
-    def __init__(self, entity, name, clock, array_idx=None, mfb_params=None, trans_type: MfbTransaction | bytes = bytes, meta_vld_with: str = "sof"):
+    def __init__(self, entity, name, clock, array_idx=None, mfb_params=None, trans_type: MfbTransaction | bytes = bytes):
         super().__init__(entity, name, clock, array_idx=array_idx)
 
-        self._regions, self._region_size, self._block_size, self._item_width, self._meta_width = get_mfb_params(
+        self._regions, self._region_size, self._block_size, self._item_width, self._meta_width, self._os_vld_with = get_mfb_params(
             self.bus, mfb_params
         )
         self._region_items = self._region_size * self._block_size
+        self._os = [s for s in self._optional_signals if hasattr(self.bus, s)]
+        self._os_widths = {s: len(getattr(self.bus, s)) // self._regions for s in self._os}
 
         self._item_width = 8 # remove this line while/after reimplementing MFB driver!!!
 
@@ -53,14 +55,7 @@ class MFBMonitor(BusMonitor):
         self._eof_pos = BinaryVector(item_count=self._regions, item_bits=int(log2(self._region_size*self._block_size)))
         self._sof     = Binary(bits=self._regions)
         self._eof     = Binary(bits=self._regions)
-
-        if self._meta_width > 0:
-            self._meta = BinaryVector(item_count=self._regions, item_bits=self._meta_width)
-
-            if meta_vld_with not in ["sof", "eof"]:
-                raise ValueError(f"Invalid value of {meta_vld_with} of 'meta_vld_with'. Supported values are: \"sof\", \"eof\".")
-
-            self._meta_vld_with = meta_vld_with
+        self._os_data = {s: BinaryVector(item_count=self._regions, item_bits=self._os_widths[s]) for s in self._os}
 
         self.frame_cnt = 0
         self.item_cnt  = 0
@@ -78,8 +73,8 @@ class MFBMonitor(BusMonitor):
         self._sof.value     = self.bus.sof.value.integer
         self._eof.value     = self.bus.eof.value.integer
 
-        if self._meta_width > 0:
-            self._meta.value = self.bus.meta.value.integer
+        for s in self._os:
+            self._os_data[s].value = getattr(self.bus, s).value.integer
 
     def _recv_trans(self):
         self.log.debug(f"received transaction: {self._transaction}")
@@ -113,13 +108,6 @@ class MFBMonitor(BusMonitor):
                     pkt_start = sof_pos * self._block_size * self._item_width
                     pkt_end   = (eof_pos + 1) * self._item_width
 
-                    # receive metadata (if present)
-                    if self._meta_width > 0 and hasattr(self._transaction, "meta"):
-                        if sof and self._meta_vld_with == "sof":
-                            self._transaction.meta = self._meta[r].int
-                        elif eof and self._meta_vld_with == "eof":
-                            self._transaction.meta = self._meta[r].int
-
                     if in_frame:
                         if sof and eof:
                             # if sof appears before eof
@@ -129,12 +117,23 @@ class MFBMonitor(BusMonitor):
 
                             # end of one packet
                             self._transaction.data += self._data[r][:pkt_end].bytes
+
+                            # read optional signals (if present) on eof
+                            if self._os_vld_with == "eof":
+                                for s in self._os:
+                                    setattr(self._transaction, s, self._os_data[s][r].int)
+
                             self._recv_trans()
                             self.frame_cnt += 1
-                            self.item_cnt += len(self._transaction.data) * 8 // self._item_width
+                            self.item_cnt += (len(self._transaction.data) * 8) // self._item_width
 
                             # start of another packet, in_frame stays True
                             self._transaction.data = self._data[r][pkt_start:].bytes
+
+                            # read optional signals (if present) on sof
+                            if self._os_vld_with == "sof":
+                                for s in self._os:
+                                    setattr(self._transaction, s, self._os_data[s][r].int)
 
                         elif sof:
                             # sof when the previous packet hasn't ended
@@ -143,10 +142,16 @@ class MFBMonitor(BusMonitor):
                         elif eof:
                             # packet ends in this region and new one doesn't start
                             self._transaction.data += self._data[r][:pkt_end].bytes
+
+                            # read optional signals (if present) on eof
+                            if self._os_vld_with == "eof":
+                                for s in self._os:
+                                    setattr(self._transaction, s, self._os_data[s][r].int)
+
                             self._recv_trans()
                             in_frame = False
                             self.frame_cnt += 1
-                            self.item_cnt += len(self._transaction.data) * 8 // self._item_width
+                            self.item_cnt += (len(self._transaction.data) * 8) // self._item_width
 
                         else:
                             # packet starts and ends in another region, in_frame stays True
@@ -156,13 +161,24 @@ class MFBMonitor(BusMonitor):
                         if sof and eof:
                             # packet starts and ends in this region, in_frame stays False
                             self._transaction.data = self._data[r][pkt_start : pkt_end].bytes
+
+                            # read optional signals (if present) on sof or eof
+                            for s in self._os:
+                                setattr(self._transaction, s, self._os_data[s][r].int)
+
                             self._recv_trans()
                             self.frame_cnt += 1
-                            self.item_cnt += len(self._transaction.data) * 8 // self._item_width
+                            self.item_cnt += (len(self._transaction.data) * 8) // self._item_width
 
                         elif sof:
                             # packet starts in this regions and ends in another one
                             self._transaction.data = self._data[r][pkt_start:].bytes
+
+                            # read optional signals (if present) on sof
+                            if self._os_vld_with == "sof":
+                                for s in self._os:
+                                    setattr(self._transaction, s, self._os_data[s][r].int)
+
                             in_frame = True
 
                         elif eof:
