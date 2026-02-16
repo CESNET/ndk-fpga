@@ -78,4 +78,11 @@ class coverage #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_subscr
         $write("Ready signals coverage %f %%\nData coverage %f %%", m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage());
     endfunction
 
+    function void report_phase(uvm_phase phase);
+        const string msg = $sformatf("Ready signals coverage %f %%\nData coverage %f %%",
+                m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage()
+        );
+        `uvm_info(this.get_full_name(), msg, UVM_LOW);
+    endfunction
+
 endclass
