@@ -9,10 +9,19 @@
 .. UVM Manual
 .. _uvm_manual:
 
-SystemVerilog and UVM tutorial
+SystemVerilog and UVM Manual
 ##############################
-This is manual describes how the UVM verification in our environment should be
-written.
+
+This manual describes concepts of UVM verification used in our environment. It
+expands on the ideas introduced in the :ref:`uvm_howto_intro` (phases, config_db,
+sequences, model, scoreboard) and gives detailed guidelines and examples for
+agents, environments, and advanced patterns.
+
+* **New to UVM here?** Start with the :ref:`uvm_howto_intro` for a friendly
+  overview of UVM and the layout of this repository.
+* **Want to write your first test?** Follow the :ref:`uvm_howto_first_ver` for a
+  step-by-step tutorial. The intro’s "Where to go next" section links back to
+  this manual and the other howtos.
 
 Other tutorials
 ***************
@@ -97,7 +106,7 @@ Example of the sequence with 10ns space between items:
 
             req = sequence_item::type_id::create("req");
 
-            for (int unsigned it = 0; it < 10 it++) begin
+            for (int unsigned it = 0; it < 10; it++) begin
                 start_item(req);
                 req.randomize();
                 finish_item(req);
@@ -418,7 +427,7 @@ are:
    sequence_library because it simplifies the run of some sequences for specific
    tests.
 
-.. image:: ./docs/layered_agents.svg
+.. image:: ./img/layered_agents.svg
     :align: center
     :alt: layered agents
 
@@ -459,7 +468,7 @@ are:
             byte_array_mfb_sequence seq;
 
             // Create new sequence library
-            seq = byte_array_mfb_sequence::type_ide::create("seq", this);
+            seq = byte_array_mfb_sequence::type_id::create("seq", this);
 
             // Connect high level sequencer to sequence.
             seq.hl_sequencer = m_byte_array_agent.m_sequencer;
@@ -608,7 +617,7 @@ environment.
     endclass
 
 
-.. image:: ./docs/cofiguration_object.svg
+.. image:: ./img/cofiguration_object.svg
     :align: center
     :alt: configuration object
 
@@ -710,7 +719,7 @@ with the low-level one. The picture below shows an Environment with two agents,
 one subenvironment containing a high-level agent connected to a low-level agent,
 and one virtual sequencer.
 
-.. image:: ./docs/enviroment.svg
+.. image:: ./img/enviroment.svg
     :align: center
     :alt: environment
 
@@ -723,7 +732,7 @@ agents start sending data at the same time). If the environment contains
 subenvironments like in the previous picture, the virtual sequencer connects
 only to the highest-level sequencer in each subenvironment.
 
-.. image:: ./docs/virtual_sequencer.svg
+.. image:: ./img/virtual_sequencer.svg
     :align: center
     :alt: virtual sequencer
 
@@ -804,7 +813,7 @@ prints an error message through the UVM_error macro.
     verification, the Scoreboard has to check if some errors occurred.
 
 
-.. image:: ./docs/scoreboard.svg
+.. image:: ./img/scoreboard.svg
     :align: center
     :alt: scoreboard
 
@@ -871,7 +880,7 @@ For example, the read request on MI has two transactions. The first transaction
 is from a master to a slave (the request) and the second transaction is a
 response from that slave back to the master.
 
-.. image:: ./docs/MI_agent.svg
+.. image:: ./img/MI_agent.svg
     :align: center
     :alt: question response
 
@@ -1035,7 +1044,7 @@ ordering of the MFB and MVB streams.
 
 The following image shows the connections between the blocks of such verification:
 
-.. image:: ./docs/mfb_splitter.svg
+.. image:: ./img/mfb_splitter.svg
     :align: center
     :alt: Verification connection
 
@@ -1867,7 +1876,7 @@ See the MI interface as an example for the bidirectional and the pipelined
 interface. Also, the slave side has to be able to respond in the same clock
 cycle as a request occurs (this is not implemented).
 
-.. image:: ./docs/interface_direction.svg
+.. image:: ./img/interface_direction.svg
     :align: center
     :alt: interface direction
 

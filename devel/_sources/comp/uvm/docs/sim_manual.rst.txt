@@ -10,21 +10,15 @@
 UVM simulation
 ###############
 
-UVM simulation is a tool that can be used by FW developers to create baseline tests for their components.
-This section will explain how to create a UVM simulation.
+UVM simulation helps create baseline tests using ready-made examples and sequence
+templates for MFB, MVB, and MI. It fits the flow in the :ref:`uvm_howto_intro` (testbench, test, environment, sequences).
+For building a full verification from scratch see :ref:`uvm_howto_first_ver`.
 
 Examples
 ********
 
-This section contains examples of the UVM simulation.
-Every example is located in the uvm_sim folder.
-All examples contain only the most necessary files (UVM components).
-Out of the components described earlier, only the Environment, Virtual Sequencer, Virtual Sequence, DUT, Testbench, and Test are used.
-Finally, for each UVM simulation, there is a ``sequence_tb.sv`` file, which is different for each component.
-This file contains a sequence for every interface (MFB, MVB, MI).
-The developer defines a set of transactions in each sequence he wants to generate.
-The following three examples are for the most commonly used combinations of interfaces: MFB + MI, MVB + MI, and MFB + META/MVB.
-The following subsections will describe what the sequences look like and how to modify them to use them for another component.
+Examples live in the *uvm_sim* folder; each has a ``sequence_tb.sv`` with sequences per interface (MFB, MVB, MI).
+You can use these as a starting point and edit the sequences for your component. Below: MFB+MI, MVB+MI, and MFB+META/MVB, with sequence snippets and how to adapt them.
 
 MFB + MI
 ========
