@@ -17,6 +17,10 @@ New verifications should be written in UVM methodology. This directory contains 
    :maxdepth: 1
    :caption: Contents:
 
-   comp/uvm/manual
-   comp/uvm/sim_manual
+   comp/uvm/docs/howto-intro
+   comp/uvm/docs/manual
+   comp/uvm/docs/sim_manual
    comp/uvm/componets
+   comp/uvm/docs/howto-first_ver
+   comp/uvm/docs/howto-extend_ver
+   comp/uvm/docs/howto-others
