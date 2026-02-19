@@ -71,8 +71,12 @@ class NfbServicer(nfb_pb_grpc.NfbServicer):
         while p:
             compatible = p.get_property("compatible")
             if compatible and compatible.value == "netcope,bus,mi":
-                m = re.search(r'PCI(?P<pci>\d+),BAR(?P<bar>\d+)', p.get_property("resource").value)
-                pci, _ = int(m.group('pci')), int(m.group('bar'))
+                resource = p.get_property("resource")
+                if resource is not None:
+                    m = re.search(r'PCI(?P<pci>\d+),BAR(?P<bar>\d+)', resource.value)
+                    pci, _ = int(m.group('pci')), int(m.group('bar'))
+                else:
+                    pci, _ = 0, 0
                 mi = self._dev.mi[pci]
                 break
             p = p.parent
