@@ -413,27 +413,40 @@ WARNING: works only for a single-channel (and single-Region) designs with E-Tile
 <td><p>(others =&gt; ‘0’)</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-reset_width"><td><p>RESET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-ftile_vsr_mode_sel"><td><p>FTILE_VSR_MODE_SEL</p></td>
+<td><p>std_logic_vector(1 downto 0)</p></td>
+<td><p>(others =&gt; ‘0’)</p></td>
+<td><dl class="simple">
+<dt>Select VSR mode for F-Tile. Values:</dt><dd><ul class="simple">
+<li><p>00 means optical mode configuration (LR/SR) - default mode for most cards</p></li>
+<li><p>01 means CR mode configuration</p></li>
+<li><p>10 is for cards for which 00 doesn’t work due to high loss</p></li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-reset_width"><td><p>RESET_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td><p>Number of user resets.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-misc_top2net_width"><td><p>MISC_TOP2NET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-misc_top2net_width"><td><p>MISC_TOP2NET_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between Top-Level FPGA design and NET_MOD core logic</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-misc_net2top_width"><td><p>MISC_NET2TOP_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-misc_net2top_width"><td><p>MISC_NET2TOP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between NET_MOD core logic and Top-Level FPGA design</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-network_mod-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-network_mod-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>Select correct FPGA device.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-network_mod-board"><td><p>BOARD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-network_mod-board"><td><p>BOARD</p></td>
 <td><p>string</p></td>
 <td><p>“DK-DEV-1SDX-P”</p></td>
 <td><p>400G1, DK-DEV-AGI027RES, DK-DEV-1SDX-P</p></td>
