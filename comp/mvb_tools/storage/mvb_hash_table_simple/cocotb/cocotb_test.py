@@ -24,7 +24,7 @@ from cocotb_bus.scoreboard import Scoreboard
 import nfb
 from ofm.comp.mvb_tools.storage.mvb_hash_table_simple.mvb_hash_table_simple import MvbHashTableSimple, toeplitz_hash, simple_xor_hash
 from cocotbext.ofm.utils.servicer import Servicer
-from cocotbext.ofm.utils.device import get_dtb
+from cocotbext.ofm.utils.device import create_dtb_simple
 from cocotbext.ofm.utils.math import ceildiv
 from transaction import MvbReqTrHashTableSimple, MvbResTrHashTableSimple
 
@@ -214,13 +214,11 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
                 await tb.mi_interface.write(_COMMIT_REG, b'\x00')
 
     elif config_method == "script":
-        dtb = get_dtb(
+        dtb = create_dtb_simple(
             comp_name="MVB_HASH_TABLE_SIMPLE",
             comp_base=0,
-            comp_offset=0x40,
-            compatible_str="cesnet,ndk,mvb_hash_table_simple",
-            bus_name="MI",
-            version=17)
+            comp_size=0x40,
+            compatible_str="cesnet,ndk,mvb_hash_table_simple")
 
         servicer = Servicer(device=tb.mi_interface, dtb=dtb)
         dev = await cocotb.external(nfb.open)(servicer.path())
