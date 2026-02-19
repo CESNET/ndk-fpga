@@ -84,8 +84,7 @@ architecture FULL of AXI2AVMM_BRIDGE is
         ST_IDLE,
         ST_WRITE_SINGLE_WORD,
         ST_WADDR,
-        ST_WRITE,
-        ST_READ
+        ST_WRITE
     );
 
     -- Control logic (FSM)
@@ -161,10 +160,8 @@ begin
                 end if;
 
                 if (AMM_READ = '1') then
+                    AMM_READY           <= DDR_S_AXI_ARREADY;
                     DDR_S_AXI_ARVALID   <= '1';
-                    if (DDR_S_AXI_ARREADY = '1') then
-                        next_state          <= ST_READ;
-                    end if;
                 end if;
 
             when ST_WRITE_SINGLE_WORD =>
@@ -216,27 +213,16 @@ begin
                     next_state          <= ST_WRITE;
                 end if;
 
-            when ST_READ        =>
-                AMM_READY           <= '0';
-                DDR_S_AXI_RREADY    <= '1';
-                word_cnt_d          <= word_cnt_q + 1;
-
-                -- Reading last transaction in burst
-                if (word_cnt_q = unsigned(AMM_BURST_COUNT) - 1) then
-                    next_state          <= ST_IDLE;
-                end if;
-
-                if (DDR_S_AXI_RVALID = '0') then
-                    word_cnt_d          <= word_cnt_q;
-                    next_state          <= ST_READ;
-                end if;
-
             when others         =>
                 AMM_READY   <= '0';
                 next_state  <= ST_IDLE;
 
         end case;
     end process;
+
+    -- Read ready is always ready, it is responsibility of initiator to be able
+    -- to handle all responses for dispatched read requests.
+    DDR_S_AXI_RREADY    <= '1';
 
     -- Write address
     DDR_S_AXI_AWADDR((AMM_ADDR_WIDTH+log2(AMM_DATA_WIDTH/8))-1 downto log2(AMM_DATA_WIDTH/8)) <= AMM_ADDRESS;
