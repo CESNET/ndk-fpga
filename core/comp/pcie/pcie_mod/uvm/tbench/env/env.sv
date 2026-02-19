@@ -31,11 +31,13 @@ class env #(
 ) extends uvm_env;
 
     localparam STRADDLING = 0;
-    `uvm_component_param_utils(uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE,
-                                                   RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
-                                                   CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
-                                                   CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE,
-                                                   ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE, DEVICE));
+    `uvm_component_param_utils(uvm_pcie_top::env #(
+            RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE,
+            RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
+            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
+            CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE,
+            ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS,  PCIE_CONS, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE, DEVICE)
+    );
 
     localparam TAG_WIDTH        = 8;
     localparam REQUEST_DEVICE   = 2;
@@ -46,6 +48,7 @@ class env #(
     localparam BAR4_BASE_ADDR    = 32'h05000000;
     localparam BAR5_BASE_ADDR    = 32'h06000000;
     localparam EXP_ROM_BASE_ADDR = 32'h0A000000;
+    // verilog_lint: waive line-length
     localparam uvm_pcie_mfb::device_t MFB_DEVICE = (DEVICE == "STRATIX10" || DEVICE == "AGILEX") ? uvm_pcie_mfb::DEV_INTEL : uvm_pcie_mfb::DEV_XILINX;
 
     uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
@@ -62,11 +65,15 @@ class env #(
                   0 ) m_dma_env[PCIE_ENDPOINTS][DMA_PORTS];
 
     protected uvm_pcie::dev  m_dma_dev[PCIE_ENDPOINTS][DMA_PORTS]; //Register request and response
-    protected uvm_pcie_mfb::env_tx #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CQ, uvm_pcie_mfb::MFB_META_SOF, MFB_DEVICE)             m_cq_env[PCIE_ENDPOINTS][DMA_PORTS];
-    protected uvm_pcie_mfb::env_rx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CC, uvm_pcie_mfb::MFB_META_SOF, STRADDLING, MFB_DEVICE) m_cc_env[PCIE_ENDPOINTS][DMA_PORTS];
-    //protected uvm_pcie_dma_cq::env#(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
-    //                                CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, DEVICE) m_dma_cq_env[PCIE_ENDPOINTS][DMA_PORTS];
-    //
+    protected uvm_pcie_mfb::env_tx #(
+            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CQ,
+            uvm_pcie_mfb::MFB_META_SOF, MFB_DEVICE
+    ) m_cq_env[PCIE_ENDPOINTS][DMA_PORTS];
+    protected uvm_pcie_mfb::env_rx #(
+            CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CC,
+            uvm_pcie_mfb::MFB_META_SOF, STRADDLING, MFB_DEVICE
+    ) m_cc_env[PCIE_ENDPOINTS][DMA_PORTS];
+
     //CONFIGURATION INTERFACE
     protected uvm_mi::agent_master #(32, 32) m_mi_agent[PCIE_ENDPOINTS];
     // Reset agent
@@ -78,7 +85,9 @@ class env #(
     /*
     //NEW CONVERTORS
     */
-    uvm_pcie_top::scoreboard #(CQ_MFB_REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE) m_scoreboard;
+    uvm_pcie_top::scoreboard #(
+            CQ_MFB_REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE
+    ) m_scoreboard;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -140,9 +149,12 @@ class env #(
                 m_dma_cfg = new();
                 m_dma_cfg.interface_name = {"vif_dma_", dma_string};
                 uvm_config_db #(uvm_dma::config_item)::set(this, {"m_dma_env_", dma_string}, "m_config", m_dma_cfg);
-                m_dma_env[pcie][dma] = uvm_dma::env#(RQ_MFB_REGIONS, RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH,
-                                                     RC_MFB_REGIONS, RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH,
-                                                     0 )::type_id::create({"m_dma_env_", dma_string}, this);
+                m_dma_env[pcie][dma] = uvm_dma::env#(
+                                            // verilog_lint: waive line-length
+                                            RQ_MFB_REGIONS, RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH,
+                                            // verilog_lint: waive line-length
+                                            RC_MFB_REGIONS, RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH,
+                                            0 )::type_id::create({"m_dma_env_", dma_string}, this);
 
 
                 m_dma_dev[pcie][dma] = uvm_pcie::dev::type_id::create({"m_dma_dev_", dma_string}, this);
@@ -150,14 +162,30 @@ class env #(
                 m_pcie_cq_cfg = new();
                 m_pcie_cq_cfg.active         = UVM_ACTIVE;
                 m_pcie_cq_cfg.interface_name = {"vif_dma_cq_", dma_string};
-                uvm_config_db #(uvm_pcie::config_item)::set(this, {"m_cq_env_", dma_string}, "m_config", m_pcie_cq_cfg);
-                m_cq_env[pcie][dma] = uvm_pcie_mfb::env_tx #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CQ, uvm_pcie_mfb::MFB_META_SOF, MFB_DEVICE)::type_id::create({"m_cq_env_", dma_string}, this);
+                uvm_config_db #(uvm_pcie::config_item)::set(
+                    this,
+                    {"m_cq_env_", dma_string},
+                    "m_config",
+                    m_pcie_cq_cfg
+                );
+                m_cq_env[pcie][dma] = uvm_pcie_mfb::env_tx #(
+                                            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
+                                            uvm_pcie_mfb::MFB_CQ, uvm_pcie_mfb::MFB_META_SOF,
+                                            MFB_DEVICE)::type_id::create({"m_cq_env_", dma_string}, this);
 
                 m_pcie_cc_cfg = new();
                 m_pcie_cc_cfg.active         = UVM_ACTIVE;
                 m_pcie_cc_cfg.interface_name = {"vif_dma_cc_", dma_string};
-                uvm_config_db #(uvm_pcie::config_item)::set(this, {"m_cc_env_", dma_string}, "m_config", m_pcie_cc_cfg);
-                m_cc_env[pcie][dma] = uvm_pcie_mfb::env_rx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CC, uvm_pcie_mfb::MFB_META_SOF, STRADDLING, MFB_DEVICE)::type_id::create({"m_cc_env_", dma_string}, this);
+                uvm_config_db #(uvm_pcie::config_item)::set(
+                    this,
+                    {"m_cc_env_", dma_string},
+                    "m_config",
+                    m_pcie_cc_cfg
+                );
+                m_cc_env[pcie][dma] = uvm_pcie_mfb::env_rx #(
+                                            CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE,
+                                            uvm_pcie_mfb::MFB_CC, uvm_pcie_mfb::MFB_META_SOF,
+                                            STRADDLING, MFB_DEVICE)::type_id::create({"m_cc_env_", dma_string}, this);
             end
         end
 
@@ -177,10 +205,13 @@ class env #(
         m_dma_reset = uvm_reset::agent::type_id::create("m_dma_reset", this);
         m_mi_reset  = uvm_reset::agent::type_id::create("m_mi_reset", this);
 
-        m_scoreboard = uvm_pcie_top::scoreboard#(CQ_MFB_REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE)::type_id::create("m_scoreboard", this);
-        m_sequencer  = uvm_pcie_top::sequencer#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
-                                                CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
-                                                ITEM_WIDTH, DMA_PORTS, PCIE_ENDPOINTS)::type_id::create("m_sequencer",this);
+        m_scoreboard = uvm_pcie_top::scoreboard#(
+                            CQ_MFB_REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH,
+                            DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE)::type_id::create("m_scoreboard", this);
+        m_sequencer  = uvm_pcie_top::sequencer#(
+                            RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
+                            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
+                            ITEM_WIDTH, DMA_PORTS, PCIE_ENDPOINTS)::type_id::create("m_sequencer",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
@@ -209,8 +240,18 @@ class env #(
 
             m_pcie_env[pcie].analysis_port_rq.connect(m_pcie_dev[pcie].port_pcie);
             m_pcie_env[pcie].analysis_port_cc.connect(m_pcie_dev[pcie].port_pcie);
-            uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_pcie_env[pcie].m_sequencer_cq, "", "pcie_info", m_pcie_dev[pcie].tx_info);
-            uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_pcie_env[pcie].m_sequencer_rc, "", "pcie_info", m_pcie_dev[pcie].rx_info);
+            uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(
+                m_pcie_env[pcie].m_sequencer_cq,
+                "",
+                "pcie_info",
+                m_pcie_dev[pcie].tx_info
+            );
+            uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(
+                m_pcie_env[pcie].m_sequencer_rc,
+                "",
+                "pcie_info",
+                m_pcie_dev[pcie].rx_info
+            );
 
             //MI CONNECT
             m_mi_agent[pcie].analysis_port_rq.connect(m_scoreboard.mi_req[pcie]);
@@ -231,7 +272,12 @@ class env #(
                 m_cq_env[pcie][dma].analysis_port.connect(m_scoreboard.dma_cq[pcie][dma]);
                 m_cc_env[pcie][dma].analysis_port.connect(m_scoreboard.dma_cc[pcie][dma]);
                 m_cq_env[pcie][dma].analysis_port.connect(m_dma_dev[pcie][dma].port_pcie);
-                uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_cc_env[pcie][dma].m_sequencer, "", "pcie_info", m_dma_dev[pcie][dma].tx_info);
+                uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(
+                    m_cc_env[pcie][dma].m_sequencer,
+                    "",
+                    "pcie_info",
+                    m_dma_dev[pcie][dma].tx_info
+                );
 
                 // ------------------------------------------------------------------
                 // Reset sync connection
