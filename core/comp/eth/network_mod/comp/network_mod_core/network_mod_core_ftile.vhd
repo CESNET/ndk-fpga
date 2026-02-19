@@ -279,6 +279,9 @@ begin
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_1x400g8_i: entity work.FTILE_1X400G8
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -328,6 +331,9 @@ begin
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_2x200g4_i: entity work.FTILE_2X200G4
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -377,6 +383,9 @@ begin
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_4x100g2_i: entity work.FTILE_4X100G2
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -427,7 +436,8 @@ begin
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_multirate_eth_2x100g4_i: entity work.FTILE_MULTIRATE_ETH_2X100G4
             generic map (
-                IP_CNT => i
+                IP_CNT       => i,
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
             )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
@@ -477,6 +487,9 @@ begin
     ftile_2x100g4_g : if (((ETH_PORT_SPEED = 100) and (EHIP_TYPE = 0)) and (ETH_PORT_CHAN = 2))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_2x100g4_i: entity work.FTILE_2X100G4
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -525,6 +538,9 @@ begin
     ftile_8x50g1_g : if ((ETH_PORT_SPEED = 50) and (EHIP_TYPE = 0))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_8x50g1_i: entity work.FTILE_8X50G1
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -573,6 +589,9 @@ begin
     ftile_2x40g4_g : if ((ETH_PORT_SPEED = 40) and (EHIP_TYPE = 0))  generate
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_2x40g4_i: entity work.FTILE_2X40G4
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -622,6 +641,9 @@ begin
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_8x25g1_i: entity work.FTILE_8X25G1
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,
@@ -672,7 +694,8 @@ begin
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_multirate_eth_8x25g1_8x10g1_i: entity work.FTILE_MULTIRATE_ETH_8X25G1_8X10G1
             generic map (
-                IP_CNT => i
+                IP_CNT       => i,
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
             )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
@@ -723,6 +746,9 @@ begin
 
         eth_ip_g : for i in ETH_PORT_CHAN-1 downto 0 generate
             ftile_8x10g1_i: entity work.FTILE_8X10G1
+            generic map (
+                VSR_MODE_SEL => FTILE_VSR_MODE_SEL
+            )
             port map (
                 MI_RESET_PHY             => MI_RESET_PHY,
                 MI_CLK_PHY               => MI_CLK_PHY,

@@ -17,8 +17,8 @@ entity FTILE_XCVR_INIT is
         RST              : in  std_logic;
         CLK              : in  std_logic;
         XCVR_RDY         : in  std_logic;
-        -- Select ROM code to execute. 0 = set_medi_mode(0x14) code, 1 = ROM for set_medi_mode(0x10) code
-        ROM_SEL          : in  std_logic_vector(0 downto 0) := "0";
+        -- Select ROM code to execute. 00 = set_medi_mode(0x14) code, 01 = ROM for set_medi_mode(0x10) or 10 = set_medi_mode(0x0) code
+        ROM_SEL          : in  std_logic_vector(1 downto 0) := "00";
         BUSY             : out std_logic;
         DONE             : out std_logic;
         -- AVMM
@@ -78,6 +78,16 @@ architecture FULL of FTILE_XCVR_INIT is
         OP_WRITE  & X"2400F" &  X"0010A" & LANE & X"64" &  X"0000", -- 2. val = (0x10 << 16)  + (0xA << 12) + (phy_lane << 8) + 0x64; write(0x9003c, val)
         OP_READ   & X"24010" &  X"00008000"             &  X"C000", -- 3. poll 0x90040 until bit 14 = 0 and bit 15 = 1
         OP_WRITE  & X"2400F" &  X"00102" & LANE & X"64" &  X"0000", -- 4. val = (0x10 << 16)  + (0x2 << 12) + (phy_lane << 8) + 0x64; write(0x9003c, val)
+        OP_READ   & X"24010" &  X"00000000"             &  X"C000"  -- 5. poll 0x90040 until bit 14 = 0 and bit 15 = 0
+    );
+
+    -- ROM2 contains code for setting the media mode to 0x0 (VSR mode disabled for high loss very short links - e.g. IA-860m)
+    constant FTILE_CONFIG_ROM2 : t_config_rom(0 to ROM_SIZE-1) := (
+     -- |   OP    |  Addr    |   Data                   |  Mask       1-5: cpi_request(data=0x14, option=0xA, opcode=0x64)
+        OP_READ   & X"24011" &  X"0000000F"             &  X"FFFF", -- 1. cpi_stat = (drp_read(0x90044) & 0xffff) must not equal to 0xf
+        OP_WRITE  & X"2400F" &  X"0000A" & LANE & X"64" &  X"0000", -- 2. val = (0x00 << 16)  + (0xA << 12) + (phy_lane << 8) + 0x64; write(0x9003c, val)
+        OP_READ   & X"24010" &  X"00008000"             &  X"C000", -- 3. poll 0x90040 until bit 14 = 0 and bit 15 = 1
+        OP_WRITE  & X"2400F" &  X"00002" & LANE & X"64" &  X"0000", -- 4. val = (0x00 << 16)  + (0x2 << 12) + (phy_lane << 8) + 0x64; write(0x9003c, val)
         OP_READ   & X"24010" &  X"00000000"             &  X"C000"  -- 5. poll 0x90040 until bit 14 = 0 and bit 15 = 0
     );
 
@@ -244,8 +254,9 @@ begin
         end if;
     end process;
 
-    cfg_rom_out <= ftile_config_rom0(rom_cntr) when ROM_SEL = "0" else
-                   ftile_config_rom1(rom_cntr);
+    cfg_rom_out <= ftile_config_rom0(rom_cntr) when ROM_SEL = "00" else
+                   ftile_config_rom1(rom_cntr) when ROM_SEL = "01" else
+                   ftile_config_rom2(rom_cntr);
 
     -- --------------------------------------------------------------------------
     -- Debug and status

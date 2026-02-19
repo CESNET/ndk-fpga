@@ -10,6 +10,15 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 entity FTILE_8X50G1 is
+    generic (
+        -- ===================================================================
+        -- Select VSR mode for F-Tile. Values:
+        --  - 00 means optical mode configuration (LR/SR)
+        --  - 01 means CR mode configuration
+        --  - 10 is for cards for which 00 doesn't work due to high loss
+        -- ===================================================================
+        VSR_MODE_SEL             : std_logic_vector(1 downto 0)
+    );
     port (
         -- ===================================================================
         -- MGMT Interface
@@ -447,7 +456,7 @@ begin
             RST              => RESET_ETH or mgmt_pma_reset,
             XCVR_RDY         => init_ready(xcvr),
             CLK              => MI_CLK_PHY,
-            ROM_SEL          => "0", -- 0 means optical mode configuration, 1 means CR mode configuration
+            ROM_SEL          => VSR_MODE_SEL, -- 00 means optical mode configuration, 01 means CR mode configuration, 10 is for cards for which 00 doesn't work
             BUSY             => init_busy,
             DONE             => init_done(xcvr),
             -- AVMM
@@ -458,7 +467,7 @@ begin
             READDATA_VALID   => reconfig_readdata_valid(IA_INDEX),
             WRITEDATA        => init_writedata,
             WAITREQUEST      => reconfig_waitrequest(IA_INDEX),
-            STATE            => open -- debug purposes only. Can be left open in the future
+            STATE            => open          -- debug purposes only. Can be left open in the future
         );
 
     end generate;
