@@ -24,7 +24,7 @@ class test_speed #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int u
         );
 
         uvm_logic_vector_mvb::sequence_lib_rx #(MFB_REGIONS, RX_MVB_ITEM_WIDTH)::type_id::set_inst_override(
-            uvm_logic_vector_mvb::sequence_lib_speed_rx #(MFB_REGIONS, RX_MVB_ITEM_WIDTH)::get_type(),
+            uvm_logic_vector_mvb::sequence_lib_rx_speed #(MFB_REGIONS, RX_MVB_ITEM_WIDTH)::get_type(),
             "m_env.m_env_rx_mvb.mvb_seq",
             this
         );

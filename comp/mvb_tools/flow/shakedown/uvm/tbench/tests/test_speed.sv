@@ -18,7 +18,7 @@ class test_speed #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
         // ------------------- //
 
         uvm_logic_vector_mvb::sequence_lib_rx #(RX_ITEMS, ITEM_WIDTH)::type_id::set_inst_override(
-            uvm_logic_vector_mvb::sequence_lib_speed_rx #(RX_ITEMS, ITEM_WIDTH)::get_type(),
+            uvm_logic_vector_mvb::sequence_lib_rx_speed #(RX_ITEMS, ITEM_WIDTH)::get_type(),
             "m_env.m_env_rx_mvb.mvb_seq",
             this
         );

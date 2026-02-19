@@ -116,7 +116,7 @@ class full_speed #(
                 REGIONS,
                 ETH_RX_HDR_WIDTH
             )::type_id::set_inst_override(
-                uvm_logic_vector_mvb::sequence_lib_speed_rx #(
+                uvm_logic_vector_mvb::sequence_lib_rx_speed #(
                     REGIONS,
                     ETH_RX_HDR_WIDTH
                 )::get_type(),
@@ -158,7 +158,7 @@ class full_speed #(
                 REGIONS,
                 DMA_RX_MVB_WIDTH
             )::type_id::set_inst_override(
-                uvm_logic_vector_mvb::sequence_lib_speed_rx #(REGIONS, DMA_RX_MVB_WIDTH)::get_type(),
+                uvm_logic_vector_mvb::sequence_lib_rx_speed #(REGIONS, DMA_RX_MVB_WIDTH)::get_type(),
                 {"m_env.m_dma_mvb_rx_", it_num, ".*"},
                 this
             );

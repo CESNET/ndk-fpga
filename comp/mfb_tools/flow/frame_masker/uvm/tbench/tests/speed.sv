@@ -33,8 +33,10 @@ class speed extends uvm_test;
         // Database overriding //
         // ------------------- //
 
-        uvm_logic_vector_mvb::sequence_lib_rx #(1, MFB_REGIONS)::type_id::set_inst_override(
-            uvm_logic_vector_mvb::sequence_lib_speed_rx #(1, MFB_REGIONS)::get_type(),
+        `ndk_override_params(
+            uvm_logic_vector_mvb::sequence_lib_rx,
+            uvm_logic_vector_mvb::sequence_lib_rx_speed,
+            #(1, MFB_REGIONS),
             "m_env.m_env_rx_mvb.mvb_seq",
             this
         );

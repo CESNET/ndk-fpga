@@ -4,25 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class mvb_rx_speed#(MFB_REGIONS, MVB_ITEM_WIDTH) extends uvm_logic_vector_mvb::sequence_lib_rx#(MFB_REGIONS, MVB_ITEM_WIDTH);
-  `uvm_object_param_utils(test::mvb_rx_speed#(MFB_REGIONS, MVB_ITEM_WIDTH))
-  `uvm_sequence_library_utils(test::mvb_rx_speed#(MFB_REGIONS, MVB_ITEM_WIDTH))
-
-    function new(string name = "mvb_rx_speed");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_logic_vector_mvb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(uvm_logic_vector_mvb::sequence_full_speed_rx #(MFB_REGIONS, MVB_ITEM_WIDTH)::get_type());
-    endfunction
-endclass
-
 class speed extends uvm_test;
      typedef uvm_component_registry #(test::speed, "test::speed") type_id;
 
@@ -48,8 +29,14 @@ class speed extends uvm_test;
     function void build_phase(uvm_phase phase);
         uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(uvm_logic_vector_array_mfb::sequence_lib_rx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
         {this.get_full_name(), ".m_env.mfb_rx_env.*"});
-        uvm_logic_vector_mvb::sequence_lib_rx#(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1))::type_id::set_inst_override(mvb_rx_speed#(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1))::get_type(),
-        {this.get_full_name(), ".m_env.mvb_rx_env.*"});
+
+        `ndk_override_params(
+            uvm_logic_vector_mvb::sequence_lib_rx,
+            uvm_logic_vector_mvb::sequence_lib_rx_speed,
+            #(MFB_REGIONS, $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1)),
+            "m_env.mvb_rx_env.*",
+            this
+        )
 
         uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
             uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),

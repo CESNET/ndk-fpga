@@ -86,7 +86,7 @@ endclass
 class sequence_mvb_full_speed_rx #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
-) extends uvm_logic_vector_mvb::sequence_full_speed_rx       #(ITEMS, ITEM_WIDTH);
+) extends uvm_logic_vector_mvb::sequence_rx_full_speed       #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(test::sequence_mvb_full_speed_rx #(ITEMS, ITEM_WIDTH))
 
     function new(string name = "test::sequence_mvb_full_speed_rx");
@@ -100,7 +100,7 @@ endclass
 class sequence_mvb_stop_rx #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
-) extends uvm_logic_vector_mvb::sequence_stop_rx #(ITEMS, ITEM_WIDTH);
+) extends uvm_logic_vector_mvb::sequence_rx_stop #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(test::sequence_mvb_stop_rx #(ITEMS, ITEM_WIDTH))
 
     function new(string name = "test::sequence_mvb_stop_rx");
