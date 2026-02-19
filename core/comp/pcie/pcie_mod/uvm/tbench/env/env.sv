@@ -73,6 +73,7 @@ class env #(
     protected uvm_reset::agent                m_dma_reset;
     protected uvm_reset::agent                m_mi_reset;
     protected uvm_reset::env#(PCIE_CONS)      m_pcie_sysrst_n;
+    protected uvm_reset::agent                m_pcie_reset[PCIE_ENDPOINTS];
 
     /*
     //NEW CONVERTORS
@@ -100,6 +101,7 @@ class env #(
         end
 
         for(int unsigned pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin
+            uvm_reset::config_item pcie_reset_cfg;
             uvm_mi::config_item m_mi_cfg;
             uvm_pcie::config_item m_pcie_cfg;
             string i_string;
@@ -113,6 +115,12 @@ class env #(
             m_pcie_env[pcie] = uvm_pcie::root::type_id::create({"m_pcie_", i_string},this);
             m_pcie_dev[pcie] = uvm_pcie::dev::type_id::create({"m_pcie_", i_string, "_dev"}, this);
 
+            // PCIE RESET
+            pcie_reset_cfg                = new();
+            pcie_reset_cfg.active         = UVM_PASSIVE;
+            pcie_reset_cfg.interface_name = $sformatf("vif_pcie_user_reset_%0d", pcie);
+            uvm_config_db #(uvm_reset::config_item)::set(this, {"m_pcie_reset_", i_string}, "m_config", pcie_reset_cfg);
+            m_pcie_reset[pcie] = uvm_reset::agent::type_id::create({"m_pcie_reset_", i_string}, this);
 
             //MI INTERFACE(CQ + CC)
             m_mi_cfg                = new();
@@ -188,57 +196,54 @@ class env #(
         bar_cfg.register(6, EXP_ROM_BASE_ADDR[32-1:2]);
 
 
-        for (int unsigned cons = 0; cons < PCIE_CONS; cons++) begin
-            for (int unsigned pcie_logic = 0; pcie_logic < PCIE_ENDPOINTS/PCIE_CONS; pcie_logic++) begin
-                const int unsigned pcie = cons*PCIE_ENDPOINTS/PCIE_CONS + pcie_logic;
+        for (int unsigned pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin
 
-                // SET BAR
-                m_pcie_env[pcie].bar_register(bar_cfg);
+            // SET BAR
+            m_pcie_env[pcie].bar_register(bar_cfg);
 
-                //PCIE CONNECT
-                m_pcie_env[pcie].analysis_port_rc.connect(m_scoreboard.pcie_rc[pcie]);
-                m_pcie_env[pcie].analysis_port_cq.connect(m_scoreboard.pcie_cq[pcie]);
-                m_pcie_env[pcie].analysis_port_rq.connect(m_scoreboard.pcie_rq[pcie]);
-                m_pcie_env[pcie].analysis_port_cc.connect(m_scoreboard.pcie_cc[pcie]);
+            //PCIE CONNECT
+            m_pcie_env[pcie].analysis_port_rc.connect(m_scoreboard.pcie_rc[pcie]);
+            m_pcie_env[pcie].analysis_port_cq.connect(m_scoreboard.pcie_cq[pcie]);
+            m_pcie_env[pcie].analysis_port_rq.connect(m_scoreboard.pcie_rq[pcie]);
+            m_pcie_env[pcie].analysis_port_cc.connect(m_scoreboard.pcie_cc[pcie]);
 
-                m_pcie_env[pcie].analysis_port_rq.connect(m_pcie_dev[pcie].port_pcie);
-                m_pcie_env[pcie].analysis_port_cc.connect(m_pcie_dev[pcie].port_pcie);
-                uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_pcie_env[pcie].m_sequencer_cq, "", "pcie_info", m_pcie_dev[pcie].tx_info);
-                uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_pcie_env[pcie].m_sequencer_rc, "", "pcie_info", m_pcie_dev[pcie].rx_info);
+            m_pcie_env[pcie].analysis_port_rq.connect(m_pcie_dev[pcie].port_pcie);
+            m_pcie_env[pcie].analysis_port_cc.connect(m_pcie_dev[pcie].port_pcie);
+            uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_pcie_env[pcie].m_sequencer_cq, "", "pcie_info", m_pcie_dev[pcie].tx_info);
+            uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_pcie_env[pcie].m_sequencer_rc, "", "pcie_info", m_pcie_dev[pcie].rx_info);
 
-                //MI CONNECT
-                m_mi_agent[pcie].analysis_port_rq.connect(m_scoreboard.mi_req[pcie]);
-                m_mi_agent[pcie].analysis_port_rs.connect(m_scoreboard.mi_rsp[pcie]);
+            //MI CONNECT
+            m_mi_agent[pcie].analysis_port_rq.connect(m_scoreboard.mi_req[pcie]);
+            m_mi_agent[pcie].analysis_port_rs.connect(m_scoreboard.mi_rsp[pcie]);
 
-                m_sequencer.m_mi_sqr[pcie]  = m_mi_agent[pcie].m_sequencer;
-                m_sequencer.m_pcie_cq[pcie] = m_pcie_env[pcie].m_sequencer_cq;
-                m_sequencer.m_pcie_rc[pcie] = m_pcie_env[pcie].m_sequencer_rc;
-                m_pcie_sysrst_n.m_agent[cons].sync_connect(m_pcie_env[pcie].reset_sync);
+            m_sequencer.m_mi_sqr[pcie]  = m_mi_agent[pcie].m_sequencer;
+            m_sequencer.m_pcie_cq[pcie] = m_pcie_env[pcie].m_sequencer_cq;
+            m_sequencer.m_pcie_rc[pcie] = m_pcie_env[pcie].m_sequencer_rc;
+            m_pcie_reset[pcie].sync_connect(m_pcie_env[pcie].reset_sync);
 
-                for (int unsigned  dma = 0; dma < DMA_PORTS; dma++) begin
-                    m_cq_env[pcie][dma].bar_register(bar_cfg);
-                    m_cc_env[pcie][dma].bar_register(bar_cfg);
+            for (int unsigned  dma = 0; dma < DMA_PORTS; dma++) begin
+                m_cq_env[pcie][dma].bar_register(bar_cfg);
+                m_cc_env[pcie][dma].bar_register(bar_cfg);
 
-                    m_dma_env[pcie][dma].rc_analysis_port.connect(m_scoreboard.dma_rc[pcie][dma]);
-                    m_dma_env[pcie][dma].rq_analysis_port.connect(m_scoreboard.dma_rq[pcie][dma]);
+                m_dma_env[pcie][dma].rc_analysis_port.connect(m_scoreboard.dma_rc[pcie][dma]);
+                m_dma_env[pcie][dma].rq_analysis_port.connect(m_scoreboard.dma_rq[pcie][dma]);
 
-                    m_cq_env[pcie][dma].analysis_port.connect(m_scoreboard.dma_cq[pcie][dma]);
-                    m_cc_env[pcie][dma].analysis_port.connect(m_scoreboard.dma_cc[pcie][dma]);
-                    m_cq_env[pcie][dma].analysis_port.connect(m_dma_dev[pcie][dma].port_pcie);
-                    uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_cc_env[pcie][dma].m_sequencer, "", "pcie_info", m_dma_dev[pcie][dma].tx_info);
+                m_cq_env[pcie][dma].analysis_port.connect(m_scoreboard.dma_cq[pcie][dma]);
+                m_cc_env[pcie][dma].analysis_port.connect(m_scoreboard.dma_cc[pcie][dma]);
+                m_cq_env[pcie][dma].analysis_port.connect(m_dma_dev[pcie][dma].port_pcie);
+                uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(m_cc_env[pcie][dma].m_sequencer, "", "pcie_info", m_dma_dev[pcie][dma].tx_info);
 
-                    // ------------------------------------------------------------------
-                    // Reset sync connection
-                    // ------------------------------------------------------------------
-                    m_dma_reset.sync_connect(m_dma_env[pcie][dma].reset_sync);
+                // ------------------------------------------------------------------
+                // Reset sync connection
+                // ------------------------------------------------------------------
+                m_dma_reset.sync_connect(m_dma_env[pcie][dma].reset_sync);
 
-                    m_dma_reset.sync_connect(m_cq_env[pcie][dma].reset_sync);
-                    m_dma_reset.sync_connect(m_cc_env[pcie][dma].reset_sync);
+                m_dma_reset.sync_connect(m_cq_env[pcie][dma].reset_sync);
+                m_dma_reset.sync_connect(m_cc_env[pcie][dma].reset_sync);
 
-                    //SEQUENCER
-                    m_sequencer.m_dma_rq[pcie][dma]     = m_dma_env[pcie][dma].m_sequencer;
-                    m_sequencer.m_dma_cc[pcie][dma]     = m_cc_env[pcie][dma].m_sequencer;
-                end
+                //SEQUENCER
+                m_sequencer.m_dma_rq[pcie][dma]     = m_dma_env[pcie][dma].m_sequencer;
+                m_sequencer.m_dma_cc[pcie][dma]     = m_cc_env[pcie][dma].m_sequencer;
             end
         end
 
