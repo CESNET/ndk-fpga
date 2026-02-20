@@ -112,7 +112,7 @@ architecture FULL of MFB_FRAME_TRIMMER is
 
     signal s_data_reg0               : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal s_meta_reg0               : std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
-    signal s_sof_pos_reg0            : std_logic_vector(REGIONS*SOF_POS_WIDTH-1 downto 0);
+    signal s_sof_pos_reg0            : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
     signal s_eof_pos_reg0            : std_logic_vector(REGIONS*EOF_POS_WIDTH-1 downto 0);
     signal s_sof_reg0                : std_logic_vector(REGIONS-1 downto 0);
     signal s_eof_reg0                : std_logic_vector(REGIONS-1 downto 0);
