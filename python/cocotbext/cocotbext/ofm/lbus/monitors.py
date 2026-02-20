@@ -36,5 +36,5 @@ class LBusMonitor(BusMonitor):
                     packet += data
 
                     if self.bus.eop.value.integer & (1 << i):
-                        self._recv(packet)
+                        self._recv(bytes(packet))
                         packet = None

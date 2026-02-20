@@ -37,5 +37,5 @@ class AvstEthMonitor(BusMonitor):
                 packet += data
 
                 if self.bus.eop.value:
-                    self._recv(packet)
+                    self._recv(bytes(packet))
                     packet = None
