@@ -151,6 +151,44 @@ begin
             OUT_META   => OUT_META,
             OUT_VALID  => OUT_VALID
         );
+    elsif HASH_FUNCTION = "CHASKEY" generate
+        chaskey_i: entity work.CHASKEY
+        generic map (
+            KEY_WIDTH  => KEY_WIDTH,
+            HASH_WIDTH => HASH_WIDTH,
+            META_WIDTH => META_WIDTH,
+            ROUNDS     => 8,
+            OUT_REG    => OUT_REG
+        ) port map (
+            CLK        => CLK,
+            RESET      => RESET,
+            IN_KEY     => IN_KEY,
+            IN_SEED    => IN_SEED,
+            IN_META    => IN_META,
+            IN_VALID   => IN_VALID,
+            OUT_HASH   => OUT_HASH,
+            OUT_META   => OUT_META,
+            OUT_VALID  => OUT_VALID
+        );
+    elsif HASH_FUNCTION = "CHASKEY_LTS" generate
+        chaskey_i: entity work.CHASKEY
+        generic map (
+            KEY_WIDTH  => KEY_WIDTH,
+            HASH_WIDTH => HASH_WIDTH,
+            META_WIDTH => META_WIDTH,
+            ROUNDS     => 12,
+            OUT_REG    => OUT_REG
+        ) port map (
+            CLK        => CLK,
+            RESET      => RESET,
+            IN_KEY     => IN_KEY,
+            IN_SEED    => IN_SEED,
+            IN_META    => IN_META,
+            IN_VALID   => IN_VALID,
+            OUT_HASH   => OUT_HASH,
+            OUT_META   => OUT_META,
+            OUT_VALID  => OUT_VALID
+        );
     else generate
         assert false
             report "Unknown hash function '" & HASH_FUNCTION & "'."

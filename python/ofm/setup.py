@@ -11,12 +11,13 @@ DESCRIPTION = 'Open FPGA Modules package'
 src = "comp"
 
 submodules = {
-    "ofm.comp.debug.data_logger.data_logger":       f"{src}/debug/data_logger/sw/data_logger",
-    "ofm.comp.debug.data_logger.mem_logger":        f"{src}/debug/data_logger/sw/mem_logger",
-    "ofm.comp.mfb_tools.flow.rate_limiter":         f"{src}/mfb_tools/flow/rate_limiter/sw",
-    "ofm.comp.mfb_tools.flow.timestamp_limiter":    f"{src}/mfb_tools/flow/timestamp_limiter/sw",
-    "ofm.comp.mfb_tools.logic.speed_meter":         f"{src}/mfb_tools/logic/speed_meter/sw",
+    "ofm.comp.debug.data_logger.data_logger":           f"{src}/debug/data_logger/sw/data_logger",
+    "ofm.comp.debug.data_logger.mem_logger":            f"{src}/debug/data_logger/sw/mem_logger",
+    "ofm.comp.mfb_tools.flow.rate_limiter":             f"{src}/mfb_tools/flow/rate_limiter/sw",
+    "ofm.comp.mfb_tools.flow.timestamp_limiter":        f"{src}/mfb_tools/flow/timestamp_limiter/sw",
+    "ofm.comp.mfb_tools.logic.speed_meter":             f"{src}/mfb_tools/logic/speed_meter/sw",
     "ofm.comp.mvb_tools.storage.mvb_hash_table_simple": f"{src}/mvb_tools/storage/mvb_hash_table_simple",
+    "ofm.comp.base.hash.chaskey":                       f"{src}/base/hash/chaskey"
 }
 
 setup(

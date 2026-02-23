@@ -12,6 +12,7 @@ from tbench.sequences import HashSeqBaseItem, HashSeqEmptyItem
 
 import spookyhash
 from siphash import siphash_64, siphash_128, half_siphash_32, half_siphash_64
+from ofm.comp.base.hash.chaskey.chaskey import Chaskey
 
 
 class HashDUT(uvm_component):
@@ -45,6 +46,11 @@ class HashDUT(uvm_component):
                                 return int.from_bytes(siphash_64(seed, key, compression_rounds, finalization_rounds), "little")
                         case _:
                             raise ValueError(f"Unsupported word width {word_width}. Supported word widths are 32 and 64.")
+            case "CHASKEY" | "CHASKEY_LTS":
+                def hash_func(key: bytes, seed: bytes):
+                    rounds: int = self.dut.hash_function_g.chaskey_i.ROUNDS.value
+                    return int.from_bytes(Chaskey.Hash128(key, seed, rounds), "little")
+
             case _:
                 raise NotImplementedError(f"Unsupported hash function '{hash_func_name}'.")
 
