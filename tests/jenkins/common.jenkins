@@ -322,15 +322,15 @@ def isInPath(path, keyword) {
     return result
 }
 
-def fetchCocotbCompsVer(include = "", exclude = []) {
+def fetchCocotbCompsVer(include = "", exclude = "") {
     def test_paths = sh(script: "find . -name 'cocotb_test.py' -exec dirname {} + | cut -c3-", returnStdout: true).trim()
     def comps_ver = []
 
     test_paths.readLines().each { path ->
-        if (isInPath(path, include)) {
+        if (isInPath(path, include) && !isInPath(path, exclude)) {
             def comp_name = sh(script: "grep '^TOP_LEVEL_ENT=' $path/Makefile | cut -d'=' -f2", returnStdout: true).trim()
 
-            if (comp_name.length() > 0 && !exclude.contains(comp_name) && comp_name != '%s') {
+            if (comp_name.length() > 0 && comp_name != '%s') {
                 comps_ver.add([comp_name, path])
             }
         }
@@ -339,7 +339,7 @@ def fetchCocotbCompsVer(include = "", exclude = []) {
     return comps_ver
 }
 
-def fetchCocotbCompsMultiVer(include = "", exclude = []) {
+def fetchCocotbCompsMultiVer(include = "", exclude = "") {
     def comps_ver = fetchCocotbCompsVer(include, exclude)
     def comps_multiver = []
 

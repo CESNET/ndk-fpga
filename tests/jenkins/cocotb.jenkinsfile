@@ -16,12 +16,11 @@ node('preklad') {
         def common_run = load "tests/jenkins/common.jenkins"
 
         // INCLUDE and EXCLUDE act as a filters of automatically detected cocotb tests.
-        // INCLUDE filtering is done by names of folders in the path to the tests.
+        // Filtering is done by names of folders in the path to the tests.
         // Operations 'and' (&) and 'or' (|) are also supported, however
         // you use only ands or only ors.
-        def INCLUDE = "" // "" for include all
-        // EXCLUDE filtering is done by the names of the components.
-        def EXCLUDE = ["fpga"] // [] for exclude none
+        def INCLUDE = ""           // "" for include all
+        def EXCLUDE = "apps|pyuvm" // "" for exclude none
 
         // /////////////////////////////////////////////////////////////////////////////
         // BASIC-VERIFICATION
