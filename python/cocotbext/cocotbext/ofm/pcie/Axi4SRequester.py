@@ -3,8 +3,8 @@
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
-from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize
-from .PcieHeaders import RQHeader, RCHeader, RQUser, RCUser, fbe2offset
+from ..utils import numberOfSetBits, bitmask, byte_serialize
+from .PcieHeaders import RQHeader, RCHeader, RQUser, fbe2offset
 from .PcieRequester import PcieRequester
 
 
@@ -26,7 +26,7 @@ class Axi4SRequester(PcieRequester):
     def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
         super().__init__(ram, rq_driver, rc_driver, rq_monitor)
         self._rq_inframe = False
-        self._rq_width = len(self._rq.bus.TDATA)
+        self._rq_width = len(rq_monitor.bus.TDATA)
 
     def handle_rq_transaction(self, transaction):
         tuser = RQUser.deserialize(int.from_bytes(transaction['TUSER'], byteorder='big'))
@@ -86,40 +86,3 @@ class Axi4SRequester(PcieRequester):
         #       FBE is only applied in first completion
         rc_hdr.addr = (req_hdr.addr << 2) + fbe2offset(req_fbe)
         return rc_hdr
-
-    async def handle_response(self):
-        """
-        Need to overload this method to connect (convert) to the AXI driver.
-
-        The driver (self._rc) accepts words (word=dictionary) or AXI transactions.
-        As this AXI bus is very specific, we need to provide words.
-        Another way would be to write a specific driver for this type of AXI bus.
-        """
-        while True:
-            rq_hdr, data = await self._q.get()
-            # TODO: split response into multiple transactions
-            rc_hdr = self.hdr_req2compl(rq_hdr)
-            dword_count = rc_hdr.dword_count + 3 # 3 DWs of header, equivalent to: len(rc_hdr) // 32
-
-            user = RCUser()
-            user.sop = 1
-            user.eop = 0
-            user.eop0 = dword_count - 1
-            # PCIe header on AXI is prepended to the data
-            tdata = concat(
-                [(rc_hdr.serialize(), len(rc_hdr))]
-                + [(byte_deserialize(data), len(data) * 8)]
-            )
-            # Send transaction word by word to the driver
-            while dword_count > 0:
-                word = {}
-                tkeep = bitmask(self._rq_width // 32)
-                if dword_count <= self._rq_width // 32:
-                    user.eop = 1
-                    user.eop_pos0 = dword_count
-                    tkeep = bitmask(dword_count)
-                self._rc.append({"TDATA": tdata & bitmask(self._rq_width), "TUSER": user.serialize(), "TKEEP": tkeep})
-
-                user.sop = 0
-                tdata >>= self._rq_width
-                dword_count -= self._rq_width // 32

@@ -6,7 +6,7 @@ import cocotb
 import cocotb.queue
 from cocotb.triggers import Event, RisingEdge
 
-from ..utils import concat, SerializableHeader
+from ..utils import SerializableHeader
 from .PcieHeaders import CQHeader, CCHeader, CQUser
 
 
@@ -21,7 +21,6 @@ class Axi4SCompleter:
         self._ccm = cc_monitor
         self._queue_send = cocotb.queue.Queue()
         self._queue_recv = cocotb.queue.Queue()
-        self._axi_width = len(self._cq.bus.TDATA) // 8
 
         self._cc_inframe = None
         self._completions = {}
@@ -90,6 +89,7 @@ class Axi4SCompleter:
                 self._tag_queue.put_nowait(hdr.tag)
 
     async def _cq_req(self, addr, byte_count, req_type=0, data=[], tag=None, sync=True):
+        """Send CQ request using unified driver."""
         if byte_count == 0:
             if tag is not None:
                 trigger, item, req_data = self._read_requests[tag]
@@ -98,10 +98,10 @@ class Axi4SCompleter:
                 trigger.set(req_data)
             return
 
-        header_empty = CQHeaderEmpty()
         header = CQHeader()
         user = CQUser()
 
+        # Calculate byte enables based on address alignment
         user.firstBe0 = [0xF, 0xE, 0xC, 0x8][addr % 4]
         user.lastBe0 = [0xF, 0x1, 0x3, 0x7][(addr + byte_count) % 4]
         user.sop0 = 1
@@ -111,10 +111,12 @@ class Axi4SCompleter:
             user.firstBe0 &= user.lastBe0
             user.lastBe0 = 0
 
+        # Pad data for write requests (address alignment)
         if req_type == 1:
             assert len(data) == byte_count
             data = [0] * (addr % 4) + data + [0] * (-(addr + byte_count) % 4)
 
+        # Fill header
         if tag is not None:
             header.tag = tag
         header.bar_apper = 26
@@ -122,16 +124,7 @@ class Axi4SCompleter:
         header.dword_count = dwords
         header.req_type = req_type
 
-        while len(data) or len(header):
-            cnt = min(self._axi_width - len(header) // 8, len(data))
-            tdata = concat([(header.serialize(), len(header))] + list(zip(data[:cnt], [8] * cnt)))
-            tuser = user.serialize()
-            tkeep = 2**(cnt // 4 + len(header) // 32) - 1
-            await self._cq.write({"TDATA": tdata, "TUSER": tuser, "TKEEP": tkeep}, sync=sync)
-
-            header = header_empty
-            user.sop0 = 0
-            data = data[cnt:]
+        self._cq.append((header, data, user))
 
     async def read(self, addr: int, byte_count: int) -> bytes:
         # TODO: split big reads to more transactions
