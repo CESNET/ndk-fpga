@@ -2,55 +2,57 @@
 # Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
 #            Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
+#            Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 
 from random import randint
 
 
 def get_mfb_params(signal_bus, params_dic):
-    if params_dic is None:
-        regions = len(signal_bus.sof)
-        dw = len(signal_bus.data)
-        sof_pos_len = len(signal_bus.sof_pos)
+    # calculating settings from the bus
+    regions = len(signal_bus.sof)
+    dw = len(signal_bus.data)
+    sof_pos_len = len(signal_bus.sof_pos)
 
-        if (signal_bus.sof_pos is None) or (sof_pos_len == regions):
-            sps = 0
-        else:
-            sps = len(signal_bus.sof_pos) // regions
-
-        if signal_bus.eof_pos is None:
-            eps = 0
-        else:
-            eps = len(signal_bus.eof_pos) // regions
-
-        region_size = 2**sps
-        block_size = 2**(eps - sps)
-        item_width = dw // (regions * region_size * block_size)
-
-        if hasattr(signal_bus, "meta"):
-            meta_width = len(signal_bus.meta) // regions
-        else:
-            meta_width = 0
+    if (signal_bus.sof_pos is None) or (sof_pos_len == regions):
+        sps = 0
     else:
-        regions = params_dic["regions"]
-        region_size = params_dic["region_size"]
-        block_size = params_dic["block_size"]
-        item_width = params_dic["item_width"]
-        if "meta_width" in params_dic.keys():
-            meta_width = params_dic["meta_width"]
-        else:
-            meta_width = 0
+        sps = len(signal_bus.sof_pos) // regions
 
-        dw = regions * region_size * block_size * item_width
+    if signal_bus.eof_pos is None:
+        eps = 0
+    else:
+        eps = len(signal_bus.eof_pos) // regions
 
-        if regions != len(signal_bus.sof):
-            signal_bus.sof.log.error("MFB parameters do not correspond to signals length!")
-            raise Exception()
+    region_size = 2**sps
+    block_size  = 2**(eps - sps)
+    item_width  = dw // (regions * region_size * block_size)
+    meta_width  = len(signal_bus.meta) // regions if hasattr(signal_bus, "meta") else 0
+    os_vld_with = "sof"
 
-        if dw != len(signal_bus.data):
-            signal_bus.data.log.error("MFB parameters do not correspond to signals length!")
-            raise Exception()
+    # overriding calculated settings with manual settings (if present)
+    if params_dic is not None:
+        regions     = params_dic.get("regions", regions)
+        region_size = params_dic.get("region_size", region_size)
+        block_size  = params_dic.get("block_size", block_size)
+        item_width  = params_dic.get("item_width", item_width)
+        meta_width  = params_dic.get("meta_width", meta_width)
+        os_vld_with = params_dic.get("os_vld_with", os_vld_with)
 
-    return regions, region_size, block_size, item_width, meta_width
+    # checking for errors
+    dw = regions * region_size * block_size * item_width
+
+    if regions != len(signal_bus.sof):
+        signal_bus.sof.log.error("MFB parameters do not correspond to signals length!")
+        raise Exception()
+
+    if dw != len(signal_bus.data):
+        signal_bus.data.log.error("MFB parameters do not correspond to signals length!")
+        raise Exception()
+
+    if os_vld_with not in ["sof", "eof"]:
+        raise ValueError(f"Invalid value of {os_vld_with} of 'os_vld_with'. Supported values are: \"sof\", \"eof\".")
+
+    return regions, region_size, block_size, item_width, meta_width, os_vld_with
 
 
 def random_tuple_iterator(min1, max1, min2, max2):
