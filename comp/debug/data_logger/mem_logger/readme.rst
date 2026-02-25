@@ -1,24 +1,41 @@
 .. _mem_logger:
 
-Mem logger
-----------
+Memory Logger
+-------------
 
-Mem logger is wrap around :ref:`DATA_LOGGER<data_logger>` that is able to log common statistics about memory interface.
-Example usage can be found in :ref:`MEM_TESTER<mem_tester>` component.
+The **Mem Logger** is a wrapper around the :ref:`DATA_LOGGER <data_logger>` component.
+It logs simple statistics about a memory interface.
 
-Key features
+Usage example can be found in the :ref:`MEM_TESTER <mem_tester>` component.
+
+Key Features
 ^^^^^^^^^^^^
 
-* Measured statistics
+Measured Statistics
+"""""""""""""""""""
 
-    * Number of read and write requests and words (including requested read words and received read words)
-    * Number of ticks between first and last read, write and both (SW can calculate data flow)
-    * Read requests latencies (minimum, maximum, average and histogram)
+* Number of read and write requests
+* Number of transferred words
+  (separately tracks requested read words vs. actually received read words)
+* Number of clock cycles between first and last transaction for:
 
-        * :ref:`LATENCY_METER<latency_meter>` and :ref:`HISTOGRAMER<histogramer>` components are used
+    * Read operations
+    * Write operations
+    * Combined read + write traffic
 
-* You can specify if read latency should be measured to the first or last received word (default: to last word)
+  (software can calculate effective data throughput from these)
+* Read request latencies:
 
+    * Minimum, maximum and average latency
+    * Latency histogram
+
+  Internally uses the :ref:`LATENCY_METER <latency_meter>` and :ref:`HISTOGRAMER <histogramer>` components.
+
+Configuration
+"""""""""""""
+
+* Option to measure read latency to the **first** or **last** received word
+  (default: last word)
 
 Component port and generics description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -66,22 +83,13 @@ Instance template (simple usage)
     );
 
 
+Control Software
+^^^^^^^^^^^^^^^^
 
-Control SW
-^^^^^^^^^^
+For installation instructions, see the :ref:`DATA_LOGGER <data_logger>` documentation.
 
-First install ``DATA_LOGGER`` package
+You can use the ``mem_logger`` Python module from your own scripts, or run the tool directly:
 
-* You also need to install ``python nfb`` package
-
-.. code-block::
-
-    cd data_logger/sw
-    python3 setup.py install --user
-
-
-Then you can call ``MEM_LOGGER`` module from your script or call ``MEM_LOGGER`` directly:
-
-.. code-block::
+.. code-block:: console
 
     python3 mem_logger.py
