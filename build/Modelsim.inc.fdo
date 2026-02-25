@@ -113,6 +113,25 @@ proc CompileMod {FNAME OPT} {
         }
     }
 
+    # HOTFIX: The vmake creates unusable Makefile if the vcom is used with -pslfile arguments.
+    # Workaround is to run the CMD in two steps:
+    # 1. vcom with -vmake parameter, but with no PSL file,
+    # 2. vcom with no -vmake parameter, but with PSL file.
+    # The second step ensures adding the PSL file to the same (recompiled) vhdl file.
+    # Despite expectations, the vmake still somehow generates Makefile aware of the PSL files.
+    if {[info exists opt(PSLFILE)]} {
+        CompileModTail -vmake {}
+        CompileModTail {} [list "-pslfile" $opt(PSLFILE)]
+    } else {
+        CompileModTail -vmake {}
+    }
+}
+
+proc CompileModTail {VMAKE PSLARGS} {
+    uplevel 1 [list set CMT_VMAKE $VMAKE]
+    uplevel 1 [list set CMT_PSLARGS $PSLARGS]
+
+  uplevel 1 {
     # Source compiling
     if {$FEXT in [list .v .vh]} {
         set CMD [list vlog -vmake {*}$COVER_PARAMS -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB]
@@ -122,17 +141,15 @@ proc CompileMod {FNAME OPT} {
         regsub "/\[^/\]+\$" $FNAME "/" DIR
         set CMD [list vlog -vmake {*}$COVER_PARAMS_SV -sv -timescale "1ps/1ps" {*}$VLOG_PARAM -work $LIB +incdir+$DIR {*}$SIM_FLAGS(VLOG_SV_FLAGS) {*}$opt(VLOG_SV_FLAGS)]
     } else {
-        set CMD [list vcom -vmake -2008 -explicit {*}$COVER_PARAMS {*}$VCOM_PARAM -work $LIB]
+        set CMD [list vcom {*}$CMT_VMAKE -2008 -explicit {*}$COVER_PARAMS {*}$VCOM_PARAM {*}$CMT_PSLARGS -work $LIB]
     }
 
     if {$SIM_FLAGS(BATCH_COMPILE)} {
-        if {[info exists opt(PSLFILE)]} {
-            lappend CMD "-pslfile" $opt(PSLFILE)
-        }
         nb_batch_add $CMD $FNAME
     } else {
         eval {*}$CMD $FNAME
     }
+  }
 }
 
 proc nb_sim_restart { {run_params "-all"} } {
