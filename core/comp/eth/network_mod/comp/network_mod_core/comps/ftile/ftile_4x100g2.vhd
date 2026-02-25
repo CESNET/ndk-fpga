@@ -529,19 +529,19 @@ begin
         i_reconfig_xcvr0_addr           => reconfig_addr           (1)(18-1 downto 0),
         i_reconfig_xcvr0_byteenable     => (others => '1'), -- not supported in MI IA yet
         o_reconfig_xcvr0_readdata_valid => reconfig_readdata_valid (1),
-        i_reconfig_xcvr0_read           => reconfig_read_drp       (1),
-        i_reconfig_xcvr0_write          => reconfig_write_drp      (1),
+        i_reconfig_xcvr0_read           => reconfig_read           (1),
+        i_reconfig_xcvr0_write          => reconfig_write          (1),
         o_reconfig_xcvr0_readdata       => reconfig_readdata       (1),
-        i_reconfig_xcvr0_writedata      => reconfig_writedata_drp  (1),
+        i_reconfig_xcvr0_writedata      => reconfig_writedata      (1),
         o_reconfig_xcvr0_waitrequest    => reconfig_waitrequest    (1),
         -- XCVR reconfig inf (0x2)
         i_reconfig_xcvr1_addr           => reconfig_addr           (2)(18-1 downto 0),
         i_reconfig_xcvr1_byteenable     => (others => '1'), -- not supported in MI IA yet
         o_reconfig_xcvr1_readdata_valid => reconfig_readdata_valid (2),
-        i_reconfig_xcvr1_read           => reconfig_read_drp       (2),
-        i_reconfig_xcvr1_write          => reconfig_write_drp      (2),
+        i_reconfig_xcvr1_read           => reconfig_read           (2),
+        i_reconfig_xcvr1_write          => reconfig_write          (2),
         o_reconfig_xcvr1_readdata       => reconfig_readdata       (2),
-        i_reconfig_xcvr1_writedata      => reconfig_writedata_drp  (2),
+        i_reconfig_xcvr1_writedata      => reconfig_writedata      (2),
         o_reconfig_xcvr1_waitrequest    => reconfig_waitrequest    (2),
         -- MAC data
         o_rx_block_lock                 => ftile_rx_block_lock,
