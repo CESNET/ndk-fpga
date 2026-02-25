@@ -1,5 +1,6 @@
 stages:
   - check
+  - test
   - deploy
 
 variables:
@@ -8,6 +9,7 @@ variables:
 
 include:
   - local: "tests/ci/check.gitlab-ci.yaml"
+  - local: "tests/ci/mem_tester.gitlab-ci.yaml"
 
 pages:
   stage: deploy

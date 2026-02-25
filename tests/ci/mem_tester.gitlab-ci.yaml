@@ -1,0 +1,23 @@
+
+mem_tester:
+  stage: test
+  image: oraclelinux:$VERSION_OS
+  variables:
+    VERSION_OS: 9
+    REPO_CODEREADY_BUILDER: "ol9_codeready_builder"
+    REPO_EPEL: "oracle-epel-release-el9"
+  script:
+    - dnf copr enable -y @CESNET/nfb-framework
+    - dnf config-manager -y --set-enabled $REPO_CODEREADY_BUILDER
+    - dnf install -y $REPO_EPEL
+    - dnf install -y nfb-framework python3-nfb python3.11 python3.11-pip pandoc texlive texlive-latex
+    - python3.11 -m pip install --no-cache-dir uv
+    - source env.sh
+    - export UV_PYTHON=3.11
+    - uv pip install --system pytest "python/ofm[test,nfb-pypi]"
+    - uv pip list
+    - uv pip show ofm nfb || { echo "Packages missing!!!"; exit 1; }
+    - python3.11 comp/debug/mem_tester/sw/mem_tester.py -h
+    - python3.11 comp/debug/mem_tester/sw/report_gen.py -h
+    - python3.11 -m pytest -xs --tb=short comp/debug/mem_tester/sw/test_mem_tester.py -h
+    - echo "Finished ... "
