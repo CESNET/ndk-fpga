@@ -33,7 +33,7 @@ class MVBDriver(BusDriver):
     def __init__(self, entity, name, clock, array_idx=None) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
 
-        self.__os = [s for s in MVBDriver._optional_signals if hasattr(self.bus, s)]
+        self.__os = [s for s in self._optional_signals if hasattr(self.bus, s)]
         self.__item_cnt = 0
         self.__items = len(self.bus.vld)
         self.__bus_isarray = not isinstance(getattr(self.bus, self.__os[0]), ModifiableObject)
