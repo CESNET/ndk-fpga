@@ -526,11 +526,11 @@ begin
             STATE            => open          -- debug purposes only. Can be left open in the future
         );
 
+        mi_ardy_phy(IA_INDEX) <= not reconfig_waitrequest(IA_INDEX) and not init_busy;
+
     end generate;
 
-    mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
-        mi_ardy_phy(i) <= not reconfig_waitrequest(i);
-    end generate;
+    mi_ardy_phy(0) <= not reconfig_waitrequest(0);
 
     CLK_ETH_OUT <= ftile_clk_out;
 

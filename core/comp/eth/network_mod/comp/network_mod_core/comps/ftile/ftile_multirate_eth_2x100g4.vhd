@@ -645,11 +645,11 @@ begin
             STATE            => open          -- debug purposes only. Can be left open in the future
         );
 
+        reconfig_waitrequest_drp(IA_INDEX) <= not reconfig_waitrequest(IA_INDEX) and not init_busy;
+
     end generate;
 
-    mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
-        reconfig_waitrequest_drp(i) <= not reconfig_waitrequest(i);
-    end generate;
+    reconfig_waitrequest_drp(0) <= not reconfig_waitrequest(0);
 
     CLK_ETH_OUT <= ftile_clk_out;
     -- =========================================================================
