@@ -13,10 +13,9 @@ set CMAC_REBASE_BASE  "$COMP_BASE/nic/cmac/obuf/comp/rebase"
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
 
-set COMPONENTS [list \
-    [list "CMAC_REBASE"  $CMAC_REBASE_BASE  "FULL" ] \
-    [list "TX_MAC_LITE"  $TX_MAC_LITE_BASE  "NO_CRC" ] \
-]
+# FIXME
+#lappend COMPONENTS [list "CMAC_REBASE"  $CMAC_REBASE_BASE  "FULL" ]
+lappend COMPONENTS [list "TX_MAC_LITE"  $TX_MAC_LITE_BASE  "NO_CRC" ]
 
 # Source files for implemented component
 set MOD "$MOD $ENTITY_BASE/tx_mac_lite_cmac.vhd"

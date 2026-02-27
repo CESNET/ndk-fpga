@@ -12,9 +12,8 @@ set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
 
 set DIC_BASE    "$COMP_BASE/400g/scheduler_tx/comp/scheduler_ctrl/comp/merger/comp/dic"
 
-set COMPONENTS [list \
-    [list "DIC"      $DIC_BASE     "FULL" ] \
-]
+# FIXME
+#lappend COMPONENTS [list "DIC"      $DIC_BASE     "FULL" ]
 
 # Source files for implemented component
 set MOD "$MOD $ENTITY_BASE/gap_counter.vhd"
