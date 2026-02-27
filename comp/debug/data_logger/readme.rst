@@ -1,50 +1,54 @@
 .. _data_logger:
 
-Data logger
------------
+Data Logger
+===========
 
-Data logger is used to log statistics about a specific events and make them available on the MI bus.
-Simple usage can be seen in :ref:`MEM_LOGGER<mem_logger>` component.
+The **Data Logger** logs statistics about specific events and exposes them on the MI bus.
+A simple usage example can be found in the :ref:`MEM_LOGGER <mem_logger>` component.
 
-Key features
-^^^^^^^^^^^^
+Key Features
+------------
 
-* Counter interface
+Counter Interface
+^^^^^^^^^^^^^^^^^
 
-    * Each counter interface contains a counter that can count
-      the number of occurrences of a specific event, the number of clock cycles of a event, ...
-    * The number of used counter interfaces is set via generic parameters
-    * Width is common for every counter and can be set to any value (even larger than MI bus width)
-    * If the counter should overflow, it will stay at the maximum possible value
-    * Custom increment value can be used (default: 1)
-    * Counter submit signal can be used to submit (save) counter value at a specific time
-      (for example if you can't determine when the event ends)
+* Each counter tracks occurrences of an event, clock cycles, etc.
+* Number of counter interfaces is configurable via generic parameters.
+* All counters share the same width (width is configurable and can be even wider than the MI bus).
+* On overflow the counter saturates at its maximum value.
+* Custom increment value (default: ``1``).
+* Optional ``submit`` signal to latch the current value at a specific moment
+  (e.g. when the end of an event cannot be detected immediately).
 
-* Value interface
+Value Interface
+^^^^^^^^^^^^^^^
 
-    * Each value interface can calculate:
+Each value interface can compute:
 
-        * Minimal and maximal occurred value
-        * Sum and count of all occurred values (SW can then calculate average value)
-        * Histogram with custom box count and box with (see :ref:`HISTOGRAMER<histogramer>`)
+* Minimum and maximum observed value
+* Sum and count of all values (average can be calculated in software)
+* Histogram with configurable number of bins and bin width
+  (see :ref:`HISTOGRAMER <histogramer>`)
 
-    * The number of used value interfaces is set via generic parameters
-    * Each value interface can have different width
-    * Each statistic can be enabled or disabled separately for each interface (to reduce resources)
+Configuration options per interface:
 
-* Control interface
+* Number of value interfaces set via generics
+* Individual data width per interface
+* Each statistic (min/max, sum/count, histogram) can be independently enabled/disabled
+  to save resources
 
-    * Can be used for custom configuration or status flags and values
-    * There is a control output interface and a control input interface
+Control Interface
+^^^^^^^^^^^^^^^^^
 
-        * CTRLO = output from `DATA_LOGGER`
-        * CTRLI = input to `DATA_LOGGER`
+Used for custom configuration registers or status flags.
 
-    * Each interface can have a custom width (for width 0 is disabled)
+* **CTRLO** ... output binary vector from the Data Logger
+* **CTRLI** ... input binary vector to the Data Logger
 
+Both interfaces support arbitrary widths; width ``0`` disables the interface.
 
-Data logger warping component
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Data Logger Wrapping Components
+-------------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -53,8 +57,7 @@ Data logger warping component
 
 
 Component port and generics description
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+---------------------------------------
 
 .. vhdl:autoentity:: DATA_LOGGER
    :noautogenerics:
@@ -169,42 +172,38 @@ Instance template (full usage)
 
 
 Control SW
-^^^^^^^^^^
+----------
 
-Folder ``data_logger/sw/`` contains following ``Python3`` packages:
+Folder ``ndk-fpga/python/ofm/`` contains following ``Python`` packages for ``DataLogger``:
 
 * ``data_logger`` ... basic interaction with ``DATA_LOGGER``
 * ``mem_logger`` ... basic interaction with ``MEM_LOGGER``
-* ``logger_stats`` ... loading firmware statistics (multiple ``DATA_LOGGERS`` can be organized in tree hierarchy)
+* ``logger_stats`` ... structured loading of ``DATA_LOGGER`` statistics (multiple ``DATA_LOGGERS`` can be organized in tree hierarchy)
 * ``graph_tools`` ... simple plot functions for statistics from ``logger_stats``
 
-Package can be installed using this command:
+**Installation steps**
 
-* You also need to install ``python nfb`` package
+* Install **NFB python package**
 
-.. code-block::
+  * See: `ndk-sw <https://github.com/CESNET/ndk-sw?tab=readme-ov-file>`_
 
-    python3 -m pip install --upgrade pip
+* Install **Open FPGA Modules python package**
 
-    # Install nfb:
-    cd swbase/pynfb
-    python3 -m pip install Cython
-    python3 -m pip install .
-    cd -
+  * It includes ``data_logger, mem_logger, logger_stats, graph_tools`` packages
+  * See: `ndk-fpga/python/ofm <https://github.com/CESNET/ndk-fpga/tree/devel/python/ofm>`_
 
-    # Install this package:
-    cd data_logger/sw
-    python3 -m pip install .
-
-Example usage of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`):
+**Example usage** of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`):
 
 .. code-block::
 
-    import logger_stats as Stats
-    from data_logger.data_logger import DataLogger
+    from ofm.comp.debug.data_logger.data_logger import DataLogger
+    import ofm.comp.debug.data_logger.logger_stats as Stats
 
     def create_stats():
         # Create DataLoggers
+        # You can specify:
+        # * Card device (dev='/dev/nfb1')
+        # * MI bus index (when multiple DataLoggers are used)
         logger_0 = DataLogger(index=0)
         logger_1 = DataLogger(index=1)
 
@@ -261,8 +260,9 @@ Example usage of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`
 
     return stats
 
-
     stats = create_stats()
+
+    # Now you can load / print / save all statistics with just one command
     stats.load()
     print(stats.to_str())
     stats.save('stats.npz')
@@ -270,6 +270,10 @@ Example usage of ``logger_stats`` (for more usage see `mem_logger/mem_logger.py`
 
 Example usage of ``graph_tools``:
 
+
+.. code-block::
+
+    from ofm.comp.debug.data_logger.graph_tools import load_data, plot_counter, plot_value, plot_value_2d
     from graph_tools.graph_tools import load_data, plot_counter, plot_value, plot_value_2d
 
     stats = load_data('stats.npz')
@@ -290,9 +294,8 @@ Example usage of ``graph_tools``:
     plot_value_2d(node['Value A'], 'Time', 'Blocks', 'Title' log=True)
 
 
-
 MI address space
-^^^^^^^^^^^^^^^^
+----------------
 
 .. code-block::
 

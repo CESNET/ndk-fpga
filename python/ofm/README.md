@@ -46,7 +46,4 @@ $ pip install .
 
 **Notes**
 
-TODO: restructure data_logger and its submodules (e.g., logger_stats.py could be spread into
-multiple files), perhaps move some of its functions to the `utils` module, etc.
-
 Please, keep this README up-to-date.
