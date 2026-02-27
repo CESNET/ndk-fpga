@@ -12,7 +12,7 @@ set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
 set PACKAGES "$PACKAGES $OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg.vhd"
 
 set COMPONENTS [list \
-    [ list "UUT"               ".."                                     "FULL" ] \
+    [ list "UUT"               "$ENTITY_BASE/.."                            "FULL" ] \
     [ list "FIFOX_MULTI"       "$OFM_PATH/comp/base/fifo/fifox_multi"       "FULL" ] \
 ]
 
