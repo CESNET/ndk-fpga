@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mem logger &mdash; NDK-FPGA  documentation</title>
+  <title>Memory Logger &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="JTAG-over-protocol Client" href="../../jtag_op_client/readme.html" />
-    <link rel="prev" title="Data logger" href="../readme.html" /> 
+    <link rel="prev" title="Data Logger" href="../readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -72,20 +72,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../streaming_debug/readme.html">Streaming Debug</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../mem_tester/readme.html">DDR4 Memory Tester</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../mem_tester/readme.html">Memory Tester</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../histogramer/readme.html">Histogramer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../latency_meter/readme.html">Latency meter</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../readme.html">Data logger</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#key-features">Key features</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../readme.html#data-logger-warping-component">Data logger warping component</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">Mem logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../readme.html">Data Logger</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Memory Logger</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-features">Key Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#measured-statistics">Measured Statistics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration">Configuration</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#component-port-and-generics-description">Component port and generics description</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#instance-template-simple-usage">Instance template (simple usage)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#instance-template-full-usage">Instance template (full usage)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#control-sw">Control SW</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../readme.html#mi-address-space">MI address space</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#component-port-and-generics-description">Component port and generics description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instance-template-simple-usage">Instance template (simple usage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#control-software">Control Software</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../jtag_op_client/readme.html">JTAG-over-protocol Client</a></li>
@@ -143,8 +142,8 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../debug.html">Debug Tools</a></li>
-          <li class="breadcrumb-item"><a href="../readme.html">Data logger</a></li>
-      <li class="breadcrumb-item active">Mem logger</li>
+          <li class="breadcrumb-item"><a href="../readme.html">Data Logger</a></li>
+      <li class="breadcrumb-item active">Memory Logger</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/comp/debug/data_logger/mem_logger/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -154,30 +153,47 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mem-logger">
-<span id="id1"></span><h1>Mem logger<a class="headerlink" href="#mem-logger" title="Link to this heading"></a></h1>
-<p>Mem logger is wrap around <a class="reference internal" href="../readme.html#data-logger"><span class="std std-ref">DATA_LOGGER</span></a> that is able to log common statistics about memory interface.
-Example usage can be found in <a class="reference internal" href="../../mem_tester/readme.html#mem-tester"><span class="std std-ref">MEM_TESTER</span></a> component.</p>
+  <section id="memory-logger">
+<span id="mem-logger"></span><h1>Memory Logger<a class="headerlink" href="#memory-logger" title="Link to this heading"></a></h1>
+<p>The <strong>Mem Logger</strong> is a wrapper around the <a class="reference internal" href="../readme.html#data-logger"><span class="std std-ref">DATA_LOGGER</span></a> component.
+It logs simple statistics about a memory interface.</p>
+<p>Usage example can be found in the <a class="reference internal" href="../../mem_tester/readme.html#mem-tester"><span class="std std-ref">MEM_TESTER</span></a> component.</p>
 <section id="key-features">
-<h2>Key features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<section id="measured-statistics">
+<h3>Measured Statistics<a class="headerlink" href="#measured-statistics" title="Link to this heading"></a></h3>
 <ul>
-<li><p>Measured statistics</p>
-<blockquote>
-<div><ul>
-<li><p>Number of read and write requests and words (including requested read words and received read words)</p></li>
-<li><p>Number of ticks between first and last read, write and both (SW can calculate data flow)</p></li>
-<li><p>Read requests latencies (minimum, maximum, average and histogram)</p>
+<li><p>Number of read and write requests</p></li>
+<li><p>Number of transferred words
+(separately tracks requested read words vs. actually received read words)</p></li>
+<li><p>Number of clock cycles between first and last transaction for:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><a class="reference internal" href="../../latency_meter/readme.html#latency-meter"><span class="std std-ref">LATENCY_METER</span></a> and <a class="reference internal" href="../../histogramer/readme.html#histogramer"><span class="std std-ref">HISTOGRAMER</span></a> components are used</p></li>
+<li><p>Read operations</p></li>
+<li><p>Write operations</p></li>
+<li><p>Combined read + write traffic</p></li>
 </ul>
 </div></blockquote>
+<p>(software can calculate effective data throughput from these)</p>
 </li>
+<li><p>Read request latencies:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Minimum, maximum and average latency</p></li>
+<li><p>Latency histogram</p></li>
 </ul>
 </div></blockquote>
+<p>Internally uses the <a class="reference internal" href="../../latency_meter/readme.html#latency-meter"><span class="std std-ref">LATENCY_METER</span></a> and <a class="reference internal" href="../../histogramer/readme.html#histogramer"><span class="std std-ref">HISTOGRAMER</span></a> components.</p>
 </li>
-<li><p>You can specify if read latency should be measured to the first or last received word (default: to last word)</p></li>
 </ul>
+</section>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Option to measure read latency to the <strong>first</strong> or <strong>last</strong> received word
+(default: last word)</p></li>
+</ul>
+</section>
 </section>
 <section id="component-port-and-generics-description">
 <h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Link to this heading"></a></h2>
@@ -416,18 +432,11 @@ Example usage can be found in <a class="reference internal" href="../../mem_test
 </pre></div>
 </div>
 </section>
-<section id="control-sw">
-<h2>Control SW<a class="headerlink" href="#control-sw" title="Link to this heading"></a></h2>
-<p>First install <code class="docutils literal notranslate"><span class="pre">DATA_LOGGER</span></code> package</p>
-<ul class="simple">
-<li><p>You also need to install <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">nfb</span></code> package</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">data_logger</span><span class="o">/</span><span class="n">sw</span>
-<span class="n">python3</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span>
-</pre></div>
-</div>
-<p>Then you can call <code class="docutils literal notranslate"><span class="pre">MEM_LOGGER</span></code> module from your script or call <code class="docutils literal notranslate"><span class="pre">MEM_LOGGER</span></code> directly:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="n">mem_logger</span><span class="o">.</span><span class="n">py</span>
+<section id="control-software">
+<h2>Control Software<a class="headerlink" href="#control-software" title="Link to this heading"></a></h2>
+<p>For installation instructions, see the <a class="reference internal" href="../readme.html#data-logger"><span class="std std-ref">DATA_LOGGER</span></a> documentation.</p>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">mem_logger</span></code> Python module from your own scripts, or run the tool directly:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python3 mem_logger.py</span>
 </pre></div>
 </div>
 </section>
@@ -437,7 +446,7 @@ Example usage can be found in <a class="reference internal" href="../../mem_test
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../readme.html" class="btn btn-neutral float-left" title="Data logger" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../readme.html" class="btn btn-neutral float-left" title="Data Logger" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../jtag_op_client/readme.html" class="btn btn-neutral float-right" title="JTAG-over-protocol Client" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

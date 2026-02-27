@@ -1,7 +1,7 @@
 .. _mem_tester_sw:
 
-MEM_TESTER Software
--------------------
+MEM_TESTER C Software (depreciated)
+-----------------------------------
 
 .. warning::
 
