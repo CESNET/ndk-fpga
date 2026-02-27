@@ -353,6 +353,19 @@ proc ApplyToMods {MODULE COMMAND FILES {TYPE ""}} {
             }
         }
 
+        # Transform the filenames in param_value similary as normal filename ($fname)
+        set PARAM_NAMES_WITH_FILENAME [list PSLFILE]
+        foreach param_name $PARAM_NAMES_WITH_FILENAME {
+            # Find the param_value index (it is right after param_name)
+            set i [expr [lsearch -exact $params $param_name] + 1]
+            if {$i > 0} {
+                set pfname [lindex $params $i]
+                set pfname [SimplPath $pfname]
+                # Update param list with new value
+                set params [lreplace $params $i $i $pfname]
+            }
+        }
+
         # Backward compatibility
         set type [DeduceType $fname $local_type]
         lappend params "TYPE" $type

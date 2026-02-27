@@ -14,9 +14,8 @@ set PACKAGES      "$PACKAGES $OFM_PATH/comp/base/pkg/math_pack.vhd"
 set PACKAGES      "$PACKAGES $ENTITY_BASE/dp_bmem_V7_func.vhd"
 set PACKAGES      "$PACKAGES $ENTITY_BASE/sdp_bmem_V7_func.vhd"
 
-set MOD           "$MOD $ENTITY_BASE/dp_bmem_V7_ent.vhd"
-set MOD           "$MOD $ENTITY_BASE/sdp_bmem_V7_ent.vhd"
-set MOD           "$MOD $ENTITY_BASE/dp_bmem_V7.psl"
+lappend MOD       [list "$ENTITY_BASE/dp_bmem_V7_ent.vhd" PSLFILE $ENTITY_BASE/dp_bmem_V7.psl]
+lappend MOD       "$ENTITY_BASE/sdp_bmem_V7_ent.vhd"
 
 # Extra simulation source files (DISABLED)
 if {false && [info exists SIMULATION] && $SIMULATION} then {

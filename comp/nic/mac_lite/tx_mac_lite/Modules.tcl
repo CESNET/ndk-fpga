@@ -32,6 +32,5 @@ set COMPONENTS [list \
 ]
 
 # Source files for implemented component
-set MOD "$MOD $ENTITY_BASE/tx_mac_lite.vhd"
-set MOD "$MOD $ENTITY_BASE/tx_mac_lite.psl"
-set MOD "$MOD $ENTITY_BASE/DevTree.tcl"
+lappend MOD [list "$ENTITY_BASE/tx_mac_lite.vhd" PSLFILE "$ENTITY_BASE/tx_mac_lite.psl"]
+lappend MOD "$ENTITY_BASE/DevTree.tcl"
