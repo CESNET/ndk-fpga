@@ -470,11 +470,11 @@ begin
             STATE            => open          -- debug purposes only. Can be left open in the future
         );
 
+        mi_ardy_phy(IA_INDEX) <= not reconfig_waitrequest(IA_INDEX) and not init_busy;
+
     end generate;
 
-    mi_ardy_conversion_g: for i in PMA_LANES downto 0 generate
-        mi_ardy_phy(i) <= not reconfig_waitrequest(i);
-    end generate;
+    mi_ardy_phy(0) <= not reconfig_waitrequest(0);
 
     CLK_ETH_OUT <= ftile_clk_out;
 
@@ -521,10 +521,10 @@ begin
         i_reconfig_xcvr0_addr           => reconfig_addr           (1)(18-1 downto 0),
         i_reconfig_xcvr0_byteenable     => (others => '1'), -- not supported in MI IA yet
         o_reconfig_xcvr0_readdata_valid => reconfig_readdata_valid (1),
-        i_reconfig_xcvr0_read           => reconfig_read_drp       (1),
-        i_reconfig_xcvr0_write          => reconfig_write_drp      (1),
+        i_reconfig_xcvr0_read           => reconfig_read           (1),
+        i_reconfig_xcvr0_write          => reconfig_write          (1),
         o_reconfig_xcvr0_readdata       => reconfig_readdata       (1),
-        i_reconfig_xcvr0_writedata      => reconfig_writedata_drp  (1),
+        i_reconfig_xcvr0_writedata      => reconfig_writedata      (1),
         o_reconfig_xcvr0_waitrequest    => reconfig_waitrequest    (1),
         -- MAC data
         o_rx_block_lock                 => ftile_rx_block_lock,
