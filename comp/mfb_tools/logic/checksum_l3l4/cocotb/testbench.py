@@ -1,0 +1,339 @@
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+import ipaddress
+import cocotb
+from cocotb.triggers import RisingEdge, ClockCycles
+from cocotbext.ofm.mfb.drivers import MFBDriver
+from cocotbext.ofm.mvb.drivers import MVBDriver
+from cocotbext.ofm.mvb.monitors import MVBMonitor
+from cocotbext.ofm.mfb.transaction import MfbTransaction
+from cocotbext.ofm.mvb.transaction import MvbTransaction
+from cocotb_bus.drivers import BitDriver
+from cocotb_bus.scoreboard import Scoreboard
+from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMvbInterface
+from dataclasses import dataclass
+from scapy.all import raw, TCP, UDP, SCTP, ICMPv6EchoRequest
+
+from cocotbext.ofm.utils.scapy import ScapyPacketGenerator
+
+
+@dataclass
+class MetadataTr(MvbTransaction):
+    """MVB transaction for L4 metadata"""
+    l3_csum_orig: int = 0
+    l3_csum_en: int = 0
+    l3_offset: int = 0
+    l3_length: int = 0
+    l4_csum_orig: int = 0
+    l4_csum_en: int = 0
+    l4_offset: int = 0
+    l4_length: int = 0
+    l4_protocol: int = 0
+    ip_src_addr: int = 0
+    ip_dst_addr: int = 0
+    ip_ver6: int = 0
+
+
+@dataclass
+class MvbTxResult(MvbTransaction):
+    """MVB transaction for TX checksum results"""
+    l3_csum: int = 0
+    l3_csum_ok: int = 0
+    l3_csum_en: int = 0
+    l4_csum: int = 0
+    l4_csum_ok: int = 0
+    l4_csum_en: int = 0
+
+
+class MVBDriverExt(MVBDriver):
+    _optional_signals = [
+        "l3_csum_orig", "l3_csum_en", "l3_offset", "l3_length",
+        "l4_csum_orig", "l4_csum_en", "l4_offset", "l4_length",
+        "l4_protocol", "ip_src_addr", "ip_dst_addr", "ip_ver6"
+    ]
+
+
+class MVBMonitorExt(MVBMonitor):
+    _optional_signals = [
+        "l3_csum", "l3_csum_ok", "l3_csum_en",
+        "l4_csum", "l4_csum_ok", "l4_csum_en"
+    ]
+
+
+class Testbench:
+    """Testbench for MFB_CHECKSUM_L3L4 component.
+
+    This class provides a complete testbench environment for testing the
+    MFB_CHECKSUM_L3L4 VHDL component. It includes MFB and MVB drivers for
+    sending packets and metadata, an MVB monitor for receiving results,
+    a scoreboard for verification, and a throughput probe for performance
+    measurement.
+
+    Attributes:
+        dut: The Device Under Test (cocotb handle).
+        mfb_driver: MFBDriver for sending packet data.
+        mvb_driver: MVBDriverExt for sending L3/L4 metadata.
+        mvb_tx_monitor: MVBMonitorExt for receiving checksum results.
+        backpressure: BitDriver for controlling TX backpressure.
+        scoreboard: Scoreboard for comparing expected vs actual results.
+        throughput_probe: ThroughputProbe for performance measurement.
+        pkts_sent: Counter of sent packets.
+        expected_output: List of expected MvbTxResult transactions.
+    """
+
+    def __init__(self, dut, debug=False):
+        self.dut = dut
+
+        # Setting MFB params based on generics
+        mfb_params = {
+            "regions": dut.MFB_REGIONS.value,
+            "region_size": dut.MFB_REGION_SIZE.value,
+            "block_size": dut.MFB_BLOCK_SIZE.value,
+            "item_width": dut.MFB_ITEM_WIDTH.value
+        }
+
+        # MFB driver for packet data
+        self.mfb_driver = MFBDriver(dut, "RX_MFB", dut.CLK, mfb_params=mfb_params)
+
+        # MVB driver for combined L3 and L4 metadata
+        self.mvb_driver = MVBDriverExt(dut, "RX_MVB", dut.CLK)
+
+        # MVB monitor for TX results
+        self.mvb_tx_monitor = MVBMonitorExt(dut, "TX_MVB", dut.CLK, tr_type=MvbTxResult)
+        # Add callback to zero out csum values when en is zero
+        self.mvb_tx_monitor.add_callback(self._process_tx_transaction)
+
+        # Backpressure driver for TX MVB
+        self.backpressure = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
+
+        # Counter of sent transactions
+        self.pkts_sent = 0
+
+        # List of expected results for scoreboard
+        self.expected_output = []
+
+        # Setting up scoreboard which compares received transactions with expected transactions
+        self.scoreboard = Scoreboard(dut)
+        # Linking monitor with its expected output
+        self.scoreboard.add_interface(self.mvb_tx_monitor, self.expected_output)
+
+        # Setting up throughput probe for performance measurement
+        self.throughput_probe = ThroughputProbe(
+            ThroughputProbeMvbInterface(self.mvb_tx_monitor),
+            throughput_units="items"
+        )
+        self.throughput_probe.add_log_interval(0, None)
+        self.throughput_probe.set_log_period(20)
+
+        # Setting up logging level
+        if debug:
+            self.mfb_driver.log.setLevel(cocotb.logging.DEBUG)
+            self.mvb_driver.log.setLevel(cocotb.logging.DEBUG)
+            self.mvb_tx_monitor.log.setLevel(cocotb.logging.DEBUG)
+
+    def _process_tx_transaction(self, transaction):
+        """Process TX transaction: zero out csum values and ok flags when en is zero.
+
+        This callback is registered with the MVB TX monitor to normalize received
+        transactions before scoreboard comparison. When checksum is disabled (en=0),
+        the DUT outputs zeros for checksum value and ok flag.
+
+        Args:
+            transaction: The MvbTxResult transaction received from the monitor.
+        """
+        if transaction.l3_csum_en == 0:
+            transaction.l3_csum = 0
+            transaction.l3_csum_ok = 0
+        if transaction.l4_csum_en == 0:
+            transaction.l4_csum = 0
+            transaction.l4_csum_ok = 0
+
+    async def reset(self):
+        """Perform a hardware reset sequence.
+
+        Drives the RESET signal high for 8 clock cycles, then releases it.
+        Waits for one rising edge after reset release.
+        """
+        self.dut.RESET.value = 1
+        await ClockCycles(self.dut.CLK, 8)
+        self.dut.RESET.value = 0
+        await RisingEdge(self.dut.CLK)
+
+    def model(self, pkt_dict):
+        """Generate expected output transaction based on input packet.
+
+        This is the reference model that predicts the DUT's output based on
+        the input packet metadata. It creates an MvbTxResult transaction with
+        expected checksum values and flags.
+
+        Args:
+            pkt_dict: Dictionary containing packet metadata including checksum
+                     information (see generate_packet_for_test return value).
+
+        Returns:
+            MvbTxResult: The expected output transaction.
+        """
+        # Create expected output transaction based on input packet
+        expected_tr = MvbTxResult(
+            l3_csum=pkt_dict["l3_csum_orig"] if pkt_dict["ipv6_vld"] == 0 else 0,
+            l3_csum_ok=1 if pkt_dict["l3_csum_en"] else 0,
+            l3_csum_en=pkt_dict["l3_csum_en"],
+            l4_csum=pkt_dict["l4_csum_orig"],
+            l4_csum_ok=1 if pkt_dict["l4_csum_en"] else 0,
+            l4_csum_en=pkt_dict["l4_csum_en"]
+        )
+
+        self.expected_output.append(expected_tr)
+        self.pkts_sent += 1
+
+        return expected_tr
+
+    async def send_packet_with_metadata(self, pkt_dict):
+        """Send packet via MFB and metadata via MVB bus.
+
+        Creates MFB and MVB transactions from the packet dictionary and
+        appends them to the respective drivers. Also generates the expected
+        output via the model and adds it to the scoreboard.
+
+        Args:
+            pkt_dict: Dictionary containing packet data and metadata
+                     (see generate_packet_for_test return value).
+        """
+        packet_bytes = pkt_dict["packet_bytes"]
+
+        # Create MFB transaction
+        mfb_tr = MfbTransaction(data=packet_bytes)
+
+        # Create combined metadata transaction
+        meta = MetadataTr(
+            l3_csum_orig=pkt_dict["l3_csum_orig"],
+            l3_csum_en=pkt_dict["l3_csum_en"],
+            l3_offset=pkt_dict["l3_offset"],
+            l3_length=pkt_dict["l3_length"],
+            l4_csum_orig=pkt_dict["l4_csum_orig"],
+            l4_csum_en=pkt_dict["l4_csum_en"],
+            l4_offset=pkt_dict["l4_offset"],
+            l4_length=pkt_dict["l4_length"],
+            l4_protocol=pkt_dict["l4_proto_number"],
+            ip_src_addr=pkt_dict["src_ip_128b"],
+            ip_dst_addr=pkt_dict["dst_ip_128b"],
+            ip_ver6=pkt_dict["ipv6_vld"]
+        )
+
+        # Add expected output to scoreboard via model
+        self.model(pkt_dict)
+
+        # Send transactions
+        self.mfb_driver.append(mfb_tr)
+        self.mvb_driver.append(meta)
+
+        cocotb.log.debug(f"Sent packet {self.pkts_sent}: L3_offset={pkt_dict['l3_offset']}, "
+                         f"L4_offset={pkt_dict['l4_offset']}, IPv6={pkt_dict['ipv6_vld']}")
+
+    @staticmethod
+    def ip_to_128b(ip_str: str) -> int:
+        """Convert IP address string to 128-bit integer.
+
+        Converts IPv4 or IPv6 address strings to 128-bit integers.
+        IPv4 addresses are converted to IPv4-mapped IPv6 format
+        (::ffff:0:0/96 prefix followed by the 32-bit IPv4 address).
+
+        Args:
+            ip_str: IP address string (e.g., "192.168.1.1" or "2001:db8::1").
+
+        Returns:
+            int: 128-bit integer representation of the IP address.
+        """
+        ip = ipaddress.ip_address(ip_str)
+        if ip.version == 4:
+            # IPv4-mapped IPv6: 0:96 bits = 0x00000000000000000000FFFF
+            return (0x00000000000000000000FFFF << 32) | int(ip)
+        else:
+            return int(ip)
+
+    async def generate_and_send_packet(self, min_len: int = 60, max_len: int = 1518) -> dict:
+        """Generate a packet and send it via MFB/MVB buses.
+
+        Convenience method that combines generate_packet_for_test() and
+        send_packet_with_metadata() into a single call.
+
+        Args:
+            min_len: Minimum packet length in bytes (default: 60).
+            max_len: Maximum packet length in bytes (default: 1518).
+
+        Returns:
+            dict: Dictionary with packet data and metadata for debugging.
+        """
+        pkt_dict = self.generate_packet_for_test(min_len, max_len)
+        await self.send_packet_with_metadata(pkt_dict)
+        return pkt_dict
+
+    def generate_packet_for_test(self, min_len: int = 60, max_len: int = 1518) -> dict:
+        """Generate packet and convert to format required by checksum_l3l4 test.
+
+        This method uses ScapyPacketGenerator class to generate a packet and extract
+        metadata, then converts it to the dictionary format expected by the testbench.
+
+        Args:
+            min_len: Minimum packet length in bytes (default: 60).
+            max_len: Maximum packet length in bytes (default: 1518).
+
+        Returns:
+            dict: Dictionary with packet data and metadata in test-specific format.
+        """
+        pkt = ScapyPacketGenerator.generate(min_len, max_len)
+        packet_bytes = raw(pkt)
+
+        # Get L3 info (includes offset)
+        l3_offset, l3_length, l3_proto_number, l3_csum_en, l3_checksum = ScapyPacketGenerator.get_l3_info(pkt)
+
+        # Get L4 info (includes offset, needs l3_length)
+        l4_offset, l4_length, l4_proto_number, l4_csum_en, l4_checksum = ScapyPacketGenerator.get_l4_info(pkt, l3_length)
+
+        # Get IP addresses (as strings only)
+        src_ip, dst_ip = ScapyPacketGenerator.get_ip_addresses(pkt)
+
+        # Convert to 128-bit integers (test-specific)
+        src_ip_128b = self.ip_to_128b(src_ip)
+        dst_ip_128b = self.ip_to_128b(dst_ip)
+
+        # ipv6_vld can be derived from l3_proto_number (6 = IPv6)
+        ipv6_vld = 1 if l3_proto_number == 6 else 0
+
+        # Extract L4 bytes
+        if pkt.haslayer(TCP):
+            l4_bytes = raw(pkt[TCP])
+        elif pkt.haslayer(UDP):
+            l4_bytes = raw(pkt[UDP])
+        elif pkt.haslayer(SCTP):
+            l4_bytes = raw(pkt[SCTP])
+        elif pkt.haslayer(ICMPv6EchoRequest):
+            l4_bytes = raw(pkt[ICMPv6EchoRequest])
+        else:
+            l4_bytes = b""
+
+        return {
+            "pkt": pkt,
+            "packet_bytes": packet_bytes,
+            "l3_checksum": l3_checksum,
+            "l4_checksum": l4_checksum,
+            "l3_offset": l3_offset,
+            "l4_offset": l4_offset,
+            "l3_length": l3_length,
+            "l4_length": l4_length,
+            "src_ip": src_ip,
+            "dst_ip": dst_ip,
+            "src_ip_128b": src_ip_128b,
+            "dst_ip_128b": dst_ip_128b,
+            "ipv6_vld": ipv6_vld,
+            "ip_header_length": l3_length,
+            "l4_proto_number": l4_proto_number,
+            "l3_csum_orig": l3_checksum if l3_checksum is not None else 0,
+            "l3_csum_en": l3_csum_en,
+            "l4_csum_orig": l4_checksum,
+            "l4_csum_en": l4_csum_en,
+            "l4_bytes": l4_bytes
+        }

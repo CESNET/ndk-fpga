@@ -1,0 +1,16 @@
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /mfb_checksum_l3l4/*
+#add_wave -group {L3CSUM} -noupdate -hex /mfb_checksum_l3l4/mfb_checksum_l3_i/*
+#add_wave -group {L3CSUM-C} -noupdate -hex /mfb_checksum_l3l4/mfb_checksum_l3_i/csum_calc_i/*
+#add_wave -group {L3CSUM-CR} -noupdate -hex /mfb_checksum_l3l4/mfb_checksum_l3_i/csum_calc_i/chsum_regional_g(0)/chsum_regional_i/*
+#add_wave -group {L4CSUM} -noupdate -hex /mfb_checksum_l3l4/mfb_checksum_l4_i/*
+#add_wave -group {L4CSUM-C} -noupdate -hex /mfb_checksum_l3l4/mfb_checksum_l4_i/csum_calc_i/*
+
+config wave -signalnamewidth 1
