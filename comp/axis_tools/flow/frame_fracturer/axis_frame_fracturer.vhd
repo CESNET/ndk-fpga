@@ -469,10 +469,10 @@ begin
         end if;
     end process;
 
-    barrel_shifter_i : entity work.BARREL_SHIFTER_GEN
+    barrel_shifter_i : entity work.BARREL_SHIFTER
     generic map (
+        DATA_WIDTH => BS_BLOCKS * 8,
         BLOCKS     => BS_BLOCKS,
-        BLOCK_SIZE => 8,
         SHIFT_LEFT => False
     )
     port map (
