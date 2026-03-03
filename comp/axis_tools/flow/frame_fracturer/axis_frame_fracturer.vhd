@@ -98,6 +98,7 @@ architecture FULL of AXIS_FRAME_FRACTURER is
     signal rx_axi_last_eofpos       : std_logic_vector(log2(WORD_ITEMS)-1 downto 0);
 
     signal stage_next               : std_logic_vector(SHREG_STAGES-1 downto 0);
+    signal stage_next_shreg         : std_logic_vector(SHREG_STAGES-1 downto 0);
     signal ready                    : std_logic_vector(SHREG_STAGES-1 downto 0);
 
     signal shreg_axi_tdata          : slv_array_t(SHREG_STAGES downto 0)(AXI_TDATA_WIDTH-1 downto 0);
@@ -197,8 +198,11 @@ begin
     -- 1) shift in all stages when the top-most stage does not have valid data or
     -- 2) keep the top-most stage the same and shift all other stages if the top stage contains valid data or
     -- 3) do not ask for any shift otherwise and leave it up to the Pause or FIFO full signals.
-    stage_next <= (others => '1')                        when (shreg_axi_tvalid(SHREG_STAGES  ) = '0') else
-                  (SHREG_STAGES-1 => '0', others => '1') when (shreg_axi_tvalid(SHREG_STAGES-1) = '0') else
+    stage_next_shreg(SHREG_STAGES-2 downto 0)   <= (others => '1');
+    stage_next_shreg(SHREG_STAGES-1)            <= '0';
+
+    stage_next <= (others => '1')  when (shreg_axi_tvalid(SHREG_STAGES  ) = '0') else
+                  stage_next_shreg when (shreg_axi_tvalid(SHREG_STAGES-1) = '0') else
                   (others => '0');
 
     -- =====================================================================
