@@ -24,6 +24,7 @@ use work.math_pack.all;
 entity BARREL_SHIFTER is
     generic (
         DATA_WIDTH  : integer := 64;
+        BLOCKS      : integer := DATA_WIDTH / 8;
         -- set true to shift left, false to shift right
         SHIFT_LEFT  : boolean := true
     );
@@ -31,7 +32,7 @@ entity BARREL_SHIFTER is
         -- Input interface ------------------------------------------------------
         DATA_IN     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
         DATA_OUT    : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        SEL         : in  std_logic_vector(log2(DATA_WIDTH/8)-1 downto 0)
+        SEL         : in  std_logic_vector(log2(BLOCKS)-1 downto 0)
     );
 end entity;
 
@@ -40,12 +41,17 @@ end entity;
 -- ----------------------------------------------------------------------------
 
 architecture BARREL_SHIFTER_ARCH of BARREL_SHIFTER is
-
+    constant BLOCK_WIDTH : natural := DATA_WIDTH / BLOCKS;
 begin
 
-    multiplexors: for i in 0 to DATA_WIDTH/8-1 generate
+    assert DATA_WIDTH mod BLOCKS = 0
+        report "DATA_WIDTH is not multiple of BLOCKS"
+        severity Failure;
+
+    multiplexors: for i in 0 to BLOCKS-1 generate
         process (DATA_IN, SEL)
             variable sel_aux : integer;
+            variable sel_blk : integer;
         begin
             if (SHIFT_LEFT) then
                 sel_aux := conv_integer('0'&SEL);
@@ -53,11 +59,9 @@ begin
                 sel_aux := conv_integer('0'&(0-SEL));
             end if;
 
-            DATA_OUT(i*8+7 downto i*8) <= DATA_IN(
-                                                  ((DATA_WIDTH/8-sel_aux+i) mod (DATA_WIDTH/8))*8 + 7
-                                                  downto
-                                                  ((DATA_WIDTH/8-sel_aux+i) mod (DATA_WIDTH/8))*8
-                                              );
+            sel_blk := ((BLOCKS-sel_aux+i) mod BLOCKS);
+
+            DATA_OUT((i+1)*BLOCK_WIDTH-1 downto i*BLOCK_WIDTH) <= DATA_IN((sel_blk+1)*BLOCK_WIDTH-1 downto sel_blk*BLOCK_WIDTH);
         end process;
     end generate;
 
