@@ -32,9 +32,10 @@ architecture FULL of PRIORITY_ENC is
 
 begin
 
-    barrel_bit_rotator_right_i : entity work.BARREL_BIT_SHIFTER(barrel_bit_shifter_arch)
+    barrel_bit_rotator_right_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        DATA_WIDTH => DATA_WIDTH,
+        BLOCKS     => DATA_WIDTH,
+        BLOCK_SIZE => 1,
         SHIFT_LEFT => false
     )
     port map (
@@ -52,9 +53,10 @@ begin
         DO => s_priority_r
     );
 
-    barrel_bit_rotator_left_i : entity work.BARREL_BIT_SHIFTER(barrel_bit_shifter_arch)
+    barrel_bit_rotator_left_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        DATA_WIDTH => DATA_WIDTH,
+        BLOCKS     => DATA_WIDTH,
+        BLOCK_SIZE => 1,
         SHIFT_LEFT => true
     )
     port map (
