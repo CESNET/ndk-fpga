@@ -1,11 +1,8 @@
 -- mux.vhd: Generic multiplexer
--- Copyright (C) 2006 CESNET
--- Author(s): Martin Kosek <kosek@liberouter.org>
+-- Copyright (C) 2026 CESNET
+-- Author(s): Radek Iša <isa@cesnet.cz>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
---
--- $Id$
---
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -32,24 +29,27 @@ end entity;
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 architecture FULL of GEN_MUX is
-    constant MUX_WIDTH_EXT : integer := 2**max(log2(MUX_WIDTH),1);
-
-    signal slv_array_data_in     : slv_array_t(0 to MUX_WIDTH-1)(DATA_WIDTH-1 downto 0);
-    signal slv_array_data_in_ext : slv_array_t(0 to MUX_WIDTH_EXT-1)(DATA_WIDTH-1 downto 0) :=
-          (others => (others => 'X'));
+    signal data_in_tmp    : unsigned(DATA_WIDTH*MUX_WIDTH-1 downto 0);
+    signal data_out_tmp   : unsigned(DATA_WIDTH*MUX_WIDTH-1 downto 0);
+    signal sel_int        : integer range 0 to MUX_WIDTH-1; -- Don't change it. It would requires more resources.
 begin
 
-    slv_array_data_in <= slv_array_to_deser(DATA_IN, MUX_WIDTH, DATA_WIDTH);
-    slv_array_data_in_extg: for i in 0 to MUX_WIDTH-1 generate
-        slv_array_data_in_ext(i) <= slv_array_data_in(i);
+    assert MUX_WIDTH > 0
+        report "NUMBER OF MUX INPUT HAVE TO BE GREATER THAT ZERO. PLEASE MODIFY YOUR CODE."
+        severity failure;
+
+    data_in_tmp <= unsigned(DATA_IN);
+
+    sel_int_gen : if (MUX_WIDTH > 1) generate
+        sel_int <= to_integer(unsigned(SEL)) when unsigned(SEL) < MUX_WIDTH else
+                   to_integer(unsigned'(log2(MUX_WIDTH)-1 downto 0 => 'X'));
+    else generate
+        sel_int <= 0;
     end generate;
 
-    gen_muxg: if MUX_WIDTH /= 1 generate
-        DATA_OUT <= slv_array_data_in_ext(to_integer(unsigned(SEL)));
-    end generate;
+    -- Select item by rottation on start
+    data_out_tmp <= IEEE.numeric_std.shift_right(data_in_tmp, sel_int*DATA_WIDTH);
+    DATA_OUT     <= std_logic_vector(data_out_tmp(DATA_WIDTH-1 downto 0));
 
-    fake_gen_muxg: if MUX_WIDTH = 1 generate
-        DATA_OUT <= slv_array_data_in_ext(0);
-    end generate;
 end architecture;
 
