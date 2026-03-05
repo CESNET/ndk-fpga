@@ -36,6 +36,7 @@ Components using the MFB bus are typically located in the ``comp/mfb_tools/`` di
    comp/mfb_tools/flow/transformer/readme
    comp/mfb_tools/logic/auxiliary_signals/readme
    comp/mfb_tools/logic/checksum_calculator/readme
+   comp/mfb_tools/logic/checksum_l3l4/readme
    comp/mfb_tools/logic/crossbarx_stream/readme
    comp/mfb_tools/storage/asfifox/readme
    comp/mfb_tools/storage/crossbarx_output_buffer/readme
