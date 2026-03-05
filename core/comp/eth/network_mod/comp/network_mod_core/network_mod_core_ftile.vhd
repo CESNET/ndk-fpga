@@ -314,6 +314,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (0),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (0),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(0),
                 RESET_ETH                => RESET_ETH,
 
@@ -366,6 +367,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -418,6 +420,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -471,6 +474,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -522,6 +526,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -573,6 +578,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -624,6 +630,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -676,6 +683,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -729,6 +737,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
@@ -781,6 +790,7 @@ begin
                 TX_MACSI_ADAPT_VALID     => ftile_tx_adapt_valid    (i),
                 TX_MACSI_MAC_READY       => ftile_tx_mac_ready      (i),
 
+                CLK_ETH_IN               => ftile_clk_out,
                 CLK_ETH_OUT              => ftile_clk_out_vec(i),
                 RESET_ETH                => RESET_ETH,
 
