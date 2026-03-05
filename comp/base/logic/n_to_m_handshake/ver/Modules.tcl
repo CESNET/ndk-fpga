@@ -9,7 +9,7 @@ set PKG_BASE      "$OFM_PATH/comp/base/pkg"
 set VER_PKG_BASE  "$OFM_PATH/comp/ver/vhdl_ver_tools/basics"
 
 set COMPONENTS [list \
-    [ list "DUT"          ".."             "FULL"] \
+    [ list "DUT"          "$ENTITY_BASE/.."             "FULL"] \
 ]
 
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"

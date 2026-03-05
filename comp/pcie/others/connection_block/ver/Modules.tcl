@@ -4,10 +4,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-set COMPONENTS [ list \
-    [list "MFB_VER"  "$OFM_PATH/comp/mfb_tools/ver_uvm"   "FULL"]\
-    [list "AVST_VER" "$FIRMWARE_BASE/comp/avst_tools/ver_uvm"  "FULL"]\
-]
+# FIXME
+#lappend COMPONENTS [list "MFB_VER"  "$OFM_PATH/comp/mfb_tools/ver_uvm"   "FULL"]
+#lappend COMPONENTS [list "AVST_VER" "$FIRMWARE_BASE/comp/avst_tools/ver_uvm"  "FULL"]
 
 lappend MOD "$ENTITY_BASE/tbench/dut.sv"
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"

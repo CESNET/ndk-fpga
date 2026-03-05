@@ -10,11 +10,10 @@ set SV_MFB_BASE "$OFM_PATH/comp/mfb_tools/ver"
 set SV_MVB_BASE "$OFM_PATH/comp/mvb_tools/ver"
 set SV_DMA_BASE "$COMP_BASE/dma/ver"
 
-set COMPONENTS [list \
-   [ list "SV_MFB" $SV_MFB_BASE "FULL"] \
-   [ list "SV_MVB" $SV_MVB_BASE "FULL"] \
-   [ list "SV_DMA" $SV_DMA_BASE "FULL"] \
-]
+lappend COMPONENTS [ list "SV_MFB" $SV_MFB_BASE "FULL"]
+lappend COMPONENTS [ list "SV_MVB" $SV_MVB_BASE "FULL"]
+# FIXME
+#lappend COMPONENTS [ list "SV_DMA" $SV_DMA_BASE "FULL"]
 
 set MOD "$MOD $ENTITY_BASE/tbench/test_pkg.sv"
 set MOD "$MOD $ENTITY_BASE/tbench/dut.sv"

@@ -14,13 +14,13 @@ set SV_MI32_TOOLS_BASE "$OFM_PATH/comp/mi_tools/ver"
 set PACKAGES           "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES           "$PACKAGES $PKG_BASE/type_pack.vhd"
 
-set COMPONENTS [list \
-   [ list "MFB2LBUS" $MFB2LBUS_BASE      "FULL"] \
-   [ list "SV_BASE"  $SV_BASE            "FULL"] \
-   [ list "SV_LBUS"  $SV_LBUS_BASE       "FULL"] \
-   [ list "SV_FLU"   $SV_FLU_BASE        "FULL"] \
-   [ list "SV_MI32"  $SV_MI32_TOOLS_BASE "FULL"] \
-]
+# FIXME
+#lappend COMPONENTS [list "MFB2LBUS" $MFB2LBUS_BASE      "FULL"]
+lappend COMPONENTS [list "SV_BASE"  $SV_BASE            "FULL"]
+# FIXME
+#lappend COMPONENTS [list "SV_LBUS"  $SV_LBUS_BASE       "FULL"]
+lappend COMPONENTS [list "SV_FLU"   $SV_FLU_BASE        "FULL"]
+lappend COMPONENTS [list "SV_MI32"  $SV_MI32_TOOLS_BASE "FULL"]
 
 set MOD "$MOD $ENTITY_BASE/tbench/dut_wrapper.vhd"
 set MOD "$MOD $ENTITY_BASE/tbench/test_pkg.sv"

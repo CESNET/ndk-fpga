@@ -8,13 +8,11 @@
 # -----------------------------------------------------------------------------
 
 
-  set MI_SIM_BASE "$ENTITY_BASE/.."
-  set MEMORY_BASE "$OFM_PATH/comp/base/mem/sp_distmem"
+set MI_SIM_BASE "$ENTITY_BASE/.."
+set MEMORY_BASE "$OFM_PATH/comp/base/mem/sp_distmem"
 
-  set COMPONENTS [list \
-      [list "MEMORY"    $MEMORY_BASE     "FULL"] \
-      [list "MI_SIM"    $MI_SIM_BASE     "FULL"] \
-  ]
+# FIXME
+#lappend COMPONENTS [list "MEMORY"    $MEMORY_BASE     "FULL"]
+lappend COMPONENTS [list "MI_SIM"    $MI_SIM_BASE     "FULL"]
 
-  set MOD "$MOD $ENTITY_BASE/testbench.vhd"
-
+set MOD "$MOD $ENTITY_BASE/testbench.vhd"
