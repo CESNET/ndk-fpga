@@ -21,9 +21,9 @@ if { $ARCHGRP == "FULL" } {
       [list "PKG_TYPE"    $PKG_BASE   "TYPE"]   \
    ]
 
+   set MOD "$MOD $ENTITY_BASE/barrel_shifter_gen.vhd"
    set MOD "$MOD $ENTITY_BASE/barrel_bit_rotator.vhd"
    set MOD "$MOD $ENTITY_BASE/barrel_shifter.vhd"
-   set MOD "$MOD $ENTITY_BASE/barrel_shifter_gen.vhd"
    set MOD "$MOD $ENTITY_BASE/barrel_shifter_gen_piped.vhd"
 
 }
