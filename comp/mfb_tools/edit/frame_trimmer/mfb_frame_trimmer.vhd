@@ -155,7 +155,10 @@ begin
     -- PACKET PREPARE
     -- -------------------------------------------------------------------------
 
-    s_rx_sof_pos <= slv_array_deser(RX_SOF_POS, REGIONS);
+    spw_g: if (SOF_POS_WIDTH > 1) generate
+        s_rx_sof_pos <= slv_array_deser(RX_SOF_POS, REGIONS);
+    end generate;
+
     s_rx_eof_pos <= slv_array_deser(RX_EOF_POS, REGIONS);
     s_rx_new_len <= slv_array_deser(RX_TRIM_LEN, REGIONS);
 
@@ -180,10 +183,16 @@ begin
     end process;
 
     new_len_g : for r in 0 to REGIONS-1 generate
-        s_rx_sof_pos_ext(r) <= unsigned(s_rx_sof_pos(r)) & to_unsigned(0,log2(BLOCK_SIZE));
         s_rx_eof_pos_blk(r) <= s_rx_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE));
 
-        s_rx_sof_after_eof(r)      <= '1' when (unsigned(s_rx_sof_pos(r)) > unsigned(s_rx_eof_pos_blk(r))) else '0';
+        spw_g: if (SOF_POS_WIDTH > 1) generate
+            s_rx_sof_pos_ext(r)   <= unsigned(s_rx_sof_pos(r)) & to_unsigned(0,log2(BLOCK_SIZE));
+            s_rx_sof_after_eof(r) <= '1' when (unsigned(s_rx_sof_pos(r)) > unsigned(s_rx_eof_pos_blk(r))) else '0';
+        else generate
+            s_rx_sof_pos_ext(r)   <= to_unsigned(0,log2(BLOCK_SIZE));
+            s_rx_sof_after_eof(r) <= '0';
+        end generate;
+
         s_rx_sof_after_eof_vld(r)  <= s_rx_sof_after_eof(r) and RX_SOF(r) and RX_EOF(r);
         s_rx_sof_before_eof_vld(r) <= not s_rx_sof_after_eof(r) and RX_SOF(r) and RX_EOF(r);
 

@@ -14,6 +14,18 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU, 
     logic [REGIONS*$clog2(PKT_MTU+1)-1 : 0] mfb_rx_trim_len;
     logic [REGIONS                  -1 : 0] mfb_rx_trim_en;
     logic [REGIONS*META_WIDTH       -1 : 0] mfb_rx_meta;
+    logic [((REGION_SIZE != 1) ? REGIONS*$clog2(REGION_SIZE) : REGIONS)-1 : 0] mfb_rx_sof_pos;
+    logic [((REGION_SIZE != 1) ? REGIONS*$clog2(REGION_SIZE) : REGIONS)-1 : 0] mfb_tx_sof_pos;
+
+    generate
+        if (REGION_SIZE != 1) begin
+            assign mfb_rx_sof_pos = mfb_rx.SOF_POS;
+            assign mfb_tx.SOF_POS = mfb_tx_sof_pos;
+        end else begin
+            assign mfb_rx_sof_pos = '0;
+            assign mfb_tx.SOF_POS = '0;
+        end
+    endgenerate
 
     MFB_FRAME_TRIMMER  #(
         .REGIONS     (REGIONS),
@@ -32,7 +44,7 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU, 
 
         .RX_DATA    (mfb_rx.DATA),
         .RX_META    (mfb_rx_meta),
-        .RX_SOF_POS (mfb_rx.SOF_POS),
+        .RX_SOF_POS (mfb_rx_sof_pos),
         .RX_EOF_POS (mfb_rx.EOF_POS),
         .RX_SOF     (mfb_rx.SOF),
         .RX_EOF     (mfb_rx.EOF),
@@ -42,7 +54,7 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU, 
 
         .TX_DATA    (mfb_tx.DATA),
         .TX_META    (mfb_tx.META),
-        .TX_SOF_POS (mfb_tx.SOF_POS),
+        .TX_SOF_POS (mfb_tx_sof_pos),
         .TX_EOF_POS (mfb_tx.EOF_POS),
         .TX_SOF     (mfb_tx.SOF),
         .TX_EOF     (mfb_tx.EOF),
