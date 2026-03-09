@@ -69,6 +69,8 @@ entity NETWORK_MOD_LOGIC is
         RESET_CORE_WIDTH  : natural := ETH_PORT_CHAN * (1           + 1          );
         -- Resize Buffer feature of RX_MAC_LITE.
         RESIZE_BUFFER     : boolean := True;
+        -- Resize Full feature of RX_MAC_LITE.
+        RESIZE_FULL       : boolean := False;
         -- Select FPGA device.
         DEVICE            : string := "STRATIX10";    -- AGILEX, STRATIX10, ULTRASCALE
         -- Select target board. Unused, only for back-compatibility.
@@ -454,6 +456,7 @@ begin
                 TX_BLOCK_SIZE   => BLOCK_SIZE,
                 TX_ITEM_WIDTH   => ITEM_WIDTH,
                 RESIZE_BUFFER   => RESIZE_BUFFER,
+                RESIZE_FULL     => RESIZE_FULL,
                 NETWORK_PORT_ID => ETH_PORT_ID*ETH_PORT_CHAN+ch, -- no support different number of channels for each port
                 PKT_MTU_BYTES   => ETH_PORT_RX_MTU,
                 CRC_IS_RECEIVED => USE_FULL_MAC,
@@ -533,18 +536,19 @@ begin
         -- Merge all ETH_CHANNELS into one ETH_STREAM from each RX MAC Lite
         mfb_merger_tree_i : entity work.MFB_MERGER_GEN
         generic map (
-            MERGER_INPUTS   => ETH_PORT_CHAN,
-            MVB_ITEMS       => USER_REGIONS,
-            MVB_ITEM_WIDTH  => ETH_RX_HDR_WIDTH,
-            MFB_REGIONS     => USER_REGIONS,
-            MFB_REG_SIZE    => USER_REGION_SIZE,
-            MFB_BLOCK_SIZE  => BLOCK_SIZE,
-            MFB_ITEM_WIDTH  => ITEM_WIDTH,
-            INPUT_FIFO_SIZE => 8,
-            RX_PAYLOAD_EN   => (others => true),
-            IN_PIPE_EN      => not LL_MODE,
-            OUT_PIPE_EN     => not LL_MODE,
-            DEVICE          => DEVICE
+            MERGER_INPUTS    => ETH_PORT_CHAN,
+            MVB_ITEMS        => USER_REGIONS,
+            MVB_ITEM_WIDTH   => ETH_RX_HDR_WIDTH,
+            MFB_REGIONS      => USER_REGIONS,
+            MFB_REG_SIZE     => USER_REGION_SIZE,
+            MFB_BLOCK_SIZE   => BLOCK_SIZE,
+            MFB_ITEM_WIDTH   => ITEM_WIDTH,
+            INPUT_FIFO_SIZE  => 512,
+            MID_MFB_FIFOS_EN => not LL_MODE,
+            RX_PAYLOAD_EN    => (others => true),
+            IN_PIPE_EN       => not LL_MODE,
+            OUT_PIPE_EN      => not LL_MODE,
+            DEVICE           => DEVICE
         )
         port map (
             CLK             => CLK_USER,

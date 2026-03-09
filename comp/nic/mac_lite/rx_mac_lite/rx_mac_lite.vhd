@@ -45,11 +45,14 @@ entity RX_MAC_LITE is
         -- TX MFB: width of one item in bits, by default same as RX
         TX_ITEM_WIDTH   : natural := RX_ITEM_WIDTH;
 
-        -- If true, the MFB bus doubles data width (number of regions) before
-        -- the packet buffer (on RX_CLK). RESIZE_BUFFER feature is allowed only
-        -- when the MFB bus increases (TX MFB width >= 2x RX MFB width) and the
-        -- following conditions must apply: RX_BLOCK_SIZE=TX_BLOCK_SIZE, RX_ITEM_WIDTH=TX_ITEM_WIDTH
+        -- If true, the MFB bus resize data width before the packet buffer (on
+        -- RX_CLK). See also RESIZE_FULL for additional settings.
         RESIZE_BUFFER   : boolean := false;
+        -- This parameter is active only if RESIZE_BUFFER=True. If is set to True,
+        -- the bus before the buffer will be resized directly to the TX parameters,
+        -- otherwise only the number of regions will be doubled to 2*RX_REGIONS.
+        -- If True, packets smaller than 60B must not be sent to the RX input.
+        RESIZE_FULL     : boolean := false;
 
         -- =====================================================================
         -- OTHERS CONFIGURATION:
@@ -211,10 +214,16 @@ architecture FULL of RX_MAC_LITE is
     -- MFB configuration for packet buffer and next modules
     -- =====================================================================
 
-    constant BF_REGIONS               : natural := tsel(RESIZE_BUFFER,2*RX_REGIONS,RX_REGIONS);
-    constant BF_REGION_SIZE           : natural := RX_REGION_SIZE;
-    constant BF_BLOCK_SIZE            : natural := RX_BLOCK_SIZE;
-    constant BF_ITEM_WIDTH            : natural := RX_ITEM_WIDTH;
+    -- select resize values to 2x regions or to TX parameters
+    constant RS_REGIONS               : natural := tsel(RESIZE_FULL, TX_REGIONS, 2*RX_REGIONS);
+    constant RS_REGION_SIZE           : natural := tsel(RESIZE_FULL, TX_REGION_SIZE, RX_REGION_SIZE);
+    constant RS_BLOCK_SIZE            : natural := tsel(RESIZE_FULL, TX_BLOCK_SIZE, RX_BLOCK_SIZE);
+    constant RS_ITEM_WIDTH            : natural := tsel(RESIZE_FULL, TX_ITEM_WIDTH, RX_ITEM_WIDTH);
+    -- enable resize before buffer
+    constant BF_REGIONS               : natural := tsel(RESIZE_BUFFER, RS_REGIONS, RX_REGIONS);
+    constant BF_REGION_SIZE           : natural := tsel(RESIZE_BUFFER, RS_REGION_SIZE, RX_REGION_SIZE);
+    constant BF_BLOCK_SIZE            : natural := tsel(RESIZE_BUFFER, RS_BLOCK_SIZE, RX_BLOCK_SIZE);
+    constant BF_ITEM_WIDTH            : natural := tsel(RESIZE_BUFFER, RS_ITEM_WIDTH, RX_ITEM_WIDTH);
 
     -- =====================================================================
     -- Helper MFB constants
@@ -415,6 +424,10 @@ architecture FULL of RX_MAC_LITE is
     signal s_cam_write_addr           : std_logic_vector(log2(MAC_COUNT)-1 downto 0);
     signal s_cam_write_en             : std_logic;
     signal s_cam_write_rdy            : std_logic;
+
+    signal s_dbg_sync_pkt_cnt         : unsigned(64-1 downto 0);
+    signal s_dbg_bfin_pkt_cnt         : unsigned(64-1 downto 0);
+    signal s_dbg_buf_pkt_cnt          : unsigned(64-1 downto 0);
 
 begin
 
@@ -835,9 +848,10 @@ begin
         TX_BLOCK_SIZE         => BF_BLOCK_SIZE,
         TX_ITEM_WIDTH         => BF_ITEM_WIDTH,
         META_WIDTH            => ETH_RX_HDR_WIDTH,
+        META_MODE             => 1, -- metadata aligned to EOF
         FIFO_SIZE             => 32,
-        FRAMES_OVER_TX_BLOCK  => 0,
-        FRAMES_OVER_TX_REGION => 0,
+        FRAMES_OVER_TX_BLOCK  => 1,
+        FRAMES_OVER_TX_REGION => 1,
         DEVICE                => DEVICE
     )
     port map (
@@ -1194,5 +1208,55 @@ begin
         STAT_HIST_4096_8191     => s_stat_out_hist_4096_8191,
         STAT_HIST_OVER_8191     => s_stat_out_hist_over_8191
     );
+
+    -- pragma synthesis_off
+    process (RX_CLK)
+        variable dbg_pkt_cnt_v : unsigned(63 downto 0);
+    begin
+        dbg_pkt_cnt_v := (others => '0');
+        if (rising_edge(RX_CLK)) then
+            if (RX_RESET = '1') then
+                s_dbg_sync_pkt_cnt <= (others => '0');
+            elsif (s_sync_src_rdy = '1' and s_sync_dst_rdy_dbg = '1') then
+                for i in 0 to RX_REGIONS-1 loop
+                    dbg_pkt_cnt_v := dbg_pkt_cnt_v + s_sync_sof(i);
+                end loop;
+                s_dbg_sync_pkt_cnt <= s_dbg_sync_pkt_cnt + dbg_pkt_cnt_v;
+            end if;
+        end if;
+    end process;
+
+    process (RX_CLK)
+        variable dbg_pkt_cnt_v : unsigned(63 downto 0);
+    begin
+        dbg_pkt_cnt_v := (others => '0');
+        if (rising_edge(RX_CLK)) then
+            if (RX_RESET = '1') then
+                s_dbg_bfin_pkt_cnt <= (others => '0');
+            elsif (s_bfin_src_rdy = '1') then
+                for i in 0 to BF_REGIONS-1 loop
+                    dbg_pkt_cnt_v := dbg_pkt_cnt_v + s_bfin_sof(i);
+                end loop;
+                s_dbg_bfin_pkt_cnt <= s_dbg_bfin_pkt_cnt + dbg_pkt_cnt_v;
+            end if;
+        end if;
+    end process;
+
+    process (TX_CLK)
+        variable dbg_pkt_cnt_v : unsigned(63 downto 0);
+    begin
+        dbg_pkt_cnt_v := (others => '0');
+        if (rising_edge(TX_CLK)) then
+            if (TX_RESET = '1') then
+                s_dbg_buf_pkt_cnt <= (others => '0');
+            elsif (s_buf_mfb_src_rdy = '1' and s_buf_mfb_dst_rdy = '1') then
+                for i in 0 to TX_REGIONS-1 loop
+                    dbg_pkt_cnt_v := dbg_pkt_cnt_v + s_buf_mfb_sof(i);
+                end loop;
+                s_dbg_buf_pkt_cnt <= s_dbg_buf_pkt_cnt + dbg_pkt_cnt_v;
+            end if;
+        end if;
+    end process;
+    -- pragma synthesis_on
 
 end architecture;
