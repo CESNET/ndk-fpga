@@ -4,11 +4,8 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class drop_cbs #(string ETH_CORE_ARCH, int unsigned ETH_PORT_SPEED) extends uvm_event_callback;
-    `uvm_object_param_utils(uvm_network_mod_env::drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED))
-
-    localparam int unsigned REGIONS_CORE = (ETH_PORT_SPEED == 400) ? 2 : 1;
-    localparam int unsigned RESIZED_REGIONS = (ETH_CORE_ARCH == "F_TILE") ? 2*REGIONS_CORE : REGIONS_CORE;
+class drop_cbs #(string ETH_CORE_ARCH, int unsigned ETH_PORT_SPEED, REGIONS) extends uvm_event_callback;
+    `uvm_object_param_utils(uvm_network_mod_env::drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED, REGIONS))
 
     logic queue[$];
 
@@ -27,14 +24,14 @@ class drop_cbs #(string ETH_CORE_ARCH, int unsigned ETH_PORT_SPEED) extends uvm_
     // post trigger method
     //---------------------------------------
     virtual function void post_trigger(uvm_event e, uvm_object data);
-        uvm_probe::data#(2*RESIZED_REGIONS) c_data;
-        logic [RESIZED_REGIONS-1:0] pkt_eof;
-        logic [RESIZED_REGIONS-1:0] pkt_drop;
+        uvm_probe::data#(2*REGIONS) c_data;
+        logic [REGIONS-1:0] pkt_eof;
+        logic [REGIONS-1:0] pkt_drop;
 
         $cast(c_data, data);
         {pkt_eof, pkt_drop} = c_data.data;
 
-        for (int unsigned it = 0; it < RESIZED_REGIONS; it++) begin
+        for (int unsigned it = 0; it < REGIONS; it++) begin
             if (pkt_eof[it] == 1) begin
                 queue.push_back(pkt_drop[it]);
             end
@@ -64,7 +61,7 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
     uvm_analysis_port    #(uvm_logic_vector::sequence_item#(ETH_RX_HDR_WIDTH)) usr_tx_hdr[ETH_PORTS];
 
     //SYNCHRONIZATION
-    protected drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED[0]) drop_sync[ETH_PORTS][];
+    protected drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED[0], REGIONS) drop_sync[ETH_PORTS][];
 
     protected int unsigned eth_recv[ETH_PORTS];
     protected int unsigned eth_drop[ETH_PORTS];
@@ -107,7 +104,7 @@ class model #(string ETH_CORE_ARCH, int unsigned ETH_PORTS, int unsigned ETH_POR
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             drop_sync[it] = new[ETH_PORT_CHAN[it]];
             for (int unsigned jt = 0; jt < ETH_PORT_CHAN[it]; jt++) begin
-               drop_sync[it][jt] = drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED[0])::type_id::create("drop_sync", this);
+               drop_sync[it][jt] = drop_cbs #(ETH_CORE_ARCH, ETH_PORT_SPEED[0], REGIONS)::type_id::create("drop_sync", this);
             end
         end
     endfunction
