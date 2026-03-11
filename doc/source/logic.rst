@@ -51,7 +51,7 @@ There is also a variant with an enable signal and a variant with a reverse codin
 
 **LFSR_SIMPLE_RANDOM_GEN** - Simple LFSR pseudo-random generator uses Fibonacci implementation of LFSR with XNOR gate.
 
-**MOD** - Behavioral implementation of generic modulo constant block. TODO
+**MOD** - Behavioral implementation of generic modulo constant block. Computes VALUE mod MODULO, where MODULO is a generic constant. Optimized for power-of-2 modulo values (simple bit truncation).
 
 **MODULO_LOOKUP** - Behavioral implementation of Modulo look-up table in ROM. Optimized for Xilinx FPGAs only.
 
