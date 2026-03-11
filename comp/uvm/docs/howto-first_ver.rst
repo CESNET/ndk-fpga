@@ -26,7 +26,7 @@ The aim of this document is to describe how to write a simple UVM verification
 Dummy Verification
 ==================
 
-In this example, we create a simplified verification for component `FIFOX <https://github.com/CESNET/ofm/tree/main/comp/base/fifo/fifox>`_
+In this example, we create a simplified verification for component `FIFOX <https://github.com/CESNET/ndk-fpga/tree/devel/comp/base/fifo/fifox>`_
 Let's start with dummy verification environment that does nothing. This prepares verification for
 next steps. Other components to drive DUT (Design Under Test — the verified VHDL component) interfaces will be added later.
 The dummy verification environment will look like this picture. There are a few components which will be extended later.
