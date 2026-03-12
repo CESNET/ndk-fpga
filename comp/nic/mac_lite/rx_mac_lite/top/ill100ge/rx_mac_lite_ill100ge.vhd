@@ -135,14 +135,15 @@ end entity;
 
 architecture FULL of RX_MAC_LITE_ILL100GE is
 
-    signal adp_mfb_data    : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    signal adp_mfb_sof_pos : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-    signal adp_mfb_eof_pos : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    signal adp_mfb_sof     : std_logic_vector(REGIONS-1 downto 0);
-    signal adp_mfb_eof     : std_logic_vector(REGIONS-1 downto 0);
-    signal adp_mfb_error   : std_logic_vector(REGIONS-1 downto 0);
-    signal adp_mfb_src_rdy : std_logic;
-    signal adp_link_up     : std_logic;
+    signal adp_mfb_data      : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal adp_mfb_sof_pos   : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
+    signal adp_mfb_eof_pos   : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
+    signal adp_mfb_sof       : std_logic_vector(REGIONS-1 downto 0);
+    signal adp_mfb_eof       : std_logic_vector(REGIONS-1 downto 0);
+    signal adp_mfb_error     : std_logic_vector(REGIONS-1 downto 0);
+    signal adp_mfb_mii_error : std_logic_vector(REGIONS-1 downto 0);
+    signal adp_mfb_src_rdy   : std_logic;
+    signal adp_link_up       : std_logic;
 
 begin
 
@@ -152,26 +153,27 @@ begin
         DATA_WIDTH => REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH
     )
     port map (
-        CLK              => RX_CLK,
-        RESET            => RX_RESET,
+        CLK               => RX_CLK,
+        RESET             => RX_RESET,
 
-        IN_AVST_DATA     => RX_AVST_DATA,
-        IN_AVST_SOP      => RX_AVST_SOP,
-        IN_AVST_EOP      => RX_AVST_EOP,
-        IN_AVST_EMPTY    => RX_AVST_EMPTY,
-        IN_AVST_ERROR    => RX_AVST_ERROR,
-        IN_AVST_VALID    => RX_AVST_VALID,
-        IN_RX_PCS_READY  => RX_PCS_READY,
-        IN_RX_BLOCK_LOCK => RX_BLOCK_LOCK,
-        IN_RX_AM_LOCK    => RX_AM_LOCK,
+        IN_AVST_DATA      => RX_AVST_DATA,
+        IN_AVST_SOP       => RX_AVST_SOP,
+        IN_AVST_EOP       => RX_AVST_EOP,
+        IN_AVST_EMPTY     => RX_AVST_EMPTY,
+        IN_AVST_ERROR     => RX_AVST_ERROR,
+        IN_AVST_VALID     => RX_AVST_VALID,
+        IN_RX_PCS_READY   => RX_PCS_READY,
+        IN_RX_BLOCK_LOCK  => RX_BLOCK_LOCK,
+        IN_RX_AM_LOCK     => RX_AM_LOCK,
 
-        OUT_MFB_DATA     => adp_mfb_data,
-        OUT_MFB_EOF_POS  => adp_mfb_eof_pos,
-        OUT_MFB_SOF      => adp_mfb_sof,
-        OUT_MFB_EOF      => adp_mfb_eof,
-        OUT_MFB_ERROR    => adp_mfb_error,
-        OUT_MFB_SRC_RDY  => adp_mfb_src_rdy,
-        OUT_LINK_UP      => adp_link_up
+        OUT_MFB_DATA      => adp_mfb_data,
+        OUT_MFB_EOF_POS   => adp_mfb_eof_pos,
+        OUT_MFB_SOF       => adp_mfb_sof,
+        OUT_MFB_EOF       => adp_mfb_eof,
+        OUT_MFB_ERROR     => adp_mfb_error,
+        OUT_MFB_MII_ERROR => adp_mfb_mii_error,
+        OUT_MFB_SRC_RDY   => adp_mfb_src_rdy,
+        OUT_LINK_UP       => adp_link_up
     );
 
     rx_mac_lite_i : entity work.RX_MAC_LITE
@@ -202,6 +204,7 @@ begin
         RX_MFB_SOF      => adp_mfb_sof,
         RX_MFB_EOF      => adp_mfb_eof,
         RX_MFB_CRC_ERR  => adp_mfb_error,
+        RX_MFB_MII_ERR  => adp_mfb_mii_error,
         RX_MFB_SRC_RDY  => adp_mfb_src_rdy,
 
         ADAPTER_LINK_UP => adp_link_up,
