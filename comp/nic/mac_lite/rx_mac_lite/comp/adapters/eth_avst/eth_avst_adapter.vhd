@@ -4,6 +4,15 @@
 --            Daniel Kondys <xkondy00@vutbr.cz>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
+-- Note:
+--
+-- AVST_ERROR bits:
+--   [0] malformed packet -> MII error.
+--   [1] FCS error
+--   [2] undersized frame
+--   [3] oversized frame
+--   [4] payload length error (based on Length/Type field),
+--   [5] reserved
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -22,28 +31,29 @@ entity ETH_AVST_ADAPTER is
     );
     port (
         -- CLOCK AND RESET
-        CLK              : in  std_logic;
-        RESET            : in  std_logic;
+        CLK               : in  std_logic;
+        RESET             : in  std_logic;
         -- INPUT AVST INTERFACE (Intel Ethernet IP cores)
-        IN_AVST_DATA     : in  std_logic_vector(DATA_WIDTH-1 downto 0);
-        IN_AVST_SOP      : in  std_logic;
-        IN_AVST_EOP      : in  std_logic;
-        IN_AVST_EMPTY    : in  std_logic_vector(max(1,log2(DATA_WIDTH/8))-1 downto 0);
-        IN_AVST_ERROR    : in  std_logic_vector(6-1 downto 0); -- IN_AVST_ERROR(2) indicates an undersized frame
-        IN_AVST_VALID    : in  std_logic;
-        IN_RX_PCS_READY  : in  std_logic;
-        IN_RX_BLOCK_LOCK : in  std_logic;
-        IN_RX_AM_LOCK    : in  std_logic;
+        IN_AVST_DATA      : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+        IN_AVST_SOP       : in  std_logic;
+        IN_AVST_EOP       : in  std_logic;
+        IN_AVST_EMPTY     : in  std_logic_vector(max(1,log2(DATA_WIDTH/8))-1 downto 0);
+        IN_AVST_ERROR     : in  std_logic_vector(6-1 downto 0); -- IN_AVST_ERROR(2) indicates an undersized frame
+        IN_AVST_VALID     : in  std_logic;
+        IN_RX_PCS_READY   : in  std_logic;
+        IN_RX_BLOCK_LOCK  : in  std_logic;
+        IN_RX_AM_LOCK     : in  std_logic;
         -- OUTPUT MFB INTERFACE
         -- (RX MAC LITE, allowed MFB configurations: 1,N,8,8, N=DATA_WIDTH/64)
-        OUT_MFB_DATA     : out std_logic_vector(DATA_WIDTH-1 downto 0);
-        OUT_MFB_SOF      : out std_logic_vector(1-1 downto 0);
-        OUT_MFB_SOF_POS  : out std_logic_vector(max(1,log2(TX_REGION_SIZE))-1 downto 0);
-        OUT_MFB_EOF      : out std_logic_vector(1-1 downto 0);
-        OUT_MFB_EOF_POS  : out std_logic_vector(max(1,log2(TX_REGION_SIZE*8))-1 downto 0);
-        OUT_MFB_ERROR    : out std_logic_vector(1-1 downto 0); -- aligned to EOF
-        OUT_MFB_SRC_RDY  : out std_logic;
-        OUT_LINK_UP      : out std_logic
+        OUT_MFB_DATA      : out std_logic_vector(DATA_WIDTH-1 downto 0);
+        OUT_MFB_SOF       : out std_logic_vector(1-1 downto 0);
+        OUT_MFB_SOF_POS   : out std_logic_vector(max(1,log2(TX_REGION_SIZE))-1 downto 0);
+        OUT_MFB_EOF       : out std_logic_vector(1-1 downto 0);
+        OUT_MFB_EOF_POS   : out std_logic_vector(max(1,log2(TX_REGION_SIZE*8))-1 downto 0);
+        OUT_MFB_ERROR     : out std_logic_vector(1-1 downto 0); -- aligned to EOF
+        OUT_MFB_MII_ERROR : out std_logic_vector(1-1 downto 0); -- aligned to EOF
+        OUT_MFB_SRC_RDY   : out std_logic;
+        OUT_LINK_UP       : out std_logic
     );
 end entity;
 
@@ -66,7 +76,9 @@ architecture FULL of ETH_AVST_ADAPTER is
     signal in_avst_eop_reg          : std_logic;
     signal last_valid_item_reg      : std_logic_vector(max(1,log2(DATA_BYTES))-1 downto 0);
     signal in_avst_error_reg        : std_logic_vector(6-1 downto 0);
+    signal in_avst_mii_error_reg    : std_logic;
     signal in_avst_valid_reg        : std_logic;
+    signal in_frame_reg             : std_logic;
 
 begin
 
@@ -99,6 +111,28 @@ begin
         end if;
     end process;
 
+    -- Contrary to the documentation, the AVST_ERROR[0] flag (malformed packet) can be set at
+    -- any time during packet reception. Therefore, the in_avst_mii_error_reg is implemented
+    -- as set-reset flip-flop storing the event until EOP
+    in_mii_err_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if ((IN_AVST_VALID = '1') and (IN_AVST_SOP = '1')) then
+                in_frame_reg  <= '1';
+            elsif ((IN_AVST_VALID = '1') and (IN_AVST_EOP = '1')) then
+                in_frame_reg  <= '0';
+            end if;
+            if ((IN_AVST_VALID = '1') and ((in_frame_reg = '1') or (IN_AVST_SOP = '1'))) then
+                in_avst_mii_error_reg <= in_avst_mii_error_reg or IN_AVST_ERROR(0);
+            elsif ((in_avst_eop_reg = '1') and (in_avst_valid_reg = '1')) then
+                in_avst_mii_error_reg <= '0';
+            end if;
+            if (RESET = '1') then
+                in_avst_mii_error_reg <= '0';
+            end if;
+        end if;
+    end process;
+
     in_reg_vld_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
@@ -115,13 +149,14 @@ begin
     shakedown_g: if ((DATA_WIDTH /= 512) or (SIMPLE_MODE_EN)) generate
 
         --  Shakedown not needed for bus width = 64
-        OUT_MFB_DATA     <= in_avst_data_rotated_reg;
-        OUT_MFB_SOF(0)   <= in_avst_sop_reg;
-        OUT_MFB_SOF_POS  <= (others => '0');
-        OUT_MFB_EOF(0)   <= in_avst_eop_reg;
-        OUT_MFB_EOF_POS  <= last_valid_item_reg;
-        OUT_MFB_ERROR(0) <= or in_avst_error_reg;
-        OUT_MFB_SRC_RDY  <= in_avst_valid_reg;
+        OUT_MFB_DATA         <= in_avst_data_rotated_reg;
+        OUT_MFB_SOF(0)       <= in_avst_sop_reg;
+        OUT_MFB_SOF_POS      <= (others => '0');
+        OUT_MFB_EOF(0)       <= in_avst_eop_reg;
+        OUT_MFB_EOF_POS      <= last_valid_item_reg;
+        OUT_MFB_ERROR(0)     <= or in_avst_error_reg(5 downto 1);
+        OUT_MFB_MII_ERROR(0) <= in_avst_mii_error_reg;
+        OUT_MFB_SRC_RDY      <= in_avst_valid_reg;
 
     else generate
 
@@ -134,21 +169,23 @@ begin
             CLK   => CLK,
             RESET => RESET,
 
-            IN_MFB_DATA       => in_avst_data_rotated_reg,
-            IN_MFB_SOF        => in_avst_sop_reg,
-            IN_MFB_EOF        => in_avst_eop_reg,
-            IN_MFB_EOF_POS    => last_valid_item_reg,
-            IN_MFB_ERROR(0)   => or in_avst_error_reg,
-            IN_MFB_UNDERSIZED => in_avst_error_reg(2),
-            IN_MFB_SRC_RDY    => in_avst_valid_reg,
+            IN_MFB_DATA         => in_avst_data_rotated_reg,
+            IN_MFB_SOF          => in_avst_sop_reg,
+            IN_MFB_EOF          => in_avst_eop_reg,
+            IN_MFB_EOF_POS      => last_valid_item_reg,
+            IN_MFB_ERROR(0)     => or in_avst_error_reg(5 downto 1),
+            IN_MFB_MII_ERROR(0) => in_avst_mii_error_reg,
+            IN_MFB_UNDERSIZED   => in_avst_error_reg(2),
+            IN_MFB_SRC_RDY      => in_avst_valid_reg,
 
-            OUT_MFB_DATA    => OUT_MFB_DATA,
-            OUT_MFB_SOF     => OUT_MFB_SOF,
-            OUT_MFB_SOF_POS => OUT_MFB_SOF_POS,
-            OUT_MFB_EOF     => OUT_MFB_EOF,
-            OUT_MFB_EOF_POS => OUT_MFB_EOF_POS,
-            OUT_MFB_ERROR   => OUT_MFB_ERROR,
-            OUT_MFB_SRC_RDY => OUT_MFB_SRC_RDY
+            OUT_MFB_DATA        => OUT_MFB_DATA,
+            OUT_MFB_SOF         => OUT_MFB_SOF,
+            OUT_MFB_SOF_POS     => OUT_MFB_SOF_POS,
+            OUT_MFB_EOF         => OUT_MFB_EOF,
+            OUT_MFB_EOF_POS     => OUT_MFB_EOF_POS,
+            OUT_MFB_ERROR       => OUT_MFB_ERROR,
+            OUT_MFB_MII_ERROR   => OUT_MFB_MII_ERROR,
+            OUT_MFB_SRC_RDY     => OUT_MFB_SRC_RDY
         );
 
     end generate;
