@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
-    `uvm_component_utils(uvm_logic_vector_array_lbus::monitor_logic_vector_array)
+    `ndk_component_utils(uvm_logic_vector_array_lbus::monitor_logic_vector_array)
 
     localparam int unsigned READY_DEASSERTION_DELAY = 4;
 
@@ -115,7 +115,7 @@ class monitor_logic_vector_array extends uvm_logic_vector_array::monitor #(8);
 endclass
 
 class monitor_logic_vector extends uvm_logic_vector::monitor #(1);
-    `uvm_component_utils(uvm_logic_vector_array_lbus::monitor_logic_vector)
+    `ndk_component_utils(uvm_logic_vector_array_lbus::monitor_logic_vector)
 
     localparam int unsigned READY_DEASSERTION_DELAY = 4;
 

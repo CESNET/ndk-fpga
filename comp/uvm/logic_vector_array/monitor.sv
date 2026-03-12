@@ -13,7 +13,10 @@
 
 class monitor #(int unsigned ITEM_WIDTH) extends uvm_monitor;
 
-    `uvm_component_param_utils(uvm_logic_vector_array::monitor #(ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array::monitor#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::monitor#(%0d)",ITEM_WIDTH)
+    )
 
     // Used to send transactions to all connected components.
     uvm_analysis_port #(sequence_item #(ITEM_WIDTH)) analysis_port;

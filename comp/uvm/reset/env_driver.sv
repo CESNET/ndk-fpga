@@ -10,7 +10,7 @@
 */
 
 class env_driver extends uvm_driver#(sequence_item);
-    `uvm_component_utils(uvm_reset::env_driver);
+    `ndk_component_utils(uvm_reset::env_driver);
 
     int unsigned signal_reset = 1'b0;
     time         delay = 20ns;

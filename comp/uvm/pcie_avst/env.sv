@@ -11,7 +11,10 @@ class env_rx #(
     int unsigned READY_LATENCY,
     logic STRADDLING
 ) extends uvm_pcie::env_rx;
-    `uvm_component_param_utils(uvm_pcie_avst::env_rx#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_avst::env_rx#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING),
+        $sformatf("uvm_pcie_avst::env_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)
+    );
 
     localparam DIRECTION = AVST_DOWN;
 
@@ -100,7 +103,10 @@ class env_tx #(
     int unsigned META_WIDTH,
     logic STRADDLING
 ) extends uvm_pcie::env_tx;
-    `uvm_component_param_utils(uvm_pcie_avst::env_tx#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_avst::env_tx#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING),
+        $sformatf("uvm_pcie_avst::env_tx#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, META_WIDTH, STRADDLING)
+    );
 
     localparam DIRECTION = AVST_UP;
 

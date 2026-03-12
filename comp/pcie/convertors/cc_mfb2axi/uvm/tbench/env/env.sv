@@ -47,10 +47,7 @@ class env #(
 
         axi_cc_cfg.interface_name = "vif_rx";
         mfb_cc_cfg.interface_name = "vif_tx";
-
-        mfb_cc_cfg.seq_type       = "PCIE";
-        mfb_cc_cfg.seq_cfg        = new();
-        mfb_cc_cfg.seq_cfg.straddling_set(STRADDLING);
+        mfb_cc_cfg.set_pcie(STRADDLING);
 
         m_config_reset                = new;
         m_config_reset.active         = UVM_ACTIVE;

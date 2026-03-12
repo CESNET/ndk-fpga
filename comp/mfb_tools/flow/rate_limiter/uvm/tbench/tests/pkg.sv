@@ -8,6 +8,7 @@
 `define RATE_LIMITER_TEST_SV
 
 package test;
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 

@@ -5,8 +5,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Request
-class sequence_item_request #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_avmm::sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class sequence_item_request #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_common::sequence_item;
+
+    `ndk_object_param_utils(
+        uvm_avmm::sequence_item_request#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::sequence_item_request#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // Bus structure of AVMM
     rand logic                       ready;
@@ -88,7 +96,10 @@ endclass
 
 // Response
 class sequence_item_response #(int unsigned DATA_WIDTH) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_avmm::sequence_item_response #(DATA_WIDTH))
+    `ndk_object_param_utils(
+        uvm_avmm::sequence_item_response#(DATA_WIDTH),
+        $sformatf("uvm_avmm::sequence_item_response#(%0d)",DATA_WIDTH)
+    )
 
     // Bus structure of AVMM
     rand logic                    ready;

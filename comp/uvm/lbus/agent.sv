@@ -9,7 +9,7 @@
 // ======= //
 
 class agent_rx extends uvm_agent;
-    `uvm_component_utils(uvm_lbus::agent_rx)
+    `ndk_component_utils(uvm_lbus::agent_rx)
 
     // Analysis port
     uvm_analysis_port #(sequence_item) analysis_port;
@@ -91,7 +91,7 @@ endclass
 // ======= //
 
 class agent_tx extends uvm_agent;
-    `uvm_component_utils(uvm_lbus::agent_tx)
+    `ndk_component_utils(uvm_lbus::agent_tx)
 
     // Analysis port
     uvm_analysis_port #(sequence_item) analysis_port;

@@ -10,7 +10,10 @@
 
 
 class env_rx #(int unsigned SEGMENTS) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_array_intel_mac_seg::env_rx#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::env_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::env_rx#(%0d)",SEGMENTS)
+    )
 
     // fcs_error, tr.error, tr.status_data
     localparam LOGIC_WIDTH = 6;
@@ -100,7 +103,12 @@ class env_rx #(int unsigned SEGMENTS) extends uvm_env;
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
             sequence_lib_rx#(SEGMENTS) intel_mac_seg;
-            intel_mac_seg = sequence_lib_rx#(SEGMENTS)::type_id::create("avalon_rx_seq_base", this);
+
+            if (m_config.lib_type == config_item::BASE) begin
+                intel_mac_seg = sequence_lib_rx#(SEGMENTS)::type_id::create("avalon_rx_seq_base", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
             intel_mac_seg.init_sequence();
             intel_mac_seg.min_random_count = 20;
             intel_mac_seg.max_random_count = 100;
@@ -115,7 +123,10 @@ endclass
 
 
 class env_tx #(int unsigned SEGMENTS) extends uvm_env;
-    `uvm_component_param_utils(uvm_logic_vector_array_intel_mac_seg::env_tx#(SEGMENTS))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::env_tx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::env_tx#(%0d)",SEGMENTS)
+    )
 
     // fcs_error, tr.error, tr.status_data
     localparam LOGIC_WIDTH = 6;
@@ -198,7 +209,12 @@ class env_tx #(int unsigned SEGMENTS) extends uvm_env;
         uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS) mac_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
-            mac_seq = uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS)::type_id::create("mac_seq", this);
+            if (m_config.lib_type == config_item::BASE) begin
+                mac_seq = uvm_intel_mac_seg::sequence_lib_tx #(SEGMENTS)::type_id::create("mac_seq", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
+
             mac_seq.init_sequence();
             mac_seq.min_random_count =  100;
             mac_seq.max_random_count = 2000;

@@ -12,7 +12,10 @@ class monitor_rx #(
     meta_position_t META_TYPE,
     device_t DEVICE
 ) extends uvm_pcie::monitor;
-    `uvm_component_param_utils(uvm_pcie_mfb::monitor_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::monitor_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE),
+        $sformatf("uvm_pcie_mfb::monitor_rx#(%0d,%0d,%0d,%s,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)
+    );
 
     uvm_tlm_analysis_fifo#(uvm_logic_vector_array::sequence_item#(32))                    port_data;
     uvm_tlm_analysis_fifo#(uvm_logic_vector::sequence_item#(meta_width_get(DIR, DEVICE))) port_meta;
@@ -94,7 +97,10 @@ class monitor #(
     meta_position_t META_TYPE,
     device_t DEVICE
 ) extends uvm_pcie::monitor;
-    `uvm_component_param_utils(uvm_pcie_mfb::monitor#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::monitor#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE),
+        $sformatf("uvm_pcie_mfb::monitor#(%0d,%0d,%0d,%s,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)
+    );
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices

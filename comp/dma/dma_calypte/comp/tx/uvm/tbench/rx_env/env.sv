@@ -58,9 +58,7 @@ class env #(
         m_rx_mfb_env_cfg.interface_name = m_config.interface_name;
         m_rx_mfb_env_cfg.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
         m_rx_mfb_env_cfg.coverage       = m_config.coverage;
-
         m_rx_mfb_env_cfg.seq_cfg = new();
-        m_rx_mfb_env_cfg.seq_cfg.straddling = 1;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_rx_mfb_env", "m_config",
                                                                       m_rx_mfb_env_cfg);

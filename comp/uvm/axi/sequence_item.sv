@@ -12,7 +12,10 @@ class sequence_item #(
 
     // ------------------------------------------------------------------------
     // Registration of object tools
-    `uvm_object_param_utils(uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_object_param_utils(
+        uvm_axi::sequence_item#(ITEMS, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::sequence_item#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb

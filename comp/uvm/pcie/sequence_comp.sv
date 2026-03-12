@@ -129,7 +129,7 @@ endclass
 // Simple sequence
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_base extends sequence_comp;
-    `uvm_object_utils(uvm_pcie::sequence_comp_base)
+    `ndk_object_utils(uvm_pcie::sequence_comp_base)
 
     rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
 
@@ -251,7 +251,7 @@ endclass
 // SEQUENCE DOESNT SEND ANY RESPONSES
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_stop extends uvm_common::sequence_base #(config_sequence, uvm_pcie::header);
-    `uvm_object_param_utils(uvm_pcie::sequence_comp_stop)
+    `uvm_object_utils(uvm_pcie::sequence_comp_stop)
 
     rand int unsigned time_sleep; //in NS
 
@@ -277,7 +277,7 @@ endclass
 //SEND COPLETER WITH SMALL RESPONSES
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_small extends sequence_comp;
-    `uvm_object_param_utils(uvm_pcie::sequence_comp_small)
+    `uvm_object_utils(uvm_pcie::sequence_comp_small)
 
     rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
 
@@ -352,7 +352,7 @@ endclass
 //SEND COPLETER WITH big
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_big extends sequence_comp;
-    `uvm_object_param_utils(uvm_pcie::sequence_comp_big)
+    `uvm_object_utils(uvm_pcie::sequence_comp_big)
 
     rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
 
@@ -428,7 +428,7 @@ endclass
 //SEND COPLETER WITH response on one tag
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_one_tag extends sequence_comp;
-    `uvm_object_param_utils(uvm_pcie::sequence_comp_one_tag)
+    `uvm_object_utils(uvm_pcie::sequence_comp_one_tag)
 
     rand enum {TAG_SEL_RAND, TAG_SEL_FIRST} tag_sel;
 
@@ -545,7 +545,7 @@ endclass
 // SEQUENCE LIBRARY COMPL
 /////////////////////////////////////////////////////////////////////////
 class sequence_comp_lib extends uvm_common::sequence_library#(config_sequence, uvm_pcie::header);
-  `uvm_object_param_utils(uvm_pcie::sequence_comp_lib)
+  `uvm_object_utils(uvm_pcie::sequence_comp_lib)
   `uvm_sequence_library_utils(uvm_pcie::sequence_comp_lib)
 
   function new(string name = "sequence_lib_tx");

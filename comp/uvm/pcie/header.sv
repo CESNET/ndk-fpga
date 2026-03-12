@@ -7,7 +7,7 @@
 // This class represents high level transaction, which can be reusable for other components.
 class header extends uvm_common::sequence_item;
     // Registration of object tools.
-    `uvm_object_utils(uvm_pcie::header)
+    `ndk_object_utils(uvm_pcie::header)
 
     //TODO: remove hdr_type and change it to function
     // function hdr_type pcie_type_get(); return RQ_HDR
@@ -123,7 +123,7 @@ endclass
 
 class request_header extends header;
     // Registration of object tools.
-    `uvm_object_utils(uvm_pcie::request_header)
+    `ndk_object_utils(uvm_pcie::request_header)
 
     rand logic [16-1:0] requester_id;
     rand logic [8-1:0]  tag;
@@ -189,7 +189,7 @@ endclass
 
 class completer_header extends header;
     // Registration of object tools.
-    `uvm_object_utils(uvm_pcie::completer_header)
+    `ndk_object_utils(uvm_pcie::completer_header)
 
     rand logic [16-1:0] completer_id;
     rand logic [3-1:0]  compl_status;

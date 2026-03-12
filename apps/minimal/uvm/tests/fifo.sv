@@ -9,13 +9,13 @@
 */
 
 
-class sequence_mfb_full_speed_rx #(
+class sequence_mfb_rx_full_speed #(
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
     int unsigned BLOCK_SIZE,
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
-) extends uvm_logic_vector_array_mfb::sequence_full_speed_rx #(
+) extends uvm_logic_vector_array_mfb::sequence_rx_full_speed #(
     REGIONS,
     REGION_SIZE,
     BLOCK_SIZE,
@@ -23,10 +23,10 @@ class sequence_mfb_full_speed_rx #(
     META_WIDTH
 );
     `uvm_object_param_utils(
-        test::sequence_mfb_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        test::sequence_mfb_rx_full_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
-    function new(string name = "test::sequence_mfb_full_speed_rx");
+    function new(string name = "test::sequence_mfb_rx_full_speed");
         super.new(name);
         hl_transactions_min = 1000;
         hl_transactions_max = 20000;
@@ -34,16 +34,16 @@ class sequence_mfb_full_speed_rx #(
 endclass
 
 
-class sequence_mfb_stop_rx #(
+class sequence_mfb_rx_stop #(
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
     int unsigned BLOCK_SIZE,
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
-) extends uvm_logic_vector_array_mfb::sequence_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `uvm_object_param_utils(test::sequence_mfb_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+) extends uvm_logic_vector_array_mfb::sequence_rx_stop #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
+    `uvm_object_param_utils(test::sequence_mfb_rx_stop #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
-    function new(string name = "test::sequence_mfb_stop_rx");
+    function new(string name = "test::sequence_mfb_rx_stop");
         super.new(name);
         hl_transactions_min = 1000;
         hl_transactions_max = 20000;
@@ -75,10 +75,10 @@ class sequence_lib__mfb_rx_fifo #(
     virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
         this.add_sequence(
-            test::sequence_mfb_full_speed_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type()
+            test::sequence_mfb_rx_full_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type()
         );
         this.add_sequence(
-            test::sequence_mfb_stop_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type()
+            test::sequence_mfb_rx_stop #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type()
         );
     endfunction
 endclass
@@ -86,7 +86,7 @@ endclass
 class sequence_mvb_full_speed_rx #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
-) extends uvm_logic_vector_mvb::sequence_full_speed_rx       #(ITEMS, ITEM_WIDTH);
+) extends uvm_logic_vector_mvb::sequence_rx_full_speed       #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(test::sequence_mvb_full_speed_rx #(ITEMS, ITEM_WIDTH))
 
     function new(string name = "test::sequence_mvb_full_speed_rx");
@@ -100,7 +100,7 @@ endclass
 class sequence_mvb_stop_rx #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH
-) extends uvm_logic_vector_mvb::sequence_stop_rx #(ITEMS, ITEM_WIDTH);
+) extends uvm_logic_vector_mvb::sequence_rx_stop #(ITEMS, ITEM_WIDTH);
     `uvm_object_param_utils(test::sequence_mvb_stop_rx #(ITEMS, ITEM_WIDTH))
 
     function new(string name = "test::sequence_mvb_stop_rx");

@@ -14,7 +14,10 @@
 class agent #(int unsigned ITEM_WIDTH) extends uvm_agent;
 
     // registration of component tools
-    `uvm_component_param_utils(uvm_logic_vector_array::agent #(ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_logic_vector_array::agent#(ITEM_WIDTH),
+        $sformatf("uvm_logic_vector_array::agent#(%0d)",ITEM_WIDTH)
+    )
 
     // -----------------------
     // Variables.

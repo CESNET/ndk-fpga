@@ -9,7 +9,10 @@
 */
 
 class sequence_item #(int unsigned SEGMENTS) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_intel_mac_seg::sequence_item#(SEGMENTS));
+    `ndk_object_param_utils(
+        uvm_intel_mac_seg::sequence_item#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::sequence_item#(%0d)",SEGMENTS)
+    );
 
     rand logic [64-1:0] data[SEGMENTS];
     rand logic          inframe[SEGMENTS];

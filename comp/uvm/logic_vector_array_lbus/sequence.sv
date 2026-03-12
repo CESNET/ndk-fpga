@@ -9,7 +9,7 @@
 // ========= //
 
 class sequence_rx extends uvm_sequence #(uvm_lbus::sequence_item);
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_rx)
+    `ndk_object_utils(uvm_logic_vector_array_lbus::sequence_rx)
     `uvm_declare_p_sequencer(uvm_lbus::sequencer)
 
     // High-level sequencer
@@ -105,7 +105,7 @@ class sequence_rx extends uvm_sequence #(uvm_lbus::sequence_item);
 endclass
 
 class sequence_rx_stop extends sequence_rx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_rx_stop)
+    `ndk_object_utils(uvm_logic_vector_array_lbus::sequence_rx_stop)
 
     // ---------- //
     // Parameters //
@@ -135,7 +135,7 @@ class sequence_rx_stop extends sequence_rx;
 endclass
 
 class sequence_rx_bursting extends sequence_rx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_rx_bursting)
+    `ndk_object_utils(uvm_logic_vector_array_lbus::sequence_rx_bursting)
 
     // ---------- //
     // Parameters //
@@ -190,7 +190,7 @@ endclass
 // ================== //
 
 class sequence_library_rx extends uvm_sequence_library #(uvm_lbus::sequence_item);
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx)
+    `ndk_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx)
     `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx)
 
     function new(string name = "sequence_library_rx");
@@ -204,11 +204,12 @@ class sequence_library_rx extends uvm_sequence_library #(uvm_lbus::sequence_item
 
 endclass
 
-class sequence_library_rx_fullspeed extends sequence_library_rx;
-    `uvm_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed)
-    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx_fullspeed)
 
-    function new(string name = "sequence_library_rx_fullspeed");
+class sequence_library_rx_speed extends sequence_library_rx;
+    `ndk_object_utils(uvm_logic_vector_array_lbus::sequence_library_rx_speed)
+    `uvm_sequence_library_utils(uvm_logic_vector_array_lbus::sequence_library_rx_speed)
+
+    function new(string name = "sequence_library_rx_speed");
         super.new(name);
         init_sequence_library();
 

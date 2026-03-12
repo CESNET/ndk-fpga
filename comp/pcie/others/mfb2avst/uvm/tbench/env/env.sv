@@ -41,10 +41,7 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
 
         avst_cfg.meta_behav   = uvm_logic_vector_array_avst::config_item::META_SOF;
         mfb_rx_cfg.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
-
-        mfb_rx_cfg.seq_type       = "PCIE";
-        mfb_rx_cfg.seq_cfg        = new();
-        mfb_rx_cfg.seq_cfg.straddling_set(1);
+        mfb_rx_cfg.set_pcie(1);
 
         m_config_reset                = new;
         m_config_reset.active         = UVM_ACTIVE;

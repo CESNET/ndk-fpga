@@ -4,8 +4,16 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class monitor #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_monitor;
-    `uvm_component_param_utils(uvm_avmm::monitor #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class monitor #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_monitor;
+
+    `ndk_component_param_utils(
+        uvm_avmm::monitor#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::monitor#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // --------- //
     // Variables //

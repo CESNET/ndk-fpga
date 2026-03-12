@@ -14,7 +14,10 @@
 class sequence_item_request #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_common::sequence_item;
 
     // registration of object tools
-    `uvm_object_param_utils(uvm_mi::sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_mi::sequence_item_request#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::sequence_item_request#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     //variables
     rand logic [ADDR_WIDTH-1:0]   addr;
@@ -107,7 +110,10 @@ endclass
 class sequence_item_response #(int unsigned DATA_WIDTH) extends uvm_common::sequence_item;
 
     // registration of object tools
-    `uvm_object_param_utils(uvm_mi::sequence_item_response#(DATA_WIDTH))
+    `ndk_object_param_utils(
+        uvm_mi::sequence_item_response#(DATA_WIDTH),
+        $sformatf("uvm_mi::sequence_item_response#(%0d)",DATA_WIDTH)
+    )
 
     //variables
     //logic [DATA_WIDTH/8-1:0] be; // for comaring data

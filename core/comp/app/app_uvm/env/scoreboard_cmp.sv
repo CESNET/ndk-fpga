@@ -82,7 +82,13 @@ class scoreboard_cmp_header #(type MODEL_ITEM, type DUT_ITEM, int unsigned META_
 endclass
 
 class scoreboard_channel_mfb_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_common::comparer_base_unordered#(packet #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH), uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
-    `uvm_component_param_utils(uvm_app_core::scoreboard_channel_mfb_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::scoreboard_channel_mfb_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::scoreboard_channel_mfb_unordered#(%0d,%0d,%0d,%0d)",
+            META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
+        )
+    )
+
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
@@ -102,7 +108,12 @@ class scoreboard_channel_mfb_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WID
 endclass
 
 class scoreboard_channel_mfb_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_common::comparer_base_ordered#(packet #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH), uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
-    `uvm_component_param_utils(uvm_app_core::scoreboard_channel_mfb_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::scoreboard_channel_mfb_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::scoreboard_channel_mfb_ordered#(%0d,%0d,%0d,%0d)",
+            META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
+        )
+    )
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
@@ -122,7 +133,12 @@ class scoreboard_channel_mfb_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
 endclass
 
 class scoreboard_channel_mfb_tagged #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_common::comparer_base_tagged#(packet #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH), uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
-    `uvm_component_param_utils(uvm_app_core::scoreboard_channel_mfb_tagged #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::scoreboard_channel_mfb_tagged #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::scoreboard_channel_mfb_tagged#(%0d,%0d,%0d,%0d)",
+            META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
+        )
+    )
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
@@ -143,7 +159,12 @@ endclass
 
 
 class scoreboard_channel_header_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_common::comparer_base_unordered #(packet #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH), uvm_logic_vector::sequence_item#(META_WIDTH + $clog2(CHANNELS) + $clog2(PKT_MTU+1) + 1));
-    `uvm_component_param_utils(uvm_app_core::scoreboard_channel_header_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::scoreboard_channel_header_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::scoreboard_channel_header_unordered#(%0d,%0d,%0d,%0d)",
+            META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
+        )
+    )
 
     protected scoreboard_cmp_header #(MODEL_ITEM, DUT_ITEM, META_WIDTH, CHANNELS, PKT_MTU) cmp;
 
@@ -166,7 +187,12 @@ class scoreboard_channel_header_unordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_
 endclass
 
 class scoreboard_channel_header_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_common::comparer_base_ordered #(packet #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH), uvm_logic_vector::sequence_item#(META_WIDTH + $clog2(CHANNELS) + $clog2(PKT_MTU+1) + 1));
-    `uvm_component_param_utils(uvm_app_core::scoreboard_channel_header_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::scoreboard_channel_header_ordered #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::scoreboard_channel_header_ordered#(%0d,%0d,%0d,%0d)",
+            META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
+        )
+    )
 
     protected scoreboard_cmp_header #(MODEL_ITEM, DUT_ITEM, META_WIDTH, CHANNELS, PKT_MTU) cmp;
 
@@ -190,7 +216,12 @@ endclass
 
 
 class scoreboard_channel_header_tagged #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_common::comparer_base_tagged #(packet #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH), uvm_logic_vector::sequence_item#(META_WIDTH + $clog2(CHANNELS) + $clog2(PKT_MTU+1) + 1));
-    `uvm_component_param_utils(uvm_app_core::scoreboard_channel_header_tagged #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::scoreboard_channel_header_tagged #(META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::scoreboard_channel_header_tagged#(%0d,%0d,%0d,%0d)",
+            META_WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH
+        )
+    )
 
     protected scoreboard_cmp_header #(MODEL_ITEM, DUT_ITEM, META_WIDTH, CHANNELS, PKT_MTU) cmp;
 

@@ -11,7 +11,10 @@
 //////////////////////////////////////////////////
 // BASE CLASS CONTAINING COMMON FUNCTIONS
 virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg::sequence_simple_rx #(SEGMENTS);
-   `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx_base#(SEGMENTS))
+   `ndk_object_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx_base#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx_base#(%0d)",SEGMENTS)
+    )
    `uvm_declare_p_sequencer(uvm_intel_mac_seg::sequencer#(SEGMENTS));
    localparam LOGIC_WIDTH = 6;
    localparam ITEM_WIDTH = 8;
@@ -169,7 +172,10 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
 endclass
 
 class sequence_simple_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
-    `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx#(SEGMENTS))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx#(%0d)",SEGMENTS)
+    )
 
     local int unsigned space_size;
     rand int unsigned  space_size_min;
@@ -233,7 +239,10 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_bas
 endclass
 
 class sequence_space_same_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
-    `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_space_same_rx#(SEGMENTS))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::sequence_space_same_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_space_same_rx#(%0d)",SEGMENTS)
+    )
 
     rand int unsigned space_size_same;
     local int unsigned space_size;
@@ -290,7 +299,10 @@ endclass
 
 
 class sequence_sop_pos_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
-    `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_sop_pos_rx #(SEGMENTS))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::sequence_sop_pos_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_sop_pos_rx#(%0d)",SEGMENTS)
+    )
 
     rand logic [SEGMENTS-1:0] sop_position;
 
@@ -352,7 +364,10 @@ endclass
 
 
 class sequence_max_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_base #(SEGMENTS);
-    `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_max_rx#(SEGMENTS))
+    `ndk_object_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::sequence_max_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_max_rx#(%0d)",SEGMENTS)
+    )
 
     function new (string name = "req");
         super.new(name);
@@ -398,7 +413,10 @@ endclass
 // SEQUENCE LIBRARY
 ///////////////////////////////////////////////////////////////
 class sequence_lib_rx #(int unsigned SEGMENTS) extends uvm_sequence_library#(uvm_intel_mac_seg::sequence_item #(SEGMENTS));
-  `uvm_object_param_utils(uvm_logic_vector_array_intel_mac_seg::sequence_lib_rx#(SEGMENTS))
+  `ndk_object_param_utils(
+        uvm_logic_vector_array_intel_mac_seg::sequence_lib_rx#(SEGMENTS),
+        $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_lib_rx#(%0d)",SEGMENTS)
+    )
   `uvm_sequence_library_utils(uvm_logic_vector_array_intel_mac_seg::sequence_lib_rx#(SEGMENTS))
   function new(string name = "");
     super.new(name);

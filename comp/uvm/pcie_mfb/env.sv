@@ -13,7 +13,10 @@ class env_rx #(
     logic STRADDLING, // TODO: REMOVE STRADDLING it if you want to switch off straddling you shoudld use comb 1, X, REGIONS*y, 32
     device_t DEVICE
 ) extends uvm_pcie::env_rx;
-    `uvm_component_param_utils(uvm_pcie_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_mfb::env_rx#(%0d,%0d,%0d,%s,%s,%0d,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE)
+    );
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices
@@ -55,9 +58,8 @@ class env_rx #(
         m_lva_cfg.interface_name = {m_config.interface_name, "_mfb"};
         m_lva_cfg.active         = m_config.active;
         m_lva_cfg.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
-        m_lva_cfg.seq_type       = "PCIE";
         m_lva_cfg.seq_cfg  = new();
-        m_lva_cfg.seq_cfg.straddling_set(STRADDLING); //Straddling enable automaticly by REGIONS > 1
+        m_lva_cfg.set_pcie(STRADDLING);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_lva", "m_config", m_lva_cfg);
         m_lva = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_lva", this);
     endfunction
@@ -113,7 +115,10 @@ class env_mvb_rx #(
     logic STRADDLING, // TODO: REMOVE STRADDLING it if you want to switch off straddling you shoudld use comb 1, X, REGIONS*y, 32
     device_t DEVICE
 ) extends env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, MFB_META_NONE, STRADDLING, DEVICE);
-    `uvm_component_param_utils(uvm_pcie_mfb::env_mvb_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, STRADDLING, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::env_mvb_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_mfb::env_mvb_rx#(%0d,%0d,%0d,%s,%s,%0d,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE)
+    );
     // LOCAL PARAMETERS
     localparam MVB_META_WIDTH = meta_width_get(DIR, DEVICE);
     //protected uvm_mvb::agent_tx #(REGIONS, MVB_META_WIDTH)                                      m_mvb;
@@ -148,7 +153,10 @@ class env_tx #(
     meta_position_t META_TYPE,
     device_t DEVICE
 ) extends uvm_pcie::env_tx;
-    `uvm_component_param_utils(uvm_pcie_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE),
+        $sformatf("uvm_pcie_mfb::env_tx#(%0d,%0d,%0d,%s,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)
+    );
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices
@@ -225,7 +233,10 @@ class env_mvb_tx #(
     direction_t  DIR,
     device_t DEVICE
 ) extends env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, MFB_META_NONE, DEVICE);
-    `uvm_component_param_utils(uvm_pcie_mfb::env_mvb_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::env_mvb_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, DEVICE),
+        $sformatf("uvm_pcie_mfb::env_mvb_tx#(%0d,%0d,%0d,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, DEVICE)
+    );
 
     // LOCAL PARAMETERS
     localparam MVB_META_WIDTH = meta_width_get(DIR, DEVICE);

@@ -15,7 +15,10 @@ class sequencer #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_sequenc
 
     // ------------------------------------------------------------------------
     // Registration of sequencer to databaze
-    `uvm_component_param_utils(uvm_mii::sequencer #(CHANNELS, WIDTH))
+    `ndk_component_param_utils(
+        uvm_mii::sequencer#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::sequencer#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     // Constructor
     function new(string name = "sequencer", uvm_component parent = null);

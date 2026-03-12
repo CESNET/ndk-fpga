@@ -9,7 +9,10 @@
 // ======= //
 
 class driver_rx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_driver #(sequence_item #(UPDATE_CNT_WIDTH));
-    `uvm_component_param_utils(uvm_avst_crdt::driver_rx #(UPDATE_CNT_WIDTH))
+    `ndk_component_param_utils(
+        uvm_avst_crdt::driver_rx #(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::driver_rx#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // Virtual interface
     virtual avst_crdt_if #(UPDATE_CNT_WIDTH).driver_rx vif;
@@ -59,7 +62,10 @@ endclass
 // ======= //
 
 class driver_tx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_driver #(sequence_item #(UPDATE_CNT_WIDTH));
-    `uvm_component_param_utils(uvm_avst_crdt::driver_tx #(UPDATE_CNT_WIDTH))
+    `ndk_component_param_utils(
+        uvm_avst_crdt::driver_tx#(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::driver_tx#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // Virtual interface
     virtual avst_crdt_if #(UPDATE_CNT_WIDTH).driver_tx vif;

@@ -9,7 +9,10 @@ class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
 
     // ------------------------------------------------------------------------
     // Register component to database
-    `uvm_component_param_utils(uvm_mfb::driver_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mfb::driver_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_mfb::driver_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Virtual interface of rx driver
@@ -76,7 +79,10 @@ endclass
 
 // Driver of mfb tx interface
 class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
-    `uvm_component_param_utils(uvm_mfb::driver_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mfb::driver_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_mfb::driver_tx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Virtual interface of driver

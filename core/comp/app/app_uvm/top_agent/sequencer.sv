@@ -7,7 +7,10 @@
 //typedef uvm_sequencer#(sequence_item) sequencer;
 
 class sequencer #(int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_sequencer #(sequence_item #(ITEM_WIDTH, META_WIDTH));
-    `uvm_component_param_utils(uvm_app_core_top_agent::sequencer #(ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core_top_agent::sequencer #(ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_app_core_top_agent::sequencer#(%0d,%0d)", ITEM_WIDTH, META_WIDTH)
+    )
 
     uvm_reset::sync_terminate reset_sync;
 

@@ -13,7 +13,10 @@ class driver_rx #(
 
     // ------------------------------------------------------------------------
     // Register component to database
-    `uvm_component_param_utils(uvm_axi::driver_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_component_param_utils(
+        uvm_axi::driver_rx#(ITEMS, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::driver_rx#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Virtual interface of rx driver
@@ -65,7 +68,10 @@ class driver_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned TUSER_WIDTH
 ) extends uvm_driver #(sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH));
-    `uvm_component_param_utils(uvm_axi::driver_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_component_param_utils(
+        uvm_axi::driver_tx#(ITEMS, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::driver_tx#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Virtual interface of driver

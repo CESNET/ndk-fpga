@@ -7,7 +7,7 @@
 
 // Definition of mfb monitor
 class stats  extends uvm_subscriber#(uvm_pcie::header);
-    `uvm_component_utils(uvm_pcie::stats)
+    `ndk_component_utils(uvm_pcie::stats)
 
     localparam KOEF = 32;
 

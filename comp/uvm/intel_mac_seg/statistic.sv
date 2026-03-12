@@ -6,7 +6,10 @@
 
 
 class statistic#(SEGMENTS) extends uvm_subscriber#(sequence_item #(SEGMENTS));
-    `uvm_component_param_utils(uvm_intel_mac_seg::statistic#(SEGMENTS));
+    `ndk_component_param_utils(
+        uvm_intel_mac_seg::statistic#(SEGMENTS),
+        $sformatf("uvm_intel_mac_seg::statistic#(%0d)",SEGMENTS)
+    );
 
 
     // SPEED mesures

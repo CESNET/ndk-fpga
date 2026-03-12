@@ -14,7 +14,10 @@
 class sequence_item #(int unsigned DATA_WIDTH) extends uvm_common::sequence_item;
 
     // registration of object tools
-    `uvm_object_param_utils(uvm_pma::sequence_item #(DATA_WIDTH))
+    `ndk_object_utils(
+        uvm_pma::sequence_item#(DATA_WIDTH),
+        $sformatf("uvm_pma::sequence_item#(%0d)",DATA_WIDTH)
+    )
 
     // Member attributes, equivalent with interface pins
     // make input attributes random, except for clocks

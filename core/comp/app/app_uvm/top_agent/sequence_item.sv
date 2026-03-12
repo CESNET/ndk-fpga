@@ -65,7 +65,10 @@ endclass
 
                                                                                                                      // CHANNEL_WIDTH + LENGHT_WIDTH + FLAGS  +  MAC_HIT  + TSU WIDTH
 class sequence_eth_item#(int unsigned CHANNELS, int unsigned LENGTH_WIDTH, int unsigned ITEM_WIDTH) extends sequence_item#(ITEM_WIDTH, LENGTH_WIDTH + $clog2(CHANNELS) + 10 + 4 + 64);
-    `uvm_object_param_utils(uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
+        $sformatf("uvm_app_core_top_agent::monitor#(%%0d,%0d,%0d)", CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)
+    )
 
     //rand logic [$clog2(CHANNELS)-1:0] channel;
     int unsigned        channel;
@@ -233,7 +236,10 @@ endclass
 
 
 class sequence_dma_item#(int unsigned CHANNELS, int unsigned LENGTH_WIDTH, int unsigned DMA_HDR_META_WIDTH, int unsigned ITEM_WIDTH) extends sequence_item#(ITEM_WIDTH, $clog2(CHANNELS) + DMA_HDR_META_WIDTH + LENGTH_WIDTH);
-    `uvm_object_param_utils(uvm_app_core_top_agent::sequence_dma_item#(CHANNELS, LENGTH_WIDTH, DMA_HDR_META_WIDTH, ITEM_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core_top_agent::sequence_dma_item#(CHANNELS, LENGTH_WIDTH, DMA_HDR_META_WIDTH, ITEM_WIDTH),
+        $sformatf("uvm_app_core_top_agent::sequence_dma_item#(%%0d,%0d,%0d)", CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)
+    )
 
     //rand logic [$clog2(CHANNELS)-1:0]   channel;
     int unsigned                        channel;

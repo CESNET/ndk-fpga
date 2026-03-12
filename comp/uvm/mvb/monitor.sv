@@ -12,7 +12,10 @@ class monitor #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_monitor
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_mvb::monitor #(ITEMS, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mvb::monitor#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::monitor#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

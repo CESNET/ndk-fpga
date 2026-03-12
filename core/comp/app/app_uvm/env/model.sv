@@ -10,7 +10,10 @@
 
 
 class packet #(WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH) extends uvm_app_core_top_agent::sequence_item#(ITEM_WIDTH, WIDTH + $clog2(CHANNELS) + $clog2(PKT_MTU+1) + 1);
-    `uvm_object_param_utils(uvm_app_core::packet #(WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH));
+    `ndk_object_param_utils(
+        uvm_app_core::packet#(WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::packet#(%0d,%0d,%0d,%0d)", WIDTH, CHANNELS, PKT_MTU, ITEM_WIDTH)
+    )
 
     logic [WIDTH-1:0]             meta;
     logic [$clog2(CHANNELS)-1:0]  channel;
@@ -69,7 +72,12 @@ endclass
 
 
 class model #(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_app_core::model#(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core::model#(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH),
+        $sformatf("uvm_app_core::model#(%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d)",
+            ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH
+        )
+    )
 
     // DEFINE class type
     typedef model#(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH) this_type;

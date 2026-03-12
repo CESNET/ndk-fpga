@@ -5,7 +5,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class monitor #(int unsigned UPDATE_CNT_WIDTH) extends uvm_monitor;
-    `uvm_component_param_utils(uvm_avst_crdt::monitor #(UPDATE_CNT_WIDTH))
+    `ndk_component_param_utils(
+        uvm_avst_crdt::monitor #(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::monitor#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // Virtual interface
     virtual avst_crdt_if #(UPDATE_CNT_WIDTH).monitor vif;

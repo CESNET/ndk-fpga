@@ -5,8 +5,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Slave
-class sequencer_slave #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_sequencer #(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH), sequence_item_response #(DATA_WIDTH));
-    `uvm_component_param_utils(uvm_avmm::sequencer_slave #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class sequencer_slave #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_sequencer #(
+    sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+    sequence_item_response #(DATA_WIDTH)
+);
+
+    `ndk_component_param_utils(
+        uvm_avmm::sequencer_slave#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::sequencer_slave#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // Constructor
     function new(string name = "sequencer_slave", uvm_component parent = null);
@@ -16,8 +27,19 @@ class sequencer_slave #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int
 endclass
 
 // Master
-class sequencer_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_sequencer #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
-    `uvm_component_param_utils(uvm_avmm::sequencer_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class sequencer_master #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_sequencer #(
+    sequence_item_response #(DATA_WIDTH),
+    sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+);
+
+    `ndk_component_param_utils(
+        uvm_avmm::sequencer_master#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::sequencer_master#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // Shared response input fifo
     uvm_tlm_analysis_fifo #(response_item #(DATA_WIDTH)) response_in;

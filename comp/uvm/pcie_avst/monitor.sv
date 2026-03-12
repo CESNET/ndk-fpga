@@ -11,7 +11,10 @@ class monitor#(
     logic STRADDLING,
     direction_t dir
 ) extends uvm_pcie::monitor;
-    `uvm_component_param_utils(uvm_pcie_avst::monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, dir));
+    `ndk_component_param_utils(
+        uvm_pcie_avst::monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, dir),
+        $sformatf("uvm_pcie_avst::monitor#(%0d,%0d,%0d,%0d,%s)",REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, dir)
+    );
 
     localparam int unsigned ITEM_WIDTH = 32;
 

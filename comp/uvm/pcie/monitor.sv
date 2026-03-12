@@ -6,7 +6,7 @@
 
 
 class monitor extends uvm_monitor;
-    `uvm_component_param_utils(uvm_pcie::monitor);
+    `ndk_component_utils(uvm_pcie::monitor);
 
     uvm_analysis_port #(uvm_pcie::header)   analysis_port;
     uvm_reset::sync_terminate reset_sync;

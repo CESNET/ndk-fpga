@@ -13,7 +13,10 @@ class monitor #(
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_axi::monitor #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_component_param_utils(
+        uvm_axi::monitor#(ITEMS, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::monitor#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

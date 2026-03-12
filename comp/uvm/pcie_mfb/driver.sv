@@ -10,7 +10,10 @@ class driver#(
     meta_position_t META_TYPE,
     device_t DEVICE
 ) extends uvm_pcie::driver;
-    `uvm_component_param_utils(uvm_pcie_mfb::driver #(DIR, META_TYPE, DEVICE));
+    `ndk_component_param_utils(
+        uvm_pcie_mfb::driver#(DIR, META_TYPE, DEVICE),
+        $sformatf("uvm_pcie_mfb::driver#(%s,%s,%s)",DIR, META_TYPE, DEVICE)
+    );
 
     uvm_common::fifo#(uvm_logic_vector_array::sequence_item #(32))            data_fifo;
     uvm_common::fifo#(uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))) meta_fifo;

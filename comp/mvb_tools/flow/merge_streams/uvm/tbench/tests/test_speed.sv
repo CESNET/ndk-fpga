@@ -19,7 +19,7 @@ class test_speed #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsi
 
         for (int unsigned i = 0; i < RX_STREAMS; i++) begin
             uvm_logic_vector_mvb::sequence_lib_rx #(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::set_inst_override(
-                uvm_logic_vector_mvb::sequence_lib_speed_rx #(MVB_ITEMS, MVB_ITEM_WIDTH)::get_type(),
+                uvm_logic_vector_mvb::sequence_lib_rx_speed #(MVB_ITEMS, MVB_ITEM_WIDTH)::get_type(),
                 $sformatf("m_env.m_env_rx_mvb_%0d.mvb_seq", i),
                 this
             );

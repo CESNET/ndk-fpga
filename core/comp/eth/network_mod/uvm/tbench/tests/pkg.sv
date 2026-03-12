@@ -12,18 +12,18 @@ package test;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 
-    parameter ETH_CORE_ARCH     = "F_TILE";
+    parameter ETH_CORE_ARCH     = "CMAC";
     parameter ETH_PORTS         = 2;
-    parameter int unsigned ETH_PORT_SPEED[ETH_PORTS-1:0]  = '{ETH_PORTS{400}};
+    parameter int unsigned ETH_PORT_SPEED[ETH_PORTS-1:0]  = '{ETH_PORTS{100}};
     parameter int unsigned ETH_PORT_CHAN[ETH_PORTS-1:0]   = '{ETH_PORTS{1}};
     parameter int unsigned EHIP_PORT_TYPE[ETH_PORTS-1:0]  = '{ETH_PORTS{0}};
     parameter int unsigned ETH_PORT_RX_MTU[ETH_PORTS-1:0] = '{ETH_PORTS{16383}};
     parameter int unsigned ETH_PORT_TX_MTU[ETH_PORTS-1:0] = '{ETH_PORTS{16383}};
-    parameter LANES             = 8;
+    parameter LANES             = 4;
     parameter QSFP_PORTS        = 2;
     parameter QSFP_I2C_PORTS    = 1;
     parameter QSFP_I2C_TRISTATE = 1'b1;
-    parameter REGIONS           = 4;
+    parameter REGIONS           = 1;
     parameter REGION_SIZE       = 8;
     parameter BLOCK_SIZE        = 8;
     parameter ITEM_WIDTH        = 8;

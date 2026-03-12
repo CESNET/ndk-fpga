@@ -7,7 +7,7 @@
 `define AVST_CONFIG_SV
 
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_avst::config_sequence)
+    `ndk_object_utils(uvm_avst::config_sequence)
 
     uvm_common::sequence_cfg state;
 

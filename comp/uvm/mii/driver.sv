@@ -15,7 +15,10 @@ class driver_rx #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_driver 
 
     // ------------------------------------------------------------------------
     // Register component to database
-    `uvm_component_param_utils(uvm_mii::driver_rx #(CHANNELS, WIDTH))
+    `ndk_component_param_utils(
+        uvm_mii::driver_rx#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::driver_rx#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     localparam TOTAL_WIDTH = CHANNELS * WIDTH;
     localparam TOTAL_BYTES = CHANNELS * (WIDTH >> 3);
@@ -58,7 +61,10 @@ class driver_tx #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_driver 
 
     // ------------------------------------------------------------------------
     // Register component to database
-    `uvm_component_param_utils(uvm_mii::driver_tx #(CHANNELS, WIDTH))
+    `ndk_component_param_utils(
+        uvm_mii::driver_tx#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::driver_tx#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     localparam TOTAL_WIDTH = CHANNELS * WIDTH;
     localparam TOTAL_BYTES = CHANNELS * (WIDTH >> 3);

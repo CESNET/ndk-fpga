@@ -8,7 +8,7 @@
 `define AVMM_CONFIG_SV
 
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_avmm::config_sequence)
+    `ndk_object_utils(uvm_avmm::config_sequence)
 
     // ----------------------- //
     // Configuration variables //
@@ -45,6 +45,7 @@ class config_sequence extends uvm_object;
 endclass
 
 class config_item extends uvm_object;
+    `ndk_object_utils(uvm_avmm::config_item)
 
     // ----------------------- //
     // Configuration variables //
@@ -63,6 +64,9 @@ class config_item extends uvm_object;
     generated_memory_file_type_e generated_memory_file_type = NULL;
     string memory_filepath = "";
 
+    function new(string name = "uvm_avmm::config_item");
+        super.new(name);
+    endfunction
 endclass
 
 `endif

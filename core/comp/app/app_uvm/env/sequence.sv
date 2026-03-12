@@ -26,8 +26,25 @@ class sequence_main #(
     int unsigned MEM_DATA_WIDTH,
     int unsigned MEM_BURST_WIDTH
 ) extends uvm_sequence;
-    `uvm_object_param_utils(
+    `ndk_object_param_utils(
         uvm_app_core::sequence_main #(
+            DMA_TX_CHANNELS,
+            DMA_RX_CHANNELS,
+            DMA_PKT_MTU,
+            DMA_HDR_META_WIDTH,
+            DMA_STREAMS,
+            ETH_TX_HDR_WIDTH,
+            MFB_ITEM_WIDTH,
+            ETH_STREAMS,
+            REGIONS,
+            MFB_REG_SIZE,
+            MFB_BLOCK_SIZE,
+            MEM_PORTS,
+            MEM_ADDR_WIDTH,
+            MEM_DATA_WIDTH,
+            MEM_BURST_WIDTH
+        ),
+        $sformatf("uvm_app_core::sequence_main#(%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d,%0d)",
             DMA_TX_CHANNELS,
             DMA_RX_CHANNELS,
             DMA_PKT_MTU,

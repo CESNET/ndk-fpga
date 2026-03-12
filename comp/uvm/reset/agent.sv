@@ -10,7 +10,7 @@
 
 
 class agent extends uvm_agent;
-    `uvm_component_utils(uvm_reset::agent);
+    `ndk_component_utils(uvm_reset::agent);
 
     uvm_analysis_port #(sequence_item) analysis_port;
 

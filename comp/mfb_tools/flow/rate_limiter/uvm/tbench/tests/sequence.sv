@@ -4,35 +4,6 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_lib_rx#(
-    MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH
-) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(
-    MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH
-);
-
-    `uvm_object_param_utils(
-        test::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
-    `uvm_sequence_library_utils(
-        test::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
-
-    function new(string name = "sequence_lib_rx");
-        super.new(name);
-        init_sequence_library();
-    endfunction
-
-    virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
-        if (param_cfg == null) begin
-            this.cfg = new();
-        end else begin
-            this.cfg = param_cfg;
-        end
-        this.add_sequence(
-            uvm_logic_vector_array_mfb::sequence_full_speed_rx#(
-                MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type());
-    endfunction
-
-endclass
-
 class virt_seq#(
     SECTION_LENGTH, INTERVAL_LENGTH, INTERVAL_COUNT, SHAPING_TYPE, OUTPUT_SPEED,
     MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH

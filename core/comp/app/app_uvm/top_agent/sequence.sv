@@ -6,7 +6,10 @@
 
 
 class sequence_base#(type TR_TYPE) extends uvm_sequence #(TR_TYPE);
-    `uvm_object_param_utils(uvm_app_core_top_agent::sequence_base#(TR_TYPE))
+    `ndk_object_param_utils(
+        uvm_app_core_top_agent::sequence_base#(TR_TYPE),
+        $sformatf("uvm_app_core_top_agent::sequence_base#(%s)", $typename(TR_TYPE))
+    )
 
     int unsigned transaction_min = 100;
     int unsigned transaction_max = 300;
@@ -50,7 +53,10 @@ endclass
 
 
 class logic_vector_array#(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
-    `uvm_object_param_utils(uvm_app_core_top_agent::logic_vector_array#(ITEM_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core_top_agent::logic_vector_array#(ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_app_core_top_agent::logic_vector_array#(%0d,%0d)", ITEM_WIDTH, META_WIDTH)
+    )
 
     uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)) fifo;
     //mailbox#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) packet_export;
@@ -85,7 +91,10 @@ endclass
 
 
 class logic_vector_sequence #(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_logic_vector::sequence_item #(META_WIDTH));
-    `uvm_object_param_utils(uvm_app_core_top_agent::logic_vector_sequence #(ITEM_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_app_core_top_agent::logic_vector_sequence#(ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_app_core_top_agent::logic_vector_sequence#(%0d,%0d)", ITEM_WIDTH, META_WIDTH)
+    )
 
     uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)) fifo;
 

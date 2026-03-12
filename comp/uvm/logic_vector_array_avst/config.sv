@@ -5,7 +5,7 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_logic_vector_array_avst::config_sequence)
+    `ndk_object_utils(uvm_logic_vector_array_avst::config_sequence)
 
     uvm_common::sequence_cfg state;
 
@@ -52,11 +52,16 @@ class config_item extends uvm_object;
                                 // META_NONE DONT CARE IF META_WIDTH = 0
                                 // ------------------------------------------------
 
+    //SEQUENCE LIBRARY TYPE
+    enum {BASE, SPEED} lib_type;
     config_sequence seq_cfg;
+
 
     // ------------------------------------------------------------------------
     // functions
     function new (string name = "");
         super.new(name);
+        seq_cfg  = new();
+        lib_type = BASE;
     endfunction
 endclass

@@ -9,7 +9,10 @@
 */
 
 class reg2bus #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_env;
-    `uvm_component_param_utils(uvm_mi::reg2bus#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::reg2bus#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::reg2bus#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     uvm_reg_predictor #(reg2bus_class)                      predictor;
     reg2bus_adapter#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)    adapter;
@@ -47,7 +50,10 @@ endclass
 
 
 class regmodel #(type REG_TYPE, int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_env;
-    `uvm_component_param_utils(uvm_mi::regmodel#(REG_TYPE, DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::regmodel#(REG_TYPE, DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::regmodel#(%s,%0d,%0d,%0d)", $typename(REG_TYPE), DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     regmodel_config                                   m_config;
     agent_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH) m_agent;

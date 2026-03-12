@@ -9,7 +9,7 @@
 // ======= //
 
 class sequencer_rx extends uvm_sequencer;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::sequencer_rx);
+    `ndk_component_utils(uvm_logic_vector_array_lbus::sequencer_rx);
 
     // A lower limit of the request queue to start accepting new items from high-level sequences
     localparam int unsigned REQUEST_QUEUE_SATURATION_THRESHOLD = 10;

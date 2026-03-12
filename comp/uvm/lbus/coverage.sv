@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class coverage extends uvm_subscriber #(sequence_item);
-    `uvm_component_utils(uvm_lbus::coverage)
+    `ndk_component_utils(uvm_lbus::coverage)
 
     // ----------- //
     // Covergroups //

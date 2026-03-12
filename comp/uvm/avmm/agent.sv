@@ -5,8 +5,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Slave
-class agent_slave #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_avmm::agent_slave #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class agent_slave #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_agent;
+    `ndk_component_param_utils(
+            uvm_avmm::agent_slave #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+            $sformatf("uvm_avmm::agent_slave#(%0d,%0d,%0d)", ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+     )
 
     // --------- //
     // Variables //
@@ -94,8 +101,15 @@ class agent_slave #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int uns
 endclass
 
 // Master
-class agent_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_avmm::agent_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class agent_master #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_agent;
+    `ndk_component_param_utils(
+        uvm_avmm::agent_master#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::agent_master#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // --------- //
     // Variables //

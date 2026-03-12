@@ -10,7 +10,10 @@ class root#(
     string DEVICE,
     logic STRADDLING
 ) extends uvm_pcie::root;
-    `uvm_component_param_utils(uvm_pcie_axi::root#(AXI_ITEMS, DEVICE, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::root#(AXI_ITEMS, DEVICE, STRADDLING),
+        $sformatf("uvm_pcie_axi::root#(%0d,%s,%0d)",AXI_ITEMS, DEVICE, STRADDLING)
+    );
 
     localparam CQ_STRADDLING = 0;
     localparam CC_STRADDLING = 0;

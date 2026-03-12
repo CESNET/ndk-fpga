@@ -13,7 +13,10 @@ class agent_rx #(
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_axi::agent_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_component_param_utils(
+        uvm_axi::agent_rx#(ITEMS, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::agent_rx#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -90,7 +93,10 @@ class agent_tx #(
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_axi::agent_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_component_param_utils(
+        uvm_axi::agent_tx#(ITEMS, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::agent_tx#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

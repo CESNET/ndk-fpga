@@ -5,8 +5,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Slave
-class driver_slave #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_driver #(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH), sequence_item_response #(DATA_WIDTH));
-    `uvm_component_param_utils(uvm_avmm::driver_slave #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class driver_slave #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_driver #(
+    sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+    sequence_item_response #(DATA_WIDTH)
+);
+
+    `ndk_component_param_utils(
+        uvm_avmm::driver_slave#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::driver_slave#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // Virtual interface of slave driver
     virtual avmm_if #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH).driver_rx vif;
@@ -69,8 +80,15 @@ class driver_slave #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int un
 endclass
 
 // Master
-class driver_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_driver #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
-    `uvm_component_param_utils(uvm_avmm::driver_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))
+class driver_master #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_driver #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
+    `ndk_component_param_utils(
+        uvm_avmm::driver_master#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
+        $sformatf("uvm_avmm::driver_master#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+    )
 
     // Virtual interface of master driver
     virtual avmm_if #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH).tb_master vif;

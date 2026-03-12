@@ -7,8 +7,10 @@
 // Reusable high level sequence. Contains transaction, which has only data part
 class sequence_simple #(int unsigned DATA_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH));
 
-    `uvm_object_param_utils(uvm_logic_vector::sequence_simple#(DATA_WIDTH));
-    `m_uvm_get_type_name_func(uvm_logic_vector::sequence_simple);
+    `ndk_object_param_utils(
+        uvm_logic_vector::sequence_simple#(DATA_WIDTH),
+        $sformatf("uvm_logic_vector::sequence_simple#(%0d)",DATA_WIDTH)
+    );
 
     int unsigned transaction_count_min = 10;
     int unsigned transaction_count_max = 1000;
@@ -47,8 +49,10 @@ class sequence_simple #(int unsigned DATA_WIDTH) extends uvm_common::sequence_ba
 endclass
 
 class sequence_endless #(int unsigned DATA_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH));
-    `uvm_object_param_utils(uvm_logic_vector::sequence_endless#(DATA_WIDTH))
-    `m_uvm_get_type_name_func(uvm_logic_vector::sequence_endless);
+    `ndk_object_param_utils(
+        uvm_logic_vector::sequence_endless#(DATA_WIDTH),
+        $sformatf("uvm_logic_vector::sequence_endless#(%0d)",DATA_WIDTH)
+    )
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence");

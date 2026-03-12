@@ -9,7 +9,10 @@ class sequence_simple_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned TUSER_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, uvm_axi::sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
-    `uvm_object_param_utils(uvm_axi::sequence_simple_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_object_param_utils(
+        uvm_axi::sequence_simple_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::sequence_simple_tx#(%0d,%0d,%0d)",ITEM, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -64,7 +67,10 @@ class sequence_full_speed_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned TUSER_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
-    `uvm_object_param_utils(uvm_axi::sequence_full_speed_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_object_param_utils(
+        uvm_axi::sequence_full_speed_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::sequence_full_speed_tx#(%0d,%0d,%0d)",ITEM, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -114,7 +120,10 @@ class sequence_stop_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned TUSER_WIDTH
 ) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
-    `uvm_object_param_utils(uvm_axi::sequence_stop_tx #(ITEM, ITEM_WIDTH, TUSER_WIDTH))
+    `ndk_object_param_utils(
+        uvm_axi::sequence_stop_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::sequence_stop_tx#(%0d,%0d,%0d)",ITEM, ITEM_WIDTH, TUSER_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -167,7 +176,10 @@ class sequence_lib_tx #(
     int unsigned ITEM_WIDTH,
     int unsigned TUSER_WIDTH
 ) extends uvm_common::sequence_library#(config_sequence, uvm_axi::sequence_item #(ITEM, ITEM_WIDTH, TUSER_WIDTH));
-  `uvm_object_param_utils(uvm_axi::sequence_lib_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH))
+  `ndk_object_param_utils(
+        uvm_axi::sequence_lib_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH),
+        $sformatf("uvm_axi::sequence_lib_tx#(%0d,%0d,%0d)",ITEM, ITEM_WIDTH, TUSER_WIDTH)
+    )
   `uvm_sequence_library_utils(uvm_axi::sequence_lib_tx#(ITEM, ITEM_WIDTH, TUSER_WIDTH))
 
   function new(string name = "sequence_lib_tx");

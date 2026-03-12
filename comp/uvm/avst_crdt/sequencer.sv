@@ -5,7 +5,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequencer #(int unsigned UPDATE_CNT_WIDTH) extends uvm_sequencer #(uvm_avst_crdt::sequence_item #(UPDATE_CNT_WIDTH));
-    `uvm_component_param_utils(uvm_avst_crdt::sequencer #(UPDATE_CNT_WIDTH))
+    `ndk_component_param_utils(
+        uvm_avst_crdt::sequencer #(UPDATE_CNT_WIDTH),
+        $sformatf("uvm_avst_crdt::sequencer#(%0d)", UPDATE_CNT_WIDTH)
+    )
 
     // Constructor
     function new(string name = "sequencer", uvm_component parent = null);

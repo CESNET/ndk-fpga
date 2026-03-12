@@ -8,7 +8,10 @@
 class agent #(int unsigned DATA_WIDTH) extends uvm_agent;
 
     // registration of component tools
-    `uvm_component_param_utils(uvm_logic_vector::agent #(DATA_WIDTH))
+    `ndk_component_param_utils(
+        uvm_logic_vector::agent#(DATA_WIDTH),
+        $sformatf("uvm_logic_vector::agent#(%0d)",DATA_WIDTH)
+    )
 
     // -----------------------
     // Variables.

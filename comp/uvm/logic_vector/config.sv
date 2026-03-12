@@ -4,7 +4,7 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 class config_sequence extends uvm_object;
-    `uvm_object_utils(uvm_logic_vector::config_sequence)
+    `ndk_object_utils(uvm_logic_vector::config_sequence)
 
     function new (string name = "uvm_logic_vector_array::config_sequence");
         super.new(name);

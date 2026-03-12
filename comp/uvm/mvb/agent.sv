@@ -9,7 +9,10 @@
 
 // This is mvb rx agent, which declares basic components.
 class agent_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mvb::agent_rx#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::agent_rx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables
@@ -84,7 +87,10 @@ endclass
 
 // This is mvb tx agent, which declares basic components.
 class agent_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_agent;
-    `uvm_component_param_utils(uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mvb::agent_tx#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::agent_tx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Variables

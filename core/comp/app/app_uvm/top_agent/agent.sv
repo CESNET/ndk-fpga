@@ -6,7 +6,10 @@
 
 class agent #(type TR_TYPE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_agent;
     // registration of component tools
-    `uvm_component_param_utils(uvm_app_core_top_agent::agent#(TR_TYPE, ITEM_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_app_core_top_agent::agent#(TR_TYPE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_app_core_top_agent::agent#(%s,%0d,%0d)", $typename(TR_TYPE), ITEM_WIDTH, META_WIDTH)
+    )
 
     // -----------------------
     // Variables.

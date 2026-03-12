@@ -10,7 +10,10 @@ class env_rx #(
     string DEVICE,
     logic STRADDLING = 1'b0
 ) extends uvm_pcie::env_rx;
-    `uvm_component_param_utils(uvm_pcie_axi::env_rx#(ITEMS, dir, DEVICE, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::env_rx#(ITEMS, dir, DEVICE, STRADDLING),
+        $sformatf("uvm_pcie_axi::env_rx#(%0d,%s,%s,%0d)",ITEMS, dir, DEVICE, STRADDLING)
+    );
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices
@@ -106,7 +109,10 @@ class env_tx #(
     string DEVICE,
     logic STRADDLING = 1'b0
 ) extends uvm_pcie::env_tx;
-    `uvm_component_param_utils(uvm_pcie_axi::env_tx#(ITEMS, dir, DEVICE, STRADDLING));
+    `ndk_component_param_utils(
+        uvm_pcie_axi::env_tx#(ITEMS, dir, DEVICE, STRADDLING),
+        $sformatf("uvm_pcie_axi::env_tx#(%0d,%s,%s,%0d)",ITEMS, dir, DEVICE, STRADDLING)
+    );
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices

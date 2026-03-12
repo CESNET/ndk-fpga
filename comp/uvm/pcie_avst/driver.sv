@@ -10,7 +10,10 @@ class driver#(
     int unsigned REGION_SIZE,
     int unsigned META_WIDTH
 ) extends uvm_pcie::driver;
-    `uvm_component_param_utils(uvm_pcie_avst::driver #(REGIONS, REGION_SIZE, META_WIDTH));
+    `ndk_component_param_utils(
+        uvm_pcie_avst::driver#(REGIONS, REGION_SIZE, META_WIDTH),
+        $sformatf("uvm_pcie_avst::driver#(%0d,%0d,%0d)",REGIONS, REGION_SIZE, META_WIDTH)
+    );
 
     uvm_common::fifo#(uvm_pcie::header) fifo;
 

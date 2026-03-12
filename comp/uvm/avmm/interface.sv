@@ -4,7 +4,14 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-interface avmm_if #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) (input logic CLK);
+interface avmm_if #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) (
+    input logic CLK
+);
+
     initial VALID_PARAMETERS : assert(ADDRESS_WIDTH > 0 && DATA_WIDTH > 0 && BURST_WIDTH > 0);
 
     // Bus structure of AVMM

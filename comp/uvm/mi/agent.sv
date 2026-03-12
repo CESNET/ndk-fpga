@@ -10,7 +10,10 @@
 
 
 class agent_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_agent;
-    `uvm_component_param_utils(uvm_mi::agent_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mi::agent_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("uvm_mi::agent_slave#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
 
     uvm_analysis_port #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)) analysis_port_rq;
@@ -64,7 +67,10 @@ endclass
 // Slave agent is connected to slave DUT port. Master agent is connected to master DUT port.
 class agent_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_agent;
     // Registration of agent to databaze.
-    `uvm_component_param_utils(agent_master #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
+    `ndk_component_param_utils(
+        agent_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
+        $sformatf("agent_master#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
+    )
 
     //analysis ports
     uvm_analysis_port #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)) analysis_port_rq;

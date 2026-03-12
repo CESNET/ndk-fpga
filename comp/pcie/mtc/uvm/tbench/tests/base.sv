@@ -16,7 +16,7 @@ class mfb_rx_no_gaps#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) 
     virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
         super.init_sequence(param_cfg);
 
-        this.add_sequence(uvm_logic_vector_array_mfb::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 

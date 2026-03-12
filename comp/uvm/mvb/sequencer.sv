@@ -11,7 +11,10 @@ class sequencer #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_seque
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
-    `uvm_component_param_utils(uvm_mvb::sequencer #(ITEMS, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mvb::sequencer#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::sequencer#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     // RESET
     uvm_reset::sync_terminate reset_sync;

@@ -6,7 +6,10 @@
 
 class monitor #(int unsigned DATA_WIDTH) extends uvm_monitor;
 
-    `uvm_component_param_utils(uvm_logic_vector::monitor#(DATA_WIDTH))
+    `ndk_component_param_utils(
+        uvm_logic_vector::monitor#(DATA_WIDTH),
+        $sformatf("uvm_logic_vector::monitor#(%0d)",DATA_WIDTH)
+    )
 
     // Used to send transactions to all connected components.
     uvm_analysis_port #(sequence_item #(DATA_WIDTH)) analysis_port;

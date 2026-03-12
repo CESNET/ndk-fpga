@@ -8,7 +8,7 @@
 `define AVST_CRDT_CONFIG_SV
 
 class config_item extends uvm_object;
-    `uvm_object_utils(uvm_avst_crdt::config_item)
+    `ndk_object_utils(uvm_avst_crdt::config_item)
 
     // ----------------------- //
     // Configuration variables //

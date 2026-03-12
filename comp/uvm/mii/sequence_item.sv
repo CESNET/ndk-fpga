@@ -12,7 +12,10 @@
 `define MII_SEQUENCE_ITEM_SV
 
 class sequence_item #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_mii::sequence_item #(CHANNELS, WIDTH))
+    `ndk_object_param_utils(
+        uvm_mii::sequence_item#(CHANNELS, WIDTH),
+        $sformatf("uvm_mii::sequence_item#(%0d,%0d)",CHANNELS, WIDTH)
+    )
 
     localparam BYTES = WIDTH >> 3;
 

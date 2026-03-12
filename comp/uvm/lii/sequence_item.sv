@@ -14,7 +14,10 @@
 class sequence_item #(int unsigned DATA_WIDTH, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_common::sequence_item;
 
     // registration of object tools
-    `uvm_object_param_utils(uvm_lii::sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH))
+    `ndk_object_param_utils(
+        uvm_lii::sequence_item#(DATA_WIDTH, META_WIDTH, SOF_WIDTH),
+        $sformatf("uvm_lii::sequence_item#(%0d,%0d,%0d)",DATA_WIDTH, META_WIDTH, SOF_WIDTH)
+    )
 
     localparam BYTES_VLD_LENGTH = $clog2(DATA_WIDTH/8)+1;
 

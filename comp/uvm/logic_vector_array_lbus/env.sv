@@ -9,7 +9,7 @@
 // ======= //
 
 class env_rx extends uvm_env;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::env_rx);
+    `ndk_component_utils(uvm_logic_vector_array_lbus::env_rx);
 
     // -------------- //
     // Analysis ports //
@@ -145,7 +145,16 @@ class env_rx extends uvm_env;
 
     task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
-            uvm_logic_vector_array_lbus::sequence_library_rx lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx::type_id::create("lbus_sequence_library", this);
+            uvm_logic_vector_array_lbus::sequence_library_rx lbus_sequence_library;
+
+            if (m_config.lib_type == config_item::BASE) begin
+                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx::type_id::create("lbus_sequence_library", this);
+            end else if (m_config.lib_type == config_item::SPEED) begin
+                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx_speed::type_id::create("lbus_sequence_library", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
+
             lbus_sequence_library.min_random_count = 20;
             lbus_sequence_library.max_random_count = 100;
 
@@ -166,7 +175,7 @@ endclass
 // ======= //
 
 class env_tx extends uvm_env;
-    `uvm_component_utils(uvm_logic_vector_array_lbus::env_tx);
+    `ndk_component_utils(uvm_logic_vector_array_lbus::env_tx);
 
     // -------------- //
     // Analysis ports //
@@ -286,6 +295,15 @@ class env_tx extends uvm_env;
         uvm_lbus::sequence_library_tx lbus_seq;
 
         if (m_config.active == UVM_ACTIVE) begin
+            if (m_config.lib_type == config_item::BASE) begin
+                lbus_seq = uvm_lbus::sequence_library_tx::type_id::create("lbus_seq", this);
+            end else if (m_config.lib_type == config_item::SPEED) begin
+                lbus_seq = uvm_lbus::sequence_library_tx_speed::type_id::create("lbus_seq", this);
+            end else begin
+                `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
+            end
+
+
             lbus_seq = uvm_lbus::sequence_library_tx::type_id::create("lbus_seq", this);
             lbus_seq.init_sequence();
             lbus_seq.min_random_count =  100;

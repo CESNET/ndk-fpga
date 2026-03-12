@@ -8,7 +8,10 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
 
     // ------------------------------------------------------------------------
     // Registration of object tools
-    `uvm_object_param_utils(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `ndk_object_param_utils(
+        uvm_mfb::sequence_item#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_mfb::sequence_item#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    )
 
     // ------------------------------------------------------------------------
     // Member attributes, equivalent with interface pins

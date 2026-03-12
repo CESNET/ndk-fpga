@@ -5,7 +5,10 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 class coverage #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_subscriber#(sequence_item #(ITEMS, ITEM_WIDTH));
-    `uvm_component_param_utils(uvm_mvb::coverage #(ITEMS, ITEM_WIDTH))
+    `ndk_component_param_utils(
+        uvm_mvb::coverage#(ITEMS, ITEM_WIDTH),
+        $sformatf("uvm_mvb::coverage#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+    )
 
     sequence_item #(ITEMS, ITEM_WIDTH) seq_item;
     logic [ITEM_WIDTH-1 : 0] item;
@@ -76,6 +79,13 @@ class coverage #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_subscr
 
     function void display();
         $write("Ready signals coverage %f %%\nData coverage %f %%", m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage());
+    endfunction
+
+    function void report_phase(uvm_phase phase);
+        const string msg = $sformatf("Ready signals coverage %f %%\nData coverage %f %%",
+                m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage()
+        );
+        `uvm_info(this.get_full_name(), msg, UVM_LOW);
     endfunction
 
 endclass

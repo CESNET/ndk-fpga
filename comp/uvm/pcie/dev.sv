@@ -81,7 +81,7 @@ endclass
 
 //TODO: BASE DEV SHOULD DO NOTHING.
 class dev extends uvm_component;
-    `uvm_component_param_utils(uvm_pcie::dev)
+    `ndk_component_utils(uvm_pcie::dev)
 
     localparam TAG_WIDTH = 8;
 
