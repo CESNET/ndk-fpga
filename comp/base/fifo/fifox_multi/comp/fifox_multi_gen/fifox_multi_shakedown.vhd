@@ -31,7 +31,7 @@ use work.math_pack.all;
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 
-architecture SHAKEDOWN of FIFOX_MULTI is
+architecture SHAKEDOWN of FIFOX_MULTI_GEN is
 
     -- Number of data words in SHAKEDOWN register
     -- Changes the width of MUXes in SHAKEDOWN and the throughput.

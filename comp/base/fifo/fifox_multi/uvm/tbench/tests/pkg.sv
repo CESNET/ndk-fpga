@@ -23,7 +23,7 @@ package test;
     parameter ALLOW_SINGLE_FIFO   = 0;
     parameter SAFE_READ_MODE      = 0;
 
-    parameter IMPL_SHAKEDOWN = 0;
+    parameter IMPL_SHAKEDOWN = "SHAKEDOWN";
 
     parameter MIN_TRANSACTION_COUNT = 4000;
     parameter MAX_TRANSACTION_COUNT = 5000;

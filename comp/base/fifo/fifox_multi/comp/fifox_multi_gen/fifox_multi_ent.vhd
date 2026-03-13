@@ -15,7 +15,7 @@ use work.math_pack.all;
 -- each cycle. With ``N`` write ports and ``M`` read ports it can perform 0 to
 -- ``N`` writes and 0 to ``M`` reads simultaneously. Uses :ref:`FIFOX <fifox>`
 -- internally (multiple, when required).
-entity FIFOX_MULTI is
+entity FIFOX_MULTI_GEN is
     generic (
         -- Width of data word stored in FIFO, in bits.
         DATA_WIDTH          : natural := 512;

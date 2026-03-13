@@ -21,6 +21,5 @@ lappend COMPONENTS \
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"              \
             "$ENTITY_BASE/tbench/tests/pkg.sv"            \
             "$ENTITY_BASE/tbench/property.sv"             \
-            "$ENTITY_BASE/tbench/fifox_multi_wrapper.vhd" \
             "$ENTITY_BASE/tbench/dut.sv"                  \
             "$ENTITY_BASE/tbench/testbench.sv"            \
