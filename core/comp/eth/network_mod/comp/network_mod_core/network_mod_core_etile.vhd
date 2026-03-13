@@ -528,6 +528,7 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal tx_adap_mfb_clk     : std_logic_vector(ETH_PORT_CHAN-1 downto 0) := (others => '0');
     signal tx_adap_mfb_data    : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal tx_adap_mfb_crc_err : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
+    signal tx_adap_mfb_mii_err : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
     signal tx_adap_mfb_sof_pos : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
     signal tx_adap_mfb_eof_pos : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
     signal tx_adap_mfb_sof     : slv_array_t(ETH_PORT_CHAN-1 downto 0)(REGIONS-1 downto 0);
@@ -1364,6 +1365,8 @@ begin
         signal mfb2avst_rx_mfb_sof : std_logic_vector(1-1 downto 0);
         signal mfb2avst_rx_mfb_eof : std_logic_vector(1-1 downto 0);
 
+        signal rx_reset            : std_logic;
+
         signal tx_ad_avst_data   : std_logic_vector(AVST_DATA_WIDTH -1 downto 0);
         signal tx_ad_avst_sop    : std_logic;
         signal tx_ad_avst_eop    : std_logic;
@@ -1388,6 +1391,8 @@ begin
         -- JC: This assignment/renaming is necessary here to synchronize
         -- the delta delay (for simulators) between the clock and data signals!
         RX_MFB_DST_RDY(IT) <= mfb2avst_rx_mfb_dst_rdy(IT);
+
+        rx_reset <= RESET_ETH or (not rx_pcs_ready(IT));
 
         -- TX adaption
         mfb2avst_i : entity work.TX_MAC_LITE_ADAPTER_AVST_100G
@@ -1424,27 +1429,28 @@ begin
             TX_REGION_SIZE => AVST_DATA_WIDTH/64
         )
         port map (
-            CLK              => etile_clk_out,
-            RESET            => RESET_ETH,
+            CLK               => etile_clk_out,
+            RESET             => rx_reset,
 
-            IN_AVST_DATA     => rx_avst_data_arr (IT),
-            IN_AVST_SOP      => rx_avst_sop      (IT),
-            IN_AVST_EOP      => rx_avst_eop      (IT),
-            IN_AVST_EMPTY    => rx_avst_empty_arr(IT),
-            IN_AVST_ERROR    => rx_avst_error_arr(IT),
-            IN_AVST_VALID    => rx_avst_valid    (IT),
-            IN_RX_PCS_READY  => '0', -- rx_pcs_ready (0)
-            IN_RX_BLOCK_LOCK => '0', -- rx_block_lock(0)
-            IN_RX_AM_LOCK    => '0', -- rx_am_lock   (0)
+            IN_AVST_DATA      => rx_avst_data_arr (IT),
+            IN_AVST_SOP       => rx_avst_sop      (IT),
+            IN_AVST_EOP       => rx_avst_eop      (IT),
+            IN_AVST_EMPTY     => rx_avst_empty_arr(IT),
+            IN_AVST_ERROR     => rx_avst_error_arr(IT),
+            IN_AVST_VALID     => rx_avst_valid    (IT),
+            IN_RX_PCS_READY   => '0', -- rx_pcs_ready (0)
+            IN_RX_BLOCK_LOCK  => '0', -- rx_block_lock(0)
+            IN_RX_AM_LOCK     => '0', -- rx_am_lock   (0)
 
-            OUT_MFB_DATA     => tx_adap_mfb_data   (IT),
-            OUT_MFB_SOF      => tx_adap_mfb_sof    (IT),
-            OUT_MFB_SOF_POS  => tx_adap_mfb_sof_pos(IT),
-            OUT_MFB_EOF      => tx_adap_mfb_eof    (IT),
-            OUT_MFB_EOF_POS  => tx_adap_mfb_eof_pos(IT),
-            OUT_MFB_ERROR    => tx_adap_mfb_crc_err(IT),
-            OUT_MFB_SRC_RDY  => tx_adap_mfb_src_rdy(IT),
-            OUT_LINK_UP      => open -- this is done here
+            OUT_MFB_DATA      => tx_adap_mfb_data   (IT),
+            OUT_MFB_SOF       => tx_adap_mfb_sof    (IT),
+            OUT_MFB_SOF_POS   => tx_adap_mfb_sof_pos(IT),
+            OUT_MFB_EOF       => tx_adap_mfb_eof    (IT),
+            OUT_MFB_EOF_POS   => tx_adap_mfb_eof_pos(IT),
+            OUT_MFB_ERROR     => tx_adap_mfb_crc_err(IT),
+            OUT_MFB_MII_ERROR => tx_adap_mfb_mii_err(IT),
+            OUT_MFB_SRC_RDY   => tx_adap_mfb_src_rdy(IT),
+            OUT_LINK_UP       => open -- this is done here
         );
 
         -- JC: This assignment/renaming is necessary here to synchronize
@@ -1456,14 +1462,14 @@ begin
         TX_MFB_EOF_POS(IT) <= tx_adap_mfb_eof_pos(IT);
         TX_MFB_CRC_ERR(IT) <= tx_adap_mfb_crc_err(IT);
         TX_MFB_SRC_RDY(IT) <= tx_adap_mfb_src_rdy(IT);
-        TX_MFB_MII_ERR(IT) <= (others => '0');
+        TX_MFB_MII_ERR(IT) <= tx_adap_mfb_mii_err(IT);
 
         repeater_i: entity work.AVST_LOOP
         generic map (
             SEGMENTS => AVST_DATA_WIDTH/64
         )
         port map (
-            RST              => RESET_ETH,
+            RST              => rx_reset,
             CLK              => etile_clk_out,
             --
             IN_AVST_DATA     => rx_avst_data_arr(IT),
