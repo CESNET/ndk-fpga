@@ -45,10 +45,14 @@ class testbench():
         # setting up driver of the DST_RDY so it randomly fluctuates between 0 and 1
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
 
-        # setting up the probe measuring throughput
-        self.throughput_probe = ThroughputProbe(ThroughputProbeMfbInterface(self.stream_out), throughput_units="bits")
-        self.throughput_probe.add_log_interval(0, None)
-        self.throughput_probe.set_log_period(10)
+        # setting up the probes measuring throughput
+        self.in_throughput_probe = ThroughputProbe(ThroughputProbeMfbInterface(self.stream_in), throughput_units="bits", name="ThroughputProbe - IN")
+        self.in_throughput_probe.add_log_interval(0, None)
+        self.in_throughput_probe.set_log_period(10)
+
+        self.out_throughput_probe = ThroughputProbe(ThroughputProbeMfbInterface(self.stream_out), throughput_units="bits", name="ThroughputProbe - OUT")
+        self.out_throughput_probe.add_log_interval(0, None)
+        self.out_throughput_probe.set_log_period(10)
 
         # counter of sent transactions
         self.pkts_sent = 0
@@ -123,9 +127,12 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
         # if not all packets have been received yet, waiting 100 cycles so the simulation doesn't stop prematurelly
         await ClockCycles(dut.CLK, 100)
 
-    # logging values measured by throughput probe
-    tb.throughput_probe.log_max_throughput()
-    tb.throughput_probe.log_average_throughput()
+    # logging values measured by throughput probes
+    tb.in_throughput_probe.log_max_throughput()
+    tb.in_throughput_probe.log_average_throughput()
+
+    tb.out_throughput_probe.log_max_throughput()
+    tb.out_throughput_probe.log_average_throughput()
 
     # displaying result of the test
     raise tb.scoreboard.result
