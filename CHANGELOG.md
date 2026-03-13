@@ -6,6 +6,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [0.13.0] - 2026-03-13
+
+### Added
+- cards: Added support for IA-860m card.
+- cards: Added support for FB2CDG1 card with AGMF039R47A1E2VC.
+- cards: Added support for Silicom N5014 card.
+- cards: Introduced BMC_ENABLE core parameter for FB2CDG1 and IA-440i cards.
+- core: Added support for setting F-TILE VSR mode via generic.
+- comp: Introduced MFB_CHECKSUM_L3L4 module.
+- comp: Introduced MFB Discarder component.
+- comp: Added Chaskey hash function (firmware, software, SystemVerilog, Python).
+- cocotb: Added ScapyPacketGenerator to ofm/utils.
+- cocotb: Added support for optional signals in MFB driver and monitor.
+- dma: Added support for Peer-to-Peer communication in DMA Calypte.
+- dma: Added update of pointer through PCIe interface in DMA Calypte.
+- dma: Added bifurcation support in DMA Calypte.
+- uvm: Introduced NDK registration macros for UVM.
+- uvm: Added new PCIe completer sequences (big/small, stop, minimal/maximal payload).
+- ci: Introduced PCIe Packet Writer.
+- ci: Added CI for mem_tester Python software.
+
+### Changed
+- core: Improved performance by enabling middle FIFOs in merger of ETH channels.
+- core: Adjusted resize settings of MFB parameters in RX MAC for better throughput.
+- dma: Increased throughput and improved channel start logic.
+- build: Used PLATFORM_TAGS for correct source selection.
+- build: Added workaround for vmake issue with PSL files in Questa.
+- docs: Updated documentation build process and added TODOs.
+- uvm: Unified sequence names and improved parameter formatting.
+- ver: Removed old and problematic CROSSBARX verification.
+
+### Removed
+- uvm: Removed TX sequences from multiple verification components.
+
+### Fixed
+- cocotb: Fixed missing card_name variants in nfbdevice.
+- cards: Fixed ETH IP for Vivado 25.1 on FB2CGHH card.
+- core: Fixed F-Tile XCVR initialization and interconnect.
+- core: Fixed handling of MFB MII error signal in E-Tile network module.
+- comp: Fixed barrel shifter implementation (use barrel_shifter instead of barrel_shifter_gen).
+- comp: Fixed MVB LUT RAM to allow SW_WIDTH > LUT_WIDTH.
+- comp: Fixed axis_frame_fracturer locally static expression for nvc.
+- build: Fixed Modules.tcl missing ENTITY_BASE for ver/dut component.
+- uvm: Fixed PCIe reset dependency in PCIE_MOD verification.
+- uvm: Fixed drop probe parameters after changes in RX MAC.
+- dma: Fixed assignment to memory array when more than 32 channels are used.
+- sw: Fixed GLS muxes default state when stopping MFB generator.
+
 ## [0.12.0] - 2025-10-02
 
 ### Added
