@@ -177,7 +177,7 @@ There is also a variant with an enable signal and a variant with a reverse codin
 <p><strong>H3_HASH</strong> - Implementation of universal H3 class hash function. Documentation can be found here <a class="reference internal" href="comp/base/logic/h3hash/readme.html#h3-hash"><span class="std std-ref">here</span></a>.</p>
 <p><strong>LAST_ONE</strong> - Behavioral implementation of generic detector of last one in input vector. Output vector one-hot encoded.</p>
 <p><strong>LFSR_SIMPLE_RANDOM_GEN</strong> - Simple LFSR pseudo-random generator uses Fibonacci implementation of LFSR with XNOR gate.</p>
-<p><strong>MOD</strong> - Behavioral implementation of generic modulo constant block. TODO</p>
+<p><strong>MOD</strong> - Behavioral implementation of generic modulo constant block. Computes VALUE mod MODULO, where MODULO is a generic constant. Optimized for power-of-2 modulo values (simple bit truncation).</p>
 <p><strong>MODULO_LOOKUP</strong> - Behavioral implementation of Modulo look-up table in ROM. Optimized for Xilinx FPGAs only.</p>
 <p><strong>MUL48</strong> - Implementation of generic multiplier based on Xilinx 7-Series DSP slices.</p>
 <p><strong>MUX</strong> - Behavioral implementation of generic multiplexer. It also contains a one-hot variant and an extended registered variant (piped).</p>
