@@ -15,7 +15,8 @@ FIFOX
 Block diagram
 ^^^^^^^^^^^^^
 
-TODO- Přidat blokový diagram komponenty FIFOX
+.. image:: doc/fifox.svg
+    :width: 100 %
 
 Verification
 ^^^^^^^^^^^^
