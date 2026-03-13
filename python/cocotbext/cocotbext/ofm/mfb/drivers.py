@@ -20,6 +20,7 @@ class MFBDriver(BusDriver):
         super().__init__(entity, name, clock, array_idx=array_idx)
         self.clock = clock
         self.frame_cnt = 0
+        self.item_cnt = 0
         self._regions, self._region_size, self._block_size, self._item_width, self._meta_width, self._os_valid_with = get_mfb_params(
             self.bus, mfb_params
         )
@@ -201,6 +202,7 @@ class MFBDriver(BusDriver):
 
                 await self._write_frame(transaction)
                 self.frame_cnt += 1
+                self.item_cnt += (len(transaction.data) * 8) // self._item_width
                 # Notify the world that this transaction is complete
                 if event:
                     event.set()
