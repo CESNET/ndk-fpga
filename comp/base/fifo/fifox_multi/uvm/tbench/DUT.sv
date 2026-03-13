@@ -15,8 +15,19 @@ module DUT (
     mvb_if.dut_tx mvb_status
 );
 
-    if (IMPL_SHAKEDOWN == "FULL") bind FIFOX_MULTI : VHDL_DUT_U probe_inf #(1+$clog2(WRITE_PORTS+1)+$clog2(READ_PORTS+1)) probe_status((RESET === 1'b0), { fifox_multi_full_g.fifox_multi_full_i.in_reg1_en, fifox_multi_full_g.fifox_multi_full_i.wr_num_reg1, fifox_multi_full_g.fifox_multi_full_i.rd_num }, CLK);
-
+    if (IMPL_SHAKEDOWN == "FULL") begin : gen_probe
+        bind FIFOX_MULTI : VHDL_DUT_U probe_inf #(
+            1 + $clog2(WRITE_PORTS + 1) + $clog2(READ_PORTS + 1)
+        ) probe_status (
+            .event_signal ((RESET === 1'b0)),
+            .event_data   ({
+                fifox_multi_full_g.fifox_multi_full_i.in_reg1_en,
+                fifox_multi_full_g.fifox_multi_full_i.wr_num_reg1,
+                fifox_multi_full_g.fifox_multi_full_i.rd_num
+            }),
+            .CLK          (CLK)
+        );
+    end : gen_probe
     logic [WRITE_PORTS-1 : 0] wr;
     logic full;
 
@@ -73,8 +84,11 @@ module DUT (
     always_comb begin
         rd_continuous = { READ_PORTS { 1'b0 } };
         for (int i = READ_PORTS-1; i >= 0; i--) begin
-            if (mvb_rd.VLD[i] === 1'b1) break;
-            else rd_continuous[i] = 1'b1;
+            if (mvb_rd.VLD[i] === 1'b1) begin
+                break;
+            end else begin
+                rd_continuous[i] = 1'b1;
+            end
         end
         rd_continuous = SAFE_READ_MODE ? ~rd_continuous : ~rd_continuous & (~empty);
     end
