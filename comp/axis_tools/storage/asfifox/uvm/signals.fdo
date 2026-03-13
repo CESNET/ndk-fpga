@@ -1,0 +1,11 @@
+# signals.fdo: Include file with signals
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Tomáš Neckař <xneckat00@stud.fit.vut.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+
+add_wave -noupdate -group "RESET_RX" "/testbench/reset_rx/*"
+add_wave -noupdate -group "RESET_TX" "/testbench/reset_tx/*"
+add_wave -noupdate -group "RX"       "/testbench/axi_rx/*"
+add_wave -noupdate -group "TX"       "/testbench/axi_tx/*"
