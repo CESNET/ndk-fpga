@@ -791,23 +791,27 @@ begin
         -- Generate LUTRAM for non-constant registers
         nonconst_reg_g: if (not CONST_REGS(i)) generate
 
-            -- Generate just one NP_LUTRAM for each MI transaction
-            reg_i : entity work.NP_LUTRAM
-            generic map (
-                DATA_WIDTH  => MI_WIDTH,
-                ITEMS       => CHANNELS,
-                WRITE_PORTS => WR_PORTS(i),
-                READ_PORTS  => RD_PORTS(i),
-                DEVICE      => DEVICE
-            )
-            port map (
-                WCLK  => CLK,
-                DI    => reg_di   (i)(WR_PORTS(i)-1 downto 0),
-                WE    => reg_we   (i)(WR_PORTS(i)-1 downto 0),
-                ADDRA => reg_addra(i)(WR_PORTS(i)-1 downto 0),
-                ADDRB => reg_addrb(i)(RD_PORTS(i)-1 downto 0),
-                DOB   => reg_dob  (i)(RD_PORTS(i)-1 downto 0)
-            );
+            wr_en_gen : if (WR_PORTS(i) > 0) generate
+                -- Generate just one NP_LUTRAM for each MI transaction
+                reg_i : entity work.NP_LUTRAM
+                generic map (
+                    DATA_WIDTH  => MI_WIDTH,
+                    ITEMS       => CHANNELS,
+                    WRITE_PORTS => WR_PORTS(i),
+                    READ_PORTS  => RD_PORTS(i),
+                    DEVICE      => DEVICE
+                )
+                port map (
+                    WCLK  => CLK,
+                    DI    => reg_di   (i)(WR_PORTS(i)-1 downto 0),
+                    WE    => reg_we   (i)(WR_PORTS(i)-1 downto 0),
+                    ADDRA => reg_addra(i)(WR_PORTS(i)-1 downto 0),
+                    ADDRB => reg_addrb(i)(RD_PORTS(i)-1 downto 0),
+                    DOB   => reg_dob  (i)(RD_PORTS(i)-1 downto 0)
+                );
+            else generate
+                reg_dob  (i)(RD_PORTS(i)-1 downto 0) <= (others => (MI_WIDTH-1 downto 0 => '0'));
+            end generate;
 
             strobe_gen : if (STROBE_EN(i)) generate
 
