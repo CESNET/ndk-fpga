@@ -63,7 +63,10 @@ entity MFB_SPLITTER_GEN is
         OUT_PIPE_EN     : boolean := true;
 
         -- "ULTRASCALE", "STRATIX10",...
-        DEVICE          : string  := "ULTRASCALE"
+        DEVICE          : string  := "ULTRASCALE";
+
+        -- "FULL", "SHAKEDOWN"
+        FIFOX_MULTI_ARCH : string  := "SHAKEDOWN"
     );
     port (
         -- ===================
@@ -170,7 +173,8 @@ begin
                 IN_MFB_FIFO_EN       => (s /= 0 and MID_MFB_FIFOS_EN),
                 MFB_FIFO_DEPTH       => MFB_FIFO_DEPTH,
                 USE_OUTREG           => OUT_PIPE_EN,
-                DEVICE               => DEVICE
+                DEVICE               => DEVICE,
+                FIFOX_MULTI_ARCH     => FIFOX_MULTI_ARCH
             )
             port map (
                 CLK              => CLK,

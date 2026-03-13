@@ -27,7 +27,9 @@ entity MFB_DISCARDER is
         -- Minimum value is 2!
         OUTPUT_FIFO_SIZE : integer := 32;
         -- Device
-        DEVICE           : string  := "ULTRASCALE"
+        DEVICE           : string  := "ULTRASCALE";
+
+        SPLITTER_FIFOX_MULTI_ARCH : string  := "FULL"
     );    port (
         -- CLOCK AND RESET
         CLK            : in  std_logic;
@@ -93,7 +95,8 @@ begin
         MFB_ITEM_WIDTH   => MFB_ITEM_WIDTH,
         OUTPUT_FIFO_SIZE => OUTPUT_FIFO_SIZE,
         OUT_PIPE_EN      => false,
-        DEVICE           => DEVICE
+        DEVICE           => DEVICE,
+        FIFOX_MULTI_ARCH => SPLITTER_FIFOX_MULTI_ARCH
     )
     port map (
         CLK             => CLK,
