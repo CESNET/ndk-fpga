@@ -62,7 +62,7 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         self._core = NFBDevice.core_instance_from_top(self._dut)
         if self._card_name == "FB2CGHH":
             await cocotb.start(Clock(self._dut.REFCLK, 20, 'ns').start())
-        elif self._card_name == "FB2CDG1":
+        elif self._card_name in ["FB2CDG1", "FB2CDG1-VAR0", "FB2CDG1-VAR1"]:
             await cocotb.start(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
         elif self._card_name in ["FB2CGG3", "FB4CGG3"]:
             await cocotb.start(Clock(self._dut.REFCLK, 20, 'ns').start())
@@ -71,10 +71,10 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         elif self._card_name == "NFB-200G2QL":
             await cocotb.start(Clock(self._dut.SYSCLK_P, 8, 'ns').start())
             await cocotb.start(Clock(self._dut.SYSCLK_N, 8, 'ns').start(start_high=False))
-        elif "AGI-FH400G" in self._card_name:
+        elif self._card_name in ["AGI-FH400G", "AGI-FH400G-REV0", "AGI-FH400G-REV1", "AGI-FH400G-REV2"]:
             await cocotb.start(Clock(self._dut.AG_SYSCLK0_P, 8, 'ns').start())
             await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 10, 'ns').start())
-        elif "IA-440I" in self._card_name:
+        elif self._card_name in ["IA-440I", "IA-440I-VAR0", "IA-440I-VAR1"]:
             await cocotb.start(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
         elif "IA-860M" in self._card_name:
             await cocotb.start(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
