@@ -9,6 +9,8 @@ from cocotb.utils import get_sim_time
 from ofm.utils import convert_units
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.mvb.drivers import MVBDriver
+from cocotbext.ofm.mfb.drivers import MFBDriver
 
 
 class ThroughputProbeInterface(ProbeInterface):
@@ -35,12 +37,33 @@ class ThroughputProbeMvbInterface(ThroughputProbeInterface):
         "item_cnt"  : "item_cnt"
     }
 
-    def __init__(self, monitor: MVBMonitor):
-        super().__init__(monitor)
+    def __init__(self, agent: MVBMonitor | MVBDriver):
+        super().__init__(agent)
+
+    @property
+    def in_reset(self):
+        """
+        Overrides 'in_reset' in interface_dict.
+
+        Implements different behavior of in_reset based on
+        the type of the agent.
+        """
+        in_reset = self.interface_dict.get("in_reset", None)
+
+        # check if in_reset has a valid translation in
+        # the interface dict and if the agent has a
+        # variable with this name. If yes, return
+        # it's value
+        if in_reset is not None:
+            if hasattr(self._agent, in_reset):
+                return getattr(self._agent, in_reset)
+
+        # if no, return False as default
+        return False
 
 
 class ThroughputProbeMfbInterface(ThroughputProbeInterface):
-    """Throughput probe interface for the MFB monitor."""
+    """Throughput probe interface for the MFB monitor or driver."""
     interface_dict = {
         "clock"     : "clock",
         "in_reset"  : "in_reset",
@@ -49,12 +72,34 @@ class ThroughputProbeMfbInterface(ThroughputProbeInterface):
         "item_cnt"  : "item_cnt"
     }
 
-    def __init__(self, monitor: MFBMonitor):
-        super().__init__(monitor)
+    def __init__(self, agent: MFBMonitor | MFBDriver):
+        super().__init__(agent)
+
+    @property
+    def in_reset(self):
+        """
+        Overrides 'in_reset' in interface_dict.
+
+        Implements different behavior of in_reset based on
+        the type of the agent.
+        """
+        in_reset = self.interface_dict.get("in_reset", None)
+
+        if in_reset is not None:
+            if hasattr(self._agent, in_reset):
+                return getattr(self._agent, in_reset)
+
+        return False
 
     @property
     def items(self):
-        return self._monitor._regions * self._monitor._region_items
+        """
+        Overrides 'items' in interface_dict.
+
+        Calculates number of items from number of regions
+        and items per region on the connected MFB bus.
+        """
+        return self._agent._regions * self._agent._region_items
 
 
 class ThroughputProbe(Probe):
