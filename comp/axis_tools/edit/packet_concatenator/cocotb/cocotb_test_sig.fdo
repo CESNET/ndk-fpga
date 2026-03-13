@@ -1,0 +1,12 @@
+# cocotb_test_sig.fdo : Include file with signals
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Daniel Kondys <kondys@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {Top} -noupdate -hex /axis_frame_concatenator/*
+
+config wave -signalnamewidth 1
