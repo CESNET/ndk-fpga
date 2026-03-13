@@ -312,7 +312,7 @@ begin
 
     else generate
 
-        trans_fifo_i : entity work.FIFOX_MULTI(SHAKEDOWN)
+        trans_fifo_i : entity work.FIFOX_MULTI
         generic map (
             DATA_WIDTH          => METADATA_WIDTH+ID_WIDTH,
             ITEMS               => TRANS_FIFO_ITEMS,
@@ -322,7 +322,8 @@ begin
             DEVICE              => DEVICE,
             ALMOST_FULL_OFFSET  => minimum(TRANS_FIFO_ITEMS-1,ALMOST_FULL_OFFSET+2*RX_TRANSS), -- compensate for output Shakedown registers
             ALMOST_EMPTY_OFFSET => 0,
-            SAFE_READ_MODE      => true
+            SAFE_READ_MODE      => true,
+            FIFOX_MULTI_ARCH    => "SHAKEDOWN"
         )
         port map (
             CLK    => CLK,

@@ -64,7 +64,10 @@ entity MFB_SPLITTER is
         USE_OUTREG      : boolean := true;
 
         -- "ULTRASCALE", "7SERIES"
-        DEVICE          : string  := "ULTRASCALE"
+        DEVICE          : string  := "ULTRASCALE";
+
+        -- "FULL", "SHAKEDOWN"
+        FIFOX_MULTI_ARCH : string  := "SHAKEDOWN"
     );
     port (
         -- ======================
@@ -215,15 +218,16 @@ begin
         switch_fifoxm_wr(i) <= '1' when RX_MVB_VLD(i) = '1' and RX_MVB_SRC_RDY = '1' and RX_MVB_PAYLOAD(i) = '1' and mvb_out_fifox_full = "00" else '0';
     end generate;
 
-    switch_fifoxm_i : entity work.FIFOX_MULTI(SHAKEDOWN)
+    switch_fifoxm_i : entity work.FIFOX_MULTI
     generic map (
-        DATA_WIDTH     => 1,
-        ITEMS          => MVB_ITEMS*2*MVB_OUTPUT_FIFO_SIZE,
-        WRITE_PORTS    => MVB_ITEMS,
-        READ_PORTS     => MVB_ITEMS,
-        RAM_TYPE       => "AUTO",
-        SAFE_READ_MODE => true,
-        DEVICE         => DEVICE
+        DATA_WIDTH       => 1,
+        ITEMS            => MVB_ITEMS*2*MVB_OUTPUT_FIFO_SIZE,
+        WRITE_PORTS      => MVB_ITEMS,
+        READ_PORTS       => MVB_ITEMS,
+        RAM_TYPE         => "AUTO",
+        SAFE_READ_MODE   => true,
+        DEVICE           => DEVICE,
+        FIFOX_MULTI_ARCH => FIFOX_MULTI_ARCH
     )
     port map (
         CLK    => CLK,

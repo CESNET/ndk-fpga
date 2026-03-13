@@ -227,7 +227,7 @@ begin
     meta_fifoxm_din <= slv_array_ser(meta_fifoxm_din_arr);
     meta_fifoxm_wr  <= (RX_MFB_SOF and RX_MFB_SRC_RDY) and RX_MFB_DST_RDY;
 
-    meta_fifoxm_i : entity work.FIFOX_MULTI(shakedown)
+    meta_fifoxm_i : entity work.FIFOX_MULTI
     generic map (
         DATA_WIDTH          => MFB_META_WIDTH+1,
         ITEMS               => 512,
@@ -238,7 +238,8 @@ begin
         ALMOST_FULL_OFFSET  => 0,
         ALMOST_EMPTY_OFFSET => 0,
         ALLOW_SINGLE_FIFO   => True,
-        SAFE_READ_MODE      => False
+        SAFE_READ_MODE      => False,
+        FIFOX_MULTI_ARCH    => "SHAKEDOWN"
     )
     port map (
         CLK   => CLK,
