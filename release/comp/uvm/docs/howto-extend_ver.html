@@ -1,0 +1,1172 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UVM HOWTO - Upgrade verification &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="UVM HOWTO - Multiver script" href="howto-others.html" />
+    <link rel="prev" title="UVM HOWTO - Create the first verification" href="howto-first_ver.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ver.html">UVM Verification</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="howto-intro.html">UVM HOWTO — Introduction for Newcomers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual.html">SystemVerilog and UVM Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim_manual.html">UVM simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../componets.html">Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto-first_ver.html">UVM HOWTO - Create the first verification</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">UVM HOWTO - Upgrade verification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-register-model">Add Register model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#uvm-factory">UVM Factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sequence-configuration">Sequence Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pcap">PCAP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#register-configuration-by-external-program">Register configuration by external program</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="howto-others.html">UVM HOWTO - Multiver script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto-others.html#uvm-howto-generate-environment">UVM HOWTO - Generate environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto-others.html#uvm-howto-generated-coverage">UVM HOWTO - Generated Coverage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../ver.html">UVM Verification</a></li>
+      <li class="breadcrumb-item active">UVM HOWTO - Upgrade verification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/comp/uvm/docs/howto-extend_ver.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uvm-howto-upgrade-verification">
+<span id="uvm-howto-extend-verification"></span><h1>UVM HOWTO - Upgrade verification<a class="headerlink" href="#uvm-howto-upgrade-verification" title="Link to this heading"></a></h1>
+<p>This chapter describes how to improve a verification environment once you have
+a basic one running. It builds on the flow from the <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a> and
+the environment you create in the <a class="reference internal" href="howto-first_ver.html#uvm-howto-first-ver"><span class="std std-ref">UVM HOWTO - Create the first verification</span></a> (test, environment,
+UVCs, model, scoreboard). If you are new to UVM in this repository, read the
+intro first for the big picture.</p>
+<section id="add-register-model">
+<h2>Add Register model<a class="headerlink" href="#add-register-model" title="Link to this heading"></a></h2>
+<p>The register model simplifies organisation and working with registers in the verification environment.
+This FIFO component doesn’t have any accessible registers from outside. Therefore, create a simple
+register in <em>testbench.sv</em>. So it would be possible to create and demonstrate a simple register model.
+This chapter is only about a demonstration register model.</p>
+<p>In this example we create one simple register in the testbench to demonstrate how the register model works.
+We create register which enable output FIFO. Register disable reading from the FIFO.
+Only the “valid” signal of the output (tx_src_rdy) depends on the register’s value.
+Create the testbench which enables output depending on the value stored in the register. Writing to the register
+is going to be done through the register model. For accessing registers through the register model
+the NDK environment uses the MI interface.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">testbench.sv</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">uvm_pkg::*</span><span class="p">;</span>
+<span class="w"> </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+<span class="w"> </span><span class="k">import</span><span class="w"> </span><span class="n">uvm_generic</span><span class="o">::*</span><span class="p">;</span>
+
+<span class="w"> </span><span class="k">module</span><span class="w"> </span><span class="n">testbench</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// Create test with parameters (Register in factory)</span>
+<span class="w">     </span><span class="k">typedef</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// Create clock</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">CLK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">     </span><span class="k">always</span><span class="w"> </span><span class="p">#(</span><span class="n">CLK_PERIOD</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">CLK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">CLK</span><span class="p">;</span>
+
+<span class="w">     </span><span class="n">reset_if</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+<span class="w">     </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w">     </span><span class="n">mvb_rx</span><span class="w">    </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+<span class="w">     </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w">     </span><span class="n">mvb_tx</span><span class="w">    </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+
+<span class="w">     </span><span class="n">mi_if</span><span class="w">  </span><span class="p">#(</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="w">            </span><span class="k">config</span><span class="w">    </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+
+
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">         </span><span class="n">uvm_root</span><span class="w"> </span><span class="n">m_root</span><span class="p">;</span>
+
+<span class="w">         </span><span class="c1">// REGISTER INTERFACE INTO DATABASE</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">reset_if</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">reset</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">))</span><span class="w">    </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mvb_rx&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">mvb_rx</span><span class="w">    </span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">))</span><span class="w">    </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mvb_tx&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">mvb_tx</span><span class="w">    </span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mi_if</span><span class="w">  </span><span class="p">#(</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">))</span><span class="w">           </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mi&quot;</span><span class="p">,</span><span class="w">         </span><span class="k">config</span><span class="w">    </span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// STOP on end of simulation and dont print message ILLEGALNAME</span>
+<span class="w">         </span><span class="n">m_root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_root</span><span class="o">::</span><span class="n">get</span><span class="p">();</span>
+<span class="w">         </span><span class="n">m_root</span><span class="p">.</span><span class="n">finish_on_completion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_root</span><span class="p">.</span><span class="n">set_report_id_action_hier</span><span class="p">(</span><span class="s">&quot;ILLEGALNAME&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">UVM_NO_ACTION</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// DONT RECORD TRANSACTIONS</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="kt">int</span><span class="p">)</span><span class="w">            </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;recording_detail&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_bitstream_t</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;recording_detail&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// RUN TESTS</span>
+<span class="w">         </span><span class="n">run_test</span><span class="p">();</span>
+<span class="w">         </span><span class="c1">// STOP ON END OF SIMULATION</span>
+<span class="w">         </span><span class="p">$</span><span class="n">stop</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="w">     </span><span class="k">end</span>
+
+<span class="w">     </span><span class="c1">//INSTANTIATE DUT</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">full</span><span class="p">;</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">empty</span><span class="p">;</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">rd</span><span class="p">;</span>
+<span class="w">     </span><span class="n">FIFOX</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">         </span><span class="p">.</span><span class="n">DATA_WIDTH</span><span class="w">          </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="w">         </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">ITEMS</span><span class="w">               </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">ITEMS</span><span class="w">              </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">RAM_TYPE</span><span class="w">            </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">RAM_TYPE</span><span class="w">           </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">DEVICE</span><span class="w">              </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DEVICE</span><span class="w">             </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">ALMOST_FULL_OFFSET</span><span class="w">  </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">ALMOST_FULL_OFFSET</span><span class="w"> </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">ALMOST_EMPTY_OFFSET</span><span class="w"> </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">ALMOST_EMPTY_OFFSET</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">FAKE_FIFO</span><span class="w">           </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">FAKE_FIFO</span><span class="w">          </span><span class="p">)</span>
+<span class="w">     </span><span class="p">)</span><span class="w"> </span><span class="n">VHDL_DUT_U</span><span class="w"> </span><span class="p">(</span>
+
+<span class="w">         </span><span class="p">.</span><span class="n">CLK</span><span class="w">   </span><span class="p">(</span><span class="n">CLK</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">RESET</span><span class="w"> </span><span class="p">(</span><span class="n">RST</span><span class="p">),</span>
+
+<span class="w">         </span><span class="p">.</span><span class="n">DI</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">DATA</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">WR</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">SRC_RDY</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">VLD</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">FULL</span><span class="w">   </span><span class="p">(</span><span class="n">full</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">AFULL</span><span class="w">  </span><span class="p">(),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">STATUS</span><span class="w"> </span><span class="p">(),</span>
+
+<span class="w">         </span><span class="p">.</span><span class="n">DO</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">DATA</span><span class="w">   </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">RD</span><span class="w">     </span><span class="p">(</span><span class="n">rd</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">EMPTY</span><span class="w">  </span><span class="p">(</span><span class="n">empty</span><span class="w">         </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">AEMPTY</span><span class="w"> </span><span class="p">()</span>
+
+<span class="w">     </span><span class="p">);</span>
+
+
+<span class="w">     </span><span class="c1">// CREATE REGISTER</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">     </span><span class="k">always</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">CLK</span><span class="p">)</span>
+<span class="w">     </span><span class="k">begin</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="k">config</span><span class="p">.</span><span class="n">WR</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">ADDR</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="n">enable</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">DWR</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">         </span><span class="k">end</span>
+<span class="w">     </span><span class="k">end</span>
+
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">ARDY</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">WR</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">RD</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">DRDY</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">RD</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">DRD</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">enable</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">DST_RDY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">full</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// Stop read from the fifo when enable register is disabled</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">rd</span><span class="w">             </span><span class="o">=</span><span class="w"> </span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">DST_RDY</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="o">~</span><span class="n">empty</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">SRC_RDY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">empty</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">enable</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">VLD</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">;</span>
+<span class="w"> </span><span class="k">endmodule</span>
+</pre></div>
+</div>
+</div>
+<p>The environment modification requires adding the register model and connecting to the MI interface.</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_component_param_utils</span><span class="p">(</span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">env</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">));</span>
+
+<span class="w">     </span><span class="c1">// Virtual sequencer</span>
+<span class="w">     </span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_sequencer</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// RESET interface</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">agent</span><span class="w"> </span><span class="n">m_reset</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// RX environments</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_rx</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// TX environments</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_tx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_tx</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// Register model</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_mi</span><span class="o">::</span><span class="n">regmodel</span><span class="p">#(</span><span class="n">regmodel</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="n">m_regmodel</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">//Model</span>
+<span class="w">     </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">model</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_model</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// Scoreboard</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">scoreboard</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_sc</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// Constructor</span>
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="c1">// Create base components of environment.</span>
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_mi</span><span class="o">::</span><span class="n">regmodel_config</span><span class="w">  </span><span class="n">cfg_mi</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">config_item</span><span class="w"> </span><span class="n">m_cfg_reset</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="w"> </span><span class="n">m_cfg_rx</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="w"> </span><span class="n">m_cfg_tx</span><span class="p">;</span>
+
+<span class="w">         </span><span class="c1">//Call parents function build_phase</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">build_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">//Create reset environment</span>
+<span class="w">         </span><span class="n">m_cfg_reset</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_cfg_reset</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span><span class="w">   </span><span class="c1">// Activly driven environment</span>
+<span class="w">         </span><span class="c1">// interface register name has to be same in the testbench uvm_config_db#(...)::set();</span>
+<span class="w">         </span><span class="n">m_cfg_reset</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_reset&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_reset</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Creation of the reset</span>
+<span class="w">         </span><span class="n">m_reset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">agent</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">)</span>
+
+<span class="w">         </span><span class="c1">// Configuration of the m_env_mvb_rx</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span>
+<span class="w">         </span><span class="c1">// interface register name has to be same in the testbench uvm_config_db#(...)::set();</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_mvb_rx&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_env_mvb_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_rx</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Creation of the m_env_mvb_rx</span>
+<span class="w">         </span><span class="n">m_env_mvb_rx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_env_mvb_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Configuration of the m_env_mvb_tx</span>
+<span class="w">         </span><span class="n">m_cfg_tx</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_cfg_tx</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span>
+<span class="w">         </span><span class="c1">// interface register name has to be same in the testbench uvm_config_db#(...)::set();</span>
+<span class="w">         </span><span class="n">m_cfg_tx</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_mvb_tx&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_env_mvb_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_tx</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Creation of the m_env_mvb_tx</span>
+<span class="w">         </span><span class="n">m_env_mvb_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_tx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_env_mvb_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="n">cfg_mi</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">         </span><span class="n">cfg_mi</span><span class="p">.</span><span class="n">addr_base</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="mh">&#39;h0</span><span class="p">;</span>
+<span class="w">         </span><span class="n">cfg_mi</span><span class="p">.</span><span class="n">agent</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span>
+<span class="w">         </span><span class="n">cfg_mi</span><span class="p">.</span><span class="n">agent</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_mi&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="p">#(</span><span class="n">uvm_mi</span><span class="o">::</span><span class="n">regmodel_config</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_regmodel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cfg_mi</span><span class="p">);</span>
+<span class="w">         </span><span class="n">m_regmodel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_mi</span><span class="o">::</span><span class="n">regmodel</span><span class="p">#(</span><span class="n">regmodel</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_regmodel&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="n">m_sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scoreboard</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_sc&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">         </span><span class="n">m_model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">model</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_model&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="c1">// Connect agent&#39;s ports with ports from scoreboard.</span>
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">connect_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Connection of the reset</span>
+<span class="w">         </span><span class="n">m_reset</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">m_rx</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Connection to Model</span>
+<span class="w">         </span><span class="n">m_rx</span><span class="p">.</span><span class="n">analysis_port</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">m_model</span><span class="p">.</span><span class="n">m_rx</span><span class="p">.</span><span class="n">analysis_export</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Connect to Scoreboard</span>
+<span class="w">         </span><span class="n">m_model</span><span class="p">.</span><span class="n">m_tx</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">m_sc</span><span class="p">.</span><span class="n">cmp</span><span class="p">.</span><span class="n">analysis_imp_model</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Connect sequencer</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_reset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_reset</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_rx</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">m_rx</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_regmodel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_regmodel</span><span class="p">.</span><span class="n">m_regmodel</span><span class="p">;</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>The Register model contains one register, which enables FIFO functionality.
+Write 1’b1 to enable the FIFO. Write 1’b0 to disable the FIFO. <em>uvm_reg_field</em> represents a register.
+Create a register sequence and add the register model to the sequencer.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">env/regmodel.sv</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c1">// create control register</span>
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">reg_control</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_reg</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">reg_control</span><span class="p">)</span>
+
+<span class="w">     </span><span class="c1">// field inside register.</span>
+<span class="w">     </span><span class="k">rand</span><span class="w"> </span><span class="n">uvm_reg_field</span><span class="w"> </span><span class="n">enable</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reg_status&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">UVM_NO_COVERAGE</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build</span><span class="p">();</span>
+<span class="w">         </span><span class="c1">// Create fields</span>
+<span class="w">         </span><span class="n">enable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_reg_field</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;enable&quot;</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Configure</span>
+<span class="w">         </span><span class="c1">// https://verificationacademy.com/verification-methodology-reference/uvm/docs_1.1a/html/files/reg/uvm_reg_field-svh.html#uvm_reg_field.configure</span>
+<span class="w">         </span><span class="n">enable</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="c1">// Parent</span>
+<span class="w">                           </span><span class="mi">1</span><span class="w">   </span><span class="p">,</span><span class="w"> </span><span class="c1">// Number of bits</span>
+<span class="w">                           </span><span class="mi">0</span><span class="w">   </span><span class="p">,</span><span class="w"> </span><span class="c1">// LSB position. (position of first bit in register)</span>
+<span class="w">                           </span><span class="s">&quot;RW&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1">// Access</span>
+<span class="w">                           </span><span class="mi">0</span><span class="w">   </span><span class="p">,</span><span class="w"> </span><span class="c1">// Volatility</span>
+<span class="w">                           </span><span class="mi">0</span><span class="w">   </span><span class="p">,</span><span class="w"> </span><span class="c1">// Value on reset</span>
+<span class="w">                           </span><span class="mi">1</span><span class="w">   </span><span class="p">,</span><span class="w"> </span><span class="c1">// Can the value be reset?</span>
+<span class="w">                           </span><span class="mi">0</span><span class="w">   </span><span class="p">,</span><span class="w"> </span><span class="c1">// Can the value be randomized?</span>
+<span class="w">                           </span><span class="mi">0</span><span class="w">     </span><span class="c1">// Does the field occupy an entire byte lane?</span>
+<span class="w">                                </span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+
+<span class="w"> </span><span class="c1">// register model</span>
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">regmodel</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_reg_block</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">regmodel</span><span class="p">)</span>
+
+<span class="w">     </span><span class="c1">// registers in componnent</span>
+<span class="w">     </span><span class="n">reg_control</span><span class="w"> </span><span class="n">ctrl</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reg_model&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">build_coverage</span><span class="p">(</span><span class="n">UVM_NO_COVERAGE</span><span class="p">));</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">set_frontdoor</span><span class="p">(</span><span class="n">uvm_reg_frontdoor</span><span class="w"> </span><span class="n">frontdoor</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_reg_frontdoor</span><span class="w"> </span><span class="n">c_frontdoor</span><span class="p">;</span>
+<span class="w">         </span><span class="p">$</span><span class="n">cast</span><span class="p">(</span><span class="n">c_frontdoor</span><span class="p">,</span><span class="w"> </span><span class="n">frontdoor</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">         </span><span class="n">ctrl</span><span class="p">.</span><span class="n">set_frontdoor</span><span class="p">(</span><span class="n">c_frontdoor</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build</span><span class="p">(</span><span class="n">uvm_reg_addr_t</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">bus_width</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Create register</span>
+<span class="w">         </span><span class="n">ctrl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reg_control</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;enable&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="n">ctrl</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="w">         </span><span class="n">ctrl</span><span class="p">.</span><span class="n">build</span><span class="p">();</span>
+
+<span class="w">         </span><span class="c1">// Create map to register array</span>
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">default_map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">create_map</span><span class="p">(</span><span class="s">&quot;MAP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">bus_width</span><span class="o">/</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">UVM_LITTLE_ENDIAN</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Put register to map  // REGISTER, register address, access right</span>
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">default_map</span><span class="p">.</span><span class="n">add_reg</span><span class="p">(</span><span class="n">ctrl</span><span class="p">,</span><span class="w"> </span><span class="mh">&#39;h0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;RW&quot;</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Lock model</span>
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">lock_model</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">env/reg_sequence.sv</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c1">// Register sequence. Write 1 into enable register</span>
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">reg_sequence</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequence</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">reg_sequence</span><span class="p">)</span>
+<span class="w">     </span><span class="k">rand</span><span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">enabled</span><span class="p">;</span>
+<span class="w">     </span><span class="n">regmodel</span><span class="w"> </span><span class="n">m_regmodel</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sequence_simple&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">task</span><span class="w"> </span><span class="n">body</span><span class="p">();</span>
+<span class="w">         </span><span class="n">uvm_status_e</span><span class="w">   </span><span class="n">status</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_regmodel</span><span class="p">.</span><span class="n">ctrl</span><span class="p">.</span><span class="n">enable</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+<span class="w">     </span><span class="k">endtask</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>Add the register model into virtual sequencer to simplify run sequence.</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">env/sequencer.sv</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">sequencer</span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="n">uvm_sequencer</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_component_param_utils</span><span class="p">(</span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">))</span>
+
+<span class="w">     </span><span class="c1">// reset sequencer</span>
+<span class="w">     </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">sequencer</span><span class="w"> </span><span class="n">m_reset</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// rx sequencer</span>
+<span class="w">     </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w">    </span><span class="n">m_rx</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// the register model</span>
+<span class="w">     </span><span class="n">regmodel</span><span class="w"> </span><span class="n">m_regmodel</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">env/pkg.sv</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="cp">`define FIFOX_ENV_SV</span>
+<span class="w"> </span><span class="kn">package</span><span class="w"> </span><span class="n">uvm_fifox</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+<span class="w">     </span><span class="k">import</span><span class="w"> </span><span class="n">uvm_pkg</span><span class="o">::*</span><span class="p">;</span>
+
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;regmodel.sv&quot;</span>
+
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;sequencer.sv&quot;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;model.sv&quot;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;scoreboard.sv&quot;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;env.sv&quot;</span>
+
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;reg_sequence.sv&quot;</span>
+<span class="w"> </span><span class="k">endpackage</span>
+<span class="w"> </span><span class="no">`endif</span>
+</pre></div>
+</div>
+</div>
+<p>Enable the FIFO by executing the <em>reg_sequence</em> in the test.
+<em>reg_sequence</em> writes 1’b1 to the enable register in the design.
+Other sequences are executed after writing to the register.</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">test/base.sv</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">base</span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_test</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`m_uvm_object_registry_internal</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
+<span class="w">     </span><span class="no">`m_uvm_get_type_name_func</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
+
+<span class="w">     </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">env</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_env</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="n">m_env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">env</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_env&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">      </span><span class="c1">// ------------------------------------------------------------------------</span>
+<span class="w">     </span><span class="c1">// run sequences on their sequencers</span>
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">task</span><span class="w"> </span><span class="n">run_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="kt">time</span><span class="w"> </span><span class="n">time_end</span><span class="p">;</span>
+
+<span class="w">         </span><span class="n">phase</span><span class="p">.</span><span class="n">raise_objection</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+<span class="w">         </span><span class="k">begin</span>
+<span class="w">             </span><span class="n">reg_sequence</span><span class="w"> </span><span class="n">reg_seq</span><span class="p">;</span>
+
+<span class="w">             </span><span class="n">reg_seq</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reg_sequence</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;reg_seq&quot;</span><span class="p">);</span>
+<span class="w">             </span><span class="k">assert</span><span class="p">(</span><span class="n">reg_seq</span><span class="p">.</span><span class="n">randomize</span><span class="p">()</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="p">{</span><span class="n">enabled</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">;})</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="no">`uvm_fatal</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">Cannot randomize register sequence&quot;</span><span class="p">);</span>
+<span class="w">             </span><span class="n">reg_seq</span><span class="p">.</span><span class="n">m_regmodel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_env</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_regmodel</span><span class="p">;</span>
+<span class="w">             </span><span class="n">reg_seq</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">m_env</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">);</span>
+<span class="w">         </span><span class="k">end</span>
+
+<span class="w">         </span><span class="k">fork</span>
+
+<span class="w">             </span><span class="c1">// Reset DUT</span>
+<span class="w">             </span><span class="k">begin</span>
+<span class="w">                 </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">sequence_start</span><span class="w"> </span><span class="n">seq_rst</span><span class="p">;</span>
+
+<span class="w">                 </span><span class="n">seq_rst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">sequence_start</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;seq_rst&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">                 </span><span class="k">assert</span><span class="p">(</span><span class="n">seq_rst</span><span class="p">.</span><span class="n">randomize</span><span class="p">())</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="no">`uvm_fatal</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">Cannot randomize reset sequence&quot;</span><span class="p">);</span>
+<span class="w">                 </span><span class="n">seq_rst</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">m_env</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_reset</span><span class="p">);</span>
+<span class="w">             </span><span class="k">end</span>
+<span class="w">         </span><span class="k">join_none</span>
+
+<span class="w">         </span><span class="c1">// RUN RX sequences</span>
+<span class="w">         </span><span class="k">fork</span><span class="w"> </span><span class="c1">// Here code would work the same as if fork had not been there.</span>
+<span class="w">             </span><span class="k">begin</span>
+<span class="w">                 </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequence_simple</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">seq_rx</span><span class="p">;</span>
+
+<span class="w">                 </span><span class="n">seq_rx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector</span><span class="o">::</span><span class="n">sequence_simple</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;seq_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">                 </span><span class="k">assert</span><span class="p">(</span><span class="n">seq_rx</span><span class="p">.</span><span class="n">randomize</span><span class="p">())</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="no">`uvm_fatal</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">Cannot randomize RX sequence&quot;</span><span class="p">);</span>
+<span class="w">                 </span><span class="n">seq_rx</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">m_env</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_rx</span><span class="p">);</span>
+<span class="w">             </span><span class="k">end</span>
+<span class="w">         </span><span class="k">join</span>
+
+<span class="w">         </span><span class="c1">// Wait for transactions inside DUT</span>
+<span class="w">         </span><span class="n">time_end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">$</span><span class="kt">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1000</span><span class="n">us</span><span class="p">;</span>
+<span class="w">         </span><span class="k">while</span><span class="w"> </span><span class="p">($</span><span class="kt">time</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">time_end</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">m_env</span><span class="p">.</span><span class="n">used</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="p">#(</span><span class="mi">500</span><span class="n">ns</span><span class="p">);</span>
+<span class="w">         </span><span class="k">end</span>
+
+<span class="w">         </span><span class="n">phase</span><span class="p">.</span><span class="n">drop_objection</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">     </span><span class="k">endtask</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">report_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="no">`uvm_info</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">TEST : &quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">get_type_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot; END</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">},</span><span class="w"> </span><span class="n">UVM_NONE</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="uvm-factory">
+<h2>UVM Factory<a class="headerlink" href="#uvm-factory" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://sourcemaking.com/design_patterns/factory_method">The factory method</a> is the design pattern which is used in
+UVM to create UVM objects and UVM components. You can change the behaviour of sequences, objects and components by
+using Factory. This ensures the variability of the verification environment. Don’t forget to uncomment <em>typedef</em> in
+<em>testbench.sv</em> with the correct test name</p>
+<p>The function is used for overriding classes and changing their behaviour.
+<code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">set_inst_override(uvm_object_wrapper</span> <span class="pre">override_type,</span> <span class="pre">string</span> <span class="pre">inst_path,</span> <span class="pre">uvm_component</span> <span class="pre">parent=null)</span></code></p>
+<p>This function registers the type which is created instead of the original type. This means that instead of object_1,
+object_2 is going to be created in specific places.</p>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">test/base_extended.sv</span><a class="headerlink" href="#id8" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">uvm_pkg::*</span><span class="p">;</span>
+<span class="w"> </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">base_extended</span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">);</span>
+<span class="w">     </span><span class="no">`m_uvm_object_registry_internal</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base_extended</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base_extended</span><span class="p">)</span>
+<span class="w">     </span><span class="no">`m_uvm_get_type_name_func</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base_extended</span><span class="p">)</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Use factory to set low-level sequence to speed sequence.</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_lib_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">set_inst_override</span><span class="p">(</span><span class="w"> </span><span class="c1">// Original type</span>
+<span class="w">             </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_lib_rx_speed</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">get_type</span><span class="p">(),</span><span class="w">       </span><span class="c1">// New type</span>
+<span class="w">             </span><span class="s">&quot;m_rx.*&quot;</span><span class="p">,</span><span class="w">                                                                       </span><span class="c1">// Path to component</span>
+<span class="w">             </span><span class="k">this</span><span class="p">.</span><span class="n">env</span><span class="w">                                                                        </span><span class="c1">// Start of path to component</span>
+<span class="w">         </span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">build_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">report_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="no">`uvm_info</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">TEST : &quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">get_type_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot; END</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">},</span><span class="w"> </span><span class="n">UVM_NONE</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>UVCs have a sequence which converts higher-level transactions to lower-level transactions. To create special
+test scenarios, it is required to change these sequences and a sequence library. Or you want to create your own special sequence.
+This is done by UVM factory methods.</p>
+<p>A lot of UVCs have prepared the speed sequence. So it is possible to use it.</p>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">test/speed.sv</span><a class="headerlink" href="#id9" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">uvm_pkg::*</span><span class="p">;</span>
+<span class="w"> </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">speed</span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">);</span>
+<span class="w">     </span><span class="no">`m_uvm_object_registry_internal</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">speed</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">speed</span><span class="p">)</span>
+<span class="w">     </span><span class="no">`m_uvm_get_type_name_func</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">speed</span><span class="p">)</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Use factory to set low-level sequence to speed sequence.</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_lib_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">set_inst_override</span><span class="p">(</span><span class="w"> </span><span class="c1">// Original type</span>
+<span class="w">             </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_lib_rx_speed</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">get_type</span><span class="p">(),</span><span class="w">       </span><span class="c1">// New type</span>
+<span class="w">             </span><span class="s">&quot;m_rx.*&quot;</span><span class="p">,</span><span class="w">                                                                       </span><span class="c1">// Path to component</span>
+<span class="w">             </span><span class="k">this</span><span class="p">.</span><span class="n">env</span><span class="w">                                                                        </span><span class="c1">// Start of path to component</span>
+<span class="w">         </span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">build_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">report_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="no">`uvm_info</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">TEST : &quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">get_type_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot; END</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">},</span><span class="w"> </span><span class="n">UVM_NONE</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>You can create your own sequences and the sequence library. This represents
+the maximal level of customisation, but it requires more time to develop.</p>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">test/my.sv</span><a class="headerlink" href="#id10" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">uvm_pkg::*</span><span class="p">;</span>
+<span class="w"> </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+
+<span class="w"> </span><span class="c1">//Send valid frame only every fourth clock cycle</span>
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">sequence_my</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">ITEM_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_simple_rx_base</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ITEM_WIDTH</span><span class="p">);</span>
+<span class="w">     </span><span class="no">`uvm_object_param_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">sequence_my</span><span class="w"> </span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">))</span>
+
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">delay</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;sequence_full_speed_rx&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="c1">//Send only every fourth clock cycle</span>
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">task</span><span class="w"> </span><span class="n">create_sequence_item</span><span class="p">();</span>
+<span class="w">         </span><span class="n">delay</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">delay</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="n">gen</span><span class="p">.</span><span class="n">src_rdy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">         </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="k">assert</span><span class="p">(</span><span class="n">ITEMS</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="no">`uvm_fatal</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">ITEMS must be 1&quot;</span><span class="p">);</span>
+<span class="w">             </span><span class="n">hi_sqr</span><span class="p">.</span><span class="n">try_next_item</span><span class="p">(</span><span class="n">frame</span><span class="p">);</span>
+<span class="w">             </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">frame</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                 </span><span class="no">`uvm_warning</span><span class="p">(</span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">High level item is not prepared!&quot;</span><span class="p">);</span>
+<span class="w">                 </span><span class="n">gen</span><span class="p">.</span><span class="n">src_rdy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">             </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">                 </span><span class="n">gen</span><span class="p">.</span><span class="n">vld</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span>
+<span class="w">                 </span><span class="n">gen</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">frame</span><span class="p">.</span><span class="n">data</span><span class="p">;</span>
+<span class="w">                 </span><span class="n">gen</span><span class="p">.</span><span class="n">src_rdy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mb">1&#39;b1</span><span class="p">;</span>
+
+<span class="w">                 </span><span class="n">hi_sqr</span><span class="p">.</span><span class="n">item_done</span><span class="p">();</span>
+<span class="w">                 </span><span class="n">hl_transactions</span><span class="o">--</span><span class="p">;</span>
+<span class="w">             </span><span class="k">end</span>
+<span class="w">         </span><span class="k">end</span>
+<span class="w">     </span><span class="k">endtask</span>
+
+<span class="w">     </span><span class="k">task</span><span class="w"> </span><span class="n">body</span><span class="p">();</span>
+<span class="w">         </span><span class="n">delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">body</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endtask</span>
+<span class="w"> </span><span class="kd">endclass</span>
+
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">sequence_lib_rx_my</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">ITEM_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_lib_rx</span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ITEM_WIDTH</span><span class="p">);</span>
+<span class="w">     </span><span class="no">`uvm_object_param_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">sequence_lib_rx_my</span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">))</span>
+<span class="w">     </span><span class="no">`uvm_sequence_library_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">sequence_lib_rx_my</span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">))</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">         </span><span class="n">init_sequence_library</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">init_sequence</span><span class="p">(</span><span class="n">config_sequence</span><span class="w"> </span><span class="n">param_cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">param_cfg</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="k">this</span><span class="p">.</span><span class="n">cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">         </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="k">this</span><span class="p">.</span><span class="n">cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">param_cfg</span><span class="p">;</span>
+<span class="w">         </span><span class="k">end</span>
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">add_sequence</span><span class="p">(</span><span class="n">sequence_my</span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">get_type</span><span class="p">());</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w">   </span><span class="kd">endclass</span>
+
+
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">my_test</span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">);</span>
+<span class="w">     </span><span class="no">`m_uvm_object_registry_internal</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">my_test</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">my_test</span><span class="p">)</span>
+<span class="w">     </span><span class="no">`m_uvm_get_type_name_func</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">my_test</span><span class="p">)</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Use factory to set low-level sequence to speed sequence.</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">sequence_lib_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">set_inst_override</span><span class="p">(</span><span class="w"> </span><span class="c1">// Original type</span>
+<span class="w">             </span><span class="n">sequence_lib_rx_my</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">get_type</span><span class="p">(),</span><span class="w">                                    </span><span class="c1">// New type</span>
+<span class="w">             </span><span class="s">&quot;m_env.m_rx.*&quot;</span><span class="p">,</span><span class="w">                                                                 </span><span class="c1">// Path to component</span>
+<span class="w">             </span><span class="k">this</span><span class="w">                                                                             </span><span class="c1">// Start of path to component</span>
+<span class="w">         </span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">build_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">report_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="no">`uvm_info</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;</span><span class="se">\n\t</span><span class="s">TEST : &quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">get_type_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot; END</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">},</span><span class="w"> </span><span class="n">UVM_NONE</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>If you want to use these tests, you have to add test files into the pkg file. Register class in
+testbench module <code class="docutils literal notranslate"><span class="pre">typedef</span> <span class="pre">test::base_changed#(uvm_generic::DATA_WIDTH)</span> <span class="pre">speed;</span></code> and <code class="docutils literal notranslate"><span class="pre">typedef</span> <span class="pre">test::my_test#(uvm_generic::DATA_WIDTH)</span> <span class="pre">my_test;</span></code>.
+To run test base_changed change line  <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">SIM_FLAGS(UVM_TEST)</span> <span class="pre">&quot;test::base&quot;</span></code>
+to <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">SIM_FLAGS(UVM_TEST)</span> <span class="pre">&quot;test::base_changed&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">SIM_FLAGS(UVM_TEST)</span> <span class="pre">&quot;test::my_test&quot;</span></code></p>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">testbench.sv</span><a class="headerlink" href="#id11" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">uvm_pkg::*</span><span class="p">;</span>
+<span class="w"> </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+<span class="w"> </span><span class="k">import</span><span class="w"> </span><span class="n">uvm_generic</span><span class="o">::*</span><span class="p">;</span>
+
+<span class="w"> </span><span class="k">module</span><span class="w"> </span><span class="n">testbench</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// Create test with parameters (Register in factory)</span>
+<span class="w">     </span><span class="k">typedef</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
+<span class="w">     </span><span class="k">typedef</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base_extended</span><span class="p">#(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">base_extended</span><span class="p">;</span>
+<span class="w">     </span><span class="k">typedef</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base_extended</span><span class="p">#(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">speed</span><span class="p">;</span>
+<span class="w">     </span><span class="k">typedef</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base_extended</span><span class="p">#(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">my_test</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// Create clock</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">CLK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">     </span><span class="k">always</span><span class="w"> </span><span class="p">#(</span><span class="n">CLK_PERIOD</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">CLK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">CLK</span><span class="p">;</span>
+
+<span class="w">     </span><span class="n">reset_if</span><span class="w"> </span><span class="n">reset</span><span class="w"> </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+<span class="w">     </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w">     </span><span class="n">mvb_rx</span><span class="w">    </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+<span class="w">     </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w">     </span><span class="n">mvb_tx</span><span class="w">    </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+
+<span class="w">     </span><span class="n">mi_if</span><span class="w">  </span><span class="p">#(</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="w">            </span><span class="k">config</span><span class="w">    </span><span class="p">(</span><span class="n">CLK</span><span class="p">);</span>
+
+
+<span class="w">    </span><span class="k">initial</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">         </span><span class="n">uvm_root</span><span class="w"> </span><span class="n">m_root</span><span class="p">;</span>
+
+<span class="w">         </span><span class="c1">// REGISTER INTERFACE INTO DATABASE</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">reset_if</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">reset</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">))</span><span class="w">    </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mvb_rx&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">mvb_rx</span><span class="w">    </span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">))</span><span class="w">    </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mvb_tx&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">mvb_tx</span><span class="w">    </span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mi_if</span><span class="w">  </span><span class="p">#(</span><span class="mi">32</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">))</span><span class="w">           </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mi&quot;</span><span class="p">,</span><span class="w">         </span><span class="k">config</span><span class="w">    </span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// STOP on end of simulation and dont print message ILLEGALNAME</span>
+<span class="w">         </span><span class="n">m_root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_root</span><span class="o">::</span><span class="n">get</span><span class="p">();</span>
+<span class="w">         </span><span class="n">m_root</span><span class="p">.</span><span class="n">finish_on_completion</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_root</span><span class="p">.</span><span class="n">set_report_id_action_hier</span><span class="p">(</span><span class="s">&quot;ILLEGALNAME&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">UVM_NO_ACTION</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// DONT RECORD TRANSACTIONS</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="kt">int</span><span class="p">)</span><span class="w">            </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;recording_detail&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_bitstream_t</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;recording_detail&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// RUN TESTS</span>
+<span class="w">         </span><span class="n">run_test</span><span class="p">();</span>
+<span class="w">         </span><span class="c1">// STOP ON END OF SIMULATION</span>
+<span class="w">         </span><span class="p">$</span><span class="n">stop</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="w">     </span><span class="k">end</span>
+
+<span class="w">     </span><span class="c1">//INSTANTIATE DUT</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">full</span><span class="p">;</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">empty</span><span class="p">;</span>
+<span class="w">     </span><span class="n">FIFOX</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">         </span><span class="p">.</span><span class="n">DATA_WIDTH</span><span class="w">          </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DATA_WIDTH</span><span class="w">         </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">ITEMS</span><span class="w">               </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">ITEMS</span><span class="w">              </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">RAM_TYPE</span><span class="w">            </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">RAM_TYPE</span><span class="w">           </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">DEVICE</span><span class="w">              </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">DEVICE</span><span class="w">             </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">ALMOST_FULL_OFFSET</span><span class="w">  </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">ALMOST_FULL_OFFSET</span><span class="w"> </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">ALMOST_EMPTY_OFFSET</span><span class="w"> </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">ALMOST_EMPTY_OFFSET</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">FAKE_FIFO</span><span class="w">           </span><span class="p">(</span><span class="n">uvm_generic</span><span class="o">::</span><span class="n">FAKE_FIFO</span><span class="w">          </span><span class="p">)</span>
+<span class="w">     </span><span class="p">)</span><span class="w"> </span><span class="n">VHDL_DUT_U</span><span class="w"> </span><span class="p">(</span>
+
+<span class="w">         </span><span class="p">.</span><span class="n">CLK</span><span class="w">   </span><span class="p">(</span><span class="n">CLK</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">RESET</span><span class="w"> </span><span class="p">(</span><span class="n">RST</span><span class="p">),</span>
+
+<span class="w">         </span><span class="p">.</span><span class="n">DI</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">DATA</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">WR</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">SRC_RDY</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">VLD</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">FULL</span><span class="w">   </span><span class="p">(</span><span class="n">full</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">AFULL</span><span class="w">  </span><span class="p">(),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">STATUS</span><span class="w"> </span><span class="p">(),</span>
+
+<span class="w">         </span><span class="p">.</span><span class="n">DO</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">DATA</span><span class="w">   </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">RD</span><span class="w">     </span><span class="p">(</span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">DST_RDY</span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">EMPTY</span><span class="w">  </span><span class="p">(</span><span class="n">empty</span><span class="w">         </span><span class="p">),</span>
+<span class="w">         </span><span class="p">.</span><span class="n">AEMPTY</span><span class="w"> </span><span class="p">()</span>
+
+<span class="w">     </span><span class="p">);</span>
+
+
+<span class="w">     </span><span class="c1">// CREATE REGISTER</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">;</span>
+<span class="w">     </span><span class="k">always</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">CLK</span><span class="p">)</span>
+<span class="w">     </span><span class="k">begin</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="k">config</span><span class="p">.</span><span class="n">WR</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mb">1&#39;b0</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">ADDR</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">&#39;0</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="n">enable</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">DWR</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="w">         </span><span class="k">end</span>
+<span class="w">     </span><span class="k">end</span>
+
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">ARDY</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">WR</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">RD</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">DRDY</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">RD</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="k">config</span><span class="p">.</span><span class="n">DRD</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">enable</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">mvb_rx</span><span class="p">.</span><span class="n">DST_RDY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">full</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">SRC_RDY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">empty</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">enable</span><span class="p">;</span>
+<span class="w">     </span><span class="k">assign</span><span class="w"> </span><span class="n">mvb_tx</span><span class="p">.</span><span class="n">VLD</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="m">&#39;1</span><span class="p">;</span>
+<span class="w"> </span><span class="k">endmodule</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">test/pkg.sv</span><a class="headerlink" href="#id12" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="cp">`define FIFOX_TEST_SV</span>
+<span class="w"> </span><span class="kn">package</span><span class="w"> </span><span class="n">test</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+<span class="w">     </span><span class="k">import</span><span class="w"> </span><span class="n">uvm_pkg</span><span class="o">::*</span><span class="p">;</span>
+
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;base.sv&quot;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;base_changed.sv&quot;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;my_test.sv&quot;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;speed.sv&quot;</span>
+<span class="w"> </span><span class="k">endpackage</span>
+<span class="w"> </span><span class="no">`endif</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="sequence-configuration">
+<h2>Sequence Configuration<a class="headerlink" href="#sequence-configuration" title="Link to this heading"></a></h2>
+<p>There is a simpler possibility of sequence configuration. Some sequences
+have a configuration object. A configuration object can be assigned by a function
+<code class="docutils literal notranslate"><span class="pre">virtual</span> <span class="pre">function</span> <span class="pre">void</span> <span class="pre">config_set(CONFIG_TYPE</span> <span class="pre">cfg)</span></code></p>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">comp/uvm/logic_vector_array_mfb/config.sv</span><a class="headerlink" href="#id13" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">config_sequence</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_object</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_object_utils</span><span class="p">(</span><span class="n">uvm_logic_vector_array_mfb</span><span class="o">::</span><span class="n">config_sequence</span><span class="p">)</span>
+
+<span class="w">     </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">sequence_cfg</span><span class="w"> </span><span class="n">state</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">//configure space between packet</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">space_size_min</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">space_size_max</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="mi">200</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// configuration of probability of rdy signal in percentage</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">rdy_probability_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">   </span><span class="c1">// inside [0:100:ta]</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">rdy_probability_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="c1">// inside [0:100]</span>
+<span class="w">     </span><span class="c1">// Straddling is used only with seq_type == &quot;PCIE&quot;</span>
+<span class="w">     </span><span class="kt">logic</span><span class="w"> </span><span class="n">straddling</span><span class="w">                 </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">typedef</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="p">{</span><span class="n">INVALID_ZERO</span><span class="p">,</span><span class="w"> </span><span class="n">INVALID_UNDEF</span><span class="p">,</span><span class="w"> </span><span class="n">INVALID_RAND</span><span class="p">}</span><span class="w"> </span><span class="n">invalid_val_t</span><span class="p">;</span>
+<span class="w">     </span><span class="n">invalid_val_t</span><span class="w"> </span><span class="n">generate_invalid</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;uvm_logic_vector_array_mfb::config_sequence&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">         </span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">;</span>
+<span class="w">         </span><span class="n">generate_invalid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">INVALID_RAND</span><span class="p">;</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">probability_set</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">min</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">max</span><span class="p">);</span>
+<span class="w">         </span><span class="n">rdy_probability_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">;</span>
+<span class="w">         </span><span class="n">rdy_probability_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">;</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">straddling_set</span><span class="p">(</span><span class="kt">logic</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
+<span class="w">         </span><span class="n">straddling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">space_size_set</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">min</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">max</span><span class="p">);</span>
+<span class="w">         </span><span class="n">space_size_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">;</span>
+<span class="w">         </span><span class="n">space_size_max</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">;</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>Setup the configuration object to lower level sequences</p>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id14" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
+<span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_component_param_utils</span><span class="p">(</span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">env</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">));</span>
+
+<span class="w">     </span><span class="c1">// Virtual sequencer</span>
+<span class="w">     </span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_sequencer</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// RESET interface</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">agent</span><span class="w"> </span><span class="n">m_reset</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// RX environments</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_rx</span><span class="p">;</span>
+<span class="w">     </span><span class="c1">// TX environments</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_tx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_tx</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// Scoreboard</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">scoreboard</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">sc</span><span class="p">;</span>
+
+<span class="w">     </span><span class="c1">// Constructor</span>
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">uvm_component</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="c1">// Create base components of environment.</span>
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">config_item</span><span class="w"> </span><span class="n">m_cfg_reset</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="w"> </span><span class="n">m_cfg_rx</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="w"> </span><span class="n">m_cfg_tx</span><span class="p">;</span>
+
+<span class="w">         </span><span class="c1">//Call parents function build_phase</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">build_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">//Create reset environment</span>
+<span class="w">         </span><span class="n">m_cfg_reset</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_cfg_reset</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span><span class="w">   </span><span class="c1">// Activly driven environment</span>
+<span class="w">         </span><span class="c1">// interface register name have to be same in the testbench uvm_config_db#(...)::set();</span>
+<span class="w">         </span><span class="n">m_cfg_reset</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_reset&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_reset</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Creation of the reset</span>
+<span class="w">         </span><span class="n">m_reset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_reset</span><span class="o">::</span><span class="n">agent</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">)</span>
+
+
+<span class="w">         </span><span class="c1">// Configuration of the m_env_mvb_rx</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span>
+<span class="w">         </span><span class="c1">// interface register name have to be same in the testbench uvm_config_db#(...)::set();</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_mvb_rx&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="c1">// configure sequence</span>
+<span class="w">         </span><span class="c1">// m_cfg_rx.seq_cfg = m_cfg.seq_rx_cfg;</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">seq_cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">space_size_set</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+<span class="w">         </span><span class="n">m_cfg_rx</span><span class="p">.</span><span class="n">probability_set</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_env_mvb_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_rx</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Creation of the m_env_mvb_rx</span>
+<span class="w">         </span><span class="n">m_env_mvb_rx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_env_mvb_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Configuration of the m_env_mvb_tx</span>
+<span class="w">         </span><span class="n">m_cfg_tx</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_cfg_tx</span><span class="p">.</span><span class="n">active</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">UVM_ACTIVE</span><span class="p">;</span>
+<span class="w">         </span><span class="c1">// interface register name have to be same in the testbench uvm_config_db#(...)::set();</span>
+<span class="w">         </span><span class="n">m_cfg_tx</span><span class="p">.</span><span class="n">interface_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vif_mvb_tx&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_env_mvb_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_tx</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Creation of the m_env_mvb_tx</span>
+<span class="w">         </span><span class="n">m_env_mvb_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_tx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_env_mvb_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="c1">// Connect agent&#39;s ports with ports from scoreboard.</span>
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">connect_phase</span><span class="p">(</span><span class="n">uvm_phase</span><span class="w"> </span><span class="n">phase</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">// Connection of the reset</span>
+<span class="w">         </span><span class="n">m_reset</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">m_rx</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span>
+<span class="w">         </span><span class="n">m_reset</span><span class="p">.</span><span class="n">sync_connect</span><span class="p">(</span><span class="n">m_tx</span><span class="p">.</span><span class="n">reset_sync</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Connection to scoreboard</span>
+<span class="w">         </span><span class="n">m_rx</span><span class="p">.</span><span class="n">analysis_port</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">analysis_imp_mvb_rx</span><span class="p">);</span>
+<span class="w">         </span><span class="n">m_tx</span><span class="p">.</span><span class="n">analysis_port</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">sc</span><span class="p">.</span><span class="n">analysis_imp_mvb_tx</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Connect sequencer</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_reset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_reset</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">;</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="p">.</span><span class="n">m_rx</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">m_rx</span><span class="p">.</span><span class="n">m_sequencer</span><span class="p">;</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="pcap">
+<h2>PCAP<a class="headerlink" href="#pcap" title="Link to this heading"></a></h2>
+<p>You can read and write data to pcap files. Below is a simple code converting
+captured packet to logic_vector_array::sequence_item. Here is some
+<a class="reference external" href="https://gitlab.liberouter.org/ndk/ndk-fpga/-/blob/devel/comp/uvm/packet_generators/sequence_search.sv?ref_type=heads">example</a></p>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">sequence.sv</span><a class="headerlink" href="#id15" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">sequence_pcap</span><span class="w"> </span><span class="p">#(</span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">ITEM_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequence</span><span class="p">#(</span><span class="n">uvm_logic_vector_array</span><span class="o">::</span><span class="n">sequence_item</span><span class="w"> </span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">));</span>
+<span class="w">     </span><span class="no">`uvm_object_param_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">sequence_pcap</span><span class="w"> </span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">))</span>
+
+<span class="w">     </span><span class="kt">string</span><span class="w"> </span><span class="n">pcap_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;test.pcap&quot;</span>
+<span class="w">     </span><span class="c1">// Instatiate pcap readere</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_pcap</span><span class="o">::</span><span class="n">reader</span><span class="w"> </span><span class="n">reader</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">         </span><span class="n">reader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">task</span><span class="w"> </span><span class="n">body</span><span class="p">();</span>
+<span class="w">         </span><span class="kt">byte</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">data</span><span class="p">[];</span>
+
+<span class="w">         </span><span class="c1">// Open pcap file</span>
+<span class="w">         </span><span class="n">reader</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">pcap_name</span><span class="p">);</span>
+
+<span class="w">         </span><span class="n">req</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_array</span><span class="o">::</span><span class="n">sequence_item</span><span class="w"> </span><span class="p">#(</span><span class="n">ITEM_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;req&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_sequencer</span><span class="p">);</span>
+<span class="w">         </span><span class="c1">//Read data from pcap</span>
+<span class="w">         </span><span class="k">while</span><span class="p">(</span><span class="n">reader</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">uvm_pcap</span><span class="o">::</span><span class="n">RET_OK</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="n">start_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+<span class="w">             </span><span class="c1">// convert data to transaction</span>
+<span class="w">             </span><span class="n">req</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">};</span>
+<span class="w">             </span><span class="n">finish_item</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+<span class="w">         </span><span class="k">end</span>
+
+<span class="w">         </span><span class="c1">// close pcap file</span>
+<span class="w">         </span><span class="n">reader</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endtask</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="register-configuration-by-external-program">
+<h2>Register configuration by external program<a class="headerlink" href="#register-configuration-by-external-program" title="Link to this heading"></a></h2>
+<p>In the NDK-FPGA environment an external program can comunacte with the DUT.
+If you want to use an external program, you have to create the register model with uvm_mem.
+(Others component, such as uvm_reg, is not tested).</p>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">regmodel.sv</span><a class="headerlink" href="#id16" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c1">// regmodel.sv: Register model of KDST</span>
+<span class="w"> </span><span class="c1">// Copyright (C) 2023 CESNET z. s. p. o.</span>
+<span class="w"> </span><span class="c1">// Author(s): Oliver Gurka &lt;oliver.gurka@cesnet.cz&gt;</span>
+
+<span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">kdst_regmodel</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_reg_block</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_object_param_utils</span><span class="p">(</span><span class="n">uvm_key_data_storage</span><span class="o">::</span><span class="n">kdst_regmodel</span><span class="p">)</span>
+
+<span class="w">     </span><span class="n">uvm_mem</span><span class="w"> </span><span class="n">kdst</span><span class="p">;</span>
+<span class="w">     </span><span class="k">localparam</span><span class="w"> </span><span class="n">MEM_BYTE_WIDTH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reg_block&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">set_frontdoor</span><span class="p">(</span><span class="n">uvm_reg_frontdoor</span><span class="w"> </span><span class="n">frontdoor</span><span class="p">);</span>
+<span class="w">         </span><span class="n">uvm_reg_frontdoor</span><span class="w"> </span><span class="n">c_frontdoor</span><span class="p">;</span>
+
+<span class="w">         </span><span class="p">$</span><span class="n">cast</span><span class="p">(</span><span class="n">c_frontdoor</span><span class="p">,</span><span class="w"> </span><span class="n">frontdoor</span><span class="p">.</span><span class="n">clone</span><span class="p">());</span>
+<span class="w">         </span><span class="n">kdst</span><span class="p">.</span><span class="n">set_frontdoor</span><span class="p">(</span><span class="n">c_frontdoor</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">virtual</span><span class="w"> </span><span class="k">function</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">build</span><span class="p">(</span><span class="n">uvm_reg_addr_t</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">bus_width</span><span class="p">);</span>
+<span class="w">         </span><span class="n">kdst</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="s">&quot;kdst&quot;</span><span class="p">,</span><span class="w"> </span><span class="mh">&#39;h300</span><span class="o">/</span><span class="n">MEM_BYTE_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="o">*</span><span class="n">MEM_BYTE_WIDTH</span><span class="p">);</span>
+<span class="w">         </span><span class="n">kdst</span><span class="p">.</span><span class="n">configure</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">//create map</span>
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">default_map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">create_map</span><span class="p">(</span><span class="s">&quot;MAP&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">base</span><span class="p">,</span><span class="w"> </span><span class="n">bus_width</span><span class="o">/</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">UVM_LITTLE_ENDIAN</span><span class="p">);</span>
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">default_map</span><span class="p">.</span><span class="n">add_mem</span><span class="p">(</span><span class="n">kdst</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">rights</span><span class="p">(</span><span class="s">&quot;RW&quot;</span><span class="p">));</span>
+<span class="w">         </span><span class="c1">//Add registers to map</span>
+
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">lock_model</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endfunction</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+<p>External program can write to <em>uvm_mem</em> and reads from <em>uvm_mem</em>. Extends class nfb_driver::mi_sequence. This class
+use GRPC server and client to maintain interprocess communication. Execute program in task <code class="docutils literal notranslate"><span class="pre">run_program</span></code>.
+The program will be automatically executed after you call the task <code class="docutils literal notranslate"><span class="pre">my_seq.start</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id17">
+<div class="code-block-caption"><span class="caption-text">reg_sequence.sv</span><a class="headerlink" href="#id17" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="k">virtual</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">run_external_program</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">nfb_driver</span><span class="o">::</span><span class="n">mi_sequence</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`uvm_object_param_utils</span><span class="p">(</span><span class="n">uvm_key_data_storage</span><span class="o">::</span><span class="n">mi_sequence_base</span><span class="p">)</span>
+
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="n">uvm_key_data_storage</span><span class="o">::</span><span class="n">kdst_regmodel</span><span class="w"> </span><span class="n">m_regmodel</span><span class="p">;</span>
+<span class="w">     </span><span class="k">protected</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="n">prog_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;`/../../../sw/build/src/cttctl/cttctl&quot;</span><span class="p">;</span>
+
+<span class="w">     </span><span class="k">function</span><span class="w"> </span><span class="k">new</span><span class="p">(</span><span class="kt">string</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;mi_sequence_base&quot;</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endfunction</span>
+
+<span class="w">     </span><span class="k">task</span><span class="w"> </span><span class="n">body</span><span class="p">;</span>
+<span class="w">         </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">uvm_config_db</span><span class="p">#(</span><span class="n">uvm_key_data_storage</span><span class="o">::</span><span class="n">kdst_regmodel</span><span class="p">)</span><span class="o">::</span><span class="n">get</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_regmodel&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_regmodel</span><span class="p">))</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">             </span><span class="no">`uvm_fatal</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">get_full_name</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Could not find regmodel&quot;</span><span class="p">)</span>
+<span class="w">         </span><span class="k">end</span>
+
+<span class="w">         </span><span class="k">this</span><span class="p">.</span><span class="n">component_set</span><span class="p">(</span><span class="n">m_regmodel</span><span class="p">.</span><span class="n">kdst</span><span class="p">);</span>
+<span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">body</span><span class="p">();</span>
+<span class="w">     </span><span class="k">endtask</span>
+
+<span class="w">     </span><span class="k">task</span><span class="w"> </span><span class="n">run_program</span><span class="p">();</span>
+<span class="w">         </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">prog</span><span class="w"> </span><span class="n">prog</span><span class="p">;</span>
+<span class="w">         </span><span class="kt">string</span><span class="w"> </span><span class="n">cmd</span><span class="p">;</span>
+<span class="w">         </span><span class="kt">string</span><span class="w"> </span><span class="n">param</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="kt">bit</span><span class="w"> </span><span class="p">[</span><span class="n">KEY_WIDTH</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+
+<span class="w">         </span><span class="n">prog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_common</span><span class="o">::</span><span class="n">prog</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;prog&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">null</span><span class="p">);</span>
+<span class="w">         </span><span class="n">param</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;-a --param2&quot;</span><span class="p">;</span>
+<span class="w">         </span><span class="n">cmd</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;`dirname &quot;</span><span class="p">,</span><span class="w"> </span><span class="no">`__FILE__</span><span class="p">,</span><span class="w"> </span><span class="n">prog_path</span><span class="p">,</span>
+<span class="w">                 </span><span class="n">param</span><span class="p">,</span><span class="w">  </span><span class="s">&quot; &gt;&gt;prog_out 2&gt;&gt;prog_err&quot;</span><span class="p">};</span>
+
+<span class="w">         </span><span class="n">prog</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">);</span>
+<span class="w">     </span><span class="k">endtask</span>
+<span class="w"> </span><span class="kd">endclass</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="howto-first_ver.html" class="btn btn-neutral float-left" title="UVM HOWTO - Create the first verification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="howto-others.html" class="btn btn-neutral float-right" title="UVM HOWTO - Multiver script" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

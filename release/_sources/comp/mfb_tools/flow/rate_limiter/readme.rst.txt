@@ -17,7 +17,7 @@ Operation
 The component forwards the incoming data unchanged.
 Based on the values loaded to the configuration registers, it either lets the traffic flow through at full speed or slows the traffic down when the limit of the configured rate is reached.
 The user configures the output speed per each Interval (see the picture below).
-Each Interval can be configured to a different throughput speed via the corresponding register in the address space.
+Each Interval can be configured to a different throughput speed via corresponding registers in the address space.
 The component loops over all configured Intervals, and after the last one, it starts again from the beginning.
 The component can limit the output speed based on the number of either bytes or packets.
 
@@ -69,13 +69,9 @@ The component has several registers accessible through the MI interface that are
 +----------------+----------------------------------------------------+
 |           0x10 | frequency (read-only)                              |
 +----------------+----------------------------------------------------+
-|           0x14 | 1st speed register                                 |
+|           0x14 | speed pointer register                             |
 +----------------+----------------------------------------------------+
-|           0x18 | 2nd speed register (INTERVAL_COUNT > 1)            |
-+----------------+----------------------------------------------------+
-|          . . . |                                                    |
-+----------------+----------------------------------------------------+
-|           0x?? | last speed register -> 0x14 + (INTERVAL_COUNT-1)*4 |
+|           0x18 | speed register                                     |
 +----------------+----------------------------------------------------+
 
 The data registers correspond with the information given in paragraph 'Generic parameters', and the status register fields are described below.
@@ -91,12 +87,10 @@ The data registers correspond with the information given in paragraph 'Generic p
 +----------------+---------------------------------------------------------------------------+
 |              3 | auxiliary flag (WO)                                                       |
 +----------------+---------------------------------------------------------------------------+
-|              4 | reset pointer (W: 1 = reset pointer to the first configured speed) (WO)   |
-+----------------+---------------------------------------------------------------------------+
-|              5 | limiting type (W: 1 = packet limiting, 0 = byte limiting - default) (RW)  |
+|              4 | limiting type (W: 1 = packet limiting, 0 = byte limiting - default) (RW)  |
 +----------------+---------------------------------------------------------------------------+
 
-.. _usage:
+.. _rate_limiter_usage:
 
 Usage
 ^^^^^
@@ -112,18 +106,19 @@ State flags indicate/set the working mode of the component:
 - CONFIGURATION mode (in which the user can change parameters such as the Section Length, Interval Length, and the Output Speed(s)), and
 - RUN mode (also the limiting mode, where traffic flows through at the configured speed(s)).
 
-The auxiliary flags (RESET POINTER and LIMITING TYPE) do not directly affect the traffic flow.
+The auxiliary flags (LIMITING TYPE) do not directly affect the traffic flow.
 To distinguish between these two types of flags, use the AUXILIARY FLAG as follows: set it to 0 to change the state flags (i.e., leave it as it is) and to 1 to change the auxiliary flags.
 
 **The modes**
 
 Let's run through an example to make it more straightforward.
-The component starts in the IDLE state (Status register: ``0b000001``).
+The component starts in the IDLE state (Status register: ``0b00001``).
 The values of the other registers (Section Length register, Frequency register, etc.) will have default values set by the generic values of the component.
-If this is good enough, you can transition straight to the RUN mode by writing ``0b000100`` to the Status register.
+If this is good enough, you can transition straight to the RUN mode by writing ``0b00100`` to the Status register.
 
-Otherwise, if you need to change some of the other-than-Status registers, you must first switch to the CONFIGURATION mode (``0b000010`` -> Status register).
+Otherwise, if you need to change some of the other-than-Status registers, you must first switch to the CONFIGURATION mode (``0b00010`` -> Status register).
 Here, you can change the output speeds for all intervals (max number of intervals set by the INTERVAL_COUNT parameter at the build phase).
+To read/write the value of a given speed register, select it first by writing its index to the speed pointer register.
 Multiple intervals might be useful when attempting some traffic-shaping mechanism.
 You never have to set a value to all of the Speed registers.
 Each of the Speed registers is automatically validated when a value is written to it (the Speed register's MSB is set to '1' - you can notice this when reading it back).
@@ -131,8 +126,13 @@ During the RUN mode, when the last Speed register with a valid speed is reached,
 This implies that you must set consecutive Speed registers because the first invalid Speed register will restart the loop (e.g., even speed 0 must be written to be valid).
 
 Often, you may want just some simple throughput limiting at a steady speed.
-Then, you only use the first Speed register (at the address offset 0x14).
+Then, you only use the first Speed register (speed pointer register = 0).
 You can ignore the Interval Length register and, in most cases, also the Section Length register.
+
+.. note::
+    Note that the speed pointer register is also utilized in the RUN mode to mark the active speed.
+    It does not get reset automatically (with the exception of the speed loop), so it has to be controlled manually by the user.
+    By contrast, after switching to the CONFIGURATION state, all of the speed registers get reset and invalidated automatically.
 
 **Limitation of the Speed register**
 
@@ -190,13 +190,8 @@ Following this, you should convert your desired speed into the Xscn format using
 
 **Types of the Auxiliary flags**
 
-As previously mentioned, there are two Auxiliary flags in the Status register.
-Bit number four is the flag allowing the user to reset the pointer to the current Speed register manually.
-It is useful only when using multiple intervals.
-In the default state, after stopping the traffic flow (returning to IDLE or CONFIGURATION mode), the pointer to the current Speed register does not change.
-This flag (which must be set only in the IDLE state) resets the pointer to the first Speed register.
-
-Bit number five switches between the types of limiting.
+As previously mentioned, currently there is one Auxiliary flag in the Status register.
+Bit number four switches between the types of limiting.
 When this bit is 0 (default), the output speed is limited according to bps - the value of the Speed register is perceived to be in Bytes per Section.
 When it is set to 1, the output speed is limited according to pps, and the value of the Speed register is perceived to be in Packets per Section.
 This bit can be changed independently on its current state, but be aware of its impact in the RUN state - suddenly, the Speed register will have the same value but in different units (Bscn <-> Pscn).
@@ -204,8 +199,8 @@ This bit can be changed independently on its current state, but be aware of its 
 **Setting the Auxiliary flags**
 
 To set the auxiliary flags, set the AUXILIARY FLAG (bit number three) to 1 and with that (in the same write request) whatever auxiliary bits you need.
-Both Auxiliary bits are always set simultaneously, so for data consistency, either store their values (keep them in the memory) or read their values before every change.
-For example, if you're using packet limiting - the LIMITING TYPE flag is set to 1 - and then you wish to reset the pointer in the IDLE state, make sure you also set the LIMITING TYPE flag to 1 because this single write request will overwrite both bits.
+Auxiliary bits are always set simultaneously, so for data consistency, either store their values (keep them in the memory) or read their values before every change.
+For example, if you're using packet limiting - the LIMITING TYPE flag is set to 1 - and you wish to modify another flag (future versions), make sure you also set the LIMITING TYPE flag to 1 because this single write request will overwrite both bits.
 
 Notes
 ^^^^^
@@ -213,8 +208,7 @@ Notes
 * To simulate intervals of different lengths, set the same output speed to more Intervals in a row.
 * Remember to set consecutive speed registers. Upon encountering a gap in the form of an invalid (not set) speed register, the component loops from the first speed again.
 * When reading a speed register, the most significant bit indicates whether the value was configured during the last configuration and is, therefore, valid (1) or not valid (0).
-* The Speed registers are reset When switched to the IDLE or CONFIGURATION state.
-* The preferred way to interact with the component is using the provided software (Python script).
+* The Speed registers are reset when switched to the CONFIGURATION state.
+* The preferred way to interact with the component is by using the provided software (Python script).
 * The component supports the BE signal internally, although its usage is not needed anywhere in the current version.
 * When using 'byte limiting' in the verification, the output speed can (under some extreme circumstances) exceed the limit a little (packets on the border of two sections are counted as a whole to only one of them).
-

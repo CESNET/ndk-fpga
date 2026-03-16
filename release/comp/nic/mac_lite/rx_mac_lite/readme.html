@@ -62,6 +62,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
@@ -109,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -783,58 +785,64 @@ according to the selected Ethernet standard.</p></td>
 <tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-resize_buffer"><td><p>RESIZE_BUFFER</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
-<td><p>If true, the MFB bus doubles data width (number of regions) before
-the packet buffer (on RX_CLK). RESIZE_BUFFER feature is allowed only
-when the MFB bus increases (TX MFB width &gt;= 2x RX MFB width) and the
-following conditions must apply: RX_BLOCK_SIZE=TX_BLOCK_SIZE, RX_ITEM_WIDTH=TX_ITEM_WIDTH</p></td>
+<td><p>If true, the MFB bus resize data width before the packet buffer (on
+RX_CLK). See also RESIZE_FULL for additional settings.</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-resize_full"><td><p>RESIZE_FULL</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>This parameter is active only if RESIZE_BUFFER=True. If is set to True,
+the bus before the buffer will be resized directly to the TX parameters,
+otherwise only the number of regions will be doubled to 2*RX_REGIONS.
+If True, packets smaller than 60B must not be sent to the RX input.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>OTHERS CONFIGURATION:</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-network_port_id"><td><p>NETWORK_PORT_ID</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-network_port_id"><td><p>NETWORK_PORT_ID</p></td>
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>ID of this network port, it is inserted into the packet metadata.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-pkt_mtu_bytes"><td><p>PKT_MTU_BYTES</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-pkt_mtu_bytes"><td><p>PKT_MTU_BYTES</p></td>
 <td><p>natural</p></td>
 <td><p>16384</p></td>
 <td><p>Maximum allowed size of packet in bytes.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-crc_is_received"><td><p>CRC_IS_RECEIVED</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-crc_is_received"><td><p>CRC_IS_RECEIVED</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Set true when CRC is part of frames in RX MFB bus.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-crc_check_en"><td><p>CRC_CHECK_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-crc_check_en"><td><p>CRC_CHECK_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of CRC checking, CRC_IS_RECEIVED must be true.
 When is disable, resources are ~60% lower.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-crc_remove_en"><td><p>CRC_REMOVE_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-crc_remove_en"><td><p>CRC_REMOVE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of CRC removing, CRC_IS_RECEIVED must be true.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-mac_check_en"><td><p>MAC_CHECK_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-mac_check_en"><td><p>MAC_CHECK_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of MAC checking.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-mac_count"><td><p>MAC_COUNT</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-mac_count"><td><p>MAC_COUNT</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>Number of maximum MAC address in CAM memory, maximum value is 16.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-timestamp_en"><td><p>TIMESTAMP_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-timestamp_en"><td><p>TIMESTAMP_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Enable of timestamping frames.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-rx_mac_lite-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-rx_mac_lite-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>Select correct FPGA device.

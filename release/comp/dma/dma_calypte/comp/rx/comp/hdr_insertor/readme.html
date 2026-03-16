@@ -62,6 +62,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../axi.html">AXI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../mi.html">MI Tools</a></li>
@@ -70,6 +71,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../nic.html">Network Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../../../../pcie.html">PCIe Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/mtc/readme.html">MTC (MI Transaction Controller)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/pkt_writer/readme.html">PCIe Packet Writer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/ptc/readme.html">PTC (PCIe Transaction Controller)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/ptc/comp/tag_manager/readme.html">PTC Tag Manager</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../../../pcie/common/readme.html">PCI_EXT_CAP</a></li>
@@ -119,6 +121,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -265,112 +268,117 @@ beginning of the word.</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector (max(1, log2(RX_REGION_SIZE*RX_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>MFB output interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(TX_REGIONS*TX_REGION_SIZE*TX_BLOCK_SIZE*TX_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(TX_REGIONS*PCIE_RQ_META_WIDTH - 1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>RQ PCIe header</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(TX_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(TX_REGIONS*max(1, log2(TX_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(TX_REGIONS*max(1, log2(TX_REGION_SIZE*TX_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Header manager MVB interface</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr"><td><p>HDRM_DMA_PCIE_HDR</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr"><td><p>HDRM_DMA_PCIE_HDR</p></td>
 <td><p>std_logic_vector(127 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_src_rdy"><td><p>HDRM_DMA_PCIE_HDR_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_src_rdy"><td><p>HDRM_DMA_PCIE_HDR_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_dst_rdy"><td><p>HDRM_DMA_PCIE_HDR_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_pcie_hdr_dst_rdy"><td><p>HDRM_DMA_PCIE_HDR_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr"><td><p>HDRM_DATA_PCIE_HDR</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr"><td><p>HDRM_DATA_PCIE_HDR</p></td>
 <td><p>std_logic_vector(127 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr_src_rdy"><td><p>HDRM_DATA_PCIE_HDR_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr_src_rdy"><td><p>HDRM_DATA_PCIE_HDR_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr_dst_rdy"><td><p>HDRM_DATA_PCIE_HDR_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_data_pcie_hdr_dst_rdy"><td><p>HDRM_DATA_PCIE_HDR_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_pkt_drop"><td><p>HDRM_PKT_DROP</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_pkt_drop"><td><p>HDRM_PKT_DROP</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_hdr_data"><td><p>HDRM_DMA_HDR_DATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_hdr_data"><td><p>HDRM_DMA_HDR_DATA</p></td>
 <td><p>std_logic_vector(63 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_hdr_src_rdy"><td><p>HDRM_DMA_HDR_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_hdr_src_rdy"><td><p>HDRM_DMA_HDR_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_hdr_dst_rdy"><td><p>HDRM_DMA_HDR_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-rx_dma_calypte_hdr_insertor-hdrm_dma_hdr_dst_rdy"><td><p>HDRM_DMA_HDR_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>

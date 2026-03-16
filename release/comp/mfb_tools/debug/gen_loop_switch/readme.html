@@ -62,11 +62,15 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Gen Loop Switch (GLS)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Gen Loop Switch (GLS)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#control-software">Control software</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../generator/readme.html">MFB Generator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_appender/readme.html">MFB MVB Appender</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../edit/frame_extender/readme.html">MFB FRAME EXTENDER</a></li>
@@ -96,6 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../flow/transformer/readme.html">MFB Trasformer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_l3l4/readme.html">MFB_CHECKSUM_L3L4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
@@ -135,6 +140,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -679,6 +685,14 @@ connection from DMA interfaces to ETH interfaces</p></td>
 </table>
 </dd></dl>
 
+<section id="control-software">
+<h2>Control software<a class="headerlink" href="#control-software" title="Link to this heading"></a></h2>
+<p>The Gen Loop Switch (GLS) module can be controlled using the <cite>GenLoopSwitch</cite> class located in the <cite>ofm</cite> Python package at <cite>ofm.comp.mfb_tools.debug.gen_loop_switch.gen_loop_switch</cite>.
+There is also the <cite>ofm-gls</cite> command-line tool available after the package installation.</p>
+<p>A script that uses the <cite>GenLoopSwitch</cite> class is provided here in the <cite>./sw</cite> directory.
+This script is performs throughput measurements in various modes and is the base for many HW tests.
+See the <a class="reference internal" href="../../../../ndk_core/doc/testing.html#ndk-testing-gls"><span class="std std-ref">GLS module tutorial</span></a> for more information.</p>
+</section>
 </section>
 
 

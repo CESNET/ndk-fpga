@@ -62,6 +62,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="axi.html">AXI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
@@ -119,6 +120,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -610,6 +612,10 @@ The purpose of this monitor is to filter out the unwanted transactions.</p>
 <section id="cocotbext-ofm-mvb">
 <h3>cocotbext.ofm.mvb<a class="headerlink" href="#cocotbext-ofm-mvb" title="Link to this heading"></a></h3>
 <p>Drivers, monitors, and transactions for MVB (Multi Value Bus).</p>
+<p>This bus (its interface) can be quite versatile from the point of different data signals.
+Other than ports for data data (and metadata), components can implement ports such as length, address, discard, and many more with possible different aliases.</p>
+<p>If the current driver, monitor, or MVB transactions do not implement the necessary signals, it is advisable to
+create your own (sub)classes for your specific usecase in your local Cocotb test directory.</p>
 <p class="rubric">drivers.MVBDriver</p>
 <p>Driver intended for the MVB bus used for sending transactions to the bus.</p>
 <p class="rubric">monitors.MVBMonitor</p>
@@ -621,7 +627,7 @@ The purpose of this monitor is to filter out the unwanted transactions.</p>
 <p class="rubric">transaction.MvbTrClassicWithMeta</p>
 <p>Transaction for the MVB bus consisting of data and metadata.</p>
 <p class="rubric">transaction.MvbTrAddressWithMeta</p>
-<p>Transaction for the MVB bus consisting of an address (could be also a key, hash, etc.) and metadata.</p>
+<p>Transaction for the MVB bus consisting of an address and metadata.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py</span></code>.</p>

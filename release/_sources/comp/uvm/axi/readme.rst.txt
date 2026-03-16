@@ -15,9 +15,10 @@ This agent is responsible for communication through the AXI interface. This is a
 
 The environment is configured by three parameters:
 
-- DATA_WIDTH
+- ITEMS
+- ITEM_WIDTH
 - TUSER_WIDTH
-- REGIONS
+
 
 sequence_item
 ---------------------------
@@ -30,11 +31,13 @@ The following table shows variables in the sequence_item class.
 
 .. code-block:: systemverilog
 
-    logic [DATA_WIDTH  -1 : 0] tdata;
+    logic [ITEMS*ITEMS_WIDTH  -1 : 0] tdata;
     logic [TUSER_WIDTH -1 : 0] tuser;
-    logic [TKEEP_WIDTH -1 : 0] tkeep;
+    logic [ITEMS -1 : 0]       tkeep;
     logic                      tlast;
     logic                      tvalid;
     logic                      tready;
 
 This is low level protocol if you generate data in sequence please be carefull if you dont breaking axi protocols rules.
+If you want to have 512-bit interface there is manny posibility how to reach it. For example ITEMS = 64, ITEMS_WIDTH=8
+or ITEMS=16, ITEMS_WIDTH = 32.

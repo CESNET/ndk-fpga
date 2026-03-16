@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data logger &mdash; NDK-FPGA  documentation</title>
+  <title>Data Logger &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,7 +19,7 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Mem logger" href="mem_logger/readme.html" />
+    <link rel="next" title="Memory Logger" href="mem_logger/readme.html" />
     <link rel="prev" title="Latency meter" href="../latency_meter/readme.html" /> 
 </head>
 
@@ -62,6 +62,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../axi.html">AXI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
@@ -71,22 +72,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../debug.html">Debug Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../streaming_debug/readme.html">Streaming Debug</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mem_tester/readme.html">DDR4 Memory Tester</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mem_tester/readme.html">Memory Tester</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../histogramer/readme.html">Histogramer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../latency_meter/readme.html">Latency meter</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Data logger</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#key-features">Key features</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#data-logger-warping-component">Data logger warping component</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="mem_logger/readme.html">Mem logger</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data Logger</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#key-features">Key Features</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#counter-interface">Counter Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#value-interface">Value Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#control-interface">Control Interface</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#component-port-and-generics-description">Component port and generics description</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#instance-template-simple-usage">Instance template (simple usage)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#instance-template-full-usage">Instance template (full usage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-logger-wrapping-components">Data Logger Wrapping Components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mem_logger/readme.html">Memory Logger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#component-port-and-generics-description">Component port and generics description</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#instance-template-simple-usage">Instance template (simple usage)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instance-template-full-usage">Instance template (full usage)</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#control-sw">Control SW</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#mi-address-space">MI address space</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="mem_logger/readme.html">Memory Logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../jtag_op_client/readme.html">JTAG-over-protocol Client</a></li>
 </ul>
 </li>
@@ -117,6 +126,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -141,7 +151,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../debug.html">Debug Tools</a></li>
-      <li class="breadcrumb-item active">Data logger</li>
+      <li class="breadcrumb-item active">Data Logger</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/comp/debug/data_logger/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -152,67 +162,55 @@
            <div itemprop="articleBody">
              
   <section id="data-logger">
-<span id="id1"></span><h1>Data logger<a class="headerlink" href="#data-logger" title="Link to this heading"></a></h1>
-<p>Data logger is used to log statistics about a specific events and make them available on the MI bus.
-Simple usage can be seen in <a class="reference internal" href="mem_logger/readme.html#mem-logger"><span class="std std-ref">MEM_LOGGER</span></a> component.</p>
+<span id="id1"></span><h1>Data Logger<a class="headerlink" href="#data-logger" title="Link to this heading"></a></h1>
+<p>The <strong>Data Logger</strong> logs statistics about specific events and exposes them on the MI bus.
+A simple usage example can be found in the <a class="reference internal" href="mem_logger/readme.html#mem-logger"><span class="std std-ref">MEM_LOGGER</span></a> component.</p>
 <section id="key-features">
-<h2>Key features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
-<ul>
-<li><p>Counter interface</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Each counter interface contains a counter that can count
-the number of occurrences of a specific event, the number of clock cycles of a event, …</p></li>
-<li><p>The number of used counter interfaces is set via generic parameters</p></li>
-<li><p>Width is common for every counter and can be set to any value (even larger than MI bus width)</p></li>
-<li><p>If the counter should overflow, it will stay at the maximum possible value</p></li>
-<li><p>Custom increment value can be used (default: 1)</p></li>
-<li><p>Counter submit signal can be used to submit (save) counter value at a specific time
-(for example if you can’t determine when the event ends)</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Value interface</p>
-<blockquote>
-<div><ul>
-<li><p>Each value interface can calculate:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Minimal and maximal occurred value</p></li>
-<li><p>Sum and count of all occurred values (SW can then calculate average value)</p></li>
-<li><p>Histogram with custom box count and box with (see <a class="reference internal" href="../histogramer/readme.html#histogramer"><span class="std std-ref">HISTOGRAMER</span></a>)</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>The number of used value interfaces is set via generic parameters</p></li>
-<li><p>Each value interface can have different width</p></li>
-<li><p>Each statistic can be enabled or disabled separately for each interface (to reduce resources)</p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Control interface</p>
-<blockquote>
-<div><ul>
-<li><p>Can be used for custom configuration or status flags and values</p></li>
-<li><p>There is a control output interface and a control input interface</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>CTRLO = output from <cite>DATA_LOGGER</cite></p></li>
-<li><p>CTRLI = input to <cite>DATA_LOGGER</cite></p></li>
-</ul>
-</div></blockquote>
-</li>
-<li><p>Each interface can have a custom width (for width 0 is disabled)</p></li>
-</ul>
-</div></blockquote>
-</li>
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<section id="counter-interface">
+<h3>Counter Interface<a class="headerlink" href="#counter-interface" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Each counter tracks occurrences of an event, clock cycles, etc.</p></li>
+<li><p>Number of counter interfaces is configurable via generic parameters.</p></li>
+<li><p>All counters share the same width (width is configurable and can be even wider than the MI bus).</p></li>
+<li><p>On overflow the counter saturates at its maximum value.</p></li>
+<li><p>Custom increment value (default: <code class="docutils literal notranslate"><span class="pre">1</span></code>).</p></li>
+<li><p>Optional <code class="docutils literal notranslate"><span class="pre">submit</span></code> signal to latch the current value at a specific moment
+(e.g. when the end of an event cannot be detected immediately).</p></li>
 </ul>
 </section>
-<section id="data-logger-warping-component">
-<h2>Data logger warping component<a class="headerlink" href="#data-logger-warping-component" title="Link to this heading"></a></h2>
+<section id="value-interface">
+<h3>Value Interface<a class="headerlink" href="#value-interface" title="Link to this heading"></a></h3>
+<p>Each value interface can compute:</p>
+<ul class="simple">
+<li><p>Minimum and maximum observed value</p></li>
+<li><p>Sum and count of all values (average can be calculated in software)</p></li>
+<li><p>Histogram with configurable number of bins and bin width
+(see <a class="reference internal" href="../histogramer/readme.html#histogramer"><span class="std std-ref">HISTOGRAMER</span></a>)</p></li>
+</ul>
+<p>Configuration options per interface:</p>
+<ul class="simple">
+<li><p>Number of value interfaces set via generics</p></li>
+<li><p>Individual data width per interface</p></li>
+<li><p>Each statistic (min/max, sum/count, histogram) can be independently enabled/disabled
+to save resources</p></li>
+</ul>
+</section>
+<section id="control-interface">
+<h3>Control Interface<a class="headerlink" href="#control-interface" title="Link to this heading"></a></h3>
+<p>Used for custom configuration registers or status flags.</p>
+<ul class="simple">
+<li><p><strong>CTRLO</strong> … output binary vector from the Data Logger</p></li>
+<li><p><strong>CTRLI</strong> … input binary vector to the Data Logger</p></li>
+</ul>
+<p>Both interfaces support arbitrary widths; width <code class="docutils literal notranslate"><span class="pre">0</span></code> disables the interface.</p>
+</section>
+</section>
+<section id="data-logger-wrapping-components">
+<h2>Data Logger Wrapping Components<a class="headerlink" href="#data-logger-wrapping-components" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="mem_logger/readme.html">Mem logger</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mem_logger/readme.html">Memory Logger</a></li>
 </ul>
 </div>
 </section>
@@ -440,9 +438,8 @@ the number of occurrences of a specific event, the number of clock cycles of a e
 </table>
 </dd></dl>
 
-</section>
 <section id="instance-template-simple-usage">
-<h2>Instance template (simple usage)<a class="headerlink" href="#instance-template-simple-usage" title="Link to this heading"></a></h2>
+<h3>Instance template (simple usage)<a class="headerlink" href="#instance-template-simple-usage" title="Link to this heading"></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_logger_i</span> <span class="p">:</span> <span class="n">entity</span> <span class="n">work</span><span class="o">.</span><span class="n">DATA_LOGGER</span>
 <span class="n">generic</span> <span class="nb">map</span> <span class="p">(</span>
     <span class="n">MI_DATA_WIDTH</span>       <span class="o">=&gt;</span> <span class="n">MI_DATA_WIDTH</span>  <span class="p">,</span>
@@ -474,7 +471,7 @@ the number of occurrences of a specific event, the number of clock cycles of a e
 </div>
 </section>
 <section id="instance-template-full-usage">
-<h2>Instance template (full usage)<a class="headerlink" href="#instance-template-full-usage" title="Link to this heading"></a></h2>
+<h3>Instance template (full usage)<a class="headerlink" href="#instance-template-full-usage" title="Link to this heading"></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_logger_i</span> <span class="p">:</span> <span class="n">entity</span> <span class="n">work</span><span class="o">.</span><span class="n">DATA_LOGGER</span>
 <span class="n">generic</span> <span class="nb">map</span> <span class="p">(</span>
     <span class="n">MI_DATA_WIDTH</span>       <span class="o">=&gt;</span> <span class="n">MI_DATA_WIDTH</span>  <span class="p">,</span>
@@ -546,38 +543,39 @@ the number of occurrences of a specific event, the number of clock cycles of a e
 </pre></div>
 </div>
 </section>
+</section>
 <section id="control-sw">
 <h2>Control SW<a class="headerlink" href="#control-sw" title="Link to this heading"></a></h2>
-<p>Folder <code class="docutils literal notranslate"><span class="pre">data_logger/sw/</span></code> contains following <code class="docutils literal notranslate"><span class="pre">Python3</span></code> packages:</p>
+<p>Folder <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/ofm/</span></code> contains following <code class="docutils literal notranslate"><span class="pre">Python</span></code> packages for <code class="docutils literal notranslate"><span class="pre">DataLogger</span></code>:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">data_logger</span></code> … basic interaction with <code class="docutils literal notranslate"><span class="pre">DATA_LOGGER</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mem_logger</span></code> … basic interaction with <code class="docutils literal notranslate"><span class="pre">MEM_LOGGER</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">logger_stats</span></code> … loading firmware statistics (multiple <code class="docutils literal notranslate"><span class="pre">DATA_LOGGERS</span></code> can be organized in tree hierarchy)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">logger_stats</span></code> … structured loading of <code class="docutils literal notranslate"><span class="pre">DATA_LOGGER</span></code> statistics (multiple <code class="docutils literal notranslate"><span class="pre">DATA_LOGGERS</span></code> can be organized in tree hierarchy)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">graph_tools</span></code> … simple plot functions for statistics from <code class="docutils literal notranslate"><span class="pre">logger_stats</span></code></p></li>
 </ul>
-<p>Package can be installed using this command:</p>
+<p><strong>Installation steps</strong></p>
 <ul class="simple">
-<li><p>You also need to install <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">nfb</span></code> package</p></li>
+<li><p>Install <strong>NFB python package</strong></p>
+<ul>
+<li><p>See: <a class="reference external" href="https://github.com/CESNET/ndk-sw?tab=readme-ov-file">ndk-sw</a></p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span>
-
-<span class="c1"># Install nfb:</span>
-<span class="n">cd</span> <span class="n">swbase</span><span class="o">/</span><span class="n">pynfb</span>
-<span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">Cython</span>
-<span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-<span class="n">cd</span> <span class="o">-</span>
-
-<span class="c1"># Install this package:</span>
-<span class="n">cd</span> <span class="n">data_logger</span><span class="o">/</span><span class="n">sw</span>
-<span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>Example usage of <code class="docutils literal notranslate"><span class="pre">logger_stats</span></code> (for more usage see <cite>mem_logger/mem_logger.py</cite>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logger_stats</span> <span class="k">as</span> <span class="nn">Stats</span>
-<span class="kn">from</span> <span class="nn">data_logger.data_logger</span> <span class="kn">import</span> <span class="n">DataLogger</span>
+</li>
+<li><p>Install <strong>Open FPGA Modules python package</strong></p>
+<ul>
+<li><p>It includes <code class="docutils literal notranslate"><span class="pre">data_logger,</span> <span class="pre">mem_logger,</span> <span class="pre">logger_stats,</span> <span class="pre">graph_tools</span></code> packages</p></li>
+<li><p>See: <a class="reference external" href="https://github.com/CESNET/ndk-fpga/tree/devel/python/ofm">ndk-fpga/python/ofm</a></p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Example usage</strong> of <code class="docutils literal notranslate"><span class="pre">logger_stats</span></code> (for more usage see <cite>mem_logger/mem_logger.py</cite>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.debug.data_logger.data_logger</span> <span class="kn">import</span> <span class="n">DataLogger</span>
+<span class="kn">import</span> <span class="nn">ofm.comp.debug.data_logger.logger_stats</span> <span class="k">as</span> <span class="nn">Stats</span>
 
 <span class="k">def</span> <span class="nf">create_stats</span><span class="p">():</span>
     <span class="c1"># Create DataLoggers</span>
+    <span class="c1"># You can specify:</span>
+    <span class="c1"># * Card device (dev=&#39;/dev/nfb1&#39;)</span>
+    <span class="c1"># * MI bus index (when multiple DataLoggers are used)</span>
     <span class="n">logger_0</span> <span class="o">=</span> <span class="n">DataLogger</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">logger_1</span> <span class="o">=</span> <span class="n">DataLogger</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -634,28 +632,36 @@ the number of occurrences of a specific event, the number of clock cycles of a e
 
 <span class="k">return</span> <span class="n">stats</span>
 
-
 <span class="n">stats</span> <span class="o">=</span> <span class="n">create_stats</span><span class="p">()</span>
+
+<span class="c1"># Now you can load / print / save all statistics with just one command</span>
 <span class="n">stats</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">to_str</span><span class="p">())</span>
 <span class="n">stats</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;stats.npz&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Example usage of <code class="docutils literal notranslate"><span class="pre">graph_tools</span></code>:</p>
-<blockquote>
-<div><p>from graph_tools.graph_tools import load_data, plot_counter, plot_value, plot_value_2d</p>
-<p>stats = load_data(‘stats.npz’)</p>
-<p>node = pd.DataFrame.from_dict(stats[‘Stats A’][‘Counters’])
-selected = [‘Counter A’, ‘Counter B’]</p>
-<p># Plot single counter
-plot_counter(node[‘Counter X’], ‘Time’, ‘Requests’, ‘Plot title’)</p>
-<p># Plot multiple counters
-plot_counter(node[selected], ‘Time’, ‘Requests’, ‘Plot title’)</p>
-<p># Plot histogram of the value interface
-plot_value(node[‘Value A’], ‘Time’, ‘Blocks’, ‘Title’ log=True)</p>
-<p># Plot 2D histogram of the value interface history
-plot_value_2d(node[‘Value A’], ‘Time’, ‘Blocks’, ‘Title’ log=True)</p>
-</div></blockquote>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.debug.data_logger.graph_tools</span> <span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">plot_counter</span><span class="p">,</span> <span class="n">plot_value</span><span class="p">,</span> <span class="n">plot_value_2d</span>
+<span class="kn">from</span> <span class="nn">graph_tools.graph_tools</span> <span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">plot_counter</span><span class="p">,</span> <span class="n">plot_value</span><span class="p">,</span> <span class="n">plot_value_2d</span>
+
+<span class="n">stats</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">&#39;stats.npz&#39;</span><span class="p">)</span>
+
+<span class="n">node</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;Stats A&#39;</span><span class="p">][</span><span class="s1">&#39;Counters&#39;</span><span class="p">])</span>
+<span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Counter A&#39;</span><span class="p">,</span> <span class="s1">&#39;Counter B&#39;</span><span class="p">]</span>
+
+<span class="c1"># Plot single counter</span>
+<span class="n">plot_counter</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;Counter X&#39;</span><span class="p">],</span> <span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Requests&#39;</span><span class="p">,</span> <span class="s1">&#39;Plot title&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot multiple counters</span>
+<span class="n">plot_counter</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="n">selected</span><span class="p">],</span> <span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Requests&#39;</span><span class="p">,</span> <span class="s1">&#39;Plot title&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot histogram of the value interface</span>
+<span class="n">plot_value</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;Value A&#39;</span><span class="p">],</span> <span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Blocks&#39;</span><span class="p">,</span> <span class="s1">&#39;Title&#39;</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Plot 2D histogram of the value interface history</span>
+<span class="n">plot_value_2d</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s1">&#39;Value A&#39;</span><span class="p">],</span> <span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Blocks&#39;</span><span class="p">,</span> <span class="s1">&#39;Title&#39;</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="mi-address-space">
 <h2>MI address space<a class="headerlink" href="#mi-address-space" title="Link to this heading"></a></h2>
@@ -723,7 +729,7 @@ plot_value_2d(node[‘Value A’], ‘Time’, ‘Blocks’, ‘Title’ log=Tru
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../latency_meter/readme.html" class="btn btn-neutral float-left" title="Latency meter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="mem_logger/readme.html" class="btn btn-neutral float-right" title="Mem logger" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="mem_logger/readme.html" class="btn btn-neutral float-right" title="Memory Logger" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

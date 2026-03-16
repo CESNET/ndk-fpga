@@ -1,44 +1,54 @@
 .. _mem_tester:
 
-DDR4 Memory Tester
-------------------
+Memory Tester
+-------------
 
-``MEM_TESTER`` is used to test external DDR memory to detect failures and overal performance of the memory.
+The ``MEM_TESTER`` component is used to test external DDR memory.
+It detects hardware failures and measures the overall performance of the memory.
 
-
-Key features
+Key Features
 ^^^^^^^^^^^^
 
-* Memory interface is compatible with AMM (Avalon-Memory-Mapped) interface and Intel EMIF Hard IP
-* Basic test workflow:
+* **Interface Compatibility**
+  Compatible with the Avalon Memory-Mapped (**AMM**) interface and Intel EMIF Hard IP.
 
-    * Sequential write of the pseudo random data to every memory address
-    * Resting pseudo random generator (to generate the exactly same sequence)
-    * Sequentially sending read requests to all memory address space and comparing received data with pseudo random generator output
+* **Basic Test Workflow**
 
-* Additionally random address generation can be enabled to measure more realistic memory performance
+  1. Sequentially writes pseudo-random data to every memory address.
+  2. Resets the pseudo-random generator (to reproduce the exact same sequence).
+  3. Sequentially reads back from all addresses and compares the received data with the expected values.
 
-    * However in this mode error counter will detect errors due to the overlap of some addresses
-    * Therefore random addressing mode should be used only for measuring and not for testing
+* **Random Addressing Mode** (optional)
 
-* Some other test parameters can be set:
+  * Generates random addresses to simulate more realistic memory access patterns and measure performance.
 
-    * Incremental read (next read request will be send only after the result of previous read is received)
+.. warning::
+    Random Addressing Mode is **not suitable for error detection (address overlaps can cause false error reports).**
+    Use it **only for performance measurement**, not for memory testing.
 
-        * This mode is better for measuring latencies, because memory is not loaded with other requests
+* **Additional Configurable Options**
 
-    * Auto precharge for random addressing
-    * Manual control over refresh period
+  * **Incremental Read mode:** The next read request is issued only after the previous one completes.
+    Ideal for precise latency measurements because the memory is not loaded with concurrent requests.
+  * **Auto precharge** support (for random addressing).
+  * Manual control of the memory **refresh period**.
 
-* Test configuration can be set via MI interface
-* There is also python script for generating PDF report with different modes
-* Measuring is handled by :ref:`MEM_LOGGER<mem_logger>`
-* ``MEM_TESTER`` must be placed to the external memory drivers clock domain
+* **Configuration & Control**
+  All test parameters are configured via the MI bus.
 
-    * For MI bus there is internal MI_ASYNC component for bridging different clock domains
+* **Reporting**
+  Includes a Python script that generates PDF performance reports.
 
-    * You can even manually read adn write to the external memory using :ref:`AMM_GEN<amm_gen>` component
+* **Measurement Logging**
+  Handled by the :ref:`MEM_LOGGER <mem_logger>` component.
 
+* **Clock Domain**
+  Must be instantiated in the **external memory controller’s clock domain**.
+
+  * The MI bus is automatically bridged using the internal ``MI_ASYNC`` component.
+
+* **Manual Memory Access**
+  You can also perform manual read/write operations on the memory using the :ref:`AMM_GEN <amm_gen>` component.
 
 Component port and generics description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,41 +57,62 @@ Component port and generics description
    :noautogenerics:
 
 
+.. _mem_tester_sw:
 
-Control SW
-^^^^^^^^^^
+Control Software
+^^^^^^^^^^^^^^^^
 
-Because the measurement is handled by `MEM_LOGGER` (`DATA_LOGGER` wrap) you need to install its package:
+**Requirements**
 
-* You also need to install `python nfb` package
+* **NFB python package**
 
-.. code-block::
+  * See: `ndk-sw <https://github.com/CESNET/ndk-sw?tab=readme-ov-file>`_
 
-    cd ofm/comp/debug/data_logger/sw
-    python3 setup.py install --user
+* **Open FPGA Modules python package**
 
+  * It includes packages for ``DATA_LOGGER`` and ``MEM_LOGGER``.
+  * See: `ndk-fpga/python/ofm <https://github.com/CESNET/ndk-fpga/tree/devel/python/ofm>`_
 
-Then you can control `MEM_TESTER` using `mem_tester.py` script:
+**Basic usage of** ``mem_tester.py``
 
-* With no arguments the script will run basic memory test and print result
-* `-p` argument can be used to print `MEM_TESTER` state
-* `-r` argument can be used to run test with random addressing
-* If you have your card at different device than `/dev/nfb0` you can use `-d` argument
-* If you have multiple `MEM_TESTER` you can select concrete instance by `-i` argument
+* No arguments          ... Run basic **sequential memory test** and show result
+* ``-p``                ... Print current state of ``MEM_TESTER``
+* ``-r``                ... Run test with **random addressing** (performance only)
+* ``-d <device>``       ... Specify NFB device (default: ``/dev/nfb0``)
+* ``-i <index>``        ... Specify ``MEM_TESTER`` instance (also applies to ``MEM_LOGGER``)
+* ``--gen-*``           ... Manual read/write access to memory via ``AMM_GEN``
 
-    * This will also set the same index for `MEM_LOGGER` component
-
-* You can even manualy write and read to the external memory using `--gen-*` arguments
-
-.. warning::
-    Test with random indexing active will generate a few errors,
-    due to multiple writes to the same address.
-    Its used just for measurement purpose.
-
+**Example output** (with no arguments)
 
 .. code-block::
 
-  $ python3 sw/mem_tester.py -h
+    || ------------------- ||
+    || TEST WAS SUCCESSFUL ||
+    || ------------------- ||
+
+    Mem_logger statistics:
+    ----------------------
+    write requests       16777215
+    write words          67108860
+    read requests        16777215
+    ...
+    Flow:
+    write                137.03 [Gb/s]
+    read                  24.66 [Gb/s]
+    total                 41.80 [Gb/s]
+    Latency:
+    min                   75.00 [ns]
+    max                  630.00 [ns]
+    avg                   80.04 [ns]
+    Errors:
+    zero burst count     0
+    simultaneous r+w     0
+
+**Full usage of** ``mem_tester.py``
+
+.. code-block::
+
+  $ python sw/mem_tester.py -h
   usage: mem_tester.py [-h] [-d device] [-c compatible] [-C compatible]
                       [-i index] [-I index] [-p] [--rst] [--rst-tester]
                       [--rst-logger] [--rst-emif] [-r] [-b BURST] [-s SCALE]
@@ -133,178 +164,132 @@ Then you can control `MEM_TESTER` using `mem_tester.py` script:
     --gen-burst GEN_BURST
                           sets burst count for amm_gen
 
-Example output:
 
-.. code-block::
+Pytest Automated Testing
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-    $ python3 sw/mem_tester.py
-    || ------------------- ||
-    || TEST WAS SUCCESSFUL ||
-    || ------------------- ||
+You can run fully automated tests with **pytest**:
 
-    Mem_logger statistics:
-    ----------------------
-    write requests       16777215
-    write words        67108860
-    read requests        16777215
-    requested words    67108860
-    received words     67108860
-    Flow:
-    write               137.03 [Gb/s]
-    read                24.66 [Gb/s]
-    total               41.80 [Gb/s]
-    Time:
-    write               250.75 [ms]
-    read                1393.22 [ms]
-    total               1643.97 [ms]
-    Latency:
-    min                 75.00 [ns]
-    max                 630.00 [ns]
-    avg                 80.04 [ns]
-    histogram [ns]:
-                    ...
-        69.0 -  75.0 ... 16165552
-                    ...
-        87.0 -  93.0 ... 62962
-        93.0 -  99.0 ... 241581
-                    ...
-        111.0 - 117.0 ... 128501
-                    ...
-        147.0 - 153.0 ... 1
-                    ...
-        435.0 - 441.0 ... 50118
-                    ...
-        453.0 - 459.0 ... 2
-        459.0 - 465.0 ... 1
-                    ...
-        471.0 - 477.0 ... 2570
-                    ...
-        483.0 - 489.0 ... 1
-        489.0 - 495.0 ... 62961
-        495.0 - 501.0 ... 62962
-                    ...
-        573.0 - 579.0 ... 1
-                    ...
-        627.0 - 633.0 ... 2
-    Errors:
-    zero burst count   0
-    simultaneous r+w   0
+.. code-block:: bash
+
+    pip install pytest
+    python -m pytest -xs --tb=short test_mem_tester.py
+
+**Useful flags:**
+
+* ``-s``          ... show measured data
+* ``-x``          ... stop after first failure
+* ``--tb=short``  ... show only assertion messages
+
+The script automatically finds all ``MEM_TESTER`` and ``MEM_LOGGER`` instances and runs sequential tests with minimal and maximal burst counts.
+
+To use a different device, edit the ``device`` variable in ``test_mem_tester.py``.
 
 
-Pytest SW
-^^^^^^^^^
+PDF Report Generator
+^^^^^^^^^^^^^^^^^^^^
 
-You can also use automated testing using pytest framework:
+The ``report_gen.py`` script runs the ``MEM_TESTER`` with many different configurations and creates a PDF (or Markdown) report with plots.
 
-* This script will try to find `MEM_TESTER` and `MEM_LOGGER` components
-* Will try to open then and read their configuration and status
-* Will run sequential tests on each detected memory interface (with minimal and maximal burst counts)
+**Report content:**
 
-.. code-block::
+* Basic configuration of ``MEM_TESTER`` and ``MEM_LOGGER``
+* Full memory test results for every interface
+* Tables and plots with latencies, bandwidth, etc.
 
-    python3 -m pytest -xs --tb=short test_mem_tester.py
-    # -s ... to show measured data
-    # -x ... end after first failure
-    # -tb ... show only assertion message
+**Requirements for PDF output:**
 
-If you need to use different device, edit `device` variable in test_mem_tester.py
+.. code-block:: bash
 
-PDF report generator SW
-^^^^^^^^^^^^^^^^^^^^^^^
+    sudo yum install pandoc texlive-latex texlive
 
-Additionally you can run `report_gen.py` script that will run `MEM_TESTER` with different configurations
-and will generate PDF or Markdown report with measured graphs.
+**Generate report:**
 
-* The report will contain basic configuration of the `MEM_TESTER` and `MEM_LOGGER`.
-* Result of the full memory test on each interface including table with measured latencies, data flow, ...
-* Number of tests on the smaller memory address space that will try different burst counts (data lengths)
+.. code-block:: bash
 
-In order to generate PDF report you need to install `pandoc` and `texlive` or other LATEX engine:
+    python report_gen.py          # Markdown + PDF report
+    python report_gen.py md       # Markdown only
 
-* If you don't need PDF report you can run `report_gen.py` with `md` argument (only Markdown and graphs will be generated)
+**Files created:**
 
-.. code-block::
-
-    sudo yum install pandoc
-    sudo yum install texlive-latex
-    sudo yum install texlive
-
-Then you can generate PDF or (only Markdown) report using:
-
-.. code-block::
-
-    python3 report_gen.py
-    python3 report_gen.py md
-
-
-This script will generate following files:
-
-* Markdown and PDF report: ``mem_tester_report.md``, ``mem_tester_report.pdf``
-* Graphs in ``fig/*`` folder
-* Raw JSON data in ``data.json`` file
+* ``mem_tester_report.md`` and ``mem_tester_report.pdf`` with plots
+* Plots: ``fig/`` folder
+* Raw data: ``data.npz``
 
 
 Internal Architecture
 ^^^^^^^^^^^^^^^^^^^^^
 
-Architecture description:
+* MI bus logic is in a separate file: ``mem_tester_mi.vhd``
 
-* :ref:`MI bus<mi_bus>` logic is separated into another file (``mem_tester_mi.vhd``)
+  * :ref:`MI_ASYNC <mi_async>` bridges MI bus and Avalon clock domains
+  * :ref:`MI_SPLITTER_PLUS_GEN <mi_splitter_plus_gen>` splits the bus for ``MEM_TESTER`` and ``AMM_GEN``
 
-    * :ref:`MI_ASYNC <mi_async>` is used to cross between MI bus and Avalon clock domains
-    * :ref:`MI_SPLITTER_PLUS_GEN <mi_splitter_plus_gen>` divides MI bus for mem_tester and AMM_GEN components
-
-* :ref:`AMM_GEN <amm_gen>` can be used to manually access the external memory
-* ``LFSR_SIMPLE_RANDOM_GEN`` components generate random data and addresses for testing external memory
-* ``AMM_MUX`` is used to select between these AMM interfaces:
-
-    * Internal logic during memory test
-    * :ref:`AMM_GEN <amm_gen>` during the manual access
-
-* The whole component is then controlled by FSM
-
+* :ref:`AMM_GEN <amm_gen>` enables manual memory access
+* Random data/addresses are generated by ``LFSR_SIMPLE_RANDOM_GEN``
+* ``AMM_MUX`` selects between test logic and manual access
+* Everything is controlled by a FSM
 
 .. image:: doc/mem_tester.svg
     :align: center
     :width: 40 %
 
 
+Manual MI Bus Control
+^^^^^^^^^^^^^^^^^^^^^
 
-MI Bus Control
-^^^^^^^^^^^^^^
+**Register map**
 
-**MI Address Space Definition**
+.. list-table::
+   :header-rows: 1
+   :widths: 15 30 55
 
-.. code-block::
+   * - Address
+     - Name
+     - Description
+   * - 0x0000
+     - ctrl_in
+     - Control register (bits below)
+   * - 0x0004
+     - ctrl_out
+     - Status register
+   * - 0x0008
+     - err_cnt
+     - Error counter
+   * - 0x000C
+     - burst_cnt
+     - Burst length used in test
+   * - 0x0010
+     - limit_addr
+     - Tested address space limit
+   * - 0x0014
+     - refresh_period
+     - Current refresh period
+   * - 0x0018
+     - default_refresh
+     - Default refresh period
+   * - 0x0040
+     - AMM_GEN base
+     - Base address for manual access
 
-    0x0000 -- ctrl in
-              1. bit -- reset
-              2. bit -- reset EMIF IP
-              3. bit -- run test
-              4. bit -- AMM_GEN enable (connects AMM_GEN to AMM bus)
-              5. bit -- random addressing enable
-              6. bit -- max. one simultaneous read transaction (for measuring latency)
-              7. bit -- auto precharge request to EMIF (if connected)
-    0x0004 -- ctrl out
-              1. bit -- test done
-              2. bit -- test successful
-              3. bit -- ECC error occurred
-              4. bit -- calibration success
-              5. bit -- calibration fail
-              6. bit -- AMM_READY
-    0x0008 -- err cnt
-    0x000C -- burst cnt during test
-    0x0010 -- limit address during test
-    0x0014 -- refresh period
-    0x0018 -- default refresh period
-    0x0040 -- AMM_GEN   base address
+**ctrl_in bits (write only, rising-edge triggered for reset/run):**
 
+* bit 0 ... reset
+* bit 1 ... reset EMIF IP
+* bit 2 ... run test
+* bit 3 ... enable AMM_GEN
+* bit 4 ... random addressing
+* bit 5 ... one simultaneous read only (latency measurement)
+* bit 6 ... auto precharge
 
-Following bits inside ``ctrl in`` register reacts only for rising edge:
+**ctrl_out bits (read):**
 
-* ``reset`` bit
-* ``reset EMIF IP`` bit
-* ``run test`` bit
+* bit 0 ... test done
+* bit 1 ... test successful
+* bit 2 ... ECC error
+* bit 3 ... calibration success
+* bit 4 ... calibration fail
+* bit 5 ... AMM_READY
 
 **Usage**
 
@@ -329,10 +314,3 @@ Sub-components
     amm_probe/readme
     sw/readme
 
-
-References
-^^^^^^^^^^
-
-* `External Memory Interfaces Intel Stratix 10 FPGA IP User Guide (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/stratix-10/ug-s10-emi.pdf>`_
-* `External Memory Interfaces Intel Agilex FPGA IP User Guide (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/hb/agilex/ug-ag-emi.pdf>`_
-* `Avalon Interface Specifications (external) <https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/mnl_avalon_spec.pdf>`_

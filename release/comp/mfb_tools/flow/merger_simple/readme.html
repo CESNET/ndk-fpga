@@ -62,6 +62,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
@@ -81,7 +82,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger/readme.html">MFB Merger</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger Simple</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger Simple</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-masking-en-parameter">Using MASKING_EN parameter</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">MFB Merger Simple GEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metadata_insertor/readme.html">Metadata Insertor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../packet_delayer/readme.html">Packet Delayer</a></li>
@@ -96,6 +100,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../transformer/readme.html">MFB Trasformer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/auxiliary_signals/readme.html">MFB Auxiliary Signals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_calculator/readme.html">Checksum Calculator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../logic/checksum_l3l4/readme.html">MFB_CHECKSUM_L3L4</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../logic/crossbarx_stream/readme.html">CrossbarX Stream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MFB ASFIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../storage/crossbarx_output_buffer/readme.html">Crossbarx Output Buffer</a></li>
@@ -135,6 +140,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -217,7 +223,7 @@ and waits for the same number of clock cycles before checking again.</p>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_merger_simple-masking_en"><td><p>MASKING_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
-<td><p>Enable masking SOF and EOF due to switch to the other input.</p></td>
+<td><p>Refer to the readme.rst file for information</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mfb_merger_simple-cnt_max"><td><p>CNT_MAX</p></td>
 <td><p>integer</p></td>
@@ -389,6 +395,17 @@ and waits for the same number of clock cycles before checking again.</p>
 </table>
 </dd></dl>
 
+<section id="using-masking-en-parameter">
+<h2>Using MASKING_EN parameter<a class="headerlink" href="#using-masking-en-parameter" title="Link to this heading"></a></h2>
+<p><em>True</em>: Allows switching of ports when reaching EOF in any of the regions regardless if higher
+regions within a bus word contain other packets. Therefore, buswords where multiple packets occupy
+multiple regions can get split.</p>
+<p><em>False</em>: A port switch can happen when reaching an EOF but only if there are no new packets
+beginning in that bus word.</p>
+<p>For example, in some configurations (like PCIe IPs), a first packet in a bus word can begin only on
+byte 0. When masking would be set to true, after a port switch, some packets can begin on higher
+bytes other than 0 in a bus word which would break a protocol.</p>
+</section>
 </section>
 <section id="id1">
 <h1>MFB Merger Simple GEN<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>

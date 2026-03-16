@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="960px" height="430px" viewBox="-0.5 -0.5 960 430" content="&lt;mxfile host=&quot;app.diagrams.net&quot; type=&quot;device&quot;&gt;&lt;diagram id=&quot;fifox-block&quot; name=&quot;Page-1&quot;&gt;5Zttj6I6FMc/Td9DK4gvfRh3N5nJbkYnm/vqptIjNluoKXV09tNvUFBo2R2vi+JwnWQCh3LA8+/vtIciIuN490nR9epJMhAIO2yHyARhPPAdhHFmeDsYeiQ3RIqzg8k9GWb8J+TGotmGM0grDbWUQvN11RjKJIFQV2xUKbmtNltKUb3qmkb5FZ2TYRZSAVaz75zplfG1Mvtn4NFKG18vpkXb3JCuKJPbkok8IGeIsm0HkbGSUldMxYF4NwaRhbQI18Hf9LzGx9tXkOgLzt+Kg4NXKjZ5RL4rrgFh51FGPETYFxqR0UIh7EfZFsI+jdeIjA7/7QZDxhSkKcLOWG4SDSqPj34rYq7kJmGQ3YGDyGi74hpmaxpmR7eKZl5XOhaITFxERksuxFgKqfbnEkYhWIaIjFKt5A8oHfHDABbL45FCTZz5kInOu55L9jdtBi2P4ysoDbuSyQ7iKZSfQMag1RvCTnFK0TtyGIrd7alnuV5uW5V6FSka0rw3R0fXv5US4Wmu5llCxxBbSj9BLLNr2BIHo+fh097ZNOsJL/Pj9kv5wOzzl+kc4UGjCi+DEMJahReB1/OcVhUm/arC2Fb4aCsr7PavrrCyUX4Gyk4kj89i9V3ena8bvd5ohJ1niHiqQaXNEu5BwHp1+gd4QXy/Vf394G4JT5eW/jNN9aairvNu+p4KGp36TJNce9lfbebef87SNdsvnXn43JJ370zgg6vrDa4lDyRsmM2JEJkshAx/IDKChE25KCSxA/zbwAGL4L+HTYGgmr9WJ1d1MSAP+1O/SZ7oEl7VaJtJM5UbFUJ+ThHHGjfmOGz60VRFoC0/ewGOX6YRieycPPliyaZhpw10St0+26eCRwkiE3XoYKOsV/OQimFujzljmbfrzWy8SkB9m4JeDQT4+hDgzkPg9hqiwHJ0MwxwTZXx3AEM3JrhvyUOSPc4MPuvFcZzQfDxn/3cjANiczB9eXz8iCRUQTg+zimBUDcNvgEIvf8BCJfOi0wQWpsX9WwQhh+VBEObmqmR57VCgtd9EkhDQ4Ll52YkeDYJs/lw/jL7+CiQukGhHRT87qEQvFPjnktCMAjuo1b2a2rlr39BgYBlKxAMnHutlfsdpMDovRcXyyZO7RXL/Zrn+JMOcHBHxXLQQRCaKpZNotqrlgMbhIenb/N/OsBCbb3cztTIXrztHgtNzY3amxwNagrmzsBQM0PyWxkYeAeX1HDQTJ1groS2hQLv4IqPqZFrvi1wqUiWo9upZCesbfZi2b+UMfuNsD8mrUEpZ4Wwf4+hhayFB0ZoncDKWv2arOUGV89aHVz78QbNZC3zfZ3WslYHlyXM2F6ctUyx28taNesSCij7sEnLd+42aXVwdcIcxq2XwC4dxi1HNwOigw/OzbR1HNj/Nm1ZjhpWaW8v/Y6g8HT6XQZ5+AU=&lt;/diagram&gt;&lt;/mxfile&gt;" style="background-color: rgb(255, 255, 255);">
+<defs>
+  <marker id="ah" viewBox="0 0 14 10" refX="13" refY="5" markerWidth="10" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M 0 0 L 14 5 L 0 10 L 4 5 Z" fill="#000000"/>
+  </marker>
+</defs>
+<g>
+  <!-- Write Logic block (blue) -->
+  <rect x="130" y="30" width="150" height="330" fill="#dae8fc" stroke="#6c8ebf" stroke-width="2"/>
+  <text x="205" y="180" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">Write Logic</text>
+  <text x="205" y="198" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">&amp;</text>
+  <text x="205" y="216" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">Address Counter</text>
+
+  <!-- Memory block (pink) -->
+  <rect x="370" y="20" width="220" height="170" fill="#f8cecc" stroke="#b85450" stroke-width="2"/>
+  <text x="480" y="98" font-family="Helvetica,Arial,sans-serif" font-size="14" text-anchor="middle" fill="#000000">Memory</text>
+  <text x="480" y="118" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="middle" fill="#666666">(BRAM / LUT / URAM / SHIFT)</text>
+
+  <!-- Read Logic block (green) -->
+  <rect x="680" y="30" width="150" height="330" fill="#d5e8d4" stroke="#82b366" stroke-width="2"/>
+  <text x="755" y="170" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">Read Logic,</text>
+  <text x="755" y="188" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">Address Counter</text>
+  <text x="755" y="206" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">&amp; Output</text>
+  <text x="755" y="224" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#000000">Registers</text>
+
+  <!-- Status &amp; Flag Logic block (gray) -->
+  <rect x="370" y="250" width="220" height="80" fill="#f5f5f5" stroke="#666666" stroke-width="2"/>
+  <text x="480" y="285" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#333333">Status Counter</text>
+  <text x="480" y="303" font-family="Helvetica,Arial,sans-serif" font-size="13" text-anchor="middle" fill="#333333">&amp; Flag Logic</text>
+
+  <!-- === External signals - Write side (left) === -->
+  <line x1="60" y1="70" x2="128" y2="70" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="50" y="74" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="end" fill="#000000">DI</text>
+
+  <line x1="60" y1="140" x2="128" y2="140" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="50" y="144" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="end" fill="#000000">WR</text>
+
+  <line x1="130" y1="220" x2="62" y2="220" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="50" y="224" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="end" fill="#000000">FULL</text>
+
+  <line x1="130" y1="270" x2="62" y2="270" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="50" y="274" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="end" fill="#000000">AFULL</text>
+
+  <line x1="130" y1="320" x2="62" y2="320" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="50" y="324" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="end" fill="#000000">STATUS</text>
+
+  <!-- === External signals - Read side (right) === -->
+  <line x1="830" y1="70" x2="898" y2="70" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="908" y="74" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" fill="#000000">DO</text>
+
+  <line x1="898" y1="140" x2="832" y2="140" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="908" y="144" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" fill="#000000">RD</text>
+
+  <line x1="830" y1="220" x2="898" y2="220" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="908" y="224" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" fill="#000000">EMPTY</text>
+
+  <line x1="830" y1="270" x2="898" y2="270" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="908" y="274" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="start" fill="#000000">AEMPTY</text>
+
+  <!-- === Internal arrows === -->
+  <!-- Write Logic -> Memory (data path) -->
+  <line x1="280" y1="70" x2="368" y2="70" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+
+  <!-- Write Logic -> Memory (write_addr) -->
+  <line x1="280" y1="130" x2="368" y2="130" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="324" y="122" font-family="Helvetica,Arial,sans-serif" font-size="9" text-anchor="middle" fill="#000000">write_addr</text>
+
+  <!-- Memory -> Read Logic (data) -->
+  <line x1="590" y1="70" x2="678" y2="70" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+
+  <!-- Read Logic -> Memory (read_addr) -->
+  <line x1="680" y1="130" x2="592" y2="130" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+  <text x="636" y="122" font-family="Helvetica,Arial,sans-serif" font-size="9" text-anchor="middle" fill="#000000">read_addr</text>
+
+  <!-- Write Logic -> Status -->
+  <line x1="280" y1="280" x2="368" y2="280" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+
+  <!-- Read Logic -> Status -->
+  <line x1="680" y1="290" x2="592" y2="290" stroke="#000000" stroke-width="2" marker-end="url(#ah)"/>
+</g>
+</svg>

@@ -62,6 +62,7 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="axi.html">AXI Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="base.html">Basic Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="async.html">Asynchronous modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="memory.html">Memory modules</a></li>
@@ -112,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
@@ -175,7 +177,7 @@ There is also a variant with an enable signal and a variant with a reverse codin
 <p><strong>H3_HASH</strong> - Implementation of universal H3 class hash function. Documentation can be found here <a class="reference internal" href="comp/base/logic/h3hash/readme.html#h3-hash"><span class="std std-ref">here</span></a>.</p>
 <p><strong>LAST_ONE</strong> - Behavioral implementation of generic detector of last one in input vector. Output vector one-hot encoded.</p>
 <p><strong>LFSR_SIMPLE_RANDOM_GEN</strong> - Simple LFSR pseudo-random generator uses Fibonacci implementation of LFSR with XNOR gate.</p>
-<p><strong>MOD</strong> - Behavioral implementation of generic modulo constant block. TODO</p>
+<p><strong>MOD</strong> - Behavioral implementation of generic modulo constant block. Computes VALUE mod MODULO, where MODULO is a generic constant. Optimized for power-of-2 modulo values (simple bit truncation).</p>
 <p><strong>MODULO_LOOKUP</strong> - Behavioral implementation of Modulo look-up table in ROM. Optimized for Xilinx FPGAs only.</p>
 <p><strong>MUL48</strong> - Implementation of generic multiplier based on Xilinx 7-Series DSP slices.</p>
 <p><strong>MUX</strong> - Behavioral implementation of generic multiplexer. It also contains a one-hot variant and an extended registered variant (piped).</p>

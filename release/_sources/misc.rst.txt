@@ -15,7 +15,7 @@ It is made accessible through MI interface using the Event Counter MI Wrapper. D
 
 **ID32** - Identification component, is a small component, which is used to detect design inside FPGA. Informations are stored inside registers which are accessible through dedicated 32 bit interface.
 
-**INTERRUPT_MANAGER** - Interrupt agregator module, TODO description.
+**INTERRUPT_MANAGER** - Interrupt aggregator module that combines up to 32 interrupt sources into a single interrupt output with a 5-bit binary-encoded source identifier. Each input can be configured via the PULSE generic as either a single-cycle pulse or a level signal (automatically edge-detected).
 
 **PACKET_PLANNER** - The Packet Planner processes input packet headers by assigning addresses to an outside buffer space to each packet,
 so that they are placed one after another with the needed inter-packet gaps and alignment. Detailed :ref:`documentation can be found here<packet_planner>`.

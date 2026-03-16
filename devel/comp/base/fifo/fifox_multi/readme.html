@@ -238,6 +238,26 @@ from ports, that are currently empty.</p>
 <p>This mode leads to worse timing and is often not needed, so it can be disabled here.</p>
 </td>
 </tr>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“FULL”</p></td>
+<td><p>ARCHITECTURE SELECTION:
+1. FULL: [Shakedown -&gt; B-Shifter -&gt; Multi-FIFO -&gt; B-Shifter]</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Native gap removal; narrow MUXes (log2 scale).</p></li>
+</ul>
+<ul class="simple">
+<li><p>High resource usage (multiple FIFOs); async output path.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>SHAKEDOWN: [Single FIFO -&gt; MVB Shakedown]
++ Low resources; direct register output.
+- Throughput ~87%; wide MUXes (2x vs FULL); worse buffering (gaps in FIFO).</p></li>
+</ol>
+</td>
+</tr>
 </tbody>
 </table>
 <span class="sig-name descname">Ports</span><table class="docutils align-default">

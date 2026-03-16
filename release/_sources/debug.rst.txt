@@ -14,6 +14,7 @@ The components are typically located in the ``comp/debug/`` directory in the OFM
    comp/debug/histogramer/readme
    comp/debug/latency_meter/readme
    comp/debug/data_logger/readme
+   comp/debug/data_logger/mem_logger/readme
    comp/debug/jtag_op_client/readme
 
 .. Add more references here...

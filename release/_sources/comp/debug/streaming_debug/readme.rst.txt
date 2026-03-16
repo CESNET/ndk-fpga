@@ -110,7 +110,7 @@ This sets the requested Probe to:
 - Discard the traffic (when the `DEBUG_DROP` signal asserts; has priority over the `DEBUG_BLOCK` signal).
   The Probe accepts all incoming traffic by asserting `RX_DST_RDY` and invalidate the output by deasserting `TX_SRC_RDY`.
 
-.. _usage:
+.. _streaming_debug_usage:
 
 Usage
 -----
