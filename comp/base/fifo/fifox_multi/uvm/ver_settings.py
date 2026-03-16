@@ -16,13 +16,13 @@ SETTINGS = {
         "ALMOST_EMPTY_OFFSET"   : "0",
         "ALLOW_SINGLE_FIFO"     : "0",
         "SAFE_READ_MODE"        : "0",
-        "IMPL_SHAKEDOWN"        : "0",
+        "IMPL_SHAKEDOWN"        : "\\\"FULL\\\"",
         "MIN_TRANSACTION_COUNT" : "4000",
         "MAX_TRANSACTION_COUNT" : "5000",
     },
 
     "IMPL_SHAKEDOWN_ON" : {
-        "IMPL_SHAKEDOWN" : "1",
+        "IMPL_SHAKEDOWN" : "\\\"SHAKEDOWN\\\"",
     },
 
     "DEVICE_7SERIES" : {

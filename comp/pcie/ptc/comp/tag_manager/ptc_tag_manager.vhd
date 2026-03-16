@@ -884,7 +884,7 @@ begin
         pcie_in_fifoxm_wr <= TAG_ASSIGN_VLD;
     end generate;
 
-    pcie_in_fifoxm_i : entity work.FIFOX_MULTI(SHAKEDOWN)
+    pcie_in_fifoxm_i : entity work.FIFOX_MULTI
     generic map (
         DATA_WIDTH          => PCIE_IN_FIFO_DATA_WIDTH,
         ITEMS               => get_pcie_fifoxm_items*get_pcie_fifoxm_write_ports,
@@ -896,7 +896,8 @@ begin
         SAFE_READ_MODE      => false,
         ALMOST_FULL_OFFSET  => PCIE_IN_FIFO_AFULL_OFFSET,
         ALMOST_EMPTY_OFFSET => 0,
-        ALLOW_SINGLE_FIFO   => false
+        ALLOW_SINGLE_FIFO   => false,
+        FIFOX_MULTI_ARCH    => "SHAKEDOWN"
     )
     port map (
         CLK    => CLK,

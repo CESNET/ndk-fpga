@@ -27,7 +27,7 @@ use work.math_pack.all;
 --                      Architecture declaration
 -- ----------------------------------------------------------------------------
 
-architecture FULL of FIFOX_MULTI is
+architecture FULL of FIFOX_MULTI_GEN is
 
     -- Quartus max fanout constraint
     attribute maxfan : integer;

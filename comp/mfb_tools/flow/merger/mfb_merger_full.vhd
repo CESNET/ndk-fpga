@@ -639,15 +639,16 @@ begin
         switch_fifoxm_wr(i) <= mvb_input_shake_tx_src_rdy and mvb_input_shake_tx_vld(i) and mvb_input_shake_tx_data(i*(MVB_DATA_W)+HDR_WIDTH+1) and mvb_output_dst_rdy;
     end generate;
 
-    switch_fifoxm_i : entity work.FIFOX_MULTI(SHAKEDOWN)
+    switch_fifoxm_i : entity work.FIFOX_MULTI
     generic map (
-        DATA_WIDTH     => 1,
-        ITEMS          => MVB_ITEMS*32,
-        WRITE_PORTS    => MVB_ITEMS,
-        READ_PORTS     => MFB_REGIONS+1,
-        RAM_TYPE       => "AUTO",
-        SAFE_READ_MODE => false,
-        DEVICE         => DEVICE
+        DATA_WIDTH       => 1,
+        ITEMS            => MVB_ITEMS*32,
+        WRITE_PORTS      => MVB_ITEMS,
+        READ_PORTS       => MFB_REGIONS+1,
+        RAM_TYPE         => "AUTO",
+        SAFE_READ_MODE   => false,
+        DEVICE           => DEVICE,
+        FIFOX_MULTI_ARCH => "SHAKEDOWN"
     )
     port map (
         CLK    => CLK,
