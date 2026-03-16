@@ -66,6 +66,7 @@ entity FTILE_8X10G1 is
         -- Netvork_MOD_CONE_ENT interface
         -- ===================================================================
         -- different for each ftile (vector)
+        CLK_ETH_IN               : in  std_logic;
         CLK_ETH_OUT              : out std_logic;
         RESET_ETH                : in  std_logic;
         -- ===================================================================
@@ -384,9 +385,9 @@ begin
     reconfig_readdata       (MI_SEL_RANGE-1 downto PMA_LANES+1) <= (others => (others => '0'));
 
     -- monitoring RX link state
-    process (ftile_clk_out)
+    process (CLK_ETH_IN)
     begin
-        if rising_edge(ftile_clk_out) then
+        if rising_edge(CLK_ETH_IN) then
             if ((ftile_rx_pcs_ready = '1') or (rx_link_rst = '1')) then
                 -- link is up, clear the counter
                 rx_link_cnt <= (others => '0');
@@ -481,8 +482,8 @@ begin
     -- can't have more than 8 10g lines devided into 8 channels
     ftile_eth_ip_i : component ftile_eth_8x10g
     port map (
-        i_clk_tx                        => ftile_clk_out,
-        i_clk_rx                        => ftile_clk_out,
+        i_clk_tx                        => CLK_ETH_IN,
+        i_clk_rx                        => CLK_ETH_IN,
         o_clk_pll                       => ftile_clk_out,
         o_clk_tx_div                    => open,
         o_clk_rec_div64                 => open,
@@ -560,9 +561,9 @@ begin
     RX_MACSI_MAC_ERROR     <= ftile_rx_mac_error;
     RX_MACSI_MAC_STATUS    <= ftile_rx_mac_status;
 
-    process (ftile_clk_out)
+    process (CLK_ETH_IN)
     begin
-        if rising_edge(ftile_clk_out) then
+        if rising_edge(CLK_ETH_IN) then
             if (MI_RESET_PHY = '1') then
                 RX_LINK_UP <= '0';
                 TX_LINK_UP <= '0';
@@ -583,7 +584,7 @@ begin
         ADATAIN(0)  => mgmt_mac_loop,
         ASEND       => '1',
         AREADY      => open,
-        BCLK        => ftile_clk_out,
+        BCLK        => CLK_ETH_IN,
         BRST        => '0',
         BDATAOUT(0) => sync_repeater_ctrl,
         BLOAD       => '1',
@@ -596,7 +597,7 @@ begin
     )
     port map (
         RST                => RESET_ETH,
-        CLK                => ftile_clk_out,
+        CLK                => CLK_ETH_IN,
 
         IN_MAC_DATA        => ftile_rx_mac_data,
         IN_MAC_INFRAME(0)  => ftile_rx_mac_inframe,
