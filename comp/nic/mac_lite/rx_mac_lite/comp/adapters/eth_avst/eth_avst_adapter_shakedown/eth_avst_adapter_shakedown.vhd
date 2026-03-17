@@ -224,7 +224,7 @@ begin
             mfb_eof_arr_reg3          <= mfb_eof_arr_reg2 and mfb_vld_reg2;
             mfb_eof_pos_item_arr_reg3 <= mfb_eof_pos_item_arr_reg2;
             mfb_error_arr_reg3        <= mfb_error_arr_reg2;
-            mfb_mii_error_arr_reg3    <= mfb_error_arr_reg2;
+            mfb_mii_error_arr_reg3    <= mfb_mii_error_arr_reg2;
             mfb_src_rdy_reg3          <= mfb_src_rdy_reg2;
 
             if (RESET = '1') then
