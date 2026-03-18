@@ -1,14 +1,12 @@
--- shifter.vhd: Left or right block-by-block shifter
--- Copyright (C) 2017 CESNET
--- Author(s): Lukas Kekely <kekely@cesnet.cz>
+-- barrel_shifter_gen.vhd:
+-- Copyright (C) 2026 CESNET
+-- Author(s): Radek Iša <isa@cesnet.cz>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
 --
 
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.std_logic_arith.all;
-use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
 use work.math_pack.all;
 
@@ -31,38 +29,37 @@ end entity;
 
 
 architecture ARCH of SHIFTER is
-    type   shift_array_t is array(0 to BLOCK_WIDTH-1) of std_logic_vector(BLOCKS-1 downto 0);
-    signal di_sa : shift_array_t;
-    signal do_sa : shift_array_t;
+    constant DATA_WIDTH : natural := BLOCKS*BLOCK_WIDTH;
+
+    signal data_in_tmp   : unsigned(2*DATA_WIDTH-1 downto 0);
+    signal data_out_tmp  : unsigned(2*DATA_WIDTH-1 downto 0);
+    signal sel_int       : integer range 0 to maximum(BLOCKS,0)-1; -- Don't change it. It would requires more resources.
 begin
 
-    empty_gen: if BLOCKS = 1 generate
-        DO <= DI;
-    end generate;
-
-
-    full_gen: if BLOCKS > 1 generate
-
-        onebit_shifters_gen: for i in 0 to BLOCK_WIDTH-1 generate
-
-            data_realign_gen: for j in 0 to BLOCKS-1 generate
-                di_sa(i)(j)         <= DI(j*BLOCK_WIDTH+i);
-                DO(j*BLOCK_WIDTH+i) <= do_sa(i)(j);
-            end generate;
-
-            onebit_shifter: entity work.SHIFTER_ONE
-            generic map (
-                DATA_WIDTH => BLOCKS,
-                MOVE_LEFT  => MOVE_LEFT,
-                ROTATE     => ROTATE
-            ) port map (
-                DI  => di_sa(i),
-                SEL => SEL,
-                DO  => do_sa(i)
-            );
-
+    -- Operation ROTATION
+    fce_rotate_gen : if (ROTATE) generate
+        data_in_tmp <= unsigned(DI & DI);
+    else generate
+        -- Operation SHIFT
+        fce_shift_gen : if (MOVE_LEFT) generate
+            data_in_tmp <= unsigned(DI) & (DATA_WIDTH-1 downto 0 => '0');
+        else generate
+            data_in_tmp <= (DATA_WIDTH-1 downto 0 => '0') & unsigned(DI);
         end generate;
-
     end generate;
 
+    sel_int_gen : if (BLOCKS > 1) generate
+        sel_int <= to_integer(unsigned(SEL)) when unsigned(SEL) < BLOCKS else
+                   to_integer(unsigned'(log2(BLOCKS)-1 downto 0 => 'X'));
+    else generate
+        sel_int <= 0;
+    end generate;
+
+    shift_sel_gen : if (MOVE_LEFT) generate
+        data_out_tmp <= IEEE.numeric_std.shift_left(data_in_tmp, sel_int*BLOCK_WIDTH);
+        DO           <= std_logic_vector(data_out_tmp(DATA_WIDTH*2-1 downto DATA_WIDTH));
+    else generate
+        data_out_tmp <= IEEE.numeric_std.shift_right(data_in_tmp, sel_int*BLOCK_WIDTH);
+        DO           <= std_logic_vector(data_out_tmp(DATA_WIDTH-1 downto 0));
+    end generate;
 end architecture;

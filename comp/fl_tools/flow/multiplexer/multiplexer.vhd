@@ -100,10 +100,11 @@ begin
    shift <= reg_last_sel + 1;
 
    --* This module mixes channel priorities.
-   shifter_i : entity work.barrel_bit_shifter
+   shifter_i : entity work.BARREL_SHIFTER_GEN
    generic map(
-      DATA_WIDTH  => CHANNELS,
-      SHIFT_LEFT  => false
+      BLOCKS     => CHANNELS,
+      BLOCK_SIZE => 1,
+      SHIFT_LEFT => false
    )
    port map(
       DATA_IN     => channel_rdy,

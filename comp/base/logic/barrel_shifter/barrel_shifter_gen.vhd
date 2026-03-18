@@ -1,26 +1,18 @@
---
--- barrel_shifter_gen.vhd: Barrel shifter with generic data width and generic block size
---                         NOTE: barel_shifter.vhd is shifter with 8bit blocks
---                               barel_bit_rotator.vhd is shifter with 1bit blocks
--- Copyright (C) 2017 CESNET
--- Author(s): Lukas Kekely <kekely@cesnet.cz>
---            Vaclav Hummel <xhumme00@cesnet.cz>
+-- barrel_shifter_gen.vhd:
+-- Copyright (C) 2026 CESNET
+-- Author(s): Radek Iša <isa@cesnet.cz>
 --
 -- SPDX-License-Identifier: BSD-3-Clause
---
--- $Id$
---
--- TODO:
 --
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.math_pack.all;
-use work.type_pack.all;
 
--- Generically adjustable barrel shifter where single bits as well as whole blocks can be shifted.
--- The direction can also be set.
+-- Generically adjustable barrel shifter supporting shifts of single bits and whole blocks
+-- Supports bite-level rotation when `BLOCK_SIZE == 1`
+-- Configurable shift direction
 entity BARREL_SHIFTER_GEN is
     generic (
         -- input/output data width in BLOCKs
@@ -42,51 +34,30 @@ end entity;
 -- ----------------------------------------------------------------------------
 
 architecture BARREL_SHIFTER_ARCH of BARREL_SHIFTER_GEN is
-    signal data_in_deser : slv_array_t(0 to BLOCKS-1)(BLOCK_SIZE-1 downto 0);
-    signal mux_in        : slv_array_2d_t(0 to BLOCKS-1)(0 to BLOCKS-1)(BLOCK_SIZE-1 downto 0);
-    signal mux_out       : slv_array_t(0 to BLOCKS-1)(BLOCK_SIZE-1 downto 0);
-    signal mux_sel       : std_logic_vector(max(1,log2(BLOCKS))-1 downto 0);
+    constant DATA_WIDTH : natural := BLOCKS*BLOCK_SIZE;
+
+    signal data_in_tmp   : unsigned(2*DATA_WIDTH-1 downto 0);
+    signal data_out_tmp  : unsigned(2*DATA_WIDTH-1 downto 0);
+    signal sel_int       : integer range 0 to maximum(BLOCKS, 1)-1; -- Don't change it. It would requires more resources.
 begin
 
-    data_in_deser <= slv_array_to_deser(DATA_IN, BLOCKS, BLOCK_SIZE);
+    data_in_tmp <= unsigned(DATA_IN & DATA_IN);
 
-    mux_leftg: if SHIFT_LEFT = true generate
-        mux_leftgg: for i in 0 to BLOCKS-1 generate
-            mux_leftggg: for j in 0 to BLOCKS-1 generate
-                mux_in(i)(j) <= data_in_deser((i-j) mod BLOCKS);
-            end generate;
-        end generate;
+    sel_int_gen : if (BLOCKS > 1) generate
+        sel_int <= to_integer(unsigned(SEL)) when unsigned(SEL) < BLOCKS else
+                   to_integer(unsigned'(log2(BLOCKS)-1 downto 0 => 'X'));
+    else generate
+        sel_int <= 0;
     end generate;
 
-    mux_rightg: if SHIFT_LEFT = false generate
-        mux_rightgg: for i in 0 to BLOCKS-1 generate
-            mux_rightggg: for j in 0 to BLOCKS-1 generate
-                mux_in(i)(j) <= data_in_deser((j+i) mod BLOCKS);
-            end generate;
-        end generate;
+    shift_sel_gen : if (SHIFT_LEFT) generate
+        data_out_tmp <= IEEE.numeric_std.shift_left(data_in_tmp, sel_int*BLOCK_SIZE);
+        DATA_OUT     <= std_logic_vector(data_out_tmp(DATA_WIDTH*2-1 downto DATA_WIDTH));
+    else generate
+        data_out_tmp <= IEEE.numeric_std.shift_right(data_in_tmp, sel_int*BLOCK_SIZE);
+        DATA_OUT     <= std_logic_vector(data_out_tmp(DATA_WIDTH-1 downto 0));
     end generate;
-
-    zero_sel : if (BLOCKS = 1) generate
-        mux_sel <= (others => '0');
-    end generate;
-    nonzero_sel : if (BLOCKS /= 1) generate
-        mux_sel <= SEL;
-    end generate;
-
-    muxg: for i in 0 to BLOCKS-1 generate
-        muxi: entity work.GEN_MUX
-        generic map (
-            DATA_WIDTH => BLOCK_SIZE,
-            MUX_WIDTH  => BLOCKS
-        )
-        port map (
-            DATA_IN  => slv_array_ser(mux_in(i), BLOCKS, BLOCK_SIZE),
-            SEL      => mux_sel,
-            DATA_OUT => mux_out(i)
-        );
-    end generate;
-
-    DATA_OUT <= slv_array_ser(mux_out, BLOCKS, BLOCK_SIZE);
-
-
 end architecture;
+
+
+
