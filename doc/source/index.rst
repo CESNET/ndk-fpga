@@ -98,6 +98,7 @@ it also provides converters:
 
     basic_cocotb_test
     cocotbext
+    cocotb_tips_and_tricks
 
 .. toctree::
     :caption: GitLab CI/CD Tools

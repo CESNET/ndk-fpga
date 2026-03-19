@@ -8,6 +8,8 @@ import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.log import SimLog
 from cocotb.utils import get_sim_time
+from cocotb_bus.drivers import BusDriver
+from cocotb_bus.monitors import BusMonitor
 from ofm.utils.units import convert_units
 from abc import ABC, abstractmethod
 from typing import Any
@@ -20,16 +22,19 @@ class ProbeInterface:
     Atributes:
         interface_dict(dict): keys are names of parameters that the probe wants to retrieve and items are tuples,
                               where the first item is the conversion function and second is tuple with arguments
-                              for the convertion function.
-        _monitor(BusMonitor): monitor object including the attributes required for probing
+                              for the conversion function. It is also possible to override a value in the interface
+                              dict by creating a class property with the same name as the key being overriden in the
+                              interface dict. This can be useful if it's necessary to calculate the value of the attribute
+                              or to implement different behavior based on the type of the agent.
+        _agent(BusMonitor | BusDriver): monitor or driver object including the attributes required for probing
     """
     interface_dict = {}
 
-    def __init__(self, monitor):
-        self._monitor = monitor
+    def __init__(self, agent: BusMonitor | BusDriver):
+        self._agent = agent
 
     def __getattr__(self, name: str) -> Any:
-        return getattr(self._monitor, self.interface_dict.get(name, None))
+        return getattr(self._agent, self.interface_dict.get(name, None))
 
 
 class Probe(ABC):
