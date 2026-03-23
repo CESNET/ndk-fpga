@@ -23,7 +23,19 @@ class start_channel extends uvm_sequence;
         data_mask_width > 3;
         hdr_mask_width  < 16;
         hdr_mask_width  > 3;
-        upd_timeout > 4;
+
+        upd_timeout dist {
+            `ndk_rand_dist_first(5, 1024, 8) :/ 10,
+            `ndk_rand_dist      (5, 1024, 8, 1)  :/ 10,
+            `ndk_rand_dist      (5, 1024, 8, 2)  :/ 8,
+            `ndk_rand_dist      (5, 1024, 8, 3)  :/ 3,
+            `ndk_rand_dist      (5, 1024, 8, 4)  :/ 1,
+            `ndk_rand_dist      (5, 1024, 8, 5)  :/ 3,
+            `ndk_rand_dist      (5, 1024, 8, 6)  :/ 8,
+            `ndk_rand_dist      (5, 1024, 8, 7)  :/ 10,
+            `ndk_rand_dist_last (5, 1024, 8) :/ 10
+        };
+
 
         // Packet BLOCK_SIZE
         data_base_addr % 128 == 0;
@@ -31,6 +43,11 @@ class start_channel extends uvm_sequence;
         hdr_base_addr  % 8   == 0;
         // Update buffer address
         update_base_addr % 4 == 0;
+
+        //Random 32-bit address
+        data_base_addr  [64-1:32] dist { 0 :/ 1, [0:$] :/ 1 };
+        hdr_base_addr   [64-1:32] dist { 0 :/ 1, [0:$] :/ 1 };
+        update_base_addr[64-1:32] dist { 0 :/ 1, [0:$] :/ 1 };
     }
 
     function new (string name = "start_channel");
@@ -170,31 +187,61 @@ endclass
 class run_channel extends uvm_sequence;
     `uvm_object_utils(uvm_dma_ll::run_channel)
 
-    rand time run_time  = 40ns;
-    time stop_time = 10ns;
-    time update_time = 20ns;
+    rand time update_time_min = 300ns;
+    rand time update_time_max = 2us;
 
-    time update_time_min = 300ns;
-    time update_time_max = 2us;
+    rand time run_time_min = 3000us;
+    rand time run_time_max = 100ms;
 
-    time run_time_min = 30us;
-    time run_time_max = 1ms;
-
-    time stop_time_min = 30us;
-    time stop_time_max = 1ms;
+    rand time stop_time_min = 30us;
+    rand time stop_time_max = 1ms;
 
     reg_channel m_regmodel;
 
+
+    constraint c_timing {
+        update_time_min < update_time_max;
+        update_time_min dist {
+            `ndk_rand_dist_first(0.5us, 10us, 8) :/ 10,
+            `ndk_rand_dist      (0.5us, 10us, 8, 1)  :/ 10,
+            `ndk_rand_dist      (0.5us, 10us, 8, 2)  :/ 8,
+            `ndk_rand_dist      (0.5us, 10us, 8, 3)  :/ 3,
+            `ndk_rand_dist      (0.5us, 10us, 8, 4)  :/ 1,
+            `ndk_rand_dist      (0.5us, 10us, 8, 5)  :/ 3,
+            `ndk_rand_dist      (0.5us, 10us, 8, 6)  :/ 8,
+            `ndk_rand_dist      (0.5us, 10us, 8, 7)  :/ 10,
+            `ndk_rand_dist_last (0.5us, 10us, 8) :/ 10
+        };
+
+        update_time_max dist {
+            `ndk_rand_dist_first(0.5us, 10us, 8) :/ 10,
+            `ndk_rand_dist      (0.5us, 10us, 8, 1)  :/ 10,
+            `ndk_rand_dist      (0.5us, 10us, 8, 2)  :/ 8,
+            `ndk_rand_dist      (0.5us, 10us, 8, 3)  :/ 3,
+            `ndk_rand_dist      (0.5us, 10us, 8, 4)  :/ 1,
+            `ndk_rand_dist      (0.5us, 10us, 8, 5)  :/ 3,
+            `ndk_rand_dist      (0.5us, 10us, 8, 6)  :/ 8,
+            `ndk_rand_dist      (0.5us, 10us, 8, 7)  :/ 10,
+            `ndk_rand_dist_last (0.5us, 10us, 8) :/ 10
+        };
+
+
+        run_time_min < run_time_max;
+        stop_time_min < stop_time_max;
+    }
 
     function new (string name = "run_channel");
         super.new(name);
     endfunction
 
     task body();
+        time run_time  = 40ns;
+        time stop_time = 10ns;
+        time update_time = 20ns;
+
         start_channel   seq_start;
         stop_channel    seq_stop;
         pointer_update  seq_update;
-        time start_time;
 
         seq_start  = start_channel::type_id::create({ this.get_name(), "_seq_start"});
         seq_start.m_regmodel = m_regmodel;
@@ -205,6 +252,8 @@ class run_channel extends uvm_sequence;
 
         //startup channel
         forever begin
+            time start_time;
+
             seq_start.randomize();
             seq_start.start(null);
             start_time = $time();
@@ -245,13 +294,15 @@ class reg_sequence #(
             it_num.itoa(it);
             driver[it] = run_channel::type_id::create({"run_channel_", it_num});
             driver[it].m_regmodel = m_regmodel.channel[it];
-            assert(driver[it].randomize());
         end
 
         for(int unsigned it = 0; it < CHANNELS; it++) begin
             fork
                 automatic int unsigned index = it;
-                driver[index].start(null);
+                forever begin
+                    assert(driver[index].randomize());
+                    driver[index].start(null);
+                end
             join_none;
         end
 
