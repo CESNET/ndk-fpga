@@ -16,6 +16,7 @@ lappend COMPONENTS [ list "SV_MVB"                    "$UVM_PATH/mvb"           
 lappend COMPONENTS [ list "SV_MI"                     "$UVM_PATH/mi"                       "FULL"]
 lappend COMPONENTS [ list "SV_PROBE_UVM"              "$UVM_PATH/probe"                    "FULL"]
 lappend COMPONENTS [ list "PCIE"                      "$UVM_PATH/pcie"                     "FULL"]
+lappend COMPONENTS [ list "PCIE_MFB"                  "$UVM_PATH/pcie_mfb"                 "FULL"]
 
 lappend MOD "$OFM_PATH/comp/base/pkg/pcie_meta_pack.sv"
 

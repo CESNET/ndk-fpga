@@ -54,11 +54,11 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
     logic CLK = 0;
-    logic RST = 1;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if reset(CLK);
+    pullup(reset.RESET);
     mfb_if #(
         .REGIONS     (USR_MFB_REGIONS),
         .REGION_SIZE (USR_MFB_REGION_SIZE),
@@ -115,11 +115,6 @@ module testbench;
     always begin
         #(CLK_PERIOD/2)
         CLK = ~CLK;
-    end
-
-    initial begin
-        #(10ns)
-        RST <= 0;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -203,7 +198,7 @@ module testbench;
         .PERF_CNTR_EN        (test::PERF_CNTR_EN)
     ) dut_i (
         .CLK             (CLK),
-        .RST             (RST | reset.RESET),
+        .RST             (reset.RESET),
         .usr_mfb         (usr_mfb),
         .pcie_rq_mfb     (pcie_rq_mfb),
         .ptr_upd_mfb     (ptr_upd_mfb),
