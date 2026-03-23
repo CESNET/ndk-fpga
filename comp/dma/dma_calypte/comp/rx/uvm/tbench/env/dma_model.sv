@@ -18,6 +18,19 @@ class dma_model_packet extends uvm_pcie::request_header;
         super.new(name);
         data_packet  = 0;
     endfunction
+
+    function string convert2string();
+        string msg = "";
+
+        msg = {msg, $sformatf("\n\tdata_packet : %s", data_packet == 1'b1 ? "DATA" : "HEADER")};
+        msg = {msg, $sformatf("\n\tpacket_num  : %0d", packet_num)};
+        msg = {msg, $sformatf("\n\tchannel     : %0d", channel)};
+        msg = {msg, $sformatf("\n\tpart    : %0d/%0d", part, part_num)};
+        msg = {msg,           "\n\t-----------------"};
+        msg = {msg, super.convert2string()};
+
+        return msg;
+    endfunction
 endclass
 
 
