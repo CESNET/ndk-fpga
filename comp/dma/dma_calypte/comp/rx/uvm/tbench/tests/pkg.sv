@@ -23,7 +23,6 @@ package test;
     parameter PCIE_RQ_REGION_SIZE = 1;
     parameter PCIE_RQ_BLOCK_SIZE  = 8;
     parameter PCIE_RQ_ITEM_WIDTH  = 32;
-    parameter PCIE_RQ_META_WIDTH  = sv_pcie_meta_pack::PCIE_RQ_META_WIDTH;
 
     parameter CHANNELS       = 4;
     parameter POINTER_WIDTH  = 16;
@@ -35,7 +34,11 @@ package test;
 
     parameter DEVICE = "ULTRASCALE";
 
+    parameter SEQ_PKT_SIZE_MIN   = 60;
+    parameter SEQ_PKT_SIZE_MAX   = PKT_SIZE_MAX;
     parameter CLK_PERIOD = 4ns;
+    //parameter time SIMULATION_TIME = 2000ms;
+    parameter time SIMULATION_TIME = 2ms;
 
     `include "sequence.sv"
     `include "base.sv"

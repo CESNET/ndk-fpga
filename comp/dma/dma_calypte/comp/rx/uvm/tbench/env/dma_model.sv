@@ -57,32 +57,6 @@ class status_cbs extends uvm_reg_cbs;
     endtask
 endclass
 
-class dma_model_accept #(
-    int unsigned CHANNELS
-) extends uvm_subscriber #(uvm_mvb::sequence_item #(1, 1));
-
-    `uvm_component_param_utils(uvm_dma_ll::dma_model_accept #(CHANNELS))
-    logic fifo[$];
-
-    function new(string name, uvm_component parent = null);
-        super.new(name, parent);
-    endfunction
-
-    function int unsigned used();
-        return fifo.size() != 0;
-    endfunction
-
-    virtual function void write(uvm_mvb::sequence_item#(1, 1) t);
-        if (t.src_rdy == 1'b1 && t.dst_rdy == 1'b1) begin
-            for (int unsigned it = 0; it < 1; it++) begin
-                if (t.vld[it] == 1'b1) begin
-                    fifo.push_back(t.data[it]);
-                end
-            end
-        end
-    endfunction
-endclass
-
 class disc_probe_cbs extends uvm_probe::cbs_simple #(1);
     `uvm_object_utils(uvm_dma_ll::disc_probe_cbs)
 
@@ -114,18 +88,7 @@ class dma_model #(
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) m_usr_mfb_data_fifo;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(USER_META_WIDTH))  m_usr_mfb_meta_fifo;
-    dma_model_accept #(CHANNELS)                                                 m_pkt_disc_mvb_subs;
     uvm_analysis_port #(dma_model_packet)                                        m_pcie_rq_mfb_port;
-
-    typedef struct{
-        logic [$clog2(PKT_SIZE_MAX+1)-1:0] packet_size;
-        logic [$clog2(CHANNELS)-1:0]       channel;
-        logic [24-1:0]                     meta;
-        time                               input_time;
-        logic [2-1:0]                      run; //[0] -> run, [1] -> soft compare
-    } packet_info;
-
-    local packet_info         m_input_meta[$];
 
     local regmodel #(CHANNELS) m_regmodel;
     local int unsigned         m_pkt_sent_cntr [CHANNELS];
@@ -172,7 +135,6 @@ class dma_model #(
         int unsigned ret = 0;
         ret |= (m_usr_mfb_data_fifo.used() != 0);
         ret |= (m_usr_mfb_meta_fifo.used() != 0);
-        ret |= (m_pkt_disc_mvb_subs.used() != 0);
         return ret;
     endfunction
 
@@ -263,7 +225,7 @@ class dma_model #(
         dma_model_packet           packet_output;
         int unsigned               it;
         // Packet end is rounded up to whole dwords
-        logic [32-1 : 0]           packet_end[] = new [((packet.size() % BLOCK_SIZE_BYTES)+3)/4];
+        logic [32-1 : 0]           packet_end[];
         logic[32-1 : 0]            pcie_packet[];
         logic[32-1 : 0]            packet_hdr[2];
         int unsigned               packet_pointer_start;
@@ -337,69 +299,45 @@ class dma_model #(
         end
     endtask
 
-    task get_input();
-        uvm_logic_vector::sequence_item #(USER_META_WIDTH) tr_meta;
-        packet_info                                        info;
-
-        forever begin
-            m_usr_mfb_meta_fifo.get(tr_meta);
-            {info.packet_size, info.channel, info.meta} = tr_meta.data;
-            info.input_time = $time();
-
-            m_input_meta.push_back(info);
-        end
-    endtask
-
     function void build_phase(uvm_phase phase);
-        m_pkt_disc_mvb_subs = dma_model_accept #(CHANNELS)::type_id::create("m_pkt_disc_mvb_subs", this);
-
         m_probe_discard = disc_probe_cbs::type_id::create("m_probe_discard", this);
         uvm_probe::pool::get_global_pool().get(
             {"probe_event_component_", "testbench.dut_i.VHDL_DUT_U", ".probe_discard" }).add_callback(m_probe_discard);
     endfunction
 
     task run_phase(uvm_phase phase);
-        uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr;
-        string                                              msg;
-        int unsigned                                        compare;
-        int unsigned                                        soft_compare;
-        logic                                               dma_discard;
-        packet_info                                         info;
-        logic                                               pkt_drop;
-
-        fork
-            get_input();
-        join_none
-
         forever begin
-            //first get metadata. Because this is relevat for checking comparability of packet
-            wait (m_input_meta.size() != 0);
-            info = m_input_meta.pop_front();
+            string                             msg;
+            logic                              dma_discard;
+            logic                              pkt_drop;
+            logic [$clog2(PKT_SIZE_MAX+1)-1:0] packet_size;
+            logic [$clog2(CHANNELS)-1:0]       channel;
+            logic [24-1:0]                     meta;
+            uvm_logic_vector_array::sequence_item #(ITEM_WIDTH) tr_data;
+            uvm_logic_vector::sequence_item #(USER_META_WIDTH)  tr_meta;
 
+            m_usr_mfb_meta_fifo.get(tr_meta);
+            {packet_size, channel, meta} = tr_meta.data;
             m_probe_discard.get({pkt_drop});
 
             //get packet
-            m_usr_mfb_data_fifo.get(tr);
-            m_pkt_cntr_total_chan[info.channel]++;
-
-            //Check if packet have been discared of send when starting or stopping channel
-            wait (m_pkt_disc_mvb_subs.fifo.size() != 0);
-            dma_discard = m_pkt_disc_mvb_subs.fifo.pop_front();
+            m_usr_mfb_data_fifo.get(tr_data);
+            m_pkt_cntr_total_chan[channel]++;
 
             // Check whether packet is accepted or not
             if (pkt_drop) begin
-                m_pkt_disc_cntr[info.channel]++;
-                m_bytes_disc_cntr[info.channel] += tr.data.size();
+                m_pkt_disc_cntr[channel]++;
+                m_bytes_disc_cntr[channel] += tr_data.data.size();
                  msg = $sformatf("\n\t\nPacket Dropped:\n RX CHANNEL: %0d\n META: %h\n PACKET SIZE: %0d\n%s",
-                                 info.channel, info.meta, info.packet_size, tr.convert2string());
+                                 channel, meta, packet_size, tr_data.convert2string());
                 `uvm_info(this.get_full_name(), msg,  UVM_MEDIUM);
             end else begin
-                m_pkt_sent_cntr[info.channel]++;
-                m_bytes_sent_cntr[info.channel] += tr.data.size();
+                m_pkt_sent_cntr[channel]++;
+                m_bytes_sent_cntr[channel] += tr_data.data.size();
                 msg = $sformatf("\n\t\nPacket Accepted:\n RX CHANNEL: %0d\n META: %h\n PACKET SIZE: %0d\n%s",
-                                info.channel, info.meta, info.packet_size, tr.convert2string());
+                                channel, meta, packet_size, tr_data.convert2string());
                 `uvm_info(this.get_full_name(), msg,  UVM_MEDIUM);
-                packet_send(tr.data, info.input_time, info.channel, info.meta);
+                packet_send(tr_data.data, tr_data.time_last(), channel, meta);
             end
         end
     endtask

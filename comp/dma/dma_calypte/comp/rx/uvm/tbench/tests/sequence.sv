@@ -10,12 +10,11 @@ class virt_seq #(
     int unsigned PCIE_RQ_REGION_SIZE,
     int unsigned PCIE_RQ_BLOCK_SIZE,
     int unsigned PCIE_RQ_ITEM_WIDTH,
-    int unsigned PCIE_RQ_META_WIDTH,
     int unsigned CHANNELS
 ) extends uvm_sequence;
 
     `uvm_object_param_utils(test::virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
-                                             PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS))
+                                             PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, CHANNELS))
     `uvm_declare_p_sequencer(uvm_dma_ll::sequencer #(USR_MFB_ITEM_WIDTH, CHANNELS))
 
     function new (string name = "virt_seq");
@@ -36,7 +35,7 @@ class virt_seq #(
         m_usr_mfb_seq.min_random_count = 80;
         m_usr_mfb_seq.max_random_count = 100;
         m_usr_mfb_seq.cfg = new();
-        m_usr_mfb_seq.cfg.array_size_set(60,PKT_SIZE_MAX);
+        m_usr_mfb_seq.cfg.array_size_set(SEQ_PKT_SIZE_MIN, SEQ_PKT_SIZE_MAX);
 
         m_reg_seq =  uvm_dma_ll::reg_sequence #(CHANNELS)::type_id::create("m_reg_seq");
         m_reg_seq.m_regmodel = m_regmodel;
@@ -47,11 +46,6 @@ class virt_seq #(
         m_reset_seq.start(p_sequencer.m_reset_sqcr);
     endtask
 
-    function void pre_randomize();
-         m_usr_mfb_seq.randomize();
-         m_reg_seq.randomize();
-    endfunction
-
     task body();
         m_done = 0;
 
@@ -59,12 +53,16 @@ class virt_seq #(
             run_reset();
             begin
                 #(200ns)
+                m_reg_seq.randomize();
                 m_reg_seq.start(null);
             end
         join_none
 
         #(50ns)
 
-        m_usr_mfb_seq.start(p_sequencer.m_usr_mfb_sqcr.m_data_sqcr);
+        while ($time < SIMULATION_TIME) begin
+            m_usr_mfb_seq.randomize();
+            m_usr_mfb_seq.start(p_sequencer.m_usr_mfb_sqcr.m_data_sqcr);
+        end
     endtask
 endclass
