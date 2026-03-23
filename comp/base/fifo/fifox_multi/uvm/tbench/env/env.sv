@@ -94,7 +94,7 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         m_reset.sync_connect(m_env_mvb_rx    .reset_sync);
         m_reset.sync_connect(m_env_mvb_rd    .reset_sync);
         m_reset.sync_connect(m_env_mvb_tx    .reset_sync);
-        m_reset.sync_connect(m_env_mvb_status.reset_sync);
+        //m_reset.sync_connect(m_env_mvb_status.reset_sync);
 
         // RX environments connection
         m_env_mvb_rx.analysis_port.connect(sc.analysis_imp_mvb_rx);
