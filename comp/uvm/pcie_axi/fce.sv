@@ -88,9 +88,13 @@ function automatic uvm_pcie::completer_header hdr_cc_get(input logic[32-1:0] dat
     ret.byte_count   = byte_count;
     ret.length       = dword_count;
 
-    ret.data = new[data.size()-3];
-    for (int unsigned it = 3; it < data.size(); it++) begin
-        ret.data[it-3] = data[it];
+    if (data.size() > 3) begin
+        ret.data = new[data.size()-3];
+        for (int unsigned it = 3; it < data.size(); it++) begin
+            ret.data[it-3] = data[it];
+        end
+    end else begin
+        ret.data = {};
     end
     return ret;
 endfunction
@@ -167,9 +171,13 @@ function automatic uvm_pcie::completer_header hdr_rc_get(input logic[32-1:0] dat
     ret.byte_count   = byte_count;
     ret.length       = dword_count;
 
-    ret.data = new[data.size()-3];
-    for (int unsigned it = 3; it < data.size(); it++) begin
-        ret.data[it-3] = data[it];
+    if (data.size() > 3) begin
+        ret.data = new[data.size()-3];
+        for (int unsigned it = 3; it < data.size(); it++) begin
+            ret.data[it-3] = data[it];
+        end
+    end else begin
+        ret.data = {};
     end
     return ret;
 endfunction
@@ -255,9 +263,13 @@ function automatic uvm_pcie::request_header hdr_rq_get(input logic[32-1:0] data[
     hdr.fbe = fbe;
     hdr.lbe = lbe;
 
-    hdr.data = new[data.size()-4];
-    for (int unsigned it = 0; it < data.size()-4; it++) begin
-        hdr.data[it] = data[it+4];
+    if (data.size() > 4) begin
+        hdr.data = new[data.size()-4];
+        for (int unsigned it = 0; it < data.size()-4; it++) begin
+            hdr.data[it] = data[it+4];
+        end
+    end else begin
+        hdr.data = {};
     end
 
     return hdr;
@@ -354,9 +366,13 @@ function automatic uvm_pcie::request_header hdr_cq_get(input logic[32-1:0] data[
     hdr.fbe = fbe;
     hdr.lbe = lbe;
 
-    hdr.data = new[data.size()-4];
-    for (int unsigned it = 0; it < data.size()-4; it++) begin
-        hdr.data[it] = data[it+4];
+    if (data.size() > 4) begin
+        hdr.data = new[data.size()-4];
+        for (int unsigned it = 0; it < data.size()-4; it++) begin
+            hdr.data[it] = data[it+4];
+        end
+    end else begin
+        hdr.data = {};
     end
     return hdr;
 endfunction
