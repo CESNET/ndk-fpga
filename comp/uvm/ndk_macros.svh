@@ -46,3 +46,32 @@
     `uvm_field_utils_begin(Tobj) \
     `uvm_object_utils_end
 
+
+///////////////////////////////////////////////////////
+// MACRO SIMPLIFY dist randomization
+///////////////////////////////////////////////////////
+// EXAMPLE:
+//      upd_timeout dist {
+//          `ndk_rand_dist_first(5, 1024, 8) :/ 10,
+//          `ndk_rand_dist      (5, 1024, 8, 1)  :/ 10,
+//          `ndk_rand_dist      (5, 1024, 8, 2)  :/ 8,
+//          `ndk_rand_dist      (5, 1024, 8, 3)  :/ 3,
+//          `ndk_rand_dist      (5, 1024, 8, 4)  :/ 1,
+//          `ndk_rand_dist      (5, 1024, 8, 5)  :/ 3,
+//          `ndk_rand_dist      (5, 1024, 8, 6)  :/ 8,
+//          `ndk_rand_dist      (5, 1024, 8, 7)  :/ 10,
+//          `ndk_rand_dist_last (5, 1024, 8) :/ 10
+//      };
+`define ndk_rand_dist_first(MIN, MAX, DIVIDER) \
+    [MIN:MIN+((MAX-MIN)/DIVIDER)]
+
+`define ndk_rand_dist(MIN, MAX, DIVIDER, BLOCK) \
+    [MIN+((MAX-MIN)/DIVIDER)*(BLOCK-1):MIN+((MAX-MIN)/DIVIDER)*BLOCK]
+
+`define ndk_rand_dist_last(MIN, MAX, DIVIDER) \
+    [MIN+((MAX-MIN)/DIVIDER)*(DIVIDER-1):MAX]
+
+
+
+
+
