@@ -57,7 +57,7 @@ module DUT (
     ) VHDL_DUT_U (
 
         .CLK   (CLK),
-        .RESET (RST),
+        .RESET (RST == 1'b1 ? 1'b1 : 1'b0),
 
         .DI    (mvb_rx.DATA),
         .WR    (wr         ),

@@ -17,6 +17,7 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if reset (CLK);
+    pullup(reset.RESET);
 
     mvb_if #(WRITE_PORTS, DATA_WIDTH) mvb_rx    (CLK);
     mvb_if #(READ_PORTS, DATA_WIDTH)  mvb_tx    (CLK);
