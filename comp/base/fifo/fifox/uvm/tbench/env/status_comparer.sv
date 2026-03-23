@@ -19,7 +19,7 @@ class status_comparer #(int unsigned STATUS_WIDTH) extends uvm_common::comparer_
 
         { status, afull, aempty } = tr.data;
 
-        return $sformatf("\nStatus\n%s\n\tITEMS %0d\n\tAlmoust full %b\n\tAlmoust full %b", tr.time2string(), status, afull, aempty);
+        return $sformatf("\nStatus\n%s\n\tITEMS %0d\n\tAlmoust full %b\n\tAlmoust empty %b", tr.time2string(), status, afull, aempty);
     endfunction
 
     function string dut_item2string(uvm_logic_vector::sequence_item #(STATUS_WIDTH+2) tr);
@@ -29,7 +29,7 @@ class status_comparer #(int unsigned STATUS_WIDTH) extends uvm_common::comparer_
 
         { status, afull, aempty } = tr.data;
 
-        return $sformatf("\nStatus\n%s\n\tITEMS %0d\n\tAlmoust full %b\n\tAlmoust full %b", tr.time2string(), status, afull, aempty);
+        return $sformatf("\nStatus\n%s\n\tITEMS %0d\n\tAlmoust full %b\n\tAlmoust empty %b", tr.time2string(), status, afull, aempty);
     endfunction
 
     function void check_phase(uvm_phase phase);
