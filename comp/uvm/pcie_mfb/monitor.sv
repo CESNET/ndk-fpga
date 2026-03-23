@@ -241,7 +241,7 @@ class monitor #(
                 if (DIR ==  MFB_CQ) begin
                     hdr = uvm_pcie_axi::hdr_cq_get(tmp_mfb, tmp_mvb[166:163], tmp_mvb[170:167], bar_cfg);
                 end else if (DIR ==  MFB_RQ) begin
-                    `uvm_fatal(this.get_full_name(), "\n\tTHIS IS NOT IMPLEMENTED\n");
+                    hdr = uvm_pcie_axi::hdr_rq_get(tmp_mfb, tmp_mvb[164-1:160], tmp_mvb[168-1:164]);
                 end else if (DIR ==  MFB_RC) begin
                     hdr = uvm_pcie_axi::hdr_rc_get(tmp_mfb);
                 end
