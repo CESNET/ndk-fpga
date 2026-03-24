@@ -8,7 +8,10 @@ class ex_test extends uvm_test;
     typedef uvm_component_registry #(test::ex_test, "test::ex_test") type_id;
 
     // Declare the environment reference variable
-    uvm_fifox_multi::env #(DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN != "FULL") m_env;
+    uvm_fifox_multi::env #(
+        DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET,
+        ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN != "FULL"
+    ) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -28,12 +31,17 @@ class ex_test extends uvm_test;
 
     task test_wait_result(time time_length);
         time start_time = $time();
-        while ($time()-start_time < time_length && m_env.sc.used() !== 0) #(600ns);
+        while ($time()-start_time < time_length && m_env.sc.used() !== 0) begin
+            #(600ns);
+        end
     endtask
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        m_env = uvm_fifox_multi::env #(DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN != "FULL")::type_id::create("m_env", this);
+        m_env = uvm_fifox_multi::env #(
+            DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS,
+            ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN != "FULL"
+        )::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
@@ -41,7 +49,9 @@ class ex_test extends uvm_test;
     virtual task run_phase(uvm_phase phase);
 
         virt_sequence #(DATA_WIDTH, READ_PORTS, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT) m_vseq;
-        m_vseq = virt_sequence #(DATA_WIDTH, READ_PORTS, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT)::type_id::create("m_vseq");
+        m_vseq = virt_sequence #(
+                DATA_WIDTH, READ_PORTS, MIN_TRANSACTION_COUNT, MAX_TRANSACTION_COUNT
+        )::type_id::create("m_vseq");
 
         phase.raise_objection(this);
         m_vseq.init(phase);

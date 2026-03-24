@@ -6,6 +6,8 @@
 
 import test::*;
 
+// Module have same nabe but in CAMMEL CASE
+// verilog_lint: waive module-filename
 module DUT (
     input logic CLK,
     input logic RST,

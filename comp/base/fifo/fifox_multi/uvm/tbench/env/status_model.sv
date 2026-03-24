@@ -4,8 +4,16 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET) extends uvm_component;
-    `uvm_component_param_utils(uvm_fifox_multi::status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET))
+class status_model #(
+    int unsigned ITEMS,
+    int unsigned WRITE_PORTS,
+    int unsigned READ_PORTS,
+    int unsigned ALMOST_FULL_OFFSET,
+    int unsigned ALMOST_EMPTY_OFFSET
+) extends uvm_component;
+    `uvm_component_param_utils(uvm_fifox_multi::status_model #(
+            ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET)
+    )
 
     // Model inputs
     uvm_probe::cbs_simple #(1+$clog2(WRITE_PORTS+1)+$clog2(READ_PORTS+1)) status_in;
@@ -22,9 +30,17 @@ class status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_
 
     function void build_phase(uvm_phase phase);
 
-        status_in = uvm_probe::cbs_simple #(1+$clog2(WRITE_PORTS+1)+$clog2(READ_PORTS+1))::type_id::create("status_in", this);
+        status_in = uvm_probe::cbs_simple #(
+            1+$clog2(WRITE_PORTS+1)+$clog2(READ_PORTS+1)
+        )::type_id::create("status_in", this);
 
-        uvm_probe::pool::get_global_pool().get({ "probe_event_component_", "testbench.DUT_U.VHDL_DUT_U.fifox_multi_full_g.fifox_multi_full_i", ".probe_status" }).add_callback(status_in);
+        uvm_probe::pool::get_global_pool().get(
+            {
+                "probe_event_component_",
+                "testbench.DUT_U.VHDL_DUT_U.fifox_multi_full_g.fifox_multi_full_i",
+                ".probe_status"
+            }
+        ).add_callback(status_in);
 
     endfunction
 
@@ -41,7 +57,9 @@ class status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_
 
         int unsigned status_wr = 0;
         int unsigned status_rd[$];
-        for (int i = 0; i < 2; i++) status_rd.push_back(0);
+        for (int i = 0; i < 2; i++) begin
+            status_rd.push_back(0);
+        end
 
         send_initial_transactions();
 
@@ -60,10 +78,14 @@ class status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_
             // Updates the read status
             status_rd.pop_back();
             status_rd.push_front(status_wr);
-            foreach (status_rd[i]) status_rd[i] -= rd;
+            foreach (status_rd[i]) begin
+                status_rd[i] -= rd;
+            end
 
             // Updates the write status
-            if (wr_en) status_wr += wr;
+            if (wr_en) begin
+                status_wr += wr;
+            end
             status_wr -= rd;
 
         end

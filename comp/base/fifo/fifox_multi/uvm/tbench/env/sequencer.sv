@@ -4,7 +4,9 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_sequencer #(DATA_WIDTH) extends uvm_sequencer;
+class virt_sequencer #(
+    int unsigned DATA_WIDTH
+) extends uvm_sequencer;
     `uvm_component_param_utils(uvm_fifox_multi::virt_sequencer #(DATA_WIDTH))
 
     uvm_reset::sequencer m_reset;

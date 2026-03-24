@@ -4,8 +4,18 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN) extends uvm_env;
-    `uvm_component_param_utils(uvm_fifox_multi::env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN));
+class env #(
+    int unsigned DATA_WIDTH,
+    int unsigned ITEMS,
+    int unsigned WRITE_PORTS,
+    int unsigned READ_PORTS,
+    int unsigned ALMOST_FULL_OFFSET,
+    int unsigned ALMOST_EMPTY_OFFSET,
+    logic        IMPL_SHAKEDOWN
+) extends uvm_env;
+    `uvm_component_param_utils(uvm_fifox_multi::env #(
+            DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN
+     ));
 
     uvm_reset::agent m_reset;
 
@@ -17,7 +27,9 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
     uvm_logic_vector_mvb::env_tx #(READ_PORTS, DATA_WIDTH) m_env_mvb_tx;
     uvm_logic_vector_mvb::env_tx #(1, 2)                   m_env_mvb_status;
     // Scoreboard
-    scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN) sc;
+    scoreboard #(
+        DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN
+    ) sc;
     // Virtual sequencer
     virt_sequencer #(DATA_WIDTH) vscr;
 
@@ -76,12 +88,16 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
         m_config_mvb_status.active         = UVM_PASSIVE;
         m_config_mvb_status.interface_name = "vif_mvb_status";
         m_config_mvb_status.coverage       = 1;
-        uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_status", "m_config", m_config_mvb_status);
+        uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(
+                this, "m_env_mvb_status", "m_config", m_config_mvb_status
+        );
         // Creation of the m_env_mvb_status
         m_env_mvb_status = uvm_logic_vector_mvb::env_tx #(1, 2)::type_id::create("m_env_mvb_status", this);
 
         // Creation of the scoreboard
-        sc = scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN)::type_id::create("sc", this);
+        sc = scoreboard #(
+                DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN
+        )::type_id::create("sc", this);
         // Creation of the virtual sequencer
         vscr = virt_sequencer #(DATA_WIDTH)::type_id::create("vscr", this);
 
@@ -101,7 +117,9 @@ class env #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMO
 
         // TX environments connection
         m_env_mvb_tx.analysis_port.connect(sc.analysis_imp_mvb_tx);
-        if (!IMPL_SHAKEDOWN) m_env_mvb_status.analysis_port.connect(sc.analysis_imp_mvb_status);
+        if (!IMPL_SHAKEDOWN) begin
+            m_env_mvb_status.analysis_port.connect(sc.analysis_imp_mvb_status);
+        end
         // Passing the sequencers to the virtual sequencer
         vscr.m_reset = m_reset.m_sequencer;
         vscr.m_mvb_rx_sqr = m_env_mvb_rx.m_sequencer;
