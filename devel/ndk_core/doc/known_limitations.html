@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Known Limitations</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#maximal-jumbo-frames">Maximal jumbo frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dpdk-settings">DPDK settings</a></li>
 </ul>
 </li>
 </ul>
@@ -140,9 +141,17 @@
 <span id="id1"></span><h1>Known Limitations<a class="headerlink" href="#known-limitations" title="Link to this heading"></a></h1>
 <section id="maximal-jumbo-frames">
 <h2>Maximal jumbo frames<a class="headerlink" href="#maximal-jumbo-frames" title="Link to this heading"></a></h2>
-<p>For DMA Medusa maximal supported frame length (MTU) is 16332 bytes. DMA Calypte supports only frames that have up to 4096 bytes.
-For proper MTU functionality for DMA transfers, it may be necessary to set the correct SW buffer sizes, this can be done using the nfb-dma tool.
-Don’t forget to also properly set the MTU in the Ethernet MAC using the nfb-eth tool, the default value here is 1526 bytes.</p>
+<p>The maximum supported frame length (MTU) for DMA Medusa is 16,332 bytes. DMA Calypte supports frames up to 4,096 bytes only.
+For proper MTU functionality during DMA transfers, you may need to configure the software buffer sizes using the <code class="docutils literal notranslate"><span class="pre">nfb-dma</span></code> tool.
+Also configure the MTU in the Ethernet MAC using the <code class="docutils literal notranslate"><span class="pre">nfb-eth</span></code> tool; the default value is 1,526 bytes.</p>
+</section>
+<section id="dpdk-settings">
+<h2>DPDK settings<a class="headerlink" href="#dpdk-settings" title="Link to this heading"></a></h2>
+<p>The DPDK native DMA drivers require the <code class="docutils literal notranslate"><span class="pre">--iova-mode</span> <span class="pre">pa</span></code> setting. This is set by default on most machines, but on some AMD systems
+it can cause issues, potentially leading to host system shutdown. The recommended way to run a DPDK application with DPDK native drivers is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dpdk</span><span class="o">-</span><span class="n">testpmd</span> <span class="o">--</span><span class="n">iova</span><span class="o">-</span><span class="n">mode</span> <span class="n">pa</span> <span class="o">-</span><span class="n">a</span> <span class="mi">0000</span><span class="p">:</span><span class="mi">17</span><span class="p">:</span><span class="mf">00.0</span><span class="p">,</span><span class="n">queue_driver</span><span class="o">=</span><span class="n">native</span>
+</pre></div>
+</div>
 </section>
 </section>
 
