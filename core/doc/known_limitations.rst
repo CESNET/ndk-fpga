@@ -6,9 +6,9 @@ Known Limitations
 Maximal jumbo frames
 ********************
 
-For DMA Medusa maximal supported frame length (MTU) is 16332 bytes. DMA Calypte supports only frames that have up to 4096 bytes.
-For proper MTU functionality for DMA transfers, it may be necessary to set the correct SW buffer sizes, this can be done using the nfb-dma tool.
-Don't forget to also properly set the MTU in the Ethernet MAC using the nfb-eth tool, the default value here is 1526 bytes.
+The maximum supported frame length (MTU) for DMA Medusa is 16,332 bytes. DMA Calypte supports frames up to 4,096 bytes only.
+For proper MTU functionality during DMA transfers, you may need to configure the software buffer sizes using the ``nfb-dma`` tool.
+Also configure the MTU in the Ethernet MAC using the ``nfb-eth`` tool; the default value is 1,526 bytes.
 
 DPDK settings
 *************
