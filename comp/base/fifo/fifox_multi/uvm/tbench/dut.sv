@@ -6,6 +6,8 @@
 
 import test::*;
 
+// Module have same nabe but in CAMMEL CASE
+// verilog_lint: waive module-filename
 module DUT (
     input logic CLK,
     input logic RST,
@@ -15,19 +17,6 @@ module DUT (
     mvb_if.dut_tx mvb_status
 );
 
-    if (IMPL_SHAKEDOWN == "FULL") begin : gen_probe
-        bind FIFOX_MULTI : VHDL_DUT_U probe_inf #(
-            1 + $clog2(WRITE_PORTS + 1) + $clog2(READ_PORTS + 1)
-        ) probe_status (
-            .event_signal ((RESET === 1'b0)),
-            .event_data   ({
-                fifox_multi_full_g.fifox_multi_full_i.in_reg1_en,
-                fifox_multi_full_g.fifox_multi_full_i.wr_num_reg1,
-                fifox_multi_full_g.fifox_multi_full_i.rd_num
-            }),
-            .CLK          (CLK)
-        );
-    end : gen_probe
     logic [WRITE_PORTS-1 : 0] wr;
     logic full;
 
@@ -38,6 +27,21 @@ module DUT (
     logic aempty;
     logic afull;
 
+    /////////////////////
+    // BIND PROBE
+    if (IMPL_SHAKEDOWN == "FULL") begin : gen_probe
+        bind FIFOX_MULTI_GEN : VHDL_DUT_U.fifox_multi_full_g.fifox_multi_full_i probe_inf #(
+            1 + $clog2(WRITE_PORTS + 1) + $clog2(READ_PORTS + 1)
+        )
+        probe_status (
+            .event_signal ((RESET === 1'b0)),
+            .event_data   ({in_reg1_en, wr_num_reg1, rd_num}),
+            .CLK          (CLK)
+        );
+    end : gen_probe
+
+    /////////////////////
+    // INSTAINTIATE VHDL DUT
     FIFOX_MULTI #(
 
         .DATA_WIDTH          (DATA_WIDTH         ),
@@ -55,7 +59,7 @@ module DUT (
     ) VHDL_DUT_U (
 
         .CLK   (CLK),
-        .RESET (RST),
+        .RESET (RST == 1'b1 ? 1'b1 : 1'b0),
 
         .DI    (mvb_rx.DATA),
         .WR    (wr         ),
@@ -82,15 +86,13 @@ module DUT (
     assign mvb_status.DST_RDY = 1;
 
     always_comb begin
-        rd_continuous = { READ_PORTS { 1'b0 } };
-        for (int i = READ_PORTS-1; i >= 0; i--) begin
-            if (mvb_rd.VLD[i] === 1'b1) begin
-                break;
-            end else begin
-                rd_continuous[i] = 1'b1;
-            end
+        logic [READ_PORTS-1 : 0] tmp;
+
+        tmp[0] = mvb_rd.VLD[0] === 1'b1;
+        for (int unsigned it = 1; it < READ_PORTS; it++) begin
+            tmp[it] = tmp[it-1] && mvb_rd.VLD[it] === 1'b1;
         end
-        rd_continuous = SAFE_READ_MODE ? ~rd_continuous : ~rd_continuous & (~empty);
+        rd_continuous = SAFE_READ_MODE ? tmp : tmp & (~empty);
     end
 
     assign mvb_rd.DST_RDY = 1;
