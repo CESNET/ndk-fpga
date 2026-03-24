@@ -8,7 +8,7 @@ class ex_test extends uvm_test;
     typedef uvm_component_registry #(test::ex_test, "test::ex_test") type_id;
 
     // Declare the environment reference variable
-    uvm_fifox_multi::env #(DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN) m_env;
+    uvm_fifox_multi::env #(DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN != "FULL") m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -33,7 +33,7 @@ class ex_test extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        m_env = uvm_fifox_multi::env #(DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN)::type_id::create("m_env", this);
+        m_env = uvm_fifox_multi::env #(DATA_WIDTH, ITEMS_ACTUAL, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN != "FULL")::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------

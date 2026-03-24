@@ -15,19 +15,6 @@ module DUT (
     mvb_if.dut_tx mvb_status
 );
 
-    if (IMPL_SHAKEDOWN == "FULL") begin : gen_probe
-        bind FIFOX_MULTI : VHDL_DUT_U probe_inf #(
-            1 + $clog2(WRITE_PORTS + 1) + $clog2(READ_PORTS + 1)
-        ) probe_status (
-            .event_signal ((RESET === 1'b0)),
-            .event_data   ({
-                fifox_multi_full_g.fifox_multi_full_i.in_reg1_en,
-                fifox_multi_full_g.fifox_multi_full_i.wr_num_reg1,
-                fifox_multi_full_g.fifox_multi_full_i.rd_num
-            }),
-            .CLK          (CLK)
-        );
-    end : gen_probe
     logic [WRITE_PORTS-1 : 0] wr;
     logic full;
 
@@ -38,6 +25,21 @@ module DUT (
     logic aempty;
     logic afull;
 
+    /////////////////////
+    // BIND PROBE
+    if (IMPL_SHAKEDOWN == "FULL") begin : gen_probe
+        bind FIFOX_MULTI_GEN : VHDL_DUT_U.fifox_multi_full_g.fifox_multi_full_i probe_inf #(
+            1 + $clog2(WRITE_PORTS + 1) + $clog2(READ_PORTS + 1)
+        )
+        probe_status (
+            .event_signal ((RESET === 1'b0)),
+            .event_data   ({in_reg1_en, wr_num_reg1, rd_num}),
+            .CLK          (CLK)
+        );
+    end : gen_probe
+
+    /////////////////////
+    // INSTAINTIATE VHDL DUT
     FIFOX_MULTI #(
 
         .DATA_WIDTH          (DATA_WIDTH         ),

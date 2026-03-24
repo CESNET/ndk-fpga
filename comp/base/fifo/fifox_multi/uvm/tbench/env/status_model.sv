@@ -24,7 +24,7 @@ class status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_
 
         status_in = uvm_probe::cbs_simple #(1+$clog2(WRITE_PORTS+1)+$clog2(READ_PORTS+1))::type_id::create("status_in", this);
 
-        uvm_probe::pool::get_global_pool().get({ "probe_event_component_", "testbench.DUT_U.VHDL_DUT_U.full_gen.fifox_multi_full_i", ".probe_status" }).add_callback(status_in);
+        uvm_probe::pool::get_global_pool().get({ "probe_event_component_", "testbench.DUT_U.VHDL_DUT_U.fifox_multi_full_g.fifox_multi_full_i", ".probe_status" }).add_callback(status_in);
 
     endfunction
 
