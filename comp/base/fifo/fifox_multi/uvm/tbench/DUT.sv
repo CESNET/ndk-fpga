@@ -82,15 +82,13 @@ module DUT (
     assign mvb_status.DST_RDY = 1;
 
     always_comb begin
-        rd_continuous = { READ_PORTS { 1'b0 } };
-        for (int i = READ_PORTS-1; i >= 0; i--) begin
-            if (mvb_rd.VLD[i] === 1'b1) begin
-                break;
-            end else begin
-                rd_continuous[i] = 1'b1;
-            end
+        logic [READ_PORTS-1 : 0] tmp;
+
+        tmp[0] = mvb_rd.VLD[0] === 1'b1;
+        for (int unsigned it = 1; it < READ_PORTS; it++) begin
+            tmp[it] = tmp[it-1] && mvb_rd.VLD[it] === 1'b1;
         end
-        rd_continuous = SAFE_READ_MODE ? ~rd_continuous : ~rd_continuous & (~empty);
+        rd_continuous = SAFE_READ_MODE ? tmp : tmp & (~empty);
     end
 
     assign mvb_rd.DST_RDY = 1;
