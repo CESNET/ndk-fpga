@@ -1,0 +1,19 @@
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /axis_eth_parser/*
+add_wave -group {ETH} -noupdate -hex /axis_eth_parser/gen_stages(0)/stage_i/*
+add_wave -group {ETH_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(0)/stage_i/sniffer_i/*
+add_wave -group {VLAN} -noupdate -hex /axis_eth_parser/gen_stages(1)/stage_i/*
+add_wave -group {VLAN_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(1)/stage_i/sniffer_i/*
+add_wave -group {IPV4} -noupdate -hex /axis_eth_parser/gen_stages(2)/stage_i/*
+add_wave -group {IPV4_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(2)/stage_i/sniffer_i/*
+add_wave -group {TCP} -noupdate -hex /axis_eth_parser/gen_stages(3)/stage_i/*
+add_wave -group {TCP_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(3)/stage_i/sniffer_i/*
+
+config wave -signalnamewidth 1
