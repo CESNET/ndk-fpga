@@ -8,6 +8,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
+use work.math_pack.all;
+use work.mfb.all;
+use work.mvb.all;
+
 -- ----------------------------------------------------------------------------
 --                        DMA BUS package
 -- ----------------------------------------------------------------------------
@@ -115,6 +119,21 @@ package dma_bus_pack is
     pure function dma_route_path_array_default (size : NATURAL) return dma_route_path_array_t;
 
     pure function dma_bus_get_payload_bit (dma_hdr : std_logic_vector) return std_logic;
+
+    type cfg_dma_stream_t is record
+        D   : cfg_mfb_t;
+        H   : cfg_mvb_t;
+    end record;
+
+    type cfg_dma_bus_t is record
+        REQ     : cfg_dma_stream_t;      -- Upstream bus configuration
+        RES     : cfg_dma_stream_t;      -- Downstream bus configuration
+    end record;
+
+    pure function cfg_dma_stream_init (REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, HDR_WIDTH : natural) return cfg_dma_stream_t;
+    pure function cfg_dma_bus_default return cfg_dma_bus_t;
+
+    pure function cfg_dma_bus_init (req, res : cfg_dma_stream_t) return cfg_dma_bus_t;
 
 end package;
 
@@ -240,6 +259,31 @@ package body dma_bus_pack is
         else
             return '0';
         end if;
+    end function;
+
+    pure function cfg_dma_stream_init (REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, HDR_WIDTH : natural) return cfg_dma_stream_t is
+        variable cfg : cfg_dma_stream_t;
+    begin
+        cfg.D   := cfg_mfb_init(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0);
+        cfg.H   := cfg_mvb_init(REGIONS, HDR_WIDTH);
+        return cfg;
+    end function;
+
+    pure function cfg_dma_bus_init (req, res : cfg_dma_stream_t)
+    return cfg_dma_bus_t is
+        variable cfg : cfg_dma_bus_t;
+    begin
+        cfg.REQ      := req;
+        cfg.RES      := res;
+        return cfg;
+    end function;
+
+    pure function cfg_dma_bus_default return cfg_dma_bus_t is
+    begin
+        return cfg_dma_bus_init(
+            cfg_dma_stream_init(1, 1, 1, 8, DMA_UPHDR_WIDTH),
+            cfg_dma_stream_init(1, 1, 1, 8, DMA_DOWNHDR_WIDTH)
+        );
     end function;
 
 end package body;
