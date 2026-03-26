@@ -5,6 +5,92 @@ Cocotb tips & tricks
 This section consists of simple problems you may encounter when creating testbenches
 using ``cocotb/cocotbext-ndk`` frameworks and the solutions to those problems.
 
+Random Seed
+===========
+
+The ``RANDOM_SEED`` environment variable controls the seed for random number generation in cocotb tests.
+
+By default, cocotb uses a different random seed for each simulation run, which means tests with random behavior (e.g., random packet generation, random delays, random backpressure) will produce different results each time.
+
+To reproduce a specific test run (e.g., when debugging a failure), set the seed to a fixed value:
+
+.. code-block:: bash
+
+    export RANDOM_SEED=12345
+    make
+
+Alternatively, add ``export RANDOM_SEED := 12345`` to your ``Makefile`` for permanent setting.
+
+The seed value is logged at the start of each simulation run. When a test fails, note the seed value from the log and use it to reproduce the exact same conditions.
+
+.. note:: Using a fixed seed makes tests deterministic, which is useful for debugging but may hide timing-related issues that only occur with certain random patterns.
+
+Debug Logging
+=============
+
+Components in ``cocotbext-ndk`` use ``self.log`` for debug messages. To enable debug logging, set the ``COCOTB_LOG_LEVEL`` environment variable before running the simulation:
+
+.. code-block:: bash
+
+    export COCOTB_LOG_LEVEL=DEBUG
+    make
+
+Alternatively, add ``export COCOTB_LOG_LEVEL := DEBUG`` to your ``Makefile`` for permanent setting.
+
+Available log levels are: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO``, ``DEBUG``.
+
+.. note:: Debug logging increases simulation time and log size. Use only during development.
+
+Optional Signals on MFB/MVB/AXI4-Stream Interfaces
+==================================================
+
+The ``_optional_signals`` mechanism is available on MVB, MFB, AXI4-Stream and other interfaces. It allows handling signals that are not part of the standard driver/monitor. To use it:
+
+1. Create extended driver/monitor classes with ``_optional_signals`` list:
+
+   .. code-block:: python
+
+       class MVBDriverExt(MVBDriver):
+           _optional_signals = ["l3_csum_orig", "l3_csum_en"]
+
+       class MVBMonitorExt(MVBMonitor):
+           _optional_signals = ["l3_csum", "l3_csum_ok"]
+
+2. Create custom transaction class with the optional fields:
+
+   .. code-block:: python
+
+       from dataclasses import dataclass
+
+       @dataclass
+       class MetadataTr(MvbTransaction):
+           l3_csum_orig: int = 0
+           l3_csum_en: int = 0
+
+3. Use the extended classes in your testbench:
+
+   .. code-block:: python
+
+       self.mvb_driver = MVBDriverExt(dut, "RX_MVB", dut.CLK)
+       self.mvb_monitor = MVBMonitorExt(dut, "TX_MVB", dut.CLK, tr_type=MetadataTr)
+
+4. Create and send transactions with optional signals:
+
+   .. code-block:: python
+
+       # Create transaction with optional signal values
+       tr = MetadataTr(data=0x1234, l3_csum_orig=0x5678, l3_csum_en=1)
+       self.mvb_driver.append(tr)
+
+.. note:: The ``_optional_signals`` list tells the driver/monitor which additional signals to look for on the interface. Signals not present on the DUT will be silently ignored.
+
+This feature is also available for:
+
+- **MFB** - optional signals are replicated across regions.
+- **AXI4-Stream** - control signals like ``TLAST`` and ``TKEEP`` are automatically handled by the driver.
+
+.. note:: Each interface has its own default ``_optional_signals`` list. Check the driver/monitor source code for details.
+
 Using probes
 ============
 
@@ -76,3 +162,4 @@ Which then produces output like this:
     #  10000.00ns INFO     cocotb.ThroughputProbe - OUT       Immediate throughput at 10.0 us: 134.5104 Gb/s, Immediate efficiency: 32.8395%
     #  20000.00ns INFO     cocotb.ThroughputProbe - OUT       Immediate throughput at 20.0 us: 134.8456 Gb/s, Immediate efficiency: 32.9213%
     #  30000.00ns INFO     cocotb.ThroughputProbe - OUT       Immediate throughput at 30.0 us: 134.9 Gb/s, Immediate efficiency: 32.9346%
+
