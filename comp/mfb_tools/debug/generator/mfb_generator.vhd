@@ -142,7 +142,7 @@ architecture BEHAV of MFB_GENERATOR is
     signal data_word            : slv_array_t(REGIONS*REGION_SIZE-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal data_word_ser        : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
 
-    function count_ones (
+    function count_ones_local (
         INP_VECTOR : std_logic_vector)
         return unsigned is
 
@@ -260,7 +260,7 @@ begin
 
                     if (ctrl_en_ris_edge = '1' and burst_mode_en = '1') then
 
-                        accepted_regions := BEHAV.count_ones(gen_accept);
+                        accepted_regions := count_ones_local(gen_accept);
 
                         if (dst_rdy = '1') then
                             my_burst_cntr_nst <= burst_size - accepted_regions;
@@ -284,7 +284,7 @@ begin
 
                 when S_BURST_COUNTDOWN =>
 
-                    accepted_regions := BEHAV.count_ones(gen_accept);
+                    accepted_regions := count_ones_local(gen_accept);
 
                     if (dst_rdy = '1') then
                         my_burst_cntr_nst <= my_burst_cntr_pst - accepted_regions;
