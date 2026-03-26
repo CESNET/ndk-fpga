@@ -20,17 +20,15 @@ import nfb.ext.protobuf.v1.dma_pb2_grpc as dma_pb_grpc
 
 
 class NfbDmaThreadedGrpcServer:
-    def __init__(self, ram, dev, addr="127.0.0.1", port=50051):
+    def __init__(self, ram, dev, addr="127.0.0.1", port=0):
         super().__init__()
         self._log = logging.getLogger(__name__)
-
-        self._port = port
 
         self._nfb_reciver = dev if isinstance(dev, nfb_pb_grpc.NfbServicer) else NfbServicer(dev)
         self._dma_reciver = ram if isinstance(ram, dma_pb_grpc.DmaServicer) or ram is None else DmaServicer(ram)
 
         self._server = grpc.server(futures.ThreadPoolExecutor())
-        self._server.add_insecure_port(f"{addr}:{port}")
+        self._port = self._server.add_insecure_port(f"{addr}:{port}")
         nfb_pb_grpc.add_NfbServicer_to_server(self._nfb_reciver, self._server)
         if self._dma_reciver:
             dma_pb_grpc.add_DmaServicer_to_server(self._dma_reciver, self._server)
