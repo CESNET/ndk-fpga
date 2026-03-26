@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Verible Tools" href="tests/verible/readme.html" />
-    <link rel="prev" title="cocotbext-ndk" href="cocotbext.html" /> 
+    <link rel="next" title="cocotbext-ndk" href="cocotbext.html" />
+    <link rel="prev" title="Getting Started with cocotb" href="basic_cocotb_test.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -82,11 +82,14 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="basic_cocotb_test.html">Getting Started with cocotb</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Cocotb tips &amp; tricks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#random-seed">Random Seed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debug-logging">Debug Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-signals-on-mfb-mvb-axi4-stream-interfaces">Optional Signals on MFB/MVB/AXI4-Stream Interfaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-probes">Using probes</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
 <ul>
@@ -140,6 +143,87 @@
 <h1>Cocotb tips &amp; tricks<a class="headerlink" href="#cocotb-tips-tricks" title="Link to this heading"></a></h1>
 <p>This section consists of simple problems you may encounter when creating testbenches
 using <code class="docutils literal notranslate"><span class="pre">cocotb/cocotbext-ndk</span></code> frameworks and the solutions to those problems.</p>
+<section id="random-seed">
+<h2>Random Seed<a class="headerlink" href="#random-seed" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">RANDOM_SEED</span></code> environment variable controls the seed for random number generation in cocotb tests.</p>
+<p>By default, cocotb uses a different random seed for each simulation run, which means tests with random behavior (e.g., random packet generation, random delays, random backpressure) will produce different results each time.</p>
+<p>To reproduce a specific test run (e.g., when debugging a failure), set the seed to a fixed value:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RANDOM_SEED</span><span class="o">=</span><span class="m">12345</span>
+make
+</pre></div>
+</div>
+<p>Alternatively, add <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">RANDOM_SEED</span> <span class="pre">:=</span> <span class="pre">12345</span></code> to your <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> for permanent setting.</p>
+<p>The seed value is logged at the start of each simulation run. When a test fails, note the seed value from the log and use it to reproduce the exact same conditions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using a fixed seed makes tests deterministic, which is useful for debugging but may hide timing-related issues that only occur with certain random patterns.</p>
+</div>
+</section>
+<section id="debug-logging">
+<h2>Debug Logging<a class="headerlink" href="#debug-logging" title="Link to this heading"></a></h2>
+<p>Components in <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> use <code class="docutils literal notranslate"><span class="pre">self.log</span></code> for debug messages. To enable debug logging, set the <code class="docutils literal notranslate"><span class="pre">COCOTB_LOG_LEVEL</span></code> environment variable before running the simulation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">COCOTB_LOG_LEVEL</span><span class="o">=</span>DEBUG
+make
+</pre></div>
+</div>
+<p>Alternatively, add <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">COCOTB_LOG_LEVEL</span> <span class="pre">:=</span> <span class="pre">DEBUG</span></code> to your <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> for permanent setting.</p>
+<p>Available log levels are: <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">WARNING</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Debug logging increases simulation time and log size. Use only during development.</p>
+</div>
+</section>
+<section id="optional-signals-on-mfb-mvb-axi4-stream-interfaces">
+<h2>Optional Signals on MFB/MVB/AXI4-Stream Interfaces<a class="headerlink" href="#optional-signals-on-mfb-mvb-axi4-stream-interfaces" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> mechanism is available on MVB, MFB, AXI4-Stream and other interfaces. It allows handling signals that are not part of the standard driver/monitor. To use it:</p>
+<ol class="arabic">
+<li><p>Create extended driver/monitor classes with <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> list:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MVBDriverExt</span><span class="p">(</span><span class="n">MVBDriver</span><span class="p">):</span>
+    <span class="n">_optional_signals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;l3_csum_orig&quot;</span><span class="p">,</span> <span class="s2">&quot;l3_csum_en&quot;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">MVBMonitorExt</span><span class="p">(</span><span class="n">MVBMonitor</span><span class="p">):</span>
+    <span class="n">_optional_signals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;l3_csum&quot;</span><span class="p">,</span> <span class="s2">&quot;l3_csum_ok&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create custom transaction class with the optional fields:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MetadataTr</span><span class="p">(</span><span class="n">MvbTransaction</span><span class="p">):</span>
+    <span class="n">l3_csum_orig</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">l3_csum_en</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use the extended classes in your testbench:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">mvb_driver</span> <span class="o">=</span> <span class="n">MVBDriverExt</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;RX_MVB&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">mvb_monitor</span> <span class="o">=</span> <span class="n">MVBMonitorExt</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;TX_MVB&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="n">tr_type</span><span class="o">=</span><span class="n">MetadataTr</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create and send transactions with optional signals:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create transaction with optional signal values</span>
+<span class="n">tr</span> <span class="o">=</span> <span class="n">MetadataTr</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mh">0x1234</span><span class="p">,</span> <span class="n">l3_csum_orig</span><span class="o">=</span><span class="mh">0x5678</span><span class="p">,</span> <span class="n">l3_csum_en</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">mvb_driver</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> list tells the driver/monitor which additional signals to look for on the interface. Signals not present on the DUT will be silently ignored.</p>
+</div>
+<p>This feature is also available for:</p>
+<ul class="simple">
+<li><p><strong>MFB</strong> - optional signals are replicated across regions.</p></li>
+<li><p><strong>AXI4-Stream</strong> - control signals like <code class="docutils literal notranslate"><span class="pre">TLAST</span></code> and <code class="docutils literal notranslate"><span class="pre">TKEEP</span></code> are automatically handled by the driver.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each interface has its own default <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> list. Check the driver/monitor source code for details.</p>
+</div>
+</section>
 <section id="using-probes">
 <h2>Using probes<a class="headerlink" href="#using-probes" title="Link to this heading"></a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> framework includes a base class for creating probes for various purposes.
@@ -204,8 +288,8 @@ from the connected agent using <code class="docutils literal notranslate"><span 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="cocotbext.html" class="btn btn-neutral float-left" title="cocotbext-ndk" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tests/verible/readme.html" class="btn btn-neutral float-right" title="Verible Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="basic_cocotb_test.html" class="btn btn-neutral float-left" title="Getting Started with cocotb" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cocotbext.html" class="btn btn-neutral float-right" title="cocotbext-ndk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

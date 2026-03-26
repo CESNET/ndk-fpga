@@ -2,69 +2,152 @@
 Getting Started with cocotb
 ===========================
 
-In this section, you will learn how to create a basic test for a flow/storage hardware component (such as a pipe, FIFO, etc.). To get started, first create a ``cocotb`` folder in the directory where the tested component is located, and put all the scripts implemented in this tutorial into it.
+This guide shows how to create a basic test for flow/storage hardware components (such as pipes, FIFOs, etc.) using the cocotb framework. Cocotb allows you to write testbenches in Python, which are then used to verify VHDL/Verilog designs.
+
+The examples in this guide use the MVB FIFOX component test located at ``comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py`` as a reference.
 
 
-.. note:: For automatic generation of a test template use the ``generate_test_template`` script in ``ndk-fpga/build/scripts/cocotb``.
+Quick Start
+-----------
+
+For beginners, the easiest way to get started is:
+
+1. **Create a ``cocotb`` folder** in the directory of the component you want to test
+2. **Copy template files** from an existing test (e.g., ``comp/mvb_tools/storage/fifox/cocotb/``)
+3. **Modify the files** for your component:
+   - Update the ``TOPLEVEL`` in the Makefile to match your component name
+   - Adjust signal names and bus parameters in the testbench
+   - Update the model function to compute expected outputs for your component
+4. **Run the test** using the Makefile
+
+.. note:: For automatic generation of a test template, use the ``generate_test_template`` script in ``ndk-fpga/build/scripts/cocotb``. This creates a basic test structure that you can customize.
 
 
-Creating a Test
-===============
+Test Structure
+==============
 
-As an example, a simple test of an MVB FIFOX component will be used.
-It can be found at ``ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py``.
+A cocotb test consists of two main parts:
+
+**1. Testbench Class** - Reusable setup code that encapsulates all test infrastructure:
+
+   - **Drivers** - Objects that write stimulus data to the DUT (Device Under Test) input interfaces
+   - **Monitors** - Objects that read output data from the DUT and convert it to transactions
+   - **Scoreboard** - Compares actual outputs (from monitors) against expected outputs
+   - **Expected outputs** - List of transactions that the DUT should produce
+   - **Optional objects** - Probes for throughput measurement, bit drivers for backpressure testing
+   - **Reset sequence** - Hardware reset initialization
+
+   The testbench class is typically reusable across multiple tests and can be copied/adapted for similar components.
+
+**2. Test Function** - The actual test with:
+
+   - ``@cocotb.test()`` decorator (required) - Marks the function as a cocotb test
+   - ``async`` function definition (required) - Enables coroutine-based simulation
+   - Test logic - Stimulus generation, DUT interaction, and verification
+
+Example test file structure:
 
 .. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py
    :language: python
    :linenos:
    :encoding: utf-8
 
-This test can be used as a template for tests of basic `flow` and `storage` components, and can be easily adapted for most other verifications. It consists of two basic parts: the testbench class and the test itself:
 
-- The testbench is the more reusable of the two and usually looks basically the same, so it can be copied and adapted. Its purpose is to initialize and encapsulate objects that drive the test. It sets up drivers, monitors, a scoreboard, expected outputs, and other optional objects, such as a bit driver for ready signals, adds probes, and so on. It also includes a simulated reset.
-- The second part is the test part. It can consist of one test (typical for simple components) or multiple tests (more common for larger designs, such as the whole firmware of a card). Every test must have the ``@cocotb.test()`` decorator and be ``async``.
+Test Flow
+---------
 
-A test begins with the clock starting, testbench initialization, and a reset. After the reset, a bit driver is started to test the component's reaction to backpressure (dst_rdy). Random data is then generated, which can either be done using ``random_transactions`` or random data that is then inserted into transaction objects (this is the case in the test above). The generated transaction is then passed to the ``model`` method of the testbench, which inserts it into the ``expected_output`` list. The generated transaction is also inserted into the driver's send queue using the ``append`` method, from where it is then written onto the bus.
+A typical test follows these steps:
 
-The data is then read from the bus by a monitor, which should pack it into a transaction of the same type as was modeled and pass it to the test's scoreboard via a callback. The scoreboard pops the transaction from the front of the expected output queue that the monitor is connected to and compares this transaction with the transaction it received from the monitor. If they are not the same, a test failure is raised.
+1. **Start clock** - Initialize the clock generator using ``cocotb.start_soon(Clock(...).start())``. The clock drives the synchronous logic of the DUT.
 
-A waiting loop is implemented to ensure that the test doesn't report scoreboard results prematurely before all the transactions have been received. Otherwise, the scoreboard may receive a different number of transactions than it expected, which will lead to an error.
+2. **Initialize testbench** - Create the testbench object, which sets up all drivers, monitors, and the scoreboard.
 
-After all the packets are received, ``tb.scoreboard.result`` is raised, and the test results are shown.
+3. **Reset** - Run the hardware reset sequence (typically 8-16 clock cycles with RESET high). This ensures the DUT starts in a known state.
+
+4. **Configure stimulus** - Set up idle generators (to create realistic gaps in data) and backpressure drivers (to test DUT behavior when output is blocked).
+
+5. **Generate and send data** - Create random transactions using helper functions like ``random_transactions`` or custom generators. Send them to the DUT via the driver's ``append()`` method.
+
+6. **Model expected output** - For each sent transaction, compute what the DUT should output and add it to the ``expected_output`` list. This is typically done in a ``model()`` method.
+
+7. **Wait for completion** - Use a waiting loop to ensure all transactions are processed before checking results. Without this, the scoreboard might evaluate prematurely.
+
+8. **Check results** - Raise ``tb.scoreboard.result`` to display pass/fail. The scoreboard automatically compares each received transaction against the expected output.
+
+
+Required Files
+==============
+
+To run a cocotb test, you need these files in your ``cocotb/`` folder:
+
+**pyproject.toml** - Python dependencies
+   This file declares the Python packages required for the test (cocotb, cocotbext-ndk, etc.). The build system uses it to create a virtual environment with all dependencies.
+
+   .. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/pyproject.toml
+      :language: toml
+      :linenos:
+      :encoding: utf-8
+
+**cocotb_test_sig.fdo** - Simulator waveform signals
+   This script defines which signals will be visible in the simulator's waveform viewer. Use it to debug failing tests by inspecting signal timing.
+
+   .. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/cocotb_test_sig.fdo
+      :language: bash
+      :linenos:
+      :encoding: utf-8
+
+**Makefile** - Build and run configuration
+   The Makefile specifies the simulator to use (Modelsim, Vivado, etc.), the top-level entity, and cocotb configuration. It handles building the simulation and running the test.
+
+   .. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/Makefile
+      :language: bash
+      :linenos:
+      :encoding: utf-8
+
+.. note:: Adjust component-specific values (TOPLEVEL, generics, parameters) and relative paths in all files to match your component.
 
 
 Running the Test
 ================
 
-To successfully build and run the simulation, it's necessary to implement a couple more files. Examples of these can again be found in the ``ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/`` folder.
+1. **Create Python virtual environment:**
 
-First, it is necessary to implement a ``pyproject.toml`` with all test dependencies listed:
+   .. code-block:: bash
 
-.. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/pyproject.toml
-   :language: toml
-   :linenos:
-   :encoding: utf-8
+       make cocotb-venv
 
-Use a special ``cocotb_test_sig.fdo`` file to define the signals that will be displayed in the simulator's waveform.
+   This creates a virtual environment (typically in ``venv-<hash>/``) with all dependencies from ``pyproject.toml``.
 
-.. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/cocotb_test_sig.fdo
-   :language: bash
-   :linenos:
-   :encoding: utf-8
+2. **Activate the environment:**
 
-Finally, create a ``Makefile`` that will run the simulation:
+   .. code-block:: bash
 
-.. literalinclude:: ../../comp/mvb_tools/storage/fifox/cocotb/Makefile
-   :language: bash
-   :linenos:
-   :encoding: utf-8
+       source venv-xxx/bin/activate
 
-.. note:: Don't forget to adjust the values that are component-specific and the relative paths if needed.
+   Replace ``venv-xxx`` with the actual virtual environment folder name.
 
-You can run the simulation by creating a python virtual environment using make cocotb-venv, entering the created virtual environment, and running the ``Makefile``:
+3. **Run the test:**
 
-.. code-block:: bash
+   .. code-block:: bash
 
-    make cocotb-venv
-    source venv-xxx/bin/activate
-    make
+       make
+
+   This builds the simulation (if needed) and runs the cocotb test. Results are printed to the terminal, and waveforms are saved for debugging.
+
+   To run the test in console-only mode (without launching the GUI waveform viewer), use:
+
+   .. code-block:: bash
+
+       make SIM_FLAGS=-c
+
+   This is useful for automated testing or when running tests on remote servers.
+
+.. tip:: Use ``export COCOTB_LOG_LEVEL=DEBUG`` before running to enable debug logging for troubleshooting. See the :ref:`Debug Logging` section for more details.
+
+.. tip:: If a test fails, examine the waveform file to understand the timing and identify the issue. The signals defined in ``cocotb_test_sig.fdo`` will be visible.
+
+See Also
+--------
+
+- :doc:`cocotb_tips_and_tricks` - Tips for debug logging, random seed control, and optional signals
+- :doc:`cocotbext` - Overview of cocotbext-ndk extension with drivers, monitors, and utilities

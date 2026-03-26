@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cocotbext-ndk" href="cocotbext.html" />
+    <link rel="next" title="Cocotb tips &amp; tricks" href="cocotb_tips_and_tricks.html" />
     <link rel="prev" title="MFB specification" href="comp/mfb_tools/readme.html" /> 
 </head>
 
@@ -82,12 +82,20 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with cocotb</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#creating-a-test">Creating a Test</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#running-the-test">Running the Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#test-structure">Test Structure</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#test-flow">Test Flow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#required-files">Required Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-test">Running the Test</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#see-also">See Also</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
 <ul>
@@ -139,15 +147,48 @@
              
   <section id="getting-started-with-cocotb">
 <h1>Getting Started with cocotb<a class="headerlink" href="#getting-started-with-cocotb" title="Link to this heading"></a></h1>
-<p>In this section, you will learn how to create a basic test for a flow/storage hardware component (such as a pipe, FIFO, etc.). To get started, first create a <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> folder in the directory where the tested component is located, and put all the scripts implemented in this tutorial into it.</p>
+<p>This guide shows how to create a basic test for flow/storage hardware components (such as pipes, FIFOs, etc.) using the cocotb framework. Cocotb allows you to write testbenches in Python, which are then used to verify VHDL/Verilog designs.</p>
+<p>The examples in this guide use the MVB FIFOX component test located at <code class="docutils literal notranslate"><span class="pre">comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py</span></code> as a reference.</p>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p>For beginners, the easiest way to get started is:</p>
+<ol class="arabic simple">
+<li><p><strong>Create a ``cocotb`` folder</strong> in the directory of the component you want to test</p></li>
+<li><p><strong>Copy template files</strong> from an existing test (e.g., <code class="docutils literal notranslate"><span class="pre">comp/mvb_tools/storage/fifox/cocotb/</span></code>)</p></li>
+<li><p><strong>Modify the files</strong> for your component:
+- Update the <code class="docutils literal notranslate"><span class="pre">TOPLEVEL</span></code> in the Makefile to match your component name
+- Adjust signal names and bus parameters in the testbench
+- Update the model function to compute expected outputs for your component</p></li>
+<li><p><strong>Run the test</strong> using the Makefile</p></li>
+</ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For automatic generation of a test template use the <code class="docutils literal notranslate"><span class="pre">generate_test_template</span></code> script in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/build/scripts/cocotb</span></code>.</p>
+<p>For automatic generation of a test template, use the <code class="docutils literal notranslate"><span class="pre">generate_test_template</span></code> script in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/build/scripts/cocotb</span></code>. This creates a basic test structure that you can customize.</p>
 </div>
-<section id="creating-a-test">
-<h2>Creating a Test<a class="headerlink" href="#creating-a-test" title="Link to this heading"></a></h2>
-<p>As an example, a simple test of an MVB FIFOX component will be used.
-It can be found at <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py</span></code>.</p>
+<section id="test-structure">
+<h3>Test Structure<a class="headerlink" href="#test-structure" title="Link to this heading"></a></h3>
+<p>A cocotb test consists of two main parts:</p>
+<p><strong>1. Testbench Class</strong> - Reusable setup code that encapsulates all test infrastructure:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Drivers</strong> - Objects that write stimulus data to the DUT (Device Under Test) input interfaces</p></li>
+<li><p><strong>Monitors</strong> - Objects that read output data from the DUT and convert it to transactions</p></li>
+<li><p><strong>Scoreboard</strong> - Compares actual outputs (from monitors) against expected outputs</p></li>
+<li><p><strong>Expected outputs</strong> - List of transactions that the DUT should produce</p></li>
+<li><p><strong>Optional objects</strong> - Probes for throughput measurement, bit drivers for backpressure testing</p></li>
+<li><p><strong>Reset sequence</strong> - Hardware reset initialization</p></li>
+</ul>
+<p>The testbench class is typically reusable across multiple tests and can be copied/adapted for similar components.</p>
+</div></blockquote>
+<p><strong>2. Test Function</strong> - The actual test with:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;cocotb.test()</span></code> decorator (required) - Marks the function as a cocotb test</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">async</span></code> function definition (required) - Enables coroutine-based simulation</p></li>
+<li><p>Test logic - Stimulus generation, DUT interaction, and verification</p></li>
+</ul>
+</div></blockquote>
+<p>Example test file structure:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="c1"># SPDX-License-Identifier: BSD-3-Clause</span>
 <span class="linenos">  2</span><span class="c1"># Copyright (C) 2025 CESNET z. s. p. o.</span>
 <span class="linenos">  3</span><span class="c1"># Author(s): Ondřej Schwarz &lt;ondrejschwarz@cesnet.cz&gt;</span>
@@ -284,20 +325,26 @@ It can be found at <code class="docutils literal notranslate"><span class="pre">
 <span class="linenos">134</span>    <span class="k">raise</span> <span class="n">tb</span><span class="o">.</span><span class="n">scoreboard</span><span class="o">.</span><span class="n">result</span>
 </pre></div>
 </div>
-<p>This test can be used as a template for tests of basic <cite>flow</cite> and <cite>storage</cite> components, and can be easily adapted for most other verifications. It consists of two basic parts: the testbench class and the test itself:</p>
-<ul class="simple">
-<li><p>The testbench is the more reusable of the two and usually looks basically the same, so it can be copied and adapted. Its purpose is to initialize and encapsulate objects that drive the test. It sets up drivers, monitors, a scoreboard, expected outputs, and other optional objects, such as a bit driver for ready signals, adds probes, and so on. It also includes a simulated reset.</p></li>
-<li><p>The second part is the test part. It can consist of one test (typical for simple components) or multiple tests (more common for larger designs, such as the whole firmware of a card). Every test must have the <code class="docutils literal notranslate"><span class="pre">&#64;cocotb.test()</span></code> decorator and be <code class="docutils literal notranslate"><span class="pre">async</span></code>.</p></li>
-</ul>
-<p>A test begins with the clock starting, testbench initialization, and a reset. After the reset, a bit driver is started to test the component’s reaction to backpressure (dst_rdy). Random data is then generated, which can either be done using <code class="docutils literal notranslate"><span class="pre">random_transactions</span></code> or random data that is then inserted into transaction objects (this is the case in the test above). The generated transaction is then passed to the <code class="docutils literal notranslate"><span class="pre">model</span></code> method of the testbench, which inserts it into the <code class="docutils literal notranslate"><span class="pre">expected_output</span></code> list. The generated transaction is also inserted into the driver’s send queue using the <code class="docutils literal notranslate"><span class="pre">append</span></code> method, from where it is then written onto the bus.</p>
-<p>The data is then read from the bus by a monitor, which should pack it into a transaction of the same type as was modeled and pass it to the test’s scoreboard via a callback. The scoreboard pops the transaction from the front of the expected output queue that the monitor is connected to and compares this transaction with the transaction it received from the monitor. If they are not the same, a test failure is raised.</p>
-<p>A waiting loop is implemented to ensure that the test doesn’t report scoreboard results prematurely before all the transactions have been received. Otherwise, the scoreboard may receive a different number of transactions than it expected, which will lead to an error.</p>
-<p>After all the packets are received, <code class="docutils literal notranslate"><span class="pre">tb.scoreboard.result</span></code> is raised, and the test results are shown.</p>
 </section>
-<section id="running-the-test">
-<h2>Running the Test<a class="headerlink" href="#running-the-test" title="Link to this heading"></a></h2>
-<p>To successfully build and run the simulation, it’s necessary to implement a couple more files. Examples of these can again be found in the <code class="docutils literal notranslate"><span class="pre">ndk-fpga/comp/mvb_tools/storage/fifox/cocotb/</span></code> folder.</p>
-<p>First, it is necessary to implement a <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> with all test dependencies listed:</p>
+</section>
+<section id="test-flow">
+<h2>Test Flow<a class="headerlink" href="#test-flow" title="Link to this heading"></a></h2>
+<p>A typical test follows these steps:</p>
+<ol class="arabic simple">
+<li><p><strong>Start clock</strong> - Initialize the clock generator using <code class="docutils literal notranslate"><span class="pre">cocotb.start_soon(Clock(...).start())</span></code>. The clock drives the synchronous logic of the DUT.</p></li>
+<li><p><strong>Initialize testbench</strong> - Create the testbench object, which sets up all drivers, monitors, and the scoreboard.</p></li>
+<li><p><strong>Reset</strong> - Run the hardware reset sequence (typically 8-16 clock cycles with RESET high). This ensures the DUT starts in a known state.</p></li>
+<li><p><strong>Configure stimulus</strong> - Set up idle generators (to create realistic gaps in data) and backpressure drivers (to test DUT behavior when output is blocked).</p></li>
+<li><p><strong>Generate and send data</strong> - Create random transactions using helper functions like <code class="docutils literal notranslate"><span class="pre">random_transactions</span></code> or custom generators. Send them to the DUT via the driver’s <code class="docutils literal notranslate"><span class="pre">append()</span></code> method.</p></li>
+<li><p><strong>Model expected output</strong> - For each sent transaction, compute what the DUT should output and add it to the <code class="docutils literal notranslate"><span class="pre">expected_output</span></code> list. This is typically done in a <code class="docutils literal notranslate"><span class="pre">model()</span></code> method.</p></li>
+<li><p><strong>Wait for completion</strong> - Use a waiting loop to ensure all transactions are processed before checking results. Without this, the scoreboard might evaluate prematurely.</p></li>
+<li><p><strong>Check results</strong> - Raise <code class="docutils literal notranslate"><span class="pre">tb.scoreboard.result</span></code> to display pass/fail. The scoreboard automatically compares each received transaction against the expected output.</p></li>
+</ol>
+<section id="required-files">
+<h3>Required Files<a class="headerlink" href="#required-files" title="Link to this heading"></a></h3>
+<p>To run a cocotb test, you need these files in your <code class="docutils literal notranslate"><span class="pre">cocotb/</span></code> folder:</p>
+<dl>
+<dt><strong>pyproject.toml</strong> - Python dependencies</dt><dd><p>This file declares the Python packages required for the test (cocotb, cocotbext-ndk, etc.). The build system uses it to create a virtual environment with all dependencies.</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">[project]</span>
 <span class="linenos"> 2</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;cocotb-hash-table-simple-test&quot;</span>
 <span class="linenos"> 3</span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
@@ -311,7 +358,8 @@ It can be found at <code class="docutils literal notranslate"><span class="pre">
 <span class="linenos">11</span><span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pdm.backend&quot;</span>
 </pre></div>
 </div>
-<p>Use a special <code class="docutils literal notranslate"><span class="pre">cocotb_test_sig.fdo</span></code> file to define the signals that will be displayed in the simulator’s waveform.</p>
+</dd>
+<dt><strong>cocotb_test_sig.fdo</strong> - Simulator waveform signals</dt><dd><p>This script defines which signals will be visible in the simulator’s waveform viewer. Use it to debug failing tests by inspecting signal timing.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># coctb_test_sig.fdo : Include file with signals</span>
 <span class="linenos"> 2</span><span class="c1"># Copyright (C) 2024 CESNET z. s. p. o.</span>
 <span class="linenos"> 3</span><span class="c1"># Author(s): Jakub Cabal &lt;cabal@cesnet.cz&gt;</span>
@@ -326,7 +374,8 @@ It can be found at <code class="docutils literal notranslate"><span class="pre">
 <span class="linenos">12</span>config<span class="w"> </span>wave<span class="w"> </span>-signalnamewidth<span class="w"> </span><span class="m">1</span>
 </pre></div>
 </div>
-<p>Finally, create a <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> that will run the simulation:</p>
+</dd>
+<dt><strong>Makefile</strong> - Build and run configuration</dt><dd><p>The Makefile specifies the simulator to use (Modelsim, Vivado, etc.), the top-level entity, and cocotb configuration. It handles building the simulation and running the test.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1"># Makefile: Makefile to compile module</span>
 <span class="linenos"> 2</span><span class="c1"># Copyright (C) 2024 CESNET z. s. p. o.</span>
 <span class="linenos"> 3</span><span class="c1"># Author(s): Ondřej Schwarz &lt;Ondrej.Schwarz@cesnet.cz&gt;</span>
@@ -342,16 +391,56 @@ It can be found at <code class="docutils literal notranslate"><span class="pre">
 <span class="linenos">13</span>include<span class="w"> </span>../../../../../build/Makefile
 </pre></div>
 </div>
+</dd>
+</dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Don’t forget to adjust the values that are component-specific and the relative paths if needed.</p>
+<p>Adjust component-specific values (TOPLEVEL, generics, parameters) and relative paths in all files to match your component.</p>
 </div>
-<p>You can run the simulation by creating a python virtual environment using make cocotb-venv, entering the created virtual environment, and running the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code>:</p>
+</section>
+<section id="running-the-test">
+<h3>Running the Test<a class="headerlink" href="#running-the-test" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p><strong>Create Python virtual environment:</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>cocotb-venv
-<span class="nb">source</span><span class="w"> </span>venv-xxx/bin/activate
-make
 </pre></div>
 </div>
+<p>This creates a virtual environment (typically in <code class="docutils literal notranslate"><span class="pre">venv-&lt;hash&gt;/</span></code>) with all dependencies from <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
+</li>
+<li><p><strong>Activate the environment:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv-xxx/bin/activate
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">venv-xxx</span></code> with the actual virtual environment folder name.</p>
+</li>
+<li><p><strong>Run the test:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
+</pre></div>
+</div>
+<p>This builds the simulation (if needed) and runs the cocotb test. Results are printed to the terminal, and waveforms are saved for debugging.</p>
+<p>To run the test in console-only mode (without launching the GUI waveform viewer), use:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">SIM_FLAGS</span><span class="o">=</span>-c
+</pre></div>
+</div>
+<p>This is useful for automated testing or when running tests on remote servers.</p>
+</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">COCOTB_LOG_LEVEL=DEBUG</span></code> before running to enable debug logging for troubleshooting. See the <a class="reference internal" href="cocotb_tips_and_tricks.html#debug-logging"><span class="std std-ref">Debug Logging</span></a> section for more details.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If a test fails, examine the waveform file to understand the timing and identify the issue. The signals defined in <code class="docutils literal notranslate"><span class="pre">cocotb_test_sig.fdo</span></code> will be visible.</p>
+</div>
+</section>
+</section>
+<section id="see-also">
+<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="cocotb_tips_and_tricks.html"><span class="doc">Cocotb tips &amp; tricks</span></a> - Tips for debug logging, random seed control, and optional signals</p></li>
+<li><p><a class="reference internal" href="cocotbext.html"><span class="doc">cocotbext-ndk</span></a> - Overview of cocotbext-ndk extension with drivers, monitors, and utilities</p></li>
+</ul>
 </section>
 </section>
 
@@ -360,7 +449,7 @@ make
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="comp/mfb_tools/readme.html" class="btn btn-neutral float-left" title="MFB specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="cocotbext.html" class="btn btn-neutral float-right" title="cocotbext-ndk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cocotb_tips_and_tricks.html" class="btn btn-neutral float-right" title="Cocotb tips &amp; tricks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
