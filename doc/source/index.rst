@@ -97,8 +97,8 @@ it also provides converters:
     :maxdepth: 1
 
     basic_cocotb_test
-    cocotbext
     cocotb_tips_and_tricks
+    cocotbext
 
 .. toctree::
     :caption: GitLab CI/CD Tools
