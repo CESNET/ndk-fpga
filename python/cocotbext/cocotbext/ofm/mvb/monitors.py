@@ -130,11 +130,13 @@ class MVBMonitor(BusMonitor):
 
         for i in range(self.__items):
             if (vld & 1):
-                mvb_tr = self.__tr_type()
-                for s in self.__os:
-                    if hasattr(mvb_tr, s):
-                        setattr(mvb_tr, s, data_dict_items[s][i])
+                kwargs = {
+                    s: data_dict_items[s][i]
+                    for s in self.__os
+                    if s in data_dict_items
+                }
 
+                mvb_tr = self.__tr_type(**kwargs)
                 self._recv(mvb_tr)
             vld >>= 1
 
