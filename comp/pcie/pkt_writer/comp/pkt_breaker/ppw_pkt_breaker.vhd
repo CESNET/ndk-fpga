@@ -27,6 +27,14 @@ entity PPW_PKT_BREAKER is
         MFB_ITEM_WIDTH  : natural := 8;
 
         -- ========================================================
+        -- AXI-Stream parameters
+        -- ========================================================
+
+        -- Uses the RX_AXI input interface when true, RX_MFB when false.
+        AXI_RX_DIRECT   : boolean := true;
+        AXI_TDATA_WIDTH : natural := 512;
+
+        -- ========================================================
         -- Other parameters
         -- ========================================================
 
@@ -49,8 +57,18 @@ entity PPW_PKT_BREAKER is
         -- Expecting only (others => '0').
         RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
         RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_SRC_RDY : in  std_logic := '0';
         RX_MFB_DST_RDY : out std_logic;
+
+        -- ========================================================
+        -- RX AXI-Stream Interface
+        -- ========================================================
+
+        RX_AXI_TDATA   : in  std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
+        RX_AXI_TKEEP   : in  std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0);
+        RX_AXI_TLAST   : in  std_logic;
+        RX_AXI_TVALID  : in  std_logic := '0';
+        RX_AXI_TREADY  : out std_logic;
 
         -- ========================================================
         -- RX MVB Instructions Interface
@@ -94,11 +112,10 @@ architecture FULL of PPW_PKT_BREAKER is
     -- =====================================================================
 
     constant REGION_ITEMS  : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE;
-    constant REGION_WIDTH  : natural := REGION_ITEMS*MFB_ITEM_WIDTH;
-    constant WORD_ITEMS    : natural := MFB_REGIONS*REGION_ITEMS;
-    constant WORD_WIDTH    : natural := WORD_ITEMS*MFB_ITEM_WIDTH;
     constant SOF_POS_WIDTH : natural := max(1,log2(MFB_REGION_SIZE));
     constant EOF_POS_WIDTH : natural := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
+    constant WORD_WIDTH    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH, MFB_REGIONS*REGION_ITEMS*MFB_ITEM_WIDTH);
+    constant WORD_ITEMS    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, MFB_REGIONS*REGION_ITEMS);
 
     -- MVB instruction combined:          last + address       + length
     constant MVB_INSTR_WIDTH : natural := 1    + ADDRESS_WIDTH + log2(PKT_MTU+1);
@@ -300,36 +317,47 @@ begin
     --  Bus conversion to AXI Stream
     -- =====================================================================
 
-    mfb2axis_i : entity work.MFB2AXI
-    generic map (
-        USE_IN_PIPE    => False,
-        USE_OUT_PIPE   => True,
-        REGIONS        => MFB_REGIONS,
-        REGION_SIZE    => MFB_REGION_SIZE,
-        BLOCK_SIZE     => MFB_BLOCK_SIZE,
-        ITEM_WIDTH     => MFB_ITEM_WIDTH,
-        AXI_DATA_WIDTH => WORD_WIDTH,
-        PIPE_TYPE      => "SHREG",
-        DEVICE         => DEVICE
-    )
-    port map (
-        CLK            => CLK,
-        RST            => RESET,
+    mfb2axis_g : if not AXI_RX_DIRECT generate
+        mfb2axis_i : entity work.MFB2AXI
+        generic map (
+            USE_IN_PIPE    => False,
+            USE_OUT_PIPE   => True,
+            REGIONS        => MFB_REGIONS,
+            REGION_SIZE    => MFB_REGION_SIZE,
+            BLOCK_SIZE     => MFB_BLOCK_SIZE,
+            ITEM_WIDTH     => MFB_ITEM_WIDTH,
+            AXI_DATA_WIDTH => WORD_WIDTH,
+            PIPE_TYPE      => "SHREG",
+            DEVICE         => DEVICE
+        )
+        port map (
+            CLK            => CLK,
+            RST            => RESET,
 
-        RX_MFB_DATA    => RX_MFB_DATA,
-        RX_MFB_SOF_POS => RX_MFB_SOF_POS,
-        RX_MFB_EOF_POS => RX_MFB_EOF_POS,
-        RX_MFB_SOF     => RX_MFB_SOF,
-        RX_MFB_EOF     => RX_MFB_EOF,
-        RX_MFB_SRC_RDY => RX_MFB_SRC_RDY,
-        RX_MFB_DST_RDY => RX_MFB_DST_RDY,
+            RX_MFB_DATA    => RX_MFB_DATA,
+            RX_MFB_SOF_POS => RX_MFB_SOF_POS,
+            RX_MFB_EOF_POS => RX_MFB_EOF_POS,
+            RX_MFB_SOF     => RX_MFB_SOF,
+            RX_MFB_EOF     => RX_MFB_EOF,
+            RX_MFB_SRC_RDY => RX_MFB_SRC_RDY,
+            RX_MFB_DST_RDY => RX_MFB_DST_RDY,
 
-        TX_AXI_TDATA   => conv_tx_axi_tdata,
-        TX_AXI_TKEEP   => conv_tx_axi_tkeep,
-        TX_AXI_TLAST   => conv_tx_axi_tlast,
-        TX_AXI_TVALID  => conv_tx_axi_tvalid,
-        TX_AXI_TREADY  => conv_tx_axi_tready
-    );
+            TX_AXI_TDATA   => conv_tx_axi_tdata,
+            TX_AXI_TKEEP   => conv_tx_axi_tkeep,
+            TX_AXI_TLAST   => conv_tx_axi_tlast,
+            TX_AXI_TVALID  => conv_tx_axi_tvalid,
+            TX_AXI_TREADY  => conv_tx_axi_tready
+        );
+
+        RX_AXI_TREADY      <= '0';
+    else generate
+        conv_tx_axi_tdata  <= RX_AXI_TDATA;
+        conv_tx_axi_tkeep  <= RX_AXI_TKEEP;
+        conv_tx_axi_tlast  <= RX_AXI_TLAST;
+        conv_tx_axi_tvalid <= RX_AXI_TVALID;
+        RX_AXI_TREADY      <= conv_tx_axi_tready;
+        RX_MFB_DST_RDY     <= '0';
+    end generate;
 
     conv_tx_axi_tready <= TX_MVB_DST_RDY and br_rx_axi_tready and valid_instr_ready and not last_instr_holdup;
 

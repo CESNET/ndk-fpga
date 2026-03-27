@@ -7,6 +7,7 @@
 # Set paths
 set PKG_BASE            "$OFM_PATH/comp/base/pkg"
 set MFB_STORAGE_BASE    "$OFM_PATH/comp/mfb_tools/storage"
+set AXIS_STORAGE_BASE   "$OFM_PATH/comp/axis_tools/storage"
 
 # Packages
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
@@ -15,6 +16,7 @@ lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # Components
 lappend COMPONENTS [ list "MFB_FIFOX"           "$MFB_STORAGE_BASE/fifox"          "FULL" ]
+lappend COMPONENTS [ list "AXIS_FIFO"           "$AXIS_STORAGE_BASE/fifo"          "FULL" ]
 lappend COMPONENTS [ list "PPW_INSTR_GEN"       "$ENTITY_BASE/comp/instr_gen"      "FULL" ]
 lappend COMPONENTS [ list "PPW_PKT_BREAKER"     "$ENTITY_BASE/comp/pkt_breaker"    "FULL" ]
 lappend COMPONENTS [ list "PPW_DMA_UPHDR_GEN"   "$ENTITY_BASE/comp/dma_uphdr_gen"  "FULL" ]
