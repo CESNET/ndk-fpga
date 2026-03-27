@@ -80,8 +80,8 @@ class dma_model #(
 
     localparam USER_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
+    localparam ITEM_BYTES = ITEM_WIDTH/8;
     localparam BLOCK_SIZE_BYTES = 128;
-    localparam BLOCK_SIZE_DWS = BLOCK_SIZE_BYTES/4;
 
     //UVM PROBE - model input
     disc_probe_cbs m_probe_discard;
@@ -147,9 +147,11 @@ class dma_model #(
     endfunction
 
 
-    function dma_model_packet get_pcie_transaction(logic [64-1:0] addr, int unsigned packet_byte_size,
-                                                   logic [32-1:0] data []);
+    function dma_model_packet get_pcie_transaction(logic [64-1:0] addr, logic [ITEM_WIDTH-1:0] data []);
         dma_model_packet rq;
+        logic [ITEM_WIDTH-1:0] prefix[];
+        logic [ITEM_WIDTH-1:0] suffix[];
+        const int unsigned packet_byte_size = (data.size()+ITEM_BYTES-1)/(ITEM_BYTES);
 
         rq = dma_model_packet::type_id::create(this.get_full_name);
 
@@ -179,20 +181,29 @@ class dma_model #(
         end
 
         // FBE
+        prefix = {};
         rq.fbe = '1;
         // LBE
         case (packet_byte_size % 4)
-            0:
+            0: begin
                 rq.lbe = 4'b1111;
-            1:
+                suffix = {};
+            end
+            1: begin
                 rq.lbe = 4'b0001;
-            2:
+                suffix = {ITEM_WIDTH'('x), ITEM_WIDTH'('x), ITEM_WIDTH'('x)};
+            end
+            2: begin
                 rq.lbe = 4'b0011;
-            3:
+                suffix = {ITEM_WIDTH'('x), ITEM_WIDTH'('x)};
+            end
+            3: begin
                 rq.lbe = 4'b0111;
+                suffix = {ITEM_WIDTH'('x)};
+            end
         endcase
         rq.length = (packet_byte_size + 3)/4;
-        rq.data   = data;
+        {<<32{rq.data}} = {<<ITEM_WIDTH{prefix, data, suffix}};
 
         if (rq.length == 1) begin
             rq.fbe &= rq.lbe;
@@ -203,16 +214,16 @@ class dma_model #(
     endfunction
 
     function void get_dma_header(logic [16-1:0] frame_pointer, logic[16-1:0] frame_length, logic [24-1:0] meta,
-                                 bit            valid_bit, bit p2p_en, output logic[32-1 : 0] header[2]);
+                                 bit            valid_bit, bit p2p_en, output logic[ITEM_WIDTH-1 : 0] header[8]);
         logic [64-1:0] out_hdr;
 
         out_hdr = {meta, 6'b0, p2p_en, valid_bit, frame_pointer, frame_length};
-        header = {<<32{out_hdr}};
+        header = {<<ITEM_WIDTH{out_hdr}};
     endfunction
 
 
-    function void get_data_last(logic [32-1 : 0]       packet[], int unsigned f_start, int unsigned f_end,
-                                output logic [32-1 : 0] out[]);
+    function void get_data_last(logic [ITEM_WIDTH-1 : 0] packet[], int unsigned f_start, int unsigned f_end,
+                                output logic [ITEM_WIDTH-1 : 0] out[]);
         out = new [f_end - f_start];
         for (int unsigned it = 0; it < f_end - f_start; it++) begin
             out[it] = packet[f_start + it];
@@ -220,24 +231,18 @@ class dma_model #(
     endfunction
 
     task packet_send(logic [ITEM_WIDTH-1:0] packet[], time start_time, int unsigned channel, logic [24-1:0] meta);
-        string                     msg;
         int unsigned               rem ;
         dma_model_packet           packet_output;
         int unsigned               it;
         // Packet end is rounded up to whole dwords
-        logic [32-1 : 0]           packet_end[];
-        logic[32-1 : 0]            pcie_packet[];
-        logic[32-1 : 0]            packet_hdr[2];
+        logic [ITEM_WIDTH-1 : 0]   packet_end[];
+        logic[ITEM_WIDTH-1 : 0]            packet_hdr[8];
         int unsigned               packet_pointer_start;
         int unsigned               parts;
         logic [64-1:0]             addr;
         logic [32-1 : 0]           exper_reg;
 
         packet_pointer_start = m_data[channel].data_ptr;
-        pcie_packet = new[(packet.size()+3)/4];
-        for (it = 0; it < (packet.size()+3)/4; it++) begin
-            pcie_packet[it] = {<<8{packet[it*4 +: 4]}};
-        end
 
         parts = (packet.size() + BLOCK_SIZE_BYTES-1)/BLOCK_SIZE_BYTES;
         //SEND PARTS OF PACKETS EXCEPT LAST PART
@@ -245,8 +250,7 @@ class dma_model #(
             addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE_BYTES);
             m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
 
-            packet_output = get_pcie_transaction(addr, BLOCK_SIZE_BYTES,
-                                                 pcie_packet[it*BLOCK_SIZE_DWS +: BLOCK_SIZE_DWS]);
+            packet_output = get_pcie_transaction(addr,packet[it*BLOCK_SIZE_BYTES +: BLOCK_SIZE_BYTES]);
             packet_output.packet_num   = m_pkt_cntr_total_chan[channel];
             packet_output.data_packet  = 1;
             packet_output.channel      = channel;
@@ -260,9 +264,9 @@ class dma_model #(
         addr = m_regmodel.channel[channel].data_base.get() + (m_data[channel].data_ptr*BLOCK_SIZE_BYTES);
         m_data[channel].data_ptr = (m_data[channel].data_ptr + 1) & m_regmodel.channel[channel].data_mask.get();
 
-        get_data_last(pcie_packet, it*BLOCK_SIZE_DWS, (packet.size()+3)/4, packet_end);
-        rem = packet.size() % BLOCK_SIZE_BYTES;
-        packet_output = get_pcie_transaction(addr, rem == 0 ? 128 : rem, packet_end);
+        get_data_last(packet, it*BLOCK_SIZE_BYTES, packet.size(), packet_end);
+        //packet_output = get_pcie_transaction(addr, rem == 0 ? 128 : rem, packet_end);
+        packet_output = get_pcie_transaction(addr, packet_end);
         packet_output.packet_num   = m_pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 1;
         packet_output.channel      = channel;
@@ -284,7 +288,7 @@ class dma_model #(
         exper_reg = m_regmodel.channel[channel].exper.get();
 
         get_dma_header(packet_pointer_start, packet.size(), meta, m_data[channel].vld_bit, exper_reg[0], packet_hdr);
-        packet_output = get_pcie_transaction(addr, 8, packet_hdr);
+        packet_output = get_pcie_transaction(addr, packet_hdr);
         packet_output.packet_num   = m_pkt_cntr_total_chan[channel];
         packet_output.data_packet  = 0;
         packet_output.channel      = channel;

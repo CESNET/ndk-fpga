@@ -18,7 +18,8 @@ module dut #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, U
         mi_if.dut_slave config_mi
     );
 
-    // UVM_PROBE //
+    // -------------------
+    // GRAY BOX CONNECTION
     bind RX_DMA_CALYPTE: VHDL_DUT_U probe_inf #(
         .DATA_WIDTH(1)
     ) probe_discard (
