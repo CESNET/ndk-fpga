@@ -275,12 +275,16 @@ class dma_model #(
         packet_output.start[this.get_full_name()]  = start_time;
         m_pcie_rq_mfb_port.write(packet_output);
 
-        msg = {msg, $sformatf("\nSend last segment of packet (CH %d, no. %d):\n", channel, parts)};
-        msg = {msg, $sformatf("\tStart pointer in input: %d \n", it*BLOCK_SIZE_DWS)};
-        msg = {msg, $sformatf("\tLength of input: %d Bytes (rounded: %d DWs) \n", packet.size(), (packet.size()+3)/4)};
-        msg = {msg, $sformatf("\tLast block length: actual -, requred %d Bytes\n", packet.size() % BLOCK_SIZE_BYTES)};
-        msg = {msg, $sformatf("\tPacket data:\n%s\n", packet_output.convert_data2string())};
-        `uvm_info(this.get_full_name(), msg, UVM_HIGH);
+        if (this.get_report_verbosity_level() >= UVM_HIGH) begin
+            string msg;
+            msg = "";
+            msg = {msg, $sformatf("\nSend last segment of packet (CH %d, no. %d):\n", channel, parts)};
+            msg = {msg, $sformatf("\tStart pointer in input: %d \n", it*BLOCK_SIZE_BYTES)};
+            msg = {msg, $sformatf("\tLength of input: %d Bytes (rounded: %d DWs) \n", packet.size(), (packet.size()+3)/4)};
+            msg = {msg, $sformatf("\tLast block length: actual -, requred %d Bytes\n", packet.size() % BLOCK_SIZE_BYTES)};
+            msg = {msg, $sformatf("\tPacket data:\n%s\n", packet_output.convert_data2string())};
+            `uvm_info(this.get_full_name(), msg, UVM_NONE);
+        end
 
         //SEND DMA HEADER
         addr = m_regmodel.channel[channel].hdr_base.get() + (m_data[channel].hdr_ptr*8);
