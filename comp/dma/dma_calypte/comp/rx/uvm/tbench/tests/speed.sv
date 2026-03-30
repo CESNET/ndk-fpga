@@ -55,7 +55,10 @@ class speed #(
         `ndk_override_params (
             uvm_mfb::sequence_lib_tx,
             uvm_mfb::sequence_lib_tx_speed,
-            #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH),
+            #(
+                PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                PCIE_RQ_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH
+            ),
             "m_env.m_pcie_rq.seq_mfb",
             this
         );
@@ -63,7 +66,10 @@ class speed #(
         `ndk_override_params (
             uvm_mfb::sequence_lib_tx,
             uvm_mfb::sequence_lib_tx_speed,
-            #(PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH),
+            #(
+                PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
+                PCIE_RQ_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_RQ_META_WIDTH
+            ),
             "m_env.m_pcie_rq_upd.seq_mfb",
             this
         );

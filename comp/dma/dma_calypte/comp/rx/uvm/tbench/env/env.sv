@@ -27,7 +27,8 @@ class env #(
                                                  PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH)
     );
 
-    localparam PCIE_DEV               = (DEVICE == "STRATIX10" || DEVICE == "AGILEX") ? uvm_pcie_mfb::DEV_INTEL : uvm_pcie_mfb::DEV_XILINX;
+    localparam logic PCIE_DEV_INTEL   = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
+    localparam PCIE_DEV               = PCIE_DEV_INTEL ? uvm_pcie_mfb::DEV_INTEL : uvm_pcie_mfb::DEV_XILINX;
     localparam INPUT_META_WIDTH       = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
     localparam PTR_UPD_REQ_MVB_ITEM_W = 2*POINTER_WIDTH + 1 + SW_ADDR_WIDTH;
 

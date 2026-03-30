@@ -280,8 +280,14 @@ class dma_model #(
             msg = "";
             msg = {msg, $sformatf("\nSend last segment of packet (CH %d, no. %d):\n", channel, parts)};
             msg = {msg, $sformatf("\tStart pointer in input: %d \n", it*BLOCK_SIZE_BYTES)};
-            msg = {msg, $sformatf("\tLength of input: %d Bytes (rounded: %d DWs) \n", packet.size(), (packet.size()+3)/4)};
-            msg = {msg, $sformatf("\tLast block length: actual -, requred %d Bytes\n", packet.size() % BLOCK_SIZE_BYTES)};
+            msg = {msg, $sformatf("\tLength of input: %d Bytes (rounded: %d DWs) \n",
+                            packet.size(), (packet.size()+3)/4
+                        )
+                  };
+            msg = {msg, $sformatf("\tLast block length: actual -, requred %d Bytes\n",
+                            packet.size() % BLOCK_SIZE_BYTES
+                        )
+                  };
             msg = {msg, $sformatf("\tPacket data:\n%s\n", packet_output.convert_data2string())};
             `uvm_info(this.get_full_name(), msg, UVM_NONE);
         end
@@ -336,13 +342,13 @@ class dma_model #(
             if (pkt_drop) begin
                 m_pkt_disc_cntr[channel]++;
                 m_bytes_disc_cntr[channel] += tr_data.data.size();
-                 msg = $sformatf("\n\t\nPacket Dropped:\n RX CHANNEL: %0d\n META: %h\n PACKET SIZE: %0d\n%s",
+                 msg = $sformatf("\n\t\nPacket Dropped:\n RX CHANNEL: %0d\n META: 0x%h\n PACKET SIZE: %0d\n%s",
                                  channel, meta, packet_size, tr_data.convert2string());
                 `uvm_info(this.get_full_name(), msg,  UVM_MEDIUM);
             end else begin
                 m_pkt_sent_cntr[channel]++;
                 m_bytes_sent_cntr[channel] += tr_data.data.size();
-                msg = $sformatf("\n\t\nPacket Accepted:\n RX CHANNEL: %0d\n META: %h\n PACKET SIZE: %0d\n%s",
+                msg = $sformatf("\n\t\nPacket Accepted:\n RX CHANNEL: %0d\n META: 0x%h\n PACKET SIZE: %0d\n%s",
                                 channel, meta, packet_size, tr_data.convert2string());
                 `uvm_info(this.get_full_name(), msg,  UVM_MEDIUM);
                 packet_send(tr_data.data, tr_data.time_last(), channel, meta);
