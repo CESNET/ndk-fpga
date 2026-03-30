@@ -64,7 +64,7 @@ architecture FULL of AXIS_HEAD_TRIMMER is
     signal rx_axi_sop          : std_logic;
     signal rx_axi_nonfirst_reg : std_logic;
 
-    signal rx_axi_trim_length_reg : std_logic_vector(log2(PKT_MTU)-1 downto 0);
+    signal rx_axi_trim_length_reg : std_logic_vector(TRIM_LEN_W-1 downto 0);
     signal rx_axi_trim_enable_reg : std_logic;
 
     signal popcount          : unsigned(POPCOUNT_W-1 downto 0);
