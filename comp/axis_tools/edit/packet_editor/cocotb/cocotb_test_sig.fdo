@@ -1,0 +1,1 @@
+add_wave -group {ALL} -noupdate -hex /axis_packet_editor/*
