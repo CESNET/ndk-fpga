@@ -433,6 +433,29 @@
 <p class="admonition-title">Tip</p>
 <p>If a test fails, examine the waveform file to understand the timing and identify the issue. The signals defined in <code class="docutils literal notranslate"><span class="pre">cocotb_test_sig.fdo</span></code> will be visible.</p>
 </div>
+<p>In case of having trouble with the automation, the test can also be run manually by following the subsequent steps.</p>
+<ol class="arabic">
+<li><p><strong>Create Python virtual environment:</strong></p>
+<p>To manually create the virtual environment, issue:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python&lt;version&gt;<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>venv-xxx
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">python3.11</span></code> as this is the mainline NDK-FPGA Python version.</p>
+</li>
+<li><p><strong>Activate the environment:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>venv-xxx/bin/activate
+</pre></div>
+</div>
+</li>
+<li><p><strong>Fetch the depedencies:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span><span class="w"> </span>&lt;ndk-fpga&gt;/env.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+</li>
+<li><p><strong>Run the test:</strong></p>
+<p>Run the test as described above.</p>
+</li>
+</ol>
 </section>
 </section>
 <section id="see-also">

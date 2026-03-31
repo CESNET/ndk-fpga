@@ -146,6 +146,34 @@ Running the Test
 
 .. tip:: If a test fails, examine the waveform file to understand the timing and identify the issue. The signals defined in ``cocotb_test_sig.fdo`` will be visible.
 
+In case of having trouble with the automation, the test can also be run manually by following the subsequent steps.
+
+1. **Create Python virtual environment:**
+
+   To manually create the virtual environment, issue:
+
+   .. code-block:: bash
+
+       python<version> -m venv venv-xxx
+
+   Use ``python3.11`` as this is the mainline NDK-FPGA Python version.
+
+2. **Activate the environment:**
+
+   .. code-block:: bash
+
+       source venv-xxx/bin/activate
+
+3. **Fetch the depedencies:**
+
+   .. code-block:: bash
+
+       source <ndk-fpga>/env.sh && pip install .
+
+4. **Run the test:**
+
+   Run the test as described above.
+
 See Also
 --------
 
