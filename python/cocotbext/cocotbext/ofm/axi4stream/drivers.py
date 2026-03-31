@@ -12,6 +12,7 @@ from cocotbext.ofm.base.transaction import IdleTransaction
 from cocotbext.ofm.utils.math import ceildiv, bitmask
 from dataclasses import asdict
 from cocotb.queue import Queue
+from cocotb.binary import BinaryValue
 from typing import Any
 
 
@@ -35,7 +36,10 @@ class Axi4StreamMaster(BusDriver):
         for name in signals:
             if hasattr(self.bus, name) and name != "TREADY":
                 signal = getattr(self.bus, name)
-                signal.value = 0
+                if name == "TVALID":
+                    signal.value = 0
+                else:
+                    signal.value = BinaryValue("X" * len(signal))
 
     def _split_frame(self, transaction: Axi4StreamBaseTransaction) -> Queue:
         """
@@ -94,6 +98,7 @@ class Axi4StreamMaster(BusDriver):
             await self._clk_re
 
         self.bus.TVALID.value = 0
+        self._clear_control_signals()
 
     async def _driver_send(self, transaction: dict[str, int], sync: bool = True, **kwargs: Any):
         """
