@@ -14,7 +14,6 @@ class base #(
     int unsigned PCIE_RQ_REGION_SIZE,
     int unsigned PCIE_RQ_BLOCK_SIZE,
     int unsigned PCIE_RQ_ITEM_WIDTH,
-    int unsigned PCIE_RQ_META_WIDTH,
     int unsigned CHANNELS,
     int unsigned PKT_SIZE_MAX,
     int unsigned MI_WIDTH,
@@ -25,14 +24,16 @@ class base #(
 
     typedef uvm_component_registry #(test::base #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE,
                                                   USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE,
-                                                  PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS,
+                                                  PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, CHANNELS,
                                                   PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH),
                                      "test::base") type_id;
 
 
-    uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS,
-                      PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS,
-                      PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH) m_env;
+    protected uvm_dma_ll::env #(
+        USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS,
+        PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH, CHANNELS,
+        PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH, SW_ADDR_WIDTH
+    ) m_env;
     localparam USR_MFB_META_WIDTH = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
 
     // ------------------------------------------------------------------------
@@ -52,7 +53,7 @@ class base #(
     function void build_phase(uvm_phase phase);
         m_env = uvm_dma_ll::env #(USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, USR_MFB_ITEM_WIDTH,
                                   PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
-                                  PCIE_RQ_META_WIDTH, CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH,
+                                  CHANNELS, PKT_SIZE_MAX, MI_WIDTH, DEVICE, POINTER_WIDTH,
                                   SW_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
@@ -61,7 +62,7 @@ class base #(
     virtual task run_phase(uvm_phase phase);
         time end_time;
         virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE, PCIE_RQ_ITEM_WIDTH,
-                   PCIE_RQ_META_WIDTH, CHANNELS) m_vseq;
+                   CHANNELS) m_vseq;
         uvm_reg_data_t pkt_cnt          [CHANNELS];
         uvm_reg_data_t byte_cnt         [CHANNELS];
         uvm_reg_data_t discard_pkt_cnt  [CHANNELS];
@@ -70,7 +71,7 @@ class base #(
 
         //CREATE SEQUENCES
         m_vseq = virt_seq #(USR_MFB_ITEM_WIDTH, PCIE_RQ_REGIONS, PCIE_RQ_REGION_SIZE, PCIE_RQ_BLOCK_SIZE,
-                            PCIE_RQ_ITEM_WIDTH, PCIE_RQ_META_WIDTH, CHANNELS)::type_id::create("m_vseq");
+                            PCIE_RQ_ITEM_WIDTH, CHANNELS)::type_id::create("m_vseq");
 
         //RISE OBJECTION
         phase.raise_objection(this);

@@ -68,7 +68,7 @@ function automatic uvm_pcie::completer_header hdr_cc_get(input logic[32-1:0] dat
     byte_count, r1, at, r0, address}
     = {data[2], data[1], data[0]};
 
-    ret = uvm_pcie::completer_header::type_id::create("cc_hdr");
+    ret = uvm_pcie::completer_header::type_id::create("ret");
     ret.fmt               = 3'b010;
     ret.pcie_type         = 5'b01010;
     ret.lower_address     = address;
@@ -88,9 +88,13 @@ function automatic uvm_pcie::completer_header hdr_cc_get(input logic[32-1:0] dat
     ret.byte_count   = byte_count;
     ret.length       = dword_count;
 
-    ret.data = new[data.size()-3];
-    for (int unsigned it = 3; it < data.size(); it++) begin
-        ret.data[it-3] = data[it];
+    if (data.size() > 3) begin
+        ret.data = new[data.size()-3];
+        for (int unsigned it = 3; it < data.size(); it++) begin
+            ret.data[it-3] = data[it];
+        end
+    end else begin
+        ret.data = {};
     end
     return ret;
 endfunction
@@ -142,12 +146,12 @@ function automatic uvm_pcie::completer_header hdr_rc_get(input logic[32-1:0] dat
     logic [3-1:0] attr;
     logic [1-1:0] r3;
 
-    {r3, attr, tc, r2, completer_id, tag, requester_id, r1,
-    poisoned_completion, completion_status, dword_count, r0, request_compl, locked_read,
-    byte_count, err_code, address}
-    = {data[2], data[1], data[0]};
+    {
+        r3, attr, tc, r2, completer_id, tag, requester_id, r1, poisoned_completion, completion_status,
+        dword_count, r0, request_compl, locked_read, byte_count, err_code, address
+    } = {data[2], data[1], data[0]};
 
-    ret = uvm_pcie::completer_header::type_id::create("rc_hdr");
+    ret = uvm_pcie::completer_header::type_id::create("ret");
     ret.fmt               = 3'b010;
     ret.pcie_type         = 5'b01010;
     ret.lower_address     = address;
@@ -167,9 +171,13 @@ function automatic uvm_pcie::completer_header hdr_rc_get(input logic[32-1:0] dat
     ret.byte_count   = byte_count;
     ret.length       = dword_count;
 
-    ret.data = new[data.size()-3];
-    for (int unsigned it = 3; it < data.size(); it++) begin
-        ret.data[it-3] = data[it];
+    if (data.size() > 3) begin
+        ret.data = new[data.size()-3];
+        for (int unsigned it = 3; it < data.size(); it++) begin
+            ret.data[it-3] = data[it];
+        end
+    end else begin
+        ret.data = {};
     end
     return ret;
 endfunction
@@ -205,7 +213,11 @@ endfunction
 //////////////////////////////////////////////////////////////////////////////////////////////
 // RQ CONVERT
 //////////////////////////////////////////////////////////////////////////////////////////////
-function automatic uvm_pcie::request_header hdr_rq_get(input logic[32-1:0] data[], input logic [4-1:0] fbe, input logic [4-1:0] lbe);
+function automatic uvm_pcie::request_header hdr_rq_get(
+        input logic[32-1:0] data[],
+        input logic [4-1:0] fbe,
+        input logic [4-1:0] lbe
+    );
     uvm_pcie::request_header hdr;
     logic [2-1:0]  at;
     logic [64-1:2] address;
@@ -225,7 +237,7 @@ function automatic uvm_pcie::request_header hdr_rq_get(input logic[32-1:0] data[
     {data[3], data[2], data[1], data[0]};
 
 
-    hdr = uvm_pcie::request_header::type_id::create("cq_hdr");
+    hdr = uvm_pcie::request_header::type_id::create("hdr");
 
     hdr.address = address;
     hdr.fmt[0] = |hdr.address[64-1:32];
@@ -236,11 +248,11 @@ function automatic uvm_pcie::request_header hdr_rq_get(input logic[32-1:0] data[
         hdr.fmt[3-1:1] = 2'b01;
         hdr.pcie_type  = 5'b00000;
     end else begin
-        `uvm_fatal("ROOT", $sformatf("\n\tUnknow pcie transaction type %b", req_type));
+        `uvm_fatal("ROOT", $sformatf("\n\tUnknow pcie transaction type 0b%b", req_type));
     end
 
     assert(requester_id_en == 0) else begin
-         `uvm_fatal("ROOT", $sformatf("\n\tOnly support reqeust id enabled == 0 %b", requester_id_en));
+         `uvm_fatal("ROOT", $sformatf("\n\tOnly support reqeust id enabled == 0 0b%b", requester_id_en));
     end
     hdr.ph           = 0;
     hdr.requester_id = requester_id;
@@ -255,9 +267,13 @@ function automatic uvm_pcie::request_header hdr_rq_get(input logic[32-1:0] data[
     hdr.fbe = fbe;
     hdr.lbe = lbe;
 
-    hdr.data = new[data.size()-4];
-    for (int unsigned it = 0; it < data.size()-4; it++) begin
-        hdr.data[it] = data[it+4];
+    if (data.size() > 4) begin
+        hdr.data = new[data.size()-4];
+        for (int unsigned it = 0; it < data.size()-4; it++) begin
+            hdr.data[it] = data[it+4];
+        end
+    end else begin
+        hdr.data = {};
     end
 
     return hdr;
@@ -294,14 +310,21 @@ function automatic void hdr_rq_set(output logic[32-1:0] data[4], input uvm_pcie:
     tag = hdr.tag;
     traffic_class = hdr.traffic_class;
 
-    {data[3], data[2], data[1], data[0]} =
-    {1'b0, attr, traffic_class, requester_id_en, completer_id, tag, requester_id, ep, req_type, dword_count, address, at};
+    {data[3], data[2], data[1], data[0]} = {
+        1'b0, attr, traffic_class, requester_id_en, completer_id, tag,
+        requester_id, ep, req_type, dword_count, address, at
+    };
 endfunction
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // CQ CONVERT
 //////////////////////////////////////////////////////////////////////////////////////////////
-function automatic uvm_pcie::request_header hdr_cq_get(input logic[32-1:0] data[], input logic [4-1:0] fbe, input logic [4-1:0] lbe, uvm_pcie::bar_config bar_cfg);
+function automatic uvm_pcie::request_header hdr_cq_get(
+        input logic[32-1:0] data[],
+        input logic [4-1:0] fbe,
+        input logic [4-1:0] lbe,
+        uvm_pcie::bar_config bar_cfg
+    );
     uvm_pcie::request_header hdr;
     logic [11-1:0] dword_count;
     logic [4-1:0]  req_type;
@@ -317,11 +340,13 @@ function automatic uvm_pcie::request_header hdr_cq_get(input logic[32-1:0] data[
     logic [1-1:0]  r0; //reserved
     logic [1-1:0]  r1; //reserved
 
-    {r0, attr, traffic_class, bar_aperture, bar, target_fce, tag, requester_id, r1, req_type, dword_count, address, at} =
-    {data[3], data[2], data[1], data[0]};
+    {
+        r0, attr, traffic_class, bar_aperture, bar, target_fce, tag,
+        requester_id, r1, req_type, dword_count, address, at
+    } = {data[3], data[2], data[1], data[0]};
 
 
-    hdr = uvm_pcie::request_header::type_id::create("cq_hdr");
+    hdr = uvm_pcie::request_header::type_id::create("hdr");
 
     if (bar_cfg != null && (|address[64-1:32]) == 1'b0) begin
         hdr.address = address;
@@ -354,15 +379,26 @@ function automatic uvm_pcie::request_header hdr_cq_get(input logic[32-1:0] data[
     hdr.fbe = fbe;
     hdr.lbe = lbe;
 
-    hdr.data = new[data.size()-4];
-    for (int unsigned it = 0; it < data.size()-4; it++) begin
-        hdr.data[it] = data[it+4];
+    if (data.size() > 4) begin
+        hdr.data = new[data.size()-4];
+        for (int unsigned it = 0; it < data.size()-4; it++) begin
+            hdr.data[it] = data[it+4];
+        end
+    end else begin
+        hdr.data = {};
     end
     return hdr;
 endfunction
 
 
-function automatic void hdr_cq_set(output logic[32-1:0] data[4], input uvm_pcie::request_header hdr, logic [8-1:0]  target_fce, uvm_pcie::bar_config bar_cfg, logic [6-1:0] bar_aperture = 26);
+function automatic void hdr_cq_set(
+        output logic[32-1:0] data[4],
+        input uvm_pcie::request_header hdr,
+        logic [8-1:0]  target_fce,
+        uvm_pcie::bar_config bar_cfg,
+        logic [6-1:0] bar_aperture = 26
+    );
+
     logic [11-1:0] dword_count;
     logic [4-1:0]  req_type;
     logic [3-1:0]  attr;
@@ -388,7 +424,10 @@ function automatic void hdr_cq_set(output logic[32-1:0] data[4], input uvm_pcie:
         bar     = 0;
     end
 
-    {data[3], data[2], data[1], data[0]} =
-    {1'b0, attr, hdr.traffic_class, bar_aperture, bar, target_fce, hdr.tag, hdr.requester_id, 1'b0, req_type, dword_count, address, hdr.at};
+    {data[3], data[2], data[1], data[0]} = {
+                                                1'b0, attr, hdr.traffic_class, bar_aperture, bar, target_fce,
+                                                hdr.tag, hdr.requester_id, 1'b0, req_type, dword_count, address,
+                                                hdr.at
+                                           };
 endfunction
 

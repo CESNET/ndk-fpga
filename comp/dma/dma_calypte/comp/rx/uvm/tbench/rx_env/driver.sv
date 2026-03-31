@@ -28,8 +28,8 @@ class driver #(
 
         seq_item_port_logic_vector_array = new("seq_item_port_logic_vector_array", this);
 
-        logic_vector_array_export = new(1);
-        logic_vector_export       = new(1);
+        logic_vector_array_export = new(25);
+        logic_vector_export       = new(25);
     endfunction
 
     function int unsigned used();
@@ -49,9 +49,10 @@ class driver #(
         logic [$clog2(PKT_SIZE_MAX+1)-1:0] packet_size;
         int unsigned channel;
         logic [24-1:0] meta;
-        string         msg = "\n";
 
         forever begin
+            string         msg = "\n";
+
             // Get new sequence item to drive to interface
             seq_item_port_logic_vector_array.get_next_item(logic_vector_array_req);
 

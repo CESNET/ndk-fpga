@@ -18,7 +18,8 @@ module dut #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, U
         mi_if.dut_slave config_mi
     );
 
-    // UVM_PROBE //
+    // -------------------
+    // GRAY BOX CONNECTION
     bind RX_DMA_CALYPTE: VHDL_DUT_U probe_inf #(
         .DATA_WIDTH(1)
     ) probe_discard (
@@ -82,7 +83,7 @@ module dut #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, U
         .PERF_CNTR_EN  (PERF_CNTR_EN)
     ) VHDL_DUT_U (
         .CLK                (CLK),
-        .RESET              (RST),
+        .RESET              (RST == 1'b1 ? 1'b1 : 1'b0),
 
         .MI_ADDR            (config_mi.ADDR),
         .MI_DWR             (config_mi.DWR),
@@ -139,7 +140,7 @@ module dut #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_MFB_BLOCK_SIZE, U
         .TX_UPD_THRESHOLD  (2**8)
     ) dma_ptr_updater_i (
         .CLK                (CLK),
-        .RESET              (RST),
+        .RESET              (RST == 1'b1 ? 1'b1 : 1'b0),
 
         .RX_STOP_REQ_BUFF_BA (rx_stop_rq_buff_ba),
         .RX_STOP_REQ_P2P_EN  (rx_stop_rq_p2p_en),
