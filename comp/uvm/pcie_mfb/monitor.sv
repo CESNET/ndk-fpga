@@ -12,9 +12,12 @@ class monitor_rx #(
     meta_position_t META_TYPE,
     device_t DEVICE
 ) extends uvm_pcie::monitor;
+
     `ndk_component_param_utils(
         uvm_pcie_mfb::monitor_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE),
-        $sformatf("uvm_pcie_mfb::monitor_rx#(%0d,%0d,%0d,%s,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)
+        $sformatf("uvm_pcie_mfb::monitor_rx#(%0d,%0d,%0d,%s,%s,%s)",
+            REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE
+        )
     );
 
     uvm_tlm_analysis_fifo#(uvm_logic_vector_array::sequence_item#(32))                    port_data;
@@ -97,9 +100,12 @@ class monitor #(
     meta_position_t META_TYPE,
     device_t DEVICE
 ) extends uvm_pcie::monitor;
+
     `ndk_component_param_utils(
         uvm_pcie_mfb::monitor#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE),
-        $sformatf("uvm_pcie_mfb::monitor#(%0d,%0d,%0d,%s,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)
+        $sformatf("uvm_pcie_mfb::monitor#(%0d,%0d,%0d,%s,%s,%s)",
+            REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE
+        )
     );
 
     // LOCAL PARAMETERS
@@ -108,8 +114,12 @@ class monitor #(
     localparam MFB_META_WIDTH = (META_TYPE != MFB_META_NONE) ? META_WIDTH : 0;
 
     typedef monitor#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE) this_type;
-    uvm_analysis_imp_mfb#(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MFB_META_WIDTH), this_type) port_mfb;
-    uvm_analysis_imp_mvb#(uvm_mvb::sequence_item #(REGIONS, META_WIDTH)                                         , this_type) port_mvb;
+    uvm_analysis_imp_mfb#(
+        uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MFB_META_WIDTH), this_type
+    ) port_mfb;
+    uvm_analysis_imp_mvb#(
+        uvm_mvb::sequence_item #(REGIONS, META_WIDTH), this_type
+    ) port_mvb;
 
     // TOP LEVEL
     // protected variable
@@ -126,7 +136,12 @@ class monitor #(
         port_mvb = new("port_mvb", this);
     endfunction
 
-    function void read_data(ref logic [REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1:0] in_data, input int unsigned start, int unsigned stop);
+    function void read_data(
+            ref logic [REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1:0] in_data,
+            input int unsigned start,
+            int unsigned stop
+        );
+
         for (int unsigned it = start; it < stop; it++) begin
             mfb_data.push_back(in_data[(it+1)*ITEM_WIDTH-1 -: ITEM_WIDTH]);
         end
@@ -151,7 +166,9 @@ class monitor #(
         mvb_fifo.delete();
     endfunction
 
-    virtual function void write_mfb(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MFB_META_WIDTH) t);
+    virtual function void write_mfb(
+            uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MFB_META_WIDTH) t
+        );
 
         // No valid data are present
         if (reset_sync.has_been_reset()) begin
