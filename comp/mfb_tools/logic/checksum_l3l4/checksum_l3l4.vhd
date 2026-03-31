@@ -34,6 +34,8 @@ entity MFB_CHECKSUM_L3L4 is
         MFB_ITEM_WIDTH   : natural := 8;
         -- Maximum size of a packet (in Items).
         PKT_MTU          : natural := 2**14;
+        -- Width of packet length signal in bits (must be log2(PKT_MTU+1)).
+        PKT_LENGTH_WIDTH : natural := log2(PKT_MTU+1);
         -- Width of L3 offset signal in bits.
         L3_OFFSET_WIDTH  : natural := 10;
         -- Width of L3 length signal in bits.
@@ -95,6 +97,8 @@ entity MFB_CHECKSUM_L3L4 is
         RX_MVB_IP_DST_ADDR  : in  std_logic_vector(MFB_REGIONS*128-1 downto 0);
         -- Indicates if the packet is IPv6.
         RX_MVB_IP_VER6      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- Packet length (in Items) for each packet.
+        RX_MVB_PKT_LENGTH   : in  std_logic_vector(MFB_REGIONS*PKT_LENGTH_WIDTH-1 downto 0);
 
         -- MVB valid and ready signals.
         RX_MVB_VLD          : in  std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -135,9 +139,10 @@ architecture FULL of MFB_CHECKSUM_L3L4 is
     -- Total width of metadata inserted into MFB
     -- L3: 16 (CSUM_ORIG) + 1 (CSUM_EN) + 7 (OFFSET) + 12 (LENGTH) = 36 bits
     -- L4: 16 (CSUM_ORIG) + 1 (CSUM_EN) + 8 (OFFSET) + 12 (LENGTH) + 8 (PROTOCOL) + 128 (SRC_ADDR) + 128 (DST_ADDR) + 1 (IP_VER6) = 302 bits
+    -- PKT: PKT_LENGTH_WIDTH bits
     constant L3_META_WIDTH : natural := 16 + 1 + L3_OFFSET_WIDTH + L3_LENGTH_WIDTH;
     constant L4_META_WIDTH : natural := 16 + 1 + L4_OFFSET_WIDTH + L4_LENGTH_WIDTH + 8 + 128 + 128 + 1;
-    constant META_WIDTH    : natural := L3_META_WIDTH + L4_META_WIDTH;
+    constant META_WIDTH    : natural := L3_META_WIDTH + L4_META_WIDTH + PKT_LENGTH_WIDTH;
 
     -- -------------------------------------------------------------------------
     -- Signals for METADATA_INSERTOR
@@ -187,6 +192,8 @@ architecture FULL of MFB_CHECKSUM_L3L4 is
     signal l3_length_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(L3_LENGTH_WIDTH-1 downto 0);
     signal l3_offset_fix_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(L3_OFFSET_WIDTH-1 downto 0);
     signal l3_length_fix_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(L3_LENGTH_WIDTH-1 downto 0);
+    signal l3_pkt_length_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(PKT_LENGTH_WIDTH-1 downto 0);
+    signal l3_offset_overflow  : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal l3_mvb_csum         : std_logic_vector(MFB_REGIONS*16-1 downto 0);
     signal l3_mvb_csum_ok      : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -205,6 +212,8 @@ architecture FULL of MFB_CHECKSUM_L3L4 is
     signal l4_length_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(L4_LENGTH_WIDTH-1 downto 0);
     signal l4_offset_fix_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(L4_OFFSET_WIDTH-1 downto 0);
     signal l4_length_fix_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(L4_LENGTH_WIDTH-1 downto 0);
+    signal l4_pkt_length_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(PKT_LENGTH_WIDTH-1 downto 0);
+    signal l4_offset_overflow  : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal l4_protocol_arr     : slv_array_t(MFB_REGIONS-1 downto 0)(8-1 downto 0);
     signal l4_ip_src_addr_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(128-1 downto 0);
     signal l4_ip_dst_addr_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(128-1 downto 0);
@@ -234,6 +243,7 @@ architecture FULL of MFB_CHECKSUM_L3L4 is
     signal rx_mvb_ip_src_addr_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(128-1 downto 0);
     signal rx_mvb_ip_dst_addr_arr  : slv_array_t(MFB_REGIONS-1 downto 0)(128-1 downto 0);
     signal rx_mvb_ip_ver6_arr      : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal rx_mvb_pkt_length_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(PKT_LENGTH_WIDTH-1 downto 0);
 
     -- -------------------------------------------------------------------------
     -- Arrays for metadata assembly/extraction
@@ -275,6 +285,7 @@ begin
     rx_mvb_ip_src_addr_arr  <= slv_array_deser(RX_MVB_IP_SRC_ADDR, MFB_REGIONS);
     rx_mvb_ip_dst_addr_arr  <= slv_array_deser(RX_MVB_IP_DST_ADDR, MFB_REGIONS);
     rx_mvb_ip_ver6_arr      <= RX_MVB_IP_VER6;
+    rx_mvb_pkt_length_arr   <= slv_array_deser(RX_MVB_PKT_LENGTH, MFB_REGIONS);
 
     -- =========================================================================
     -- Assemble MVB metadata for METADATA_INSERTOR
@@ -285,6 +296,7 @@ begin
         -- L3 metadata: CSUM_ORIG(16) & CSUM_EN(1) & OFFSET(L3_OFFSET_WIDTH) & LENGTH(L3_LENGTH_WIDTH)
         -- L4 metadata: CSUM_ORIG(16) & CSUM_EN(1) & OFFSET(L4_OFFSET_WIDTH) & LENGTH(L4_LENGTH_WIDTH) &
         --              PROTOCOL(8) & SRC_ADDR(128) & DST_ADDR(128) & IP_VER6(1)
+        -- PKT metadata: PKT_LENGTH(PKT_LENGTH_WIDTH)
         meta_arr(i) <= rx_mvb_l3_csum_orig_arr(i) &
                        rx_mvb_l3_csum_en_arr(i) &
                        rx_mvb_l3_offset_arr(i) &
@@ -296,7 +308,8 @@ begin
                        rx_mvb_l4_protocol_arr(i) &
                        rx_mvb_ip_src_addr_arr(i) &
                        rx_mvb_ip_dst_addr_arr(i) &
-                       rx_mvb_ip_ver6_arr(i);
+                       rx_mvb_ip_ver6_arr(i) &
+                       rx_mvb_pkt_length_arr(i);
     end generate;
 
     mi_mvb_data <= slv_array_ser(meta_arr);
@@ -404,23 +417,33 @@ begin
         l3_csum_orig_arr(i) <= mi_mfb_meta_arr(i)(META_WIDTH-1 downto META_WIDTH-16);
         l3_csum_en_arr(i)   <= mi_mfb_meta_arr(i)(META_WIDTH-17);
         l3_offset_arr(i)    <= mi_mfb_meta_arr(i)(META_WIDTH-18 downto META_WIDTH-18-L3_OFFSET_WIDTH+1);
-        l3_length_arr(i)    <= mi_mfb_meta_arr(i)(L4_META_WIDTH+L3_LENGTH_WIDTH-1 downto L4_META_WIDTH);
+        l3_length_arr(i)    <= mi_mfb_meta_arr(i)(L4_META_WIDTH+L3_LENGTH_WIDTH+PKT_LENGTH_WIDTH-1 downto L4_META_WIDTH+PKT_LENGTH_WIDTH);
 
-        -- L4 metadata is at the end (lowest bits): CSUM_ORIG(16) & CSUM_EN(1) & OFFSET & LENGTH & PROTOCOL(8) & SRC_ADDR(128) & DST_ADDR(128) & IP_VER6(1)
-        l4_csum_orig_arr(i)   <= mi_mfb_meta_arr(i)(L4_META_WIDTH-1 downto L4_META_WIDTH-16);
-        l4_csum_en_arr(i)     <= mi_mfb_meta_arr(i)(L4_META_WIDTH-17);
-        l4_offset_arr(i)      <= mi_mfb_meta_arr(i)(L4_META_WIDTH-18 downto L4_META_WIDTH-18-L4_OFFSET_WIDTH+1);
-        l4_length_arr(i)      <= mi_mfb_meta_arr(i)(L4_META_WIDTH-18-L4_OFFSET_WIDTH downto 128+128+8+1);
-        l4_protocol_arr(i)    <= mi_mfb_meta_arr(i)(128+128+8 downto 128+128+1);
-        l4_ip_src_addr_arr(i) <= mi_mfb_meta_arr(i)(128+128 downto 128+1);
-        l4_ip_dst_addr_arr(i) <= mi_mfb_meta_arr(i)(128 downto 1);
-        l4_ip_ver6_arr(i)     <= mi_mfb_meta_arr(i)(0);
+        -- L4 metadata is in the middle: CSUM_ORIG(16) & CSUM_EN(1) & OFFSET & LENGTH & PROTOCOL(8) & SRC_ADDR(128) & DST_ADDR(128) & IP_VER6(1)
+        l4_csum_orig_arr(i)   <= mi_mfb_meta_arr(i)(L4_META_WIDTH+PKT_LENGTH_WIDTH-1 downto L4_META_WIDTH+PKT_LENGTH_WIDTH-16);
+        l4_csum_en_arr(i)     <= mi_mfb_meta_arr(i)(L4_META_WIDTH+PKT_LENGTH_WIDTH-17);
+        l4_offset_arr(i)      <= mi_mfb_meta_arr(i)(L4_META_WIDTH+PKT_LENGTH_WIDTH-18 downto L4_META_WIDTH+PKT_LENGTH_WIDTH-18-L4_OFFSET_WIDTH+1);
+        l4_length_arr(i)      <= mi_mfb_meta_arr(i)(L4_META_WIDTH+PKT_LENGTH_WIDTH-18-L4_OFFSET_WIDTH downto 128+128+8+1+PKT_LENGTH_WIDTH);
+        l4_protocol_arr(i)    <= mi_mfb_meta_arr(i)(128+128+8+PKT_LENGTH_WIDTH downto 128+128+1+PKT_LENGTH_WIDTH);
+        l4_ip_src_addr_arr(i) <= mi_mfb_meta_arr(i)(128+128+PKT_LENGTH_WIDTH downto 128+1+PKT_LENGTH_WIDTH);
+        l4_ip_dst_addr_arr(i) <= mi_mfb_meta_arr(i)(128+PKT_LENGTH_WIDTH downto 1+PKT_LENGTH_WIDTH);
+        l4_ip_ver6_arr(i)     <= mi_mfb_meta_arr(i)(PKT_LENGTH_WIDTH);
 
+        -- Packet length is at the lowest bits
+        l3_pkt_length_arr(i)  <= mi_mfb_meta_arr(i)(PKT_LENGTH_WIDTH-1 downto 0);
+        l4_pkt_length_arr(i)  <= mi_mfb_meta_arr(i)(PKT_LENGTH_WIDTH-1 downto 0);
 
-        l3_offset_fix_arr(i) <= l3_offset_arr(i) when l3_csum_en_arr(i) = '1' else (others => '0');
-        l3_length_fix_arr(i) <= l3_length_arr(i) when l3_csum_en_arr(i) = '1' else std_logic_vector(to_unsigned(20, L3_LENGTH_WIDTH));
-        l4_offset_fix_arr(i) <= l4_offset_arr(i) when l4_csum_en_arr(i) = '1' else (others => '0');
-        l4_length_fix_arr(i) <= l4_length_arr(i) when l4_csum_en_arr(i) = '1' else std_logic_vector(to_unsigned(20, L4_LENGTH_WIDTH));
+        -- Offset+length overflow detection for L3
+        l3_offset_overflow(i) <= '1' when (resize(unsigned(l3_offset_arr(i)), PKT_LENGTH_WIDTH) + resize(unsigned(l3_length_arr(i)), PKT_LENGTH_WIDTH) > unsigned(l3_pkt_length_arr(i))) else '0';
+
+        -- Offset+length overflow detection for L4
+        l4_offset_overflow(i) <= '1' when (resize(unsigned(l4_offset_arr(i)), PKT_LENGTH_WIDTH) + resize(unsigned(l4_length_arr(i)), PKT_LENGTH_WIDTH) > unsigned(l4_pkt_length_arr(i))) else '0';
+
+        -- Fix offset and length: disable checksum if EN='0' or offset+length > packet_length
+        l3_offset_fix_arr(i) <= l3_offset_arr(i) when (l3_csum_en_arr(i) = '1' and l3_offset_overflow(i) = '0') else (others => '0');
+        l3_length_fix_arr(i) <= l3_length_arr(i) when (l3_csum_en_arr(i) = '1' and l3_offset_overflow(i) = '0') else std_logic_vector(to_unsigned(1, L3_LENGTH_WIDTH));
+        l4_offset_fix_arr(i) <= l4_offset_arr(i) when (l4_csum_en_arr(i) = '1' and l4_offset_overflow(i) = '0') else (others => '0');
+        l4_length_fix_arr(i) <= l4_length_arr(i) when (l4_csum_en_arr(i) = '1' and l4_offset_overflow(i) = '0') else std_logic_vector(to_unsigned(1, L4_LENGTH_WIDTH));
     end generate;
 
     -- =========================================================================

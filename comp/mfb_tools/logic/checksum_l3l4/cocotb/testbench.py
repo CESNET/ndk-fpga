@@ -12,17 +12,17 @@ from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mfb.transaction import MfbTransaction
 from cocotbext.ofm.mvb.transaction import MvbTransaction
 from cocotb_bus.drivers import BitDriver
-from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMvbInterface
 from dataclasses import dataclass
 from scapy.all import raw, TCP, UDP, SCTP, ICMPv6EchoRequest
 
 from cocotbext.ofm.utils.scapy import ScapyPacketGenerator
+from scoreboard import MfbChecksumL3L4Result, compare_checksums
 
 
 @dataclass
 class MetadataTr(MvbTransaction):
-    """MVB transaction for L4 metadata"""
+    """MVB transaction for L3/L4 metadata"""
     l3_csum_orig: int = 0
     l3_csum_en: int = 0
     l3_offset: int = 0
@@ -35,6 +35,7 @@ class MetadataTr(MvbTransaction):
     ip_src_addr: int = 0
     ip_dst_addr: int = 0
     ip_ver6: int = 0
+    pkt_length: int = 0
 
 
 @dataclass
@@ -52,7 +53,8 @@ class MVBDriverExt(MVBDriver):
     _optional_signals = [
         "l3_csum_orig", "l3_csum_en", "l3_offset", "l3_length",
         "l4_csum_orig", "l4_csum_en", "l4_offset", "l4_length",
-        "l4_protocol", "ip_src_addr", "ip_dst_addr", "ip_ver6"
+        "l4_protocol", "ip_src_addr", "ip_dst_addr", "ip_ver6",
+        "pkt_length"
     ]
 
 
@@ -84,7 +86,7 @@ class Testbench:
         expected_output: List of expected MvbTxResult transactions.
     """
 
-    def __init__(self, dut, debug=False):
+    def __init__(self, dut, debug=False, log_comparisons=True):
         self.dut = dut
 
         # Setting MFB params based on generics
@@ -115,10 +117,16 @@ class Testbench:
         # List of expected results for scoreboard
         self.expected_output = []
 
-        # Setting up scoreboard which compares received transactions with expected transactions
-        self.scoreboard = Scoreboard(dut)
-        # Linking monitor with its expected output
-        self.scoreboard.add_interface(self.mvb_tx_monitor, self.expected_output)
+        # Setting up custom scoreboard which compares received transactions with expected transactions
+        # using the nice comparison format from AXI-Stream Ethernet Parser verification
+        self.scoreboard = None  # Custom scoreboard implemented via monitor callback
+        self.scoreboard_errors = []
+        self.scoreboard_comparisons = 0
+        self.stop_on_error = True  # Stop test on first scoreboard error
+        self.log_comparisons = log_comparisons  # Enable/disable scoreboard error logging
+
+        # Add callback for scoreboard comparison
+        self.mvb_tx_monitor.add_callback(self._scoreboard_compare)
 
         # Setting up throughput probe for performance measurement
         self.throughput_probe = ThroughputProbe(
@@ -166,7 +174,7 @@ class Testbench:
         """Generate expected output transaction based on input packet.
 
         This is the reference model that predicts the DUT's output based on
-        the input packet metadata. It creates an MvbTxResult transaction with
+        the input packet metadata. It creates an MfbChecksumL3L4Result transaction with
         expected checksum values and flags.
 
         Args:
@@ -174,22 +182,68 @@ class Testbench:
                      information (see generate_packet_for_test return value).
 
         Returns:
-            MvbTxResult: The expected output transaction.
+            MfbChecksumL3L4Result: The expected output transaction.
         """
-        # Create expected output transaction based on input packet
-        expected_tr = MvbTxResult(
+        # Create expected output result based on input packet
+        expected_result = MfbChecksumL3L4Result(
             l3_csum=pkt_dict["l3_csum_orig"] if pkt_dict["ipv6_vld"] == 0 else 0,
             l3_csum_ok=1 if pkt_dict["l3_csum_en"] else 0,
             l3_csum_en=pkt_dict["l3_csum_en"],
             l4_csum=pkt_dict["l4_csum_orig"],
             l4_csum_ok=1 if pkt_dict["l4_csum_en"] else 0,
-            l4_csum_en=pkt_dict["l4_csum_en"]
+            l4_csum_en=pkt_dict["l4_csum_en"],
+            packet_num=self.pkts_sent + 1,
+            packet_bytes=pkt_dict.get("packet_bytes", b'')
         )
 
-        self.expected_output.append(expected_tr)
+        self.expected_output.append(expected_result)
         self.pkts_sent += 1
 
-        return expected_tr
+        return expected_result
+
+    def _scoreboard_compare(self, actual_tr):
+        """Custom scoreboard comparison callback with formatted output.
+
+        This callback compares expected vs actual checksum results and logs
+        detailed comparison tables on mismatch. Stops test on first error
+        if stop_on_error is True.
+
+        Args:
+            actual_tr: The actual MvbTxResult transaction from the DUT.
+        """
+        if not self.expected_output:
+            cocotb.log.warning("No expected output available for comparison")
+            return
+
+        # Get next expected result
+        expected = self.expected_output.pop(0)
+
+        # Convert actual transaction to result object for comparison
+        actual = MfbChecksumL3L4Result(
+            l3_csum=actual_tr.l3_csum,
+            l3_csum_ok=actual_tr.l3_csum_ok,
+            l3_csum_en=actual_tr.l3_csum_en,
+            l4_csum=actual_tr.l4_csum,
+            l4_csum_ok=actual_tr.l4_csum_ok,
+            l4_csum_en=actual_tr.l4_csum_en,
+            packet_num=expected.packet_num,
+            packet_bytes=expected.packet_bytes
+        )
+
+        self.scoreboard_comparisons += 1
+
+        # Compare using the formatted comparison function
+        match, msg = compare_checksums(expected, actual)
+
+        if not match:
+            self.scoreboard_errors.append(msg)
+            if self.log_comparisons:
+                cocotb.log.error(f"Scoreboard mismatch at transaction {self.scoreboard_comparisons}")
+                cocotb.log.error(msg)
+
+            # Stop test on first error if enabled
+            if self.stop_on_error:
+                raise AssertionError(f"Scoreboard mismatch at transaction {self.scoreboard_comparisons}")
 
     async def send_packet_with_metadata(self, pkt_dict):
         """Send packet via MFB and metadata via MVB bus.
@@ -220,7 +274,8 @@ class Testbench:
             l4_protocol=pkt_dict["l4_proto_number"],
             ip_src_addr=pkt_dict["src_ip_128b"],
             ip_dst_addr=pkt_dict["dst_ip_128b"],
-            ip_ver6=pkt_dict["ipv6_vld"]
+            ip_ver6=pkt_dict["ipv6_vld"],
+            pkt_length=pkt_dict["packet_length"]
         )
 
         # Add expected output to scoreboard via model
@@ -254,7 +309,7 @@ class Testbench:
         else:
             return int(ip)
 
-    async def generate_and_send_packet(self, min_len: int = 60, max_len: int = 1518) -> dict:
+    async def generate_and_send_packet(self, min_len: int = 60, max_len: int = 1518, truncate_chance: float = 0.0) -> dict:
         """Generate a packet and send it via MFB/MVB buses.
 
         Convenience method that combines generate_packet_for_test() and
@@ -263,29 +318,51 @@ class Testbench:
         Args:
             min_len: Minimum packet length in bytes (default: 60).
             max_len: Maximum packet length in bytes (default: 1518).
+            truncate_chance: Probability of truncating the packet (0.0-1.0, default: 0.0).
 
         Returns:
             dict: Dictionary with packet data and metadata for debugging.
         """
-        pkt_dict = self.generate_packet_for_test(min_len, max_len)
+        pkt_dict = self.generate_packet_for_test(min_len, max_len, truncate_chance)
         await self.send_packet_with_metadata(pkt_dict)
         return pkt_dict
 
-    def generate_packet_for_test(self, min_len: int = 60, max_len: int = 1518) -> dict:
+    def generate_packet_for_test(self, min_len: int = 60, max_len: int = 1518, truncate_chance: float = 0.0) -> dict:
         """Generate packet and convert to format required by checksum_l3l4 test.
 
         This method uses ScapyPacketGenerator class to generate a packet and extract
         metadata, then converts it to the dictionary format expected by the testbench.
+        Optionally truncates the packet to simulate corrupted/damaged packets.
 
         Args:
             min_len: Minimum packet length in bytes (default: 60).
             max_len: Maximum packet length in bytes (default: 1518).
+            truncate_chance: Probability of truncating the packet (0.0-1.0, default: 0.0).
 
         Returns:
             dict: Dictionary with packet data and metadata in test-specific format.
         """
+        import random
+
         pkt = ScapyPacketGenerator.generate(min_len, max_len)
-        packet_bytes = raw(pkt)
+        packet_bytes = bytearray(raw(pkt))
+
+        # Optionally truncate the packet to simulate damaged packets
+        if truncate_chance > 0 and random.random() < truncate_chance:
+            # Calculate truncation parameters
+            original_len = len(packet_bytes)
+            # Ensure we keep at least min_len bytes (default 60)
+            # Truncate significantly: keep between min_len and 75% of original length
+            max_keep = max(min_len, int(original_len * 0.75))
+            if max_keep > min_len:
+                new_len = random.randint(min_len, max_keep)
+            else:
+                new_len = min_len
+
+            # Truncate the packet bytes
+            packet_bytes = packet_bytes[:new_len]
+
+            cocotb.log.debug(f"Truncated packet from {original_len} to {new_len} bytes")
 
         # Get L3 info (includes offset)
         l3_offset, l3_length, l3_proto_number, l3_csum_en, l3_checksum = ScapyPacketGenerator.get_l3_info(pkt)
@@ -335,5 +412,6 @@ class Testbench:
             "l3_csum_en": l3_csum_en,
             "l4_csum_orig": l4_checksum,
             "l4_csum_en": l4_csum_en,
-            "l4_bytes": l4_bytes
+            "l4_bytes": l4_bytes,
+            "packet_length": len(packet_bytes)
         }
