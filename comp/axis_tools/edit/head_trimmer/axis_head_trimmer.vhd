@@ -79,8 +79,6 @@ architecture FULL of AXIS_HEAD_TRIMMER is
     signal shreg_popcount    : u_array_t(SHREG_STAGES downto 0)(POPCOUNT_W-1 downto 0);
     signal shreg_byte_cnt    : u_array_t(SHREG_STAGES downto 0)(TRIM_LEN_W-1 downto 0);
     signal shreg_tdata       : slv_array_t(SHREG_STAGES downto 0)(AXI_TDATA_WIDTH-1 downto 0);
-    signal shreg_tkeep       : slv_array_t(SHREG_STAGES downto 0)(WORD_BYTES-1 downto 0);
-    signal shreg_tfirst      : std_logic_vector(SHREG_STAGES downto 0);
     signal shreg_tlast       : std_logic_vector(SHREG_STAGES downto 0);
     signal shreg_tvalid      : std_logic_vector(SHREG_STAGES downto 0);
     signal shreg_trim_len    : u_array_t(SHREG_STAGES downto 0)(TRIM_LEN_W-1 downto 0);
@@ -91,18 +89,11 @@ architecture FULL of AXIS_HEAD_TRIMMER is
     signal shreg_ok          : std_logic;
     signal shreg_tvalid_fix  : std_logic;
 
-    signal buf_tdata       : std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
-    signal buf_tkeep       : std_logic_vector(WORD_BYTES-1 downto 0);
-    signal buf_tfirst      : std_logic;
     signal buf_tlast       : std_logic;
     signal buf_tvalid      : std_logic;
     signal buf_tready      : std_logic;
-    signal buf_trim_len    : unsigned(TRIM_LEN_W-1 downto 0);
-    signal buf_trim_en     : std_logic;
     signal buf_trim_active : std_logic;
     signal buf_trim_last   : std_logic;
-    signal buf_popcount    : unsigned(POPCOUNT_W-1 downto 0);
-    signal buf_byte_cnt    : unsigned(TRIM_LEN_W-1 downto 0);
     signal buf_2word_bytes : unsigned(log2(2*WORD_BYTES+1)-1 downto 0);
     signal buf_next_bytes  : unsigned(log2(2*WORD_BYTES+1)-1 downto 0);
     signal buf_new_keep    : std_logic_vector(WORD_BYTES-1 downto 0);
@@ -191,9 +182,7 @@ begin
     trim_last   <= shreg_trim_en(0) and trim_pos_ok and not trim_pos_next_ok;
 
     shreg_tdata(0)    <= RX_AXI_TDATA;
-    shreg_tkeep(0)    <= RX_AXI_TKEEP;
-    shreg_tfirst(0)   <= rx_axi_sop;
-    shreg_tlast(0)    <= RX_AXI_TLAST;
+    shreg_tlast(0)    <= RX_AXI_TLAST and RX_AXI_TVALID;
     shreg_tvalid(0)   <= RX_AXI_TVALID;
     shreg_byte_cnt(0) <= byte_cnt_reg;
     shreg_popcount(0) <= popcount;
@@ -209,8 +198,6 @@ begin
             if rising_edge(CLK) then
                 if (shreg_ready(i) = '1') then
                     shreg_tdata(i+1)       <= shreg_tdata(i);
-                    shreg_tkeep(i+1)       <= shreg_tkeep(i);
-                    shreg_tfirst(i+1)      <= shreg_tfirst(i);
                     shreg_tlast(i+1)       <= shreg_tlast(i);
                     shreg_tvalid(i+1)      <= shreg_tvalid(i);
                     shreg_trim_len(i+1)    <= shreg_trim_len(i);
@@ -236,19 +223,12 @@ begin
 
     -- shreg_ok indicates valid data can be presented at output
     shreg_ok <= (shreg_tvalid(SHREG_STAGES) and shreg_tvalid(SHREG_STAGES-1)) or
-                (shreg_tvalid(SHREG_STAGES) and shreg_tlast(SHREG_STAGES-1));
+                (shreg_tvalid(SHREG_STAGES) and shreg_tlast(SHREG_STAGES));
 
-    buf_tdata       <= shreg_tdata(SHREG_STAGES);
-    buf_tkeep       <= shreg_tkeep(SHREG_STAGES);
-    buf_tfirst      <= shreg_tfirst(SHREG_STAGES);
     buf_tlast       <= shreg_tlast(SHREG_STAGES);
     buf_tvalid      <= shreg_tvalid_fix;
-    buf_trim_len    <= shreg_trim_len(SHREG_STAGES);
-    buf_trim_en     <= shreg_trim_en(SHREG_STAGES);
     buf_trim_active <= shreg_trim_active(SHREG_STAGES);
     buf_trim_last   <= shreg_trim_last(SHREG_STAGES);
-    buf_byte_cnt    <= shreg_byte_cnt(SHREG_STAGES);
-    buf_popcount    <= shreg_popcount(SHREG_STAGES);
 
     buf_tready <= TX_AXI_TREADY;
 
