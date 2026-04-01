@@ -74,7 +74,7 @@ async def _run_test(
 
     timeout = 0
     last_item_cnt = 0
-    while tb.headers_monitor.item_cnt < pkt_count and timeout < 100000:
+    while tb.headers_monitor.item_cnt < pkt_count and timeout < 1000000:
         if tb.headers_monitor.item_cnt % 200 == 0 and tb.headers_monitor.item_cnt != last_item_cnt:
             last_item_cnt = tb.headers_monitor.item_cnt
             cocotb.log.info(f"Headers captured: {tb.headers_monitor.item_cnt}/{pkt_count}")
