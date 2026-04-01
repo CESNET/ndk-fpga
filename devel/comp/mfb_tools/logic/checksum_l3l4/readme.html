@@ -219,27 +219,32 @@ both L3 and L4 checksum results.</p>
 <td><p>2**14</p></td>
 <td><p>Maximum size of a packet (in Items).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_checksum_l3l4-l3_offset_width"><td><p>L3_OFFSET_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_checksum_l3l4-pkt_length_width"><td><p>PKT_LENGTH_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>log2(PKT_MTU+1)</p></td>
+<td><p>Width of packet length signal in bits (must be log2(PKT_MTU+1)).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_checksum_l3l4-l3_offset_width"><td><p>L3_OFFSET_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>10</p></td>
 <td><p>Width of L3 offset signal in bits.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_checksum_l3l4-l3_length_width"><td><p>L3_LENGTH_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_checksum_l3l4-l3_length_width"><td><p>L3_LENGTH_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>13</p></td>
 <td><p>Width of L3 length signal in bits.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_checksum_l3l4-l4_offset_width"><td><p>L4_OFFSET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_checksum_l3l4-l4_offset_width"><td><p>L4_OFFSET_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>10</p></td>
 <td><p>Width of L4 offset signal in bits.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_checksum_l3l4-l4_length_width"><td><p>L4_LENGTH_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_checksum_l3l4-l4_length_width"><td><p>L4_LENGTH_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>13</p></td>
 <td><p>Width of L4 length signal in bits.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_checksum_l3l4-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_checksum_l3l4-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td><p>FPGA device name.
@@ -376,67 +381,72 @@ Options: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
 <td><p>in</p></td>
 <td><p>Indicates if the packet is IPv6.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_pkt_length"><td><p>RX_MVB_PKT_LENGTH</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*PKT_LENGTH_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Packet length (in Items) for each packet.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>MVB valid and ready signals.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>TX MVB interface (checksum results)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l3_csum"><td><p>TX_MVB_L3_CSUM</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l3_csum"><td><p>TX_MVB_L3_CSUM</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*16-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>L3 checksum calculated value.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l3_csum_ok"><td><p>TX_MVB_L3_CSUM_OK</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l3_csum_ok"><td><p>TX_MVB_L3_CSUM_OK</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>L3 checksum comparison result (OK).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l3_csum_en"><td><p>TX_MVB_L3_CSUM_EN</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l3_csum_en"><td><p>TX_MVB_L3_CSUM_EN</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>L3 checksum calculation permission (EN).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum"><td><p>TX_MVB_L4_CSUM</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum"><td><p>TX_MVB_L4_CSUM</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*16-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>L4 checksum calculated value.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum_ok"><td><p>TX_MVB_L4_CSUM_OK</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum_ok"><td><p>TX_MVB_L4_CSUM_OK</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>L4 checksum comparison result (OK).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum_en"><td><p>TX_MVB_L4_CSUM_EN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum_en"><td><p>TX_MVB_L4_CSUM_EN</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>L4 checksum calculation permission (EN).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>MVB valid and ready signals.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
