@@ -15,5 +15,7 @@ add_wave -group {IPV4} -noupdate -hex /axis_eth_parser/gen_stages(2)/stage_i/*
 add_wave -group {IPV4_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(2)/stage_i/sniffer_i/*
 add_wave -group {TCP} -noupdate -hex /axis_eth_parser/gen_stages(3)/stage_i/*
 add_wave -group {TCP_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(3)/stage_i/sniffer_i/*
+add_wave -group {UDP} -noupdate -hex /axis_eth_parser/gen_stages(4)/stage_i/*
+add_wave -group {UDP_SNIF} -noupdate -hex /axis_eth_parser/gen_stages(4)/stage_i/sniffer_i/*
 
 config wave -signalnamewidth 1

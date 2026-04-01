@@ -77,7 +77,8 @@ class HeadersMonitor(BusMonitor):
                     f"Captured headers #{self.item_cnt}: "
                     f"eth_vld={headers.eth_vld}, "
                     f"ipv4_vld={headers.ipv4_vld}, "
-                    f"tcp_vld={headers.tcp_vld}"
+                    f"tcp_vld={headers.tcp_vld}, "
+                    f"udp_vld={headers.udp_vld}"
                 )
 
     def _capture_headers(self) -> AxisEthParserResult:
@@ -134,5 +135,13 @@ class HeadersMonitor(BusMonitor):
         result.tcp_urgent_ptr = int(self.dut.HEADERS.tcp.urgent_ptr.value)
         result.tcp_vld = int(self.dut.HEADERS.tcp_vld.value)
         result.tcp_offset = int(self.dut.HEADERS.tcp_offset.value)
+
+        # UDP header
+        result.udp_src_port = int(self.dut.HEADERS.udp.src_port.value)
+        result.udp_dst_port = int(self.dut.HEADERS.udp.dst_port.value)
+        result.udp_length = int(self.dut.HEADERS.udp.length.value)
+        result.udp_checksum = int(self.dut.HEADERS.udp.checksum.value)
+        result.udp_vld = int(self.dut.HEADERS.udp_vld.value)
+        result.udp_offset = int(self.dut.HEADERS.udp_offset.value)
 
         return result

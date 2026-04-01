@@ -14,10 +14,11 @@ The model implements a chain of parsing stages where each stage:
 3. If yes: parses the protocol and passes next protocol info to the next stage
 4. If no: passes the input info unchanged to the next stage
 
-Supported protocol chain: ETH -> [VLAN] -> IPv4 -> TCP
+Supported protocol chain: ETH -> [VLAN] -> IPv4 -> TCP/UDP
 - VLAN is optional (max 1 tag)
 - IPv4 is parsed only if ethertype indicates IPv4 (0x0800)
 - TCP is parsed only if IPv4 protocol field indicates TCP (6)
+- UDP is parsed only if IPv4 protocol field indicates UDP (17)
 """
 
 from dataclasses import dataclass
@@ -62,6 +63,7 @@ class AxisEthParserModel:
     PROTO_VLAN = 'VLAN'
     PROTO_IPV4 = 'IPv4'
     PROTO_TCP = 'TCP'
+    PROTO_UDP = 'UDP'
     PROTO_NONE = 'NONE'
 
     # Ethertype constants
@@ -70,6 +72,7 @@ class AxisEthParserModel:
 
     # IP protocol constants
     IP_PROTOCOL_TCP = 6
+    IP_PROTOCOL_UDP = 17
 
     def __init__(self):
         """Initialize the reference model."""
@@ -135,6 +138,9 @@ class AxisEthParserModel:
 
         # Stage 4: TCP Parser
         self._parse_tcp(data, result, next_info)
+
+        # Stage 5: UDP Parser
+        self._parse_udp(data, result, next_info)
 
         self.pkts_processed += 1
         return result
@@ -300,6 +306,11 @@ class AxisEthParserModel:
             ip_hdr_len = result.ipv4_ihl * 4
             tcp_offset = offset + ip_hdr_len
             return ParserStageInfo(self.PROTO_TCP, tcp_offset)
+        elif result.ipv4_protocol == self.IP_PROTOCOL_UDP:
+            # Calculate UDP offset based on IP header length (IHL * 4 bytes)
+            ip_hdr_len = result.ipv4_ihl * 4
+            udp_offset = offset + ip_hdr_len
+            return ParserStageInfo(self.PROTO_UDP, udp_offset)
         else:
             return ParserStageInfo(self.PROTO_NONE, offset, False)
 
@@ -355,6 +366,49 @@ class AxisEthParserModel:
 
         result.tcp_vld = 1
         result.tcp_offset = offset
+
+        # No further parsing stages
+        return ParserStageInfo(self.PROTO_NONE, offset, False)
+
+    def _parse_udp(self, data: bytes, result: AxisEthParserResult,
+                   stage_info: ParserStageInfo) -> ParserStageInfo:
+        """UDP parsing stage.
+
+        Parses UDP header if stage_info indicates UDP protocol.
+
+        UDP header format (8 bytes):
+        - Source Port: 2 bytes
+        - Destination Port: 2 bytes
+        - Length: 2 bytes
+        - Checksum: 2 bytes
+
+        Args:
+            data: Raw packet bytes
+            result: Result object to populate
+            stage_info: Protocol info from previous stage
+
+        Returns:
+            ParserStageInfo: Info for the next stage (always NONE)
+        """
+        # Check if we should parse UDP
+        if stage_info.protocol_type != self.PROTO_UDP or not stage_info.valid:
+            # Pass through - UDP not present
+            return ParserStageInfo(self.PROTO_NONE, stage_info.offset, False)
+
+        offset = stage_info.offset
+
+        if len(data) < offset + 8:
+            # Packet too short for UDP header
+            return ParserStageInfo(self.PROTO_NONE, offset, False)
+
+        # Parse UDP header
+        result.udp_src_port = int.from_bytes(data[offset:offset + 2], 'big')
+        result.udp_dst_port = int.from_bytes(data[offset + 2:offset + 4], 'big')
+        result.udp_length = int.from_bytes(data[offset + 4:offset + 6], 'big')
+        result.udp_checksum = int.from_bytes(data[offset + 6:offset + 8], 'big')
+
+        result.udp_vld = 1
+        result.udp_offset = offset
 
         # No further parsing stages
         return ParserStageInfo(self.PROTO_NONE, offset, False)

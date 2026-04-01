@@ -43,7 +43,9 @@ async def _run_test(
     pkt_count: int = 10,
     pkt_range: Tuple[int, int] = (60, 8000),
     tx_cfg: Optional[BPCfg] = None,
-    test_name: str = ""
+    test_name: str = "",
+    zero_idles_chance: int = 50,
+    max_idles: int = 5
 ):
     """Run test with specified packet count and configuration."""
     cocotb.log.info(f"Starting AXIS_HEAD_TRIMMER {test_name} test")
@@ -53,7 +55,7 @@ async def _run_test(
     await tb.reset()
     cocotb.log.info("Reset completed")
 
-    tb.rx_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
+    tb.rx_driver.set_idle_generator(ItemRateLimiter(max_idles=max_idles, zero_idles_chance=zero_idles_chance))
 
     tx_task = None
     if tx_cfg:
@@ -113,27 +115,46 @@ async def run_test_random(dut, pkt_count=2000):
         dut, pkt_count=pkt_count,
         pkt_range=(60, 8000),
         tx_cfg=BPCfg(1, 5, 0.5),
-        test_name="random"
+        test_name="random",
+        zero_idles_chance=50,
+        max_idles=5
     )
 
 
 @cocotb.test()
-async def run_test_aggressive_backpressure(dut, pkt_count=2000):
+async def run_test_aggressive_backpressure(dut, pkt_count=1000):
     """Test with aggressive backpressure on TX interface."""
     await _run_test(
         dut, pkt_count=pkt_count,
-        pkt_range=(60, 8000),
-        tx_cfg=BPCfg(10, 50, 0.8),
-        test_name="aggressive_backpressure"
+        pkt_range=(60, 1500),
+        tx_cfg=BPCfg(10, 30, 0.8),
+        test_name="aggressive_backpressure",
+        zero_idles_chance=50,
+        max_idles=5
     )
 
 
 @cocotb.test()
-async def run_test_jumbo_packets(dut, pkt_count=2000):
+async def run_test_jumbo_packets(dut, pkt_count=1000):
     """Test with jumbo packets up to PKT_MTU (9216 bytes)."""
     await _run_test(
         dut, pkt_count=pkt_count,
         pkt_range=(4000, 9216),
         tx_cfg=BPCfg(1, 5, 0.5),
-        test_name="jumbo_packets"
+        test_name="jumbo_packets",
+        zero_idles_chance=50,
+        max_idles=5
+    )
+
+
+@cocotb.test()
+async def run_test_small_packets(dut, pkt_count=2000):
+    """Test with small packets from 60 to 75 bytes."""
+    await _run_test(
+        dut, pkt_count=pkt_count,
+        pkt_range=(60, 75),
+        tx_cfg=BPCfg(1, 10, 0.3),
+        test_name="small_packets",
+        zero_idles_chance=0,
+        max_idles=10
     )

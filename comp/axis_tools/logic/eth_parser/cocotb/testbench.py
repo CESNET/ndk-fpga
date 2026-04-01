@@ -11,7 +11,7 @@ sending and receiving packets, a scoreboard for verification, and
 uses scapy for packet generation.
 
 Supported protocol stack:
-    - Ethernet + [VLAN] + [IPv4] + [TCP]
+    - Ethernet + [VLAN] + [IPv4] + [TCP/UDP]
 """
 
 import random

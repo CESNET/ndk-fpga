@@ -27,6 +27,7 @@ package axis_eth_parser_types is
     constant PROTO_VLAN   : natural := 2;  -- VLAN tag
     constant PROTO_IPV4   : natural := 3;  -- IPv4 header
     constant PROTO_TCP    : natural := 4;  -- TCP header
+    constant PROTO_UDP    : natural := 5;  -- UDP header
 
     -- Width of protocol identifier field (must accommodate all PROTO_* values)
     constant PROTOCOL_WIDTH : natural := 3;
@@ -34,6 +35,11 @@ package axis_eth_parser_types is
     -- Maximum width of offset field (supports PKT_MTU up to 2^14)
     -- This is the maximum offset width used in extracted_headers_t record
     constant MAX_OFFSET_WIDTH : natural := 15;
+
+    -- Total width of serialized headers vector
+    -- ETH: 48+48+16+1+15 = 128, VLAN: 16+16+1+15 = 48, IPv4: 161+15 = 176, TCP: 161+15 = 176, UDP: 65+15 = 80
+    -- Total: 128 + 48 + 176 + 176 + 80 = 608 bits
+    constant HEADERS_SLV_WIDTH : natural := 608;
 
     -- =========================================================================
     -- Ethernet header constants
@@ -67,6 +73,15 @@ package axis_eth_parser_types is
     -- =========================================================================
     constant TCP_HDR_MIN_SIZE : natural := 20;  -- Minimum TCP header size (data offset=5)
     constant TCP_HDR_EXTRACT  : natural := 20;  -- Bytes to extract for TCP header
+
+    -- =========================================================================
+    -- UDP header constants
+    -- =========================================================================
+    constant UDP_HDR_SIZE    : natural := 8;    -- UDP header size: src_port(2) + dst_port(2) + length(2) + checksum(2)
+    constant UDP_HDR_EXTRACT : natural := 8;    -- Bytes to extract for UDP header
+
+    -- IPv4 protocol field values
+    constant IPV4_PROTO_UDP : std_logic_vector(7 downto 0) := X"11";  -- UDP
 
     -- =========================================================================
     -- Function declarations
@@ -121,6 +136,14 @@ package axis_eth_parser_types is
         urgent_ptr  : std_logic_vector(15 downto 0);  -- Urgent pointer
     end record;
 
+    -- UDP header fields
+    type udp_header_t is record
+        src_port : std_logic_vector(15 downto 0);  -- Source port
+        dst_port : std_logic_vector(15 downto 0);  -- Destination port
+        length   : std_logic_vector(15 downto 0);  -- UDP length (header + data)
+        checksum : std_logic_vector(15 downto 0);  -- UDP checksum
+    end record;
+
     -- Combined extracted headers from all protocol layers
     -- Uses MAX_OFFSET_WIDTH to support any PKT_MTU up to 2^16 bytes
     type extracted_headers_t is record
@@ -136,6 +159,9 @@ package axis_eth_parser_types is
         tcp         : tcp_header_t;
         tcp_vld     : std_logic;
         tcp_offset  : unsigned(MAX_OFFSET_WIDTH-1 downto 0);
+        udp         : udp_header_t;
+        udp_vld     : std_logic;
+        udp_offset  : unsigned(MAX_OFFSET_WIDTH-1 downto 0);
     end record;
 
     -- =========================================================================
@@ -188,6 +214,12 @@ package body axis_eth_parser_types is
         r.tcp.urgent_ptr       := (others => '0');
         r.tcp_vld              := '0';
         r.tcp_offset           := (others => '0');
+        r.udp.src_port         := (others => '0');
+        r.udp.dst_port         := (others => '0');
+        r.udp.length           := (others => '0');
+        r.udp.checksum         := (others => '0');
+        r.udp_vld              := '0';
+        r.udp_offset           := (others => '0');
         return r;
     end function;
 
@@ -199,6 +231,7 @@ package body axis_eth_parser_types is
             when PROTO_VLAN => return VLAN_HDR_EXTRACT;
             when PROTO_IPV4 => return IPV4_HDR_EXTRACT;
             when PROTO_TCP => return TCP_HDR_EXTRACT;
+            when PROTO_UDP => return UDP_HDR_EXTRACT;
             when others => return 20;
         end case;
     end function;
@@ -206,13 +239,13 @@ package body axis_eth_parser_types is
     -- Return maximum bytes required across all supported protocols
     function get_max_extract_bytes return natural is
     begin
-        return maximum(maximum(maximum(ETH_HDR_EXTRACT, VLAN_HDR_EXTRACT), IPV4_HDR_EXTRACT), TCP_HDR_EXTRACT);
+        return maximum(maximum(maximum(maximum(ETH_HDR_EXTRACT, VLAN_HDR_EXTRACT), IPV4_HDR_EXTRACT), TCP_HDR_EXTRACT), UDP_HDR_EXTRACT);
     end function;
 
     -- Convert extracted_headers_t record to std_logic_vector for serialization
     -- OFFSET_WIDTH specifies the actual width of offset fields to use (must be <= MAX_OFFSET_WIDTH)
     function extracted_headers_to_slv (hdrs : extracted_headers_t; OFFSET_WIDTH : natural) return std_logic_vector is
-        variable r   : std_logic_vector(511 downto 0);
+        variable r   : std_logic_vector(HEADERS_SLV_WIDTH-1 downto 0);
         variable pos : natural := 0;
     begin
         -- Ethernet: 48+48+16+1+OFFSET_WIDTH bits
@@ -253,7 +286,14 @@ package body axis_eth_parser_types is
         r(pos+15 downto pos)             := hdrs.tcp.checksum;      pos := pos + 16;
         r(pos+15 downto pos)             := hdrs.tcp.urgent_ptr;    pos := pos + 16;
         r(pos)                           := hdrs.tcp_vld;           pos := pos + 1;
-        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.tcp_offset(OFFSET_WIDTH-1 downto 0));
+        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.tcp_offset(OFFSET_WIDTH-1 downto 0)); pos := pos + OFFSET_WIDTH;
+        -- UDP: 16+16+16+16+1+OFFSET_WIDTH bits
+        r(pos+15 downto pos)             := hdrs.udp.src_port;      pos := pos + 16;
+        r(pos+15 downto pos)             := hdrs.udp.dst_port;      pos := pos + 16;
+        r(pos+15 downto pos)             := hdrs.udp.length;        pos := pos + 16;
+        r(pos+15 downto pos)             := hdrs.udp.checksum;      pos := pos + 16;
+        r(pos)                           := hdrs.udp_vld;           pos := pos + 1;
+        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.udp_offset(OFFSET_WIDTH-1 downto 0));
         return r(pos-1 downto 0);
     end function;
 
@@ -297,7 +337,14 @@ package body axis_eth_parser_types is
         r.tcp.checksum         := slv(pos+15 downto pos);      pos := pos + 16;
         r.tcp.urgent_ptr       := slv(pos+15 downto pos);      pos := pos + 16;
         r.tcp_vld              := slv(pos);                    pos := pos + 1;
-        r.tcp_offset           := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos));
+        r.tcp_offset           := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos)); pos := pos + OFFSET_WIDTH;
+        -- UDP: 16+16+16+16+1+OFFSET_WIDTH bits
+        r.udp.src_port         := slv(pos+15 downto pos);      pos := pos + 16;
+        r.udp.dst_port         := slv(pos+15 downto pos);      pos := pos + 16;
+        r.udp.length           := slv(pos+15 downto pos);      pos := pos + 16;
+        r.udp.checksum         := slv(pos+15 downto pos);      pos := pos + 16;
+        r.udp_vld              := slv(pos);                    pos := pos + 1;
+        r.udp_offset           := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos));
         return r;
     end function;
 
