@@ -257,6 +257,9 @@ rule:
     package_body_507:
         disable : true
 
+    use_clause_001:
+        disable : true
+
 indent:
     tokens:
         use_clause:
