@@ -247,8 +247,8 @@ begin
     -- logic for determining if the packet continues from the previous region or not
     pkt_cont0_g : for i in 0 to REGIONS-1 generate
         pkt_cont0(i+1) <= (new_sof0(i) and not new_eof0(i) and not pkt_cont0(i)) or
-                         (new_sof0(i) and new_eof0(i) and pkt_cont0(i)) or
-                         (not new_sof0(i) and not new_eof0(i) and pkt_cont0(i));
+                          (new_sof0(i) and new_eof0(i) and pkt_cont0(i)) or
+                          (not new_sof0(i) and not new_eof0(i) and pkt_cont0(i));
     end generate;
 
     -- stores the value of the last bit ot the pkt_cont0 signal from the previous data word
@@ -395,8 +395,8 @@ begin
     -- logic for determining if the packet continues from the previous region or not
     pkt_cont1_g : for i in 0 to REGIONS-1 generate
         pkt_cont1(i+1) <= (new_sof1(i) and not new_eof1(i) and not pkt_cont1(i)) or
-                         (new_sof1(i) and new_eof1(i) and pkt_cont1(i)) or
-                         (not new_sof1(i) and not new_eof1(i) and pkt_cont1(i));
+                          (new_sof1(i) and new_eof1(i) and pkt_cont1(i)) or
+                          (not new_sof1(i) and not new_eof1(i) and pkt_cont1(i));
     end generate;
 
     -- stores the value of the last bit ot the pkt_cont1 signal from the previous data word

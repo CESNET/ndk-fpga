@@ -233,8 +233,8 @@ begin
 
     incomplete_word_g : for r in 0 to REGIONS-1 generate
         s_incomplete_word(r+1) <= (s_sfd_vld_final(r) and not s_efd_vld_reg1(r) and not s_incomplete_word(r)) or
-            (s_sfd_vld_final(r) and s_efd_vld_reg1(r) and s_incomplete_word(r)) or
-            (not s_sfd_vld_final(r) and not s_efd_vld_reg1(r) and s_incomplete_word(r));
+                                  (s_sfd_vld_final(r) and s_efd_vld_reg1(r) and s_incomplete_word(r)) or
+                                  (not s_sfd_vld_final(r) and not s_efd_vld_reg1(r) and s_incomplete_word(r));
     end generate;
 
     incomplete_word_reg_p : process (CLK)

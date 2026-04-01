@@ -290,8 +290,8 @@ begin
     -- Checks present incomplete frames
     incomplete_frame_g : for r in 0 to REGIONS-1 generate
         s_inc_frame(r+1) <= (s_mfb_fifo_sof(r) and not s_mfb_fifo_eof(r) and not s_inc_frame(r)) or
-                          (s_mfb_fifo_sof(r) and s_mfb_fifo_eof(r) and s_inc_frame(r)) or
-                          (not s_mfb_fifo_sof(r) and not s_mfb_fifo_eof(r) and s_inc_frame(r));
+                            (s_mfb_fifo_sof(r) and s_mfb_fifo_eof(r) and s_inc_frame(r)) or
+                            (not s_mfb_fifo_sof(r) and not s_mfb_fifo_eof(r) and s_inc_frame(r));
     end generate;
 
     -- INCOMPLETE FRAME

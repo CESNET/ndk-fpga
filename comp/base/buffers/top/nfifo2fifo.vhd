@@ -244,7 +244,7 @@ begin
 
         read_allow <= READ and PIPE_EN and (not blk_empty(conv_integer(BLOCK_ADDR)));
         read_addr  <= (BLOCK_ADDR & reg_read_addr(conv_integer(BLOCK_ADDR))(ADDR_RANGE))
-                - addr_fix(conv_integer(BLOCK_ADDR));
+                      - addr_fix(conv_integer(BLOCK_ADDR));
 
         -- block read allow signal
         more_flows_field : for j in 0 to FLOWS-1 generate

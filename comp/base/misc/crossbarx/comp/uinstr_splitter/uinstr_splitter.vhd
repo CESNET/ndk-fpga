@@ -150,8 +150,8 @@ begin
 
     -- Buffer B address of last item of the uInstruction
     rx_uinstr_b_last_item <= (unsigned(RX_UINSTR_B_COL) & unsigned(RX_UINSTR_B_ITEM))
-                            +resize(unsigned(RX_UINSTR_LEN),log2(BUF_B_COLS*BUF_B_ROWS*ROW_ITEMS))
-                            -1;
+                             +resize(unsigned(RX_UINSTR_LEN),log2(BUF_B_COLS*BUF_B_ROWS*ROW_ITEMS))
+                             -1;
 
     -----------------------------------------------------------------------
 

@@ -210,7 +210,7 @@ begin
         tx_vld_comb <= mfb_sof_vld and accept_last_sof;
         MFB_DST_RDY <= TX_DST_RDY and accept_last_sof;
         RX_DST_RDY  <= (accept_all_eof and not accept_last_sof and not RESET) or
-                  (TX_DST_RDY and accept_last_sof and accept_all_eof and not RESET);
+                       (TX_DST_RDY and accept_last_sof and accept_all_eof and not RESET);
 
         -- ==========================================================================
         --  OUTPUT REGISTERS

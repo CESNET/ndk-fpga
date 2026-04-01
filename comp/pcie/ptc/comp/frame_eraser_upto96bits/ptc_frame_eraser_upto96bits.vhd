@@ -105,7 +105,7 @@ begin
     is_frame_g : for r in 0 to REGIONS-1 generate
         -- compute incomplete frame in this region
         s_inc_prev_region(r+1) <= (s_sof_masked(r) and not s_eof_masked(r) and not s_inc_prev_region(r)) or
-                                (not s_sof_masked(r) and not s_eof_masked(r) and s_inc_prev_region(r));
+                                  (not s_sof_masked(r) and not s_eof_masked(r) and s_inc_prev_region(r));
         -- flag of "is frame in this region"
         s_is_frame(r)          <= s_sof_masked(r) or s_eof_masked(r) or s_inc_prev_region(r);
     end generate;

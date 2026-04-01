@@ -153,7 +153,7 @@ architecture IB_BFM_ARCH of IB_BFM is
         variable globaladdr     : bit_vector(63 downto 0);
         variable data           : bit_vector(63 downto 0);
         variable i              : integer;
-        file     output         : ascii_text open write_mode  is "STD_OUTPUT";
+        file     output         : ascii_text open write_mode is "STD_OUTPUT";
         file     outfile        : ascii_text open append_mode is "internal_bus.log";
     begin
         to_bit_vector(cmdV.Di.SrcAddr,    srcaddr);

@@ -214,8 +214,8 @@ begin
 
     -- control of packet template destination ready
     RX_CTRL_DST_RDY <= (TX_MFB_DST_RDY and RX_CTRL_INSERT_VLD and s_fifox_rdy) or
-                      (TX_MFB_DST_RDY and not RX_CTRL_INSERT_VLD) or
-                      (not RX_CTRL_SRC_RDY);
+                       (TX_MFB_DST_RDY and not RX_CTRL_INSERT_VLD) or
+                       (not RX_CTRL_SRC_RDY);
 
     -- control of payload accept
     s_last_addr <= unsigned(RX_CTRL_INSERT_MOVE(REGIONS*REGION_SIZE-1));
@@ -224,7 +224,7 @@ begin
 
     -- control of output source ready
     s_src_rdy <= (RX_CTRL_SRC_RDY and RX_CTRL_INSERT_VLD and s_fifox_rdy) or
-                (RX_CTRL_SRC_RDY and not RX_CTRL_INSERT_VLD);
+                 (RX_CTRL_SRC_RDY and not RX_CTRL_INSERT_VLD);
 
     -- =========================================================================
     --  0. REGISTER STAGE

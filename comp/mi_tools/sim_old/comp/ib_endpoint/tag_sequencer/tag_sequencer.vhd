@@ -235,7 +235,7 @@ begin
     USR_OP_TAG <= tag_dob;
 
     start_ptr_en <= (not pend_dob) and (not sig_empty) and
-                   (not SIBLING_PAUSE_IN);
+                    (not SIBLING_PAUSE_IN);
 
     SIBLING_PAUSE_OUT <= (not pend_dob) and (not sig_empty);
 

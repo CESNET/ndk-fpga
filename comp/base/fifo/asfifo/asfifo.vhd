@@ -121,7 +121,7 @@ begin
     --!    when reading and both the memory and the output registers are not empty OR
     --!    when the memory is not empty while the output registers are empty
     read_allow  <= (RD and NOT empty_signal and NOT reg_empty) or
-                  (NOT empty_signal and reg_empty);
+                   (NOT empty_signal and reg_empty);
 
     FULL   <= full_signal;
 

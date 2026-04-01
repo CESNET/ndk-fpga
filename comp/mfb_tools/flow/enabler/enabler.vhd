@@ -255,7 +255,7 @@ begin
     begin
         for r in 0 to REGIONS-1 loop
             s_discarded_frame(r) <= (RX_EOF(r) and not s_eof_fsm(r) and s_valid and not RESET) or
-                              (RX_EOF(r) and RX_SRC_RDY and not s_valid and not RESET);
+                                    (RX_EOF(r) and RX_SRC_RDY and not s_valid and not RESET);
         end loop;
     end process;
 

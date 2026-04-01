@@ -180,8 +180,8 @@ begin
 
     incomplete_pkt_g : for r in 0 to MFB_REGIONS-1 generate
         s_inc_pkt(r+1) <= (RX_MFB_DATA_SOF(r) and not RX_MFB_DATA_EOF(r) and not s_inc_pkt(r)) or
-                        (RX_MFB_DATA_SOF(r) and RX_MFB_DATA_EOF(r) and s_inc_pkt(r)) or
-                        (not RX_MFB_DATA_SOF(r) and not RX_MFB_DATA_EOF(r) and s_inc_pkt(r));
+                          (RX_MFB_DATA_SOF(r) and RX_MFB_DATA_EOF(r) and s_inc_pkt(r)) or
+                          (not RX_MFB_DATA_SOF(r) and not RX_MFB_DATA_EOF(r) and s_inc_pkt(r));
     end generate;
 
     incomplete_pkt_reg_p : process (CLK)

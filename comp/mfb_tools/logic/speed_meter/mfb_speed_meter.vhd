@@ -187,8 +187,8 @@ begin
 
     incomplete_frame_g : for r in 0 to REGIONS-1 generate
         incomplete_frame(r+1) <= (rx_sof_reg(r) and not rx_eof_reg(r) and not incomplete_frame(r)) or
-                               (rx_sof_reg(r) and rx_eof_reg(r) and incomplete_frame(r)) or
-                               (not rx_sof_reg(r) and not rx_eof_reg(r) and incomplete_frame(r));
+                                 (rx_sof_reg(r) and rx_eof_reg(r) and incomplete_frame(r)) or
+                                 (not rx_sof_reg(r) and not rx_eof_reg(r) and incomplete_frame(r));
     end generate;
 
     incomplete_frame_last_reg_p : process (CLK)

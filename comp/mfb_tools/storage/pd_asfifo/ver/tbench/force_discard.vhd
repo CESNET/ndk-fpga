@@ -52,8 +52,8 @@ begin
 
     inc_frame_g : for r in 0 to REGIONS-1 generate
         s_inc_frame(r+1) <= (IN_SOF(r) and not IN_EOF(r) and not s_inc_frame(r)) or
-                          (IN_SOF(r) and IN_EOF(r) and s_inc_frame(r)) or
-                          (not IN_SOF(r) and not IN_EOF(r) and s_inc_frame(r));
+                            (IN_SOF(r) and IN_EOF(r) and s_inc_frame(r)) or
+                            (not IN_SOF(r) and not IN_EOF(r) and s_inc_frame(r));
     end generate;
 
     inc_frame_reg_p : process (CLK)

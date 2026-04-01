@@ -459,8 +459,8 @@ begin
     begin
         for r in 0 to RX_REGIONS-1 loop
             s_rx_inc_frame(r+1) <= (s_in_sof(r) and not s_in_eof(r) and not s_rx_inc_frame(r)) or
-                               (s_in_sof(r) and s_in_eof(r) and s_rx_inc_frame(r)) or
-                               (not s_in_sof(r) and not s_in_eof(r) and s_rx_inc_frame(r));
+                                   (s_in_sof(r) and s_in_eof(r) and s_rx_inc_frame(r)) or
+                                   (not s_in_sof(r) and not s_in_eof(r) and s_rx_inc_frame(r));
         end loop;
     end process;
 
@@ -890,8 +890,8 @@ begin
     end generate;
 
     s_bfin_error <= (s_bfin_adapter_err_masked or s_bfin_crc_err_masked or
-                    s_bfin_len_min_err_masked or s_bfin_len_max_err_masked or
-                    s_bfin_mac_err_masked) or (not s_ctl_enable);
+                     s_bfin_len_min_err_masked or s_bfin_len_max_err_masked or
+                     s_bfin_mac_err_masked) or (not s_ctl_enable);
 
     s_bfin_metactrl <= s_ctl_error_mask & s_ctl_enable;
 

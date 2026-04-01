@@ -1002,8 +1002,8 @@ begin
     -- debug
     tx_inc_frame_g : for r in 0 to MFB_REGIONS-1 generate
         tx_inc_frame(r+1) <= (up_pipe_mfb_sof(r) and not up_pipe_mfb_eof(r) and not tx_inc_frame(r)) or
-                          (up_pipe_mfb_sof(r) and up_pipe_mfb_eof(r) and tx_inc_frame(r)) or
-                          (not up_pipe_mfb_sof(r) and not up_pipe_mfb_eof(r) and tx_inc_frame(r));
+                             (up_pipe_mfb_sof(r) and up_pipe_mfb_eof(r) and tx_inc_frame(r)) or
+                             (not up_pipe_mfb_sof(r) and not up_pipe_mfb_eof(r) and tx_inc_frame(r));
     end generate;
 
     process (CLK)

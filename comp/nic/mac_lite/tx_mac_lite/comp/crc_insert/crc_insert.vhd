@@ -330,8 +330,8 @@ begin
 
     ci_inc_region_g : for r in 0 to MFB_REGIONS-1 generate
         ci_inc_region(r+1) <= (ci_mfb_sof(r) and not ci_mfb_eof_new(r) and not ci_inc_region(r)) or
-            (ci_mfb_sof(r) and ci_mfb_eof_new(r) and ci_inc_region(r)) or
-            (not ci_mfb_sof(r) and not ci_mfb_eof_new(r) and ci_inc_region(r));
+                              (ci_mfb_sof(r) and ci_mfb_eof_new(r) and ci_inc_region(r)) or
+                              (not ci_mfb_sof(r) and not ci_mfb_eof_new(r) and ci_inc_region(r));
     end generate;
 
     process (CLK)

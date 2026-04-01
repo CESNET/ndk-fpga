@@ -268,7 +268,7 @@ begin
 
         write_allow <= WRITE and (not sig_full(conv_integer(BLOCK_ADDR)));
         write_addr  <= (BLOCK_ADDR & reg_write_addr(conv_integer(BLOCK_ADDR))(ADDR_RANGE))
-                 - addr_fix(conv_integer(BLOCK_ADDR));
+                       - addr_fix(conv_integer(BLOCK_ADDR));
 
         -- block write allow signal
         more_flows_field : for j in 0 to FLOWS-1 generate

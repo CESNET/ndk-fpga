@@ -188,8 +188,8 @@ begin
     -- Packet continues
     pkt_cont_g : for r in 0 to MFB_REGIONS - 1 generate
         pkt_cont(r+1) <=    (FIFO_TX_SOF(r) and not FIFO_TX_EOF(r) and not pkt_cont(r)) or
-                            (FIFO_TX_SOF(r) and     FIFO_TX_EOF(r) and     pkt_cont(r)) or
-                            (not FIFO_TX_SOF(r) and not FIFO_TX_EOF(r) and     pkt_cont(r));
+                         (FIFO_TX_SOF(r) and     FIFO_TX_EOF(r) and     pkt_cont(r)) or
+                         (not FIFO_TX_SOF(r) and not FIFO_TX_EOF(r) and     pkt_cont(r));
     end generate;
 
     -- Transfer to the next word

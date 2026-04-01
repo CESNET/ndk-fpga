@@ -90,7 +90,7 @@ begin
 
     RD_SRC_RDY_OUT       <= (RD_SRC_RDY_IN or write_last) and data_reg0_vld and ((must_src_rdy and RD_SRC_RDY_IN) or not must_src_rdy);
     RD_EOF               <= (write_last and data_reg0_vld and must_src_rdy and RD_SRC_RDY_IN)
-                        or (write_last and data_reg0_vld and not must_src_rdy);
+                            or (write_last and data_reg0_vld and not must_src_rdy);
 
     RD_DST_RDY_IN        <= RD_DST_RDY_OUT or not data_reg0_vld;
     data_reg_we          <= (RD_DST_RDY_OUT and RD_SRC_RDY_IN) or (not data_reg0_vld and RD_SRC_RDY_IN);

@@ -158,8 +158,8 @@ begin
 
     inc_pkt_g : for i in 0 to 1 generate
         s_inc_pkt(i+1) <= (RX_MFB_SOF(i) and not RX_MFB_EOF(i) and not s_inc_pkt(i)) or
-            (RX_MFB_SOF(i) and RX_MFB_EOF(i) and s_inc_pkt(i)) or
-            (not RX_MFB_SOF(i) and not RX_MFB_EOF(i) and s_inc_pkt(i));
+                          (RX_MFB_SOF(i) and RX_MFB_EOF(i) and s_inc_pkt(i)) or
+                          (not RX_MFB_SOF(i) and not RX_MFB_EOF(i) and s_inc_pkt(i));
     end generate;
 
     inc_pkt_reg_p : process (CLK)

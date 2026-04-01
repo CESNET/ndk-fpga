@@ -127,8 +127,8 @@ begin
     region_aux_g : if REGION_AUX_EN generate
         incomplete_region_g : for r in 0 to REGIONS-1 generate
             s_incomplete_region(r+1) <= (RX_SOF(r) and not RX_EOF(r) and not s_incomplete_region(r)) or
-            (RX_SOF(r) and RX_EOF(r) and s_incomplete_region(r)) or
-            (not RX_SOF(r) and not RX_EOF(r) and s_incomplete_region(r));
+                                        (RX_SOF(r) and RX_EOF(r) and s_incomplete_region(r)) or
+                                        (not RX_SOF(r) and not RX_EOF(r) and s_incomplete_region(r));
         end generate;
 
         incomplete_region_reg_p : process (CLK)

@@ -293,8 +293,8 @@ begin
 
     inc_frame_g : for r in 0 to REGIONS-1 generate
         s_inc_frame(r+1) <= (s_rx_sof_reg(r) and not s_new_eof_reg_fix(r) and not s_inc_frame(r)) or
-                                   (s_rx_sof_reg(r) and s_new_eof_reg_fix(r) and s_inc_frame(r)) or
-                                   (not s_rx_sof_reg(r) and not s_new_eof_reg_fix(r) and s_inc_frame(r));
+                            (s_rx_sof_reg(r) and s_new_eof_reg_fix(r) and s_inc_frame(r)) or
+                            (not s_rx_sof_reg(r) and not s_new_eof_reg_fix(r) and s_inc_frame(r));
     end generate;
 
     inc_frame_last_reg_p : process (CLK)

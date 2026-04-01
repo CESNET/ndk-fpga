@@ -122,8 +122,8 @@ begin
 
     inc_pkt_g : for r in 0 to REGIONS-1 generate
         s_inc_pkt(r+1) <=   (s_sof(r) and not s_eof(r) and not s_inc_pkt(r)) or
-                            (s_sof(r) and     s_eof(r) and     s_inc_pkt(r)) or
-                            (not s_sof(r) and not s_eof(r) and     s_inc_pkt(r));
+                          (s_sof(r) and     s_eof(r) and     s_inc_pkt(r)) or
+                          (not s_sof(r) and not s_eof(r) and     s_inc_pkt(r));
     end generate;
 
     -- Remove register
