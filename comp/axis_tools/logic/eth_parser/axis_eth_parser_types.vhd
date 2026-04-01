@@ -36,6 +36,11 @@ package axis_eth_parser_types is
     -- This is the maximum offset width used in extracted_headers_t record
     constant MAX_OFFSET_WIDTH : natural := 15;
 
+    -- Total width of serialized headers vector
+    -- ETH: 48+48+16+1+15 = 128, VLAN: 16+16+1+15 = 48, IPv4: 161+15 = 176, TCP: 161+15 = 176, UDP: 65+15 = 80
+    -- Total: 128 + 48 + 176 + 176 + 80 = 608 bits
+    constant HEADERS_SLV_WIDTH : natural := 608;
+
     -- =========================================================================
     -- Ethernet header constants
     -- =========================================================================
@@ -240,7 +245,7 @@ package body axis_eth_parser_types is
     -- Convert extracted_headers_t record to std_logic_vector for serialization
     -- OFFSET_WIDTH specifies the actual width of offset fields to use (must be <= MAX_OFFSET_WIDTH)
     function extracted_headers_to_slv (hdrs : extracted_headers_t; OFFSET_WIDTH : natural) return std_logic_vector is
-        variable r   : std_logic_vector(511 downto 0);
+        variable r   : std_logic_vector(HEADERS_SLV_WIDTH-1 downto 0);
         variable pos : natural := 0;
     begin
         -- Ethernet: 48+48+16+1+OFFSET_WIDTH bits
