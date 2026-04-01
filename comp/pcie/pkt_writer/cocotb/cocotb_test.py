@@ -127,7 +127,6 @@ class testbench():
             # Remove processed part from the packet
             packet = packet[length:]
 
-
     async def reset(self):
         self.dut.RESET.value = 1
         await ClockCycles(self.dut.CLK, 10)
