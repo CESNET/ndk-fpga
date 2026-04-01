@@ -222,7 +222,7 @@ begin
     -- A packet's last word is arriving on RX0 and not all of its bytes are valid.
     rx0_packet_end_pending <= RX0_AXIS_TVALID and RX0_AXIS_TLAST and not rx0_all_valid;
     -- A one-word-long packet is preloaded in rx0_reg.
-    rx0_short_in_reg       <= not rx0_all_valid_reg and rx0_last_reg;
+    rx0_short_in_reg       <= not rx0_all_valid_reg and rx0_last_reg and rx0_valid_reg;
 
     fsm_state_reg_p : process (CLK)
     begin

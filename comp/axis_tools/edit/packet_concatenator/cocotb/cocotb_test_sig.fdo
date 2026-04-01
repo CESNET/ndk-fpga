@@ -7,6 +7,6 @@
 view wave
 delete wave *
 
-add_wave -group {Top} -noupdate -hex /axis_frame_concatenator/*
+add_wave -group {Top} -noupdate -hex /axis_packet_concatenator/*
 
 config wave -signalnamewidth 1
