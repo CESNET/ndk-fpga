@@ -14,13 +14,13 @@ use work.type_pack.all;
 use work.axis_eth_parser_types.all;
 
 -- The AXIS_ETH_PARSER component parses Ethernet frames and extracts headers
--- from multiple protocol layers (Ethernet, VLAN, IPv4, TCP). The parser uses
--- a multi-stage pipeline architecture where each stage processes one protocol
--- header and passes the remaining data to the next stage. Extracted headers
--- are stored in separate FIFOs and presented on the HEADERS output interface.
--- The original frame data passes through unchanged to the TX interface.
--- Backpressure is applied to the RX interface when the internal packet counter
--- approaches FIFO capacity to prevent data loss.
+-- from multiple protocol layers (Ethernet, VLAN, IPv4, TCP, UDP). The parser
+-- uses a multi-stage pipeline architecture where each stage processes one
+-- protocol header and passes the remaining data to the next stage. Extracted
+-- headers are stored in separate FIFOs and presented on the HEADERS output
+-- interface. The original frame data passes through unchanged to the TX
+-- interface. Backpressure is applied to the RX interface when the internal
+-- packet counter approaches FIFO capacity to prevent data loss.
 --
 entity AXIS_ETH_PARSER is
     generic (
@@ -63,10 +63,10 @@ end entity;
 
 architecture FULL of AXIS_ETH_PARSER is
 
-    -- Number of parsing stages (Ethernet, VLAN, IPv4, TCP)
-    constant NUM_STAGES        : natural := 4;
+    -- Number of parsing stages (Ethernet, VLAN, IPv4, TCP, UDP)
+    constant NUM_STAGES        : natural := 5;
     -- Protocol sequence for each stage in the parsing pipeline
-    constant PROTOCOL_SEQUENCE : integer_vector(0 to NUM_STAGES-1) := (PROTO_ETH, PROTO_VLAN, PROTO_IPV4, PROTO_TCP);
+    constant PROTOCOL_SEQUENCE : integer_vector(0 to NUM_STAGES-1) := (PROTO_ETH, PROTO_VLAN, PROTO_IPV4, PROTO_TCP, PROTO_UDP);
     -- Number of bytes per AXI word
     constant WORD_BYTES        : natural := AXI_TDATA_WIDTH/8;
     -- Number of bits required for byte offset within an AXI word
@@ -325,6 +325,17 @@ begin
                                                 fifo_data(i)(8*(19+1)-1 downto 8*19);
                         hdrs.tcp_vld         := fifo_ok(i);
                         hdrs.tcp_offset      := resize(unsigned(fifo_offset(i)), MAX_OFFSET_WIDTH);
+                    when PROTO_UDP =>
+                        hdrs.udp.src_port := fifo_data(i)(8*(0+1)-1 downto 8*0) &
+                                             fifo_data(i)(8*(1+1)-1 downto 8*1);
+                        hdrs.udp.dst_port := fifo_data(i)(8*(2+1)-1 downto 8*2) &
+                                             fifo_data(i)(8*(3+1)-1 downto 8*3);
+                        hdrs.udp.length   := fifo_data(i)(8*(4+1)-1 downto 8*4) &
+                                             fifo_data(i)(8*(5+1)-1 downto 8*5);
+                        hdrs.udp.checksum := fifo_data(i)(8*(6+1)-1 downto 8*6) &
+                                             fifo_data(i)(8*(7+1)-1 downto 8*7);
+                        hdrs.udp_vld      := fifo_ok(i);
+                        hdrs.udp_offset   := resize(unsigned(fifo_offset(i)), MAX_OFFSET_WIDTH);
                     when others => null;
                 end case;
             end if;

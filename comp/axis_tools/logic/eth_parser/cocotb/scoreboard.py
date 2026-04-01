@@ -53,6 +53,12 @@ class AxisEthParserResult:
         tcp_urgent_ptr: Urgent pointer
         tcp_vld: TCP header valid flag
         tcp_offset: Offset to TCP header
+        udp_src_port: Source port
+        udp_dst_port: Destination port
+        udp_length: UDP length (header + data)
+        udp_checksum: UDP checksum
+        udp_vld: UDP header valid flag
+        udp_offset: Offset to UDP header
     """
     eth_dst_mac: int = 0
     eth_src_mac: int = 0
@@ -92,6 +98,13 @@ class AxisEthParserResult:
     tcp_urgent_ptr: int = 0
     tcp_vld: int = 0
     tcp_offset: int = 0
+
+    udp_src_port: int = 0
+    udp_dst_port: int = 0
+    udp_length: int = 0
+    udp_checksum: int = 0
+    udp_vld: int = 0
+    udp_offset: int = 0
 
     packet_num: int = 0  # Packet number for debugging
     packet_bytes: bytes = b''  # Original packet bytes for debugging
@@ -213,6 +226,10 @@ def compare_headers(expected: AxisEthParserResult, actual: AxisEthParserResult) 
     has_error |= not match
     rows.append(_format_row("tcp_vld", _fmt_vld(expected.tcp_vld), _fmt_vld(actual.tcp_vld), match))
 
+    match = expected.udp_vld == actual.udp_vld
+    has_error |= not match
+    rows.append(_format_row("udp_vld", _fmt_vld(expected.udp_vld), _fmt_vld(actual.udp_vld), match))
+
     # 3. Ethernet fields if valid
     if expected.eth_vld:
         match = expected.eth_dst_mac == actual.eth_dst_mac
@@ -320,6 +337,28 @@ def compare_headers(expected: AxisEthParserResult, actual: AxisEthParserResult) 
         match = expected.tcp_offset == actual.tcp_offset
         has_error |= not match
         rows.append(_format_row("tcp_offset", expected.tcp_offset, actual.tcp_offset, match))
+
+    # 7. UDP fields if valid
+    if expected.udp_vld:
+        match = expected.udp_src_port == actual.udp_src_port
+        has_error |= not match
+        rows.append(_format_row("udp_src_port", expected.udp_src_port, actual.udp_src_port, match))
+
+        match = expected.udp_dst_port == actual.udp_dst_port
+        has_error |= not match
+        rows.append(_format_row("udp_dst_port", expected.udp_dst_port, actual.udp_dst_port, match))
+
+        match = expected.udp_length == actual.udp_length
+        has_error |= not match
+        rows.append(_format_row("udp_length", expected.udp_length, actual.udp_length, match))
+
+        match = expected.udp_checksum == actual.udp_checksum
+        has_error |= not match
+        rows.append(_format_row("udp_checksum", expected.udp_checksum, actual.udp_checksum, match))
+
+        match = expected.udp_offset == actual.udp_offset
+        has_error |= not match
+        rows.append(_format_row("udp_offset", expected.udp_offset, actual.udp_offset, match))
 
     # Build formatted table - all lines exactly 66 chars: # + 64 chars + #
     lines = []

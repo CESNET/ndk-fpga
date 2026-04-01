@@ -15,7 +15,7 @@ use work.axis_eth_parser_types.all;
 
 -- The AXIS_ETH_PARSER_UNIT component is a single stage in the multi-stage
 -- Ethernet header parser pipeline. Each stage extracts header data for one
--- protocol layer (Ethernet, VLAN, IPv4, or TCP) and determines the next
+-- protocol layer (Ethernet, VLAN, IPv4, TCP, or UDP) and determines the next
 -- protocol in the chain. The component uses the AXIS_ETH_PARSER_SNIFFER to
 -- extract raw header bytes from the AXI-Stream data flow. Based on the
 -- extracted header content, the next protocol type and byte offset are
@@ -27,7 +27,7 @@ entity AXIS_ETH_PARSER_UNIT is
         AXI_TDATA_WIDTH    : natural := 512;
         -- Width of extracted data field in bits (get_max_extract_bytes * 8)
         EXTRACT_DATA_WIDTH : natural := 160;
-        -- Protocol to parse in this stage (PROTO_ETH, PROTO_VLAN, PROTO_IPV4, PROTO_TCP)
+        -- Protocol to parse in this stage (PROTO_ETH, PROTO_VLAN, PROTO_IPV4, PROTO_TCP, PROTO_UDP)
         PROTOCOL           : natural := PROTO_ETH;
         -- Maximum packet size in bytes (determines offset field width)
         PKT_MTU            : natural := 2**14;
@@ -186,6 +186,8 @@ begin
             ip_ihl := unsigned(ext_data_resized(0*8+3 downto 0));
             if ((next_type_ipv4 = IPV4_PROTO_TCP)) then
                 NEXT_PROTOCOL <= std_logic_vector(to_unsigned(PROTO_TCP, PROTOCOL_WIDTH));
+            elsif ((next_type_ipv4 = IPV4_PROTO_UDP)) then
+                NEXT_PROTOCOL <= std_logic_vector(to_unsigned(PROTO_UDP, PROTOCOL_WIDTH));
             else
                 NEXT_PROTOCOL <= (others => '0');
             end if;
@@ -195,6 +197,16 @@ begin
             else
                 NEXT_OFFSET <= std_logic_vector(unsigned(ext_meta_offset) + to_unsigned(IPV4_HDR_MIN_SIZE, OFFSET_WIDTH));
             end if;
+        end if;
+
+        if ((PROTO_TCP = PROTOCOL) and (to_integer(unsigned(ext_meta_proto)) = PROTOCOL)) then
+            NEXT_PROTOCOL <= (others => '0');
+            NEXT_OFFSET   <= std_logic_vector(unsigned(ext_meta_offset) + to_unsigned(TCP_HDR_EXTRACT, OFFSET_WIDTH));
+        end if;
+
+        if ((PROTO_UDP = PROTOCOL) and (to_integer(unsigned(ext_meta_proto)) = PROTOCOL)) then
+            NEXT_PROTOCOL <= (others => '0');
+            NEXT_OFFSET   <= std_logic_vector(unsigned(ext_meta_offset) + to_unsigned(UDP_HDR_EXTRACT, OFFSET_WIDTH));
         end if;
     end process;
 
