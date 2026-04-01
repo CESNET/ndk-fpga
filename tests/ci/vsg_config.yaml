@@ -93,6 +93,10 @@ rule:
         action: 'remove'
     process_029:
         clock: 'edge'
+    process_034:
+        disable : true
+    process_035:
+        disable : true
 
     # for discussion
     generic_map_002:
