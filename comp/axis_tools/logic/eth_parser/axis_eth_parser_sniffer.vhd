@@ -57,6 +57,8 @@ entity AXIS_ETH_PARSER_SNIFFER is
         -- Start byte offset within the frame
         START_OFFSET          : in  std_logic_vector(log2(PKT_MTU+1)-1 downto 0);
         -- Start extraction enable
+        START_ENABLE          : in  std_logic;
+        -- Start extraction valid
         START_VALID           : in  std_logic;
 
         -- Extracted metadata (passed through from START_META)
@@ -97,12 +99,14 @@ architecture FULL of AXIS_ETH_PARSER_SNIFFER is
     -- Start offset and metadata latching
     signal start_offset_reg     : unsigned(OFFSET_WIDTH-1 downto 0);
     signal start_valid_reg      : std_logic;
+    signal start_enable_reg     : std_logic;
     signal soff                 : unsigned(OFFSET_WIDTH-1 downto 0);
     signal soff_word            : unsigned(OFF_WORDS_W-1 downto 0);
     signal soff_bytes           : unsigned(OFF_BYTES_W-1 downto 0);
     signal soff_vld             : std_logic;
     signal word_ok              : std_logic;
     signal word_ok_set          : std_logic;
+    signal enable_flag          : std_logic;
 
     -- Extraction state machine
     signal extracting           : std_logic;
@@ -179,6 +183,7 @@ begin
                 start_offset_reg <= unsigned(START_OFFSET);
                 start_valid_reg  <= '1';
                 start_meta_reg   <= START_META;
+                start_enable_reg <= START_ENABLE;
             end if;
             if ((RESET = '1') or (end_word = '1')) then
                 start_valid_reg <= '0';
@@ -192,17 +197,19 @@ begin
     soff_word  <= soff(OFFSET_WIDTH-1 downto OFF_BYTES_W);
     soff_bytes <= soff(OFF_BYTES_W-1 downto 0);
 
+    enable_flag <= START_ENABLE when (START_VALID = '1') else start_enable_reg;
+
     -- Word matches target offset when word counter equals offset word field
     word_ok <= '1' when (soff_vld = '1' and soff_word = word_cnt) else '0';
 
     -- Calculate number of bytes to extract in current cycle
-    process (extracting, valid_word, bytes_extracted, soff_bytes, bytes_remaining)
+    process (all)
     begin
         if ((extracting = '1') and (valid_word = '1')) then
             if (bytes_extracted = 0) then
                 -- First extraction word: extract from soff_bytes to end of AXI word
                 if ((WORD_BYTES - to_integer(soff_bytes)) < to_integer(bytes_remaining)) then
-                    bytes_to_extract <= resize((WORD_BYTES - soff_bytes), WORD_BYTES_W);
+                    bytes_to_extract <= to_unsigned(WORD_BYTES, WORD_BYTES_W) - soff_bytes;
                 else
                     bytes_to_extract <= resize(bytes_remaining, WORD_BYTES_W);
                 end if;
@@ -315,8 +322,10 @@ begin
         if rising_edge(CLK) then
             if (RESET = '1') then
                 extracted_vld_reg <= '0';
-            else
+            elsif (enable_flag = '1') then
                 extracted_vld_reg <= extracted_vld;
+            else
+                extracted_vld_reg <= valid_word and word_ok and not word_ok_set;
             end if;
         end if;
     end process;

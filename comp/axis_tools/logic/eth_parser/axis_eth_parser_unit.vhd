@@ -81,6 +81,8 @@ architecture FULL of AXIS_ETH_PARSER_UNIT is
     -- Number of bytes to extract for current protocol
     constant STAGE_EXTRACT_BYTES : natural := get_extract_bytes(PROTOCOL);
 
+    signal in_enable           : std_logic;
+
     -- Extracted data and metadata from sniffer
     signal ext_valid           : std_logic;
     signal ext_meta            : std_logic_vector(META_WIDTH_INTERNAL-1 downto 0);
@@ -101,6 +103,8 @@ architecture FULL of AXIS_ETH_PARSER_UNIT is
     signal dbg_hdr_cnt         : unsigned(63 downto 0);
 
 begin
+
+    in_enable <= '1' when (to_integer(unsigned(IN_PROTOCOL)) = PROTOCOL) else '0';
 
     -- Sniffer extracts header bytes from AXI-Stream at calculated offset
     sniffer_i : entity work.AXIS_ETH_PARSER_SNIFFER
@@ -126,6 +130,7 @@ begin
         TX_AXI_TREADY     => TX_AXI_TREADY,
         START_META        => std_logic_vector(IN_OFFSET) & std_logic_vector(IN_PROTOCOL),
         START_OFFSET      => std_logic_vector(IN_OFFSET),
+        START_ENABLE      => in_enable,
         START_VALID       => IN_VLD,
         EXTRACTED_META    => ext_meta,
         EXTRACTED_DATA    => ext_data,
