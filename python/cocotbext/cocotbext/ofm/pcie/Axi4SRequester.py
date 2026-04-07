@@ -23,8 +23,8 @@ class Frame(object):
 class Axi4SRequester(PcieRequester):
     """Handles PCIe requests on the PCIe-specific AXI4-Streaming interface."""
 
-    def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
-        super().__init__(ram, rq_driver, rc_driver, rq_monitor)
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64):
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb)
         self._rq_inframe = False
         self._rq_width = len(rq_monitor.bus.TDATA)
 
@@ -68,21 +68,47 @@ class Axi4SRequester(PcieRequester):
         else:
             raise NotImplementedError
 
-    def hdr_req2compl(self, rq_hdr):
-        req_hdr, meta = rq_hdr # AXI speciality - some data are in header, some in metadata (tuser)
+    def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):
+        """
+        Creates a completion header from the given request header.
+
+        Args:
+            rq_hdr: The original request header (tuple of header and metadata for AXI4S)
+            byte_count: Total remaining bytes including this completion (for split completions)
+            lower_address: Lower address for this completion (RCB-aligned for non-first completions)
+            is_last: True if this is the final completion in a split sequence
+            payload_bytes: Number of payload bytes in this completion
+        """
+        req_hdr, meta = rq_hdr  # AXI speciality - some data are in header, some in metadata (tuser)
         req_fbe, req_lbe, req_addr_offset = meta
         rc_hdr = RCHeader()
         rc_hdr.tag = req_hdr.tag
-        rc_hdr.dword_count = req_hdr.dword_count
-        # TODO: Check IO and CFG transfers
-        rc_hdr.byte_count = (
-            req_hdr.dword_count * 4
-            - (4 - numberOfSetBits(req_fbe))
-            - ((4 - numberOfSetBits(req_fbe)) if req_hdr.dword_count > 1 else 0)
-        )
-        # TODO: support multiple completions
-        rc_hdr.request_completed = 1
-        # TODO: for multiple completions must be updated
-        #       FBE is only applied in first completion
-        rc_hdr.addr = (req_hdr.addr << 2) + fbe2offset(req_fbe)
+
+        # Calculate dword_count from payload_bytes
+        if payload_bytes is not None:
+            rc_hdr.dword_count = (payload_bytes + 3) // 4  # Round up to dwords
+        else:
+            rc_hdr.dword_count = req_hdr.dword_count
+
+        # Set byte_count - total remaining bytes including this completion
+        if byte_count is not None:
+            rc_hdr.byte_count = byte_count
+        else:
+            # TODO: Check IO and CFG transfers
+            rc_hdr.byte_count = (
+                req_hdr.dword_count * 4
+                - (4 - numberOfSetBits(req_fbe))
+                - ((4 - numberOfSetBits(req_fbe)) if req_hdr.dword_count > 1 else 0)
+            )
+
+        # Set request_completed - only 1 on the final completion
+        rc_hdr.request_completed = 1 if is_last else 0
+
+        # Set lower address
+        if lower_address is not None:
+            # For split completions: first uses original address, subsequent are RCB-aligned
+            rc_hdr.addr = lower_address & 0xFFF  # 12-bit address field
+        else:
+            rc_hdr.addr = (req_hdr.addr << 2) + fbe2offset(req_fbe)
+
         return rc_hdr
