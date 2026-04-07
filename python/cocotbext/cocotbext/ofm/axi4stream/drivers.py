@@ -24,16 +24,14 @@ class Axi4StreamMaster(BusDriver):
         super().__init__(entity, name, clock, array_idx=array_idx)
 
         ms, os = self._signals, self._optional_signals
-        signals = ms | os if isinstance(ms, dict) else ms + os
-        for s in signals:
+        self.all_signals = ms | os if isinstance(ms, dict) else ms + os
+        for s in self.all_signals:
             if hasattr(self.bus, s) and s not in ["TREADY"]:
                 val = 2 ** getattr(self.bus, s).value.n_bits - 1 if s in ["TSTRB", "TKEEP"] else 0
                 getattr(self.bus, s).setimmediatevalue(val)
 
     def _clear_control_signals(self):
-        signals = self._signals + self._optional_signals
-
-        for name in signals:
+        for name in self.all_signals:
             if hasattr(self.bus, name) and name != "TREADY":
                 signal = getattr(self.bus, name)
                 if name == "TVALID":
