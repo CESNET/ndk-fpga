@@ -77,8 +77,8 @@ def _compare_transactions(expected: PprData, actual: PprData, packet_num: int = 
     return False, msg
 
 
-class testbench():
-    def __init__(self, dut, debug=False):
+class Testbench():
+    def __init__(self, dut, debug=False, **kwargs):
         self.dut = dut
         self.user_req_drv = PprDriver(dut, "USER_REQ_MVB", dut.CLK)
         self.pcie_up_drv = BitDriver(dut.PCIE_UP_MVB_DST_RDY, dut.CLK)
@@ -94,7 +94,9 @@ class testbench():
             ram=self.ram,
             rq_driver=self.pcie_up_drv,
             rc_driver=self.pcie_down_drv,
-            rq_monitor=self.pcie_up_mon
+            rq_monitor=self.pcie_up_mon,
+            mps=kwargs.get("mps", 256),
+            rcb=kwargs.get("rcb", 64)
         )
         # Address tracker to prevent overlapping memory accesses
         self.addr_tracker = AddressRangeTracker(self.ram_capacity)
@@ -164,13 +166,15 @@ class testbench():
 
 # NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
 @cocotb.test()
-async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=1500, pcie_mrrs=256):
-    assert pcie_mrrs in [128, 256, 512, 1024, 2048, 4096, 8192, 16384], "PCIE_MRRS must be one of the standard values."
+async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=1500, pcie_mrrs=512, pcie_mps=256, pcie_rcb=64):
+    assert pcie_mrrs in [128, 256, 512, 1024, 2048, 4096], "PCIE_MRRS must be one of the standard values."
+    assert pcie_mps in [128, 256, 512, 1024, 2048, 4096], "PCIE_MPS must be one of the standard values."
+    assert pcie_rcb in [64, 128], "PCIE_RCB must be one of the standard values."
 
     dut.RESET.value = 1
     cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
 
-    tb = testbench(dut, debug=False)
+    tb = Testbench(dut, debug=False, mps=pcie_mps, rcb=pcie_rcb)
     # Change MVB driver's IdleGenerator to ItemRateLimiter
     idle_gen_conf = dict(random_idles=True, max_idles=3, zero_idles_chance=80)
     tb.user_req_drv.set_idle_generator(ItemRateLimiter(rate_percentage=50, **idle_gen_conf))
