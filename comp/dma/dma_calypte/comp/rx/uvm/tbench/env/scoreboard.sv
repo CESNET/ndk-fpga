@@ -147,13 +147,13 @@ class scoreboard #(
 
         //Check pcie requiretments
         if (dut.data.size() > MPS || ((({dut.address, 2'b00} & (PAGE_SIZE-1)) + dut.data.size()) > PAGE_SIZE)) begin
-            const logic [64-1:0] tmp_addr = ((({dut.address, 2'b00} & (PAGE_SIZE-1)) + dut.data.size());
+            const logic [64-1:0] tmp_addr = (({dut.address, 2'b00} & (PAGE_SIZE-1)) + dut.data.size());
             string err_msg = $sformatf("\n\tPacket doesn't meet pcie requirements.");
             err_msg = {err_msg, $sformaf("\n\t\tPacket size %0d", dut.data.size())};
             err_msg = {err_msg, $sformaf("\n\t\tMaximum payload(%0d) exceeded %0d", MPS, dut.data.size() > MPS)};
             err_msg = {err_msg, $sformaf("\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
                                                     PAGE_SIZE,
-                                                    tmp_addr > PAGE_SIZE),
+                                                    tmp_addr > PAGE_SIZE,
                                                     {dut.address, 2'b00})};
             `uvm_error(this.get_full_name(), err_msg);
         end
