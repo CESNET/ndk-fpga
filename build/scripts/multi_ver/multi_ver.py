@@ -63,149 +63,155 @@ def run_modelsim(fdo_file, test_name, manual=False, gui=False, coverage=False, e
         del os.environ[k]
     return result
 
-##########
-# Parsing script arguments
-##########
-
-
-parser = argparse.ArgumentParser()
-
-parser.add_argument("fdo_file", help="Name of verification \".fdo\" file to run in Modelsim")
-parser.add_argument("test_pkg_file", help="Name of verification \".sv\" or \".vhd\" package file modify when applying settings")
-parser.add_argument("settings_file", help="Name of verification settings \".py\" file containing \"SETTINGS\" dictionary variable")
-parser.add_argument("-s", "--setting", nargs="+", help="Name of a specific setting or a sequence of settings from the \"SETTINGS\" dictionary to apply and run")
-parser.add_argument("-d", "--dry-run", action="store_true", help="(Used together with '-s') Only sets the requested setting to test package without starting the verification")
-parser.add_argument("-c", "--command-line", action="store_true", help="(Used together with '-s') Starts ModelSim with parameter '-c' for command line run")
-parser.add_argument("-r", "--run-percantage", action="store", help="(Used without '-s') Randomly reduces number of performed combination to the given percantage ('100' for running all combinations)")
-parser.add_argument("-n", "--test-name", action="store", help="(Used with '-s') select name of test. Some file will be saved with this suffix")
-parser.add_argument("-p", "--prefix-name", action="store", help="this create prefix for test_name to prevent rewrite older files", default="")
-parser.add_argument("--coverage", action="store_true", help="Generate and save code coverarge to <test_name>.ucdb file")
-
-args = parser.parse_args()
-
-# Detect package type
-PKG_MOD_SED = """sed -i "s/\\\\(\\<\\(parameter\\|localparam int unsigned\\)\\>\\s\\s*\\<{}\\W*\\\\)=..*;/\\\\1= {};/g" {}"""
-if len(args.test_pkg_file) > 4:
-    if args.test_pkg_file[-4:] == ".vhd":
-        PKG_MOD_SED = """sed -i "s/\\\\(\\<constant\\>\\s\\s*\\<{}\\W*:.*\\\\):=..*;/\\\\1:= {};/g" {}""" # VHDL format
 
 ##########
-
+# Main function of the script
 ##########
-# Import Settings
-##########
+def main():
+    global FAIL
 
-# import using relative path from execution directory
-SETTINGS = SourceFileLoader(args.settings_file, "./" + args.settings_file).load_module().SETTINGS
+    # Parsing script arguments
+    parser = argparse.ArgumentParser()
 
-if "default" not in SETTINGS.keys():
-    print("ERROR: The settings file \"{}\" does not contain the obligatory \"default\" setting!".format(args.settings_file))
-    exit(-2)
+    parser.add_argument("fdo_file", help="Name of verification \".fdo\" file to run in Modelsim")
+    parser.add_argument("test_pkg_file", help="Name of verification \".sv\" or \".vhd\" package file modify when applying settings")
+    parser.add_argument("settings_file", help="Name of verification settings \".py\" file containing \"SETTINGS\" dictionary variable")
+    parser.add_argument("-s", "--setting", nargs="+", help="Name of a specific setting or a sequence of settings from the \"SETTINGS\" dictionary to apply and run")
+    parser.add_argument("-d", "--dry-run", action="store_true", help="(Used together with '-s') Only sets the requested setting to test package without starting the verification")
+    parser.add_argument("-c", "--command-line", action="store_true", help="(Used together with '-s') Starts ModelSim with parameter '-c' for command line run")
+    parser.add_argument("-r", "--run-percantage", action="store", help="(Used without '-s') Randomly reduces number of performed combination to the given percantage ('100' for running all combinations)")
+    parser.add_argument("-n", "--test-name", action="store", help="(Used with '-s') select name of test. Some file will be saved with this suffix")
+    parser.add_argument("-p", "--prefix-name", action="store", help="this create prefix for test_name to prevent rewrite older files", default="")
+    parser.add_argument("--coverage", action="store_true", help="Generate and save code coverarge to <test_name>.ucdb file")
 
-SETTING = {}
+    args = parser.parse_args()
 
-##########
+    # Detect package type
+    PKG_MOD_SED = """sed -i "s/\\\\(\\<\\(parameter\\|localparam int unsigned\\)\\>\\s\\s*\\<{}\\W*\\\\)=..*;/\\\\1= {};/g" {}"""
+    if len(args.test_pkg_file) > 4:
+        if args.test_pkg_file[-4:] == ".vhd":
+            PKG_MOD_SED = """sed -i "s/\\\\(\\<constant\\>\\s\\s*\\<{}\\W*:.*\\\\):=..*;/\\\\1:= {};/g" {}""" # VHDL format
 
-##########
-# Define settings combinations
-##########
-
-COMBINATIONS = dict()
-
-if "_combinations_" in SETTINGS.keys():
-    # User defined combinations
-    if type(SETTINGS["_combinations_"]) is dict:
-        COMBINATIONS = SETTINGS["_combinations_"]
-    if type(SETTINGS["_combinations_"]) is tuple:
-        for it, comb in enumerate(SETTINGS["_combinations_"]):
-            COMBINATIONS[f"test_name_{it}"] = comb
-
-    del SETTINGS["_combinations_"]
-
-else:
-    # Default combinations
-    for key in SETTINGS.keys():
-        COMBINATIONS[key] = (key, )
-
-if args.run_percantage:
-    # Randomly reduce number of combinations based on command argument
-    COMBINATIONS = reduce_combinations(COMBINATIONS, int(args.run_percantage))
-    del SETTINGS["_combinations_run_percentage_"]
-elif "_combinations_run_percentage_" in SETTINGS.keys():
-    # Randomly reduce number of combinations based on SETTINGS
-    COMBINATIONS = reduce_combinations(COMBINATIONS, SETTINGS["_combinations_run_percentage_"])
-    del SETTINGS["_combinations_run_percentage_"]
-
-#print(COMBINATIONS)
-
-##########
-
-#Print current directory where verification is running
-print(os.getcwd())
-
-#Set text_name_prefix and REPLACE SPACE WITH UNDERSCORE.
-test_name_prefix = ""
-if args.prefix_name is not None and args.prefix_name != "":
-    test_name_prefix = args.prefix_name.replace(" ", "_") + "_"
-
-
-if args.setting is None and args.test_name is None:
-    ##########
-    # Run all settings
     ##########
 
-    for key in COMBINATIONS:
-        comb = COMBINATIONS[key]
-        SETTING = create_setting_from_combination(SETTINGS, comb)
+    ##########
+    # Import Settings
+    ##########
 
+    # import using relative path from execution directory
+    SETTINGS = SourceFileLoader(args.settings_file, "./" + args.settings_file).load_module().SETTINGS
+
+    if "default" not in SETTINGS.keys():
+        print("ERROR: The settings file \"{}\" does not contain the obligatory \"default\" setting!".format(args.settings_file))
+        exit(-2)
+
+    SETTING = {}
+
+    ##########
+
+    ##########
+    # Define settings combinations
+    ##########
+
+    COMBINATIONS = dict()
+
+    if "_combinations_" in SETTINGS.keys():
+        # User defined combinations
+        if type(SETTINGS["_combinations_"]) is dict:
+            COMBINATIONS = SETTINGS["_combinations_"]
+        if type(SETTINGS["_combinations_"]) is tuple:
+            for it, comb in enumerate(SETTINGS["_combinations_"]):
+                COMBINATIONS[f"test_name_{it}"] = comb
+
+        del SETTINGS["_combinations_"]
+
+    else:
+        # Default combinations
+        for key in SETTINGS.keys():
+            COMBINATIONS[key] = (key, )
+
+    if args.run_percantage:
+        # Randomly reduce number of combinations based on command argument
+        COMBINATIONS = reduce_combinations(COMBINATIONS, int(args.run_percantage))
+        del SETTINGS["_combinations_run_percentage_"]
+    elif "_combinations_run_percentage_" in SETTINGS.keys():
+        # Randomly reduce number of combinations based on SETTINGS
+        COMBINATIONS = reduce_combinations(COMBINATIONS, SETTINGS["_combinations_run_percentage_"])
+        del SETTINGS["_combinations_run_percentage_"]
+
+    #print(COMBINATIONS)
+
+    ##########
+
+    #Print current directory where verification is running
+    print(os.getcwd())
+
+    #Set text_name_prefix and REPLACE SPACE WITH UNDERSCORE.
+    test_name_prefix = ""
+    if args.prefix_name is not None and args.prefix_name != "":
+        test_name_prefix = args.prefix_name.replace(" ", "_") + "_"
+
+    if args.setting is None and args.test_name is None:
+        ##########
+        # Run all settings
+        ##########
+
+        for key in COMBINATIONS:
+            comb = COMBINATIONS[key]
+            SETTING = create_setting_from_combination(SETTINGS, comb)
+
+            env = apply_setting(args.test_pkg_file, SETTING, PKG_MOD_SED)
+
+            comb_name = " ".join(comb)
+            print(f"Running combination: {key} ({comb_name})")
+            if (not args.dry_run):
+                vsim_time_start = time.time()
+                result = run_modelsim(args.fdo_file, f'{test_name_prefix}{key}', coverage=args.coverage, env=env)
+                vsim_time_stop = time.time()
+                time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
+                if result == 0: # detect failure
+                    print(f"Run SUCCEEDED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
+                else:
+                    print(f"Run FAILED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
+                    FAIL = True
+
+            # backup transcript
+            # system("cp transcript transcript_"+"_".join(c))
+            # backup test_pkg
+            # system("cp {} {}_".format(args.test_pkg_file,args.test_pkg_file)+"_".join(c))
+        if args.coverage:
+            system('vcover merge coverage_merged.ucdb coverage_*.ucdb > /dev/null')
+        ##########
+    else:
+        ##########
+        # Run selected setting
+        ##########
+
+        if args.test_name is not None:
+            test_name = args.test_name
+            test_setings = COMBINATIONS[args.test_name]
+        if args.setting is not None:
+            test_name = "test_setings"
+            test_setings = args.setting
+
+        SETTING = create_setting_from_combination(SETTINGS, test_setings)
         env = apply_setting(args.test_pkg_file, SETTING, PKG_MOD_SED)
 
-        comb_name = " ".join(comb)
-        print(f"Running combination: {key} ({comb_name})")
+        print("Running combination: " + " ".join(test_setings))
         if (not args.dry_run):
-            vsim_time_start = time.time()
-            result = run_modelsim(args.fdo_file, f'{test_name_prefix}{key}', coverage=args.coverage, env=env)
-            vsim_time_stop = time.time()
-            time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
-            if result == 0: # detect failure
-                print(f"Run SUCCEEDED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
+            result = run_modelsim(args.fdo_file, f'{test_name_prefix}{test_name}', True, (not args.command_line), coverage=args.coverage, env=env)
+            if (result == 0): # detect failure
+                print("Run SUCCEEDED (" + " ".join(test_setings) + ")")
             else:
-                print(f"Run FAILED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
+                print("Run FAILED (" + " ".join(test_setings) + ")")
                 FAIL = True
 
-        # backup transcript
-        # system("cp transcript transcript_"+"_".join(c))
-        # backup test_pkg
-        # system("cp {} {}_".format(args.test_pkg_file,args.test_pkg_file)+"_".join(c))
-    if args.coverage:
-        system('vcover merge coverage_merged.ucdb coverage_*.ucdb > /dev/null')
-    ##########
-else:
-    ##########
-    # Run selected setting
-    ##########
+        print("Done")
+        ##########
 
-    if args.test_name is not None:
-        test_name = args.test_name
-        test_setings = COMBINATIONS[args.test_name]
-    if args.setting is not None:
-        test_name = "test_setings"
-        test_setings = args.setting
+    if (FAIL):
+        exit(-1)
 
-    SETTING = create_setting_from_combination(SETTINGS, test_setings)
-    env = apply_setting(args.test_pkg_file, SETTING, PKG_MOD_SED)
 
-    print("Running combination: " + " ".join(test_setings))
-    if (not args.dry_run):
-        result = run_modelsim(args.fdo_file, f'{test_name_prefix}{test_name}', True, (not args.command_line), coverage=args.coverage, env=env)
-        if (result == 0): # detect failure
-            print("Run SUCCEEDED (" + " ".join(test_setings) + ")")
-        else:
-            print("Run FAILED (" + " ".join(test_setings) + ")")
-            FAIL = True
-
-    print("Done")
-    ##########
-
-if (FAIL):
-    exit(-1)
+if __name__ == "__main__":
+    main()
