@@ -32,7 +32,6 @@ entity PPR_REQUEST_PROCESSOR is
         MEMORY_ITEM_WIDTH : natural := 1*8*8*8;
         ID_WIDTH          : natural := 11;
         PCIE_MRRS_WIDTH   : natural := 13;
-        ADDRESS_WIDTH     : natural := 64;
         -- Size of a RAM page (in bytes).
         PAGE_SIZE         : natural := 4096;
         DEVICE            : string := "AGILEX"
@@ -50,7 +49,7 @@ entity PPR_REQUEST_PROCESSOR is
         -- ========================================================
 
         RX_MVB_ID         : in  std_logic_vector(MVB_ITEMS*ID_WIDTH-1 downto 0);
-        RX_MVB_ADDRESS    : in  std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
+        RX_MVB_ADDRESS    : in  std_logic_vector(MVB_ITEMS*DMA_REQUEST_GLOBAL_W-1 downto 0);
         RX_MVB_LENGTH     : in  std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         RX_MVB_VLD        : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY    : in  std_logic;
@@ -126,7 +125,7 @@ architecture FULL of PPR_REQUEST_PROCESSOR is
     signal rx_meta_arr               : slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH_BASE-1 downto 0);
 
     signal instr_tx_meta             : std_logic_vector(MVB_ITEMS*META_WIDTH_BASE-1 downto 0);
-    signal instr_tx_address          : std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
+    signal instr_tx_address          : std_logic_vector(MVB_ITEMS*DMA_REQUEST_GLOBAL_W-1 downto 0);
     signal instr_tx_length           : std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
     signal instr_tx_last             : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal instr_tx_valid            : std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -183,7 +182,7 @@ begin
         MVB_META_WIDTH => META_WIDTH_BASE,
         PKT_MTU        => PKT_MTU,
         PCIE_MPS_WIDTH => PCIE_MRRS_WIDTH,
-        ADDRESS_WIDTH  => ADDRESS_WIDTH,
+        ADDRESS_WIDTH  => DMA_REQUEST_GLOBAL_W,
         PAGE_SIZE      => PAGE_SIZE,
         DEVICE         => DEVICE
     )
@@ -224,7 +223,6 @@ begin
         MVB_ITEMS      => MVB_ITEMS,
         MVB_META_WIDTH => META_WIDTH_EXT,
         PKT_MTU        => PKT_MTU,
-        ADDRESS_WIDTH  => ADDRESS_WIDTH,
         DEVICE         => DEVICE
     )
     port map (

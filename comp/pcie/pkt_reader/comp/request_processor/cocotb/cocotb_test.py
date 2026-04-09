@@ -213,9 +213,11 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
 
     id = 0
     id_width = tb.dut.ID_WIDTH.value
+    # Get address width from DmaUphdr class (dma_request_global field)
+    addr_width = dict(DmaUphdr.items)['dma_request_global']
     # No need to generate packets, but it will be simpler to reuse it in the test for the whole PPR component
     for mfb_pkt in random_packets(frame_size_min, frame_size_max, frame_count):
-        addr = randint(0, 2**tb.dut.ADDRESS_WIDTH.value - 1)
+        addr = randint(0, 2**addr_width - 1)
         length = len(mfb_pkt)
         # Generate a MVB instruction for each packet
         mvb_instr = PprInstr()

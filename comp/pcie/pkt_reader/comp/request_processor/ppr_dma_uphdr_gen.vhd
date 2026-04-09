@@ -21,7 +21,6 @@ entity PPR_DMA_UPHDR_GEN is
         MVB_META_WIDTH  : natural := 0;
         -- Maximum packet size in bytes
         PKT_MTU         : integer := 2**12;
-        ADDRESS_WIDTH   : natural := 64;
         DEVICE          : string := "AGILEX"
     );
     port (
@@ -33,7 +32,7 @@ entity PPR_DMA_UPHDR_GEN is
         -- ========================================================
 
         RX_MVB_META    : in  std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
-        RX_MVB_ADDRESS : in  std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
+        RX_MVB_ADDRESS : in  std_logic_vector(MVB_ITEMS*DMA_REQUEST_GLOBAL_W-1 downto 0);
         RX_MVB_LENGTH  : in  std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         RX_MVB_VALID   : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY : in  std_logic;

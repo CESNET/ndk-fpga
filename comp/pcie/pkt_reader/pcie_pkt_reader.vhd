@@ -56,7 +56,6 @@ entity PCIE_PKT_READER is
         MEMORY_SIZE     : natural := 1024;
         ID_WIDTH        : natural := 11;
         PCIE_MRRS_WIDTH : natural := 13;
-        ADDRESS_WIDTH   : natural := 64;
         -- Size of a RAM page (in bytes).
         PAGE_SIZE       : natural := 4096;
         DEVICE          : string := "AGILEX"
@@ -72,7 +71,7 @@ entity PCIE_PKT_READER is
         -- =================================================================
 
         USER_REQ_MVB_ID       : in  std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0);
-        USER_REQ_MVB_ADDRESS  : in  std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
+        USER_REQ_MVB_ADDRESS  : in  std_logic_vector(MFB_REGIONS*DMA_REQUEST_GLOBAL_W-1 downto 0);
         USER_REQ_MVB_LENGTH   : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
         USER_REQ_MVB_VLD      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         USER_REQ_MVB_SRC_RDY  : in  std_logic;
@@ -359,7 +358,6 @@ begin
         MEMORY_ITEM_WIDTH => WORD_WIDTH,
         ID_WIDTH          => ID_WIDTH,
         PCIE_MRRS_WIDTH   => PCIE_MRRS_WIDTH,
-        ADDRESS_WIDTH     => ADDRESS_WIDTH,
         PAGE_SIZE         => PAGE_SIZE,
         DEVICE            => DEVICE
     )
