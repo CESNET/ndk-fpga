@@ -1,12 +1,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2023 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
+#            Daniel Kondys <kondys@cesnet.cz>
 
-import logging
-import cocotb
-from cocotb.queue import Queue
-from ..utils import concat, numberOfSetBits, bitmask, byte_serialize, byte_deserialize
-from .PcieHeaders import RQHeader, RCHeader, RQUser, RCUser, fbe2offset
+from ..utils import numberOfSetBits, bitmask, byte_serialize
+from .PcieHeaders import RQHeader, RCHeader, RQUser, fbe2offset
+from .PcieRequester import PcieRequester
 
 
 class Frame(object):
@@ -21,26 +20,13 @@ class Frame(object):
         return self
 
 
-class Axi4SRequester:
+class Axi4SRequester(PcieRequester):
+    """Handles PCIe requests on the PCIe-specific AXI4-Streaming interface."""
+
     def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
-        self._ram = ram
-        self._rq = rq_driver
-        self._rc = rc_driver
-        self._rcm = rq_monitor
-
-        self._q = Queue()
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor)
         self._rq_inframe = False
-        self._rq_pending = 0
-        self._rq_pending_dwords = 0
-        self._rq_pending_meta = ()
-
-        self._rq_width = len(self._rq.bus.TDATA)
-
-        self._log = logging.getLogger(__name__)
-
-        rq_monitor.add_callback(self.handle_rq_transaction)
-
-        cocotb.start_soon(self.handle_response())
+        self._rq_width = len(rq_monitor.bus.TDATA)
 
     def handle_rq_transaction(self, transaction):
         tuser = RQUser.deserialize(int.from_bytes(transaction['TUSER'], byteorder='big'))
@@ -71,60 +57,32 @@ class Axi4SRequester:
             sop_pos.pop(0)
 
     def handle_request(self, req):
-        fbe, lbe, addr_offset = req.meta
         header = RQHeader.deserialize(req.data)
         payload = bytes(byte_serialize(req.data >> len(header), header.dword_count * 4))
 
         addr = header.addr << 2
-        byte_count = header.dword_count * 4
-
         if header.req_type == 1:
-            self._ram.w(addr, payload)
-            self._log.debug(f"Write addr: {addr:#010x} dwords: {header.dword_count: 3} payload: {payload.hex()}")
+            self.handle_wr_request(data=payload, addr=addr)
         elif header.req_type == 0:
-            d = self._ram.r(addr, byte_count)
-            self._log.debug(f"Read  addr: {addr:#010x} dwords: {header.dword_count: 3} payload: {d.hex()}")
-            self._q.put_nowait((header, req.meta, d))
+            self.handle_rd_request(hdr=(header, req.meta), addr=addr, length=header.dword_count*4)
         else:
             raise NotImplementedError
 
-    async def handle_response(self):
-        while True:
-            request, req_meta, data = await self._q.get()
-            req_fbe, req_lbe, req_addr_offset = req_meta
-            dword_count = request.dword_count + 3
-
-            header = RCHeader()
-            header.tag = request.tag
-            header.dword_count = request.dword_count
-            # 15.bit_count() # only in Python 3.10 and newer can be used below
-            # TODO: Check IO and CFG transfers
-            header.byte_count = (
-                request.dword_count * 4
-                - (4 - numberOfSetBits(req_fbe))
-                - ((4 - numberOfSetBits(req_fbe)) if request.dword_count > 1 else 0)
-            )
-            header.request_completed = 1
-            # TODO: for multiple completions must be updated
-            #       FBE is only applied in first completion
-            header.addr = (request.addr << 2) + fbe2offset(req_fbe)
-            user = RCUser()
-            user.sop = 1
-            user.eop = 0
-            user.eop0 = dword_count - 1
-
-            tdata = concat(
-                [(header.serialize(), len(header))]
-                + [(byte_deserialize(data), len(data) * 8)]
-            )
-            while dword_count > 0:
-                tkeep = bitmask(self._rq_width // 32)
-                if dword_count <= self._rq_width // 32:
-                    user.eop = 1
-                    user.eop_pos0 = dword_count
-                    tkeep = bitmask(dword_count)
-                await self._rc.write({"TDATA": tdata & bitmask(self._rq_width), "TUSER": user.serialize(), "TKEEP": tkeep}, sync=False)
-
-                user.sop = 0
-                tdata >>= self._rq_width
-                dword_count -= self._rq_width // 32
+    def hdr_req2compl(self, rq_hdr):
+        req_hdr, meta = rq_hdr # AXI speciality - some data are in header, some in metadata (tuser)
+        req_fbe, req_lbe, req_addr_offset = meta
+        rc_hdr = RCHeader()
+        rc_hdr.tag = req_hdr.tag
+        rc_hdr.dword_count = req_hdr.dword_count
+        # TODO: Check IO and CFG transfers
+        rc_hdr.byte_count = (
+            req_hdr.dword_count * 4
+            - (4 - numberOfSetBits(req_fbe))
+            - ((4 - numberOfSetBits(req_fbe)) if req_hdr.dword_count > 1 else 0)
+        )
+        # TODO: support multiple completions
+        rc_hdr.request_completed = 1
+        # TODO: for multiple completions must be updated
+        #       FBE is only applied in first completion
+        rc_hdr.addr = (req_hdr.addr << 2) + fbe2offset(req_fbe)
+        return rc_hdr

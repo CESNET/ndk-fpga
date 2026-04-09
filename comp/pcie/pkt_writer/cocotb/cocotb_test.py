@@ -106,7 +106,7 @@ class testbench():
             addr, length = p
             # Create DMA upstream header
             hdr = DmaUphdr()
-            hdr.dma_request_length = length >> 2
+            hdr.dma_request_length = (length >> 2) + (length & 0b11 != 0) # Round up to dwords
             hdr.dma_request_type = 1 # 1=Write
             hdr.dma_request_firstib = 0
             hdr.dma_request_lastib = 4 - (length & 3)

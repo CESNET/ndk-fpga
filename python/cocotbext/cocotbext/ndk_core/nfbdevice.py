@@ -10,10 +10,11 @@ from cocotb.utils import get_sim_steps
 
 from cocotb import simulator
 
-from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster, Axi4StreamSlave
+from cocotbext.ofm.axi4s_pcie.drivers import Axi4sPcieDriverMaster, Axi4sPcieDriverSlave
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.avst_pcie.drivers import AvstPcieDriverMaster, AvstPcieDriverSlave
 from cocotbext.ofm.avst_pcie.monitors import AvstPcieMonitor
+
 
 from cocotbext.ofm.pcie import Axi4SCompleter
 from cocotbext.ofm.pcie import Axi4SRequester
@@ -30,16 +31,6 @@ from cocotbext.ofm.mac_segmented.drivers import MAC_Segmented_RX_Driver
 from cocotbext.ofm.mac_segmented.monitors import MAC_Segmented_TX_Monitor
 
 from cocotbext.ofm.avst_pcie.creditor import AvstCreditorRX, AvstCreditorTX, AvstCreditRequester, AvstCreditReceiver
-
-
-class Axi4StreamMasterV(Axi4StreamMaster):
-    _signals = {"TVALID": "VALID"}
-    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP": "KEEP", "TUSER": "USER"}
-
-
-class Axi4StreamSlaveV(Axi4StreamSlave):
-    _signals = {"TVALID": "VALID"}
-    _optional_signals = {"TREADY": "READY", "TDATA": "DATA", "TLAST": "LAST", "TKEEP": "KEEP", "TUSER": "USER"}
 
 
 class Axi4StreamV(Axi4Stream):
@@ -169,12 +160,12 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             clk = pcie_i.pcie_clk[i]
             #rst = pcie_i.pcie_hip_rst[i]
             if hasattr(pcie_i, "pcie_cq_axi_data"):
-                cq  = Axi4StreamMasterV(pcie_i, "pcie_cq_axi", clk, array_idx=i)
-                cc  = Axi4StreamSlaveV(pcie_i, "pcie_cc_axi", clk, array_idx=i)
+                cq  = Axi4sPcieDriverMaster(pcie_i, "pcie_cq_axi", clk, array_idx=i)
+                cc  = Axi4sPcieDriverSlave(pcie_i, "pcie_cc_axi", clk, array_idx=i)
                 ccm = Axi4StreamV(pcie_i, "pcie_cc_axi", clk, 0, aux_signals=True, array_idx=i)
 
-                rq  = Axi4StreamSlaveV(pcie_i, "pcie_rq_axi", clk, array_idx=i)
-                rc  = Axi4StreamMasterV(pcie_i, "pcie_rc_axi", clk, array_idx=i)
+                rq  = Axi4sPcieDriverSlave(pcie_i, "pcie_rq_axi", clk, array_idx=i)
+                rc  = Axi4sPcieDriverMaster(pcie_i, "pcie_rc_axi", clk, array_idx=i)
                 rqm = Axi4StreamV(pcie_i, "pcie_rq_axi", clk, aux_signals=True, array_idx=i)
 
                 req = Axi4SRequester(self.ram, rq, rc, rqm)

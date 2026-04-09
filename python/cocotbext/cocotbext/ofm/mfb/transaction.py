@@ -2,26 +2,13 @@
 # Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Vladislav Valek <vladislav.valek@stud.uni-heidelberg.de>
 
+from dataclasses import dataclass
 from ..base.transaction import Transaction
 
 
+@dataclass(slots=True)
 class MfbTransaction(Transaction):
-    attrs = ["data"]
-
-    def __init__(self, **kwargs):
-        for i in self.attrs:
-            setattr(self, i, 0)
-
-        for attr, value in kwargs.items():
-            setattr(self, attr, value)
-
-    def __eq__(self, other):
-        if isinstance(other, MfbTransaction):
-            for attr in self.attrs:
-                if getattr(self, attr) != getattr(other, attr):
-                    return False
-            return True
-        return NotImplemented
+    data: bytes = b""
 
     def __repr__(self):
         ret = ""
@@ -43,5 +30,6 @@ class MfbTransaction(Transaction):
         return f"{ret}"
 
 
+@dataclass(slots=True)
 class MfbTransactionWithMeta(MfbTransaction):
-    attrs = ["data", "meta"]
+    meta: int = 0

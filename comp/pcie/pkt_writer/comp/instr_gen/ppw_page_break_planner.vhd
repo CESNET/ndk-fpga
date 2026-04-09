@@ -15,6 +15,7 @@ entity PPW_PAGE_BREAK_PLANNER is
     generic (
         -- Number of MVB Items in a word, can't handle more than 1.
         MVB_ITEMS      : natural := 1;
+        MVB_META_WIDTH : natural := 0;
         -- Maximum packet size (in bytes).
         PKT_MTU        : integer := 2**12;
         ADDRESS_WIDTH  : natural := 64;
@@ -30,6 +31,8 @@ entity PPW_PAGE_BREAK_PLANNER is
         -- RX Interface
         -- ========================================================
 
+        -- Received Metadata are duplicated for each generated partial instruction.
+        RX_MVB_META    : in  std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0) := (others => '0');
         RX_MVB_ADDRESS : in  std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
         RX_MVB_LENGTH  : in  std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         RX_MVB_VALID   : in  std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -40,6 +43,8 @@ entity PPW_PAGE_BREAK_PLANNER is
         -- TX Interface
         -- ========================================================
 
+        -- Received Metadata are duplicated for each generated partial instruction.
+        TX_MVB_META    : out std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
         TX_MVB_ADDRESS : out std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
         TX_MVB_LENGTH  : out std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         -- Indicates final MVB Item for a packet.
@@ -80,7 +85,9 @@ architecture FULL of PPW_PAGE_BREAK_PLANNER is
 
     signal nextpage_addr_reg   : unsigned(ADDRESS_WIDTH-log2(PAGE_SIZE)-1 downto 0);
     signal len2end_reg         : unsigned(log2(PKT_MTU+1)-1 downto 0);
+    signal meta_reg            : std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
 
+    signal s_tx_mvb_meta       : std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
     signal s_tx_mvb_address    : std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
     signal s_tx_mvb_length     : std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
     signal s_tx_mvb_last       : std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -90,6 +97,15 @@ architecture FULL of PPW_PAGE_BREAK_PLANNER is
 begin
 
     RX_MVB_DST_RDY <= TX_MVB_DST_RDY and not (breaking and RX_MVB_SRC_RDY);
+
+    meta_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if ((RX_MVB_SRC_RDY = '1') and (RX_MVB_DST_RDY = '1')) then
+                meta_reg <= RX_MVB_META;
+            end if;
+        end if;
+    end process;
 
     -- =====================================================================
     --  Initial calculations from input data
@@ -149,6 +165,7 @@ begin
         case (fsm_pstate) is
 
             when ST_IDLE =>
+                s_tx_mvb_meta    <= RX_MVB_META;
                 s_tx_mvb_address <= RX_MVB_ADDRESS;
                 s_tx_mvb_length  <= std_logic_vector(resize(len2endpage_init, log2(PKT_MTU+1))) when (len_over_page_init = '1') else RX_MVB_LENGTH;
                 s_tx_mvb_last    <= "0" when (len_over_page_init = '1') else "1";
@@ -160,6 +177,7 @@ begin
                 breaking      <= '0';
 
             when ST_BREAK =>
+                s_tx_mvb_meta    <= meta_reg;
                 s_tx_mvb_address <= std_logic_vector(resize_right(nextpage_addr_reg, ADDRESS_WIDTH));
                 s_tx_mvb_length  <= std_logic_vector(to_unsigned(PAGE_SIZE, log2(PKT_MTU+1))) when (len_over_page_cont = '1') else std_logic_vector(len2end_reg);
                 s_tx_mvb_last    <= "0" when (len_over_page_cont = '1') else "1";
@@ -191,6 +209,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (TX_MVB_DST_RDY = '1') then
+                TX_MVB_META    <= s_tx_mvb_meta;
                 TX_MVB_ADDRESS <= s_tx_mvb_address;
                 TX_MVB_LENGTH  <= s_tx_mvb_length;
                 TX_MVB_LAST    <= s_tx_mvb_last;
