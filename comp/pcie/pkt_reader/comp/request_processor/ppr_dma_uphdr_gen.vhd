@@ -74,19 +74,21 @@ architecture FULL of PPR_DMA_UPHDR_GEN is
     --                                 SIGNALS
     -- =====================================================================
 
-    signal tr_cnt         : unsigned(DMA_REQUEST_TAG_W-1 downto 0);
-    signal tr_cnt_full    : std_logic;
-    signal init_tags      : std_logic;
+    signal tr_cnt             : unsigned(DMA_REQUEST_TAG_W-1 downto 0);
+    signal tr_cnt_full        : std_logic;
+    signal init_tags          : std_logic;
 
-    signal tag_fifo_di    : std_logic_vector(MVB_ITEMS*DMA_REQUEST_TAG_W-1 downto 0);
-    signal tag_fifo_wr    : std_logic_vector(MVB_ITEMS-1 downto 0);
-    signal tag_fifo_full  : std_logic;
-    signal tag_fifo_do    : std_logic_vector(MVB_ITEMS*DMA_REQUEST_TAG_W-1 downto 0);
-    signal tag_fifo_rd    : std_logic_vector(MVB_ITEMS-1 downto 0);
-    signal tag_fifo_empty : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal tag_fifo_di        : std_logic_vector(MVB_ITEMS*DMA_REQUEST_TAG_W-1 downto 0);
+    signal tag_fifo_wr        : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal tag_fifo_full      : std_logic;
+    signal tag_fifo_do        : std_logic_vector(MVB_ITEMS*DMA_REQUEST_TAG_W-1 downto 0);
+    signal tag_fifo_rd        : std_logic_vector(MVB_ITEMS-1 downto 0);
+    signal tag_fifo_empty     : std_logic_vector(MVB_ITEMS-1 downto 0);
 
-    signal length_dwords  : unsigned(log2(PKT_MTU/4+1)-1 downto 0);
-    signal dma_uphdr_data : std_logic_vector(DMA_UPHDR_WIDTH-1 downto 0);
+    signal length_bytes_total : unsigned(log2(PKT_MTU+1)+1-1 downto 0);
+    signal length_dwords      : unsigned(log2(PKT_MTU/4+1)+1-1 downto 0);
+    signal dma_uphdr_data     : std_logic_vector(DMA_UPHDR_WIDTH-1 downto 0);
+    signal address_resized    : std_logic_vector(DMA_REQUEST_GLOBAL_W-1 downto 0);
 
 begin
 
@@ -173,17 +175,22 @@ begin
     -- =====================================================================
 
     -- Convert to DWORDS
-    length_dwords <= unsigned(RX_MVB_LENGTH(RX_MVB_LENGTH'high downto 2)) + (or RX_MVB_LENGTH(1 downto 0));
+    -- 1. Total bytes including offset
+    length_bytes_total <= resize(unsigned(RX_MVB_LENGTH), length_bytes_total'length) + unsigned(RX_MVB_ADDRESS(1 downto 0));
+    -- 2. Round up
+    length_dwords      <= length_bytes_total(length_bytes_total'high downto 2) + (or length_bytes_total(1 downto 0));
 
     dma_uphdr_data(DMA_REQUEST_LENGTH  ) <= std_logic_vector(resize(length_dwords, DMA_REQUEST_LENGTH_W));
     dma_uphdr_data(DMA_REQUEST_TYPE    ) <= DMA_TYPE_READ;
-    -- Packets are aligned to the beginning of the word (hence also beginning of DWORD)
-    dma_uphdr_data(DMA_REQUEST_FIRSTIB ) <= (others => '0');
+    -- Compensates for the dword-aligned address by identifing the number of invalid bytes from the start.
+    dma_uphdr_data(DMA_REQUEST_FIRSTIB ) <= RX_MVB_ADDRESS(1 downto 0);
     -- Number of invalid bytes in the last DWORD of the transaction
-    dma_uphdr_data(DMA_REQUEST_LASTIB  ) <= std_logic_vector(TWO_ZEROS - unsigned(RX_MVB_LENGTH(1 downto 0)));
+    dma_uphdr_data(DMA_REQUEST_LASTIB  ) <= std_logic_vector(TWO_ZEROS - unsigned(length_bytes_total(1 downto 0)));
     dma_uphdr_data(DMA_REQUEST_TAG     ) <= tag_fifo_do(DMA_REQUEST_TAG_W-1 downto 0);
     dma_uphdr_data(DMA_REQUEST_UNITID  ) <= (others => '0');
-    dma_uphdr_data(DMA_REQUEST_GLOBAL  ) <= std_logic_vector(resize(unsigned(RX_MVB_ADDRESS), DMA_REQUEST_GLOBAL_W));
+    -- Word-aligning the address (dword is 4 bytes -> drive two LSBs low).
+    address_resized <= std_logic_vector(resize(unsigned(RX_MVB_ADDRESS), DMA_REQUEST_GLOBAL_W));
+    dma_uphdr_data(DMA_REQUEST_GLOBAL  ) <= address_resized(DMA_REQUEST_GLOBAL_W-1 downto 2) & "00";
     dma_uphdr_data(DMA_REQUEST_VFID    ) <= (others => '0');
     dma_uphdr_data(DMA_REQUEST_PASID   ) <= (others => '0');
     dma_uphdr_data(DMA_REQUEST_PASIDVLD) <= (others => '0');

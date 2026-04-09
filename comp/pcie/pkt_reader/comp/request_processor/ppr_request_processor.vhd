@@ -84,6 +84,8 @@ entity PPR_REQUEST_PROCESSOR is
         TAGMEM_ADDR       : out std_logic_vector(MVB_ITEMS*(log2(MEMORY_ITEMS)+log2(MEMORY_ITEM_WIDTH/8))-1 downto 0);
         -- TAGMEM Data part 1 - identifier of the packet this Tag (Read response) belongs to.
         TAGMEM_ID         : out std_logic_vector(MVB_ITEMS*ID_WIDTH-1 downto 0);
+        -- TAGMEM Data part 2 - First Invalid Bytes - compensation for word alignment of the address.
+        TAGMEM_FIRSTIB    : out std_logic_vector(MVB_ITEMS*DMA_REQUEST_FIRSTIB_W-1 downto 0);
         -- TAGMEM record valid / write request.
         TAGMEM_VLD        : out std_logic_vector(MVB_ITEMS-1 downto 0);
 
@@ -370,10 +372,11 @@ begin
     process (CLK)
     begin
         if rising_edge(CLK) then
-            TAGMEM_TAG  <= hdrgen_tx_data(DMA_REQUEST_TAG);
-            TAGMEM_ADDR <= std_logic_vector(resize_right(main_mem_base_addr(MEM_BASE_ADDR_WIDTH-1 downto 0), MEM_COMB_ADDR_WIDTH) + main_mem_partial_addr);
-            TAGMEM_ID   <= hdrgen_tx_id;
-            TAGMEM_VLD  <= (others => hdr_valid and hdrgen_tx_dst_rdy);
+            TAGMEM_TAG     <= hdrgen_tx_data(DMA_REQUEST_TAG);
+            TAGMEM_ADDR    <= std_logic_vector(resize_right(main_mem_base_addr(MEM_BASE_ADDR_WIDTH-1 downto 0), MEM_COMB_ADDR_WIDTH) + main_mem_partial_addr);
+            TAGMEM_ID      <= hdrgen_tx_id;
+            TAGMEM_FIRSTIB <= hdrgen_tx_data(DMA_REQUEST_FIRSTIB);
+            TAGMEM_VLD     <= (others => hdr_valid and hdrgen_tx_dst_rdy);
             if (RESET = '1') then
                 TAGMEM_VLD <= (others => '0');
             end if;
