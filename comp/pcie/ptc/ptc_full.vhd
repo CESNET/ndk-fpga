@@ -534,6 +534,7 @@ begin
             MID_MFB_FIFOS_EN => true,
             IN_PIPE_EN       => false,
             OUT_PIPE_EN      => true,
+            FIFOX_MULTI_ARCH => "FULL",
             DEVICE           => DEVICE
         )
         port map (
