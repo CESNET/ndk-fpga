@@ -78,6 +78,9 @@ entity MFB_MERGER is
         -- Output register is created when this is set to false.
         OUT_PIPE_EN        : boolean := true;
 
+        -- Architecture of FIFOX_MULTI
+        FIFOX_MULTI_ARCH   : string := "SHAKEDOWN";
+
         -- "ULTRASCALE", "7SERIES"
         DEVICE             : string  := "ULTRASCALE"
     );

@@ -648,7 +648,7 @@ begin
         RAM_TYPE         => "AUTO",
         SAFE_READ_MODE   => false,
         DEVICE           => DEVICE,
-        FIFOX_MULTI_ARCH => "SHAKEDOWN"
+        FIFOX_MULTI_ARCH => FIFOX_MULTI_ARCH
     )
     port map (
         CLK    => CLK,
