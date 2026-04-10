@@ -47,14 +47,9 @@ begin
         sel_int <= 0;
     end generate;
 
-    -- HOTFIX: hotfix bug in function shift_right in vivado
-    data_out_gen: if (DATA_WIDTH*MUX_WIDTH > 0) generate
-        -- Select item by rottation on start
-        data_out_tmp <= IEEE.numeric_std.shift_right(data_in_tmp, sel_int*DATA_WIDTH);
-        DATA_OUT     <= std_logic_vector(data_out_tmp(DATA_WIDTH-1 downto 0));
-    else generate
-        DATA_OUT     <= (others => '0');
-    end generate;
+    -- Select item by rottation on start
+    data_out_tmp <= IEEE.numeric_std.shift_right(data_in_tmp, sel_int*DATA_WIDTH);
+    DATA_OUT     <= std_logic_vector(data_out_tmp(DATA_WIDTH-1 downto 0));
 
 end architecture;
 
