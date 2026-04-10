@@ -145,8 +145,7 @@ architecture FULL of RX_MAC_LITE_STAT_UNIT is
     -- Quartus max fanout constraint
     attribute maxfan : integer;
 
-    constant DEVICE_WITH_DSP_CNT : boolean := (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "STRATIX10");
-    constant USE_DSP_CNT         : boolean := CNT_IN_DSP and DEVICE_WITH_DSP_CNT;
+    constant USE_DSP_CNT         : boolean := CNT_IN_DSP;
     constant SUM_ONE_OUTPUT_REG  : boolean := True;
     constant FRAME_STATS_W       : natural := 18;
     constant HIST_W              : natural := 12;
