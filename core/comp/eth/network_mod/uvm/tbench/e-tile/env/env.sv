@@ -90,7 +90,11 @@ class env #(
             cfg_eth_rx = new();
             cfg_eth_rx.active = UVM_ACTIVE;
             cfg_eth_rx.interface_name = $sformatf("vif_eth_rx_%0d", it);
-            cfg_eth_rx.meta_behav = uvm_logic_vector_array_avst::config_item::META_EOF;
+            //FIXME: Documentation specify EOP but there is bug in INTEL IP.
+            // So ERRORS is generated with SOP and testbench it propagate
+            // throught all valid data on rx avalon bus.
+            //cfg_eth_rx.meta_behav = uvm_logic_vector_array_avst::config_item::META_EOF;
+            cfg_eth_rx.meta_behav = uvm_logic_vector_array_avst::config_item::META_SOF;
             uvm_config_db #(uvm_logic_vector_array_avst::config_item)::set(this, $sformatf("m_eth_rx_%0d", it), "m_config", cfg_eth_rx);
             m_eth_rx[it] = uvm_logic_vector_array_avst::env_rx #(ETH_PORT_CHAN[0], REGION_SIZE * BLOCK_SIZE, ITEM_WIDTH, 6, 0)::type_id::create($sformatf("m_eth_rx_%0d", it), this);
 
