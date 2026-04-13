@@ -38,10 +38,15 @@ class sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITE
     endtask
 
     protected virtual task configure_addresses();
+        string msg = "";
         uvm_status_e status;
+
         foreach (addresses[i]) begin
             p_sequencer.regmodel.channel[0].rx_mac.mac[i].write(status, { 1'b1, addresses[i] });
+            msg = {msg, $sformatf("\n\t\tMAC[%0d] : %h", i, addresses[i])};
         end
+
+        `uvm_info(p_sequencer.get_full_name(), {"\n\tWrite MAC ADDRESS:", msg}, UVM_LOW);
     endtask
 
     protected virtual task configure_mode();
