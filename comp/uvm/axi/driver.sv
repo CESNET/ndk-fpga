@@ -30,6 +30,8 @@ class driver_rx #(
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
+        rsp = sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("mfb_rsp");
+
         forever begin
             // Get new sequence item to drive to interface
             seq_item_port.try_next_item(req);
@@ -42,11 +44,16 @@ class driver_rx #(
                 vif.driver_rx_cb.TKEEP  <= req.tkeep;
                 vif.driver_rx_cb.TVALID <= req.tvalid;
 
+                rsp.copy(req);
+                rsp.set_id_info(req);
+                seq_item_port.item_done();
+
                 // Wait for the clocking block to write values to the registres
                 @(vif.driver_rx_cb);
 
-                req.tready = vif.driver_rx_cb.TREADY;
-                seq_item_port.item_done(req);
+                rsp.tready = vif.driver_rx_cb.TREADY;
+                seq_item_port.put_response(rsp);
+
             end else begin
                 vif.driver_rx_cb.TDATA  <= 'X;
                 vif.driver_rx_cb.TUSER  <= 'X;
@@ -86,6 +93,8 @@ class driver_tx #(
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
+        rsp = sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("mfb_rsp");
+
         forever begin
             // Get new sequence item to drive to interface
             seq_item_port.try_next_item(req);
@@ -94,16 +103,20 @@ class driver_tx #(
             if (req != null) begin
 
                 vif.driver_tx_cb.TREADY <= req.tready;
+                rsp.copy(req);
+                rsp.set_id_info(req);
+                seq_item_port.item_done();
 
                 // Wait for the clocking block to write values to the registres
                 @(vif.driver_tx_cb);
 
-                req.tdata  = vif.driver_tx_cb.TDATA;
-                req.tuser  = vif.driver_tx_cb.TUSER;
-                req.tlast  = vif.driver_tx_cb.TLAST;
-                req.tkeep  = vif.driver_tx_cb.TKEEP;
-                req.tvalid = vif.driver_tx_cb.TVALID;
-                seq_item_port.item_done(req);
+                rsp.tdata  = vif.driver_tx_cb.TDATA;
+                rsp.tuser  = vif.driver_tx_cb.TUSER;
+                rsp.tlast  = vif.driver_tx_cb.TLAST;
+                rsp.tkeep  = vif.driver_tx_cb.TKEEP;
+                rsp.tvalid = vif.driver_tx_cb.TVALID;
+                seq_item_port.put_response(rsp);
+
             end else begin
                 vif.driver_tx_cb.TREADY <= 1'b0;
 
