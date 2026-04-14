@@ -138,121 +138,120 @@ architecture SH_REG_DYNAMIC_ARCH of SH_REG_BASE_DYNAMIC is
 
 begin
 
-    -------------------------------
-    -- I/O signals
-    sig_in <= DIN;
-    DOUT   <= sig_out;
+    sh_g: if (NUM_BITS = 0 )generate
 
+        DOUT <= DIN;
 
+    else generate
 
+        -------------------------------
+        -- I/O signals
+        sig_in <= DIN;
+        DOUT   <= sig_out;
 
-    -- SH_REG_VIVADO : if (NUM_BITS > OPT_THRESHOLD or OPTIMALIZATION = "VIVADO") generate
-    sh_reg_vivado : if ((not DEVICE_HAS_SRL16E) or NUM_BITS > OPT_THRESHOLD or OPT /= "SRL") generate
-        signal sig_addr : std_logic_vector(log2(NUM_BITS) -1  downto 0);
-    begin
-        -- adress
-        sig_addr <= ADDR;
-
-        -------------------------------------
-        -- CLK not invertid
-        sh_reg_vivado_not_clk_inverted : if(IS_CLK_INVERTED = '0') generate
-            signal reg_shift : array_slv := sh_reg_init_conv;
-
-            attribute shreg_extract : string;
-            attribute shreg_extract of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
+        -- SH_REG_VIVADO : if (NUM_BITS > OPT_THRESHOLD or OPTIMALIZATION = "VIVADO") generate
+        sh_reg_vivado : if ((not DEVICE_HAS_SRL16E) or NUM_BITS > OPT_THRESHOLD or OPT /= "SRL") generate
+            signal sig_addr : std_logic_vector(log2(NUM_BITS) -1  downto 0);
         begin
-            process (CLK)
-            begin
-                if (CLK = '1' and CLK'event) then
-                    if (CE = '1') then
-                        for i in 0 to DATA_WIDTH-1 loop
-                            reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
-                        end loop;
-                    end if;
-                end if;
-            end process;
+            -- adress
+            sig_addr <= ADDR;
 
-            process (reg_shift,sig_addr)
+            -------------------------------------
+            -- CLK not invertid
+            sh_reg_vivado_not_clk_inverted : if(IS_CLK_INVERTED = '0') generate
+                signal reg_shift : array_slv := sh_reg_init_conv;
+
+                attribute shreg_extract : string;
+                attribute shreg_extract of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
             begin
-                for i in 0 to DATA_WIDTH-1 loop
-                    sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
-                end loop;
-            end process;
+                process (CLK)
+                begin
+                    if (CLK = '1' and CLK'event) then
+                        if (CE = '1') then
+                            for i in 0 to DATA_WIDTH-1 loop
+                                reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
+                            end loop;
+                        end if;
+                    end if;
+                end process;
+
+                process (reg_shift,sig_addr)
+                begin
+                    for i in 0 to DATA_WIDTH-1 loop
+                        sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
+                    end loop;
+                end process;
+            end generate;
+
+            -------------------------------------
+            -- CLK invertid
+            sh_reg_vivado_clk_inverted : if(IS_CLK_INVERTED = '1') generate
+                signal reg_shift : array_slv := sh_reg_init_conv;
+
+                attribute shreg_extract : string;
+                attribute shreg_extract of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
+            begin
+                process (CLK)
+                begin
+                    if (CLK = '0' and CLK'event) then
+                        if (CE = '1') then
+                            for i in 0 to DATA_WIDTH-1 loop
+                                reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
+                            end loop;
+                        end if;
+                    end if;
+                end process;
+
+                process (reg_shift,sig_addr)
+                begin
+                    for i in 0 to DATA_WIDTH-1 loop
+                        sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
+                    end loop;
+                end process;
+            end generate;
+            -- end generate optimalization
         end generate;
 
-        -------------------------------------
-        -- CLK invertid
-        sh_reg_vivado_clk_inverted : if(IS_CLK_INVERTED = '1') generate
-            signal reg_shift : array_slv := sh_reg_init_conv;
 
-            attribute shreg_extract : string;
-            attribute shreg_extract of reg_shift : signal is get_shreg_extract_opt; -- "no" => REG, "yes" => VIVADO
+
+
+
+
+
+        --------------------------------------------
+        -- 16- bit
+        sh_reg_srl : if (DEVICE_HAS_SRL16E and NUM_BITS <= OPT_THRESHOLD and OPT = "SRL") generate
+            constant ADDR_MAX   : integer := 3;
+            constant ADDR_SPLIT : integer := ADDR'left;
+            signal   sig_addr   : std_logic_vector(3 downto 0);
         begin
-            process (CLK)
-            begin
-                if (CLK = '0' and CLK'event) then
-                    if (CE = '1') then
-                        for i in 0 to DATA_WIDTH-1 loop
-                            reg_shift(i) <= reg_shift(i)(NUM_BITS-2 downto 0) & sig_in(i);
-                        end loop;
-                    end if;
-                end if;
-            end process;
+            -- addres if ADDR is to small
+            sig_addr(ADDR_MAX   downto ADDR_SPLIT +1) <= (others => '0');
+            sig_addr(ADDR_SPLIT downto 0)             <= ADDR;
 
-            process (reg_shift,sig_addr)
-            begin
-                for i in 0 to DATA_WIDTH-1 loop
-                    sig_out(i) <= reg_shift(i)(conv_integer(sig_addr));
-                end loop;
-            end process;
+
+            -- generate data width
+            sh_reg_srl_width: for i in (DATA_WIDTH -1) downto 0 generate
+                sh_reg_srl16 : component srl16e
+                generic map (
+                    INIT            => to_bitvector(sh_reg_init_conv_srl(i)),
+                    IS_CLK_INVERTED => IS_CLK_INVERTED
+                )
+                port map (
+                    -- output
+                    Q   => sig_out(i),
+                    CE  => CE,
+                    CLK => CLK,
+                    D   => sig_in(i),
+
+                    A0 => sig_addr(0),
+                    A1 => sig_addr(1),
+                    A2 => sig_addr(2),
+                    A3 => sig_addr(3)
+                );
+            end generate;
         end generate;
-        -- end generate optimalization
+
     end generate;
-
-
-
-
-
-
-
-    --------------------------------------------
-    -- 16- bit
-    sh_reg_srl : if (DEVICE_HAS_SRL16E and NUM_BITS <= OPT_THRESHOLD and OPT = "SRL") generate
-        constant ADDR_MAX   : integer := 3;
-        constant ADDR_SPLIT : integer := ADDR'left;
-        signal   sig_addr   : std_logic_vector(3 downto 0);
-    begin
-        -- addres if ADDR is to small
-        sig_addr(ADDR_MAX   downto ADDR_SPLIT +1) <= (others => '0');
-        sig_addr(ADDR_SPLIT downto 0)             <= ADDR;
-
-
-        -- generate data width
-        sh_reg_srl_width: for i in (DATA_WIDTH -1) downto 0 generate
-            sh_reg_srl16 : component srl16e
-            generic map (
-                INIT            => to_bitvector(sh_reg_init_conv_srl(i)),
-                IS_CLK_INVERTED => IS_CLK_INVERTED
-            )
-            port map (
-                -- output
-                Q   => sig_out(i),
-                CE  => CE,
-                CLK => CLK,
-                D   => sig_in(i),
-
-                A0 => sig_addr(0),
-                A1 => sig_addr(1),
-                A2 => sig_addr(2),
-                A3 => sig_addr(3)
-            );
-        end generate;
-    end generate;
-
 
 end architecture;
-
-
-
-
-
