@@ -13,21 +13,21 @@ class env #(
     `uvm_component_param_utils(uvm_asfifox::env #(ITEMS, ITEM_WIDTH, TUSER_WIDTH));
 
     // Virtual sequencer
-    sequencer #(ITEM_WIDTH) m_sequencer;
+    sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_sequencer;
 
     // RESET RX interface
     protected uvm_reset::agent m_reset_rx;
     // RESET TX interface
     protected uvm_reset::agent m_reset_tx;
     // RX environments
-    protected uvm_logic_vector_array_axi::env_rx #(ITEMS, ITEM_WIDTH) m_rx;
+    protected uvm_axi::agent_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_rx;
     // TX environments
-    protected uvm_logic_vector_array_axi::env_tx #(ITEMS, ITEM_WIDTH) m_tx;
+    protected uvm_axi::agent_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_tx;
 
     // Scoreboard
-    protected scoreboard #(ITEM_WIDTH) m_sc;
+    protected scoreboard #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_sc;
     // Model instance
-    protected uvm_asfifox::model #(ITEM_WIDTH) m_model;
+    protected uvm_asfifox::model #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_model;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -44,8 +44,8 @@ class env #(
     function void build_phase(uvm_phase phase);
         uvm_reset::config_item m_cfg_reset_rx;
         uvm_reset::config_item m_cfg_reset_tx;
-        uvm_logic_vector_array_axi::config_item m_cfg_rx;
-        uvm_logic_vector_array_axi::config_item m_cfg_tx;
+        uvm_axi::config_item m_cfg_rx;
+        uvm_axi::config_item m_cfg_tx;
 
         //Call parents function build_phase
         super.build_phase(phase);
@@ -73,30 +73,30 @@ class env #(
         m_cfg_rx.active         = UVM_ACTIVE;
         // interface register name has to be same in testbench uvm_config_db#(...)::set();
         m_cfg_rx.interface_name = "vif_axi_rx";
-        uvm_config_db #(uvm_logic_vector_array_axi::config_item)::set(this, "m_rx", "m_config", m_cfg_rx);
+        uvm_config_db #(uvm_axi::config_item)::set(this, "m_rx", "m_config", m_cfg_rx);
         // Creation of the m_rx
-        m_rx = uvm_logic_vector_array_axi::env_rx #(ITEMS, ITEM_WIDTH)::type_id::create("m_rx", this);
+        m_rx = uvm_axi::agent_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_rx", this);
 
         // Configuration of the m_tx
         m_cfg_tx                = new;
         m_cfg_tx.active         = UVM_ACTIVE;
         // interface register name has to be same in testbench uvm_config_db#(...)::set();
         m_cfg_tx.interface_name = "vif_axi_tx";
-        uvm_config_db #(uvm_logic_vector_array_axi::config_item)::set(this, "m_tx", "m_config", m_cfg_tx);
+        uvm_config_db #(uvm_axi::config_item)::set(this, "m_tx", "m_config", m_cfg_tx);
         // Creation of the m_tx
-        m_tx = uvm_logic_vector_array_axi::env_tx #(ITEMS, ITEM_WIDTH)::type_id::create("m_tx", this);
+        m_tx = uvm_axi::agent_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_tx", this);
 
         // Creation of the virtual sequencer, scoreboard, model
-        m_sequencer = sequencer #(ITEM_WIDTH)::type_id::create("m_sequencer", this);
-        m_sc = scoreboard #(ITEM_WIDTH)::type_id::create("m_sc", this);
-        m_model = uvm_asfifox::model #(ITEM_WIDTH)::type_id::create("m_model", this);
+        m_sequencer = sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_sequencer", this);
+        m_sc = scoreboard #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_sc", this);
+        m_model = uvm_asfifox::model #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_model", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
     function void connect_phase(uvm_phase phase);
         // Connection of the reset
-        m_reset_rx.sync_connect(m_rx.reset_sync);
-        m_reset_tx.sync_connect(m_tx.reset_sync);
+        //m_reset_rx.sync_connect(m_rx.reset_sync);
+        //m_reset_tx.sync_connect(m_tx.reset_sync);
 
         // Connection to Model
         m_rx.analysis_port.connect(m_model.m_rx.analysis_export);
@@ -108,6 +108,7 @@ class env #(
         m_sequencer.m_reset_rx = m_reset_rx.m_sequencer;
         m_sequencer.m_reset_tx = m_reset_tx.m_sequencer;
         m_sequencer.m_rx    = m_rx.m_sequencer;
+        m_sequencer.m_tx    = m_tx.m_sequencer;
     endfunction
 
 endclass

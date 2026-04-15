@@ -6,18 +6,22 @@
 
 
 class sequencer #(
-    int unsigned ITEM_WIDTH
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
 ) extends uvm_sequencer;
-    `uvm_component_param_utils(uvm_asfifox::sequencer #(ITEM_WIDTH))
+    `uvm_component_param_utils(uvm_asfifox::sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
 
     // rx reset sequencer
     uvm_reset::sequencer m_reset_rx;
     // tx reset sequencer
     uvm_reset::sequencer m_reset_tx;
     // rx sequencer
-    uvm_logic_vector_array::sequencer #(ITEM_WIDTH) m_rx;
+    uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_rx;
+    // Tx sequencer
+    uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_tx;
 
-    function new(string name, uvm_component parent);
+    function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction
 

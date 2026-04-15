@@ -10,8 +10,12 @@
 
 package uvm_asfifox;
 
+    `include "ndk_macros.svh"
     `include "uvm_macros.svh"
     import uvm_pkg::*;
+
+    `include "config.sv"
+    `include "sequence.sv"
 
     `include "sequencer.sv"
     `include "model.sv"

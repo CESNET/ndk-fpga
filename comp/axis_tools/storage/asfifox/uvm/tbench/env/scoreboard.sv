@@ -30,12 +30,14 @@ endclass
 
 
 class scoreboard #(
-    int unsigned ITEM_WIDTH
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
 ) extends uvm_scoreboard;
-    `uvm_component_utils(uvm_asfifox::scoreboard #(ITEM_WIDTH))
+    `uvm_component_utils(uvm_asfifox::scoreboard #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))
 
     // Transaction comparator
-    uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)) cmp;
+    uvm_asfifox::scoreboard_cmp #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) cmp;
 
     // Contructor of scoreboard.
     function new(string name, uvm_component parent = null);
@@ -58,8 +60,7 @@ class scoreboard #(
 
     function void build_phase(uvm_phase phase);
         // Create scoreboard
-        cmp = uvm_common::comparer_ordered
-        #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))::type_id::create("cmp", this);
+        cmp = scoreboard_cmp#(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("cmp", this);
     endfunction
 
     function void report_phase(uvm_phase phase);

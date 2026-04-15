@@ -17,7 +17,8 @@ module testbench;
     // Register test with parameters in UVM factory.
     typedef test::base#(
         .ITEMS      (ITEMS),
-        .ITEM_WIDTH (ITEM_WIDTH)
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .TUSER_WIDTH (TUSER_WIDTH)
     ) base;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------

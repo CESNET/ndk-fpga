@@ -6,14 +6,15 @@
 
 class base #(
     int unsigned ITEMS,
-    int unsigned ITEM_WIDTH
+    int unsigned ITEM_WIDTH,
+    int unsigned TUSER_WIDTH
 ) extends uvm_test;
-    uvm_component_registry #(test::base#(ITEMS, ITEM_WIDTH), "test::base") type_id;
+    uvm_component_registry #(test::base#(ITEMS, ITEM_WIDTH, TUSER_WIDTH), "test::base") type_id;
 
     `m_uvm_get_type_name_func(test::base)
 
     // Test have to create top level environment
-    uvm_asfifox::env #(ITEMS, ITEM_WIDTH) m_env;
+    uvm_asfifox::env #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_env;
 
     // Constructor
     function new(string name = "base_test", uvm_component parent = null);
@@ -22,7 +23,7 @@ class base #(
 
     // Create environment
     function void build_phase(uvm_phase phase);
-        m_env = uvm_asfifox::env #(ITEMS, ITEM_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_asfifox::env #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
@@ -58,30 +59,45 @@ class base #(
 
         join_none
 
-        // Start RX sequence. Generating input
-        begin
-            uvm_logic_vector_array::sequence_lib #(ITEM_WIDTH) seq_rx;
-            uvm_logic_vector_array::config_sequence cfg;
-            seq_rx = uvm_logic_vector_array::sequence_lib #(ITEM_WIDTH)::type_id::create("seq_rx", this);
+        fork
+            // Start RX sequence. Generating input
+            // Join when input stop
+            begin
+                uvm_asfifox::sequence_rx_base #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) seq;
+                time seq_time_end;
 
-            // Instantiate and set up the configuration object BEFORE randomizing
-            cfg = new();
-            cfg.array_size_min = 1;
-            cfg.array_size_max = 2048;
 
-            seq_rx.min_random_count = 10;
-            seq_rx.max_random_count = 20;
+                seq = uvm_asfifox::sequence_rx_base #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("seq", this);
 
-            seq_rx.init_sequence(cfg);
+                seq.cfg = new();
+                seq.cfg.frame_size_min = 1;
+                seq.cfg.frame_size_max = 2048;
 
-            // Run for ~5 minutes
-            for (int i=0; i<20; ++i) begin
-                assert(seq_rx.randomize()) else begin
-                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize RX sequence");
+                for (int i=0; i<20; ++i) begin
+                    assert(seq.randomize()) else begin
+                        `uvm_fatal(this.get_full_name(), "\n\tCannot randomize RX sequence");
+                    end
+                    seq.start(m_env.m_sequencer.m_rx);
                 end
-                seq_rx.start(m_env.m_sequencer.m_rx);
             end
-        end
+
+            // Start TX sequence. Low level agent need received RDY signal
+            begin
+                uvm_axi::sequence_lib_tx#(ITEMS, ITEM_WIDTH, TUSER_WIDTH) seq;
+
+                seq = uvm_axi::sequence_lib_tx#(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("seq", this);
+                seq.init_sequence();
+                seq.min_random_count =  100;
+                seq.max_random_count = 2000;
+
+                forever begin
+                    assert(seq.randomize()) else begin
+                        `uvm_fatal(this.get_full_name(), "\n\tCannot randomize TX sequence\n");
+                    end
+                    seq.start(m_env.m_sequencer.m_tx);
+                end
+            end
+        join_any
 
         #(100us);
 
