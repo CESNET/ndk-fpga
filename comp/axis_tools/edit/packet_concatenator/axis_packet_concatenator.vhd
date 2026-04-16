@@ -113,8 +113,6 @@ architecture FULL of AXIS_PACKET_CONCATENATOR is
 
     signal rx0_all_valid             : std_logic;
     signal rx0_all_valid_reg         : std_logic;
-    signal rx0_last_complete         : std_logic;
-    signal rx0_last_complete_reg     : std_logic;
     signal rx1_last_complete         : std_logic;
     signal rx1_packet_ending         : std_logic;
     signal rx0_packet_end_pending    : std_logic;
@@ -178,12 +176,10 @@ begin
                 rx0_valid_reg          <= RX0_AXIS_TVALID;
                 rx0_all_valid_reg      <= rx0_all_valid;
 
-                rx0_last_complete_reg  <= rx0_last_complete;
                 rx1_start_byte_pos_reg <= rx1_start_byte_pos;
             end if;
             if (RESET = '1') then
                 rx0_valid_reg         <= '0';
-                rx0_last_complete_reg <= '0';
             end if;
         end if;
     end process;
@@ -213,8 +209,6 @@ begin
 
     -- Detect if all bytes are valid in the last word
     rx0_all_valid          <= and RX0_AXIS_TKEEP;
-    -- RX0 last word is complete => all bytes in the last word are valid.
-    rx0_last_complete      <= rx0_all_valid and RX0_AXIS_TLAST and RX0_AXIS_TVALID;
     -- RX1 last word is complete => all bytes in the last word were able to fit into this word.
     rx1_last_complete      <= or rx1_shifted_last_1hot_bot;
     -- Validated rx1_last_complete.
