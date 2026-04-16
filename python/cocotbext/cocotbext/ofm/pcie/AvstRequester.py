@@ -58,11 +58,25 @@ class AvstRequester(PcieRequester):
         else: # 64-bit address
             addr = hdr.addr
 
+        # Add FBE offset to address (indicates byte offset)
+        try:
+            fbe_offset = fbe2offset(hdr.fbe)
+            addr += fbe_offset
+        except ValueError:
+            fbe_offset = 0 # leave address as is when hdr.fbe==0 (-> read requests)
+
+        byte_length = (
+            hdr.dwords * 4
+            - (4 - numberOfSetBits(hdr.fbe))
+            - ((4 - numberOfSetBits(hdr.lbe)) if hdr.dwords > 1 else 0)
+        )
+
         # Fiter out MI responses - process if it is a request (DMA WR or RD)
         if hdr.tlp_type == 0:
             if hdr.req_type == 0:
-                self.handle_rd_request(hdr=hdr, addr=addr, length=hdr.dwords*4)
+                self.handle_rd_request(hdr=hdr, addr=addr, length=byte_length)
             elif hdr.req_type == 1:
+                data_bytes = data_bytes[fbe_offset:fbe_offset + byte_length]
                 self.handle_wr_request(data=data_bytes, addr=addr)
             else:
                 raise NotImplementedError(f"Unsupported REQ type {hdr.req_type}, expected: [0, 1]")
@@ -97,7 +111,7 @@ class AvstRequester(PcieRequester):
             rc_hdr.byte_cnt = (
                 rc_hdr.dwords * 4
                 - (4 - numberOfSetBits(rq_hdr.fbe))
-                - ((4 - numberOfSetBits(rq_hdr.fbe)) if rc_hdr.dwords > 1 else 0)
+                - ((4 - numberOfSetBits(rq_hdr.lbe)) if rc_hdr.dwords > 1 else 0)
             )
 
         # Set lower address
@@ -110,7 +124,12 @@ class AvstRequester(PcieRequester):
                 addr = addr_l
             else: # 64-bit address
                 addr = rq_hdr.addr
-            rc_hdr.low_addr = ((addr) + fbe2offset(rq_hdr.fbe)) & 0x7f
+            # Same address correction as above in handle_rq_transaction()
+            try:
+                addr += fbe2offset(rq_hdr.fbe)
+            except ValueError:
+                pass
+            rc_hdr.low_addr = addr & 0x7f # Keeps 7 LSBs
 
         return rc_hdr
 
