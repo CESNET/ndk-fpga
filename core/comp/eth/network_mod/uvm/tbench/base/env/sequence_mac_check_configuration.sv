@@ -5,9 +5,43 @@
 
 // TODO: Multi-channel support
 
-class sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(uvm_network_mod_env::sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
-    `uvm_declare_p_sequencer(uvm_network_mod_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+class sequence_mac_check_configuration #(
+    int unsigned ETH_TX_HDR_WIDTH,
+    int unsigned ETH_RX_HDR_WIDTH,
+    int unsigned ITEM_WIDTH,
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ETH_PORT_CHAN,
+    int unsigned MI_DATA_WIDTH,
+    int unsigned MI_ADDR_WIDTH
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        uvm_network_mod_env::sequence_mac_check_configuration #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )
+    )
+    `uvm_declare_p_sequencer(
+        uvm_network_mod_env::sequencer_port #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )
+    )
 
     localparam int unsigned RX_MAC_COUNT = 16;
 
@@ -38,10 +72,17 @@ class sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITE
     endtask
 
     protected virtual task configure_addresses();
+        string msg = "";
         uvm_status_e status;
+
         foreach (addresses[i]) begin
             p_sequencer.regmodel.channel[0].rx_mac.mac[i].write(status, { 1'b1, addresses[i] });
+            // Mac is commonly print as hexadecimal number
+            // verilog_lint: numeric-format-string-style
+            msg = {msg, $sformatf("\n\t\tMAC[%0d] : %h", i, addresses[i])};
         end
+
+        `uvm_info(p_sequencer.get_full_name(), {"\n\tWrite MAC ADDRESS:", msg}, UVM_LOW);
     endtask
 
     protected virtual task configure_mode();

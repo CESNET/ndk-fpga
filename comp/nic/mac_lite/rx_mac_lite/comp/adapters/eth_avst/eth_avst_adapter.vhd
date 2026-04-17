@@ -78,7 +78,6 @@ architecture FULL of ETH_AVST_ADAPTER is
     signal in_avst_error_reg        : std_logic_vector(6-1 downto 0);
     signal in_avst_mii_error_reg    : std_logic;
     signal in_avst_valid_reg        : std_logic;
-    signal in_frame_reg             : std_logic;
 
 begin
 
@@ -117,18 +116,16 @@ begin
     in_mii_err_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if ((IN_AVST_VALID = '1') and (IN_AVST_SOP = '1')) then
-                in_frame_reg  <= '1';
-            elsif ((IN_AVST_VALID = '1') and (IN_AVST_EOP = '1')) then
-                in_frame_reg  <= '0';
-            end if;
-            if ((IN_AVST_VALID = '1') and ((in_frame_reg = '1') or (IN_AVST_SOP = '1'))) then
-                in_avst_mii_error_reg <= in_avst_mii_error_reg or IN_AVST_ERROR(0);
-            elsif ((in_avst_eop_reg = '1') and (in_avst_valid_reg = '1')) then
-                in_avst_mii_error_reg <= '0';
-            end if;
-            if (RESET = '1') then
-                in_avst_mii_error_reg <= '0';
+            -- We don't care outside of frame
+            if (IN_AVST_VALID = '1') then
+                if (IN_AVST_SOP = '1') then
+                    in_avst_mii_error_reg <= IN_AVST_ERROR(0);
+                -- After EOF we don't care
+                -- elsif(IN_AVST_EOP = '1') then
+                --     in_avst_mii_error_reg <= 'x';
+                else
+                    in_avst_mii_error_reg <= in_avst_mii_error_reg or IN_AVST_ERROR(0);
+                end if;
             end if;
         end if;
     end process;

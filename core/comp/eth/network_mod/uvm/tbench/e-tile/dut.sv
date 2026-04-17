@@ -124,9 +124,12 @@ module DUT #(
         .tsu (tsu)
     );
 
-    generate;
-        for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin
+    generate
+         for (genvar eth_it = 0; eth_it < ETH_PORTS; eth_it++) begin : eth_gen
             localparam AVST_ITEMS = REGION_SIZE * BLOCK_SIZE;
+            //FIXME: FIX BUG IN INTEL IP. MOR INFO IN env/env.sv EOP/SOP
+            logic [6-1 : 0]    avst_rx_meta_reg;
+            logic [6-1 : 0]    avst_rx_meta[ETH_PORT_CHAN[eth_it]];
 
             logic [ETH_PORT_CHAN[eth_it]*AVST_ITEMS*ITEM_WIDTH-1 : 0] avst_tx_data;
             logic [ETH_PORT_CHAN[eth_it]*6-1 : 0]                     avst_tx_meta;
@@ -136,8 +139,29 @@ module DUT #(
             always #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH_GEN = ~CLK_ETH_GEN;
             // RX
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_data  = { <<ITEM_WIDTH { {>>{ eth_rx[eth_it].DATA}} }};
-            assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_error = { >> {eth_rx[eth_it].META}};
+
+
+            always_ff @(posedge CLK_ETH[eth_it]) begin
+                avst_rx_meta_reg <= avst_rx_meta[ETH_PORT_CHAN[eth_it]-1];
+            end
+
+            always_comb begin
+                //FOR FIRST ITEM
+                for (int unsigned it = 0; it < ETH_PORT_CHAN[eth_it]; it++) begin
+                    if (eth_rx[eth_it].SOP[it] && eth_rx[eth_it].VALID[it]) begin
+                        avst_rx_meta[it] = eth_rx[eth_it].META[it];
+                    end else begin
+                        if (it == 0) begin
+                            avst_rx_meta[0] = avst_rx_meta_reg;
+                        end else begin
+                            avst_rx_meta[it] = avst_rx_meta[it-1];
+                        end
+                    end
+                end
+            end
+
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_empty = { >> {eth_rx[eth_it].EMPTY}};
+            assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_error = { >> {avst_rx_meta}};
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_sop   = eth_rx[eth_it].SOP;
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_eop   = eth_rx[eth_it].EOP;
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_valid = eth_rx[eth_it].VALID;
