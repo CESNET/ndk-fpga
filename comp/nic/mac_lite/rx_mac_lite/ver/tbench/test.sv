@@ -107,7 +107,7 @@ program TEST (
         int ready2stop;
         #(1000*TX_CLK_PERIOD);
         wait(!mfb_driver.busy);
-        //$write("DisableTestEnvironment start, time: %t\n", $time);
+        $write("DisableTestEnvironment start, time: %t\n", $time);
         ready2stop = 0;
         do begin
             if (!mfb_monitor.busy && !mvb_monitor.busy) begin
@@ -115,11 +115,11 @@ program TEST (
             end else begin
                 ready2stop = 0;
             end;
-            //$write("ready2stop %d, time: %t\n", ready2stop, $time);
-            #(500*TX_CLK_PERIOD);
-        end while (ready2stop < 100);
+            $write("ready2stop %d, time: %t\n", ready2stop, $time);
+            #(50*TX_CLK_PERIOD);
+        end while (ready2stop < 50);
         #(5000*TX_CLK_PERIOD);
-        //$write("DisableTestEnvironment ready, time: %t\n", $time);
+        $write("DisableTestEnvironment ready, time: %t\n", $time);
         mfb_driver.setDisabled();
         mfb_monitor.setDisabled();
         mfb_responder.setDisabled();
