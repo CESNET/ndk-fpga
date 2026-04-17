@@ -81,6 +81,10 @@ class AvstRequester(PcieRequester):
             else:
                 raise NotImplementedError(f"Unsupported REQ type {hdr.req_type}, expected: [0, 1]")
 
+    def tag_from_hdr(self, hdr):
+        """Extract the tag value from the AVST request header."""
+        return (hdr.tag_h << 9) | (hdr.tag_m << 8) | hdr.tag_l
+
     def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):
         """
         Creates a completion header from the given request header.

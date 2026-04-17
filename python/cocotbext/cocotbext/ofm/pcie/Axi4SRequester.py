@@ -83,6 +83,11 @@ class Axi4SRequester(PcieRequester):
         else:
             raise NotImplementedError
 
+    def tag_from_hdr(self, hdr):
+        """Extract the tag value from the AXI4S request header."""
+        req_hdr, meta = hdr  # hdr is a tuple (header, metadata)
+        return req_hdr.tag
+
     def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):
         """
         Creates a completion header from the given request header.
