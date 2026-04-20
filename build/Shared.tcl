@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 source $OFM_PATH/build/misc/getopt.tcl
+source $OFM_PATH/build/targets.tcl
 
 set NB_COMP_BASE $FIRMWARE_BASE/comp
 set NB_FLAGS(VERBOSITY) 1
