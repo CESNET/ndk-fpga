@@ -62,7 +62,8 @@ class speed_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_mvb_merge_streams_ordered::env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_env", this);
+        m_env = uvm_mvb_merge_streams_ordered::env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)
+            ::type_id::create("m_env", this);
 
         uvm_mvb::sequence_lib_tx#(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::set_inst_override(
             uvm_mvb::sequence_lib_tx_speed#(MVB_ITEMS, MVB_ITEM_WIDTH)::get_type(),

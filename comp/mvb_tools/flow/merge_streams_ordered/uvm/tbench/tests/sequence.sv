@@ -110,7 +110,8 @@ class sequence_select_speed #(int unsigned DATA_WIDTH) extends uvm_logic_vector:
 
 endclass
 
-class virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends virt_sequence#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS);
+class virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)
+    extends virt_sequence#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS);
     `uvm_object_param_utils(test::virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS))
     `uvm_declare_p_sequencer(uvm_mvb_merge_streams_ordered::virt_sequencer#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS))
 
@@ -122,7 +123,8 @@ class virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends virt_s
         m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
 
         for (int port = 0; port < RX_STREAMS; port++) begin
-            m_rx_mvb_seq[port] = uvm_logic_vector::sequence_simple#(MVB_ITEM_WIDTH)::type_id::create($sformatf("m_rx_mvb_seq_%0d", port));
+            m_rx_mvb_seq[port] = uvm_logic_vector::sequence_simple#(MVB_ITEM_WIDTH)
+                ::type_id::create($sformatf("m_rx_mvb_seq_%0d", port));
             m_rx_mvb_seq[port].transaction_count_min = MIN_TRANSACTION_COUNT;
             m_rx_mvb_seq[port].transaction_count_max = MAX_TRANSACTION_COUNT;
         end
@@ -130,7 +132,8 @@ class virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends virt_s
         if (ARCH == "SIMPLE") begin
             m_rx_sel_mvb_seq = test::sequence_select_speed#($clog2(RX_STREAMS))::type_id::create("m_rx_sel_mvb_seq");
         end else begin
-            m_rx_sel_mvb_seq = uvm_logic_vector::sequence_simple#($clog2(RX_STREAMS))::type_id::create("m_rx_sel_mvb_seq");
+            m_rx_sel_mvb_seq = uvm_logic_vector::sequence_simple#($clog2(RX_STREAMS))
+                ::type_id::create("m_rx_sel_mvb_seq");
         end
         m_rx_sel_mvb_seq.transaction_count_min = MIN_TRANSACTION_COUNT;
         m_rx_sel_mvb_seq.transaction_count_max = MAX_TRANSACTION_COUNT;
