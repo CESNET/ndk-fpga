@@ -206,7 +206,7 @@ begin
         ITEM_WIDTH     => 8,
         META_WIDTH     => 1,
         LNG_WIDTH      => LNG_WIDTH,
-        REG_BITMAP     => "111",
+        REG_BITMAP     => "010",
         SATURATION     => True,
         IMPLEMENTATION => "parallel"
     )

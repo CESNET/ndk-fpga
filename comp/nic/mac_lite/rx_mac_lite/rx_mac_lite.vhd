@@ -247,6 +247,9 @@ architecture FULL of RX_MAC_LITE is
     constant INBANDCRC                : boolean := CRC_IS_RECEIVED and not CRC_REMOVE_EN;
     constant SM_CNT_TICKS_WIDTH       : natural := 24;
     constant SM_CNT_BYTES_WIDTH       : natural := 32;
+    constant CRC_CHECK_LATENCY        : natural := tsel((CRC_IS_RECEIVED and CRC_CHECK_EN), 9, 0);
+    constant MAC_CHECK_LATENCY        : natural := tsel(MAC_CHECK_EN, 5, 0);
+    constant MAX_CHECK_LATENCY        : natural := max(max(CRC_CHECK_LATENCY, 2), MAC_CHECK_LATENCY);
 
     signal s_rx_inc_frame             : std_logic_vector(RX_REGIONS downto 0);
     signal s_rx_mfb_error             : std_logic_vector(RX_REGIONS*2-1 downto 0);
@@ -544,7 +547,7 @@ begin
     --  FRAME LENGHT CHECK MODULE
     -- -------------------------------------------------------------------------
 
-    -- frame lenght check -- latency 4 cycles
+    -- frame lenght check -- latency 2 cycles
     frame_lng_check_i : entity work.MFB_FRAME_LNG_CHECK
     generic map (
         REGIONS     => RX_REGIONS,
@@ -552,7 +555,8 @@ begin
         BLOCK_SIZE  => RX_BLOCK_SIZE,
         ITEM_WIDTH  => RX_ITEM_WIDTH,
         META_WIDTH  => 3,
-        LNG_WIDTH   => LEN_WIDTH
+        LNG_WIDTH   => LEN_WIDTH,
+        REG_BITMAP  => "0110"
     )
     port map (
         CLK            => RX_CLK,
@@ -599,7 +603,7 @@ begin
     -- If RESET has 5 or more cycles, then it is enough SH_REG without reset.
     flc_sync_shreg_i : entity work.SH_REG_BASE_STATIC
     generic map (
-        NUM_BITS   => 5,
+        NUM_BITS   => MAX_CHECK_LATENCY-2, -- maximum - len check latency
         DATA_WIDTH => FLC_SYNC_WIDTH,
         DEVICE     => DEVICE
     )
@@ -700,7 +704,7 @@ begin
 
         sh_reg_mac_i : entity work.SH_REG_BASE_STATIC
         generic map (
-            NUM_BITS   => 4,
+            NUM_BITS   => MAX_CHECK_LATENCY - MAC_CHECK_LATENCY,
             DATA_WIDTH => RX_REGIONS*MAC_STATUS_WIDTH,
             DEVICE     => DEVICE
         )

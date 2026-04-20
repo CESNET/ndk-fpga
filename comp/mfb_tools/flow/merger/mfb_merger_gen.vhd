@@ -74,6 +74,9 @@ entity MFB_MERGER_GEN is
         -- Output register is created when this is set to false.
         OUT_PIPE_EN     : boolean := true;
 
+        -- Architecture of FIFOX_MULTI
+        FIFOX_MULTI_ARCH : string := "SHAKEDOWN";
+
         -- "ULTRASCALE", "STRATIX10",...
         DEVICE          : string  := "ULTRASCALE"
     );
@@ -214,6 +217,7 @@ begin
                 SW_TIMEOUT_WIDTH    => SW_TIMEOUT_WIDTH,
                 IN_PIPE_EN          => IN_PIPE_EN,
                 OUT_PIPE_EN         => OUT_PIPE_EN,
+                FIFOX_MULTI_ARCH    => FIFOX_MULTI_ARCH,
                 DEVICE              => DEVICE
             )
             port map (

@@ -394,7 +394,7 @@ begin
         ITEM_WIDTH     => MD_ITEM_WIDTH,
         META_WIDTH     => 1,
         LNG_WIDTH      => LEN_WIDTH,
-        REG_BITMAP     => "111",
+        REG_BITMAP     => "010",
         IMPLEMENTATION => "parallel"
     )
     port map (

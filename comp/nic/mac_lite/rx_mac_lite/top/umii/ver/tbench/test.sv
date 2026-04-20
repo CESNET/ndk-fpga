@@ -110,8 +110,8 @@ program TEST (
                 ready2stop = 0;
             end;
             //$write("ready2stop %d, time: %t\n", ready2stop, $time);
-            #(500*TX_CLK_PERIOD);
-        end while (ready2stop < 100);
+            #(50*TX_CLK_PERIOD);
+        end while (ready2stop < 50);
         #(5000*TX_CLK_PERIOD);
         //$write("DisableTestEnvironment ready, time: %t\n", $time);
 
