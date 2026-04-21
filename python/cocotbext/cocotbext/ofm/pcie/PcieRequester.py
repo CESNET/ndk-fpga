@@ -14,24 +14,40 @@ class PcieRequester(ABC):
     """
     Base class that handles PCIe requests and generates responses.
 
+    Completion modes (see cpl_split_mode):
+        SPLIT_NONE (0): Send the whole completion as-is without splitting (ignores MPS)
+        SPLIT_MAX (1): Split to create maximum-sized packets while respecting RCB boundaries
+        SPLIT_RAND (2): Split randomly at RCB boundaries
+
     Attributes:
     ram: memory, such as RAM from cocotbext.ofm.utils
     rc_driver: to drive responses onto the appropriate interface
     rq_monitor: to receive requests from the appropriate interface
     mps: Max Payload Size in bytes (default 256 bytes)
     rcb: Read Completion Boundary in bytes (default 64 bytes)
-    cpl_dly: delay of Read Completions in number of clock cycles
+    cpl_split_mode: mode for splitting completions (default SPLIT_MAX)
+    cpl_dly: delay of Read Completions, applies only for SPLIT_RAND (default 10 clock cycles)
     """
-    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_dly=10):
+
+    # Completion mode constants
+    SPLIT_NONE = 0
+    SPLIT_MAX = 1
+    SPLIT_RAND = 2
+
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_split_mode=SPLIT_MAX, cpl_dly=10):
         self._ram = ram
         self._rq = rq_driver
         self._rc = rc_driver
         self._mps = mps  # Max Payload Size in bytes
         self._rcb = rcb  # Read Completion Boundary in bytes
         self._cpl_dly = cpl_dly
+        self._cpl_split_mode = cpl_split_mode
 
-        # Per-tag queues: dict[tag, Queue]
-        self._tag_queues = {}
+        if self._cpl_split_mode == self.SPLIT_RAND:
+            # Per-tag queues: dict[tag, Queue]
+            self._tag_queues = {}
+        else:
+            self._q = Queue()
 
         self._log = logging.getLogger(__name__)
 
@@ -84,54 +100,84 @@ class PcieRequester(ABC):
             data: The data read from RAM
             addr: The starting address
         """
-        q = Queue()
-        tag = self.tag_from_hdr(hdr)
-
         total_bytes = len(data)
         bytes_remaining = total_bytes
         current_addr = addr
         offset = 0
         is_first = True
 
-        while bytes_remaining > 0:
-            # Calculate the next RCB boundary
-            next_rcb_boundary = ((current_addr // self._rcb) + 1) * self._rcb
-
-            if is_first:
-                # First completion: can go up to MPS or next RCB boundary, whichever is smaller
-                max_first_payload = min(self._mps, next_rcb_boundary - current_addr)
-                payload_bytes = min(bytes_remaining, max_first_payload)
-                lower_addr = addr
-                is_first = False
-            else:
-                # Subsequent completions: start at RCB boundary, limited by MPS
-                payload_bytes = min(bytes_remaining, self._mps)
-                lower_addr = current_addr
-
-            is_last = (payload_bytes >= bytes_remaining)
-
-            # Create completion header
+        if self._cpl_split_mode == self.SPLIT_NONE:
+            # SPLIT_NONE mode: Send all data in a single completion
             rc_hdr = self.hdr_req2compl(
                 hdr,
-                byte_count=bytes_remaining,
-                lower_address=lower_addr,
-                is_last=is_last,
-                payload_bytes=payload_bytes
+                byte_count=total_bytes,
+                lower_address=addr,
+                is_last=True,
+                payload_bytes=total_bytes
             )
+            completion = self.prep_response_tr(rc_hdr, data)
+            self._q.put_nowait(completion)
 
-            # Extract payload data for this completion
-            completion_data = data[offset:offset + payload_bytes]
+        elif self._cpl_split_mode == self.SPLIT_MAX:
+            # SPLIT_MAX mode: Create maximum-sized packets while respecting RCB boundaries
+            while bytes_remaining > 0:
+                if is_first:
+                    # First completion: find the last RCB boundary that fits within MPS
+                    # Add MPS to current address and mask to RCB boundary
+                    max_end_addr = ((current_addr + self._mps) // self._rcb) * self._rcb
+                    payload_bytes = min(bytes_remaining, max_end_addr - current_addr)
+                    is_first = False
+                else:
+                    # Subsequent completions: use full MPS (which is RCB-aligned)
+                    payload_bytes = min(bytes_remaining, self._mps)
 
-            # Create and queue completion
-            completion = self.prep_response_tr(rc_hdr, completion_data)
-            q.put_nowait(completion)
+                # Create completion header
+                rc_hdr = self.hdr_req2compl(
+                    hdr,
+                    byte_count=bytes_remaining,
+                    lower_address=current_addr,
+                    is_last=(payload_bytes >= bytes_remaining),
+                    payload_bytes=payload_bytes
+                )
 
-            # Update tracking variables
-            bytes_remaining -= payload_bytes
-            offset += payload_bytes
-            current_addr += payload_bytes
+                # Extract payload, create and queue completion
+                completion_data = data[offset:offset + payload_bytes]
+                completion = self.prep_response_tr(rc_hdr, completion_data)
+                self._q.put_nowait(completion)
 
-        self._tag_queues[tag] = q
+                # Update tracking variables
+                bytes_remaining -= payload_bytes
+                offset += payload_bytes
+                current_addr += payload_bytes
+
+        elif self._cpl_split_mode == self.SPLIT_RAND:
+            q = Queue()
+            tag = self.tag_from_hdr(hdr)
+            # SPLIT_RAND mode: Randomly select RCB boundaries for splitting
+            while bytes_remaining > 0:
+                # Bytes from current position to the next RCB boundary
+                dist_to_next_rcb = self._rcb - (current_addr % self._rcb)
+                max_possible = min(bytes_remaining, self._mps)
+
+                # All valid RCB-aligned payload sizes form an arithmetic sequence
+                valid_boundaries = list(range(dist_to_next_rcb, max_possible + 1, self._rcb))
+                payload_bytes = random.choice(valid_boundaries) if valid_boundaries else max_possible
+
+                rc_hdr = self.hdr_req2compl(
+                    hdr,
+                    byte_count=bytes_remaining,
+                    lower_address=current_addr,
+                    is_last=(payload_bytes >= bytes_remaining),
+                    payload_bytes=payload_bytes
+                )
+
+                completion = self.prep_response_tr(rc_hdr, data[offset:offset + payload_bytes])
+                q.put_nowait(completion)
+
+                bytes_remaining -= payload_bytes
+                offset += payload_bytes
+                current_addr += payload_bytes
+            self._tag_queues[tag] = q
 
     def handle_wr_request(self, data, addr):
         """Writes the given data to RAM at the specified address."""
@@ -163,21 +209,31 @@ class PcieRequester(ABC):
         Processes queued completions and sends them to the driver.
         Completions from different tags are interleaved randomly while
         maintaining ordering within each tag.
-    """
-        # Wait until at least one tag has data
-        while not self._tag_queues or all(q.empty() for q in self._tag_queues.values()):
-            await ClockCycles(self._rc.clock, self._cpl_dly)
 
-        while True:
-            # Get list of tags with non-empty queues
-            ready_tags = [tag for tag, q in self._tag_queues.items() if not q.empty()]
-
-            if ready_tags:
-                # Randomly select a tag and send one completion
-                selected_tag = random.choice(ready_tags)
-                completion = await self._tag_queues[selected_tag].get()
-                self._rc.append(completion)
-
+        For SPLIT_NONE and SPLIT_MAX modes, all completions are sent immediately
+        without random interleaving for maximum transmission speed.
+        Only SPLIT_RAND mode uses random interleaving between tags.
+        """
+        if self._cpl_split_mode == self.SPLIT_RAND:
             # Wait until at least one tag has data
             while not self._tag_queues or all(q.empty() for q in self._tag_queues.values()):
                 await ClockCycles(self._rc.clock, self._cpl_dly)
+
+            while True:
+                # Get list of tags with non-empty queues
+                ready_tags = [tag for tag, q in self._tag_queues.items() if not q.empty()]
+
+                if ready_tags:
+                    # Randomly select a tag and send one completion
+                    selected_tag = random.choice(ready_tags)
+                    completion = await self._tag_queues[selected_tag].get()
+                    self._rc.append(completion)
+
+                # Wait until at least one tag has data
+                while not self._tag_queues or all(q.empty() for q in self._tag_queues.values()):
+                    await ClockCycles(self._rc.clock, self._cpl_dly)
+        else:
+            # For SPLIT_NONE and SPLIT_MAX: use single queue
+            while True:
+                completion = await self._q.get()
+                self._rc.append(completion)

@@ -38,8 +38,8 @@ class CompletionHeader(SerializableHeader):
 class AvstRequester(PcieRequester):
     """Handles PCIe requests on the PCIe-specific AVST interface."""
 
-    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64):
-        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb)
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_split_mode=PcieRequester.SPLIT_NONE):
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb, cpl_split_mode)
         self._avst_tr_type = 1 # differentiates transactions for the driver; 0=CQ, 1=RC
 
     def handle_rq_transaction(self, transaction):

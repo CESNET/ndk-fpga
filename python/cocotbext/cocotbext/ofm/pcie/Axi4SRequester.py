@@ -23,8 +23,8 @@ class Frame(object):
 class Axi4SRequester(PcieRequester):
     """Handles PCIe requests on the PCIe-specific AXI4-Streaming interface."""
 
-    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64):
-        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb)
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_split_mode=PcieRequester.SPLIT_MAX):
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb, cpl_split_mode)
         self._rq_inframe = False
         self._rq_width = len(rq_monitor.bus.TDATA)
 
