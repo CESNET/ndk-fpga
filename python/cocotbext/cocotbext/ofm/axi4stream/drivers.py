@@ -58,6 +58,8 @@ class Axi4StreamMaster(BusDriver):
                 trans_dict["TKEEP"] = bitmask(data_width) if len(transaction.TDATA) >= data_width else bitmask(len(transaction.TDATA))
             if hasattr(self.bus, "TLAST"):
                 trans_dict["TLAST"] = 1 if len(transaction.TDATA) <= data_width else 0
+            if hasattr(self.bus, "SEL"):
+                trans_dict["SEL"] = transaction.SEL
 
             for name, value in asdict(transaction).items():
                 if hasattr(self.bus, name):

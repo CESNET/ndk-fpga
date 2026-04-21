@@ -4,12 +4,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
+from random import getrandbits
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
-from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
+from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction, Axi4StreamTransactionWithSelect
 from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_transactions
 
@@ -43,12 +44,17 @@ async def run_base_test(dut, min_size=40, max_size=200, pkt_count=10000):
     for i, (rx0_tr, rx1_tr) in enumerate(zip(rx0_gen, rx1_gen)):
         cocotb.log.debug(f"Generated packets iteration #{i}: RX0={len(rx0_tr.TDATA)}B, RX1={len(rx1_tr.TDATA)}B")
 
+        rx0_tr_ce     = Axi4StreamTransactionWithSelect()
+        rx0_tr_ce     = rx0_tr
+        rx0_tr_ce.SEL = getrandbits(1)
+
         # Model the expected output
-        tb.model(rx0_tr, rx1_tr)
+        tb.model(rx0_tr, rx1_tr if rx0_tr_ce.SEL else Axi4StreamTransaction())
 
         # Send to DUT
-        tb.rx0_drv.append(rx0_tr)
-        tb.rx1_drv.append(rx1_tr)
+        tb.rx0_drv.append(rx0_tr_ce)
+        if rx0_tr_ce.SEL:
+            tb.rx1_drv.append(rx1_tr)
 
     await ClockCycles(dut.CLK, 10)
 
@@ -87,12 +93,17 @@ async def run_full_speed_test(dut, min_size=40, max_size=500, pkt_count=10000):
     for i, (rx0_tr, rx1_tr) in enumerate(zip(rx0_gen, rx1_gen)):
         cocotb.log.debug(f"Generated packets iteration #{i}: RX0={len(rx0_tr.TDATA)}B, RX1={len(rx1_tr.TDATA)}B")
 
+        rx0_tr_ce     = Axi4StreamTransactionWithSelect()
+        rx0_tr_ce     = rx0_tr
+        rx0_tr_ce.SEL = getrandbits(1)
+
         # Model the expected output
-        tb.model(rx0_tr, rx1_tr)
+        tb.model(rx0_tr, rx1_tr if rx0_tr_ce.SEL else Axi4StreamTransaction())
 
         # Send to DUT
-        tb.rx0_drv.append(rx0_tr)
-        tb.rx1_drv.append(rx1_tr)
+        tb.rx0_drv.append(rx0_tr_ce)
+        if rx0_tr_ce.SEL:
+            tb.rx1_drv.append(rx1_tr)
 
     await ClockCycles(dut.CLK, 10)
 

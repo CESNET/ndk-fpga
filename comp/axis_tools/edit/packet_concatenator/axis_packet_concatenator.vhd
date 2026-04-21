@@ -55,6 +55,11 @@ entity AXIS_PACKET_CONCATENATOR is
         RX0_AXIS_TVALID : in  std_logic;
         RX0_AXIS_TREADY : out std_logic;
 
+        -- Enable concatenation with RX1 (must be valid with RX0_AXIS_TLAST).
+        -- '0' = do not concatenate data from RX1 to current RX0
+        -- '1' = enable concatenation with RX1
+        RX0_AXIS_SEL    : in  std_logic := '1';
+
         -- =========================================================================
         -- RX1 AXI-Stream interface
         -- =========================================================================
@@ -106,6 +111,7 @@ architecture FULL of AXIS_PACKET_CONCATENATOR is
     signal rx0_keep_reg              : std_logic_vector(DATA_BYTES-1 downto 0);
     signal rx0_last_reg              : std_logic;
     signal rx0_valid_reg             : std_logic;
+    signal rx0_cat_en_reg            : std_logic;
     signal rx1_data_reg              : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
     signal rx1_keep_reg              : std_logic_vector(DATA_BYTES-1 downto 0);
     signal rx1_last_reg              : std_logic;
@@ -113,8 +119,6 @@ architecture FULL of AXIS_PACKET_CONCATENATOR is
 
     signal rx0_all_valid             : std_logic;
     signal rx0_all_valid_reg         : std_logic;
-    signal rx0_last_complete         : std_logic;
-    signal rx0_last_complete_reg     : std_logic;
     signal rx1_last_complete         : std_logic;
     signal rx1_packet_ending         : std_logic;
     signal rx0_packet_end_pending    : std_logic;
@@ -176,14 +180,15 @@ begin
                 rx0_keep_reg           <= RX0_AXIS_TKEEP;
                 rx0_last_reg           <= RX0_AXIS_TLAST;
                 rx0_valid_reg          <= RX0_AXIS_TVALID;
+                rx0_cat_en_reg         <= RX0_AXIS_SEL;
                 rx0_all_valid_reg      <= rx0_all_valid;
 
-                rx0_last_complete_reg  <= rx0_last_complete;
                 rx1_start_byte_pos_reg <= rx1_start_byte_pos;
             end if;
             if (RESET = '1') then
-                rx0_valid_reg         <= '0';
-                rx0_last_complete_reg <= '0';
+                rx0_valid_reg          <= '0';
+                rx0_last_reg           <= '0';
+                rx0_cat_en_reg         <= '0';
             end if;
         end if;
     end process;
@@ -213,16 +218,14 @@ begin
 
     -- Detect if all bytes are valid in the last word
     rx0_all_valid          <= and RX0_AXIS_TKEEP;
-    -- RX0 last word is complete => all bytes in the last word are valid.
-    rx0_last_complete      <= rx0_all_valid and RX0_AXIS_TLAST and RX0_AXIS_TVALID;
     -- RX1 last word is complete => all bytes in the last word were able to fit into this word.
     rx1_last_complete      <= or rx1_shifted_last_1hot_bot;
     -- Validated rx1_last_complete.
     rx1_packet_ending      <= rx1_last_complete and rx1_last_reg and rx1_valid_reg;
     -- A packet's last word is arriving on RX0 and not all of its bytes are valid.
-    rx0_packet_end_pending <= RX0_AXIS_TVALID and RX0_AXIS_TLAST and not rx0_all_valid;
+    rx0_packet_end_pending <= RX0_AXIS_TVALID and RX0_AXIS_TLAST and RX0_AXIS_SEL and not rx0_all_valid;
     -- A one-word-long packet is preloaded in rx0_reg.
-    rx0_short_in_reg       <= not rx0_all_valid_reg and rx0_last_reg and rx0_valid_reg;
+    rx0_short_in_reg       <= not rx0_all_valid_reg and rx0_last_reg and rx0_valid_reg and rx0_cat_en_reg;
 
     fsm_state_reg_p : process (CLK)
     begin
@@ -241,11 +244,11 @@ begin
         case (fsm_pstate) is
             -- Forward complete words from RX0.
             when ST_SEND_RX0 =>
-                if ((rx0_last_reg = '1') and (rx0_valid_reg = '1')) then
+                if ((rx0_last_reg = '1') and (rx0_valid_reg = '1') and (rx0_cat_en_reg = '1')) then
                     -- When the last word on RX0 has all bytes valid, we stay in ST_SEND_RX0 one more clock cycle
                     -- and then need to go straight to ST_SEND_RX1.
                     fsm_nstate <= ST_SEND_RX1;
-                elsif ((RX0_AXIS_TVALID = '1') and (RX0_AXIS_TLAST = '1') and (rx0_all_valid = '0')) then
+                elsif ((RX0_AXIS_TVALID = '1') and (RX0_AXIS_TLAST = '1') and (RX0_AXIS_SEL = '1') and (rx0_all_valid = '0')) then
                     -- A packet's last word is arriving on RX0.
                     -- Need to complete this word with bytes from a packet data on RX1 or rx1_reg.
                     fsm_nstate <= ST_SEND_RX0_RX1;
@@ -299,7 +302,7 @@ begin
                 new_bs_shift_en          <= '1';
                 -- New value for bs_shift can come from two sources: rx1_start_byte_pos_reg and rx1_start_byte_pos.
                 -- 0: stage 0 (the input), 1: stage 1 (the input register)
-                new_bs_shift_src         <= rx0_last_reg and rx0_valid_reg;
+                new_bs_shift_src         <= rx0_last_reg and rx0_valid_reg and rx0_cat_en_reg;
                 -- rx1_packet_ending_reg could assert when the packet's last word on RX0 was arriving and a shorter-than-word packet was in rx1_reg.
                 rx1_packet_ending_reg_en <= '0';
 
@@ -308,7 +311,7 @@ begin
 
                 s_tx_axis_tdata  <= rx0_data_reg;
                 s_tx_axis_tkeep  <= rx0_keep_reg;
-                s_tx_axis_tlast  <= '0';
+                s_tx_axis_tlast  <= rx0_last_reg and not rx0_cat_en_reg;
                 s_tx_axis_tvalid <= rx0_valid_reg;
 
             when ST_SEND_RX0_RX1 =>
