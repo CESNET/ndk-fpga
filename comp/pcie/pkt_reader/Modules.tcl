@@ -21,7 +21,7 @@ lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # Components
 lappend COMPONENTS [ list "PPR_REQUEST_PROCESSOR"    "$ENTITY_BASE/comp/request_processor"  "FULL"       ]
-lappend COMPONENTS [ list "N_LOOP_OP"                "$LOGIC_BASE/n_loop_op"                "FULL"       ]
+lappend COMPONENTS [ list "NP_LUTRAM"                "$MEM_BASE/np_lutram"                  "FULL"       ]
 lappend COMPONENTS [ list "FIFOX_MULTI"              "$FIFO_BASE/fifox_multi"               "FULL"       ]
 lappend COMPONENTS [ list "MFB_FIFOX"                $MFB_FIFOX_BASE                        "FULL"       ]
 lappend COMPONENTS [ list "MFB2AXI"                  "$MFB_AXI_BASE/mfb2axi"                "BEHAVIORAL" ]

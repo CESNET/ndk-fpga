@@ -69,7 +69,7 @@ entity PPR_REQUEST_PROCESSOR is
         -- IDMEM Data part 0 - address of a packets SOF in the Main Memory.
         IDMEM_ADDR        : out std_logic_vector(MVB_ITEMS*log2(MEMORY_ITEMS)+1-1 downto 0);
         -- IDMEM Data part 1 - maximum number of words an MTU can consist of.
-        IDMEM_WORDS       : out std_logic_vector(MVB_ITEMS*log2(div_roundup(PKT_MTU,MEMORY_ITEM_WIDTH/8))-1 downto 0);
+        IDMEM_WORDS       : out std_logic_vector(MVB_ITEMS*log2(div_roundup(PKT_MTU+1,MEMORY_ITEM_WIDTH/8))-1 downto 0);
         -- IDMEM Data part 2 - a packet's end position throughout the whole word.
         IDMEM_EOF_POS     : out std_logic_vector(MVB_ITEMS*log2(MEMORY_ITEM_WIDTH/8)-1 downto 0);
         -- IDMEM Data part 3 - the amount of Tags (Read requests) used for this packet's transmission.

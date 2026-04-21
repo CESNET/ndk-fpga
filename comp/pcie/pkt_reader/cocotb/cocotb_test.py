@@ -101,7 +101,7 @@ class Testbench():
         # Address tracker to prevent overlapping memory accesses
         self.addr_tracker = AddressRangeTracker(self.ram_capacity)
         self.exp_output = []
-        self.model_sent = 0
+        self.packets_expected = kwargs.get("pkts_exp", 10000)
         self.packets_received = 0
         # Track which IDs are currently in use (not yet received)
         self.ids_in_use = set()
@@ -109,11 +109,29 @@ class Testbench():
         self.scoreboard = Scoreboard(dut)
 
         def compare_wrapper(actual):
-            """Compare actual output with expected, providing detailed mismatch info."""
+            """
+            Compare actual output with expected, providing detailed mismatch info.
+            Supports out-of-order packet arrival within reorder_depth window.
+            """
             if not self.exp_output:
                 cocotb.log.error("Received unexpected packet")
                 return
-            expected = self.exp_output.pop(0)
+
+            # Search for matching transaction by ID within reorder_depth window
+            reorder_depth = self.packets_expected
+            found_idx = None
+            for i in range(min(reorder_depth, len(self.exp_output))):
+                if self.exp_output[i].id == actual.id:
+                    found_idx = i
+                    break
+
+            if found_idx is None:
+                cocotb.log.error(f"No matching expected transaction found for packet ID {actual.id} "
+                                 f"within reorder_depth={reorder_depth}")
+                self.scoreboard.errors += 1
+                assert False
+
+            expected = self.exp_output.pop(found_idx)
             self.packets_received += 1
 
             # Free the address range by packet ID when packet is received
@@ -155,7 +173,6 @@ class Testbench():
 
         # Connect to Scoreboard expected output
         self.exp_output.append(response)
-        self.model_sent += 1
 
     async def reset(self):
         self.dut.RESET.value = 1
@@ -174,7 +191,7 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     dut.RESET.value = 1
     cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
 
-    tb = Testbench(dut, debug=False, mps=pcie_mps, rcb=pcie_rcb)
+    tb = Testbench(dut, debug=False, pkts_exp=frame_count, mps=pcie_mps, rcb=pcie_rcb)
     # Change MVB driver's IdleGenerator to ItemRateLimiter
     idle_gen_conf = dict(random_idles=True, max_idles=3, zero_idles_chance=80)
     tb.user_req_drv.set_idle_generator(ItemRateLimiter(rate_percentage=50, **idle_gen_conf))

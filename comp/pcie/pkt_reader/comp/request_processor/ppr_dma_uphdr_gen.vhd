@@ -87,7 +87,8 @@ architecture FULL of PPR_DMA_UPHDR_GEN is
     signal length_bytes_total : unsigned(log2(PKT_MTU+1)+1-1 downto 0);
     signal length_dwords      : unsigned(log2(PKT_MTU/4+1)+1-1 downto 0);
     signal dma_uphdr_data     : std_logic_vector(DMA_UPHDR_WIDTH-1 downto 0);
-    signal address_resized    : std_logic_vector(DMA_REQUEST_GLOBAL_W-1 downto 0);
+
+    signal tx_vld             : std_logic_vector(MVB_ITEMS-1 downto 0);
 
 begin
 
@@ -183,13 +184,12 @@ begin
     dma_uphdr_data(DMA_REQUEST_TYPE    ) <= DMA_TYPE_READ;
     -- Compensates for the dword-aligned address by identifing the number of invalid bytes from the start.
     dma_uphdr_data(DMA_REQUEST_FIRSTIB ) <= RX_MVB_ADDRESS(1 downto 0);
-    -- Number of invalid bytes in the last DWORD of the transaction
+    -- Number of invalid bytes in the last DWORD of the transaction.
     dma_uphdr_data(DMA_REQUEST_LASTIB  ) <= std_logic_vector(TWO_ZEROS - unsigned(length_bytes_total(1 downto 0)));
     dma_uphdr_data(DMA_REQUEST_TAG     ) <= tag_fifo_do(DMA_REQUEST_TAG_W-1 downto 0);
     dma_uphdr_data(DMA_REQUEST_UNITID  ) <= (others => '0');
     -- Word-aligning the address (dword is 4 bytes -> drive two LSBs low).
-    address_resized <= std_logic_vector(resize(unsigned(RX_MVB_ADDRESS), DMA_REQUEST_GLOBAL_W));
-    dma_uphdr_data(DMA_REQUEST_GLOBAL  ) <= address_resized(DMA_REQUEST_GLOBAL_W-1 downto 2) & "00";
+    dma_uphdr_data(DMA_REQUEST_GLOBAL  ) <= RX_MVB_ADDRESS(DMA_REQUEST_GLOBAL_W-1 downto 2) & "00";
     dma_uphdr_data(DMA_REQUEST_VFID    ) <= (others => '0');
     dma_uphdr_data(DMA_REQUEST_PASID   ) <= (others => '0');
     dma_uphdr_data(DMA_REQUEST_PASIDVLD) <= (others => '0');
@@ -199,14 +199,15 @@ begin
     --  Output register
     -- =====================================================================
 
+    tx_vld <= RX_MVB_VALID and not tag_fifo_empty;
     output_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (TX_MVB_DST_RDY = '1') then
                 TX_MVB_DATA    <= dma_uphdr_data;
                 TX_MVB_META    <= RX_MVB_META;
-                TX_MVB_VLD     <= RX_MVB_VALID and not tag_fifo_empty;
-                TX_MVB_SRC_RDY <= RX_MVB_SRC_RDY;
+                TX_MVB_VLD     <= tx_vld;
+                TX_MVB_SRC_RDY <= RX_MVB_SRC_RDY and (or tx_vld);
             end if;
             if (RESET = '1') then
                 TX_MVB_SRC_RDY <= '0';
