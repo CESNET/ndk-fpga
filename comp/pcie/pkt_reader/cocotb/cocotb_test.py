@@ -96,7 +96,9 @@ class Testbench():
             rc_driver=self.pcie_down_drv,
             rq_monitor=self.pcie_up_mon,
             mps=kwargs.get("mps", 256),
-            rcb=kwargs.get("rcb", 64)
+            rcb=kwargs.get("rcb", 64),
+            cpl_split_mode=kwargs.get("cpl_split_mode", 2),
+            cpl_dly=kwargs.get("cpl_dly", 10)
         )
         # Address tracker to prevent overlapping memory accesses
         self.addr_tracker = AddressRangeTracker(self.ram_capacity)

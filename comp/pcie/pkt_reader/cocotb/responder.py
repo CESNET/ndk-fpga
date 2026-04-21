@@ -37,8 +37,8 @@ class DmaUpHdr(SerializableHeader):
 class PprRequester(PcieRequester):
     """Handles PCIe requests for the PCIe Packet Reader module."""
 
-    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64):
-        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb)
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_split_mode=PcieRequester.SPLIT_RAND, cpl_dly=10):
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb, cpl_split_mode, cpl_dly)
 
     def handle_rq_transaction(self, transaction):
         """Parses the RQ header and writes to or reads from the memory accordingly."""
@@ -53,6 +53,10 @@ class PprRequester(PcieRequester):
             self.handle_rd_request(hdr=dma_uphdr, addr=addr, length=length)
         else:
             raise NotImplementedError
+
+    def tag_from_hdr(self, hdr):
+        """Extract the tag value from the DMA request header."""
+        return hdr.dma_request_tag
 
     def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):
         """
