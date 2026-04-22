@@ -152,7 +152,7 @@ This module pieces these parts together and marks them with the ID from the requ
 <p>Must still be tested in scenarios where:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>requests generate multiple completions and</p></li>
+<li><p>requests generate multiple completions (FIP: Fixing In Process) and</p></li>
 <li><p>completions arrive out-of-order (in-order per same tag).</p></li>
 </ol>
 </div></blockquote>
@@ -212,20 +212,15 @@ This module pieces these parts together and marks them with the ID from the requ
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-pcie_mrrs_width"><td><p>PCIE_MRRS_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>13</p></td>
+<td><p>12</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-address_width"><td><p>ADDRESS_WIDTH</p></td>
-<td><p>natural</p></td>
-<td><p>64</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-page_size"><td><p>PAGE_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-page_size"><td><p>PAGE_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>4096</p></td>
 <td><p>Size of a RAM page (in bytes).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td></td>
@@ -267,7 +262,7 @@ This module pieces these parts together and marks them with the ID from the requ
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-user_req_mvb_address"><td><p>USER_REQ_MVB_ADDRESS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*DMA_REQUEST_GLOBAL_W-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
