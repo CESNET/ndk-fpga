@@ -47,7 +47,7 @@ entity AXIS_FIFO is
         -- =========================================================================
         RX_AXI_TDATA    : in  std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
         RX_AXI_TKEEP    : in  std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0);
-        RX_AXI_TDEST    : in  std_logic_vector(AXI_TUSER_WIDTH-1 downto 0) := (others => '0');
+        RX_AXI_TUSER    : in  std_logic_vector(AXI_TUSER_WIDTH-1 downto 0) := (others => '0');
         RX_AXI_TLAST    : in  std_logic;
         RX_AXI_TVALID   : in  std_logic;
         RX_AXI_TREADY   : out std_logic;
@@ -57,7 +57,7 @@ entity AXIS_FIFO is
         -- =========================================================================
         TX_AXI_TDATA    : out std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
         TX_AXI_TKEEP    : out std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0);
-        TX_AXI_TDEST    : out std_logic_vector(AXI_TUSER_WIDTH-1 downto 0);
+        TX_AXI_TUSER    : out std_logic_vector(AXI_TUSER_WIDTH-1 downto 0);
         TX_AXI_TLAST    : out std_logic;
         TX_AXI_TVALID   : out std_logic;
         TX_AXI_TREADY   : in  std_logic;
@@ -91,10 +91,10 @@ architecture FULL of AXIS_FIFO is
 begin
 
     axi_tdest_g : if AXI_TUSER_WIDTH > 0 generate
-        subtype AXI_TDEST_R is natural range (AXI_TKEEP_R'high+1) + AXI_TUSER_WIDTH -1 downto (AXI_TKEEP_R'high+1);
+        subtype AXI_TUSER_R is natural range (AXI_TKEEP_R'high+1) + AXI_TUSER_WIDTH -1 downto (AXI_TKEEP_R'high+1);
     begin
-        s_rx_axi_ifc_packed <= RX_AXI_TLAST & RX_AXI_TDEST & RX_AXI_TKEEP & RX_AXI_TDATA;
-        TX_AXI_TDEST        <= s_tx_axi_ifc_packed(AXI_TDEST_R);
+        s_rx_axi_ifc_packed <= RX_AXI_TLAST & RX_AXI_TUSER & RX_AXI_TKEEP & RX_AXI_TDATA;
+        TX_AXI_TUSER        <= s_tx_axi_ifc_packed(AXI_TUSER_R);
     else generate
         s_rx_axi_ifc_packed <= RX_AXI_TLAST & RX_AXI_TKEEP & RX_AXI_TDATA;
     end generate;

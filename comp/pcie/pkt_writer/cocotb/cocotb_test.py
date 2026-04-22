@@ -22,6 +22,8 @@ from cocotbext.ofm.mvb.transaction import MvbTrClassic
 from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.utils.header import SerializableHeader
+from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
+from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 
 from transaction import MvbTrAddressAndLength
 from drivers import MvbDriverAddressAndLength as MVBDriver
@@ -47,7 +49,12 @@ class DmaUphdr(SerializableHeader):
 class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
-        self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK)
+        if dut.AXI_RX_DIRECT.value:
+            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK)
+            self.mfb_rx_drv = None
+        else:
+            self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK)
+            self.axis_rx_drv = None
         self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK)
         self.mfb_tx_drv = BitDriver(dut.TX_MFB_DST_RDY, dut.CLK)
         self.mvb_tx_drv = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
@@ -62,7 +69,10 @@ class testbench():
         self.scoreboard.add_interface(self.mfb_tx_mon, self.mfb_expected_output)
 
         if debug:
-            self.mfb_rx_drv.log.setLevel(cocotb.logging.DEBUG)
+            if self.mfb_rx_drv is not None:
+                self.mfb_rx_drv.log.setLevel(cocotb.logging.DEBUG)
+            if self.axis_rx_drv is not None:
+                self.axis_rx_drv.log.setLevel(cocotb.logging.DEBUG)
             self.mvb_rx_drv.log.setLevel(cocotb.logging.DEBUG)
             self.mfb_tx_mon.log.setLevel(cocotb.logging.DEBUG)
             self.mvb_tx_mon.log.setLevel(cocotb.logging.DEBUG)
@@ -170,7 +180,12 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256
         mvb_instr.length = length
 
         # Send to Driver (DUT)
-        tb.mfb_rx_drv.append(mfb_pkt)
+        if tb.mfb_rx_drv is not None:
+            tb.mfb_rx_drv.append(mfb_pkt)
+        else:
+            axis_tr = Axi4StreamTransaction()
+            axis_tr.TDATA = mfb_pkt
+            tb.axis_rx_drv.append(axis_tr)
         tb.mvb_rx_drv.append(mvb_instr)
 
         # Send to Model

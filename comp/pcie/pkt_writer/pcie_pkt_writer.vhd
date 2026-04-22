@@ -38,6 +38,15 @@ entity PCIE_PKT_WRITER is
         MFB_ITEM_WIDTH  : natural := 8;
 
         -- ========================================================
+        -- AXI-Stream parameters
+        -- ========================================================
+
+        -- Uses the RX_AXI input interface when true, RX_MFB when false.
+        AXI_RX_DIRECT   : boolean := true;
+        AXI_TDATA_WIDTH : natural := 512;
+        AXI_TUSER_WIDTH : natural := 0; -- not supported
+
+        -- ========================================================
         -- Other parameters
         -- ========================================================
 
@@ -60,6 +69,7 @@ entity PCIE_PKT_WRITER is
 
         -- ========================================================
         -- RX Interface
+        --   - select between MFB and AXI RX interface using AXI_RX_DIRECT
         -- ========================================================
 
         RX_MVB_ADDRESS : in  std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
@@ -73,8 +83,15 @@ entity PCIE_PKT_WRITER is
         RX_MFB_EOF     : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         RX_MFB_SOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
         RX_MFB_EOF_POS : in  std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-        RX_MFB_SRC_RDY : in  std_logic;
+        RX_MFB_SRC_RDY : in  std_logic := '0';
         RX_MFB_DST_RDY : out std_logic;
+
+        RX_AXI_TDATA   : in  std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
+        RX_AXI_TKEEP   : in  std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0);
+        RX_AXI_TUSER   : in  std_logic_vector(AXI_TUSER_WIDTH-1 downto 0) := (others => '0'); -- not supported
+        RX_AXI_TLAST   : in  std_logic;
+        RX_AXI_TVALID  : in  std_logic := '0';
+        RX_AXI_TREADY  : out std_logic;
 
         -- ========================================================
         -- TX Interface
@@ -102,10 +119,14 @@ architecture FULL of PCIE_PKT_WRITER is
     --                                CONSTANTS
     -- =====================================================================
 
+    -- MFB constants
     constant REGION_WIDTH  : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    constant WORD_WIDTH    : natural := MFB_REGIONS*REGION_WIDTH;
     constant SOF_POS_WIDTH : natural := max(1, log2(MFB_REGION_SIZE));
     constant EOF_POS_WIDTH : natural := max(1, log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
+
+    -- Common constants
+    constant WORD_WIDTH    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH, MFB_REGIONS*REGION_WIDTH);
+    constant WORD_ITEMS    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE);
 
     -- =====================================================================
     --                                 SIGNALS
@@ -125,6 +146,12 @@ architecture FULL of PCIE_PKT_WRITER is
     signal fifo_tx_mfb_eof       : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal fifo_tx_mfb_src_rdy   : std_logic;
     signal fifo_tx_mfb_dst_rdy   : std_logic;
+
+    signal fifo_tx_axis_tdata    : std_logic_vector(WORD_WIDTH-1 downto 0);
+    signal fifo_tx_axis_tkeep    : std_logic_vector(WORD_ITEMS-1 downto 0);
+    signal fifo_tx_axis_tlast    : std_logic;
+    signal fifo_tx_axis_tvalid   : std_logic;
+    signal fifo_tx_axis_tready   : std_logic;
 
     signal hdrgen_rx_mvb_address : std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
     signal hdrgen_rx_mvb_length  : std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
@@ -175,45 +202,87 @@ begin
     --  Packet breaker
     -- ========================================================
 
-    mfb_fifox_i : entity work.MFB_FIFOX
-    generic map (
-        REGIONS             => MFB_REGIONS,
-        REGION_SIZE         => MFB_REGION_SIZE,
-        BLOCK_SIZE          => MFB_BLOCK_SIZE,
-        ITEM_WIDTH          => MFB_ITEM_WIDTH,
-        META_WIDTH          => 0,
-        FIFO_DEPTH          => 512,
-        RAM_TYPE            => "AUTO",
-        DEVICE              => DEVICE,
-        ALMOST_FULL_OFFSET  => 0,
-        ALMOST_EMPTY_OFFSET => 0
-    )
-    port map (
-        CLK         => CLK,
-        RST         => RESET,
+    mfb_fifox_g : if not AXI_RX_DIRECT generate
+        mfb_fifox_i : entity work.MFB_FIFOX
+        generic map (
+            REGIONS             => MFB_REGIONS,
+            REGION_SIZE         => MFB_REGION_SIZE,
+            BLOCK_SIZE          => MFB_BLOCK_SIZE,
+            ITEM_WIDTH          => MFB_ITEM_WIDTH,
+            META_WIDTH          => 0,
+            FIFO_DEPTH          => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
+            ALMOST_EMPTY_OFFSET => 0
+        )
+        port map (
+            CLK         => CLK,
+            RST         => RESET,
 
-        RX_DATA     => RX_MFB_DATA,
-        RX_META     => (others => '0'),
-        RX_SOF_POS  => RX_MFB_SOF_POS,
-        RX_EOF_POS  => RX_MFB_EOF_POS,
-        RX_SOF      => RX_MFB_SOF,
-        RX_EOF      => RX_MFB_EOF,
-        RX_SRC_RDY  => RX_MFB_SRC_RDY,
-        RX_DST_RDY  => RX_MFB_DST_RDY,
+            RX_DATA     => RX_MFB_DATA,
+            RX_META     => (others => '0'),
+            RX_SOF_POS  => RX_MFB_SOF_POS,
+            RX_EOF_POS  => RX_MFB_EOF_POS,
+            RX_SOF      => RX_MFB_SOF,
+            RX_EOF      => RX_MFB_EOF,
+            RX_SRC_RDY  => RX_MFB_SRC_RDY,
+            RX_DST_RDY  => RX_MFB_DST_RDY,
 
-        TX_DATA     => fifo_tx_mfb_data,
-        TX_META     => open,
-        TX_SOF_POS  => fifo_tx_mfb_sof_pos,
-        TX_EOF_POS  => fifo_tx_mfb_eof_pos,
-        TX_SOF      => fifo_tx_mfb_sof,
-        TX_EOF      => fifo_tx_mfb_eof,
-        TX_SRC_RDY  => fifo_tx_mfb_src_rdy,
-        TX_DST_RDY  => fifo_tx_mfb_dst_rdy,
+            TX_DATA     => fifo_tx_mfb_data,
+            TX_META     => open,
+            TX_SOF_POS  => fifo_tx_mfb_sof_pos,
+            TX_EOF_POS  => fifo_tx_mfb_eof_pos,
+            TX_SOF      => fifo_tx_mfb_sof,
+            TX_EOF      => fifo_tx_mfb_eof,
+            TX_SRC_RDY  => fifo_tx_mfb_src_rdy,
+            TX_DST_RDY  => fifo_tx_mfb_dst_rdy,
 
-        FIFO_STATUS => open,
-        FIFO_AFULL  => open,
-        FIFO_AEMPTY => open
-    );
+            FIFO_STATUS => open,
+            FIFO_AFULL  => open,
+            FIFO_AEMPTY => open
+        );
+
+        RX_AXI_TREADY <= '0';
+    else generate
+        axis_fifox_i : entity work.AXIS_FIFO
+        generic map (
+            AXI_TDATA_WIDTH     => AXI_TDATA_WIDTH,
+            AXI_TUSER_WIDTH     => AXI_TUSER_WIDTH,
+            ITEMS               => 512,
+            RAM_TYPE            => "AUTO",
+            DEVICE              => DEVICE,
+            ALMOST_FULL_OFFSET  => 0,
+            ALMOST_EMPTY_OFFSET => 0,
+            FIFO_TYPE           => 1 -- FIFOX
+        )
+        port map (
+            CLK           => CLK,
+            RESET         => RESET,
+
+            RX_AXI_TDATA  => RX_AXI_TDATA,
+            RX_AXI_TKEEP  => RX_AXI_TKEEP,
+            RX_AXI_TUSER  => RX_AXI_TUSER,
+            RX_AXI_TLAST  => RX_AXI_TLAST,
+            RX_AXI_TVALID => RX_AXI_TVALID,
+            RX_AXI_TREADY => RX_AXI_TREADY,
+
+            TX_AXI_TDATA  => fifo_tx_axis_tdata,
+            TX_AXI_TKEEP  => fifo_tx_axis_tkeep,
+            TX_AXI_TUSER  => open,
+            TX_AXI_TLAST  => fifo_tx_axis_tlast,
+            TX_AXI_TVALID => fifo_tx_axis_tvalid,
+            TX_AXI_TREADY => fifo_tx_axis_tready,
+
+            FULL          => open,
+            AFULL         => open,
+            STATUS        => open,
+            EMPTY         => open,
+            AEMPTY        => open
+        );
+
+        RX_MFB_DST_RDY <= '0';
+    end generate;
 
     packet_breaker_i : entity work.PPW_PKT_BREAKER
     generic map (
@@ -221,6 +290,8 @@ begin
         MFB_REGION_SIZE => MFB_REGION_SIZE,
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+        AXI_RX_DIRECT   => AXI_RX_DIRECT,
+        AXI_TDATA_WIDTH => AXI_TDATA_WIDTH,
         PKT_MTU         => PKT_MTU,
         ADDRESS_WIDTH   => ADDRESS_WIDTH,
         DEVICE          => DEVICE
@@ -236,6 +307,12 @@ begin
         RX_MFB_EOF     => fifo_tx_mfb_eof,
         RX_MFB_SRC_RDY => fifo_tx_mfb_src_rdy,
         RX_MFB_DST_RDY => fifo_tx_mfb_dst_rdy,
+
+        RX_AXI_TDATA   => fifo_tx_axis_tdata,
+        RX_AXI_TKEEP   => fifo_tx_axis_tkeep,
+        RX_AXI_TLAST   => fifo_tx_axis_tlast,
+        RX_AXI_TVALID  => fifo_tx_axis_tvalid,
+        RX_AXI_TREADY  => fifo_tx_axis_tready,
 
         RX_MVB_ADDRESS => instr_address,
         RX_MVB_LENGTH  => instr_length,

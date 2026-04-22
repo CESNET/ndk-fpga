@@ -507,7 +507,7 @@ begin
 
         RX_AXI_TDATA  => bs_tx_axi_tdata,
         RX_AXI_TKEEP  => bs_tx_axi_tkeep,
-        RX_AXI_TDEST  => (others => '0'),
+        RX_AXI_TUSER  => (others => '0'),
         RX_AXI_TLAST  => bs_tx_axi_tlast,
         RX_AXI_TVALID => bs_tx_axi_tvalid,
         RX_AXI_TREADY => open,
@@ -517,7 +517,7 @@ begin
 
         TX_AXI_TDATA  => TX_AXI_TDATA,
         TX_AXI_TKEEP  => TX_AXI_TKEEP,
-        TX_AXI_TDEST  => open,
+        TX_AXI_TUSER  => open,
         TX_AXI_TLAST  => TX_AXI_TLAST,
         TX_AXI_TVALID => TX_AXI_TVALID,
         TX_AXI_TREADY => TX_AXI_TREADY,
