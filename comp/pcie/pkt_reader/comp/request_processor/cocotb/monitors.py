@@ -105,7 +105,7 @@ class IdMemMonitor(BaseMemMonitor):
 
 
 class TagMemMonitor(BaseMemMonitor):
-    _optional_signals = ["tag", "addr", "id"]
+    _optional_signals = ["tag", "addr", "id", "firstib"]
 
     def __init__(self, entity, name, clock, array_idx=None) -> None:
         super().__init__(entity, name, clock, tr_type=TagMemTr(), array_idx=array_idx)

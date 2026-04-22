@@ -27,3 +27,4 @@ class TagMemTr(Transaction):
     tag : int = 0
     addr : int = 0
     id : int = 0
+    firstib : int = 0

@@ -37,15 +37,16 @@ class DmaUpHdr(SerializableHeader):
 class PprRequester(PcieRequester):
     """Handles PCIe requests for the PCIe Packet Reader module."""
 
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_split_mode=PcieRequester.SPLIT_RAND, cpl_dly=10):
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb, cpl_split_mode, cpl_dly)
+
     def handle_rq_transaction(self, transaction):
         """Parses the RQ header and writes to or reads from the memory accordingly."""
         mvb_hdr = transaction
         dma_uphdr = DmaUpHdr.deserialize(mvb_hdr.data)
 
-        addr = dma_uphdr.dma_request_global
-        length = dma_uphdr.dma_request_length * 4
-        if dma_uphdr.dma_request_firstib != 0:
-            raise ValueError(f"Received DMA Up header with First Invalid Byte != 0: {dma_uphdr.dma_request_firstib}")
+        addr = dma_uphdr.dma_request_global + dma_uphdr.dma_request_firstib
+        length = dma_uphdr.dma_request_length * 4 - dma_uphdr.dma_request_firstib - dma_uphdr.dma_request_lastib
 
         # Process only if it is a Read request
         if dma_uphdr.dma_request_type == 0:
@@ -53,11 +54,32 @@ class PprRequester(PcieRequester):
         else:
             raise NotImplementedError
 
-    def hdr_req2compl(self, rq_hdr):
-        """Creates a completion header from the given request header."""
+    def tag_from_hdr(self, hdr):
+        """Extract the tag value from the DMA request header."""
+        return hdr.dma_request_tag
+
+    def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):
+        """
+        Creates a completion header from the given request header.
+
+        Args:
+            rq_hdr: The original request header (DmaUpHdr)
+            byte_count: Total remaining bytes including this completion (for split completions)
+            lower_address: Lower address for this completion (RCB-aligned for non-first completions)
+            is_last: True if this is the final completion in a split sequence
+            payload_bytes: Number of payload bytes in this completion
+        """
         dma_downhdr = DmaDownHdr()
-        dma_downhdr.dma_completion_length = rq_hdr.dma_request_length
-        dma_downhdr.dma_completion_completed = 1 # TODO: split completions
+
+        # Calculate length in dwords from payload_bytes
+        if payload_bytes is not None:
+            dma_downhdr.dma_completion_length = (payload_bytes + 3) // 4  # Round up to dwords
+        else:
+            dma_downhdr.dma_completion_length = rq_hdr.dma_request_length
+
+        # Set dma_completion_completed - only 1 on the final completion
+        dma_downhdr.dma_completion_completed = 1 if is_last else 0
+
         dma_downhdr.dma_completion_tag = rq_hdr.dma_request_tag
         dma_downhdr.dma_completion_unitid = 0 # Not used
         mvb_hdr = MvbTrClassic()

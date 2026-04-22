@@ -114,13 +114,15 @@ class testbench():
 
             # Create DMA upstream header transaction
             hdr = DmaUphdr()
-            hdr.dma_request_length = (req_len + 3) >> 2 # +3 is to round up
-            hdr.dma_request_type = 0 # 0=Read
-            hdr.dma_request_firstib = 0
-            hdr.dma_request_lastib = 4 - (req_len & 3)
+            # Total bytes is length + byte offset (lower 2 bits of address)
+            total_bytes = req_len + (req_addr % 4)
+            hdr.dma_request_length = (total_bytes + 3) // 4 # Round up to dwords (ceildiv)
+            hdr.dma_request_type = 0  # 0=Read
+            hdr.dma_request_firstib = req_addr % 4 # Invalid bytes at start = address offset
+            hdr.dma_request_lastib = (-total_bytes) % 4
             hdr.dma_request_tag = self.model_sent
             hdr.dma_request_unitid = 0
-            hdr.dma_request_global = req_addr
+            hdr.dma_request_global = req_addr & ~3 # Dword-aligned address
             hdr.dma_request_vfid = 0
             hdr.dma_request_pasid = 0
             hdr.dma_request_pasidvld = 0
@@ -147,6 +149,7 @@ class testbench():
                 mem_word_addr = addr_extended & (bytes_per_word - 1)
             tagmem_tr.addr = addr_extended
             tagmem_tr.id = req_id
+            tagmem_tr.firstib = req_addr % 4  # Invalid bytes at start = address offset
             # Connect to Scoreboard expected output
             self.tagmem_exp_output.append(tagmem_tr)
             # Update the word address (can accumulate over multiple words)
@@ -162,10 +165,9 @@ class testbench():
         idmem_tr.tag_cnt = len(all_parts)
         # Connect to Scoreboard expected output
         self.idmem_exp_output.append(idmem_tr)
-        # Update the base address
+        # Update the base address, then mask it to keep only the address bits + 1 extra bit (as required by the DUT)
         self._mem_base_addr += words_roundedup
-        # Wrap around after reaching max address (= memory size)
-        self._mem_base_addr &= (memory_size - 1)
+        self._mem_base_addr %= (memory_size << 1)
 
     async def reset(self):
         self.dut.RESET.value = 1
@@ -211,9 +213,11 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
 
     id = 0
     id_width = tb.dut.ID_WIDTH.value
+    # Get address width from DmaUphdr class (dma_request_global field)
+    addr_width = dict(DmaUphdr.items)['dma_request_global']
     # No need to generate packets, but it will be simpler to reuse it in the test for the whole PPR component
     for mfb_pkt in random_packets(frame_size_min, frame_size_max, frame_count):
-        addr = randint(0, 2**tb.dut.ADDRESS_WIDTH.value - 1)
+        addr = randint(0, 2**addr_width - 1)
         length = len(mfb_pkt)
         # Generate a MVB instruction for each packet
         mvb_instr = PprInstr()

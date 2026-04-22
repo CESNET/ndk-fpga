@@ -32,7 +32,6 @@ entity PPR_REQUEST_PROCESSOR is
         MEMORY_ITEM_WIDTH : natural := 1*8*8*8;
         ID_WIDTH          : natural := 11;
         PCIE_MRRS_WIDTH   : natural := 13;
-        ADDRESS_WIDTH     : natural := 64;
         -- Size of a RAM page (in bytes).
         PAGE_SIZE         : natural := 4096;
         DEVICE            : string := "AGILEX"
@@ -50,7 +49,7 @@ entity PPR_REQUEST_PROCESSOR is
         -- ========================================================
 
         RX_MVB_ID         : in  std_logic_vector(MVB_ITEMS*ID_WIDTH-1 downto 0);
-        RX_MVB_ADDRESS    : in  std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
+        RX_MVB_ADDRESS    : in  std_logic_vector(MVB_ITEMS*DMA_REQUEST_GLOBAL_W-1 downto 0);
         RX_MVB_LENGTH     : in  std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
         RX_MVB_VLD        : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY    : in  std_logic;
@@ -70,7 +69,7 @@ entity PPR_REQUEST_PROCESSOR is
         -- IDMEM Data part 0 - address of a packets SOF in the Main Memory.
         IDMEM_ADDR        : out std_logic_vector(MVB_ITEMS*log2(MEMORY_ITEMS)+1-1 downto 0);
         -- IDMEM Data part 1 - maximum number of words an MTU can consist of.
-        IDMEM_WORDS       : out std_logic_vector(MVB_ITEMS*log2(div_roundup(PKT_MTU,MEMORY_ITEM_WIDTH/8))-1 downto 0);
+        IDMEM_WORDS       : out std_logic_vector(MVB_ITEMS*log2(div_roundup(PKT_MTU+1,MEMORY_ITEM_WIDTH/8))-1 downto 0);
         -- IDMEM Data part 2 - a packet's end position throughout the whole word.
         IDMEM_EOF_POS     : out std_logic_vector(MVB_ITEMS*log2(MEMORY_ITEM_WIDTH/8)-1 downto 0);
         -- IDMEM Data part 3 - the amount of Tags (Read requests) used for this packet's transmission.
@@ -84,6 +83,8 @@ entity PPR_REQUEST_PROCESSOR is
         TAGMEM_ADDR       : out std_logic_vector(MVB_ITEMS*(log2(MEMORY_ITEMS)+log2(MEMORY_ITEM_WIDTH/8))-1 downto 0);
         -- TAGMEM Data part 1 - identifier of the packet this Tag (Read response) belongs to.
         TAGMEM_ID         : out std_logic_vector(MVB_ITEMS*ID_WIDTH-1 downto 0);
+        -- TAGMEM Data part 2 - First Invalid Bytes - compensation for word alignment of the address.
+        TAGMEM_FIRSTIB    : out std_logic_vector(MVB_ITEMS*DMA_REQUEST_FIRSTIB_W-1 downto 0);
         -- TAGMEM record valid / write request.
         TAGMEM_VLD        : out std_logic_vector(MVB_ITEMS-1 downto 0);
 
@@ -124,7 +125,7 @@ architecture FULL of PPR_REQUEST_PROCESSOR is
     signal rx_meta_arr               : slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH_BASE-1 downto 0);
 
     signal instr_tx_meta             : std_logic_vector(MVB_ITEMS*META_WIDTH_BASE-1 downto 0);
-    signal instr_tx_address          : std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
+    signal instr_tx_address          : std_logic_vector(MVB_ITEMS*DMA_REQUEST_GLOBAL_W-1 downto 0);
     signal instr_tx_length           : std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
     signal instr_tx_last             : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal instr_tx_valid            : std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -181,7 +182,7 @@ begin
         MVB_META_WIDTH => META_WIDTH_BASE,
         PKT_MTU        => PKT_MTU,
         PCIE_MPS_WIDTH => PCIE_MRRS_WIDTH,
-        ADDRESS_WIDTH  => ADDRESS_WIDTH,
+        ADDRESS_WIDTH  => DMA_REQUEST_GLOBAL_W,
         PAGE_SIZE      => PAGE_SIZE,
         DEVICE         => DEVICE
     )
@@ -222,7 +223,6 @@ begin
         MVB_ITEMS      => MVB_ITEMS,
         MVB_META_WIDTH => META_WIDTH_EXT,
         PKT_MTU        => PKT_MTU,
-        ADDRESS_WIDTH  => ADDRESS_WIDTH,
         DEVICE         => DEVICE
     )
     port map (
@@ -370,10 +370,11 @@ begin
     process (CLK)
     begin
         if rising_edge(CLK) then
-            TAGMEM_TAG  <= hdrgen_tx_data(DMA_REQUEST_TAG);
-            TAGMEM_ADDR <= std_logic_vector(resize_right(main_mem_base_addr(MEM_BASE_ADDR_WIDTH-1 downto 0), MEM_COMB_ADDR_WIDTH) + main_mem_partial_addr);
-            TAGMEM_ID   <= hdrgen_tx_id;
-            TAGMEM_VLD  <= (others => hdr_valid and hdrgen_tx_dst_rdy);
+            TAGMEM_TAG     <= hdrgen_tx_data(DMA_REQUEST_TAG);
+            TAGMEM_ADDR    <= std_logic_vector(resize_right(main_mem_base_addr(MEM_BASE_ADDR_WIDTH-1 downto 0), MEM_COMB_ADDR_WIDTH) + main_mem_partial_addr);
+            TAGMEM_ID      <= hdrgen_tx_id;
+            TAGMEM_FIRSTIB <= hdrgen_tx_data(DMA_REQUEST_FIRSTIB);
+            TAGMEM_VLD     <= (others => hdr_valid and hdrgen_tx_dst_rdy);
             if (RESET = '1') then
                 TAGMEM_VLD <= (others => '0');
             end if;

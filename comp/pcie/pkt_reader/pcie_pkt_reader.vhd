@@ -31,7 +31,7 @@ use work.dma_bus_pack.all;
 --
 -- Must still be tested in scenarios where:
 --
---    #. requests generate multiple completions and
+--    #. requests generate multiple completions (FIP: Fixing In Process) and
 --    #. completions arrive out-of-order (in-order per same tag).
 --
 entity PCIE_PKT_READER is
@@ -55,8 +55,7 @@ entity PCIE_PKT_READER is
         -- Size of the Main Memory for responses, in number of stored MFB words.
         MEMORY_SIZE     : natural := 1024;
         ID_WIDTH        : natural := 11;
-        PCIE_MRRS_WIDTH : natural := 13;
-        ADDRESS_WIDTH   : natural := 64;
+        PCIE_MRRS_WIDTH : natural := 12;
         -- Size of a RAM page (in bytes).
         PAGE_SIZE       : natural := 4096;
         DEVICE          : string := "AGILEX"
@@ -72,7 +71,7 @@ entity PCIE_PKT_READER is
         -- =================================================================
 
         USER_REQ_MVB_ID       : in  std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0);
-        USER_REQ_MVB_ADDRESS  : in  std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
+        USER_REQ_MVB_ADDRESS  : in  std_logic_vector(MFB_REGIONS*DMA_REQUEST_GLOBAL_W-1 downto 0);
         USER_REQ_MVB_LENGTH   : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
         USER_REQ_MVB_VLD      : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         USER_REQ_MVB_SRC_RDY  : in  std_logic;
@@ -140,18 +139,14 @@ architecture FULL of PCIE_PKT_READER is
     -- Main Memory write address (specifies a word and a byte within the memory).
     constant MM_WR_ADDR_W   : natural := log2(MEMORY_SIZE) + log2(WORD_ITEMS);
 
-    -- Width of Tag Memory data:         MM WR addr   + packet ID
-    constant TAGMEM_DATA_W  : natural := MM_WR_ADDR_W + ID_WIDTH;
-    -- Width of Tag Memory metadata:        (vld + TAGMEM_DATA , vld + cmpl + DMA_COMPLETION_LENGTH)
-    constant TAGMEM_META_W  : natural := max(1   + TAGMEM_DATA_W, 1   + 1    + DMA_COMPLETION_LENGTH_W);
+    -- Width of Tag Memory data:         MM WR addr   + packet ID + First Invalid Byte
+    constant TAGMEM_DATA_W  : natural := MM_WR_ADDR_W + ID_WIDTH  + DMA_REQUEST_FIRSTIB_W;
     -- Width of WR instr FIFO data:      vld + MM WR addr   + ID       + tag
     constant WR_INSTR_WIDTH : natural := 1   + MM_WR_ADDR_W + ID_WIDTH + DMA_REQUEST_TAG_W;
     -- Max number of words a packet (MTU) can stretch over.
-    constant MAX_WORDS_W    : natural := log2(div_roundup(PKT_MTU,WORD_ITEMS));
+    constant MAX_WORDS_W    : natural := log2(div_roundup(PKT_MTU+1,WORD_ITEMS));
     -- Width of ID Memory data:          MM RD addr     + words       + EOFPOS in word   + Tag count
     constant IDMEM_DATA_W   : natural := MM_RD_ADDR_W+1 + MAX_WORDS_W + log2(WORD_ITEMS) + DMA_REQUEST_TAG_W;
-    -- Width of ID Memory metadata:      vld + IDMEM_DATA
-    constant IDMEM_META_W   : natural := 1   + IDMEM_DATA_W;
     -- Width of RD instr FIFO data:      ID       + ID Mem data  - Tag count
     constant RD_INSTR_WIDTH : natural := ID_WIDTH + IDMEM_DATA_W - DMA_REQUEST_TAG_W;
 
@@ -159,80 +154,70 @@ architecture FULL of PCIE_PKT_READER is
     --                                 SIGNALS
     -- =====================================================================
 
-    signal idmem_wr_id              : std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0);
-    signal idmem_wr_addr            : std_logic_vector(MFB_REGIONS*MM_RD_ADDR_W+1-1 downto 0);
-    signal idmem_wr_words           : std_logic_vector(MFB_REGIONS*MAX_WORDS_W-1 downto 0);
-    signal idmem_wr_eof_pos         : std_logic_vector(MFB_REGIONS*log2(WORD_ITEMS)-1 downto 0);
-    signal idmem_wr_tag_cnt         : std_logic_vector(MFB_REGIONS*DMA_REQUEST_TAG_W-1 downto 0);
-    signal idmem_wr_vld             : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal idmem_id                 : std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0);
+    signal idmem_addr               : std_logic_vector(MFB_REGIONS*MM_RD_ADDR_W+1-1 downto 0);
+    signal idmem_words              : std_logic_vector(MFB_REGIONS*MAX_WORDS_W-1 downto 0);
+    signal idmem_eof_pos            : std_logic_vector(MFB_REGIONS*log2(WORD_ITEMS)-1 downto 0);
+    signal idmem_tag_cnt            : std_logic_vector(MFB_REGIONS*DMA_REQUEST_TAG_W-1 downto 0);
+    signal idmem_vld                : std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    signal tagmem_wr_tag            : std_logic_vector(MFB_REGIONS*DMA_REQUEST_TAG_W-1 downto 0);
-    signal tagmem_wr_addr           : std_logic_vector(MFB_REGIONS*MM_WR_ADDR_W-1 downto 0);
-    signal tagmem_wr_id             : std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0);
-    signal tagmem_wr_vld            : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal tagmem_tag               : std_logic_vector(MFB_REGIONS*DMA_REQUEST_TAG_W-1 downto 0);
+    signal tagmem_addr              : std_logic_vector(MFB_REGIONS*MM_WR_ADDR_W-1 downto 0);
+    signal tagmem_id                : std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0);
+    signal tagmem_firstib           : std_logic_vector(MFB_REGIONS*DMA_REQUEST_LASTIB_W-1 downto 0);
+    signal tagmem_vld               : std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    signal tagmem_free_tag          : std_logic_vector(MFB_REGIONS*DMA_REQUEST_TAG_W-1 downto 0);
-    signal tagmem_free_vld          : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal free_tag                 : std_logic_vector(MFB_REGIONS*DMA_REQUEST_TAG_W-1 downto 0);
+    signal free_tag_vld             : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal mm_freed_rd_ptr          : std_logic_vector(MM_RD_ADDR_W+1-1 downto 0);
 
-    signal tagmem_wr_addr_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(MM_WR_ADDR_W-1 downto 0);
-    signal tagmem_wr_id_arr         : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
-    signal tagmem_wr0_meta_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_META_W-1 downto 0);
-    signal tagmem_wr1_meta_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_META_W-1 downto 0);
-
-    signal tagmem_wr_sel            : slv_array_t(2*MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
-    signal tagmem_wr_meta           : slv_array_t(2*MFB_REGIONS-1 downto 0)(TAGMEM_META_W-1 downto 0);
-
-    signal tagmem_rd_sel            : slv_array_t(2*MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
-    signal tagmem_rd1_sel           : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
-    signal tagmem_rd_data           : slv_array_t(2*MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
-    signal tagmem_rd_data_2d_arr    : slv_array_2d_t(2-1 downto 0)(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
-    signal tagmem_rd_meta           : slv_array_t(2*MFB_REGIONS-1 downto 0)(TAGMEM_META_W-1 downto 0);
-    signal tagmem_rd_meta_2d_arr    : slv_array_2d_t(2-1 downto 0)(MFB_REGIONS-1 downto 0)(TAGMEM_META_W-1 downto 0);
-
-    signal tagmem_wr0_new_data      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
-    signal tagmem_wr0_new_vld       : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal tagmem_wr0_cur_data      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
+    signal tagmem_addr_arr          : slv_array_t(MFB_REGIONS-1 downto 0)(MM_WR_ADDR_W-1 downto 0);
+    signal tagmem_id_arr            : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
+    signal tagmem_firstib_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_LASTIB_W-1 downto 0);
     signal tagmem_wr0_data_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
-    signal tagmem_wr1_resp_len      : u_array_t(MFB_REGIONS-1 downto 0)(DMA_COMPLETION_LENGTH_W+2-1 downto 0);
-    signal tagmem_wr1_resp_cmpl     : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal tagmem_wr1_resp_vld      : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal tagmem_wr1_id            : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
+
+    signal tagmem_wr_addr           : slv_array_t(2*MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
+    signal tagmem_wr_data           : slv_array_t(2*MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
+    signal tagmem_wr_en             : std_logic_vector(2*MFB_REGIONS-1 downto 0);
+    signal tagmem_rd_addr           : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
+    signal tagmem_rd_data           : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
+
+    signal tagmem_rd_reg_addr       : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
+    signal tagmem_rd_reg_data       : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
+    signal tagmem_rd_reg_len        : u_array_t(MFB_REGIONS-1 downto 0)(DMA_COMPLETION_LENGTH_W-1 downto 0);
+    signal tagmem_rd_reg_cmpl       : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal tagmem_rd_reg_vld        : std_logic_vector(MFB_REGIONS-1 downto 0);
+
     signal tagmem_wr1_cur_addr      : slv_array_t(MFB_REGIONS-1 downto 0)(MM_WR_ADDR_W-1 downto 0);
+    signal tagmem_wr1_id            : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
+    signal tagmem_wr1_firstib       : u_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_FIRSTIB_W-1 downto 0);
     signal tagmem_wr1_new_addr      : slv_array_t(MFB_REGIONS-1 downto 0)(MM_WR_ADDR_W-1 downto 0);
-    signal tagmem_wr1_upd_addr      : slv_array_t(MFB_REGIONS-1 downto 0)(MM_WR_ADDR_W-1 downto 0);
+    signal tagmem_wr1_upd_fib       : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_FIRSTIB_W-1 downto 0);
     signal tagmem_wr1_data_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
-    signal tagmem_wr_data           : slv_array_t(2-1 downto 0)(MFB_REGIONS*TAGMEM_DATA_W-1 downto 0);
 
-    signal idmem_wr_addr_arr        : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
-    signal idmem_wr_words_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(MAX_WORDS_W-1 downto 0);
-    signal idmem_wr_eof_pos_arr     : slv_array_t(MFB_REGIONS-1 downto 0)(log2(WORD_ITEMS)-1 downto 0);
-    signal idmem_wr_tag_cnt_arr     : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
-    signal idmem_wr0_meta_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_META_W-1 downto 0);
-    signal tagmem_tag_completed     : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal idmem_wr1_meta_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_META_W-1 downto 0);
-
-    signal idmem_wr_sel             : slv_array_t(2-1 downto 0)(MFB_REGIONS*ID_WIDTH-1 downto 0);
-    signal idmem_wr_meta            : slv_array_t(2-1 downto 0)(MFB_REGIONS*IDMEM_META_W-1 downto 0);
-
-    signal idmem_rd_sel             : slv_array_t(2*MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
-    signal idmem_rd_sel_2d_arr      : slv_array_2d_t(2-1 downto 0)(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
-    signal idmem_rd_data            : slv_array_t(2*MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
-    signal idmem_rd_data_2d_arr     : slv_array_2d_t(2-1 downto 0)(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
-    signal idmem_rd_meta            : slv_array_t(2*MFB_REGIONS-1 downto 0)(IDMEM_META_W-1 downto 0);
-    signal idmem_rd_meta_2d_arr     : slv_array_2d_t(2-1 downto 0)(MFB_REGIONS-1 downto 0)(IDMEM_META_W-1 downto 0);
-
-    signal idmem_wr0_new_data       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
-    signal idmem_wr0_new_vld        : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal idmem_wr0_cur_data       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
+    signal idmem_addr_arr           : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
+    signal idmem_words_arr          : slv_array_t(MFB_REGIONS-1 downto 0)(MAX_WORDS_W-1 downto 0);
+    signal idmem_eof_pos_arr        : slv_array_t(MFB_REGIONS-1 downto 0)(log2(WORD_ITEMS)-1 downto 0);
+    signal idmem_tag_cnt_arr        : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr0_data_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
-    signal idmem_wr1_cur_tag_cnt    : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
-    signal idmem_wr1_dec_tag_cnt    : std_logic_vector(MFB_REGIONS-1 downto 0);
+
+    signal idmem_wr_addr            : slv_array_t(2*MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
+    signal idmem_wr_data            : slv_array_t(2*MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
+    signal idmem_wr_en              : std_logic_vector(2*MFB_REGIONS-1 downto 0);
+    signal idmem_rd_addr            : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
+    signal idmem_rd_data            : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
+
+    signal idmem_rd_reg_addr        : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
+    signal idmem_rd_reg_data        : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
+    signal idmem_rd_reg_cmpl        : std_logic_vector(MFB_REGIONS-1 downto 0);
+
+    signal idmem_wr1_rdaddr         : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
+    signal idmem_wr1_words          : slv_array_t(MFB_REGIONS-1 downto 0)(MAX_WORDS_W-1 downto 0);
+    signal idmem_wr1_eofpos         : slv_array_t(MFB_REGIONS-1 downto 0)(log2(WORD_ITEMS)-1 downto 0);
+    signal idmem_wr1_tagcnt         : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr1_new_tag_cnt    : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
-    signal idmem_wr1_upd_tag_cnt    : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr1_data_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
-    signal idmem_wr_data            : slv_array_t(2-1 downto 0)(MFB_REGIONS*IDMEM_DATA_W-1 downto 0);
 
     signal pcie_down_mvb_data_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_DOWNHDR_WIDTH-1 downto 0);
     signal pcie_resp_len            : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_COMPLETION_LENGTH_W-1 downto 0);
@@ -253,6 +238,7 @@ architecture FULL of PCIE_PKT_READER is
     signal wr_instr_id              : std_logic_vector(ID_WIDTH-1 downto 0);
     signal wr_instr_tag             : std_logic_vector(DMA_REQUEST_TAG_W-1 downto 0);
     signal wr_instr_cmpl            : std_logic;
+    signal tag_completed            : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal pcie_mfb_fifo_data       : std_logic_vector(WORD_WIDTH-1 downto 0);
     signal pcie_mfb_fifo_sof_pos    : std_logic_vector(MFB_REGIONS*SOF_POS_WIDTH-1 downto 0);
@@ -359,7 +345,6 @@ begin
         MEMORY_ITEM_WIDTH => WORD_WIDTH,
         ID_WIDTH          => ID_WIDTH,
         PCIE_MRRS_WIDTH   => PCIE_MRRS_WIDTH,
-        ADDRESS_WIDTH     => ADDRESS_WIDTH,
         PAGE_SIZE         => PAGE_SIZE,
         DEVICE            => DEVICE
     )
@@ -381,208 +366,189 @@ begin
         TX_MVB_SRC_RDY    => PCIE_UP_MVB_SRC_RDY,
         TX_MVB_DST_RDY    => PCIE_UP_MVB_DST_RDY,
 
-        IDMEM_ID          => idmem_wr_id,
-        IDMEM_ADDR        => idmem_wr_addr,
-        IDMEM_WORDS       => idmem_wr_words,
-        IDMEM_EOF_POS     => idmem_wr_eof_pos,
-        IDMEM_TAG_CNT     => idmem_wr_tag_cnt,
-        IDMEM_VLD         => idmem_wr_vld,
+        IDMEM_ID          => idmem_id,
+        IDMEM_ADDR        => idmem_addr,
+        IDMEM_WORDS       => idmem_words,
+        IDMEM_EOF_POS     => idmem_eof_pos,
+        IDMEM_TAG_CNT     => idmem_tag_cnt,
+        IDMEM_VLD         => idmem_vld,
 
-        TAGMEM_TAG        => tagmem_wr_tag,
-        TAGMEM_ADDR       => tagmem_wr_addr,
-        TAGMEM_ID         => tagmem_wr_id,
-        TAGMEM_VLD        => tagmem_wr_vld,
+        TAGMEM_TAG        => tagmem_tag,
+        TAGMEM_ADDR       => tagmem_addr,
+        TAGMEM_ID         => tagmem_id,
+        TAGMEM_FIRSTIB    => tagmem_firstib,
+        TAGMEM_VLD        => tagmem_vld,
 
-        TAGMEM_FREE_TAG   => tagmem_free_tag,
-        TAGMEM_FREE_VLD   => tagmem_free_vld,
+        TAGMEM_FREE_TAG   => free_tag,
+        TAGMEM_FREE_VLD   => free_tag_vld,
 
         MEM_RD_PTR        => mm_freed_rd_ptr
     );
 
-    tagmem_free_tag <= wr_instr_tag;
-    tagmem_free_vld <= tagmem_tag_completed;
+    free_tag     <= wr_instr_tag;
+    free_tag_vld <= tag_completed;
 
     -- ========================================================
     --  Store records to manage responses
     -- ========================================================
 
     -- --------------------------------------------------------
-    --  Tag record memory
+    --  Memory for Tag records
+    --
+    -- The idea here is to enable memory access from two
+    -- different sources at the same time:
+    --   0) the Request Processor's TAGMEM interface
+    --      - sets new records
+    --   1) completions from PCIe down interface
+    --      - uses record's data for the current completion
+    --      - updates the MM WR address for the next completion
+    --      - (it utilizes also the read ports)
     -- --------------------------------------------------------
-    tagmem_wr_addr_arr <= slv_array_deser(tagmem_wr_addr, MFB_REGIONS);
-    tagmem_wr_id_arr   <= slv_array_deser(tagmem_wr_id, MFB_REGIONS);
+
+    tagmem_addr_arr    <= slv_array_deser(tagmem_addr, MFB_REGIONS);
+    tagmem_id_arr      <= slv_array_deser(tagmem_id, MFB_REGIONS);
+    tagmem_firstib_arr <= slv_array_deser(tagmem_firstib, MFB_REGIONS);
     tag_mem_wr0_g : for r in 0 to MFB_REGIONS-1 generate
-        tagmem_wr0_meta_arr(r) <= tagmem_wr_vld(r) & tagmem_wr_addr_arr(r) & tagmem_wr_id_arr(r);
+        tagmem_wr0_data_arr(r) <= tagmem_addr_arr   (r) & -- MM WR address
+                                  tagmem_id_arr     (r) & -- packet ID
+                                  tagmem_firstib_arr(r);  -- First Inv Bytes
     end generate;
 
-    tag_mem_wr1_g : for r in 0 to MFB_REGIONS-1 generate
-        tagmem_wr1_meta_arr(r) <= (
-            DMA_COMPLETION_COMPLETED_O+1 => pcie_resp_vld (r),
-            DMA_COMPLETION_COMPLETED_O   => pcie_resp_cmlp(r),
-            DMA_COMPLETION_LENGTH        => pcie_resp_len (r),
-            others                       => '0');
-    end generate;
+    -- TAGMEM source 0
+    tagmem_wr_addr(MFB_REGIONS-1 downto 0) <= slv_array_deser(tagmem_tag, MFB_REGIONS);
+    tagmem_wr_data(MFB_REGIONS-1 downto 0) <= tagmem_wr0_data_arr;
+    tagmem_wr_en  (MFB_REGIONS-1 downto 0) <= tagmem_vld;
 
-    -- The thought here is to enable accessing this memory's contents from two sources at the same time:
-    -- 1) Source 0: the Request Processor's TAGMEM interface - only (over)writes data
-    tagmem_wr_sel (MFB_REGIONS-1 downto 0) <= slv_array_deser(tagmem_wr_tag, MFB_REGIONS);
-    tagmem_wr_meta(MFB_REGIONS-1 downto 0) <= tagmem_wr0_meta_arr;
-
-    -- 2) Source 1: the instructions from PCIe down headers (responses) - updates data (Main Memory address field)
-    tagmem_wr_sel (2*MFB_REGIONS-1 downto MFB_REGIONS) <= pcie_resp_tag;
-    tagmem_wr_meta(2*MFB_REGIONS-1 downto MFB_REGIONS) <= array_item_resize_l(tagmem_wr1_meta_arr, TAGMEM_META_W);
-
-    tag_mem_i : entity work.N_LOOP_OP
+    -- TAGMEM records are addressed by Tags
+    tag_mem_i : entity work.NP_LUTRAM
     generic map (
-        DATA_WIDTH     => TAGMEM_DATA_W,
-        ITEMS          => 2**DMA_REQUEST_TAG_W, -- to store all Tags
-        QUICK_RESET_EN => False,
-        RESET_VAL      => 0,
-        READ_PORTS     => 0,
-        OPERATORS      => 2*MFB_REGIONS,
-        OPERATIONS     => 1,
-        META_WIDTH     => TAGMEM_META_W,
-        USE_REG_ARRAY  => False,
-        DEVICE         => DEVICE
+        DATA_WIDTH  => TAGMEM_DATA_W,
+        ITEMS       => 2**DMA_REQUEST_TAG_W, -- to store all Tags
+        WRITE_PORTS => 2*MFB_REGIONS,
+        READ_PORTS  => MFB_REGIONS,
+        DEVICE      => DEVICE
     )
     port map (
-        CLK           => CLK,
-        RESET         => RESET,
+        WCLK  => CLK,
 
-        OP_ITEM_SEL   => tagmem_wr_sel,
-        OP_OPERATIONS => (others => (others => '1')),
-        OP_META       => tagmem_wr_meta,
+        ADDRA => tagmem_wr_addr,
+        DI    => tagmem_wr_data,
+        WE    => tagmem_wr_en,
 
-        OP_IN_SEL     => tagmem_rd_sel,
-        OP_IN_SRC     => open, -- use this to solve collisions when implementing support for MFB_REGIONS>1
-        OP_IN_OPS     => open,
-        OP_IN_DATA    => tagmem_rd_data,
-        OP_IN_META    => tagmem_rd_meta,
-
-        OP_OUT_DATA   => tagmem_wr_data,
-
-        READ_ADDR     => (others => (others => '0')),
-        READ_DATA     => open
+        ADDRB => tagmem_rd_addr,
+        DOB   => tagmem_rd_data
     );
 
-    tagmem_rd1_sel <= tagmem_rd_sel(2*MFB_REGIONS-1 downto MFB_REGIONS);
+    tagmem_rd_addr <= pcie_resp_tag;
 
-    tagmem_rd_data_2d_arr <= slv_array_2d_deser(slv_array_ser(tagmem_rd_data), 2, MFB_REGIONS);
-    tagmem_rd_meta_2d_arr <= slv_array_2d_deser(slv_array_ser(tagmem_rd_meta), 2, MFB_REGIONS);
+    process (CLK)
+    begin
+        if rising_edge(CLK) then
+            tagmem_rd_reg_addr <= tagmem_rd_addr;
+            tagmem_rd_reg_data <= tagmem_rd_data;
 
-    -- Over write current data only when new data (from tagmem_rd_meta) are valid
-    tagmem_wr0_data_g : for r in 0 to MFB_REGIONS-1 generate
-        -- New data + valid from metadata (= new data from the TAGMEM Request Processor interface).
-        tagmem_wr0_new_data(r) <= tagmem_rd_meta_2d_arr(0)(r)(TAGMEM_DATA_W-1 downto 0);
-        tagmem_wr0_new_vld (r) <= tagmem_rd_meta_2d_arr(0)(r)(TAGMEM_DATA_W);
-        -- Currently stored data
-        tagmem_wr0_cur_data(r) <= tagmem_rd_data_2d_arr(0)(r);
-        tagmem_wr0_data_arr(r) <= tagmem_wr0_new_data(r) when (tagmem_wr0_new_vld(r) = '1') else tagmem_wr0_cur_data(r);
-    end generate;
+            tagmem_rd_reg_len  <= slv_arr_to_u_arr(pcie_resp_len);
+            tagmem_rd_reg_cmpl <= pcie_resp_cmlp;
+            tagmem_rd_reg_vld  <= pcie_resp_vld;
+        end if;
+    end process;
 
+    tagmem_wr1_cur_addr <= slv_array_slice(tagmem_rd_reg_data, TAGMEM_DATA_W-1, TAGMEM_DATA_W-MM_WR_ADDR_W);
+    tagmem_wr1_id       <= slv_array_slice(tagmem_rd_reg_data, TAGMEM_DATA_W-MM_WR_ADDR_W-1, TAGMEM_DATA_W-MM_WR_ADDR_W-ID_WIDTH);
+    tagmem_wr1_firstib  <= slv_arr_to_u_arr(slv_array_slice(tagmem_rd_reg_data, TAGMEM_DATA_W-MM_WR_ADDR_W-ID_WIDTH-1, 0));
     tagmem_wr1_data_g : for r in 0 to MFB_REGIONS-1 generate
-        -- Length (Dwords->Bytes) + Completition bit + Valid bit from metadata (from MVB response header).
-        tagmem_wr1_resp_len (r) <= resize_right(unsigned(tagmem_rd_meta_2d_arr(1)(r)(DMA_COMPLETION_LENGTH_W-1 downto 0)), DMA_COMPLETION_LENGTH_W+2);
-        tagmem_wr1_resp_cmpl(r) <= tagmem_rd_meta_2d_arr(1)(r)(DMA_COMPLETION_LENGTH_W);
-        tagmem_wr1_resp_vld (r) <= tagmem_rd_meta_2d_arr(1)(r)(DMA_COMPLETION_LENGTH_W+1);
-        -- Packet ID - to associate update with correct record in the ID Mem
-        tagmem_wr1_id       (r) <= tagmem_rd_data_2d_arr(1)(r)(ID_WIDTH-1 downto 0);
-        -- Address from the current record - to be incremented by length of the incomming response.
-        tagmem_wr1_cur_addr (r) <= tagmem_rd_data_2d_arr(1)(r)(TAGMEM_DATA_W-1 downto ID_WIDTH);
-        tagmem_wr1_new_addr (r) <= std_logic_vector(unsigned(tagmem_wr1_cur_addr(r)) + tagmem_wr1_resp_len(r));
-        tagmem_wr1_upd_addr (r) <= tagmem_wr1_new_addr(r) when (tagmem_wr1_resp_vld(r) = '1') else tagmem_wr1_cur_addr(r);
-        tagmem_wr1_data_arr (r) <= tagmem_wr1_upd_addr(r) & tagmem_rd_data_2d_arr(1)(r)(ID_WIDTH-1 downto 0);
+        -- Current address + length with correction by First IB for 1st completion only.
+        tagmem_wr1_new_addr(r) <= std_logic_vector(unsigned(tagmem_wr1_cur_addr(r)) + (tagmem_rd_reg_len(r) & "00") - tagmem_wr1_firstib(r));
+        -- Set First Invalid Byte to 0 as it only plays a role in the first address update.
+        tagmem_wr1_upd_fib (r) <= (others => '0');
+
+        -- Write back updated record.
+        tagmem_wr1_data_arr(r) <= tagmem_wr1_new_addr(r) & tagmem_wr1_id(r) & tagmem_wr1_upd_fib(r);
     end generate;
 
-    tagmem_wr_data(  MFB_REGIONS-1 downto           0) <= tagmem_wr0_data_arr;
+    -- TAGMEM source 1
+    tagmem_wr_addr(2*MFB_REGIONS-1 downto MFB_REGIONS) <= tagmem_rd_reg_addr;
     tagmem_wr_data(2*MFB_REGIONS-1 downto MFB_REGIONS) <= tagmem_wr1_data_arr;
+    tagmem_wr_en  (2*MFB_REGIONS-1 downto MFB_REGIONS) <= tagmem_rd_reg_vld;
 
     -- --------------------------------------------------------
-    --  ID record memory
+    --  Memory for ID records
+    --
+    -- The idea here is to enable memory access from two different sources at the same time:
+    --   0) the Request Processor's IDMEM interface
+    --      - sets new records
+    --   1) updates from the Tagmem
+    --      - decrements the number of Tags needed to complete a whole packet
+    --      - after the number of Tags reaches 0, it is sent to the RD Instr FIFO
+    --      - (it utilizes also the read ports)
     -- --------------------------------------------------------
-    idmem_wr_addr_arr    <= slv_array_deser(idmem_wr_addr, MFB_REGIONS);
-    idmem_wr_words_arr   <= slv_array_deser(idmem_wr_words, MFB_REGIONS);
-    idmem_wr_eof_pos_arr <= slv_array_deser(idmem_wr_eof_pos, MFB_REGIONS);
-    idmem_wr_tag_cnt_arr <= slv_array_deser(idmem_wr_tag_cnt, MFB_REGIONS);
+    idmem_addr_arr    <= slv_array_deser(idmem_addr, MFB_REGIONS);
+    idmem_words_arr   <= slv_array_deser(idmem_words, MFB_REGIONS);
+    idmem_eof_pos_arr <= slv_array_deser(idmem_eof_pos, MFB_REGIONS);
+    idmem_tag_cnt_arr <= slv_array_deser(idmem_tag_cnt, MFB_REGIONS);
     idmem_wr0_g : for r in 0 to MFB_REGIONS-1 generate
-        idmem_wr0_meta_arr(r) <= idmem_wr_vld(r) & idmem_wr_addr_arr(r) & idmem_wr_words_arr(r) & idmem_wr_eof_pos_arr(r) & idmem_wr_tag_cnt_arr(r);
+        idmem_wr0_data_arr(r) <= idmem_addr_arr   (r) & -- MM RD address
+                                 idmem_words_arr  (r) & -- number of words
+                                 idmem_eof_pos_arr(r) & -- EOFPOS
+                                 idmem_tag_cnt_arr(r);  -- Number of partial requests
     end generate;
 
-    -- Tag completed bit
-    tagmem_tag_completed <= (others => wr_instr_cmpl and wr_instr_fifo_rd(0));
-    idmem_wr1_g : for r in 0 to MFB_REGIONS-1 generate
-        idmem_wr1_meta_arr(r) <= (0 => tagmem_tag_completed(r), others => '0');
-    end generate;
+    -- IDMEM source 0
+    idmem_wr_addr(MFB_REGIONS-1 downto 0) <= slv_array_deser(idmem_id, MFB_REGIONS);
+    idmem_wr_data(MFB_REGIONS-1 downto 0) <= idmem_wr0_data_arr;
+    idmem_wr_en  (MFB_REGIONS-1 downto 0) <= idmem_vld;
 
-    -- Like with Tag Mem - enable accessing this memory's contents from two sources at the same time:
-    -- 1) Source 0: the Request Processor's IDMEM interface - only (over)writes data
-    idmem_wr_sel (MFB_REGIONS-1 downto 0) <= slv_array_deser(idmem_wr_id, MFB_REGIONS);
-    idmem_wr_meta(MFB_REGIONS-1 downto 0) <= idmem_wr0_meta_arr;
-
-    -- 2) Source 1: tag completion updates from Tag Mem (passed through WR Instr FIFO to sync with the data).
-    idmem_wr_sel (2*MFB_REGIONS-1 downto MFB_REGIONS) <= (others => wr_instr_id);
-    idmem_wr_meta(2*MFB_REGIONS-1 downto MFB_REGIONS) <= idmem_wr1_meta_arr;
-
-    id_mem_i : entity work.N_LOOP_OP
+    -- IDMEM records are addressed by IDs
+    id_mem_i : entity work.NP_LUTRAM
     generic map (
-        DATA_WIDTH     => IDMEM_DATA_W,
-        ITEMS          => 2**ID_WIDTH,
-        QUICK_RESET_EN => False,
-        RESET_VAL      => 0,
-        READ_PORTS     => 0,
-        OPERATORS      => 2*MFB_REGIONS,
-        OPERATIONS     => 1,
-        META_WIDTH     => IDMEM_META_W,
-        USE_REG_ARRAY  => False,
-        DEVICE         => DEVICE
+        DATA_WIDTH  => IDMEM_DATA_W,
+        ITEMS       => 2**ID_WIDTH, -- to store all IDs
+        WRITE_PORTS => 2*MFB_REGIONS,
+        READ_PORTS  => MFB_REGIONS,
+        DEVICE      => DEVICE
     )
     port map (
-        CLK           => CLK,
-        RESET         => RESET,
+        WCLK  => CLK,
 
-        OP_ITEM_SEL   => idmem_wr_sel,
-        OP_OPERATIONS => (others => (others => '1')),
-        OP_META       => idmem_wr_meta,
+        ADDRA => idmem_wr_addr,
+        DI    => idmem_wr_data,
+        WE    => idmem_wr_en,
 
-        OP_IN_SEL     => idmem_rd_sel,
-        OP_IN_SRC     => open, -- will need to use this to solve collisions when implementing support for MFB_REGIONS>1
-        OP_IN_OPS     => open,
-        OP_IN_DATA    => idmem_rd_data,
-        OP_IN_META    => idmem_rd_meta,
-
-        OP_OUT_DATA   => idmem_wr_data,
-
-        READ_ADDR     => (others => (others => '0')),
-        READ_DATA     => open
+        ADDRB => idmem_rd_addr,
+        DOB   => idmem_rd_data
     );
 
-    idmem_rd_sel_2d_arr  <= slv_array_2d_deser(slv_array_ser(idmem_rd_sel), 2, MFB_REGIONS);
-    idmem_rd_data_2d_arr <= slv_array_2d_deser(slv_array_ser(idmem_rd_data), 2, MFB_REGIONS);
-    idmem_rd_meta_2d_arr <= slv_array_2d_deser(slv_array_ser(idmem_rd_meta), 2, MFB_REGIONS);
+    idmem_rd_addr <= (others => wr_instr_id);
 
-    -- Over write current data only when new data (from idmem_rd_meta) are valid
-    idmem_wr_data0_g : for r in 0 to MFB_REGIONS-1 generate
-        -- New data + valid from metadata (= new data from the IDMEM Request Processor interface).
-        idmem_wr0_new_data(r) <= idmem_rd_meta_2d_arr(0)(r)(IDMEM_DATA_W-1 downto 0);
-        idmem_wr0_new_vld (r) <= idmem_rd_meta_2d_arr(0)(r)(IDMEM_DATA_W);
-        -- Currently stored data
-        idmem_wr0_cur_data(r) <= idmem_rd_data_2d_arr(0)(r);
-        idmem_wr0_data_arr(r) <= idmem_wr0_new_data(r) when (idmem_wr0_new_vld(r) = '1') else idmem_wr0_cur_data(r);
-    end generate;
+    process (CLK)
+    begin
+        if rising_edge(CLK) then
+            idmem_rd_reg_addr <= idmem_rd_addr;
+            idmem_rd_reg_data <= idmem_rd_data;
 
+            idmem_rd_reg_cmpl <= tag_completed;
+        end if;
+    end process;
+
+    idmem_wr1_rdaddr <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-1, IDMEM_DATA_W-(MM_RD_ADDR_W+1));
+    idmem_wr1_words  <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-1, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W);
+    idmem_wr1_eofpos <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W-1, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W-log2(WORD_ITEMS));
+    idmem_wr1_tagcnt <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W-log2(WORD_ITEMS)-1, 0);
     idmem_wr_data1_g : for r in 0 to MFB_REGIONS-1 generate
-        -- Current value of tag count
-        idmem_wr1_cur_tag_cnt(r) <= idmem_rd_data_2d_arr(1)(r)(DMA_REQUEST_TAG_W-1 downto 0);
-        -- Decrement enable - when a Tag has been completed
-        idmem_wr1_dec_tag_cnt(r) <= idmem_rd_meta_2d_arr(1)(r)(0);
-        -- Decremented tag count
-        idmem_wr1_new_tag_cnt(r) <= std_logic_vector(unsigned(idmem_wr1_cur_tag_cnt(r)) - 1);
-        idmem_wr1_upd_tag_cnt(r) <= idmem_wr1_new_tag_cnt(r) when (idmem_wr1_dec_tag_cnt(r) = '1') else idmem_wr1_cur_tag_cnt(r);
-        idmem_wr1_data_arr   (r) <= idmem_rd_data_2d_arr(1)(r)(IDMEM_DATA_W-1 downto DMA_REQUEST_TAG_W) & idmem_wr1_upd_tag_cnt(r);
+        -- Decrement tag count
+        idmem_wr1_new_tag_cnt(r) <= std_logic_vector(unsigned(idmem_wr1_tagcnt(r)) - 1);
+
+        -- Write back updated record.
+        idmem_wr1_data_arr   (r) <= idmem_wr1_rdaddr     (r) &
+                                    idmem_wr1_words      (r) &
+                                    idmem_wr1_eofpos     (r) &
+                                    idmem_wr1_new_tag_cnt(r);
     end generate;
 
-    idmem_wr_data(  MFB_REGIONS-1 downto           0) <= idmem_wr0_data_arr;
+    -- IDMEM source 1
+    idmem_wr_addr(2*MFB_REGIONS-1 downto MFB_REGIONS) <= idmem_rd_reg_addr;
     idmem_wr_data(2*MFB_REGIONS-1 downto MFB_REGIONS) <= idmem_wr1_data_arr;
+    idmem_wr_en  (2*MFB_REGIONS-1 downto MFB_REGIONS) <= idmem_rd_reg_cmpl;
 
     -- ========================================================
     --  Process responses and sends them to the Main Memory
@@ -604,12 +570,15 @@ begin
     pcie_resp_vld <= PCIE_DOWN_MVB_VLD and PCIE_DOWN_MVB_SRC_RDY and PCIE_DOWN_MVB_DST_RDY;
 
     wr_instr_fifo_di_g : for r in 0 to MFB_REGIONS-1 generate
-        wr_instr_fifo_di_arr(r) <= tagmem_wr1_resp_cmpl(r) & tagmem_wr1_cur_addr(r) & tagmem_wr1_id(r) & tagmem_rd1_sel(r);
+        wr_instr_fifo_di_arr(r) <= tagmem_rd_reg_cmpl (r) & -- Tag completed
+                                   tagmem_wr1_cur_addr(r) & -- MM WR address
+                                   tagmem_wr1_id      (r) & -- packet ID
+                                   tagmem_rd_reg_addr (r);  -- request Tag
     end generate;
 
     -- Store write instructions (only the WR address) from the record in the Tag Mem
     wr_instr_fifo_di <= slv_array_ser(wr_instr_fifo_di_arr);
-    wr_instr_fifo_wr <= tagmem_wr1_resp_vld;
+    wr_instr_fifo_wr <= tagmem_rd_reg_vld;
 
     wr_instr_fifo_i : entity work.FIFOX_MULTI
     generic map (
@@ -653,6 +622,8 @@ begin
     wr_instr_tag  <= wr_instr_fifo_do(DMA_REQUEST_TAG_W-1 downto 0);
     -- Instruction (PCIe response) is the last one for this Tag -> update record in the ID Mem.
     wr_instr_cmpl <= wr_instr_fifo_do(WR_INSTR_WIDTH-1);
+
+    tag_completed <= (others => wr_instr_cmpl and wr_instr_fifo_rd(0));
 
     -- --------------------------------------------------------
     --  Store response packets
@@ -864,9 +835,12 @@ begin
 
     rd_instr_fifo_g : for r in 0 to MFB_REGIONS-1 generate
         -- Write the ID Mem's record data to the RD Instr FIFO when completion of the last Tag arrives.
-        rd_instr_fifo_wr    (r) <= idmem_wr1_dec_tag_cnt(r) when (unsigned(idmem_wr1_cur_tag_cnt(r)) = 1) else '0';
-        -- All ID Mem data including the ID (the select signal) except tag count.
-        rd_instr_fifo_di_arr(r) <= idmem_rd_sel_2d_arr(1)(r) & idmem_rd_data_2d_arr(1)(r)(IDMEM_DATA_W-1 downto DMA_REQUEST_TAG_W);
+        rd_instr_fifo_wr    (r) <= idmem_rd_reg_cmpl(r) when (unsigned(idmem_wr1_tagcnt(r)) = 1) else '0';
+        -- All ID Mem data including the ID except tag count.
+        rd_instr_fifo_di_arr(r) <= idmem_rd_reg_addr(r) & -- packet ID
+                                   idmem_wr1_rdaddr (r) & -- MM RD address
+                                   idmem_wr1_words  (r) & -- number of words
+                                   idmem_wr1_eofpos (r);  -- EOFPOS
     end generate;
     rd_instr_fifo_di <= slv_array_ser(rd_instr_fifo_di_arr);
 
@@ -968,9 +942,9 @@ begin
     --  Read address freeing
     -- ========================================================
 
-    transs_rx_trans_id      <= slv_array_deser(idmem_wr_id, MFB_REGIONS);
-    transs_rx_trans_meta    <= slv_array_deser(idmem_wr_addr, MFB_REGIONS);
-    transs_rx_trans_src_rdy <= idmem_wr_vld;
+    transs_rx_trans_id      <= slv_array_deser(idmem_id, MFB_REGIONS);
+    transs_rx_trans_meta    <= slv_array_deser(idmem_addr, MFB_REGIONS);
+    transs_rx_trans_src_rdy <= idmem_vld;
 
     transs_rx_conf_id  <= (others => rd_instr_id);
     transs_rx_conf_vld <= rd_instr_fifo_rd;

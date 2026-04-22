@@ -106,13 +106,15 @@ class testbench():
             addr, length = p
             # Create DMA upstream header
             hdr = DmaUphdr()
-            hdr.dma_request_length = (length >> 2) + (length & 0b11 != 0) # Round up to dwords
-            hdr.dma_request_type = 1 # 1=Write
-            hdr.dma_request_firstib = 0
-            hdr.dma_request_lastib = 4 - (length & 3)
+            # Total bytes is length + byte offset (lower 2 bits of address)
+            total_bytes = length + (addr % 4)
+            hdr.dma_request_length = (total_bytes + 3) // 4  # Round up to dwords (ceildiv)
+            hdr.dma_request_type = 1  # 1=Write
+            hdr.dma_request_firstib = addr % 4  # Invalid bytes at start = address offset
+            hdr.dma_request_lastib = (-total_bytes) % 4
             hdr.dma_request_tag = self.model_sent
             hdr.dma_request_unitid = 0
-            hdr.dma_request_global = addr
+            hdr.dma_request_global = addr & ~3  # Dword-aligned address
             hdr.dma_request_vfid = 0
             hdr.dma_request_pasid = 0
             hdr.dma_request_pasidvld = 0

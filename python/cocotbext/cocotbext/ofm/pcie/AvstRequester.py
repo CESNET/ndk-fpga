@@ -38,8 +38,8 @@ class CompletionHeader(SerializableHeader):
 class AvstRequester(PcieRequester):
     """Handles PCIe requests on the PCIe-specific AVST interface."""
 
-    def __init__(self, ram, rq_driver, rc_driver, rq_monitor):
-        super().__init__(ram, rq_driver, rc_driver, rq_monitor)
+    def __init__(self, ram, rq_driver, rc_driver, rq_monitor, mps=256, rcb=64, cpl_split_mode=PcieRequester.SPLIT_NONE):
+        super().__init__(ram, rq_driver, rc_driver, rq_monitor, mps, rcb, cpl_split_mode)
         self._avst_tr_type = 1 # differentiates transactions for the driver; 0=CQ, 1=RC
 
     def handle_rq_transaction(self, transaction):
@@ -58,39 +58,83 @@ class AvstRequester(PcieRequester):
         else: # 64-bit address
             addr = hdr.addr
 
+        # Add FBE offset to address (indicates byte offset)
+        try:
+            fbe_offset = fbe2offset(hdr.fbe)
+            addr += fbe_offset
+        except ValueError:
+            fbe_offset = 0 # leave address as is when hdr.fbe==0 (-> read requests)
+
+        byte_length = (
+            hdr.dwords * 4
+            - (4 - numberOfSetBits(hdr.fbe))
+            - ((4 - numberOfSetBits(hdr.lbe)) if hdr.dwords > 1 else 0)
+        )
+
         # Fiter out MI responses - process if it is a request (DMA WR or RD)
         if hdr.tlp_type == 0:
             if hdr.req_type == 0:
-                self.handle_rd_request(hdr=hdr, addr=addr, length=hdr.dwords*4)
+                self.handle_rd_request(hdr=hdr, addr=addr, length=byte_length)
             elif hdr.req_type == 1:
+                data_bytes = data_bytes[fbe_offset:fbe_offset + byte_length]
                 self.handle_wr_request(data=data_bytes, addr=addr)
             else:
                 raise NotImplementedError(f"Unsupported REQ type {hdr.req_type}, expected: [0, 1]")
 
-    def hdr_req2compl(self, rq_hdr):
-        """Creates a completion header from the given request header."""
+    def tag_from_hdr(self, hdr):
+        """Extract the tag value from the AVST request header."""
+        return (hdr.tag_h << 9) | (hdr.tag_m << 8) | hdr.tag_l
+
+    def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):
+        """
+        Creates a completion header from the given request header.
+
+        Args:
+            rq_hdr: The original request header
+            byte_count: Total remaining bytes including this completion (for split completions)
+            lower_address: Lower address for this completion (RCB-aligned for non-first completions)
+            is_last: True if this is the final completion in a split sequence
+            payload_bytes: Number of payload bytes in this completion
+        """
         rc_hdr = CompletionHeader()
         rc_hdr.tag_l, rc_hdr.tag_m, rc_hdr.tag_h = rq_hdr.tag_l, rq_hdr.tag_m, rq_hdr.tag_h
         rc_hdr.fmt = int("010", base=2) # Completition with data: "010", Completition withOUT data: "000"
         rc_hdr.tlp_type = int("01010", base=2) # Completion for LOCKED Memory Read: "01011" (with/without data)
-        rc_hdr.dwords = rq_hdr.dwords
 
-        # TODO: Check IO and CFG transfers
-        rc_hdr.byte_cnt = (
-            rc_hdr.dwords * 4
-            - (4 - numberOfSetBits(rq_hdr.fbe))
-            - ((4 - numberOfSetBits(rq_hdr.fbe)) if rc_hdr.dwords > 1 else 0)
-        )
+        # Calculate dwords from payload_bytes
+        if payload_bytes is not None:
+            rc_hdr.dwords = (payload_bytes + 3) // 4  # Round up to dwords
+        else:
+            rc_hdr.dwords = rq_hdr.dwords
 
-        rc_hdr.compl_stat = 1
-        if rq_hdr.addr_len == 0: # 32-bit address
-            addr_h, addr_l = deconcat([rq_hdr.addr, 32, 32])
-            addr = addr_l
-        else: # 64-bit address
-            addr = rq_hdr.addr
-        # TODO: for multiple completions must be updated
-        #       FBE is only applied in first completion
-        rc_hdr.low_addr = ((addr) + fbe2offset(rq_hdr.fbe)) & 0x7f
+        # Set byte_count - total remaining bytes including this completion
+        if byte_count is not None:
+            rc_hdr.byte_cnt = byte_count
+        else:
+            # TODO: Check IO and CFG transfers
+            rc_hdr.byte_cnt = (
+                rc_hdr.dwords * 4
+                - (4 - numberOfSetBits(rq_hdr.fbe))
+                - ((4 - numberOfSetBits(rq_hdr.lbe)) if rc_hdr.dwords > 1 else 0)
+            )
+
+        # Set lower address
+        if lower_address is not None:
+            # For split completions: first uses original address, subsequent are RCB-aligned
+            rc_hdr.low_addr = lower_address & 0x7f
+        else:
+            if rq_hdr.addr_len == 0: # 32-bit address
+                addr_h, addr_l = deconcat([rq_hdr.addr, 32, 32])
+                addr = addr_l
+            else: # 64-bit address
+                addr = rq_hdr.addr
+            # Same address correction as above in handle_rq_transaction()
+            try:
+                addr += fbe2offset(rq_hdr.fbe)
+            except ValueError:
+                pass
+            rc_hdr.low_addr = addr & 0x7f # Keeps 7 LSBs
+
         return rc_hdr
 
     def prep_response_tr(self, hdr, data, **kwargs):
