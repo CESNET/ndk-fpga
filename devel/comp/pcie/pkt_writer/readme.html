@@ -197,6 +197,26 @@ Its output interface is compatible with the PTC module.</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
+<td><p>AXI-Stream parameters</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-axi_rx_direct"><td><p>AXI_RX_DIRECT</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Uses the RX_AXI input interface when true, RX_MFB when false.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_writer-axi_tdata_width"><td><p>AXI_TDATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-axi_tuser_width"><td><p>AXI_TUSER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>not supported</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
 <td><p>Other parameters</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
@@ -257,7 +277,12 @@ PCIe specification allows at least 128.</p></td>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>RX Interface</p></td>
 <td><p>=====</p></td>
-<td><p>=====</p></td>
+<td><blockquote>
+<div><ul class="simple">
+<li><p>select between MFB and AXI RX interface using AXI_RX_DIRECT</p></li>
+</ul>
+</div></blockquote>
+</td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-rx_mvb_address"><td><p>RX_MVB_ADDRESS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0)</p></td>
@@ -315,6 +340,36 @@ PCIe specification allows at least 128.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-rx_axi_tdata"><td><p>RX_AXI_TDATA</p></td>
+<td><p>std_logic_vector(AXI_TDATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-rx_axi_tkeep"><td><p>RX_AXI_TKEEP</p></td>
+<td><p>std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-rx_axi_tuser"><td><p>RX_AXI_TUSER</p></td>
+<td><p>std_logic_vector(AXI_TUSER_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>not supported</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-rx_axi_tlast"><td><p>RX_AXI_TLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-rx_axi_tvalid"><td><p>RX_AXI_TVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-rx_axi_tready"><td><p>RX_AXI_TREADY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
