@@ -29,6 +29,7 @@ def create_dtb_simple(comp_name: str, comp_base: int, comp_size: int, compatible
 
     mybus = fdt.Node(bus_name)
     mybus.set_property("compatible", "netcope,bus,mi")
+    mybus.set_property("resource", "PCI0,BAR0")
     mybus.append(mycomp)
 
     myfdt.add_item(mybus)
