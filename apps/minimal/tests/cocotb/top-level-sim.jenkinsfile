@@ -1,25 +1,24 @@
-def common_card_test_run(CARD_NAME) {
+def common_card_test_run(CARD_NAME, failed) {
     try {
         sh """
         source venv-fpga/bin/activate
         make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\" BMC_ENABLE=0
         """
     } catch (err) {
-        echo "Error detected, firmware build failed!"
+        echo "Error detected, firmware build failed for $CARD_NAME!"
         currentBuild.result = 'FAILURE'
         currentStage.result = 'FAILURE'
-        failed.add("$card_name")
+        failed.add("$CARD_NAME")
+        return
     }
 
-    junit allowEmptyResults: true, testResults: "apps/minimal/build/$CARD_NAME/results.xml"
+    // Run junit step to record test results
+    def testResult = junit allowEmptyResults: false, testResults: "apps/minimal/build/$CARD_NAME/results.xml"
 
-    try {
-        sh "test -f apps/minimal/build/$CARD_NAME/results.xml"
-    } catch (err) {
-        echo "Error detected, no tests performed (results missing)!"
-        currentBuild.result = 'FAILURE'
-        currentStage.result = 'FAILURE'
-        failed.add("$card_name")
+    // Track failed tests based on actual test results
+    if (testResult.failCount > 0) {
+        echo "Tests failed for $CARD_NAME (${testResult.failCount} failures), build marked as UNSTABLE"
+        failed.add("$CARD_NAME")
     }
 }
 
@@ -50,11 +49,11 @@ node("preklad") {
         try {
             timeout(time: 1, unit: 'HOURS') {
                 stage("Run test: $card_name") {
-                    common_card_test_run(card_name)
+                    common_card_test_run(card_name, failed)
                 }
             }
         } catch(err) {
-            echo "Error detected, test stage failed!"
+            echo "Error detected, test stage failed for $card_name!"
             currentBuild.result = 'FAILURE'
             failed.add("$card_name")
         }
@@ -62,8 +61,8 @@ node("preklad") {
 
     sh "rm -rf venv-fpga"
 
-    // send out emails if failure is detected
-    if(currentBuild.result == "FAILURE") {
+    // send out emails if failure is detected (FAILURE or UNSTABLE)
+    if(currentBuild.result != "SUCCESS") {
         println "FAILED on cards: ${failed}."
         emailext \
             recipientProviders: [culprits(), developers()],
