@@ -32,7 +32,7 @@ end entity;
 -- ============================================================================
 architecture BEHAVIORAL of TESTBENCH is
 
-    -- target device: STRATIX10 (Intel), AGILEX (Intel), 7SERIES (Xilinx), ULTRASCALE (Xilinx)
+    -- target device: STRATIX10 (Intel), AGILEX (Intel), 7SERIES (Xilinx), ULTRASCALE (Xilinx), VERSAL (Xilinx)
     constant DEVICE        : string  := "AGILEX";
     constant INPUT_REGS    : boolean := true;
     constant INPUT_WIDTH   : natural := 27;

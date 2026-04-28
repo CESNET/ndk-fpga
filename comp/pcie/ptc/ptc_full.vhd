@@ -297,7 +297,7 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
 
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PCIE_TRANSACTION_CTRL: unsupported device!"
         severity failure;
 

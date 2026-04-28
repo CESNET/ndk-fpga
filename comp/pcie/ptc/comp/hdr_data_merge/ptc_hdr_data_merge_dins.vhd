@@ -170,7 +170,7 @@ architecture FULL of PTC_HDR_DATA_MERGE_DINS is
 
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PTC_HDR_DATA_MERGE_DINS: unsupported device!"
         severity failure;
 

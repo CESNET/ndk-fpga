@@ -20,7 +20,7 @@ use unisim.vcomponents.all;
 
 entity ASFIFO_BRAM_XILINX is
     generic (
-        DEVICE                  : string := "ULTRASCALE"; --! "VIRTEX6", "7SERIES", "ULTRASCALE"
+        DEVICE                  : string := "ULTRASCALE"; --! "VIRTEX6", "7SERIES", "ULTRASCALE", "VERSAL"
         DATA_WIDTH              : integer := 64;          --! any possitive value
         ITEMS                   : integer := 512;         --! 512, 1024, 2048, 4096, 8192 (less effective)
         FIRST_WORD_FALL_THROUGH : boolean := true;
@@ -286,7 +286,7 @@ begin
 
 
 
-    us_gen : if DEVICE = "ULTRASCALE" generate
+    us_gen : if DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" generate
 
         constant I                   : integer := tsel(
                                                        ITEMS <= 512,   512, tsel(
@@ -581,7 +581,7 @@ begin
 
 
 
-    error_gen : if DEVICE /= "ULTRASCALE" and DEVICE /= "VIRTEX6" and DEVICE /= "7SERIES" generate
+    error_gen : if DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL" and DEVICE /= "VIRTEX6" and DEVICE /= "7SERIES" generate
         assert false
             report "ASFIFO_BRAM_XILINX: DEVICE not supported!"
             severity failure;

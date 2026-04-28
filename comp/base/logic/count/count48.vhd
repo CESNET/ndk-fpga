@@ -57,7 +57,7 @@ end entity;
 --! Vitrex-7 architecture of COUNT48
 architecture V7_DSP of COUNT48 is
 
-    constant DEVICE_HAS_DSP48E : boolean := DEVICE = "7SERIES" or DEVICE = "ULTRASCALE";
+    constant DEVICE_HAS_DSP48E : boolean := DEVICE = "7SERIES" or DEVICE = "ULTRASCALE" or DEVICE = "VERSAL";
 
     --! signals
     signal zeros        : std_logic_vector(63 downto 0);

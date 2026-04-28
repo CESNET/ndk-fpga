@@ -36,6 +36,7 @@ entity RX_DMA_CALYPTE_HDR_MANAGER is
         -- - "STRATIX10"
         -- - "AGILEX"
         -- - "ULTRASCALE"
+        -- - "VERSAL"
         DEVICE        : string  := "ULTRASCALE"
     );
     port (
@@ -867,7 +868,7 @@ begin
         if (rising_edge(CLK)) then
             dma_hdr_pcie_addr_reg         <= dma_hdr_pcie_addr;
             pcie_hdr_dma_hdr_tran_fifo_wr <= dma_hdr_pcie_addr_vld;
-            pcie_addr_len_dma_hdr_tran    <= '1' when (DEVICE = "ULTRASCALE" or dma_hdr_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
+            pcie_addr_len_dma_hdr_tran    <= '1' when (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" or dma_hdr_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
             dma_hdr_p2p_en_reg            <= dma_hdr_p2p_en;
             vld_bit_sel                   <= vld_bits_per_ch(to_integer(unsigned(dma_hdr_addr_chan)));
         end if;
@@ -927,7 +928,7 @@ begin
         if (rising_edge(CLK)) then
             data_pcie_addr_reg         <= data_pcie_addr;
             pcie_hdr_data_tran_fifo_wr <= data_pcie_addr_vld;
-            pcie_addr_len_data_tran    <= '1' when (DEVICE = "ULTRASCALE" or data_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
+            pcie_addr_len_data_tran    <= '1' when (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" or data_pcie_addr(64-1 downto 32) /= (32-1 downto 0 => '0')) else '0';
         end if;
     end process;
 

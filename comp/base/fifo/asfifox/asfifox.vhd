@@ -40,6 +40,7 @@ entity ASFIFOX is
         --
         -- - "7SERIES"
         -- - "ULTRASCALE"
+        -- - "VERSAL"
         -- - "STRATIX10"
         -- - "ARRIA10"
         -- - "AGILEX"
@@ -272,7 +273,7 @@ begin
     end generate;
 
     sdp_lutram_g : if (RAM_TYPE = "LUT") generate
-        device_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") generate
+        device_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "VERSAL") generate
             -- use Xilinx XPM macro with embedded constraints (UG974)
             sdp_lutram_xilinx_i : component xpm_memory_sdpram
             generic map (

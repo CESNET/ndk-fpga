@@ -27,7 +27,7 @@ entity PTC_PCIE_AXI2MFB is
         -- =======================================================================
         -- Target device specification
         -- =======================================================================
-        -- Supported devices: "7SERIES", "ULTRASCALE"
+        -- Supported devices: "7SERIES", "ULTRASCALE", "VERSAL"
         DEVICE           : string  := "ULTRASCALE";
         -- =======================================================================
         -- MFB BUS CONFIGURATION:
@@ -150,7 +150,7 @@ begin
         rx_axi_eop_pos_bot(i) <= rx_axi_eop_pos(i)(EOF_POS_WIDTH-1 downto 0);
     end generate;
 
-    ultrascale_pos_gen : if DEVICE = "ULTRASCALE" generate
+    ultrascale_pos_gen : if DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" generate
         tuser_div_gen : for i in 0 to MFB_REGIONS-1 generate
             rx_axi_eop(i)     <= RX_AXI_TUSER(i+SOP_POS_WIDTH*MFB_REGIONS+MFB_REGIONS+BE_WIDTH);
             rx_axi_eop_pos(i) <= RX_AXI_TUSER(EOP_POS_WIDTH*(i+1)+MFB_REGIONS+SOP_POS_WIDTH*MFB_REGIONS+MFB_REGIONS+BE_WIDTH-1 downto EOP_POS_WIDTH*i+MFB_REGIONS+SOP_POS_WIDTH*MFB_REGIONS+MFB_REGIONS+BE_WIDTH);

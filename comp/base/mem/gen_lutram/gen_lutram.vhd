@@ -53,7 +53,7 @@ entity GEN_LUTRAM is
         MLAB_CONSTR_RDW_DC : boolean := True;
         -- This parameter allows the correct selection of the LUTRAM
         -- implementation according to the FPGA used. Supported values are:
-        -- "7SERIES", "ULTRASCALE", "STRATIX10", "ARRIA10", "AGILEX"
+        -- "7SERIES", "ULTRASCALE", "VERSAL", "STRATIX10", "ARRIA10", "AGILEX"
         DEVICE             : string  := "AGILEX"
     );
     port (

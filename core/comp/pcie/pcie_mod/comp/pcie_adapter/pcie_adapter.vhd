@@ -259,7 +259,7 @@ end entity;
 
 architecture FULL of PCIE_ADAPTER is
 
-    constant IS_XILINX_DEVICE : boolean := (DEVICE = "ULTRASCALE");
+    constant IS_XILINX_DEVICE : boolean := (DEVICE = "ULTRASCALE") or (DEVICE = "VERSAL");
     constant IS_INTEL_DEVICE  : boolean := (DEVICE = "STRATIX10") or (DEVICE = "AGILEX");
 
     signal cq_tph_present       : std_logic_vector(CQ_MFB_REGIONS-1 downto 0);

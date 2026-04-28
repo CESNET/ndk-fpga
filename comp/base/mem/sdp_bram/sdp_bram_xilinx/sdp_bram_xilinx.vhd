@@ -25,11 +25,11 @@ architecture FULL of SDP_BRAM_XILINX2 is
 
 begin
 
-    assert ((DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE"))
-        report "SDP_BRAM_XILINX2: Illegal value of parameter DEVICE '" & DEVICE & "'; allowed devices are: 7SERIES, ULTRASCALE!"
+    assert ((DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "VERSAL"))
+        report "SDP_BRAM_XILINX2: Illegal value of parameter DEVICE '" & DEVICE & "'; allowed devices are: 7SERIES, ULTRASCALE, VERSAL!"
         severity failure;
 
-    xilinx_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") generate
+    xilinx_g : if (DEVICE = "7SERIES") or (DEVICE = "ULTRASCALE") or (DEVICE = "VERSAL") generate
         dev_be_g : if BLOCK_ENABLE generate
             xilinx_we    <= WR_BE;
         else generate

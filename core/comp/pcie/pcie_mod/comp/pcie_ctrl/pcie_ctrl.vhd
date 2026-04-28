@@ -581,7 +581,7 @@ begin
         pcie_cq_mfb_data_arr <= slv_array_deser(PCIE_CQ_MFB_DATA,CQ_MFB_REGIONS);
 
         cq_mfb_sel_g: for i in 0 to CQ_MFB_REGIONS-1 generate
-            bar_index_g: if (DEVICE = "ULTRASCALE") generate
+            bar_index_g: if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") generate
                 -- BAR index is in AXI header
                 pcie_cq_mfb_bar(i) <= pcie_cq_mfb_data_arr(i)(114 downto 112);
             else generate -- Intel FPGA (R-Tile, P-Tile)

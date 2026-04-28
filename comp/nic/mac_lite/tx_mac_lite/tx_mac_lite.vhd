@@ -191,7 +191,7 @@ architecture FULL of TX_MAC_LITE is
 
     constant MD_DATA_W           : natural := MD_REGIONS*MD_REGION_SIZE*MD_BLOCK_SIZE*MD_ITEM_WIDTH;
 
-    constant NUM_OF_PKTS         : natural := tsel(DEVICE = "ULTRASCALE" and TX_REGIONS = 1 and TX_REGION_SIZE = 1,1,4);
+    constant NUM_OF_PKTS         : natural := tsel((DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") and TX_REGIONS = 1 and TX_REGION_SIZE = 1,1,4);
     constant LEN_WIDTH           : natural := log2(PKT_MTU_BYTES+1);
     constant WORST_ALIGNMENT     : natural := MD_DATA_W-(MD_BLOCK_SIZE*MD_ITEM_WIDTH);
     constant DFIFO_ITEMS         : natural := 2**log2(max(div_roundup((PKT_MTU_BYTES+WORST_ALIGNMENT),(MD_DATA_W/8)), 512));

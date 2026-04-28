@@ -59,7 +59,7 @@ begin
         report "Wrong value of MAX_VAL, check port decription for more information."
         severity failure;
 
-    assert ((DEVICE = "AGILEX") or (DEVICE = "STRATIX10") or (DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES"))
+    assert ((DEVICE = "AGILEX") or (DEVICE = "STRATIX10") or (DEVICE = "ULTRASCALE") or (DEVICE = "7SERIES") or (DEVICE = "VERSAL"))
         report "Wrong / unsupported device !! See comment near DEVICE generic."
         severity failure;
 

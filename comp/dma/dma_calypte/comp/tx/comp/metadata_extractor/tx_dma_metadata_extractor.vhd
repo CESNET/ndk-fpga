@@ -211,7 +211,7 @@ begin
     pcie_mfb_meta_arr   <= slv_array_deser(PCIE_MFB_META, MFB_REGIONS);
 
     pcie_hdr_deparser_g: for i in MFB_REGIONS - 1 downto 0 generate
-        device_sel_pcie_hdr_g: if (DEVICE = "ULTRASCALE") generate
+        device_sel_pcie_hdr_g: if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") generate
             pcie_hdr_data_int(i) <= pcie_mfb_data_arr(i)(PCIE_CQ_META_HEADER);
         else generate
             pcie_hdr_data_int(i) <= pcie_mfb_meta_arr(i)(PCIE_CQ_META_HEADER);
@@ -372,7 +372,7 @@ begin
     end generate;
 
     -- Cutter is used only for Xilinx devices
-    pcie_hdr_cutter_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
+    pcie_hdr_cutter_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
         pcie_hdr_cutter_i : entity work.MFB_CUTTER_SIMPLE
         generic map (
             REGIONS        => MFB_REGIONS,

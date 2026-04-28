@@ -199,7 +199,7 @@ package body pcie_endpoint_test_pkg is
          vec(l1+4*(i+1)-1 downto l1+4*i) := tu.last_be(i);
       end loop;
 
-      if (DEVICE="ULTRASCALE") then
+      if (DEVICE="ULTRASCALE" or DEVICE = "VERSAL") then
          vec(l4-1 downto l3) := tu.sop;
 
          for i in 0 to MFB_UP_REGIONS-1 loop
@@ -234,7 +234,7 @@ package body pcie_endpoint_test_pkg is
          tuser.last_be(i)  := tu(l1+4*(i+1)-1 downto l1+4*i);
       end loop;
 
-      if (DEVICE="ULTRASCALE") then
+      if (DEVICE="ULTRASCALE" or DEVICE = "VERSAL") then
          tuser.sop := tu(l4-1 downto l3);
 
          for i in 0 to MFB_UP_REGIONS-1 loop
@@ -266,7 +266,7 @@ package body pcie_endpoint_test_pkg is
 
       vec(l2-1 downto l1) := tu.sop;
 
-      if (DEVICE="ULTRASCALE") then
+      if (DEVICE="ULTRASCALE" or DEVICE = "VERSAL") then
          for i in 0 to MFB_DOWN_REGIONS-1 loop
             vec(l2+AXI_DOWN_SOP_POS_WIDTH*(i+1)-1 downto l2+AXI_DOWN_SOP_POS_WIDTH*i) := std_logic_vector(to_unsigned(tu.sop_pos(i),AXI_DOWN_SOP_POS_WIDTH));
          end loop;
@@ -300,7 +300,7 @@ package body pcie_endpoint_test_pkg is
 
       tuser.sop := tu(l2-1 downto l1);
 
-      if (DEVICE="ULTRASCALE") then
+      if (DEVICE="ULTRASCALE" or DEVICE = "VERSAL") then
          for i in 0 to MFB_DOWN_REGIONS-1 loop
             tuser.sop_pos(i) := to_integer(unsigned(tu(l2+AXI_DOWN_SOP_POS_WIDTH*(i+1)-1 downto l2+AXI_DOWN_SOP_POS_WIDTH*i)));
          end loop;

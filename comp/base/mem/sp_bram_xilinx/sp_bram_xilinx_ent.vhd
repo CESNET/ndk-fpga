@@ -21,7 +21,7 @@ use IEEE.std_logic_unsigned.all;
 --! \brief Entity of single port Xilinx BRAM declaration
 entity SP_BRAM_XILINX is
     generic (
-        --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6", "ULTRASCALE".
+        --! Select target device "VIRTEX5", "VIRTEX6", "7SERIES", "SPARTAN6", "ULTRASCALE", "VERSAL".
         DEVICE : string := "ULTRASCALE";
 
         --! A read operation is implicitly performed to address ADDR combinatorially,
@@ -38,7 +38,7 @@ entity SP_BRAM_XILINX is
         ENABLE_OUT_REG : boolean := true;
 
         --! Block RAM type, 18Kb or 36Kb blocks.
-        --! - Only for non ULTRASCALE devices (DEVICE /= "ULTRASCALE")!
+        --! - Only for non ULTRASCALE and non VERSAL devices (DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL")!
         BRAM_TYPE         : integer := 36;
         --! Enable check write before read. For more info check *.psl file
         PSL_WR_BEFFORE_RD : boolean := true

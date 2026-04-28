@@ -15,7 +15,7 @@ use IEEE.numeric_std.all;
 -- The Purpose of this component is to fill PCIE CC header.
 entity PCIE_CC_HDR_GEN is
     generic (
-        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE"
+        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE", "VERSAL"
         DEVICE         : string  := "STRATIX10"
     );
     port (
@@ -68,7 +68,7 @@ architecture FULL of PCIE_CC_HDR_GEN is
     signal in_tlp_type      : std_logic_vector(8-1 downto 0);
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PCIE_CC_HDR_GEN: unsupported device!"
         severity failure;
 
@@ -76,7 +76,7 @@ begin
     -- CC Header construction
     -- -------------------------------------------------------------------------
 
-    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
+    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
         OUT_HEADER <=
                       '0'                & -- force ECRC
                       IN_ATTRIBUTES      & -- attributes

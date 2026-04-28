@@ -17,7 +17,7 @@ use work.math_pack.all;
 -- The Purpose of this component is to deparse PCIE RC header.
 entity PCIE_RC_HDR_DEPARSER is
     generic (
-        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE"
+        -- Target device: "AGILEX", "STRATIX10", "7SERIES", "ULTRASCALE", "VERSAL"
         DEVICE : string  := "STRATIX10"
     );
     port (
@@ -58,7 +58,7 @@ architecture FULL of PCIE_RC_HDR_DEPARSER is
     signal   rem_bytes_vld         : unsigned(REMAINING_BYTES_WIDTH-1 downto 0);
 begin
 
-    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES")
+    assert (DEVICE = "STRATIX10" or DEVICE = "AGILEX" or DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL")
         report "PCIE_RC_HDR_DEPARSER: unsupported device!"
         severity failure;
 
@@ -66,7 +66,7 @@ begin
     -- RC Header deparsing
     -- -------------------------------------------------------------------------
 
-    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
+    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
         OUT_LOW_ADDR   <=        IN_HEADER(12   -1 downto 0);
         OUT_BYTE_CNT   <=        IN_HEADER(29   -1 downto 16);
         OUT_COMPLETE   <=        IN_HEADER(30);

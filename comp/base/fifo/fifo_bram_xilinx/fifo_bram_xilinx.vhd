@@ -245,7 +245,7 @@ begin
 
 
 
-    us_gen : if DEVICE = "ULTRASCALE" generate
+    us_gen : if DEVICE = "ULTRASCALE" or DEVICE = "VERSAL" generate
 
         constant ITEMS_CEIL       : integer := tsel(
                                                     ITEMS <= 512,   512, tsel(
@@ -454,7 +454,7 @@ begin
 
 
 
-    error_gen : if DEVICE /= "ULTRASCALE" and DEVICE /= "VIRTEX6" and DEVICE /= "7SERIES" generate
+    error_gen : if DEVICE /= "ULTRASCALE" and DEVICE /= "VERSAL" and DEVICE /= "VIRTEX6" and DEVICE /= "7SERIES" generate
         assert false
             report "FIFO_BRAM_XILINX: DEVICE not supported!"
             severity failure;
