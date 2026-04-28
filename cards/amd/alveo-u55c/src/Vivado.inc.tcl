@@ -31,6 +31,7 @@ set CARD_ARCHGRP(IP_GEN_FILES)          false
 set CARD_ARCHGRP(PCIE_ENDPOINTS)        $PCIE_ENDPOINTS
 set CARD_ARCHGRP(PCIE_ENDPOINT_MODE)    $PCIE_ENDPOINT_MODE
 set CARD_ARCHGRP(HBM_PORTS)             $HBM_PORTS
+set CARD_ARCHGRP(PCIE_GEN)              $PCIE_GEN
 
 # make lists from associative arrays
 set CARD_ARCHGRP_L [array get CARD_ARCHGRP]
