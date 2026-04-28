@@ -15,6 +15,7 @@ from cocotbext.ofm.base.proxymonitor import ProxyMonitor
 from dataclasses import dataclass
 from cocotbext.ofm.pcie.AvstCompleter import RequestHeader
 from sys import maxsize
+import cocotb
 
 
 class AvstCreditorStatesTX(Enum):
@@ -296,61 +297,71 @@ class AvstCreditRequester(BusDriver):
         self._bytes_per_credit = params["bytes_per_crdt"]
         self._frame_cnt = 0
 
-    async def write_rc(self, data: dict):
-        """
-        Catches completion request transaction sent by AvstRequester.
-        """
-        self._rc_queue.put_nowait((self._frame_cnt, AvstTransactionTypes.Completion, data))
-        self._frame_cnt += 1
+        cocotb.start_soon(self._credit_gate_thread())
 
-    async def write_cq(self, data: dict):
+    async def _driver_send(self, transaction, sync=True, **kwargs):
         """
-        Catches posted and non-poster transaction sent by AvstCompleter.
+        Intercepts transactions from the standard BusDriver append() pipeline.
+        Classifies them by AvstTransactionTypes and routes to priority queues
+        for credit-gated sending.
         """
-        header = RequestHeader().deserialize(data["HDR"])
-        pcie_trans_type = header.req_t
+        try:
+            hdr, data, tr_type = transaction
+        except (ValueError, TypeError) as e:
+            self.log.error(f"_driver_send: Failed to unpack transaction {transaction!r}: {e}")
+            raise
 
-        if pcie_trans_type in PcieTransactionTypes.MWr:
-            avst_trans_type = AvstTransactionTypes.Posted
-        elif pcie_trans_type in PcieTransactionTypes.MRd:
-            avst_trans_type = AvstTransactionTypes.NonPosted
+        if tr_type == 1:  # RC (Completion)
+            avst_type = AvstTransactionTypes.Completion
+            self._rc_queue.put_nowait((self._frame_cnt, avst_type, transaction))
+        elif tr_type == 0:  # CQ (Request) - determine Posted vs NonPosted
+            hdr_int = hdr.serialize()
+            pcie_req_type = RequestHeader().deserialize(hdr_int).req_t
+            if pcie_req_type in PcieTransactionTypes.MWr:
+                avst_type = AvstTransactionTypes.Posted
+            elif pcie_req_type in PcieTransactionTypes.MRd:
+                avst_type = AvstTransactionTypes.NonPosted
+            else:
+                raise NotImplementedError(f"PCIe transaction type {pcie_req_type} is not supported.")
+            self._cq_queue.put_nowait((self._frame_cnt, avst_type, transaction))
         else:
-            raise NotImplementedError(f"Pcie transaction of type {pcie_trans_type} is not supported.")
+            raise NotImplementedError(f"PCIe transaction type {tr_type} is not supported.")
 
-        self._cq_queue.put_nowait((self._frame_cnt, avst_trans_type, data))
         self._frame_cnt += 1
 
-    async def _send_thread(self):
+    async def _credit_gate_thread(self):
         """
-        There are two queues - request queue and completion queue. If there is a transaction in the queue,
-        the transaction is taken out, it's type is determined and credits are checked. If there aren't enough
-        credits of the specific type, transaction is returned to the queue and waits, until there are enough
-        credits. Once there are enough credits to send the transaction, number of credits are updated based
-        of the length of the transaction and the transaction is sent to the AvstDriverMaster.
+        Credit-gating coroutine. Reads transactions from priority queues,
+        checks if there are enough credits, and forwards them to the
+        AvstPcieDriverMaster when credits are sufficient.
         """
-
         while True:
             await self._clk_re
 
-            for queue, callback in [(self._rc_queue, self._driver.write_rc), (self._cq_queue, self._driver.write_cq)]:
-                while (queue.qsize() > 0):
-                    priority, trans_type, data = queue.get_nowait()
+            if self._rc_queue.empty() and self._cq_queue.empty():
+                continue  # No transactions to process
+
+            for queue in [self._rc_queue, self._cq_queue]:
+                while not queue.empty():
+                    priority, trans_type, transaction = queue.get_nowait()
 
                     hcrdt = self._header_creditor.get_credits(trans_type.value)
                     dcrdt = self._data_creditor.get_credits(trans_type.value)
 
                     if (hcrdt > self._min_hcrdt) and (dcrdt > self._min_dcrdt):
-                        data_len = (data["DATA"].bit_length() + 7) // 8
+                        hdr, data, tr_type = transaction
 
                         self._header_creditor.update_credits(trans_type.value, 1)
 
-                        consumed_data_credits = ceildiv(self._bytes_per_credit, data_len)
+                        consumed_data_credits = ceildiv(self._bytes_per_credit, len(data))
                         self._data_creditor.update_credits(trans_type.value, consumed_data_credits)
 
-                        await callback(data)
+                        # Forward the original 3-tuple to AvstPcieDriverMaster
+                        self._driver.append(transaction)
 
                     else:
-                        queue.put_nowait((priority, trans_type, data))
+                        # Not enough credits, put back and wait
+                        queue.put_nowait((priority, trans_type, transaction))
                         break
 
 
