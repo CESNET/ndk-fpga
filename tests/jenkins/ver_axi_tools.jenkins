@@ -1,0 +1,37 @@
+/*
+ * ver_mvb_tools.jenkins: Jenkins configuration script
+ * Copyright (C) 2021 CESNET z. s. p. o.
+ * Author(s): Jakub Cabal <cabal@cesnet.cz>
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+// Clean previous builds
+library 'liberouter'
+cleanBuilds()
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// MULTI-VERIFICATION
+// /////////////////////////////////////////////////////////////////////////////
+// Add engines for automatic Jenkins verifications into the following list
+// FORMAT:
+//  [ 'name'             , 'path_to_ver'                                      , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
+def COMPONENTS_MULTIVER = [\
+    ['ASFIFO UVM'  , 'comp/axis_tools/storage/asfifox/uvm/'   , 'top_level.fdo', 'tbench/generic.sv'  , 'ver_settings.py' ],\
+]
+// /////////////////////////////////////////////////////////////////////////////
+
+def COMPONENTS_HARP = [\
+]
+
+// Run component verifications using common script
+node('preklad') {
+    lock(label:"resources-${env.NODE_NAME}", quantity: 1) {
+        // fetch sources from GIT
+        checkout scm
+        def common_run = load "tests/jenkins/common.jenkins"
+        common_run.commonPrekladHarpRun(COMPONENTS_HARP)
+        common_run.commonPrekladMultiVerRun(COMPONENTS_MULTIVER)
+    }
+}
