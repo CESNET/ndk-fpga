@@ -67,6 +67,8 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     constant DBG_PROBE_STR         : string := "PUMFPUMVPURQPDMFPDMVPDRC";
     constant RST_WIDTH             : natural := 5;
 
+    constant PTC_DMA_ROUTE_JUNC     : dma_route_junction_t := priv_ptc_get_dma_junc(DMA_PORTS);
+
     ---------------------------------------------------------------------------
 
     ---------------------------------------------------------------------------
@@ -85,7 +87,6 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     signal up_mvb_trans_out_data     : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
     signal up_mvb_trans_out_data_2d  : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
     signal up_mvb_trans_out_data_2df : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
-    signal up_mvb_trans_out_data_sel : slv_array_2d_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS-1 downto 0)(log2(DMA_PORTS)-1 downto 0);
     signal up_mvb_trans_out_data_fix : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
     signal up_mvb_trans_out_vld      : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS                -1 downto 0);
     signal up_mvb_trans_out_payload  : slv_array_t(DMA_PORTS-1 downto 0)(MVB_UP_ITEMS                -1 downto 0);
@@ -508,12 +509,8 @@ begin
             process (all)
             begin
                 for rr in 0 to MVB_UP_ITEMS-1 loop
-                    up_mvb_trans_out_data_sel(ii)(rr) <= std_logic_vector(to_unsigned(ii, log2(DMA_PORTS)));
-
-                    -- Set the lower bits of UNITID to the DMA EP number.
-                    -- These bits must not be used by another component!
-                    up_mvb_trans_out_data_2df(ii)(rr)                                                                     <= up_mvb_trans_out_data_2d(ii)(rr);
-                    up_mvb_trans_out_data_2df(ii)(rr)(DMA_REQUEST_UNITID_O+log2(DMA_PORTS)-1 downto DMA_REQUEST_UNITID_O) <= up_mvb_trans_out_data_sel(ii)(rr);
+                    -- INFO: DMA_ROUTE should be validated to match nodes created from the PTC_DMA_ROUTE_JUNC
+                    up_mvb_trans_out_data_2df(ii)(rr) <= dma_route_req_apply_path(DMA_ROUTE(ii), up_mvb_trans_out_data_2d(ii)(rr));
                 end loop;
             end process;
 
@@ -1208,7 +1205,7 @@ begin
 
     down_mvb_split_in_data_arr <= slv_array_deser(down_mvb_split_in_data,MVB_DOWN_ITEMS);
     down_mvb_split_in_switch_g : for i in 0 to MVB_DOWN_ITEMS-1 generate
-        down_mvb_split_in_switch_arr(i) <= down_mvb_split_in_data_arr(i)(DMA_COMPLETION_UNITID_O+log2(DMA_PORTS)-1 downto DMA_COMPLETION_UNITID_O);
+        down_mvb_split_in_switch_arr(i) <= dma_route_res_extract_switch(PTC_DMA_ROUTE_JUNC, down_mvb_split_in_data_arr(i));
     end generate;
     down_mvb_split_in_switch <= slv_array_ser(down_mvb_split_in_switch_arr);
 
@@ -1320,9 +1317,7 @@ begin
             process (all)
             begin
                 for rr in 0 to MVB_DOWN_ITEMS-1 loop
-                    -- resetting the reserved low bits of UNITID
-                    down_mvb_trans_in_data_2d(ii)(rr)                                                                           <= down_mvb_trans_in_data_2df(ii)(rr);
-                    down_mvb_trans_in_data_2d(ii)(rr)(DMA_COMPLETION_UNITID_O+log2(DMA_PORTS)-1 downto DMA_COMPLETION_UNITID_O) <= (others => '0');
+                    down_mvb_trans_in_data_2d(ii)(rr)   <= down_mvb_trans_in_data_2df(ii)(rr);
                 end loop;
             end process;
 

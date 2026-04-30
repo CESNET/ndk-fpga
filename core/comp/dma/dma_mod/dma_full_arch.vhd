@@ -131,6 +131,7 @@ begin
         DMA_STREAMS     => DMA_STREAMS,
         DMA_ENDPOINTS   => DMA_ENDPOINTS,
         PCIE_ENDPOINTS  => PCIE_ENDPOINTS,
+        DMA_ROUTE       => DMA_ROUTE,
 
         USR_MVB_ITEMS       => IUSR_MVB_ITEMS,
         USR_MFB_REGIONS     => IUSR_MFB_REGIONS,

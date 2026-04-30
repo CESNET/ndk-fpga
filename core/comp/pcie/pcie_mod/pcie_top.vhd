@@ -12,6 +12,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_bus_pack.all;
 use work.pcie_meta_pack.all;
+use work.core_pcie_pkg.all;
 
 entity PCIE is
     generic (
@@ -78,6 +79,8 @@ entity PCIE is
         MISC_TOP2PCIE_WIDTH : natural := 1;
         -- Width of MISC signal between PCIE core logic and Top-Level FPGA design
         MISC_PCIE2TOP_WIDTH : natural := 1;
+        -- Dynamic routing parameters of the DMA bus
+        DMA_ROUTE           : dma_route_path_array_t := core_pcie_get_dma_route(DMA_PORTS, PCIE_ENDPOINTS);
         -- FPGA device
         DEVICE              : string  := "STRATIX10"
     );
@@ -493,6 +496,9 @@ begin
 
     pcie_ctrl_g: for i in 0 to PCIE_ENDPOINTS-1 generate
         subtype DPE is natural range (i+1)*DMA_PORTS_PER_EP-1 downto i*DMA_PORTS_PER_EP;
+        subtype DPEI is natural range i*DMA_PORTS_PER_EP to (i+1)*DMA_PORTS_PER_EP-1;
+
+        constant PCIE_DMA_ROUTE    : dma_route_path_array_t(0 to DMA_PORTS_PER_EP-1) := DMA_ROUTE(DPEI);
     begin
         pcie_ctrl_i : entity work.PCIE_CTRL
         generic map (
@@ -525,6 +531,7 @@ begin
             PTC_DISABLE         => PTC_DISABLE,
             DMA_BAR_ENABLE      => DMA_BAR_ENABLE,
             ENDPOINT_TYPE       => PCIE_ENDPOINT_TYPE,
+            DMA_ROUTE           => PCIE_DMA_ROUTE,
             DEVICE              => DEVICE
         )
         port map (

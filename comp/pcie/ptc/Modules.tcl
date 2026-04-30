@@ -48,6 +48,7 @@ lappend COMPONENTS [ list "CUTTER"              "$MFB_TOOLS_BASE/flow/cutter_sim
 lappend COMPONENTS [ list "DEBUG_PROBE"         "$OFM_PATH/comp/debug/streaming_debug"       "FULL" ]
 
 # entity and architecture
+lappend MOD "$ENTITY_BASE/ptc_pkg.vhd"
 lappend MOD "$ENTITY_BASE/ptc_ent.vhd"
 lappend MOD "$ENTITY_BASE/ptc_full.vhd"
 lappend MOD "$ENTITY_BASE/ptc_wrapper.vhd"

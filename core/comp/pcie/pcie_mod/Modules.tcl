@@ -20,6 +20,7 @@ lappend COMPONENTS [ list "PCIE_CTRL"   "$PCIE_COMP_BASE/pcie_ctrl" "FULL"   ]
 lappend COMPONENTS [ list "MI_SPLITTER" $MI_SPLITTER_BASE           "FULL"   ]
 
 # Files
+lappend MOD "$ENTITY_BASE/pcie_pkg.vhd"
 lappend MOD "$ENTITY_BASE/pcie_top.vhd"
 
 #lappend MOD "$ENTITY_BASE/DevTree.vhd"

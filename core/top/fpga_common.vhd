@@ -21,6 +21,8 @@ use work.pcie_meta_pack.all;
 use work.eth_hdr_pack.all;
 use work.mi_addr_space_pack.all;
 
+use work.core_pcie_pkg.all;
+
 entity FPGA_COMMON is
     generic (
         -- System clock period in ns
@@ -289,6 +291,11 @@ end entity;
 -- ----------------------------------------------------------------------------
 
 architecture FULL of FPGA_COMMON is
+
+    -- Upstream DMA route (after PCI core junction).
+    constant DMA_ROUTE_PCIE             : dma_route_path_array_t :=
+        core_pcie_get_dma_route(DMA_ENDPOINTS, PCIE_ENDPOINTS);
+    constant DMA_ROUTE_PATH_DMA         : dma_route_path_array_t := DMA_ROUTE_PCIE;
 
     constant HEARTBEAT_CNT_W     : natural := 27;
     constant CLK_COUNT           : natural := 4+ETH_PORTS;
@@ -1150,6 +1157,7 @@ begin
         USR_TX_PKT_SIZE_MAX  => DMA_TX_FRAME_SIZE_MAX,
 
         DMA_ENDPOINTS        => DMA_ENDPOINTS,
+        DMA_ROUTE            => DMA_ROUTE_PATH_DMA,
         PCIE_MPS             => PCIE_MPS,
         PCIE_MRRS            => PCIE_MRRS,
         DMA_TAG_WIDTH        => 8,

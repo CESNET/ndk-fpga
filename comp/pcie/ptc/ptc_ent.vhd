@@ -12,6 +12,8 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_bus_pack.all; -- contains definitions for MVB header fields
 
+use work.ptc_pkg.all;
+
 -- ----------------------------------------------------------------------------
 --                           Description
 -- ----------------------------------------------------------------------------
@@ -121,6 +123,9 @@ entity PCIE_TRANSACTION_CTRL is
         -- Width of DOWN AXI signal RC_TUSER (defined in PCIe specification)
         -- UltraScale+ -> 161; Virtex7 -> 75;
         RC_TUSER_WIDTH    : integer := 161;
+
+        -- Dynamic routing parameters of the DMA bus
+        DMA_ROUTE           : dma_route_path_array_t := ptc_get_dma_route(DMA_PORTS);
 
         -- CPL credits checking:
         -- Each credit represents one available 64B or 128B word in receiving buffer.

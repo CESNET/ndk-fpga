@@ -207,6 +207,7 @@ begin
             USR_RX_PKT_SIZE_MAX  => USR_RX_PKT_SIZE_MAX,
             USR_TX_PKT_SIZE_MAX  => USR_TX_PKT_SIZE_MAX,
             DMA_ENDPOINTS        => DMA_EP_PER_DMA,
+            DMA_ROUTE            => DMA_ROUTE,
 
             PCIE_MPS             => PCIE_MPS,
             PCIE_MRRS            => PCIE_MRRS,
