@@ -12,8 +12,6 @@ set STRATIX10_BASE "$OFM_PATH/comp/base/dsp/dsp_comparator_intel/comp/dsp_compar
 
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/math_pack.vhd"
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/type_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg.vhd"
 
 set MOD "$MOD $ENTITY_BASE/dsp_comparator_intel_ent.vhd"
 

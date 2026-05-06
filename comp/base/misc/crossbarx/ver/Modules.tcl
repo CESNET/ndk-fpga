@@ -8,10 +8,9 @@
 set PKG_BASE "$OFM_PATH/comp/base/pkg"
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
-set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg.vhd"
 
 set COMPONENTS [list \
+    [ list "VHDL_VER_TOOLS" "$OFM_PATH/comp/ver/vhdl_ver_tools/basics" "FULL"] \
     [ list "UUT"               "$ENTITY_BASE/.."                            "FULL" ] \
     [ list "FIFOX_MULTI"       "$OFM_PATH/comp/base/fifo/fifox_multi"       "FULL" ] \
 ]

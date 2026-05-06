@@ -8,8 +8,8 @@
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
-lappend PACKAGES "$OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg.vhd"
+
+lappend COMPONENTS [ list "VHDL_VER_TOOLS" "$OFM_PATH/comp/ver/vhdl_ver_tools/basics" "FULL" ]
 
 # Source files for implemented component
 lappend MOD "$ENTITY_BASE/tsu_format_to_ns.vhd"

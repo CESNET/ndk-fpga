@@ -17,7 +17,6 @@ set PKG_BASE "$OFM_PATH/comp/base/pkg"
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg.vhd"
 
 # list of sub-components
 set COMPONENTS [list \
@@ -27,6 +26,7 @@ set COMPONENTS [list \
     [ list "PIPE_TREE_ADDER" $TREE_ADDER_BASE "FULL" ] \
     [ list "N_LOOP_OP"       $N_LOOP_OP_BASE  "FULL" ] \
     [ list "SHAKEDOWN"       $SHAKEDOWN_BASE  "FULL" ] \
+    [ list "VHDL_VER_TOOLS" "$OFM_PATH/comp/ver/vhdl_ver_tools/basics" "FULL"] \
 ]
 
 # Source files for implemented component
