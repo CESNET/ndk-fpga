@@ -16,10 +16,10 @@ set SHAKEDOWN_BASE     "$OFM_PATH/comp/mvb_tools/flow/merge_n_to_m"
 set PKG_BASE "$OFM_PATH/comp/base/pkg"
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
-set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
 
 # list of sub-components
 set COMPONENTS [list \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
     [ list "GEN_ENC"         $GEN_ENC_BASE    "FULL" ] \
     [ list "GEN_NOR"         $GEN_NOR_BASE    "FULL" ] \
     [ list "FIFOX_MULTI"     $FIFOXM_BASE     "FULL" ] \

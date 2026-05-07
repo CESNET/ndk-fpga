@@ -17,9 +17,9 @@ set MFB_LOGIC_BASE      "$OFM_PATH/comp/mfb_tools/logic"
 # Packages
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
 lappend PACKAGES "$PKG_BASE/type_pack.vhd"
-lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # Components
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "PPR_REQUEST_PROCESSOR"    "$ENTITY_BASE/comp/request_processor"  "FULL"       ]
 lappend COMPONENTS [ list "NP_LUTRAM"                "$MEM_BASE/np_lutram"                  "FULL"       ]
 lappend COMPONENTS [ list "FIFOX_MULTI"              "$FIFO_BASE/fifox_multi"               "FULL"       ]

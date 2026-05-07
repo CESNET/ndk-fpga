@@ -4,7 +4,6 @@
 #
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 
 set MI_PIPE_BASE        "$OFM_PATH/comp/mi_tools/pipe"
 set NP_LUTRAM_BASE      "$OFM_PATH/comp/base/mem/np_lutram"
@@ -12,6 +11,7 @@ set DSP_COMP_BASE       "$OFM_PATH/comp/base/dsp/dsp_comparator"
 set MEMX_COUNTER_BASE   "$OFM_PATH/comp/base/logic/cnt_multi_memx"
 
 lappend COMPONENTS \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
     [ list "MI_PIPE"            "$MI_PIPE_BASE"                         "FULL" ] \
     [ list "NP_LUTRAM"          "$NP_LUTRAM_BASE"                       "FULL" ] \
     [ list "DSP_COMPARATOR"     "$DSP_COMP_BASE"                        "FULL" ] \

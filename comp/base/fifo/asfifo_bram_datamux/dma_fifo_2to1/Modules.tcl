@@ -7,10 +7,10 @@
 # Base directories
 set ASFIFO_BASE     "$OFM_PATH/comp/base/fifo/asfifox"
 lappend PACKAGES    "$OFM_PATH/comp/base/pkg/math_pack.vhd"
-lappend PACKAGES    "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 
 # List of components
 set COMPONENTS [list \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
     [list "ASFIFO"  $ASFIFO_BASE "FULL"] \
 ]
 set MOD "$MOD $ENTITY_BASE/dma_fifo_2to1_ent.vhd"

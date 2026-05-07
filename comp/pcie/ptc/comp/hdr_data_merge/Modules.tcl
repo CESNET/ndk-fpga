@@ -16,10 +16,10 @@ set MVB_SHAKEDOWN_BASE "$OFM_PATH/comp/mvb_tools/flow/shakedown"
 # Packages
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/math_pack.vhd"
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/type_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 
 # Components
 set COMPONENTS [concat $COMPONENTS [list \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
    [list "GEN_MUX"        $GEN_MUX_BASE       "FULL" ] \
    [list "SUM_ONE"        $SUM_ONE_BASE       "FULL" ] \
    [list "DEC1FN2B"       $DEC_BASE           "FULL" ] \

@@ -12,9 +12,9 @@ set AXIS_STORAGE_BASE   "$OFM_PATH/comp/axis_tools/storage"
 # Packages
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
 lappend PACKAGES "$PKG_BASE/type_pack.vhd"
-lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # Components
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "MFB_FIFOX"           "$MFB_STORAGE_BASE/fifox"          "FULL" ]
 lappend COMPONENTS [ list "AXIS_FIFO"           "$AXIS_STORAGE_BASE/fifo"          "FULL" ]
 lappend COMPONENTS [ list "PPW_INSTR_GEN"       "$ENTITY_BASE/comp/instr_gen"      "FULL" ]

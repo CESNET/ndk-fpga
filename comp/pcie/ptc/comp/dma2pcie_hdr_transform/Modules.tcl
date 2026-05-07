@@ -8,9 +8,9 @@ set PKG_BASE            "$OFM_PATH/comp/base/pkg"
 
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
 lappend PACKAGES "$PKG_BASE/type_pack.vhd"
-lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # list of sub-components
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "PCIE_HDR_GEN"         "$OFM_PATH/comp/pcie/others/hdr_gen"            "FULL" ]
 
 # entity and architecture
