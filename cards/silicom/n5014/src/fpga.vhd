@@ -2441,7 +2441,7 @@ begin
 
     -- HBM reset
     hbm_rst_req <= (others => '0'); -- not rst request
-    hbm_wmcrst_n <= hbm_rst_req;
+    hbm_wmcrst_n <= not hbm_rst_req;
     hbm_core_clk_locked <= (others => (not common_misc_out(3)));
 
     -- HBM TOP
