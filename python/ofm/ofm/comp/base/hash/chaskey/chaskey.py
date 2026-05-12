@@ -7,6 +7,7 @@
 # https://gitlab.com/fwojcik/smhasher3/-/blob/main/hashes/chaskey.cpp
 
 from copy import copy
+from typing import Union
 
 
 class Chaskey:
@@ -99,6 +100,7 @@ class Chaskey:
 
                 msg = msg[16:]
 
+        lastblock: Union[bytes, bytearray]
         if msglen > 0 and remain == 0:
             lastkey   = k1
             lastblock = msg
