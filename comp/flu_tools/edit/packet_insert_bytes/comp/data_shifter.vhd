@@ -15,7 +15,7 @@ use IEEE.std_logic_unsigned.all;
 
 use work.math_pack.all;
 
-entity DATA_SHIFTER is
+entity FLU_PIB_DATA_SHIFTER is
    generic(
       DATA_WIDTH  : integer := 512;
       --! enable mem
@@ -37,7 +37,7 @@ entity DATA_SHIFTER is
 );
 end entity;
 
-architecture full of DATA_SHIFTER is
+architecture full of FLU_PIB_DATA_SHIFTER is
    signal mem_out       : std_logic_vector(31 downto 0);
    signal pipe_DATA_IN  : std_logic_vector(DATA_WIDTH-1 downto 0);
    signal pipe_MUX_SELS : std_logic_vector(MUX_SELS'length-1 downto 0);

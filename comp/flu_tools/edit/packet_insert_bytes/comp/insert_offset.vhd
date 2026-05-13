@@ -417,7 +417,7 @@ begin
    editor_pause         <= TX_DST_RDY;
    editor_in_vld        <= src_rdy_editor;
    editor_data_in       <= data_in_editor;
-   OFFSET_CONTROL_inst : entity work.OFFSET_CONTROL
+   OFFSET_CONTROL_inst : entity work.FLU_PIB_OFFSET_CONTROL
    generic map (
       DATA_WIDTH        => DATA_WIDTH,
       OFFSET_WIDTH      => OFFSET_WIDTH
