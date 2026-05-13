@@ -140,7 +140,6 @@ begin
         next_state          <= state;
         word_cnt_d          <= word_cnt_q;
         AMM_READY           <= '1';
-        DDR_S_AXI_RREADY    <= '0';
         DDR_S_AXI_WVALID    <= '0';
         DDR_S_AXI_ARVALID   <= '0';
         DDR_S_AXI_AWVALID   <= '0';
