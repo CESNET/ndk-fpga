@@ -26,9 +26,15 @@ entity RAND_GENERATOR is
 end RAND_GENERATOR;
 
 architecture full of RAND_GENERATOR is
+   function init_seed return std_logic_vector is
+      variable v : std_logic_vector(DATA_WIDTH-1 downto 0) := (others => '0');
+   begin
+      v(v'high) := '1';
+      return v;
+   end function;
 begin
    gen_rand_value: process(CLK)
-      variable rand_temp : std_logic_vector(DATA_WIDTH-1 downto 0):=(DATA_WIDTH-1 => '1',others => '0');
+      variable rand_temp : std_logic_vector(DATA_WIDTH-1 downto 0) := init_seed;
       variable temp      : std_logic := '0';
    begin
       --! generating random value

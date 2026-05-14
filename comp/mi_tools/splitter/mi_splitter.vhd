@@ -94,8 +94,11 @@ architecture MI_SPLITTER_ARCH of MI_SPLITTER is
     end function;
 
     function addr_mask return std_logic_vector is
-        variable a_mask : std_logic_vector(ADDR_WIDTH+log2(ITEMS)-1 downto 0) := (ADDR_WIDTH+log2(ITEMS)-1 downto ADDR_WIDTH => '1', others => '0');
+        variable a_mask : std_logic_vector(ADDR_WIDTH+log2(ITEMS)-1 downto 0) := (others => '0');
     begin
+        for i in ADDR_WIDTH to ADDR_WIDTH+log2(ITEMS)-1 loop
+            a_mask(i) := '1';
+        end loop;
         return a_mask;
     end function;
 
