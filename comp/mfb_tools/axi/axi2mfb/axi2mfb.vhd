@@ -172,32 +172,31 @@ begin
     -----------------------------------------------------------------------------
     -- input stage (s0 => s1)
     -----------------------------------------------------------------------------
-    input_pipe_i : entity  work.AXI_PIPE
+    input_pipe_i : entity  work.AXIS_PIPE
     generic map (
-        AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
-        AXI_USER_WIDTH  => AXI_USER_WIDTH,
+        TDATA_WIDTH     => AXI_DATA_WIDTH,
+        TUSER_WIDTH     => AXI_USER_WIDTH,
         FAKE_PIPE       => not USE_IN_PIPE,
-        USE_DST_RDY     => true,
         PIPE_TYPE       => PIPE_TYPE,
         DEVICE          => DEVICE
     )
     port map (
-        CLK           => CLK,
-        RESET         => RST,
+        CLK             => CLK,
+        RESET           => RST,
 
-        RX_AXI_TDATA   => RX_AXI_TDATA,
-        RX_AXI_TUSER   => RX_AXI_TUSER,
-        RX_AXI_TKEEP   => RX_AXI_TKEEP,
-        RX_AXI_TLAST   => RX_AXI_TLAST,
-        RX_AXI_TVALID  => RX_AXI_TVALID,
-        RX_AXI_TREADY  => RX_AXI_TREADY,
+        RX_AXIS_TDATA   => RX_AXI_TDATA,
+        RX_AXIS_TUSER   => RX_AXI_TUSER,
+        RX_AXIS_TKEEP   => RX_AXI_TKEEP,
+        RX_AXIS_TLAST   => RX_AXI_TLAST,
+        RX_AXIS_TVALID  => RX_AXI_TVALID,
+        RX_AXIS_TREADY  => RX_AXI_TREADY,
 
-        TX_AXI_TDATA   => axi_tdata_s1,
-        TX_AXI_TUSER   => axi_tuser_s1,
-        TX_AXI_TKEEP   => axi_tkeep_s1,
-        TX_AXI_TLAST   => axi_tlast_s1,
-        TX_AXI_TVALID  => src_rdy_s1,
-        TX_AXI_TREADY  => dst_rdy_s1
+        TX_AXIS_TDATA   => axi_tdata_s1,
+        TX_AXIS_TUSER   => axi_tuser_s1,
+        TX_AXIS_TKEEP   => axi_tkeep_s1,
+        TX_AXIS_TLAST   => axi_tlast_s1,
+        TX_AXIS_TVALID  => src_rdy_s1,
+        TX_AXIS_TREADY  => dst_rdy_s1
     );
 
     -----------------------------------------------------------------------------
