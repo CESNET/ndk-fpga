@@ -74,6 +74,7 @@ program TEST (
 
         $write("\n\n############ TEST CASE 1 ############\n\n");
         enableTestEnvironment();
+        resetDesign();
         generator.setEnabled(TRANSACTION_COUNT);
         wait(!generator.enabled);
         disableTestEnvironment();
@@ -88,7 +89,6 @@ program TEST (
 
     initial begin
         bit status;
-        resetDesign();
         createGeneratorEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
         createEnvironment();
         test1(status);
