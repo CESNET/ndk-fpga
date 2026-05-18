@@ -18,7 +18,8 @@ cleanBuilds()
 // FORMAT:
 //  [ 'name'             , 'path_to_ver'                                      , 'fdo_file.fdo'       , 'test_pkg.sv/.vhd'   , 'settings.py'           ]
 def COMPONENTS_MULTIVER = [\
-    ['ASFIFO UVM'  , 'comp/axis_tools/storage/asfifox/uvm/'   , 'top_level.fdo', 'tbench/generic.sv'  , 'ver_settings.py' ],\
+    ['ASFIFO UVM'       , 'comp/axis_tools/storage/asfifox/uvm/'   , 'top_level.fdo', 'tbench/generic.sv'  , 'ver_settings.py' ],\
+    ['VECTOR2PACKET UVM', 'comp/axis_tools/flow/vector2packet/uvm/', 'top_level.fdo', 'tbench/generic.sv'  , 'ver_settings.py' ],\
 ]
 // /////////////////////////////////////////////////////////////////////////////
 
