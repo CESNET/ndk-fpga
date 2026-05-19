@@ -6,12 +6,13 @@
 
 # Set paths
 
-set SV_COMP_BASE   "$ENTITY_BASE/../../"
+set AXIS_PIPE_BASE   "$OFM_PATH/comp/axis_tools/flow/pipe"
+set MFB_PIPE_BASE    "$OFM_PATH/comp/mfb_tools/flow/pipe"
 
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 
-lappend COMPONENTS [list "AXI_PIPE" $SV_COMP_BASE/axi/axi_pipe "FULL" ]
-lappend COMPONENTS [list "MFB_PIPE" $SV_COMP_BASE/flow/pipe "FULL" ]
+lappend COMPONENTS [list "AXIS_PIPE" $AXIS_PIPE_BASE "FULL" ]
+lappend COMPONENTS [list "MFB_PIPE"  $MFB_PIPE_BASE  "FULL" ]
 
 # Source files for implemented component
 lappend MOD "$ENTITY_BASE/mfb2axi.vhd"

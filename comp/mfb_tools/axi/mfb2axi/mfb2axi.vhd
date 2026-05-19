@@ -915,29 +915,29 @@ begin
     -----------------------------------------------------------------------------
     -- output stage
     -----------------------------------------------------------------------------
-    output_pipe_i : entity  work.AXI_PIPE
+    output_pipe_i : entity  work.AXIS_PIPE
     generic map (
-        AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
+        TDATA_WIDTH     => AXI_DATA_WIDTH,
+        TUSER_WIDTH     => 0,
         FAKE_PIPE       => not USE_OUT_PIPE,
-        USE_DST_RDY     => true,
         PIPE_TYPE       => PIPE_TYPE,
         DEVICE          => DEVICE
     )
     port map (
-        CLK           => CLK,
-        RESET         => RST,
+        CLK             => CLK,
+        RESET           => RST,
 
-        RX_AXI_TDATA   => axi_tdata_out,
-        RX_AXI_TKEEP   => axi_tkeep_out,
-        RX_AXI_TLAST   => axi_tlast_out,
-        RX_AXI_TVALID  => tvalid_out,
-        RX_AXI_TREADY  => tready_out,
+        RX_AXIS_TDATA   => axi_tdata_out,
+        RX_AXIS_TKEEP   => axi_tkeep_out,
+        RX_AXIS_TLAST   => axi_tlast_out,
+        RX_AXIS_TVALID  => tvalid_out,
+        RX_AXIS_TREADY  => tready_out,
 
-        TX_AXI_TDATA   => TX_AXI_TDATA,
-        TX_AXI_TKEEP   => TX_AXI_TKEEP,
-        TX_AXI_TLAST   => TX_AXI_TLAST,
-        TX_AXI_TVALID  => TX_AXI_TVALID,
-        TX_AXI_TREADY  => TX_AXI_TREADY
+        TX_AXIS_TDATA   => TX_AXI_TDATA,
+        TX_AXIS_TKEEP   => TX_AXI_TKEEP,
+        TX_AXIS_TLAST   => TX_AXI_TLAST,
+        TX_AXIS_TVALID  => TX_AXI_TVALID,
+        TX_AXIS_TREADY  => TX_AXI_TREADY
     );
 
 end architecture;

@@ -1,6 +1,6 @@
 # Modules.tcl: Components include script
-# Copyright (C) 2024 DynaNIC Semiconductors, Ltd.
-# Author(s): Radek Hajek <hajek@dyna-nic.com>
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author(s): Vlastimil Kosar <kosar@dyna-nic.com>, 2025
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -10,4 +10,4 @@ lappend COMPONENTS [list "PIPE"    $PIPE_BASE     "FULL"]
 
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 
-lappend MOD "$ENTITY_BASE/axi_pipe.vhd"
+lappend MOD "$ENTITY_BASE/axis_pipe.vhd"
