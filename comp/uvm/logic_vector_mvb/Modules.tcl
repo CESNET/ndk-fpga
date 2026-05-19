@@ -9,3 +9,5 @@ lappend COMPONENTS [list "LOGIC_VECTOR"    "$OFM_PATH/comp/uvm/logic_vector"   "
 lappend COMPONENTS [list "MVB"             "$OFM_PATH/comp/uvm/mvb"            "FULL"]
 
 lappend MOD "$ENTITY_BASE/pkg.sv"
+lappend MOD "$ENTITY_BASE/probe.sv"
+
