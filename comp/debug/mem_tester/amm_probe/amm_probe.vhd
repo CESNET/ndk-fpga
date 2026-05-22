@@ -105,7 +105,7 @@ generic (
     -- Number of used MI addr LSB bits
     MI_ADDR_USED_BITS       : integer := MI_ADDR_WIDTH;
     HISTOGRAM_BOXES         : integer := 512;
-    DEVICE                  : string
+    DEVICE                  : string := "AGILEX"
 );
 port(
     -- ================

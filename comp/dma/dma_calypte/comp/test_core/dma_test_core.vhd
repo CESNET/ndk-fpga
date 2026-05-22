@@ -34,7 +34,7 @@ entity DMA_TEST_CORE is
         LATENCY_METER_EN   : boolean := TRUE;
         TX_DMA_DBG_CORE_EN : boolean := TRUE;
 
-        ST_SP_DBG_SIGNAL_W : natural := 2;
+        ST_SP_DBG_SIGNAL_W : natural := 4;
         -- Width of MI bus
         MI_WIDTH           : natural := 32
     );

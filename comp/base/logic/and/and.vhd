@@ -22,7 +22,7 @@ entity GEN_AND is
     generic (
         --! \brief Width of input signal, number of bits to AND.
         --! \details Must be greater than 0.
-        AND_WIDTH    : integer  -- and width (number of inputs)
+        AND_WIDTH    : integer := 1  -- and width (number of inputs)
     );
     port (
         --! Input data, vector of bits to AND.

@@ -28,7 +28,7 @@ entity TX_DMA_DEBUG_CORE is
         CHANNELS       : natural := 4;
 
         DBG_CNTRS_WIDTH    : natural := 64;
-        ST_SP_DBG_SIGNAL_W : natural := 2;
+        ST_SP_DBG_SIGNAL_W : natural := 4;
 
         -- Width of MI bus
         MI_WIDTH    : natural := 32;
