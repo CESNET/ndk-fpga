@@ -34,7 +34,7 @@ interface logic_vector_mvb_probe_if #(
         )
 
         protected uvm_logic_vector_mvb::env_rx#(REGIONS, DATA_WIDTH) m_mvb;
-        protected uvm_analysis_export#(uvm_logic_vector::sequence_item#(sv_dma_bus_pack::DMA_UPHDR_WIDTH)) analysis_export;
+        protected uvm_analysis_export#(uvm_logic_vector::sequence_item#(DATA_WIDTH)) analysis_export;
 
         function new(string name, uvm_component parent);
             super.new(name, parent);
@@ -51,7 +51,7 @@ interface logic_vector_mvb_probe_if #(
 
             analysis_export = new("analysis_export", this);
             uvm_config_db#(
-                uvm_analysis_export#(uvm_logic_vector::sequence_item#(sv_dma_bus_pack::DMA_UPHDR_WIDTH))
+                uvm_analysis_export#(uvm_logic_vector::sequence_item#(DATA_WIDTH))
             )::set(null, PATH, "dma_analysis_port", this.analysis_export);
         endfunction
 
