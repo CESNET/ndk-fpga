@@ -83,8 +83,10 @@ architecture FULL of MFB_CHECKSUM_L3 is
     signal cc_mvb_csum_raw_arr  : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal cc_mvb_csum_orig     : std_logic_vector(MFB_REGIONS*16-1 downto 0);
     signal cc_mvb_csum_orig_arr : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal cc_mvb_csum_orbe_arr : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal cc_mvb_csum_xarr     : u_array_t       (MFB_REGIONS-1 downto 0)(17-1 downto 0);
     signal cc_mvb_csum_arr      : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal cc_mvb_csum_le_arr   : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal cc_mvb_csum_same     : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal cc_mvb_csum_ok       : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal cc_mvb_csum_bypass   : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -124,7 +126,7 @@ begin
         RX_LENGTH       => RX_MFB_L3_LENGTH,
         RX_CHSUM_EN     => RX_MFB_L3_CSUM_EN,
 
-        TX_MVB_DATA     => cc_mvb_csum_raw,
+        TX_MVB_DATA     => cc_mvb_csum_raw, -- negated in big endian
         TX_MVB_META     => cc_mvb_csum_orig,
         TX_CHSUM_BYPASS => cc_mvb_csum_bypass,
         TX_MVB_VLD      => cc_mvb_vld,
@@ -136,16 +138,30 @@ begin
     cc_mvb_csum_orig_arr <= slv_array_deser(cc_mvb_csum_orig, MFB_REGIONS);
 
     csum_g : for ii in 0 to MFB_REGIONS-1 generate
-        -- Check if the calculated checksum is correct (zero)
+        -- The original checksum from the parser is in little-endian byte order
+        -- (as read from the MFB bus). The raw checksum from CHECKSUM_CALCULATOR
+        -- (NETWORK_ORDER=True) is in big-endian. Convert original to big-endian
+        -- so both operands use the same byte order.
+        cc_mvb_csum_orbe_arr(ii) <= cc_mvb_csum_orig_arr(ii)(7 downto 0) & cc_mvb_csum_orig_arr(ii)(15 downto 8);
+
+        -- Check if the calculated checksum is correct (raw sum == 0 means the
+        -- 1's complement sum of all 16-bit words including the checksum field
+        -- equals 0xFFFF, i.e. the checksum is valid).
         cc_mvb_csum_ok(ii) <= '1' when (unsigned(cc_mvb_csum_raw_arr(ii)) = 0) else '0';
 
-        -- The calculation assumes a zero checksum field,
-        -- so this value must be subtracted.
-        cc_mvb_csum_xarr(ii) <= resize(unsigned(cc_mvb_csum_raw_arr(ii)), 17) + unsigned(not cc_mvb_csum_orig_arr(ii));
+        -- Compute the new checksum:
+        --   raw = ~(sum_without_csum + old_csum)     -- negated sum over data including old checksum field
+        --   ~raw + ~old_csum = sum_without_csum      -- negate raw to recover the sum, then subtract old checksum
+        --   result = ~(sum_without_csum)             -- negate to get the final checksum
+        -- All operations in 1's complement big-endian with end-around carry.
+        cc_mvb_csum_xarr(ii) <= resize(unsigned(not cc_mvb_csum_raw_arr(ii)), 17) + unsigned(not cc_mvb_csum_orbe_arr(ii));
         cc_mvb_csum_arr(ii)  <= std_logic_vector(not (cc_mvb_csum_xarr(ii)(16-1 downto 0) + cc_mvb_csum_xarr(ii)(16)));
 
         -- DEBUG: Comparison of calculated and original checksum values.
-        cc_mvb_csum_same(ii) <= '1' when (cc_mvb_csum_arr(ii) = cc_mvb_csum_orig_arr(ii)) else '0';
+        cc_mvb_csum_same(ii) <= '1' when (cc_mvb_csum_arr(ii) = cc_mvb_csum_orbe_arr(ii)) else '0';
+
+        -- Convert result back to little-endian for output.
+        cc_mvb_csum_le_arr(ii) <= cc_mvb_csum_arr(ii)(7 downto 0) & cc_mvb_csum_arr(ii)(15 downto 8);
     end generate;
 
     cc_mvb_dst_rdy <= TX_MVB_DST_RDY;
@@ -154,7 +170,7 @@ begin
     begin
         if rising_edge(CLK) then
             if (TX_MVB_DST_RDY = '1') then
-                TX_MVB_CSUM    <= slv_array_ser(cc_mvb_csum_arr);
+                TX_MVB_CSUM    <= slv_array_ser(cc_mvb_csum_le_arr);
                 TX_MVB_CSUM_OK <= cc_mvb_csum_ok;
                 TX_MVB_CSUM_EN <= not cc_mvb_csum_bypass;
                 TX_MVB_VLD     <= cc_mvb_vld;
