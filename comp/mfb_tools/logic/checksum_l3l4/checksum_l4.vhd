@@ -130,12 +130,14 @@ architecture FULL of MFB_CHECKSUM_L4 is
     signal mrg_mvb_ph_csum_arr    : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_raw_arr   : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_orig_arr  : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal mrg_mvb_csum_orbe_arr  : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_xraw_arr  : u_array_t       (MFB_REGIONS-1 downto 0)(17-1 downto 0);
     signal mrg_mvb_csum_fraw_arr  : u_array_t       (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_xarr      : u_array_t       (MFB_REGIONS-1 downto 0)(18-1 downto 0);
     signal mrg_mvb_csum_farr      : u_array_t       (MFB_REGIONS-1 downto 0)(17-1 downto 0);
     signal mrg_mvb_csum_zarr      : u_array_t       (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_arr       : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal mrg_mvb_csum_le_arr    : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_same      : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal mrg_mvb_csum_ok        : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal mrg_mvb_csum_bypass    : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -271,7 +273,7 @@ begin
         RX_LENGTH       => RX_MFB_L4_LENGTH,
         RX_CHSUM_EN     => RX_MFB_L4_CSUM_EN,
 
-        TX_MVB_DATA     => cc_mvb_csum_raw,
+        TX_MVB_DATA     => cc_mvb_csum_raw, -- negated in big endian
         TX_MVB_META     => cc_mvb_csum_orig,
         TX_CHSUM_BYPASS => cc_mvb_csum_bypass,
         TX_MVB_VLD      => cc_mvb_vld,
@@ -339,25 +341,46 @@ begin
     --------------------------------------------------------------------
 
     csum_g : for ii in 0 to MFB_REGIONS-1 generate
-        -- Calculate the intermediate checksum value by adding the pseudoheader checksum and the raw L4 checksum.
-        mrg_mvb_csum_xraw_arr(ii) <= resize(unsigned(mrg_mvb_csum_raw_arr(ii)), 17) + unsigned(mrg_mvb_ph_csum_arr(ii));
-        -- Fold carry (end-around) and take 1's complement to get the full RAW checksum value for check validity.
-        mrg_mvb_csum_fraw_arr(ii) <= (mrg_mvb_csum_xraw_arr(ii)(16-1 downto 0) + mrg_mvb_csum_xraw_arr(ii)(16));
-        -- Check if the calculated checksum is correct (zero) using full RAW checksum value.
-        mrg_mvb_csum_ok(ii)       <= '1' when (unsigned(mrg_mvb_csum_fraw_arr(ii)) = X"FFFF") else '0';
+        -- The original checksum from the parser is in little-endian byte order.
+        -- The raw checksum (CHECKSUM_CALCULATOR with NETWORK_ORDER=True) and the
+        -- pseudoheader checksum are both in big-endian. Convert original to
+        -- big-endian so all operands use the same byte order.
+        mrg_mvb_csum_orbe_arr(ii) <= mrg_mvb_csum_orig_arr(ii)(7 downto 0) & mrg_mvb_csum_orig_arr(ii)(15 downto 8);
 
-        -- Calculate the checksum value by adding the pseudoheader checksum,
-        -- the raw L4 checksum, and the negated original checksum value.
-        mrg_mvb_csum_xarr(ii) <= resize(mrg_mvb_csum_xraw_arr(ii), 18) + unsigned(not mrg_mvb_csum_orig_arr(ii));
-        -- Fold carry (end-around) and take 1's complement to get the almost final checksum value.
+        -- Step 1: Add raw L4 checksum and pseudoheader checksum.
+        --   raw = ~(sum_l4_data + old_csum)    -- negated sum over L4 data including old checksum field
+        --   ph   = ~(sum_pseudoheader)         -- negated sum over pseudoheader (IPs, proto, length)
+        mrg_mvb_csum_xraw_arr(ii) <= resize(unsigned(mrg_mvb_csum_raw_arr(ii)), 17) + unsigned(mrg_mvb_ph_csum_arr(ii));
+
+        -- Step 2: End-around carry on the 17-bit sum, producing a 16-bit value.
+        --   fraw = xraw[15:0] + xraw[16]       -- fold carry back
+        mrg_mvb_csum_fraw_arr(ii) <= (mrg_mvb_csum_xraw_arr(ii)(16-1 downto 0) + mrg_mvb_csum_xraw_arr(ii)(16));
+
+        -- Check validity: for a correct packet, fraw == 0xFFFF (all ones).
+        mrg_mvb_csum_ok(ii) <= '1' when (unsigned(mrg_mvb_csum_fraw_arr(ii)) = X"FFFF") else '0';
+
+        -- Step 3: Compute the new checksum.
+        --   ~fraw + ~old_csum                  -- negate fraw to recover the sum, subtract old checksum
+        --   = ~(~(sum_l4 + sum_ph + old_csum)) + ~old_csum
+        --   = sum_l4 + sum_ph                  -- old_csum cancels out
+        --   result = ~(sum_l4 + sum_ph)        -- final negate gives the new checksum
+        -- Uses fraw (16-bit, already folded) so the 1's complement negation is correct.
+        mrg_mvb_csum_xarr(ii) <= resize(unsigned(not mrg_mvb_csum_fraw_arr(ii)), 18) + unsigned(not mrg_mvb_csum_orbe_arr(ii));
+
+        -- Step 4: End-around carry on the 18-bit sum.
         mrg_mvb_csum_farr(ii) <= resize(mrg_mvb_csum_xarr(ii)(16-1 downto 0), 17) + mrg_mvb_csum_xarr(ii)(17 downto 16);
-        -- Fold carry again if needed and take 1's complement and negate to get the final checksum value.
+
+        -- Step 5: Final end-around carry and 1's complement negation.
         mrg_mvb_csum_zarr(ii) <= not (mrg_mvb_csum_farr(ii)(16-1 downto 0) + mrg_mvb_csum_farr(ii)(16));
-        -- Convert csum from +0 value to -0 value.
+
+        -- Step 6: Convert +0 (0x0000) to -0 (0xFFFF) per RFC 1071.
         mrg_mvb_csum_arr(ii)  <= X"FFFF" when (mrg_mvb_csum_zarr(ii) = 0) else std_logic_vector(mrg_mvb_csum_zarr(ii));
 
+        -- Convert result back to little-endian for output.
+        mrg_mvb_csum_le_arr(ii) <= mrg_mvb_csum_arr(ii)(7 downto 0) & mrg_mvb_csum_arr(ii)(15 downto 8);
+
         -- DEBUG: Comparison of calculated and original checksum values.
-        mrg_mvb_csum_same(ii) <= '1' when (mrg_mvb_csum_arr(ii) = mrg_mvb_csum_orig_arr(ii)) else '0';
+        mrg_mvb_csum_same(ii) <= '1' when (mrg_mvb_csum_arr(ii) = mrg_mvb_csum_orbe_arr(ii)) else '0';
     end generate;
 
     mrg_mvb_dst_rdy <= TX_MVB_DST_RDY;
@@ -366,7 +389,7 @@ begin
     begin
         if rising_edge(CLK) then
             if (TX_MVB_DST_RDY = '1') then
-                TX_MVB_CSUM    <= slv_array_ser(mrg_mvb_csum_arr);
+                TX_MVB_CSUM    <= slv_array_ser(mrg_mvb_csum_le_arr);
                 TX_MVB_CSUM_OK <= mrg_mvb_csum_ok;
                 TX_MVB_CSUM_EN <= not mrg_mvb_csum_bypass;
                 TX_MVB_VLD     <= mrg_mvb_vld;
