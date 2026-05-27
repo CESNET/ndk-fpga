@@ -22,10 +22,11 @@ package test_pkg;
    parameter BLOCK_SIZE   = 8;
    parameter ITEM_WIDTH   = 8;
    parameter CUTTED_ITEMS = 27;
+   parameter MAX_CUT_OFFSET = 64;
 
    parameter FRAME_SIZE_MAX = 512;
-   parameter FRAME_SIZE_MIN = 64+27;
-   parameter TRANSACTION_COUNT = 10000;
+   parameter FRAME_SIZE_MIN = 64+CUTTED_ITEMS+MAX_CUT_OFFSET;
+   parameter TRANSACTION_COUNT = 100000;
 
    parameter CLK_PERIOD = 10ns;
    parameter RESET_TIME = 10*CLK_PERIOD;

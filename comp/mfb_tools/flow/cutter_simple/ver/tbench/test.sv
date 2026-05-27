@@ -24,12 +24,13 @@ program TEST (
    iMfbTx.tb      TX,
    iMfbTx.monitor TX_MONITOR
 );
+   localparam int CUT_OFFSET_WIDTH = ($clog2(MAX_CUT_OFFSET) > 1) ? $clog2(MAX_CUT_OFFSET) : 1;
 
-   MfbTransaction #(ITEM_WIDTH,1) blueprint;
+   MfbTransaction #(ITEM_WIDTH,CUT_OFFSET_WIDTH+1) blueprint;
    Generator    generator;
-   MfbDriver    #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,0,1) mfb_driver;
-   MfbResponder #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) mfb_responder;
-   MfbMonitor   #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) mfb_monitor;
+   MfbDriver    #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,0,CUT_OFFSET_WIDTH+1) mfb_driver;
+   MfbResponder #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,CUT_OFFSET_WIDTH+1) mfb_responder;
+   MfbMonitor   #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,CUT_OFFSET_WIDTH+1) mfb_monitor;
    Scoreboard   scoreboard;
 
    task createGeneratorEnvironment(int packet_size_max, int packet_size_min);
