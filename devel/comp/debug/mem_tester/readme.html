@@ -268,7 +268,7 @@ For alowed values se LFSR_SIMPLE_RANDOM_GEN (4, 8, 16, 20, 24, 26, 32, 64)</p></
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mem_tester-random_data_seed"><td><p>RANDOM_DATA_SEED</p></td>
 <td><p>slv_array_t(0 to AMM_DATA_WIDTH / RAND_GEN_DATA_WIDTH - 1)(RAND_GEN_DATA_WIDTH - 1 downto 0)</p></td>
-<td><p>UNDEFINED</p></td>
+<td><p>(others =&gt; (others =&gt; ‘0’))</p></td>
 <td><p>Random data generator seed</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mem_tester-"><td><p></p></td>
@@ -324,7 +324,7 @@ Shoud be power of 2</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mem_tester-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
-<td><p>UNDEFINED</p></td>
+<td><p>“AGILEX”</p></td>
 <td></td>
 </tr>
 </tbody>
