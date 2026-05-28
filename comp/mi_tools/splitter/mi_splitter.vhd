@@ -87,15 +87,18 @@ architecture MI_SPLITTER_ARCH of MI_SPLITTER is
         variable a_base : slv_array_t(ITEMS-1 downto 0)((ADDR_WIDTH+log2(ITEMS))-1 downto 0) := (others => (others => '0'));
     begin
         for i in 0 to ITEMS-1 loop
-            a_base(i) := std_logic_vector(to_unsigned(i*2**ADDR_WIDTH,ADDR_WIDTH+log2(ITEMS)));
+            a_base(i) := std_logic_vector(shift_left(to_unsigned(i, ADDR_WIDTH+log2(ITEMS)), ADDR_WIDTH));
         end loop;
 
         return a_base;
     end function;
 
     function addr_mask return std_logic_vector is
-        variable a_mask : std_logic_vector(ADDR_WIDTH+log2(ITEMS)-1 downto 0) := (ADDR_WIDTH+log2(ITEMS)-1 downto ADDR_WIDTH => '1', others => '0');
+        variable a_mask : std_logic_vector(ADDR_WIDTH+log2(ITEMS)-1 downto 0) := (others => '0');
     begin
+        for i in ADDR_WIDTH to ADDR_WIDTH+log2(ITEMS)-1 loop
+            a_mask(i) := '1';
+        end loop;
         return a_mask;
     end function;
 

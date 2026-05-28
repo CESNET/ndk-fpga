@@ -72,8 +72,7 @@ begin
         RESET       => reset_d,
         A           => a_d,
         B           => b_d,
-        CE_IN       => ce_in_d,
-        CE_OUT      => ce_out_d,
+        CE          => ce_in_d,
         P           => p_d
     );
 

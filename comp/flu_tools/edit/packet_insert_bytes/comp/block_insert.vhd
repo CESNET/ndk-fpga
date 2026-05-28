@@ -350,7 +350,7 @@ begin
    mux_offs_end_out_pipe <= mux_offs_end_out;
 
    -- insert block with muliplexers array
-   DATA_SHIFTER_inst: entity work.DATA_SHIFTER
+   DATA_SHIFTER_inst: entity work.FLU_PIB_DATA_SHIFTER
    generic map(
       DATA_WIDTH  => DATA_WIDTH,
       MEM_EN      => true,

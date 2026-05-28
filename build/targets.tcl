@@ -91,7 +91,7 @@ proc target_makefile {filename} {
     }
     set NB_FILELIST [AddInputFiles SYNTH_FLAGS HIERARCHY $SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_EVAL_FILE) $SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_EVAL_COMP)]
 
-    set content ""
+    set content [list]
 
     foreach FILE $SYNTH_FLAGS(NB_GENERATED_FILES) {
         # Create full path as ApplyToMods do, because Makefile match exact path string
@@ -116,6 +116,54 @@ proc target_makefile {filename} {
         }
     }
     nb_file_update $filename $content
+}
+
+proc target_vhdl_ls_toml {} {
+    global SYNTH_FLAGS HIERARCHY NB_FLAGS OFM_PATH
+
+    # Sanitize TARGET_MAKEFILE_EXTRA items
+    lappend SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_INIT) DevTree_init
+    lappend SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_EVAL_FILE) EvalFileDevTree_paths
+    lappend SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_EVAL_COMP)
+    set NB_FLAGS(VERBOSITY) 0
+
+    foreach init_proc $SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_INIT) {
+        eval $init_proc
+    }
+    set NB_FILELIST [AddInputFiles SYNTH_FLAGS HIERARCHY $SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_EVAL_FILE) $SYNTH_FLAGS(TARGET_MAKEFILE_EXTRA_EVAL_COMP)]
+
+    exec cp $OFM_PATH/build/misc/vhdl_ls.template.toml $OFM_PATH/.vhdl_ls.toml
+
+    set content ""
+    lappend skip_types [list COMPONENT DEVTREE]
+    foreach FILE [lreverse $NB_FILELIST] {
+        array set opt [lassign $FILE FNAME]
+        set FNAME [string map [list [SimplPath "$OFM_PATH"] ""] $FNAME]
+        # Skip absolute path (the string map doesn't any work)
+        if {[string first "/" $FNAME] == 0} {
+            continue
+        }
+        set FEXT [file extension $FNAME]
+        if {$opt(TYPE) == "" && $FEXT ni [list ".psl" ".sv" ".qsys" ".v"]} {
+            append content "    \"$FNAME\",\\n"
+        }
+    }
+
+    if {[catch {exec dirname [exec which vivado]} VIVADO_PATH]} {
+        exec sed "/VIVADO_PATH/d" -i $OFM_PATH/.vhdl_ls.toml
+    } else {
+        exec sed -r -e "s=VIVADO_PATH=$VIVADO_PATH=" -i $OFM_PATH/.vhdl_ls.toml
+    }
+
+    if {[catch {exec dirname [exec which quartus]} QUARTUS_PATH]} {
+        exec sed "/QUARTUS_PATH/d" -i $OFM_PATH/.vhdl_ls.toml
+    } else {
+        exec sed -r -e "s=QUARTUS_PATH=$QUARTUS_PATH=" -i $OFM_PATH/.vhdl_ls.toml
+    }
+
+    exec sed -r -e "s=    # NDK_FPGA_SOURCES=$content=" -i $OFM_PATH/.vhdl_ls.toml
+
+    exec mv $OFM_PATH/.vhdl_ls.toml $OFM_PATH/vhdl_ls.toml
 }
 
 proc target_generate_file {filename} {

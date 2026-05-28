@@ -76,7 +76,7 @@ generic (
     DEFAULT_BURST_CNT       : integer := 4;
     DEFAULT_ADDR_LIMIT      : integer;
     DEF_REFR_PERIOD         : std_logic_vector(REFR_PERIOD_WIDTH - 1 downto 0);
-    DEVICE                  : string
+    DEVICE                  : string := "AGILEX"
 );
 port(
     -- ==========================

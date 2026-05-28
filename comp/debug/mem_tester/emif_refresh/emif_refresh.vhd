@@ -33,7 +33,7 @@ generic (
     RANK_CNT                : integer := 4;
     REFRESH_REG_ADDR        : integer := 44;
     ACK_REG_ADDR            : integer := 50;
-    DEVICE                  : string
+    DEVICE                  : string := "AGILEX"
 );
 port(
     -- Main --

@@ -28,7 +28,7 @@ entity TX_DMA_DEBUG_CORE is
         CHANNELS       : natural := 4;
 
         DBG_CNTRS_WIDTH    : natural := 64;
-        ST_SP_DBG_SIGNAL_W : natural := 2;
+        ST_SP_DBG_SIGNAL_W : natural := 4;
 
         -- Width of MI bus
         MI_WIDTH    : natural := 32;
@@ -709,8 +709,8 @@ begin
             -- Reset registers by writing 0
             -- Sample registers from counters by writing 1
             -- Reset and sample old value at the same time by writing 2
-            with unsigned(mi_split_dwr_reg) select reg_di (i)(0) <=
-                (others => '0') when to_unsigned(0, MI_WIDTH),
+            with to_integer(unsigned(mi_split_dwr_reg)) select reg_di (i)(0) <=
+                (others => '0') when 0,
                 cntr_do(i) when others;
 
             -- reading is performed one clock cycle earlier than the writing

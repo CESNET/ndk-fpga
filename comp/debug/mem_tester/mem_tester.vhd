@@ -33,7 +33,7 @@ generic (
     RAND_GEN_ADDR_WIDTH     : integer := 26;
 
     -- Random data generator seed
-    RANDOM_DATA_SEED        : slv_array_t(0 to AMM_DATA_WIDTH / RAND_GEN_DATA_WIDTH - 1)(RAND_GEN_DATA_WIDTH - 1 downto 0);
+    RANDOM_DATA_SEED        : slv_array_t(0 to AMM_DATA_WIDTH / RAND_GEN_DATA_WIDTH - 1)(RAND_GEN_DATA_WIDTH - 1 downto 0) := (others => (others => '0'));
     --RANDOM_ADDR_SEED        : std_logic_vector(RAND_GEN_ADDR_WIDTH - 1 downto 0) := std_logic_vector(resize(to_unsigned(66844679, 32), RAND_GEN_ADDR_WIDTH));
     RANDOM_ADDR_SEED        : std_logic_vector(RAND_GEN_ADDR_WIDTH - 1 downto 0) := resize(X"3FBF807", RAND_GEN_ADDR_WIDTH);
 
@@ -54,7 +54,7 @@ generic (
     DEFAULT_ADDR_LIMIT      : integer := 2**AMM_ADDR_WIDTH - 2 ** AMM_BURST_COUNT_WIDTH;
     -- Force random address generator to generate in range 0 to DEFAULT_ADDR_LIMIT (for simulation)
     DEBUG_RAND_ADDR         : boolean := false;
-    DEVICE                  : string
+    DEVICE                  : string := "AGILEX"
 );
 port(
     -- =======================================================================

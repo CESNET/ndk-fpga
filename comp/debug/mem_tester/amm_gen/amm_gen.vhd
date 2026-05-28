@@ -50,7 +50,7 @@ generic (
     -- Others --
     MI_ADDR_BASE            : std_logic_vector(MI_ADDR_WIDTH - 1 downto 0) := (others => '0');
     MI_ADDR_USED_BITS       : integer := MI_ADDR_WIDTH;     -- Number of used MI addr LSB bits
-    DEVICE                  : string
+    DEVICE                  : string := "AGILEX"
 );
 port(
     -- Main --

@@ -1,0 +1,50 @@
+[libraries.ieee2008]
+files = [
+    "VIVADO_PATH/../data/vhdl/2008/IEEE/std_logic_1164.vhdl",
+    "VIVADO_PATH/../data/vhdl/2008/IEEE/numeric_std.vhdl",
+]
+is_third_party = true
+
+[libraries.unisim]
+files = [
+    "VIVADO_PATH/../data/vhdl/src/unisims/unisim_VCOMP.vhd",
+    "VIVADO_PATH/../data/vhdl/src/unisims/unisim_retarget_VCOMP.vhd"
+]
+is_third_party = true
+
+[libraries.unimacro]
+files = [
+    "VIVADO_PATH/../data/vhdl/src/unimacro/unimacro_VCOMP.vhd",
+]
+is_third_party = true
+
+[libraries.xpm]
+files = [
+    "VIVADO_PATH/../data/ip/xpm/xpm_VCOMP.vhd",
+]
+is_third_party = true
+
+
+[libraries.tennm]
+files = [
+    "QUARTUS_PATH/../libraries/vhdl/tennm/tennm_components.vhd",
+]
+is_third_party = true
+
+[libraries.fourteennm]
+files = [
+    "QUARTUS_PATH/../libraries/vhdl/fourteennm/fourteennm_components.vhd",
+]
+is_third_party = true
+
+[libraries.ndk]
+files = [
+    # NDK_FPGA_SOURCES
+]
+
+[lint]
+unused = false
+unassociated = false
+unnecessary_work_library = false
+superfluous_in_sensitivity_list = false
+missing_in_sensitivity_list = false

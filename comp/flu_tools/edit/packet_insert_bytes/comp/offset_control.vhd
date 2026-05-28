@@ -15,7 +15,7 @@ use IEEE.std_logic_unsigned.all;
 
 use work.math_pack.all;
 
-entity OFFSET_CONTROL is
+entity FLU_PIB_OFFSET_CONTROL is
    generic(
       DATA_WIDTH 	         : integer := 512;
       -- offfset block - max 48 bits
@@ -43,7 +43,7 @@ entity OFFSET_CONTROL is
    );
 end entity;
 
-architecture full of OFFSET_CONTROL is
+architecture full of FLU_PIB_OFFSET_CONTROL is
 
    signal zeros               : std_logic_vector(63 downto 0);
 

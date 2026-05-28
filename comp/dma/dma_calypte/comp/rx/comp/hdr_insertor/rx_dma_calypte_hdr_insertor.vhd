@@ -319,10 +319,10 @@ begin
                         if (RX_MFB_EOF = '1') then
                             data_pcie_hdr_corr(A_RQ_HDR_DWORD_CNT) := std_logic_vector(resize(rx_mfb_eof_pos_u(rx_mfb_eof_pos_u'high-1 downto 2), A_RQ_HDR_DWORD_CNT_W) + 1);
 
-                            case trans_byte_length is
-                                when to_unsigned(1, trans_byte_length'length) => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0001";
-                                when to_unsigned(2, trans_byte_length'length) => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0011";
-                                when to_unsigned(3, trans_byte_length'length) => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0111";
+                            case to_integer(trans_byte_length) is
+                                when 1      => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0001";
+                                when 2      => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0011";
+                                when 3      => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0111";
                                 when others => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "1111";
                             end case;
 
@@ -576,10 +576,10 @@ begin
                         if (RX_MFB_EOF = '1') then
                             data_pcie_hdr_corr(A_RQ_HDR_DWORD_CNT) := std_logic_vector(resize(rx_mfb_eof_pos_u(rx_mfb_eof_pos_u'high downto 2), A_RQ_HDR_DWORD_CNT_W) + 1);
 
-                            case trans_byte_length is
-                                when to_unsigned(1, trans_byte_length'length) => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0001";
-                                when to_unsigned(2, trans_byte_length'length) => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0011";
-                                when to_unsigned(3, trans_byte_length'length) => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0111";
+                            case to_integer(trans_byte_length) is
+                                when 1      => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0001";
+                                when 2      => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0011";
+                                when 3      => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "0111";
                                 when others                                   => tx_mfb_meta_arr(0)(PCIE_RQ_META_FBE) <= "1111";
                             end case;
 
@@ -822,11 +822,11 @@ begin
                         if (RX_MFB_EOF = '1') then
                             data_pcie_hdr_corr(I_RQ_HDR_DW_CNT) := std_logic_vector(resize(rx_mfb_eof_pos_u(rx_mfb_eof_pos_u'high-1 downto 2), I_RQ_HDR_DW_CNT_W) + 1);
 
-                            case trans_byte_length is
-                                when to_unsigned(1, trans_byte_length'length) => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0001";
-                                when to_unsigned(2, trans_byte_length'length) => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0011";
-                                when to_unsigned(3, trans_byte_length'length) => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0111";
-                                when others                                   => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "1111";
+                            case to_integer(trans_byte_length) is
+                                when 1      => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0001";
+                                when 2      => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0011";
+                                when 3      => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0111";
+                                when others => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "1111";
                             end case;
 
                             if (trans_byte_length > 4) then
@@ -1060,11 +1060,11 @@ begin
                         if (RX_MFB_EOF = '1') then
                             data_pcie_hdr_corr(I_RQ_HDR_DW_CNT) := std_logic_vector(resize(rx_mfb_eof_pos_u(rx_mfb_eof_pos_u'high downto 2), I_RQ_HDR_DW_CNT_W) + 1);
 
-                            case trans_byte_length is
-                                when to_unsigned(1, trans_byte_length'length) => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0001";
-                                when to_unsigned(2, trans_byte_length'length) => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0011";
-                                when to_unsigned(3, trans_byte_length'length) => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0111";
-                                when others                                   => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "1111";
+                            case to_integer(trans_byte_length) is
+                                when 1      => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0001";
+                                when 2      => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0011";
+                                when 3      => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "0111";
+                                when others => data_pcie_hdr_corr(I_RQ_HDR_FBE) := "1111";
                             end case;
 
                             if (trans_byte_length > 4) then
