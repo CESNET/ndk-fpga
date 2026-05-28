@@ -45,8 +45,6 @@ class MFBMonitor(BusMonitor):
         self._os = [s for s in self._optional_signals if hasattr(self.bus, s)]
         self._os_widths = {s: len(getattr(self.bus, s)) // self._regions for s in self._os}
 
-        self._item_width = 8 # remove this line while/after reimplementing MFB driver!!!
-
         self._trans_type  = trans_type
         self._transaction = MfbTransaction() if self._trans_type is bytes else trans_type()
 
