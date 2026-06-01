@@ -13,121 +13,225 @@ library work;
 use work.math_pack.all;
 use work.type_pack.all;
 
--- ----------------------------------------------------------------------------
---                            Entity declaration
--- ----------------------------------------------------------------------------
-
--- MFB+MVB bus merger with generic number of inputs
+-- MFB+MVB bus merger with generic number of inputs.
+--
+-- This module merges multiple input MVB+MFB streams into a single output stream
+-- using a binary tree of 2:1 MFB_MERGER units. The number of inputs can be any
+-- positive integer (non-power-of-2 inputs are padded internally).
+--
+-- MVB and MFB Interface Usage
+-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-- The MVB interface carries header information (e.g., DMA descriptors) while
+-- the MFB interface carries the associated data payload. Each MVB header can
+-- be marked as having an associated payload frame using the ``RX_MVB_PAYLOAD``
+-- signal. When ``RX_MVB_PAYLOAD(i)(j) = '1'``, the j-th header on input i is
+-- associated with data on the MFB interface. The merger maintains this
+-- association throughout the merging process.
+--
+-- .. warning::
+--   Related MVB headers and their corresponding MFB data frames must arrive at
+--   each input in the same order they are expected to appear on the output. The
+--   merger pairs headers with payloads based on arrival order, not by content
+--   matching. Out-of-order arrival will result in incorrect header-payload pairing.
+--
+-- RX_MVB_PAYLOAD Signal Usage
+-- ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-- This signal indicates which MVB headers have associated data payload on MFB.
+--
+-- * When ``'1'``: The corresponding header has an associated data frame on MFB
+-- * When ``'0'``: The header is standalone (control-only, no data payload)
+--
+-- Each bit in ``RX_MVB_PAYLOAD(i)`` corresponds to one MVB header item on input i.
+--
+-- RX_PAYLOAD_EN Generic
+-- ^^^^^^^^^^^^^^^^^^^^^
+-- Controls whether the MFB data path is implemented for each input port.
+--
+-- * When ``true``: Full MVB+MFB merging with header-payload association
+-- * When ``false``: Only MVB headers are processed; MFB path is bypassed
+--
+-- Use ``false`` for inputs that only send control headers without data payload,
+-- reducing resource consumption by eliminating unnecessary MFB pipeline stages.
+--
+-- Features
+-- ^^^^^^^^
+-- * Configurable number of input streams (any positive integer)
+-- * Configurable MVB item count and MFB geometry
+-- * Optional mid-stage MFB FIFOs for buffering
+-- * Configurable input/output pipelining
+-- * Timeout-based stream switching
+-- * Metadata support on MFB interface
+--
 entity MFB_MERGER_GEN is
     generic (
-        -- number of merger inputs
+        -- =====================================================================
+        -- GENERAL PARAMETERS
+        -- =====================================================================
+
+        -- Number of merger input streams
+        -- Can be any positive integer (non-power-of-2 values are padded internally)
         MERGER_INPUTS   : integer := 2;
 
-        -- =============================
-        -- MVB characteristics
-        -- =============================
+        -- =====================================================================
+        -- MVB INTERFACE PARAMETERS
+        -- =====================================================================
 
-        -- number of headers
+        -- Number of MVB header items (parallel headers per cycle)
         MVB_ITEMS       : integer := 2;
-        -- width of header
+        -- Width of each MVB header item in bits
         MVB_ITEM_WIDTH  : integer := 32;
 
-        -- =============================
-        -- MFB characteristics
-        -- =============================
+        -- =====================================================================
+        -- MFB INTERFACE PARAMETERS
+        -- =====================================================================
 
-        -- number of regions in word
+        -- Number of MFB regions per word
         MFB_REGIONS     : integer := 2;
-        -- number of blocks in region
+        -- Number of blocks per region
         MFB_REG_SIZE    : integer := 1;
-        -- number of items in block
+        -- Number of items per block
         MFB_BLOCK_SIZE  : integer := 8;
-        -- width  of one item (in bits)
+        -- Width of one MFB item in bits
         MFB_ITEM_WIDTH  : integer := 32;
-        -- width of MFB metadata
+        -- Width of MFB metadata bus in bits
         MFB_META_WIDTH  : integer := 1;
 
-        -- =============================
-        -- Others
-        -- =============================
+        -- =====================================================================
+        -- GENERAL PARAMETERS
+        -- =====================================================================
 
-        -- Size of input MVB and MFB FIFOs (in words)
-        -- Minimum value is 2!
+        -- Depth of input MVB and MFB FIFOs in words
+        -- Minimum value is 2
         INPUT_FIFO_SIZE : integer := 8;
 
-        -- Data/Payload MFB interface required/active on individual input ports
-        -- Currently used only in SIMPLE architecture to optimize usage of input/output pipes
+        -- MFB data payload enable for each input port
+        -- RX_PAYLOAD_EN(i) = true: Full MVB+MFB operation on input i
+        -- RX_PAYLOAD_EN(i) = false: MVB headers only on input i (MFB path optimized away)
+        -- Use false for inputs that only carry control headers without data
         RX_PAYLOAD_EN   : b_array_t(MERGER_INPUTS-1 downto 0) := (others => true);
 
-        -- Width of timeout counter, determines the time when the switch to
-        -- the next active MVB/MFB stream occurs.
+        -- Width of stream switch timeout counter
+        -- Timeout = 2^SW_TIMEOUT_WIDTH cycles of inactivity before switching
+        -- Higher values reduce switching frequency but increase latency for
+        -- the non-active stream. Lower values may create gaps between MFB
+        -- packets during switching, reducing throughput (only one input port
+        -- is read per cycle per merger stage)
         SW_TIMEOUT_WIDTH : natural := 4;
 
-        -- To enable optional MFB FIFOs at middle stages
+        -- Enable optional MFB FIFOs at intermediate merger stages
+        -- false: No FIFOs between merger stages (input FIFOs only)
+        -- true: Adds MFB_FIFOX buffers at each internal tree stage
         MID_MFB_FIFOS_EN : boolean := False;
 
-        -- Input PIPEs enable for all 2:1 Mergers
-        -- Input registers is created when this is set to false.
+        -- Enable input PIPE stages for all internal 2:1 merger units
+        -- true: Uses MVB_PIPE and MFB_PIPE components for registered inputs
+        -- false: Uses simple registers (combinatorial input path)
         IN_PIPE_EN      : boolean := false;
 
-        -- Output PIPE enable for all 2:1 Mergers
-        -- Output register is created when this is set to false.
+        -- Enable output PIPE stage for all internal 2:1 merger units
+        -- true: Uses MVB_PIPE and MFB_PIPE components for registered outputs
+        -- false: Uses simple output registers
         OUT_PIPE_EN     : boolean := true;
 
-        -- Architecture of FIFOX_MULTI
+        -- Architecture selection for internal FIFOX_MULTI component
+        -- Supported values:
+        -- * "SHAKEDOWN": Handshake-based FIFO with better buffering and throughput
+        -- * "FULL": Standard implementation with wide MUXes
         FIFOX_MULTI_ARCH : string := "SHAKEDOWN";
 
-        -- "ULTRASCALE", "STRATIX10",...
+        -- Target device family for FIFO/PIPE implementation
+        -- Specifies the FPGA device family for optimal resource inference
         DEVICE          : string  := "ULTRASCALE"
     );
     port (
-        -- =============================
-        -- Common interface
-        -- =============================
+        -- =====================================================================
+        -- COMMON SIGNALS
+        -- =====================================================================
 
+        -- System clock
         CLK            : in  std_logic;
+        -- Synchronous reset (active high)
         RESET          : in  std_logic;
 
-        -- =============================
-        -- RX interfaces
-        -- =============================
+        -- =====================================================================
+        -- RX INTERFACES (per input port)
+        -- =====================================================================
 
+        -- MVB header bus array (one per input port)
+        -- RX_MVB_DATA(i) contains MVB_ITEMS headers, each MVB_ITEM_WIDTH bits
         RX_MVB_DATA    : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
-        -- the header is associated with a payload frame on MFB
+        -- Payload association flags array (one per input port)
+        -- RX_MVB_PAYLOAD(i)(j) = '1': Header j on input i has associated MFB data
         RX_MVB_PAYLOAD : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MVB_ITEMS-1 downto 0);
+        -- Header valid flags array (one per input port)
         RX_MVB_VLD     : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MVB_ITEMS-1 downto 0);
+        -- Source ready array (one per input port)
+        -- Backpressure from merger to upstream sender
         RX_MVB_SRC_RDY : in  std_logic_vector(MERGER_INPUTS-1 downto 0);
+        -- Destination ready array (one per input port)
+        -- Flow control from merger to upstream sender
         RX_MVB_DST_RDY : out std_logic_vector(MERGER_INPUTS-1 downto 0);
 
+        -- MFB data bus array (one per input port)
+        -- Organized as: MFB_REGIONS x MFB_REG_SIZE x MFB_BLOCK_SIZE x MFB_ITEM_WIDTH bits
         RX_MFB_DATA    : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-        -- Allways valid, metadata merged by words
+        -- MFB metadata bus array (one per input port)
+        -- Always valid when MFB data is valid; passed through unchanged
         RX_MFB_META    : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*MFB_META_WIDTH-1 downto 0) := (others => (others => '0'));
+        -- Start of Frame flags array (one per input port)
+        -- RX_MFB_SOF(i)(r) = '1': Region r on input i contains SOF
         RX_MFB_SOF     : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        -- End of Frame flags array (one per input port)
+        -- RX_MFB_EOF(i)(r) = '1': Region r on input i contains EOF
         RX_MFB_EOF     : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS-1 downto 0);
+        -- SOF position array (one per input port)
+        -- Indicates which block within the region contains the SOF
         RX_MFB_SOF_POS : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        -- EOF position array (one per input port)
+        -- Indicates which item within the block contains the EOF
         RX_MFB_EOF_POS : in  slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        -- Source ready array (one per input port)
         RX_MFB_SRC_RDY : in  std_logic_vector(MERGER_INPUTS-1 downto 0);
+        -- Destination ready array (one per input port)
         RX_MFB_DST_RDY : out std_logic_vector(MERGER_INPUTS-1 downto 0);
 
-        -- =============================
-        -- TX interface
-        -- =============================
+        -- =====================================================================
+        -- TX INTERFACE (merged output)
+        -- =====================================================================
 
+        -- Merged MVB header bus
+        -- Contains headers from all inputs, merged based on activity
         TX_MVB_DATA    : out std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
-        -- the header is associated with a payload frame on MFB
+        -- Payload association flags for merged output
+        -- Maintains the header-to-payload relationship from input streams
         TX_MVB_PAYLOAD : out std_logic_vector(MVB_ITEMS-1 downto 0);
+        -- Header valid flags for merged output
         TX_MVB_VLD     : out std_logic_vector(MVB_ITEMS-1 downto 0);
+        -- Source ready - backpressure from downstream receiver
+        -- Asserted when the merger has valid data to send
         TX_MVB_SRC_RDY : out std_logic;
+        -- Destination ready - flow control from downstream consumer
+        -- When '1', the consumer can accept new data
         TX_MVB_DST_RDY : in  std_logic;
 
+        -- Merged MFB data bus
+        -- Contains payload data from all inputs, synchronized with TX_MVB_DATA
         TX_MFB_DATA    : out std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-        -- Allways valid, metadata merged by words
+        -- Merged MFB metadata bus
+        -- Metadata from active input stream passed through unchanged
         TX_MFB_META    : out std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0);
+        -- Start of Frame flags for merged output
         TX_MFB_SOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- End of Frame flags for merged output
         TX_MFB_EOF     : out std_logic_vector(MFB_REGIONS-1 downto 0);
+        -- SOF position for merged output
         TX_MFB_SOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        -- EOF position for merged output
         TX_MFB_EOF_POS : out std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        -- Source ready - backpressure from downstream receiver
+        -- Asserted when the merger has valid MFB data to send
         TX_MFB_SRC_RDY : out std_logic;
+        -- Destination ready - flow control from downstream consumer
         TX_MFB_DST_RDY : in  std_logic
     );
 end entity;
