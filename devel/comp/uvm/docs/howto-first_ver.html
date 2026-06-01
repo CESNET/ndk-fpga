@@ -604,9 +604,6 @@ In the next chapters we will add UVCs to start generating and observing signals.
 <p><span class="caption-text">Waveform displaying run of the dummy verification environment</span><a class="headerlink" href="#id17" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 </section>
 <hr class="docutils" />
 <section id="uvm-phases">
@@ -614,9 +611,6 @@ In the next chapters we will add UVCs to start generating and observing signals.
 <p>UVM components run in phases (e.g. <em>build_phase</em>, <em>connect_phase</em>, <em>run_phase</em>); you see them in
 <em>env.sv</em> and <em>test.sv</em>. For an overview of what each phase does, see <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a> (UVM concepts — Phases).
 Not every component implements every phase; for example, the NDK agents commonly don’t implement <em>check_phase</em>.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 </section>
 </section>
 <hr class="docutils" />
@@ -956,7 +950,7 @@ in the testbench <code class="docutils literal notranslate"><span class="pre">uv
 </div>
 <p>The model produces expected transactions from the same inputs as the DUT; the scoreboard compares them to DUT outputs
 (see <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a>, Model and scoreboard). For our FIFO, order is preserved so we use <em>uvm_common::comparer_ordered</em>.
-The code below shows the scoreboard (with <em>report_phase</em> printing <strong>VERIFICATION SUCCESS</strong> or <strong>VERIFICATION FAILED</strong>) and the model (a simple pass-through for the FIFO). For different model vs DUT transaction types, override <em>compare</em> in the comparer. Automatic testing looks for <strong>VERIFICATION SUCCESS</strong> in the transcript; see <span class="xref std std-ref">uvm_howto_others</span>.</p>
+The code below shows the scoreboard (with <em>report_phase</em> printing <strong>VERIFICATION SUCCESS</strong> or <strong>VERIFICATION FAILED</strong>) and the model (a simple pass-through for the FIFO). For different model vs DUT transaction types, override <em>compare</em> in the comparer. Automatic testing looks for <strong>VERIFICATION SUCCESS</strong> in the transcript; see <a class="reference internal" href="howto-others.html#uvm-howto-others"><span class="std std-ref">UVM HOWTO - Multiver script</span></a>.</p>
 <div class="literal-block-wrapper docutils container" id="id27">
 <div class="code-block-caption"><span class="caption-text">env/scoreboard.sv</span><a class="headerlink" href="#id27" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard</span><span class="w"> </span><span class="p">#(</span>
@@ -1183,7 +1177,7 @@ received by comparators from DUT and MODEL.</p>
 multiver), see the “Where to go next” section in the <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a>.
 To extend this environment with a register model, custom sequences, or the UVM
 factory, continue with the <a class="reference internal" href="howto-extend_ver.html#uvm-howto-extend-verification"><span class="std std-ref">UVM HOWTO - Upgrade verification</span></a>. To run many
-parameter combinations automatically, see the <span class="xref std std-ref">uvm_howto_others</span>.</p>
+parameter combinations automatically, see the <a class="reference internal" href="howto-others.html#uvm-howto-others"><span class="std std-ref">UVM HOWTO - Multiver script</span></a>.</p>
 </section>
 </section>
 </section>

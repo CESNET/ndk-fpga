@@ -142,7 +142,7 @@
 <section id="maximal-jumbo-frames">
 <h2>Maximal jumbo frames<a class="headerlink" href="#maximal-jumbo-frames" title="Link to this heading"></a></h2>
 <p>The Ethernet MAC supports a maximum MTU of 16,383 bytes on all Ethernet types. However, the DMA Medusa engine cannot always transfer
-frames of the full MAC MTU. The maximum frame length supported by DMA RX depends on the size of the user DMA header (<span class="xref std std-ref">hdr_meta_format</span>),
+frames of the full MAC MTU. The maximum frame length supported by DMA RX depends on the size of the user DMA header (see <a class="reference internal" href="app.html#hdr-meta-format"><span class="std std-ref">Header metadata format</span></a> in <a class="reference internal" href="app.html#ndk-app"><span class="std std-ref">NDK Application</span></a>),
 which is prepended to the Ethernet packet and becomes part of the transferred data:</p>
 <div class="line-block">
 <div class="line"><strong>max Ethernet frame (RX)</strong> = 16,383 − <code class="docutils literal notranslate"><span class="pre">HDR_LEN</span></code></div>

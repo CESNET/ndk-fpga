@@ -294,6 +294,260 @@ Implementation of barrel_shifter in git is tested.</p>
 </pre></div>
 </div>
 </div>
+<table class="docutils align-center" id="id7">
+<caption><span class="caption-text">Barrel Shifter Implementation Comparison</span><a class="headerlink" href="#id7" title="Link to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>BLOCKS
+BLOCK_WIDTH</p></th>
+<th class="head"><p>IMPLEMENTATION</p></th>
+<th class="head"><p>LUT</p></th>
+<th class="head"><p>MUX</p></th>
+<th class="head"><p>TIME</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>8|8</p></td>
+<td><p>V0</p></td>
+<td><p>128</p></td>
+<td><p>0</p></td>
+<td><p>/</p></td>
+</tr>
+<tr class="row-odd"><td><p>8|8</p></td>
+<td><p>V1</p></td>
+<td><p>128</p></td>
+<td><p>0</p></td>
+<td><p>/</p></td>
+</tr>
+<tr class="row-even"><td><p>8|8</p></td>
+<td><p>V2</p></td>
+<td><p>96</p></td>
+<td><p>0</p></td>
+<td><p>0.62ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>8|8</p></td>
+<td><p>V3</p></td>
+<td><p>96</p></td>
+<td><p>0</p></td>
+<td><p>0.67ns</p></td>
+</tr>
+<tr class="row-even"><td><p>8|8</p></td>
+<td><p>V4</p></td>
+<td><p>96</p></td>
+<td><p>0</p></td>
+<td><p>0.63ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>64|16</p></td>
+<td><p>V0</p></td>
+<td><p>1700</p></td>
+<td><p>10000</p></td>
+<td><p>1.44ns</p></td>
+</tr>
+<tr class="row-even"><td><p>64|16</p></td>
+<td><p>V1</p></td>
+<td><p>4876</p></td>
+<td><p>400</p></td>
+<td><p>1.29ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>64|16</p></td>
+<td><p>V2</p></td>
+<td><p>3847</p></td>
+<td><p>180</p></td>
+<td><p>1.54ns</p></td>
+</tr>
+<tr class="row-even"><td><p>64|16</p></td>
+<td><p>V3</p></td>
+<td><p>4855</p></td>
+<td><p>0</p></td>
+<td><p>1.88ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>64|16</p></td>
+<td><p>V4</p></td>
+<td><p>1920</p></td>
+<td><p>0</p></td>
+<td><p>0.95ns</p></td>
+</tr>
+<tr class="row-even"><td><p>64|10</p></td>
+<td><p>V0</p></td>
+<td><p>23000</p></td>
+<td><p>5000</p></td>
+<td><p>/</p></td>
+</tr>
+<tr class="row-odd"><td><p>64|10</p></td>
+<td><p>V1</p></td>
+<td><p>2088</p></td>
+<td><p>0</p></td>
+<td><p>/</p></td>
+</tr>
+<tr class="row-even"><td><p>64|10</p></td>
+<td><p>V2</p></td>
+<td><p>14000</p></td>
+<td><p>2000</p></td>
+<td><p>1.54ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>64|10</p></td>
+<td><p>V3</p></td>
+<td><p>4855</p></td>
+<td><p>0</p></td>
+<td><p>1.87ns</p></td>
+</tr>
+<tr class="row-even"><td><p>64|10</p></td>
+<td><p>V4</p></td>
+<td><p>1920</p></td>
+<td><p>0</p></td>
+<td><p>0.95ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>100|10</p></td>
+<td><p>V0</p></td>
+<td><p>26000</p></td>
+<td><p>5000</p></td>
+<td><p>6.94ns</p></td>
+</tr>
+<tr class="row-even"><td><p>100|10</p></td>
+<td><p>V1</p></td>
+<td><p>47000</p></td>
+<td><p>12000</p></td>
+<td><p>3.28ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>100|10</p></td>
+<td><p>V2</p></td>
+<td><p>14000</p></td>
+<td><p>2000</p></td>
+<td><p>1.75ns</p></td>
+</tr>
+<tr class="row-even"><td><p>100|10</p></td>
+<td><p>V3</p></td>
+<td><p>9257</p></td>
+<td><p>0</p></td>
+<td><p>3.51ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>100|10</p></td>
+<td><p>V4</p></td>
+<td><p>4053</p></td>
+<td><p>0</p></td>
+<td><p>0.956ns</p></td>
+</tr>
+<tr class="row-even"><td><p>10|16</p></td>
+<td><p>V0</p></td>
+<td><p>2075</p></td>
+<td><p>10</p></td>
+<td><p>5.19ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>10|16</p></td>
+<td><p>V1</p></td>
+<td><p>320</p></td>
+<td><p>0</p></td>
+<td><p>0.71ns</p></td>
+</tr>
+<tr class="row-even"><td><p>10|16</p></td>
+<td><p>V2</p></td>
+<td><p>351</p></td>
+<td><p>0</p></td>
+<td><p>0.71ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>10|16</p></td>
+<td><p>V3</p></td>
+<td><p>320</p></td>
+<td><p>0</p></td>
+<td><p>0.69ns</p></td>
+</tr>
+<tr class="row-even"><td><p>10|16</p></td>
+<td><p>V4</p></td>
+<td><p>352</p></td>
+<td><p>0</p></td>
+<td><p>0.72ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>100|16</p></td>
+<td><p>V0</p></td>
+<td><p>30000</p></td>
+<td><p>13000</p></td>
+<td><p>5.93ns</p></td>
+</tr>
+<tr class="row-even"><td><p>100|16</p></td>
+<td><p>V1</p></td>
+<td><p>47000</p></td>
+<td><p>30000</p></td>
+<td><p>2.31ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>100|16</p></td>
+<td><p>V2</p></td>
+<td><p>12000</p></td>
+<td><p>5000</p></td>
+<td><p>1.27ns</p></td>
+</tr>
+<tr class="row-even"><td><p>100|16</p></td>
+<td><p>V3</p></td>
+<td><p>13000</p></td>
+<td><p>32</p></td>
+<td><p>1.91ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>100|16</p></td>
+<td><p>V4</p></td>
+<td><p>6000</p></td>
+<td><p>0</p></td>
+<td><p>1.25ns</p></td>
+</tr>
+<tr class="row-even"><td><p>512|8</p></td>
+<td><p>V0</p></td>
+<td><p>445000</p></td>
+<td><p>25000</p></td>
+<td><p>2.13ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>512|8</p></td>
+<td><p>V1</p></td>
+<td><p>65000</p></td>
+<td><p>30000</p></td>
+<td><p>1.40ns</p></td>
+</tr>
+<tr class="row-even"><td><p>512|8</p></td>
+<td><p>V2</p></td>
+<td><p>65000</p></td>
+<td><p>40000</p></td>
+<td><p>1.39ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>512|8</p></td>
+<td><p>V3</p></td>
+<td><p>37000</p></td>
+<td><p>0</p></td>
+<td><p>2.44ns</p></td>
+</tr>
+<tr class="row-even"><td><p>512|8</p></td>
+<td><p>V4</p></td>
+<td><p>18000</p></td>
+<td><p>0</p></td>
+<td><p>1.42ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>253|32</p></td>
+<td><p>V0</p></td>
+<td><p>84000</p></td>
+<td><p>50000</p></td>
+<td><p>6.65ns</p></td>
+</tr>
+<tr class="row-even"><td><p>253|32</p></td>
+<td><p>V1</p></td>
+<td><p>595000</p></td>
+<td><p>30000</p></td>
+<td><p>2.35ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>253|32</p></td>
+<td><p>V2</p></td>
+<td><p>90000</p></td>
+<td><p>58</p></td>
+<td><p>1.37ns</p></td>
+</tr>
+<tr class="row-even"><td><p>253|32</p></td>
+<td><p>V3</p></td>
+<td><p>81000</p></td>
+<td><p>0</p></td>
+<td><p>2.24ns</p></td>
+</tr>
+<tr class="row-odd"><td><p>253|32</p></td>
+<td><p>V4</p></td>
+<td><p>32000</p></td>
+<td><p>0</p></td>
+<td><p>1.32ns</p></td>
+</tr>
+</tbody>
+</table>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-barrel_shifter_gen">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">BARREL_SHIFTER_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-barrel_shifter_gen" title="Link to this definition"></a></dt>

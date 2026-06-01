@@ -1,4 +1,4 @@
-.. _mem_tester_sw:
+.. _mem_tester_sw_doc:
 
 MEM_TESTER C Software (depreciated)
 -----------------------------------

@@ -1,3 +1,5 @@
+.. _cocotb_top_level_sim:
+
 =================================
 Top-Level Simulation using cocotb
 =================================
