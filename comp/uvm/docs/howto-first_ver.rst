@@ -479,7 +479,6 @@ In the next chapters we will add UVCs to start generating and observing signals.
     :alt: WAVE - Create base environment
 
     Waveform displaying run of the dummy verification environment
-|
 
 ----
 
@@ -490,8 +489,6 @@ UVM PHASES
 UVM components run in phases (e.g. *build_phase*, *connect_phase*, *run_phase*); you see them in
 *env.sv* and *test.sv*. For an overview of what each phase does, see :ref:`uvm_howto_intro` (UVM concepts — Phases).
 Not every component implements every phase; for example, the NDK agents commonly don't implement *check_phase*.
-
-|
 
 ----
 

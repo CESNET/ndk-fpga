@@ -12,9 +12,9 @@ MI agent
 This package contains two UVM verification agents which generate transactions to the :ref:MI<mi_bus> interface. The slave agent is connected to the slave DUT port but acts as the master of this communication (the slave agent generates the requests for the DUT). The master agent is connected to the master DUT port but acts as the slave of this communication (it accepts the requests from the DUT).
 Both agents have three class parameters. ``DATA_WIDTH`` , ``ADDR_WIDTH`` and ``META_WIDTH``. ``META_WIDTH`` has default value set to 0.
 
-.. image:: ../docs/MI_agent.svg
+.. image:: ../docs/img/MI_agent.svg
    :align: center
-   :width: 50 %
+   :width: 50%
 
 Sequence_item
 ^^^^^^^^^^^^^^^^^^

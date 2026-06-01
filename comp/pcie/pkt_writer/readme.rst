@@ -12,7 +12,7 @@ PCIe Packet Writer
 Architecture
 ------------
 
-.. _ppw_toplevel_diagram:
+.. _ppw_toplevel_diagram_writer:
 .. figure:: img/pcie_pkt_writer.drawio.svg
     :align: center
     :width: 100 %

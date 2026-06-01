@@ -1,3 +1,5 @@
+.. _cocotb_ver:
+
 ===========================
 Getting Started with cocotb
 ===========================
