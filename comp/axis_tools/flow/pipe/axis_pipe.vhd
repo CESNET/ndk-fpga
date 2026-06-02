@@ -26,6 +26,8 @@ entity AXIS_PIPE is
         TDATA_WIDTH     : natural := 512;
         -- User metadata width
         TUSER_WIDTH     : natural := 0;
+        -- One TKEEP bit belongs to one item. The AXI4-Stream specification uses 8.
+        ITEM_WIDTH      : natural := 8;
 
         -- =============================
         -- Others
@@ -51,7 +53,7 @@ entity AXIS_PIPE is
 
         RX_AXIS_TDATA  : in  std_logic_vector(TDATA_WIDTH-1 downto 0);
         RX_AXIS_TUSER  : in  std_logic_vector(TUSER_WIDTH-1 downto 0) := (others => '0');
-        RX_AXIS_TKEEP  : in  std_logic_vector(TDATA_WIDTH/8-1 downto 0);
+        RX_AXIS_TKEEP  : in  std_logic_vector(TDATA_WIDTH/ITEM_WIDTH-1 downto 0);
         RX_AXIS_TLAST  : in  std_logic;
         RX_AXIS_TVALID : in  std_logic;
         RX_AXIS_TREADY : out std_logic;
@@ -62,7 +64,7 @@ entity AXIS_PIPE is
 
         TX_AXIS_TDATA  : out std_logic_vector(TDATA_WIDTH-1 downto 0);
         TX_AXIS_TUSER  : out std_logic_vector(TUSER_WIDTH-1 downto 0) := (others => '0');
-        TX_AXIS_TKEEP  : out std_logic_vector(TDATA_WIDTH/8-1 downto 0);
+        TX_AXIS_TKEEP  : out std_logic_vector(TDATA_WIDTH/ITEM_WIDTH-1 downto 0);
         TX_AXIS_TLAST  : out std_logic;
         TX_AXIS_TVALID : out std_logic;
         TX_AXIS_TREADY : in  std_logic
@@ -74,7 +76,6 @@ end entity;
 architecture ARCH of AXIS_PIPE is
 
     constant TLAST_WIDTH       : integer := 1;
-    constant ITEM_WIDTH        : integer := 8;
     constant TKEEP_WIDTH       : integer := TDATA_WIDTH / ITEM_WIDTH;
 
     constant PIPE_WIDTH        : integer := TDATA_WIDTH + TUSER_WIDTH + TKEEP_WIDTH + TLAST_WIDTH;
