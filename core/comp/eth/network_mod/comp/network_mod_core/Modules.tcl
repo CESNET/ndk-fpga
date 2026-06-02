@@ -45,6 +45,7 @@ if { $ARCHGRP == "F_TILE"} {
     lappend COMPONENTS [list "RX_FTILE_ADAPTER"    "$RX_ADAPTER_BASE/mac_seg"                "FULL"]
     lappend COMPONENTS [list "FIFOX"               "$FIFO_BASE/fifox"                        "FULL"]
     lappend COMPONENTS [list "ASYNC_BUS_HANDSHAKE" "$OFM_PATH/comp/base/async/bus_handshake" "FULL"]
+    lappend COMPONENTS [list "ASYNC_RESET"         "$ASYNC_BASE/reset"                       "FULL"]
 
     # IP are now in card (400G1) top-level Modules.tcl
     # Uncomment for network module synthesis only!
@@ -82,6 +83,7 @@ if { $ARCHGRP == "F_TILE"} {
 
     # Source files for implemented component
     lappend MOD "$ENTITY_BASE/ftile_init.vhd"
+    lappend MOD "$ENTITY_BASE/ftile_eth_rst_seq.vhd"
     lappend MOD "$ENTITY_BASE/macseg_loop.vhd"
     lappend MOD "$ENTITY_BASE/comps/bridge_drp/bridge_drp.vhd"
 
