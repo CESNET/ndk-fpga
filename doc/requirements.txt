@@ -1,4 +1,4 @@
 GitPython
-sphinx
+sphinx==8.2.3
 sphinx-vhdl
 sphinx-rtd-theme
