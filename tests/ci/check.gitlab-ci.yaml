@@ -40,7 +40,13 @@ commitlint:
     - apk add --no-cache git
     - npm install --save-dev @commitlint/config-conventional @commitlint/cli
   script:
-    - npx commitlint --extends '@commitlint/config-conventional' --from "${BASE_COMMIT_SHA}" --to "${CI_COMMIT_SHA}"
+    - |
+      if [ "${BASE_COMMIT_SHA}" = "${CI_COMMIT_SHA}" ]; then
+        echo "BASE_COMMIT_SHA equals CI_COMMIT_SHA, linting last commit only"
+        npx commitlint --extends '@commitlint/config-conventional' --last
+      else
+        npx commitlint --extends '@commitlint/config-conventional' --from "${BASE_COMMIT_SHA}" --to "${CI_COMMIT_SHA}"
+      fi
 
 vhdlcodestyle:
     stage: check
