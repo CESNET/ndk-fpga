@@ -6,6 +6,134 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [0.14.0] - Unreleased
+
+### Added
+- build: Added support for Versal chips.
+- build: Added targets.tcl source to Shared.tcl.
+- ci: Improved app-minimal-test result processing and notification.
+- cocotb: Added item counter to MFB driver.
+- cocotb: Added support for driver in throughput Probe.
+- cocotb: Enabled drivers to use throughput probe interfaces.
+- cocotb: Added input throughput probe to MFB FIFOX test.
+- cocotb: Improved MVB monitor transaction creation.
+- comp: Introduced AXIS_ETH_PARSER module.
+- comp: Introduced AXIS_HEAD_TRIMMER module.
+- comp: Introduced AXIS_TAIL_TRIMMER module.
+- comp: Introduced AXIS_PACKET_CONCATENATOR module.
+- comp: Introduced AXIS_PACKET_EDITOR module.
+- comp: Introduced AXIS_PIPE module.
+- comp: Introduced AXIS_DISCARD module.
+- comp: Introduced AXIS_PACKET_LEN module.
+- comp: Added conditional concatenation feature to AXIS_PACKET_CONCATENATOR.
+- comp: Introduced FIFOX_MULTI_ARCH generic parameter for fifox_multi component.
+- comp: Added barrel_shifter_gen to Modules.tcl.
+- comp: Introduced PCIe Packet Reader.
+- comp: Introduced PCIe Packet Writer with direct RX AXI-Stream interface.
+- comp: Added metadata propagation to PCIe Packet Writer Instruction Generator.
+- comp: Upgraded slv_array_ser function in type_pack to handle arrays with non-zero index.
+- comp: Added pkt_length overflow protection to MFB_CHECKSUM_L3L4.
+- comp: Added FIFOX_MULTI_ARCH generic to MFB_MERGER.
+- comp: Added base class for PCIe Requesters in cocotbext.
+- comp: Introduced PCIe-specific driver for AXI4-stream bus in cocotbext.
+- comp: Implemented out-of-order completion scheduling in PCIe Requesters.
+- comp: Implemented splitting of RC messages according to MPS in cocotbext-pcie.
+- comp: Added fake zero-length shift register variant to base-shreg.
+- comp: Introduced experimental support for vhdl_ls language server.
+- comp: Added all_modules Makefile target for generating vhdl_ls.toml.
+- comp: Added ASFIFO support for TUSER signal.
+- dma: Added asynchronous sending of MVB and MFB transactions in DMA Calypte.
+- dma: Added convert2string to DMA model output transaction.
+- dma: Added constraints for channel control sequence randomization in DMA Calypte UVM.
+- uvm: Added validation for adequate data size in PCIE-AXI.
+- uvm: Added AXI RQ support on MFB interface in PCIE_MFB.
+- uvm: Added macros to simplify dist constraint generation.
+- uvm: Added pull-up reset at DMA Calypte verification start.
+- uvm: Replaced LVA/LV agents with unified PCIe agent in DMA Calypte.
+- uvm: Created UVM verification for ASFIFOX.
+- uvm: Added Jenkins verification file for AXI tools.
+- uvm: Created probe for MVB interface.
+- uvm: Included NDK macros in network_mod verification.
+- uvm: Implemented LVA to AXI converter.
+- docs: Added cocotb tips and tricks on how to use probes.
+- docs: Added cocotb tips for debug logging, random seed and optional signals.
+- docs: Described manual test build in cocotb documentation.
+- docs: Updated known limitations with DPDK settings info.
+- docs: Updated known limitations maximal jumbo frames section.
+- docs: Added documentation build script.
+
+### Changed
+- build: Set Vivado 2025.1 as default.
+- build: Removed automatic restart on Modelsim simulation start.
+- comp: Used barrel_shifter_gen implementation in barrel-shifter for better performance.
+- comp: Set FIFOX_MULTI_ARCH to FULL in dma_up_merger_i (PTC).
+- comp: Removed DEVICE_WITH_DSP_CNT parameter from RX_MAC_LITE.
+- comp: Optimized RX_MAC_LITE verification speed.
+- comp: Reduced latency of RX_MAC_LITE check stage.
+- comp: Reduced latency of RX_MAC_LITE SEG adapter.
+- comp: Reduced mfb_frame_len_i latency in TX_MAC_LITE to save resources.
+- docs: Refactored basic_cocotb_test guide for better readability.
+- docs: Reordered cocotb documentation pages.
+- docs: Updated MFB Merger documentation.
+
+### Removed
+- comp: Removed obsolete mfb_merger_old component.
+- comp: Removed AXI_PIPE component (replaced by AXIS_PIPE from axis_tools).
+
+### Fixed
+- cards: Fixed HBM reset polarity on N5014 card.
+- cards: Fixed PCIE_GEN propagation to CARD_ARCHGRP on Alveo-U55C.
+- cards: Fixed RR_ARBITER ACK port width.
+- ci: Updated vsg to version 3.35.0.
+- ci: Disabled VSG rules use_clause_001, process_034, and process_035.
+- cocotb: Fixed invalid signal list concatenation in Axi4StreamMaster.
+- cocotb: Removed ugly constant in MFB monitor.
+- cocotb: Fixed AvstCreditRequester to reflect changes in AvstPcieDriverMaster.
+- cocotb: Fixed address and length computation using FBE/LBE in Axi4S and AvstRequester.
+- cocotb: Added 'resource' property to fdt in create_dtb_simple.
+- cocotb: Fixed default gRPC server port to 0.
+- comp: Fixed F-TILE clock connections in network-mod.
+- comp: Fixed MII error propagation in avst_adapter.
+- comp: Fixed error register setting during SOF and packet reception in network_mod.
+- comp: Fixed register width in axis_head_trimmer.
+- comp: Fixed shreg_ok detection and cleanup signals in axis_head_trimmer.
+- comp: Added START_ENABLE to control extraction per protocol in axis_eth_parser.
+- comp: Fixed extracted_headers_to_slv in axis_eth_parser pkg.
+- comp: Fixed signal validity check before FSM state transition in axis_packet_concatenator.
+- comp: Fixed np_lutram usage with zero writing ports in dma-calypte.
+- comp: Fixed locally-static issues in dma-calypte.
+- comp: Fixed status check when shakedown architecture is not set in fifox_multi-uvm.
+- comp: Fixed read vector generation logic in fifox_multi-uvm.
+- comp: Disconnected software reset from status environment in fifox_multi-uvm.
+- comp: Fixed empty signal name in message in fifox_uvm.
+- comp: Changed fifox_multi architecture due to performance issues in mfb_discarder.
+- comp: Fixed missing unique name for local count_ones function in mfb_generator.
+- comp: Fixed byte-order mismatch and missing negation in L3/L4 in mfb_checksum_l3l4.
+- comp: Fixed integer overflow in base computation in mi_splitter.
+- comp: Fixed locally-static issues in mi_splitter and rand_generator.
+- comp: Fixed Vivado bug in mux (reverted rotate implementation).
+- comp: Fixed calculation of length, address, and first/last IB in pcie-pkt_reader.
+- comp: Fixed calculation of length, address, and first/last IB in pcie-pkt_writer.
+- comp: Fixed round up when converting length in bytes to dwords in pcie-pkt_writer.
+- comp: Fixed errors discovered due to testing split PCIe completions in pcie-pkt_reader.
+- comp: Fixed duplicate architecture name in hwid.
+- comp: Fixed clocking ports in mul48_top.
+- comp: Fixed default generic values in dma_calypte_debug, mem_tester, and and components.
+- comp: Fixed incorrect DDR_S_AXI_RREADY setting in axi2avmm_ddr_bridge.
+- comp: Fixed duplicate local entity names in flu_tools packet_insert_bytes.
+- comp: Fixed app_conf.tcl to use OFM_PATH variable for VERSION file.
+- comp: Fixed reset timing in axi2mfb and mfb2axi after environment enable.
+- uvm: Fixed hotfix of Intel E-Tile network module in network_mod-uvm.
+- uvm: Fixed MAC address configuration print in network_mod-uvm.
+- uvm: Fixed uvm_component path in DMA Calypte speed verification.
+- uvm: Fixed msg variable clearing before reuse in DMA Calypte UVM.
+- uvm: Fixed syntax when printing error message in DMA Calypte UVM.
+- uvm: Fixed high-level sequence create transaction inside clock cycle in uvm-axi.
+- uvm: Fixed constant to parameter conversion.
+- uvm: Fixed LOGIC_VECTOR_ARRAY sequencer DB registration macro.
+- docs: Fixed web formatting in UVM env/pkg.sv documentation.
+- docs: Fixed various errors in Sphinx documentation.
+
 ## [0.13.0] - 2026-03-13
 
 ### Added
