@@ -109,3 +109,7 @@ Unless otherwise noted, the content of this repository is available under the BS
 ## Repository Maintainer
 
 - Jakub Cabal, cabal@cesnet.cz
+
+## Acknowledgment
+
+This work was supported by the Ministry of Education, Youth and Sports of the Czech Republic through the e-INFRA CZ (ID:90254).
