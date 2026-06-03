@@ -13,10 +13,6 @@ use IEEE.std_logic_1164.all;
 
 package combo_const is
 
-    -- NDK version numbers
-    constant NDK_MAJOR         : std_logic_vector(7 downto 0) := X"01";
-    constant NDK_MINOR         : std_logic_vector(7 downto 0) := X"00";
-
     -- PCIe BARs base addresses
     constant BAR0_BASE_ADDR    : std_logic_vector := X"00000000";
     constant BAR1_BASE_ADDR    : std_logic_vector := X"00000000";
