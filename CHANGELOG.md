@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
-## [2026.6.0] - Unreleased
+## [2026.6.0] - 2026-06-03
 
 ### Added
 - build: Added support for Versal chips.
@@ -56,6 +56,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - uvm: Included NDK macros in network_mod verification.
 - uvm: Implemented LVA to AXI converter.
 - docs: Added cocotb tips and tricks on how to use probes.
+- docs: Added e-INFRA CZ acknowledgment.
 - docs: Added cocotb tips for debug logging, random seed and optional signals.
 - docs: Described manual test build in cocotb documentation.
 - docs: Updated known limitations with DPDK settings info.
@@ -64,6 +65,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 
 ### Changed
 - build: Set Vivado 2025.1 as default.
+- build: Switched to Calendar Versioning (YYYY.MM.MICRO).
 - build: Removed automatic restart on Modelsim simulation start.
 - comp: Used barrel_shifter_gen implementation in barrel-shifter for better performance.
 - comp: Set FIFOX_MULTI_ARCH to FULL in dma_up_merger_i (PTC).
@@ -77,6 +79,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - docs: Updated MFB Merger documentation.
 
 ### Removed
+- comp: Removed NDK version numbers from core_const.
 - comp: Removed obsolete mfb_merger_old component.
 - comp: Removed AXI_PIPE component (replaced by AXIS_PIPE from axis_tools).
 
@@ -132,6 +135,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - uvm: Fixed constant to parameter conversion.
 - uvm: Fixed LOGIC_VECTOR_ARRAY sequencer DB registration macro.
 - docs: Fixed web formatting in UVM env/pkg.sv documentation.
+- docs: Removed contact for author from configuration docs.
 - docs: Fixed various errors in Sphinx documentation.
 
 ## [0.13.0] - 2026-03-13
