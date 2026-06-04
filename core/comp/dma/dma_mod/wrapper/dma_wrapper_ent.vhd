@@ -23,6 +23,8 @@ entity DMA_WRAPPER is
         -- Number of PCIe Endpoints
         -- Determines number of MI interfaces
         PCIE_ENDPOINTS       : natural := DMA_ENDPOINTS;
+        -- Dynamic routing parameters of the DMA bus
+        DMA_ROUTE            : dma_route_path_array_t := dma_route_path_array_default(PCIE_ENDPOINTS);
 
         USR_MVB_ITEMS        : natural := 1;
         USR_MFB_REGIONS      : natural := 1;

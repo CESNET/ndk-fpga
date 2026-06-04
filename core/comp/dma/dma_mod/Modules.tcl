@@ -13,11 +13,11 @@ set GEN_LOOP_SWITCH_BASE      "$OFM_PATH/comp/mfb_tools/debug/gen_loop_switch"
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 
 lappend MOD "$ENTITY_BASE/dma_ent.vhd"
 
 # Common components
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "MI_SPLITTER_PLUS_GEN" $MI_SPLITTER_PLUS_GEN_BASE "FULL" ]
 lappend COMPONENTS [ list "GEN_LOOP_SWITCH"      $GEN_LOOP_SWITCH_BASE      "FULL" ]
 

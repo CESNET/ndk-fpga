@@ -23,10 +23,10 @@ set DMA_TEST_CORE_BASE          "$OFM_PATH/comp/dma/dma_calypte/comp/test_core"
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 
 lappend MOD "$ENTITY_BASE/dma_wrapper_ent.vhd"
 
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "MI_ASYNC" $MI_ASYNC_BASE "FULL" ]
 lappend COMPONENTS [ list "ASYNC_RESET" $ASYNC_RESET_BASE "FULL" ]
 

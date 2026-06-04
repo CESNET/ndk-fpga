@@ -60,6 +60,8 @@ entity PCIE_CTRL is
         PTC_DISABLE         : boolean := false;
         -- Enable CQ/CC interface for DMA-BAR, DMA_PORTS must be 1
         DMA_BAR_ENABLE      : boolean := false;
+        -- Dynamic routing parameters of the DMA bus
+        DMA_ROUTE           : dma_route_path_array_t := dma_route_path_array_default(DMA_PORTS);
         -- Connected PCIe endpoint type
         ENDPOINT_TYPE       : string  := "P_TILE";
         -- FPGA device
@@ -467,6 +469,7 @@ begin
             DOWN_FIFO_ITEMS      => 1024,
             AUTO_ASSIGN_TAGS     => true,
 
+            DMA_ROUTE            => DMA_ROUTE,
             DBG_ENABLE           => DEBUG_EN,
             ENDPOINT_TYPE        => ENDPOINT_TYPE,
             DEVICE               => DEVICE

@@ -15,11 +15,11 @@ set SHAKEDOWN_BASE      "$OFM_PATH/comp/mvb_tools/flow/shakedown"
 # Packages
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
-set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
 
 #set FIFOX_BASE       "$OFM_PATH/comp/base/fifo/fifox"
 
 set COMPONENTS [list \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
     [ list "FIFOX_MULTI"      "$FIFOXM_BASE"                        "FULL" ] \
     [ list "FIFOX"            "$FIFOX_BASE"                         "FULL" ] \
     [ list "DIC"              "$DIC_BASE"                           "FULL" ] \

@@ -16,10 +16,10 @@ set COMPONENTS [list \
 
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
-set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/ver/vhdl_ver_tools/basics/basics_test_pkg.vhd"
 
-set PACKAGES "$PACKAGES $ENTITY_BASE/ab_init_pack.vhd"
+lappend MOD "$ENTITY_BASE/ab_init_pack.vhd"
+
+lappend COMPONENTS [ list "VHDL_VER_TOOLS" "$OFM_PATH/comp/ver/vhdl_ver_tools/basics" "FULL" ]
 
 set MOD "$MOD $ENTITY_BASE/mi_splitter_plus_gen.vhd"
 set MOD "$MOD $ENTITY_BASE/ver/mi_splitter_plus_gen_wrapper.vhd"

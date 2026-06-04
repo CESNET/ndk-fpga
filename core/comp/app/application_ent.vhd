@@ -14,6 +14,7 @@ use work.math_pack.all;
 use work.type_pack.all;
 use work.eth_hdr_pack.all;
 use work.combo_user_const.all;
+use work.dma_bus_pack.all;
 
 entity APPLICATION_CORE is
     generic (
@@ -43,6 +44,30 @@ entity APPLICATION_CORE is
         DMA_MFB_REGIONS       : natural := 1;
         -- DMA MFB: number of blocks in region
         DMA_MFB_REGION_SIZE   : natural := 8;
+
+        -- DMA_BUS MFB parameters
+        DMA_BUS_REQ_REGIONS         : natural := 1;
+        DMA_BUS_REQ_REGION_SIZE     : natural := 1;
+        DMA_BUS_REQ_BLOCK_SIZE      : natural := 1;
+        DMA_BUS_REQ_ITEM_WIDTH      : natural := 8;
+        DMA_BUS_RES_REGIONS         : natural := 1;
+        DMA_BUS_RES_REGION_SIZE     : natural := 1;
+        DMA_BUS_RES_BLOCK_SIZE      : natural := 1;
+        DMA_BUS_RES_ITEM_WIDTH      : natural := 8;
+
+        -- DMA BUS configuration
+        DMA_BUS_CFG           : cfg_dma_bus_t := cfg_dma_bus_init(
+            cfg_dma_stream_init(
+                DMA_BUS_REQ_REGIONS, DMA_BUS_REQ_REGION_SIZE, DMA_BUS_REQ_BLOCK_SIZE,
+                DMA_BUS_REQ_ITEM_WIDTH, DMA_UPHDR_WIDTH),
+            cfg_dma_stream_init(
+                DMA_BUS_RES_REGIONS, DMA_BUS_RES_REGION_SIZE, DMA_BUS_RES_BLOCK_SIZE,
+                DMA_BUS_RES_ITEM_WIDTH, DMA_DOWNHDR_WIDTH)
+        );
+        -- Number of DMA bus interfaces (can differ from PCIE_ENDPOINTS on some configurations)
+        DMA_ENDPOINTS         : natural := 1;
+        -- DMA BUS routing mechanism parameters
+        DMA_ROUTES            : dma_route_path_array_t := dma_route_path_array_default(DMA_ENDPOINTS);
         -- MFB parameters: number of regions in word, DEPRECATED!
         MFB_REGIONS           : natural := ETH_MFB_REGIONS;
         -- MFB parameters: number of blocks in region, DEPRECATED!
@@ -314,6 +339,35 @@ entity APPLICATION_CORE is
         DMA_TX_MFB_SRC_RDY      : in  std_logic_vector(DMA_STREAMS-1 downto 0);
         -- DMA TX MFB streams: destination ready of each MFB bus
         DMA_TX_MFB_DST_RDY      : out std_logic_vector(DMA_STREAMS-1 downto 0);
+
+        -- =========================================================================
+        -- DMA BUS for memory requests (PCIe)
+        -- =========================================================================
+        DMA_UP_MFB_DATA         : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.D.data_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MFB_SOF          : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.D.sof_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MFB_EOF          : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.D.eof_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MFB_SOF_POS      : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.D.sof_pos_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MFB_EOF_POS      : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.D.eof_pos_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MFB_SRC_RDY      : out std_logic_vector(DMA_ENDPOINTS-1 downto 0) := (others => '0');
+        DMA_UP_MFB_DST_RDY      : in  std_logic_vector(DMA_ENDPOINTS-1 downto 0);
+
+        DMA_UP_MVB_DATA         : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.H.data_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MVB_CTRL         : out slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.REQ.H.vld_w-1 downto 0) := (others => (others => '0'));
+        DMA_UP_MVB_SRC_RDY      : out std_logic_vector(DMA_ENDPOINTS-1 downto 0) := (others => '0');
+        DMA_UP_MVB_DST_RDY      : in  std_logic_vector(DMA_ENDPOINTS-1 downto 0);
+
+        DMA_DOWN_MFB_DATA       : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.D.data_w-1 downto 0);
+        DMA_DOWN_MFB_SOF        : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.D.sof_w-1 downto 0);
+        DMA_DOWN_MFB_EOF        : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.D.eof_w-1 downto 0);
+        DMA_DOWN_MFB_SOF_POS    : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.D.sof_pos_w-1 downto 0);
+        DMA_DOWN_MFB_EOF_POS    : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.D.eof_pos_w-1 downto 0);
+        DMA_DOWN_MFB_SRC_RDY    : in  std_logic_vector(DMA_ENDPOINTS-1 downto 0);
+        DMA_DOWN_MFB_DST_RDY    : out std_logic_vector(DMA_ENDPOINTS-1 downto 0) := (others => '0');
+
+        DMA_DOWN_MVB_DATA       : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.H.data_w-1 downto 0);
+        DMA_DOWN_MVB_CTRL       : in  slv_array_t(DMA_ENDPOINTS-1 downto 0)(DMA_BUS_CFG.RES.H.vld_w-1 downto 0);
+        DMA_DOWN_MVB_SRC_RDY    : in  std_logic_vector(DMA_ENDPOINTS-1 downto 0);
+        DMA_DOWN_MVB_DST_RDY    : out std_logic_vector(DMA_ENDPOINTS-1 downto 0) := (others => '0');
 
         -- =====================================================================
         --  Application specific signals

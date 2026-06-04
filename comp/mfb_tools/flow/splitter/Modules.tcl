@@ -13,10 +13,10 @@ set PKG_BASE            "$OFM_PATH/comp/base/pkg"
 
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
 lappend PACKAGES "$PKG_BASE/type_pack.vhd"
-lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # list of sub-components
 set COMPONENTS [ list \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
    [ list "FIFOX_MULTI"   $FIFOXM_BASE         "FULL" ] \
    [ list "FIFOX"         $FIFOX_BASE          "FULL" ] \
    [ list "SPLITTER"      $SPLITTER_BASE       "FULL" ] \

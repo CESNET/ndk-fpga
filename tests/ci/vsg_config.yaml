@@ -63,6 +63,8 @@ rule:
         case: 'upper'
     constant_012:
         disable : true
+    constant_014:
+        disable : true
     constant_016:
         disable : true
     constant_100:

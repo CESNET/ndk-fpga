@@ -12,10 +12,10 @@ set AUX_SIG_BASE       "$OFM_PATH/comp/mfb_tools/logic/auxiliary_signals"
 
 set PACKAGES "$PACKAGES $PKG_BASE/math_pack.vhd"
 set PACKAGES "$PACKAGES $PKG_BASE/type_pack.vhd"
-set PACKAGES "$PACKAGES $PKG_BASE/dma_bus_pack.vhd"
 
 # list of sub-components
 set COMPONENTS [ list \
+    [ list "DMA_PACKAGE" "$OFM_PATH/comp/base/pkg" "DMA_PKG" ] \
    [ list "MFB_FIFOX"         $MFB_FIFOX_BASE  "FULL"] \
    [ list "AUXILIARY_SIGNALS" $AUX_SIG_BASE    "FULL"] \
 ]

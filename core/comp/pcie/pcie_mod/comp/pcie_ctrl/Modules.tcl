@@ -19,11 +19,11 @@ set INTEL_BASE        "$ENTITY_BASE/../../../../.."
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
-lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/pcie_meta_pack.vhd"
 lappend PACKAGES "$INTEL_BASE/config/core_const.vhd"
 
 # Components
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "MTC"          $MTC_BASE          "FULL" ]
 lappend COMPONENTS [ list "PTC"          $PTC_BASE          "FULL" ]
 lappend COMPONENTS [ list "MFB_MERGER"   $MFB_MERGER_BASE   "FULL" ]

@@ -14,9 +14,9 @@ set SUBCOMP_BASE       "$ENTITY_BASE/comp"
 
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
 lappend PACKAGES "$PKG_BASE/type_pack.vhd"
-lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
 
 # list of sub-components
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "ASYNC_RESET"         "$OFM_PATH/comp/base/async/reset"            "FULL" ]
 lappend COMPONENTS [ list "MVB_SFIFOX"          "$MVB_TOOLS_BASE/storage/fifox"              "FULL" ]
 lappend COMPONENTS [ list "MVB_ASFIFOX"         "$MVB_TOOLS_BASE/storage/asfifox"            "FULL" ]
@@ -48,6 +48,7 @@ lappend COMPONENTS [ list "CUTTER"              "$MFB_TOOLS_BASE/flow/cutter_sim
 lappend COMPONENTS [ list "DEBUG_PROBE"         "$OFM_PATH/comp/debug/streaming_debug"       "FULL" ]
 
 # entity and architecture
+lappend MOD "$ENTITY_BASE/ptc_pkg.vhd"
 lappend MOD "$ENTITY_BASE/ptc_ent.vhd"
 lappend MOD "$ENTITY_BASE/ptc_full.vhd"
 lappend MOD "$ENTITY_BASE/ptc_wrapper.vhd"

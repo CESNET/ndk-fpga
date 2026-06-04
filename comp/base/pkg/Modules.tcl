@@ -14,7 +14,9 @@ if { $ARCHGRP == "TYPE" } {
 }
 
 if { $ARCHGRP == "DMA_PKG"} {
-   set MOD "$MOD $ENTITY_BASE/dma_bus_pack.vhd"
+    lappend COMPONENTS [list "MFB_PKG" "$COMP_BASE/mfb_tools/pkg" "FULL"]
+    lappend COMPONENTS [list "MVB_PKG" "$COMP_BASE/mvb_tools/pkg" "FULL"]
+    lappend MOD "$ENTITY_BASE/dma_bus_pack.vhd"
 }
 
 if {$ARCHGRP == "SV_DMA_PKG"} {

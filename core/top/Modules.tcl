@@ -33,6 +33,8 @@ set JTAG_OP_CTRL_BASE    "$CORE_COMP_BASE/misc/jtag_op_ctrl"
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
+lappend PACKAGES "$OFM_PATH/comp/mfb_tools/pkg/mfb_pkg.vhd"
+lappend PACKAGES "$OFM_PATH/comp/mvb_tools/pkg/mvb_pkg.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/eth_hdr_pack.vhd"
 lappend PACKAGES "$ENTITY_BASE/../config/core_const.vhd"

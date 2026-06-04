@@ -6,15 +6,13 @@
 
 # Set paths
 set PKG_BASE      "$OFM_PATH/comp/base/pkg"
-set VER_PKG_BASE  "$OFM_PATH/comp/ver/vhdl_ver_tools/basics"
 
 set COMPONENTS [list \
+    [ list "VHDL_VER_TOOLS" "$OFM_PATH/comp/ver/vhdl_ver_tools/basics" "FULL"] \
     [ list "DUT"          "$ENTITY_BASE/.."             "FULL"] \
 ]
 
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
 lappend PACKAGES "$PKG_BASE/type_pack.vhd"
-lappend PACKAGES "$PKG_BASE/dma_bus_pack.vhd"
-lappend PACKAGES "$VER_PKG_BASE/basics_test_pkg.vhd"
 
 lappend MOD "$ENTITY_BASE/testbench.vhd"

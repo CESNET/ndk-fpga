@@ -11,11 +11,9 @@
 # Packages
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/math_pack.vhd"
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/type_pack.vhd"
-set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/dma_bus_pack.vhd"
 
 # Components
-set COMPONENTS [concat $COMPONENTS [list \
-]]
+lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 
 # Source files for implemented component
 set MOD "$MOD $ENTITY_BASE/ptc_pcie_axi2mfb.vhd"
