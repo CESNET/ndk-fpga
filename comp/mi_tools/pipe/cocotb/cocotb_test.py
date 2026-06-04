@@ -8,6 +8,7 @@ from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mi.drivers import MIRequestDriverAgent, MIResponseDriverAgent
 from cocotbext.ofm.mi.proxymonitor import MIProxyMonitor
 from cocotbext.ofm.mi.monitors import MIMonitor
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.utils.math import ceildiv
 from cocotb_bus.drivers import BitDriver
@@ -16,7 +17,6 @@ from cocotbext.ofm.mi.transaction import MiRequestTransaction, MiResponseTransac
 from cocotb.binary import BinaryValue
 from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
 
-import itertools
 from random import choice, randint
 
 
@@ -63,7 +63,7 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
     tb = testbench(dut, debug=False)
     await tb.reset()
 
-    tb.backpressure.start((1, i % 5) for i in itertools.count())
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     item_count = 0
     trans_cntr = 0

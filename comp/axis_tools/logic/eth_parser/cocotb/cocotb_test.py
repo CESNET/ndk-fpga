@@ -10,44 +10,23 @@ Tests:
 - run_test_headers_backpressure: Strong backpressure on HEADERS_READY
 """
 
-import random
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from cocotbext.ofm.base.generators import ItemRateLimiter
+from cocotbext.ofm.ver.backpressure import BackpressureConfig, apply_backpressure
 
 from testbench import Testbench
-
-
-@dataclass
-class BPCfg:
-    """Backpressure config: min/max hold cycles, low probability."""
-    min_hold: int = 1
-    max_hold: int = 5
-    low_prob: float = 0.5
-
-
-async def _backpressure(signal, clock, cfg: Optional[BPCfg] = None):
-    """Apply backpressure to a ready signal."""
-    cfg = cfg or BPCfg()
-    while True:
-        if random.random() < cfg.low_prob:
-            signal.value = 0
-            await ClockCycles(clock, random.randint(cfg.min_hold, cfg.max_hold))
-        else:
-            signal.value = 1
-            await ClockCycles(clock, random.randint(cfg.min_hold, cfg.max_hold))
 
 
 async def _run_test(
     dut,
     pkt_count: int = 3000,
     pkt_range: Tuple[int, int] = (60, 1500),
-    tx_cfg: Optional[BPCfg] = None,
-    hdr_cfg: Optional[BPCfg] = None,
+    tx_cfg: Optional[BackpressureConfig] = None,
+    hdr_cfg: Optional[BackpressureConfig] = None,
     corrupt_prob: float = 0.05,
     test_name: str = ""
 ):
@@ -62,8 +41,8 @@ async def _run_test(
     tb.rx_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
     tb.tx_driver.bus.TREADY.value = 1
 
-    tx_task = cocotb.start_soon(_backpressure(dut.TX_AXI_TREADY, dut.CLK, tx_cfg))
-    hdr_task = cocotb.start_soon(_backpressure(dut.HEADERS_READY, dut.CLK, hdr_cfg))
+    tx_task = cocotb.start_soon(apply_backpressure(dut.TX_AXI_TREADY, dut.CLK, tx_cfg))
+    hdr_task = cocotb.start_soon(apply_backpressure(dut.HEADERS_READY, dut.CLK, hdr_cfg))
 
     for i in range(pkt_count):
         await tb.generate_and_send_packet(
@@ -97,8 +76,8 @@ async def run_test_base(dut, pkt_count=3000):
     """Base test: moderate backpressure on TX and HEADERS_READY."""
     await _run_test(
         dut, pkt_count=pkt_count,
-        tx_cfg=BPCfg(1, 5, 0.5),
-        hdr_cfg=BPCfg(1, 5, 0.5),
+        tx_cfg=BackpressureConfig(1, 5, 0.5),
+        hdr_cfg=BackpressureConfig(1, 5, 0.5),
         test_name="base"
     )
 
@@ -108,8 +87,8 @@ async def run_test_headers_backpressure(dut, pkt_count=2000):
     """Headers backpressure test: strong HEADERS_READY, light TX backpressure."""
     await _run_test(
         dut, pkt_count=pkt_count,
-        tx_cfg=BPCfg(1, 5, 0.1),
-        hdr_cfg=BPCfg(20, 200, 0.9),
+        tx_cfg=BackpressureConfig(1, 5, 0.1),
+        hdr_cfg=BackpressureConfig(20, 200, 0.9),
         test_name="headers_backpressure"
     )
 
@@ -119,8 +98,8 @@ async def run_test_corruption(dut, pkt_count=2000):
     """Corruption test: 50% packet corruption with base backpressure."""
     await _run_test(
         dut, pkt_count=pkt_count,
-        tx_cfg=BPCfg(1, 5, 0.5),
-        hdr_cfg=BPCfg(1, 5, 0.5),
+        tx_cfg=BackpressureConfig(1, 5, 0.5),
+        hdr_cfg=BackpressureConfig(1, 5, 0.5),
         corrupt_prob=0.5,
         test_name="corruption"
     )

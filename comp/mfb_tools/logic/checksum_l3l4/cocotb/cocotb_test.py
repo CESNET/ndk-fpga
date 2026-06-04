@@ -3,12 +3,11 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import itertools
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from cocotbext.ofm.base.generators import ItemRateLimiter
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 
 from testbench import Testbench
 
@@ -38,7 +37,7 @@ async def run_test_base(dut, pkt_count=4000, truncate_chance=0):
     tb.mvb_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
 
     # Start backpressure (randomized DST_RDY)
-    tb.backpressure.start((1, i % 5) for i in itertools.count())
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # Generate and send packets
     for _ in range(pkt_count):
@@ -96,7 +95,7 @@ async def run_test_corrupted_extreme(dut, pkt_count=5000, truncate_chance=0.9, l
     tb.mvb_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
 
     # Start backpressure (randomized DST_RDY)
-    tb.backpressure.start((1, i % 5) for i in itertools.count())
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # Generate and send packets with extreme truncation (90%)
     for _ in range(pkt_count):

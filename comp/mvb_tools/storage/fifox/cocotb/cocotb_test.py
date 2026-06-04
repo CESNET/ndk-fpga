@@ -5,13 +5,12 @@
 
 
 # importing required modules
-import itertools
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_integers
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
@@ -90,7 +89,7 @@ async def run_test(dut, pkt_count=10000):
     await tb.reset()
 
     # starting the BitDriver (randomized DST_RDY)
-    tb.backpressure.start((1, i % 5) for i in itertools.count())
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # dynamically getting the width of the data signal that will be set (useful if the width of the signal may change)
     data_width = tb.stream_in.item_widths["data"]
