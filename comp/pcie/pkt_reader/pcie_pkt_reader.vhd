@@ -18,7 +18,9 @@ use work.dma_bus_pack.all;
 --
 -- This module accepts request instructions to read data from a memory device over the PCIe.
 -- The user provides the Address and Length of the requested data on the RX_USR interface.
--- They also provide an ID, which will identify the read data received on the TX_USR interface, which may arrive out of order.
+-- They also provide an ID, which will identify the read data received on the TX_USR interface.
+-- The read data can be output in the same order as the requests were received when RESP_IN_ORDER=True.
+-- When RESP_IN_ORDER=False, completed packets are output immediately regardless of request order.
 --
 -- This module's non-user interfaces (PCIE_UP, PCIE_DOWN) are compatible with the PTC module.
 -- The transactions it receives from the PTC module may come in parts and mixed with parts from other read data.
@@ -28,11 +30,6 @@ use work.dma_bus_pack.all;
 -- ..warning::
 --
 --   To ensure correct function, DO NOT reuse IDs until appropriate response is received!
---
--- Must still be tested in scenarios where:
---
---    #. requests generate multiple completions (FIP: Fixing In Process) and
---    #. completions arrive out-of-order (in-order per same tag).
 --
 entity PCIE_PKT_READER is
     generic (
@@ -58,6 +55,10 @@ entity PCIE_PKT_READER is
         PCIE_MRRS_WIDTH : natural := 12;
         -- Size of a RAM page (in bytes).
         PAGE_SIZE       : natural := 4096;
+        -- When True, packets are output in the same order as the original requests.
+        -- May lead to higher latency due to the reordering process.
+        -- When False, completed packets are output immediately regardless of request order.
+        RESP_IN_ORDER   : boolean := True;
         DEVICE          : string := "AGILEX"
     );
     port (
@@ -145,10 +146,18 @@ architecture FULL of PCIE_PKT_READER is
     constant WR_INSTR_WIDTH : natural := 1   + MM_WR_ADDR_W + ID_WIDTH + DMA_REQUEST_TAG_W;
     -- Max number of words a packet (MTU) can stretch over.
     constant MAX_WORDS_W    : natural := log2(div_roundup(PKT_MTU+1,WORD_ITEMS));
-    -- Width of ID Memory data:          MM RD addr     + words       + EOFPOS in word   + Tag count
-    constant IDMEM_DATA_W   : natural := MM_RD_ADDR_W+1 + MAX_WORDS_W + log2(WORD_ITEMS) + DMA_REQUEST_TAG_W;
-    -- Width of RD instr FIFO data:      ID       + ID Mem data  - Tag count
-    constant RD_INSTR_WIDTH : natural := ID_WIDTH + IDMEM_DATA_W - DMA_REQUEST_TAG_W;
+    -- Packet metadata width:            MM RD addr     + words       + EOFPOS in word
+    constant PKT_META_W     : natural := MM_RD_ADDR_W+1 + MAX_WORDS_W + log2(WORD_ITEMS);
+    -- ID Memory data width:
+    --   In-order:     only tag count (metadata lives in TRANS_SORTER)
+    --   Out-of-order: metadata + tag count (metadata read from IDMEM for RD instructions)
+    constant IDMEM_DATA_W   : natural := tsel(RESP_IN_ORDER, DMA_REQUEST_TAG_W, PKT_META_W + DMA_REQUEST_TAG_W);
+    -- TRANS_SORTER metadata width:
+    --   In-order:     full metadata (output to RD instructions)
+    --   Out-of-order: only MM RD addr (for freed pointer tracking)
+    constant TRANS_META_W   : natural := tsel(RESP_IN_ORDER, PKT_META_W, MM_RD_ADDR_W+1);
+    -- Width of RD instr FIFO data:      ID       + packet metadata
+    constant RD_INSTR_W     : natural := ID_WIDTH + PKT_META_W;
 
     -- =====================================================================
     --                                 SIGNALS
@@ -212,10 +221,7 @@ architecture FULL of PCIE_PKT_READER is
     signal idmem_rd_reg_data        : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
     signal idmem_rd_reg_cmpl        : std_logic_vector(MFB_REGIONS-1 downto 0);
 
-    signal idmem_wr1_rdaddr         : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
-    signal idmem_wr1_words          : slv_array_t(MFB_REGIONS-1 downto 0)(MAX_WORDS_W-1 downto 0);
-    signal idmem_wr1_eofpos         : slv_array_t(MFB_REGIONS-1 downto 0)(log2(WORD_ITEMS)-1 downto 0);
-    signal idmem_wr1_tagcnt         : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
+    signal idmem_wr1_tagcnt         : u_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr1_new_tag_cnt    : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr1_data_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
 
@@ -284,19 +290,21 @@ architecture FULL of PCIE_PKT_READER is
     signal mm_rd_curr_addr          : std_logic_vector(MM_RD_ADDR_W-1 downto 0);
 
     signal transs_rx_trans_id       : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
-    signal transs_rx_trans_meta     : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
+    signal transs_rx_trans_meta     : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_META_W-1 downto 0);
     signal transs_rx_trans_src_rdy  : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal transs_rx_conf_id        : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
     signal transs_rx_conf_vld       : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal transs_tx_id             : slv_array_t(MFB_REGIONS-1 downto 0)(ID_WIDTH-1 downto 0);
-    signal transs_tx_meta           : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
+    signal transs_tx_meta           : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_META_W-1 downto 0);
     signal transs_tx_src_rdy        : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal transs_tx_dst_rdy_i      : std_logic;
+    signal transs_tx_mm_addr        : std_logic_vector(MM_RD_ADDR_W downto 0);
 
-    signal rd_instr_fifo_di_arr     : slv_array_t(MFB_REGIONS-1 downto 0)(RD_INSTR_WIDTH-1 downto 0);
-    signal rd_instr_fifo_di         : std_logic_vector(MFB_REGIONS*RD_INSTR_WIDTH-1 downto 0);
+    signal rd_instr_fifo_di_arr     : slv_array_t(MFB_REGIONS-1 downto 0)(RD_INSTR_W-1 downto 0);
+    signal rd_instr_fifo_di         : std_logic_vector(MFB_REGIONS*RD_INSTR_W-1 downto 0);
     signal rd_instr_fifo_wr         : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal rd_instr_fifo_full       : std_logic;
-    signal rd_instr_fifo_do         : std_logic_vector(RD_INSTR_WIDTH-1 downto 0);
+    signal rd_instr_fifo_do         : std_logic_vector(RD_INSTR_W-1 downto 0);
     signal rd_instr_fifo_rd         : std_logic_vector(1-1 downto 0);
     signal rd_instr_fifo_empty      : std_logic_vector(1-1 downto 0);
     signal rd_instr_invalidate      : std_logic;
@@ -474,23 +482,30 @@ begin
     -- --------------------------------------------------------
     --  Memory for ID records
     --
+    -- In-order:     stores only tag count per ID (metadata lives in TRANS_SORTER)
+    -- Out-of-order: stores metadata + tag count per ID (metadata read for RD instructions)
+    --
     -- The idea here is to enable memory access from two different sources at the same time:
     --   0) the Request Processor's IDMEM interface
     --      - sets new records
     --   1) updates from the Tagmem
     --      - decrements the number of Tags needed to complete a whole packet
-    --      - after the number of Tags reaches 0, it is sent to the RD Instr FIFO
+    --      - after the number of Tags reaches 0, it is sent to the RD Instr FIFO/TRANS_SORTER
     --      - (it utilizes also the read ports)
     -- --------------------------------------------------------
     idmem_addr_arr    <= slv_array_deser(idmem_addr, MFB_REGIONS);
     idmem_words_arr   <= slv_array_deser(idmem_words, MFB_REGIONS);
     idmem_eof_pos_arr <= slv_array_deser(idmem_eof_pos, MFB_REGIONS);
     idmem_tag_cnt_arr <= slv_array_deser(idmem_tag_cnt, MFB_REGIONS);
-    idmem_wr0_g : for r in 0 to MFB_REGIONS-1 generate
-        idmem_wr0_data_arr(r) <= idmem_addr_arr   (r) & -- MM RD address
-                                 idmem_words_arr  (r) & -- number of words
-                                 idmem_eof_pos_arr(r) & -- EOFPOS
-                                 idmem_tag_cnt_arr(r);  -- Number of partial requests
+    idmem_wr0_g : if RESP_IN_ORDER generate
+        idmem_wr0_data_arr <= idmem_tag_cnt_arr; -- Number of partial requests (tags)
+    else generate
+        idmem_wr0_data_g : for r in 0 to MFB_REGIONS-1 generate
+            idmem_wr0_data_arr(r) <= idmem_addr_arr   (r) & -- MM RD address (+ new-packet flag)
+                                     idmem_words_arr  (r) & -- number of words
+                                     idmem_eof_pos_arr(r) & -- EOFPOS
+                                     idmem_tag_cnt_arr(r);  -- Number of partial requests (tags)
+        end generate;
     end generate;
 
     -- IDMEM source 0
@@ -530,19 +545,18 @@ begin
         end if;
     end process;
 
-    idmem_wr1_rdaddr <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-1, IDMEM_DATA_W-(MM_RD_ADDR_W+1));
-    idmem_wr1_words  <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-1, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W);
-    idmem_wr1_eofpos <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W-1, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W-log2(WORD_ITEMS));
-    idmem_wr1_tagcnt <= slv_array_slice(idmem_rd_reg_data, IDMEM_DATA_W-(MM_RD_ADDR_W+1)-MAX_WORDS_W-log2(WORD_ITEMS)-1, 0);
-    idmem_wr_data1_g : for r in 0 to MFB_REGIONS-1 generate
-        -- Decrement tag count
-        idmem_wr1_new_tag_cnt(r) <= std_logic_vector(unsigned(idmem_wr1_tagcnt(r)) - 1);
+    idmem_wr1_tagcnt <= slv_arr_to_u_arr(slv_array_slice(idmem_rd_reg_data, DMA_REQUEST_TAG_W-1, 0));
 
-        -- Write back updated record.
-        idmem_wr1_data_arr   (r) <= idmem_wr1_rdaddr     (r) &
-                                    idmem_wr1_words      (r) &
-                                    idmem_wr1_eofpos     (r) &
-                                    idmem_wr1_new_tag_cnt(r);
+    idmem_wr1_data_g : for r in 0 to MFB_REGIONS-1 generate
+        -- Decrement tag count
+        idmem_wr1_new_tag_cnt(r) <= std_logic_vector(idmem_wr1_tagcnt(r) - 1);
+        idmem_wr_data1_g : if RESP_IN_ORDER generate
+            -- In-order: write only tag count (no metadata stored in IDMEM).
+            idmem_wr1_data_arr(r) <= idmem_wr1_new_tag_cnt(r);
+        else generate
+            -- Out-of-order: preserve metadata, update only tag count.
+            idmem_wr1_data_arr(r) <= idmem_rd_reg_data(r)(IDMEM_DATA_W-1 downto DMA_REQUEST_TAG_W) & idmem_wr1_new_tag_cnt(r);
+        end generate;
     end generate;
 
     -- IDMEM source 1
@@ -557,7 +571,9 @@ begin
     -- --------------------------------------------------------
     --  MVB path
     -- --------------------------------------------------------
-    PCIE_DOWN_MVB_DST_RDY <= not wr_instr_fifo_full and not rd_instr_fifo_full;
+    -- In-order: TRANS_SORTER provides extra buffer so we don't care about rd_instr_fifo_full.
+    PCIE_DOWN_MVB_DST_RDY <= not wr_instr_fifo_full when (RESP_IN_ORDER) else
+                             not wr_instr_fifo_full and not rd_instr_fifo_full;
 
     -- Data from MVB headers are used to access records in the Tag Mem
     pcie_down_mvb_data_arr <= slv_array_deser(PCIE_DOWN_MVB_DATA, MFB_REGIONS);
@@ -833,21 +849,25 @@ begin
     --  Read completed packets
     -- ========================================================
 
-    rd_instr_fifo_g : for r in 0 to MFB_REGIONS-1 generate
-        -- Write the ID Mem's record data to the RD Instr FIFO when completion of the last Tag arrives.
-        rd_instr_fifo_wr    (r) <= idmem_rd_reg_cmpl(r) when (unsigned(idmem_wr1_tagcnt(r)) = 1) else '0';
-        -- All ID Mem data including the ID except tag count.
-        rd_instr_fifo_di_arr(r) <= idmem_rd_reg_addr(r) & -- packet ID
-                                   idmem_wr1_rdaddr (r) & -- MM RD address
-                                   idmem_wr1_words  (r) & -- number of words
-                                   idmem_wr1_eofpos (r);  -- EOFPOS
+    rd_instr_input_g : if RESP_IN_ORDER generate
+        -- In-order: RD instructions come from TRANS_SORTER output (sorted by original request order)
+        rd_instr_fifo_wr <= transs_tx_src_rdy;
+        rd_instr_fifo_g : for r in 0 to MFB_REGIONS-1 generate
+            rd_instr_fifo_di_arr(r) <= transs_tx_id(r) & transs_tx_meta(r);
+        end generate;
+    else generate
+        -- Out-of-order: RD instructions come directly from ID Memory when all tags complete
+        rd_instr_fifo_g : for r in 0 to MFB_REGIONS-1 generate
+            rd_instr_fifo_wr    (r) <= idmem_rd_reg_cmpl(r) when (idmem_wr1_tagcnt(r) = 1) else '0';
+            rd_instr_fifo_di_arr(r) <= idmem_rd_reg_addr(r) & idmem_rd_reg_data(r)(IDMEM_DATA_W-1 downto DMA_REQUEST_TAG_W);
+        end generate;
     end generate;
     rd_instr_fifo_di <= slv_array_ser(rd_instr_fifo_di_arr);
 
     -- Store read instructions
     rd_instr_fifo_i : entity work.FIFOX_MULTI
     generic map (
-        DATA_WIDTH          => RD_INSTR_WIDTH,
+        DATA_WIDTH          => RD_INSTR_W,
         ITEMS               => 64,
         WRITE_PORTS         => MFB_REGIONS,
         READ_PORTS          => 1,
@@ -939,15 +959,29 @@ begin
     USER_RESP_MFB_SRC_RDY <= tx_mfb_src_rdy;
 
     -- ========================================================
-    --  Read address freeing
+    --  In-order output and read address freeing
     -- ========================================================
 
+    -- Pass metadata to TRANS_SORTER when a new request arrives
     transs_rx_trans_id      <= slv_array_deser(idmem_id, MFB_REGIONS);
-    transs_rx_trans_meta    <= slv_array_deser(idmem_addr, MFB_REGIONS);
+    transs_rx_trans_meta_g : if RESP_IN_ORDER generate
+        -- In-order: full metadata (output to RD instructions)
+        transs_rx_trans_meta_full_g : for r in 0 to MFB_REGIONS-1 generate
+            transs_rx_trans_meta(r) <= idmem_addr_arr   (r) & -- MM RD address
+                                       idmem_words_arr  (r) & -- number of words
+                                       idmem_eof_pos_arr(r);  -- EOFPOS
+        end generate;
+    else generate
+        -- Out-of-order: only MM RD address (for freed pointer tracking)
+        transs_rx_trans_meta <= idmem_addr_arr;
+    end generate;
     transs_rx_trans_src_rdy <= idmem_vld;
 
-    transs_rx_conf_id  <= (others => rd_instr_id);
-    transs_rx_conf_vld <= rd_instr_fifo_rd;
+    -- Confirm to TRANS_SORTER when all tags for an ID have completed
+    transs_rx_conf_id  <= idmem_rd_reg_addr;
+    transs_rx_conf_g : for r in 0 to MFB_REGIONS-1 generate
+        transs_rx_conf_vld(r) <= idmem_rd_reg_cmpl(r) when (idmem_wr1_tagcnt(r) = 1) else '0';
+    end generate;
 
     trans_sorter_i : entity work.TRANS_SORTER
     generic map (
@@ -956,7 +990,7 @@ begin
         ID_CONFS            => MFB_REGIONS,
         ID_WIDTH            => ID_WIDTH,
         TRANS_FIFO_ITEMS    => 2**ID_WIDTH, -- enough for RX_TRANS_DST_RDY and/or TRANS_FIFO_AFULL to never fire
-        METADATA_WIDTH      => MM_RD_ADDR_W+1,
+        METADATA_WIDTH      => TRANS_META_W,
         MSIDT_BEHAV         => 0,
         MAX_SAME_ID_TRANS   => 0,
         USE_SHAKEDOWN_FIFOX => False,
@@ -977,17 +1011,24 @@ begin
         RX_CONF_ID       => transs_rx_conf_id,
         RX_CONF_VLD      => transs_rx_conf_vld,
 
-        TX_TRANS_ID      => open,
+        TX_TRANS_ID      => transs_tx_id,
         TX_TRANS_META    => transs_tx_meta,
         TX_TRANS_SRC_RDY => transs_tx_src_rdy,
-        TX_TRANS_DST_RDY => '1'
+        TX_TRANS_DST_RDY => transs_tx_dst_rdy_i
     );
+
+    -- Out-of-order: always drain TRANS_SORTER output (used only for mm_freed_rd_ptr tracking)
+    transs_tx_dst_rdy_i <= not rd_instr_fifo_full when (RESP_IN_ORDER) else '1';
+
+    -- Extract MM read address from TRANS_SORTER metadata
+    transs_tx_mm_addr <= transs_tx_meta(0) when (not RESP_IN_ORDER) else
+                         transs_tx_meta(0)(TRANS_META_W-1 downto MAX_WORDS_W+log2(WORD_ITEMS));
 
     process (CLK)
     begin
         if rising_edge(CLK) then
             if (transs_tx_src_rdy(0) = '1') then
-                mm_freed_rd_ptr <= transs_tx_meta(0);
+                mm_freed_rd_ptr <= transs_tx_mm_addr;
             end if;
             if (RESET = '1') then
                 mm_freed_rd_ptr <= (others => '0');
