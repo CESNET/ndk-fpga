@@ -63,6 +63,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="mem.html">The Memory Controller</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tsu.html">Time Stamp Unit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dma_bus.html">DMA Bus</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">NDK testing</a></li>
@@ -409,7 +410,12 @@ the PCIe IP RQ and RC interfaces.</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between PCIE core logic and Top-Level FPGA design</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie-dma_route"><td><p>DMA_ROUTE</p></td>
+<td><p>dma_route_path_array_t</p></td>
+<td><p>core_pcie_get_dma_route(DMA_PORTS, PCIE_ENDPOINTS)</p></td>
+<td><p>Dynamic routing parameters of the DMA bus</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“STRATIX10”</p></td>
 <td><p>FPGA device</p></td>
