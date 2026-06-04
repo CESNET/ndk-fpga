@@ -6,7 +6,6 @@ from cocotb_bus.scoreboard import Scoreboard as BaseScoreboard
 from cocotb.result import TestFailure
 from cocotb_bus.monitors import Monitor
 import logging
-from cocotb.utils import hexdump
 
 
 class Scoreboard(BaseScoreboard):
@@ -52,7 +51,7 @@ class Scoreboard(BaseScoreboard):
                 self.errors += 1
                 log.error("Received a transaction but wasn't expecting "
                           "anything")
-                log.info("Got: %s" % (hexdump(str(transaction))))
+                log.info("Got: %s", transaction)
                 if self._imm:
                     raise TestFailure("Received a transaction but wasn't "
                                       "expecting anything")

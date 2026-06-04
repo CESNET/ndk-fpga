@@ -12,6 +12,8 @@ and the comparison function for scoreboard verification.
 from dataclasses import dataclass
 from typing import Tuple
 
+from cocotbext.ofm.utils.hex_formatter import format_bytes
+
 
 @dataclass(eq=False)
 class MfbChecksumL3L4Result:
@@ -75,30 +77,8 @@ def _format_row(field: str, exp_val, act_val, match: bool) -> str:
     act_str = _fmt_val(act_val, is_checksum)
 
     marker = " " if match else "X"
-
     # Format: # + space + marker + space + field(18) + 2 spaces + exp(18) + 2 spaces + act(18) + space + #
     return f"# {marker} {field:<18}  {exp_str:>18}  {act_str:>18}   #"
-
-
-def _format_packet_bytes(packet_bytes: bytes, label: str) -> str:
-    """Format packet bytes for display, 16 bytes per line.
-
-    Args:
-        packet_bytes: Raw packet bytes
-        label: Label to display before the bytes
-
-    Returns:
-        Formatted string with bytes nicely aligned
-    """
-    lines = [f"{label}:"]
-    for i in range(0, min(len(packet_bytes), 256), 16):  # Limit to first 256 bytes
-        chunk = packet_bytes[i:i+16]
-        hex_str = ' '.join(f'{b:02X}' for b in chunk)
-        ascii_str = ''.join(chr(b) if 32 <= b < 127 else '.' for b in chunk)
-        lines.append(f"  {i:04X}: {hex_str:<48} {ascii_str}")
-    if len(packet_bytes) > 256:
-        lines.append(f"  ... ({len(packet_bytes) - 256} more bytes)")
-    return '\n'.join(lines)
 
 
 def compare_checksums(expected: MfbChecksumL3L4Result, actual: MfbChecksumL3L4Result) -> Tuple[bool, str]:
@@ -171,7 +151,7 @@ def compare_checksums(expected: MfbChecksumL3L4Result, actual: MfbChecksumL3L4Re
     lines.append("")
 
     msg = "\n".join(lines)
-    msg += "\n" + _format_packet_bytes(expected.packet_bytes, "Packet bytes (Expected)") + "\n"
-    msg += "\n" + _format_packet_bytes(actual.packet_bytes, "Packet bytes (Actual/DUT)") + "\n"
+    msg += "\n" + format_bytes(expected.packet_bytes, label="Packet bytes (Expected)", max_bytes=256) + "\n"
+    msg += "\n" + format_bytes(actual.packet_bytes, label="Packet bytes (Actual/DUT)", max_bytes=256) + "\n"
 
     return not has_error, msg

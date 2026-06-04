@@ -12,6 +12,8 @@ and the comparison function for scoreboard verification.
 from dataclasses import dataclass
 from typing import Tuple
 
+from cocotbext.ofm.utils.hex_formatter import format_bytes
+
 
 @dataclass(eq=False)
 class AxisEthParserResult:
@@ -159,28 +161,8 @@ def _format_row(field: str, exp_val, act_val, match: bool) -> str:
     act_str = _fmt_val(act_val, is_mac, is_ip, is_vlan, is_offset, is_ethertype)
 
     marker = " " if match else "X"
-
     # Format: # + space + marker + space + field(18) + 2 spaces + exp(18) + 2 spaces + act(18) + space + #
     return f"# {marker} {field:<18}  {exp_str:>18}  {act_str:>18}   #"
-
-
-def _format_packet_bytes(packet_bytes: bytes, label: str) -> str:
-    """Format packet bytes for display, 16 bytes per line.
-
-    Args:
-        packet_bytes: Raw packet bytes
-        label: Label to display before the bytes
-
-    Returns:
-        Formatted string with bytes nicely aligned
-    """
-    lines = [f"{label}:"]
-    for i in range(0, len(packet_bytes), 16):
-        chunk = packet_bytes[i:i+16]
-        hex_str = ' '.join(f'{b:02X}' for b in chunk)
-        ascii_str = ''.join(chr(b) if 32 <= b < 127 else '.' for b in chunk)
-        lines.append(f"  {i:04X}: {hex_str:<48} {ascii_str}")
-    return '\n'.join(lines)
 
 
 def compare_headers(expected: AxisEthParserResult, actual: AxisEthParserResult) -> Tuple[bool, str]:
@@ -375,7 +357,7 @@ def compare_headers(expected: AxisEthParserResult, actual: AxisEthParserResult) 
     lines.append("")
 
     msg = "\n".join(lines)
-    msg += "\n" + _format_packet_bytes(expected.packet_bytes, "Packet bytes (Expected)") + "\n"
-    msg += "\n" + _format_packet_bytes(actual.packet_bytes, "Packet bytes (Actual/DUT)") + "\n"
+    msg += "\n" + format_bytes(expected.packet_bytes, label="Packet bytes (Expected)") + "\n"
+    msg += "\n" + format_bytes(actual.packet_bytes, label="Packet bytes (Actual/DUT)") + "\n"
 
     return not has_error, msg
