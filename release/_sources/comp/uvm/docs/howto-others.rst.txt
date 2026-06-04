@@ -5,9 +5,10 @@
 .. SPDX-License-Identifier: BSD-3-Clause
 
 .. UVM howto
-.. _uvm_howto_others:
 
 ----
+
+.. _uvm_howto_others:
 
 ***************************
 UVM HOWTO - Multiver script

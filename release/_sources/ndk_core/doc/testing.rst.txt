@@ -11,8 +11,8 @@ This chapter describes how the NDK firmware and its HDL components can be tested
 
 - Test R/W access to scratch registers in the NDK firmware (:ref:`see below <ndk_testing_mi>`).
 - Simple HW throughput tests can be executed using the :ref:`Gen Loop Switch (GLS) debug module <gls_debug>` (:ref:`see below <ndk_testing_gls>`).
-- HDL components are tested by :ref:`verification, mainly using the UVM <uvm_ver>`.
-- There is also a :ref:`simulation of almost the entire firmware using cocotb <cocotb_sim>` (however, it is not yet publicly available).
+- HDL components are tested by :ref:`verification using UVM <uvm_ver>` and :ref:`cocotb <cocotb_ver>`.
+- There is also a :ref:`simulation of almost the entire firmware using cocotb <cocotb_top_level_sim>`.
 
 .. _ndk_testing_mi:
 

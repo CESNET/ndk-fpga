@@ -48,7 +48,7 @@ Inside *tbench* create *env* and *test* (some setups use *tests*). Create the fi
 * ./uvm/tbench/env/pkg.sv
 * ./uvm/tbench/test/base.sv
 * ./uvm/tbench/test/pkg.sv
-* ./uvm/generic.sv
+* ./uvm/tbench/generic.sv
 * ./uvm/Modules.tcl
 * ./uvm/top_level.fdo
 * ./uvm/signals.fdo
@@ -93,6 +93,8 @@ Later we add RX/TX UVCs, model, and scoreboard. Some classes are parametrised (e
             //Call parents function build_phase
             super.build_phase(phase);
 
+            // Create sequencer
+            m_sequencer = sequencer #(DATA_WIDTH)::type_id::create("m_sequencer", this);
         endfunction
 
         // Connect agent's ports with ports from scoreboard.
@@ -127,6 +129,7 @@ Package simplifies organization of files and classes into namespace.
 
 .. code-block:: systemverilog
    :caption: env/pkg.sv
+
     `ifndef FIFOX_ENV_SV
     `define FIFOX_ENV_SV
     package uvm_fifox;
@@ -154,8 +157,7 @@ Function *used* indicates whether the scoreboard is still waiting for DUT data.
     class base#(
         int unsigned DATA_WIDTH
     ) extends uvm_test;
-        `m_uvm_object_registry_internal(test::base#(DATA_WIDTH), test::base)
-        `m_uvm_get_type_name_func(test::base)
+        uvm_component_registry #(test::base#(DATA_WIDTH), "test::base") type_id;
 
         // test have to create top level environment
         uvm_fifox::env #(DATA_WIDTH) m_env;
@@ -477,7 +479,6 @@ In the next chapters we will add UVCs to start generating and observing signals.
     :alt: WAVE - Create base environment
 
     Waveform displaying run of the dummy verification environment
-|
 
 ----
 
@@ -488,8 +489,6 @@ UVM PHASES
 UVM components run in phases (e.g. *build_phase*, *connect_phase*, *run_phase*); you see them in
 *env.sv* and *test.sv*. For an overview of what each phase does, see :ref:`uvm_howto_intro` (UVM concepts — Phases).
 Not every component implements every phase; for example, the NDK agents commonly don't implement *check_phase*.
-
-|
 
 ----
 
@@ -567,6 +566,9 @@ and *uvm_reset::agent*.
             uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_rx", "m_config", m_cfg_rx);
             // Creation of the m_rx
             m_rx = uvm_logic_vector_mvb::env_rx #(1, DATA_WIDTH)::type_id::create("m_rx", this);
+
+            // Create sequencer
+            m_sequencer = sequencer #(DATA_WIDTH)::type_id::create("m_sequencer", this);
         endfunction
 
         // Connect agent's ports with ports from scoreboard.
@@ -628,8 +630,7 @@ data has stopped. Using *join* would not work because the reset sequence never s
     class base#(
         int unsigned DATA_WIDTH
     ) extends uvm_test;
-        `m_uvm_object_registry_internal(test::base#(DATA_WIDTH), test::base)
-        `m_uvm_get_type_name_func(test::base)
+        uvm_component_registry #(test::base#(DATA_WIDTH), "test::base") type_id;
 
         // test has to create top-level environment
         uvm_fifox::env #(DATA_WIDTH) m_env;
@@ -804,6 +805,9 @@ Add *uvm_logic_vector_mvb::env_tx* to the environment. It drives *DST_RDY* (FIFO
             uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_tx", "m_config", m_cfg_tx);
             // Creation of the m_tx
             m_tx = uvm_logic_vector_mvb::env_tx #(1, DATA_WIDTH)::type_id::create("m_tx", this);
+
+            // Create sequencer
+            m_sequencer = sequencer #(DATA_WIDTH)::type_id::create("m_sequencer", this);
         endfunction
 
         // Connect agent's ports with ports from scoreboard.
@@ -1019,6 +1023,9 @@ Add the model and the scoreboard into the environment
             uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_tx", "m_config", m_cfg_tx);
             // Creation of the m_tx
             m_tx = uvm_logic_vector_mvb::env_tx #(1, DATA_WIDTH)::type_id::create("m_tx", this);
+
+            // Create sequencer
+            m_sequencer = sequencer #(DATA_WIDTH)::type_id::create("m_sequencer", this);
 
             m_sc = scoreboard #(DATA_WIDTH)::type_id::create("m_sc", this);
 

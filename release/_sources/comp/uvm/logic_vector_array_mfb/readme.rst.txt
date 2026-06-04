@@ -5,7 +5,7 @@
 .. SPDX-License-Identifier: BSD-3-Clause
 
 ..  logic_vector_array to mfb enviroment
-.. _logic_vector_array_mfb_mfb:
+.. _logic_vector_array_mfb_env:
 
 **********************************
 logic_vector_array_mfb environment
@@ -14,11 +14,9 @@ This environment has two high-level agents. The first one is a logic vector arra
 This package contains two environments. Environment RX generates data and metadata and sends them to the DUT. Environment TX generates the DST_RDY signal and
 observes the TX interface.
 
-
-.. image:: ../docs/byte_array_mfb_env.svg
+.. image:: ../docs/img/byte_array_mfb_env.svg
     :align: center
     :alt: logic_vector_array_mfb schema
-
 
 The environment is configured by these four parameters: For more information see :ref:`mfb documentation<mfb_bus>`.
 

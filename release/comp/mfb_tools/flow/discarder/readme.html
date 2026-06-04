@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -186,127 +187,132 @@ Minimum value is 2!</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>Device</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-clk"><td><p>CLK</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-splitter_fifox_multi_arch"><td><p>SPLITTER_FIFOX_MULTI_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“FULL”</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-clk"><td><p>CLK</p></td>
 <td><p>in  std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>CLOCK AND RESET</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-reset"><td><p>RESET</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-reset"><td><p>RESET</p></td>
 <td><p>in  std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
 <td><p>in  std_logic_vector(REGIONS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>RX INTERFACE</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_discard"><td><p>RX_MVB_DISCARD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_discard"><td><p>RX_MVB_DISCARD</p></td>
 <td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
 <td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
 <td><p>in  std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
 <td><p>out std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
 <td><p>in  std_logic_vector(REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
 <td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
 <td><p>in  std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
 <td><p>in  std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
 <td><p>in  std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
 <td><p>in  std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
 <td><p>out std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
 <td><p>out std_logic_vector(REGIONS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>TX INTERFACE</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>out std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>out std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>in  std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>out std_logic_vector(REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>out std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>out std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>out std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>out std_logic_vector(REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>out std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_discarder-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_discarder-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>in  std_logic</p></td>
 <td><p>UNDEFINED</p></td>
 <td></td>

@@ -97,6 +97,7 @@ it also provides converters:
     :maxdepth: 1
 
     basic_cocotb_test
+    cocotb_tips_and_tricks
     cocotbext
 
 .. toctree::

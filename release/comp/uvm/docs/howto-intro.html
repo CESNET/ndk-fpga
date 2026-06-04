@@ -108,6 +108,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -233,39 +234,33 @@ from <code class="docutils literal notranslate"><span class="pre">comp/uvm/</spa
 <section id="the-big-picture-what-runs-when">
 <h2>The big picture: what runs when<a class="headerlink" href="#the-big-picture-what-runs-when" title="Link to this heading"></a></h2>
 <p>A single verification run looks like this:</p>
-<ol class="arabic">
-<li><p><strong>Testbench</strong> (SystemVerilog <code class="docutils literal notranslate"><span class="pre">module</span></code>)
-* Creates clock and reset.
-* Instantiates the <strong>DUT</strong> and <strong>interfaces</strong> that connect the DUT to the</p>
-<blockquote>
-<div><p>verification world.</p>
-</div></blockquote>
+<ol class="arabic simple">
+<li><p><strong>Testbench</strong> (SystemVerilog <code class="docutils literal notranslate"><span class="pre">module</span></code>)</p>
 <ul class="simple">
+<li><p>Creates clock and reset.</p></li>
+<li><p>Instantiates the <strong>DUT</strong> and <strong>interfaces</strong> that connect the DUT to the
+verification world.</p></li>
 <li><p>Puts pointers to those interfaces into the <strong>UVM config database</strong> so UVCs
 can find them.</p></li>
 <li><p>Calls <strong>run_test()</strong>, which builds the UVM tree and runs the chosen test.</p></li>
 </ul>
 </li>
-<li><p><strong>Test</strong> (e.g. <code class="docutils literal notranslate"><span class="pre">test::base</span></code>)
-* Is the UVM “root” of your verification.
-* In <strong>build_phase</strong>: creates your <strong>environment</strong>.
-* In <strong>run_phase</strong>: starts <strong>sequences</strong> (e.g. reset, then RX traffic), waits</p>
-<blockquote>
-<div><p>for work to finish, then drops the objection so simulation can end.</p>
-</div></blockquote>
-</li>
-<li><p><strong>Environment</strong> (e.g. <code class="docutils literal notranslate"><span class="pre">uvm_fifox::env</span></code>)
-* In <strong>build_phase</strong>: creates <strong>UVCs</strong> (e.g. reset agent, RX/TX logic_vector_mvb</p>
-<blockquote>
-<div><p>envs), <strong>model</strong>, and <strong>scoreboard</strong>.</p>
-</div></blockquote>
-<ul>
-<li><p>In <strong>connect_phase</strong>:
-* Connects UVCs to the <strong>virtual sequencer</strong> (so the test can start</p>
-<blockquote>
-<div><p>sequences on the right sequencers).</p>
-</div></blockquote>
+<li><p><strong>Test</strong> (e.g. <code class="docutils literal notranslate"><span class="pre">test::base</span></code>)</p>
 <ul class="simple">
+<li><p>Is the UVM “root” of your verification.</p></li>
+<li><p>In <strong>build_phase</strong>: creates your <strong>environment</strong>.</p></li>
+<li><p>In <strong>run_phase</strong>: starts <strong>sequences</strong> (e.g. reset, then RX traffic), waits
+for work to finish, then drops the objection so simulation can end.</p></li>
+</ul>
+</li>
+<li><p><strong>Environment</strong> (e.g. <code class="docutils literal notranslate"><span class="pre">uvm_fifox::env</span></code>)</p>
+<ul class="simple">
+<li><p>In <strong>build_phase</strong>: creates <strong>UVCs</strong> (e.g. reset agent, RX/TX logic_vector_mvb
+envs), <strong>model</strong>, and <strong>scoreboard</strong>.</p></li>
+<li><p>In <strong>connect_phase</strong>:</p>
+<ul>
+<li><p>Connects UVCs to the <strong>virtual sequencer</strong> (so the test can start
+sequences on the right sequencers).</p></li>
 <li><p>Connects <strong>analysis ports</strong>: RX monitor → model input; model output and
 TX monitor → scoreboard (comparer).</p></li>
 </ul>
@@ -273,38 +268,34 @@ TX monitor → scoreboard (comparer).</p></li>
 <li><p>Does not run sequences itself; the <strong>test</strong> does that.</p></li>
 </ul>
 </li>
-<li><p><strong>UVCs (from comp/uvm)</strong>
-* <strong>RX side</strong>: sequencer + driver + monitor. Sequences produce high-level</p>
-<blockquote>
-<div><p>transactions; the UVC converts them to protocol signals and drives the
-interface; the monitor captures transactions and sends them to the
-scoreboard/model.</p>
-</div></blockquote>
+<li><p><strong>UVCs (from comp/uvm)</strong></p>
 <ul class="simple">
+<li><p><strong>RX side</strong>: sequencer + driver + monitor. Sequences produce high-level
+transactions; the UVC converts them to protocol signals and drives the
+interface; the monitor captures transactions and sends them to the
+scoreboard/model.</p></li>
 <li><p><strong>TX side</strong>: monitor (and often a simple “ready” driver). The monitor
 sends DUT outputs to the scoreboard.</p></li>
 <li><p><strong>Reset</strong>: drives reset and synchronizes other UVCs (e.g. “start after
 reset”).</p></li>
 </ul>
 </li>
-<li><p><strong>Model</strong>
-* Receives the <strong>same</strong> stimulus as the DUT (e.g. from RX analysis port).
-* Implements the <strong>expected</strong> behavior (e.g. for a FIFO: output = input in</p>
-<blockquote>
-<div><p>order).</p>
-</div></blockquote>
+<li><p><strong>Model</strong></p>
 <ul class="simple">
+<li><p>Receives the <strong>same</strong> stimulus as the DUT (e.g. from RX analysis port).</p></li>
+<li><p>Implements the <strong>expected</strong> behavior (e.g. for a FIFO: output = input in
+order).</p></li>
 <li><p>Sends expected transactions to the <strong>scoreboard</strong>.</p></li>
 </ul>
 </li>
-<li><p><strong>Scoreboard (comparer)</strong>
-* Receives <strong>expected</strong> transactions from the model and <strong>actual</strong> from the TX
-* monitor.
-* Compares them (e.g. ordered with <code class="docutils literal notranslate"><span class="pre">uvm_common::comparer_ordered</span></code>).
-* Reports <strong>VERIFICATION SUCCESS</strong> or <strong>VERIFICATION FAILED</strong> in</p>
-<blockquote>
-<div><p><strong>report_phase</strong>.</p>
-</div></blockquote>
+<li><p><strong>Scoreboard (comparer)</strong></p>
+<ul class="simple">
+<li><p>Receives <strong>expected</strong> transactions from the model and <strong>actual</strong> from the TX
+monitor.</p></li>
+<li><p>Compares them (e.g. ordered with <code class="docutils literal notranslate"><span class="pre">uvm_common::comparer_ordered</span></code>).</p></li>
+<li><p>Reports <strong>VERIFICATION SUCCESS</strong> or <strong>VERIFICATION FAILED</strong> in
+<strong>report_phase</strong>.</p></li>
+</ul>
 </li>
 </ol>
 <p>So in one sentence: the <strong>test</strong> builds the <strong>environment</strong> (UVCs + model +
@@ -375,30 +366,27 @@ stuck.</p></li>
 <h2>Writing your first verification (roadmap)<a class="headerlink" href="#writing-your-first-verification-roadmap" title="Link to this heading"></a></h2>
 <p>Follow this path; the details are in <a class="reference internal" href="howto-first_ver.html#uvm-howto-first-ver"><span class="std std-ref">UVM HOWTO - Create the first verification</span></a>.</p>
 <ol class="arabic">
-<li><p><strong>Create the directory layout</strong>
-Next to your DUT: <code class="docutils literal notranslate"><span class="pre">uvm/tbench/env/</span></code>, <code class="docutils literal notranslate"><span class="pre">uvm/tbench/tests/</span></code>, and files
+<li><p><strong>Create the directory layout</strong></p>
+<p>Next to your DUT: <code class="docutils literal notranslate"><span class="pre">uvm/tbench/env/</span></code>, <code class="docutils literal notranslate"><span class="pre">uvm/tbench/tests/</span></code>, and files
 <code class="docutils literal notranslate"><span class="pre">env/pkg.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">env/env.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">env/sequencer.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">tests/pkg.sv</span></code>,
 <code class="docutils literal notranslate"><span class="pre">tests/base.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">generic.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">testbench.sv</span></code>, <code class="docutils literal notranslate"><span class="pre">Modules.tcl</span></code>,
-<code class="docutils literal notranslate"><span class="pre">top_level.fdo</span></code>, (optional) <code class="docutils literal notranslate"><span class="pre">signals.fdo</span></code>.</p></li>
-<li><p><strong>Implement a minimal environment</strong>
-* Environment: only a virtual sequencer (no UVCs yet).
-* Test: create env in build_phase; in run_phase raise objection, wait some</p>
-<blockquote>
-<div><p>time, drop objection.</p>
-</div></blockquote>
+<code class="docutils literal notranslate"><span class="pre">top_level.fdo</span></code>, (optional) <code class="docutils literal notranslate"><span class="pre">signals.fdo</span></code>.</p>
+</li>
+<li><p><strong>Implement a minimal environment</strong></p>
 <ul class="simple">
+<li><p>Environment: only a virtual sequencer (no UVCs yet).</p></li>
+<li><p>Test: create env in build_phase; in run_phase raise objection, wait some
+time, drop objection.</p></li>
 <li><p>Testbench: clock, interfaces, register interfaces in config_db, <code class="docutils literal notranslate"><span class="pre">run_test()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">$stop(2)</span></code>.</p></li>
 </ul>
 <p>Run with <code class="docutils literal notranslate"><span class="pre">vsim</span> <span class="pre">-do</span> <span class="pre">top_level.fdo</span></code> and confirm it finishes without errors.</p>
 </li>
-<li><p><strong>Add reset and RX UVC</strong>
-* In env build_phase: create configs and instantiate <code class="docutils literal notranslate"><span class="pre">uvm_reset::agent</span></code> and</p>
-<blockquote>
-<div><p><code class="docutils literal notranslate"><span class="pre">uvm_logic_vector_mvb::env_rx</span></code> (or the UVC that matches your DUT
-interface).</p>
-</div></blockquote>
+<li><p><strong>Add reset and RX UVC</strong></p>
 <ul class="simple">
+<li><p>In env build_phase: create configs and instantiate <code class="docutils literal notranslate"><span class="pre">uvm_reset::agent</span></code> and
+<code class="docutils literal notranslate"><span class="pre">uvm_logic_vector_mvb::env_rx</span></code> (or the UVC that matches your DUT
+interface).</p></li>
 <li><p>In connect_phase: connect reset sync to RX; assign virtual sequencer
 <code class="docutils literal notranslate"><span class="pre">m_reset</span></code> and <code class="docutils literal notranslate"><span class="pre">m_rx</span></code> to the agents’ sequencers.</p></li>
 <li><p>In test run_phase: start reset sequence and RX sequence (e.g.
@@ -407,21 +395,19 @@ in parallel (e.g. <code class="docutils literal notranslate"><span class="pre">f
 </ul>
 <p>Check in the waveform that reset and RX traffic appear.</p>
 </li>
-<li><p><strong>Add TX UVC</strong>
-* Add <code class="docutils literal notranslate"><span class="pre">uvm_logic_vector_mvb::env_tx</span></code> (or your protocol’s TX env), connect</p>
-<blockquote>
-<div><p>it in connect_phase and in the virtual sequencer.</p>
-</div></blockquote>
+<li><p><strong>Add TX UVC</strong></p>
+<ul class="simple">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">uvm_logic_vector_mvb::env_tx</span></code> (or your protocol’s TX env), connect
+it in connect_phase and in the virtual sequencer.</p></li>
+</ul>
 <p>TX UVC usually drives “ready” and monitors DUT output; no extra sequence is
 needed for basic operation.</p>
 </li>
-<li><p><strong>Add model and scoreboard</strong>
-* <strong>Model</strong>: has analysis_fifo for RX input and analysis_port for expected</p>
-<blockquote>
-<div><p>output. In run_phase, <code class="docutils literal notranslate"><span class="pre">get</span></code> from RX, apply expected function (e.g. FIFO:
-pass-through), <code class="docutils literal notranslate"><span class="pre">write</span></code> to output.</p>
-</div></blockquote>
+<li><p><strong>Add model and scoreboard</strong></p>
 <ul class="simple">
+<li><p><strong>Model</strong>: has analysis_fifo for RX input and analysis_port for expected
+output. In run_phase, <code class="docutils literal notranslate"><span class="pre">get</span></code> from RX, apply expected function (e.g. FIFO:
+pass-through), <code class="docutils literal notranslate"><span class="pre">write</span></code> to output.</p></li>
 <li><p><strong>Scoreboard</strong>: contains e.g. <code class="docutils literal notranslate"><span class="pre">uvm_common::comparer_ordered</span></code>; connect
 model output to <code class="docutils literal notranslate"><span class="pre">analysis_imp_model</span></code> and TX monitor to
 <code class="docutils literal notranslate"><span class="pre">analysis_imp_dut</span></code>.</p></li>
@@ -437,7 +423,7 @@ depending on comparer success and used().</p></li>
 <p>After that you have a <strong>full first verification</strong>: stimulus, observation, and
 automatic checking. Then you can add more tests, use the factory to swap
 sequences (<a class="reference internal" href="howto-extend_ver.html#uvm-howto-extend-verification"><span class="std std-ref">UVM HOWTO - Upgrade verification</span></a>), or run multiver
-(<span class="xref std std-ref">uvm_howto_others</span>).</p>
+(<a class="reference internal" href="howto-others.html#uvm-howto-others"><span class="std std-ref">UVM HOWTO - Multiver script</span></a>).</p>
 </section>
 <hr class="docutils" />
 <section id="where-to-go-next">
@@ -450,7 +436,7 @@ sequences, scoreboard, factory, coding guidelines.</p></li>
 <li><p><strong>Extending verification (register model, factory, sequences)</strong> —
 <a class="reference internal" href="howto-extend_ver.html#uvm-howto-extend-verification"><span class="std std-ref">UVM HOWTO - Upgrade verification</span></a>: register model, UVM factory, custom
 sequences, sequence configuration, PCAP, external programs.</p></li>
-<li><p><strong>Automation and multiver</strong> — <span class="xref std std-ref">uvm_howto_others</span>: multiver script,
+<li><p><strong>Automation and multiver</strong> — <a class="reference internal" href="howto-others.html#uvm-howto-others"><span class="std std-ref">UVM HOWTO - Multiver script</span></a>: multiver script,
 VERIFICATION SUCCESS in transcript.</p></li>
 <li><p><strong>Simulation examples (MFB+MI, MVB+MI, etc.)</strong> — <a class="reference internal" href="sim_manual.html#uvm-simulation"><span class="std std-ref">UVM simulation</span></a>:
 ready-made simulation examples and sequence snippets.</p></li>

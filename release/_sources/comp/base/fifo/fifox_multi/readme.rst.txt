@@ -10,8 +10,8 @@ Block diagram
 
 .. Path relative to local directory for Gitlab preview
 .. image:: doc/fifox_multi.svg
-      :width: 100 %
-      :alt:
+   :width: 100%
+   :alt:
 
 Write interface behavior
 ^^^^^^^^^^^^^^^^^^^^^^^^

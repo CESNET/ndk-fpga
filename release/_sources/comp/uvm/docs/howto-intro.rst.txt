@@ -85,11 +85,12 @@ Typical layout for a component’s UVM tree:
 ----
 
 The big picture: what runs when
-==============================
+===============================
 
 A single verification run looks like this:
 
 1. **Testbench** (SystemVerilog ``module``)
+
    * Creates clock and reset.
    * Instantiates the **DUT** and **interfaces** that connect the DUT to the
      verification world.
@@ -98,15 +99,18 @@ A single verification run looks like this:
    * Calls **run_test()**, which builds the UVM tree and runs the chosen test.
 
 2. **Test** (e.g. ``test::base``)
-   * Is the UVM “root” of your verification.
+
+   * Is the UVM "root" of your verification.
    * In **build_phase**: creates your **environment**.
    * In **run_phase**: starts **sequences** (e.g. reset, then RX traffic), waits
      for work to finish, then drops the objection so simulation can end.
 
 3. **Environment** (e.g. ``uvm_fifox::env``)
+
    * In **build_phase**: creates **UVCs** (e.g. reset agent, RX/TX logic_vector_mvb
      envs), **model**, and **scoreboard**.
    * In **connect_phase**:
+
      * Connects UVCs to the **virtual sequencer** (so the test can start
        sequences on the right sequencers).
      * Connects **analysis ports**: RX monitor → model input; model output and
@@ -114,24 +118,27 @@ A single verification run looks like this:
    * Does not run sequences itself; the **test** does that.
 
 4. **UVCs (from comp/uvm)**
+
    * **RX side**: sequencer + driver + monitor. Sequences produce high-level
      transactions; the UVC converts them to protocol signals and drives the
      interface; the monitor captures transactions and sends them to the
      scoreboard/model.
-   * **TX side**: monitor (and often a simple “ready” driver). The monitor
+   * **TX side**: monitor (and often a simple "ready" driver). The monitor
      sends DUT outputs to the scoreboard.
-   * **Reset**: drives reset and synchronizes other UVCs (e.g. “start after
-     reset”).
+   * **Reset**: drives reset and synchronizes other UVCs (e.g. "start after
+     reset").
 
 5. **Model**
+
    * Receives the **same** stimulus as the DUT (e.g. from RX analysis port).
    * Implements the **expected** behavior (e.g. for a FIFO: output = input in
      order).
    * Sends expected transactions to the **scoreboard**.
 
 6. **Scoreboard (comparer)**
+
    * Receives **expected** transactions from the model and **actual** from the TX
-   * monitor.
+     monitor.
    * Compares them (e.g. ordered with ``uvm_common::comparer_ordered``).
    * Reports **VERIFICATION SUCCESS** or **VERIFICATION FAILED** in
      **report_phase**.
@@ -210,37 +217,45 @@ Writing your first verification (roadmap)
 Follow this path; the details are in :ref:`uvm_howto_first_ver`.
 
 1. **Create the directory layout**
+
    Next to your DUT: ``uvm/tbench/env/``, ``uvm/tbench/tests/``, and files
    ``env/pkg.sv``, ``env/env.sv``, ``env/sequencer.sv``, ``tests/pkg.sv``,
    ``tests/base.sv``, ``generic.sv``, ``testbench.sv``, ``Modules.tcl``,
    ``top_level.fdo``, (optional) ``signals.fdo``.
 
 2. **Implement a minimal environment**
+
    * Environment: only a virtual sequencer (no UVCs yet).
    * Test: create env in build_phase; in run_phase raise objection, wait some
      time, drop objection.
    * Testbench: clock, interfaces, register interfaces in config_db, ``run_test()``,
      ``$stop(2)``.
+
    Run with ``vsim -do top_level.fdo`` and confirm it finishes without errors.
 
 3. **Add reset and RX UVC**
+
    * In env build_phase: create configs and instantiate ``uvm_reset::agent`` and
      ``uvm_logic_vector_mvb::env_rx`` (or the UVC that matches your DUT
      interface).
    * In connect_phase: connect reset sync to RX; assign virtual sequencer
-     ``m_reset`` and ``m_rx`` to the agents’ sequencers.
+     ``m_reset`` and ``m_rx`` to the agents' sequencers.
    * In test run_phase: start reset sequence and RX sequence (e.g.
      ``uvm_reset::sequence_start`` and ``uvm_logic_vector::sequence_simple``)
      in parallel (e.g. ``fork ... join_any``).
+
    Check in the waveform that reset and RX traffic appear.
 
 4. **Add TX UVC**
-   * Add ``uvm_logic_vector_mvb::env_tx`` (or your protocol’s TX env), connect
+
+   * Add ``uvm_logic_vector_mvb::env_tx`` (or your protocol's TX env), connect
      it in connect_phase and in the virtual sequencer.
-   TX UVC usually drives “ready” and monitors DUT output; no extra sequence is
+
+   TX UVC usually drives "ready" and monitors DUT output; no extra sequence is
    needed for basic operation.
 
 5. **Add model and scoreboard**
+
    * **Model**: has analysis_fifo for RX input and analysis_port for expected
      output. In run_phase, ``get`` from RX, apply expected function (e.g. FIFO:
      pass-through), ``write`` to output.

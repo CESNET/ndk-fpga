@@ -93,11 +93,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#drive-tx">Drive TX</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id9">Run test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Run test</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#model-and-scoreboard">Model and Scoreboard</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id10">Run test</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Run test</a></li>
 </ul>
 </li>
 </ul>
@@ -118,6 +118,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -186,10 +187,10 @@ scoreboard.</p></li>
 Let’s start with dummy verification environment that does nothing. This prepares verification for
 next steps. Other components to drive DUT (Design Under Test — the verified VHDL component) interfaces will be added later.
 The dummy verification environment will look like this picture. There are a few components which will be extended later.</p>
-<figure class="align-center" id="id11">
+<figure class="align-center" id="id3">
 <img alt="../../../_images/testbench_1.svg" src="../../../_images/testbench_1.svg" />
 <figcaption>
-<p><span class="caption-text">The dummy verification environment</span><a class="headerlink" href="#id11" title="Link to this image"></a></p>
+<p><span class="caption-text">The dummy verification environment</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <div class="line-block">
@@ -204,7 +205,7 @@ Inside <em>tbench</em> create <em>env</em> and <em>test</em> (some setups use <e
 <li><p>./uvm/tbench/env/pkg.sv</p></li>
 <li><p>./uvm/tbench/test/base.sv</p></li>
 <li><p>./uvm/tbench/test/pkg.sv</p></li>
-<li><p>./uvm/generic.sv</p></li>
+<li><p>./uvm/tbench/generic.sv</p></li>
 <li><p>./uvm/Modules.tcl</p></li>
 <li><p>./uvm/top_level.fdo</p></li>
 <li><p>./uvm/signals.fdo</p></li>
@@ -214,8 +215,8 @@ Inside <em>tbench</em> create <em>env</em> and <em>test</em> (some setups use <e
 <h3>Create environment<a class="headerlink" href="#create-environment" title="Link to this heading"></a></h3>
 <p>We start with a minimal environment containing only the virtual sequencer (see <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a>, The big picture).
 Later we add RX/TX UVCs, model, and scoreboard. Some classes are parametrised (e.g. <em>env</em>), similar to C++ templates.</p>
-<div class="literal-block-wrapper docutils container" id="id12">
-<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id12" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
@@ -241,6 +242,8 @@ Later we add RX/TX UVCs, model, and scoreboard. Some classes are parametrised (e
 <span class="w">         </span><span class="c1">//Call parents function build_phase</span>
 <span class="w">         </span><span class="k">super</span><span class="p">.</span><span class="n">build_phase</span><span class="p">(</span><span class="n">phase</span><span class="p">);</span>
 
+<span class="w">         </span><span class="c1">// Create sequencer</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_sequencer&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 <span class="w">     </span><span class="k">endfunction</span>
 
 <span class="w">     </span><span class="c1">// Connect agent&#39;s ports with ports from scoreboard.</span>
@@ -254,8 +257,8 @@ Later we add RX/TX UVCs, model, and scoreboard. Some classes are parametrised (e
 When adding UVCs into the environment we should add the sequencer from the UVC to the virtual sequencer
 associated with the environment.
 Now the virtual sequencer is just empty class. Later we add RX sequencer.</p>
-<div class="literal-block-wrapper docutils container" id="id13">
-<div class="code-block-caption"><span class="caption-text">env/sequencer.sv</span><a class="headerlink" href="#id13" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text">env/sequencer.sv</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">sequencer</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequencer</span><span class="p">;</span>
@@ -270,12 +273,15 @@ Now the virtual sequencer is just empty class. Later we add RX sequencer.</p>
 </div>
 <p>The last thing in the environment is to create a package file.
 Package simplifies organization of files and classes into namespace.</p>
-<div class="literal-block-wrapper docutils container" id="id14">
-<div class="code-block-caption"><span class="caption-text">env/pkg.sv
-<a href="#id1"><span class="problematic" id="id2">`</span></a>ifndef FIFOX_ENV_SV
-<a href="#id3"><span class="problematic" id="id4">`</span></a>define FIFOX_ENV_SV
-package uvm_fifox;</span><a class="headerlink" href="#id14" title="Link to this code"></a></div>
-<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;sequencer.sv&quot;</span>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text">env/pkg.sv</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="no">`ifndef</span><span class="w"> </span><span class="n">FIFOX_ENV_SV</span>
+<span class="w"> </span><span class="no">`define</span><span class="w"> </span><span class="n">FIFOX_ENV_SV</span>
+<span class="w"> </span><span class="k">package</span><span class="w"> </span><span class="n">uvm_fifox</span><span class="p">;</span>
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
+<span class="w">     </span><span class="k">import</span><span class="w"> </span><span class="n">uvm_pkg</span><span class="o">::*</span><span class="p">;</span>
+
+<span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;sequencer.sv&quot;</span>
 <span class="w">     </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;env.sv&quot;</span>
 <span class="w"> </span><span class="k">endpackage</span>
 <span class="w"> </span><span class="no">`endif</span>
@@ -288,13 +294,12 @@ package uvm_fifox;</span><a class="headerlink" href="#id14" title="Link to this 
 <p>Create a test class that builds the environment and, in <em>run_phase</em>, raises an objection, starts sequences,
 waits for work to finish, then drops the objection so simulation can end (see <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a>, The big picture).
 Function <em>used</em> indicates whether the scoreboard is still waiting for DUT data.</p>
-<div class="literal-block-wrapper docutils container" id="id15">
-<div class="code-block-caption"><span class="caption-text">test/base.sv</span><a class="headerlink" href="#id15" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text">test/base.sv</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">base</span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_test</span><span class="p">;</span>
-<span class="w">     </span><span class="no">`m_uvm_object_registry_internal</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
-<span class="w">     </span><span class="no">`m_uvm_get_type_name_func</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
+<span class="w">     </span><span class="n">uvm_component_registry</span><span class="w"> </span><span class="p">#(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test::base&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">type_id</span><span class="p">;</span>
 
 <span class="w">     </span><span class="c1">// test have to create top level environment</span>
 <span class="w">     </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">env</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_env</span><span class="p">;</span>
@@ -335,8 +340,8 @@ Function <em>used</em> indicates whether the scoreboard is still waiting for DUT
 </div>
 </div>
 <p>Create the test package. This package creates the test namespace.</p>
-<div class="literal-block-wrapper docutils container" id="id16">
-<div class="code-block-caption"><span class="caption-text">test/pkg.sv</span><a class="headerlink" href="#id16" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id8">
+<div class="code-block-caption"><span class="caption-text">test/pkg.sv</span><a class="headerlink" href="#id8" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="no">`ifndef</span><span class="w"> </span><span class="n">FIFOX_TEST_SV</span>
 <span class="w"> </span><span class="no">`define</span><span class="w"> </span><span class="n">FIFOX_TEST_SV</span>
 <span class="w"> </span><span class="k">package</span><span class="w"> </span><span class="n">test</span><span class="p">;</span>
@@ -359,8 +364,8 @@ See <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span 
 In our UVC is not interface for common FIFO interface. We could create one or we can
 used one of the existing with slight adjustents/conversions. Opting for the second option,
 we convert signals between the FIFO and MVB interface.</p>
-<div class="literal-block-wrapper docutils container" id="id17">
-<div class="code-block-caption"><span class="caption-text">testbench.sv</span><a class="headerlink" href="#id17" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id9">
+<div class="code-block-caption"><span class="caption-text">testbench.sv</span><a class="headerlink" href="#id9" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">import</span><span class="w"> </span><span class="nn">uvm_pkg::*</span><span class="p">;</span>
 <span class="w"> </span><span class="no">`include</span><span class="w"> </span><span class="s">&quot;uvm_macros.svh&quot;</span>
 <span class="w"> </span><span class="k">import</span><span class="w"> </span><span class="n">uvm_generic</span><span class="o">::*</span><span class="p">;</span>
@@ -441,8 +446,8 @@ we convert signals between the FIFO and MVB interface.</p>
 </div>
 </div>
 <p>Clock generation (commonly in the testbench):</p>
-<div class="literal-block-wrapper docutils container" id="id18">
-<div class="code-block-caption"><span class="caption-text">CLOCK GENERATING</span><a class="headerlink" href="#id18" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id10">
+<div class="code-block-caption"><span class="caption-text">CLOCK GENERATING</span><a class="headerlink" href="#id10" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c1">// Create clock</span>
 <span class="w"> </span><span class="kt">logic</span><span class="w"> </span><span class="n">CLK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="w"> </span><span class="k">always</span><span class="w"> </span><span class="p">#(</span><span class="n">CLK_PERIOD</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">CLK</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">CLK</span><span class="p">;</span>
@@ -450,8 +455,8 @@ we convert signals between the FIFO and MVB interface.</p>
 </div>
 </div>
 <p>Interface registration (names must match UVC config; see intro):</p>
-<div class="literal-block-wrapper docutils container" id="id19">
-<div class="code-block-caption"><span class="caption-text">registration interface</span><a class="headerlink" href="#id19" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id11">
+<div class="code-block-caption"><span class="caption-text">registration interface</span><a class="headerlink" href="#id11" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">reset_if</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_reset&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">reset</span><span class="p">);</span>
 <span class="w"> </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">))</span><span class="w">    </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mvb_rx&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">mvb_rx</span><span class="w">    </span><span class="p">);</span>
 <span class="w"> </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="k">virtual</span><span class="w"> </span><span class="n">mvb_if</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">))</span><span class="w">    </span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">null</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;vif_mvb_tx&quot;</span><span class="p">,</span><span class="w">     </span><span class="n">mvb_tx</span><span class="w">    </span><span class="p">);</span>
@@ -459,8 +464,8 @@ we convert signals between the FIFO and MVB interface.</p>
 </div>
 </div>
 <p>Run the test and stop simulation:</p>
-<div class="literal-block-wrapper docutils container" id="id20">
-<div class="code-block-caption"><span class="caption-text">run the test</span><a class="headerlink" href="#id20" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id12">
+<div class="code-block-caption"><span class="caption-text">run the test</span><a class="headerlink" href="#id12" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="c1">// RUN TESTS</span>
 <span class="n">run_test</span><span class="p">();</span>
 <span class="c1">// STOP ON END OF SIMULATION</span>
@@ -473,8 +478,8 @@ we convert signals between the FIFO and MVB interface.</p>
 <h3>Create parameters package<a class="headerlink" href="#create-parameters-package" title="Link to this heading"></a></h3>
 <p>Put DUT generic parameters in a package so the verification can mirror them and run all relevant combinations.
 The snippet below mirrors the FIFO generics and adds <em>CLK_PERIOD</em>.</p>
-<div class="literal-block-wrapper docutils container" id="id21">
-<div class="code-block-caption"><span class="caption-text">generic.sv</span><a class="headerlink" href="#id21" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id13">
+<div class="code-block-caption"><span class="caption-text">generic.sv</span><a class="headerlink" href="#id13" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kn">package</span><span class="w"> </span><span class="n">uvm_generic</span><span class="p">;</span>
 <span class="w">     </span><span class="k">parameter</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
 <span class="w">     </span><span class="k">parameter</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">ITEMS</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
@@ -508,8 +513,8 @@ You can see there, three types of variables</p>
 <li><p><em>COMPONENTS</em> - local files dependencies (NDK’s UVC). Commonly in &lt;NDK-root-dir&gt;/comp/uvm</p></li>
 <li><p><em>MOD</em>        - Local files (tbench files)</p></li>
 </ul>
-<div class="literal-block-wrapper docutils container" id="id22">
-<div class="code-block-caption"><span class="caption-text">Modules.tcl</span><a class="headerlink" href="#id22" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id14">
+<div class="code-block-caption"><span class="caption-text">Modules.tcl</span><a class="headerlink" href="#id14" title="Link to this code"></a></div>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="nb">lappend</span><span class="w"> </span>COMPONENTS<span class="w"> </span><span class="k">[</span><span class="w"> </span><span class="nb">list</span><span class="w"> </span><span class="s2">&quot;SV_LV_MVB_BASE&quot;</span><span class="w">      </span><span class="s2">&quot;$OFM_PATH/comp/uvm/logic_vector_mvb&quot;</span><span class="w">         </span><span class="s2">&quot;FULL&quot;</span><span class="k">]</span>
 <span class="w"> </span><span class="nb">lappend</span><span class="w"> </span>COMPONENTS<span class="w"> </span><span class="k">[</span><span class="w"> </span><span class="nb">list</span><span class="w"> </span><span class="s2">&quot;SV_RESET_BASE&quot;</span><span class="w">       </span><span class="s2">&quot;$OFM_PATH/comp/uvm/reset&quot;</span><span class="w">                    </span><span class="s2">&quot;FULL&quot;</span><span class="k">]</span>
 
@@ -522,8 +527,8 @@ You can see there, three types of variables</p>
 </div>
 <p><em>top_level.fdo</em> starts the simulation. Set <em>SIM_FLAGS(UVM_TEST)</em> to your test name (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;test::base&quot;</span></code>);
 <em>SIM_FLAGS(DEBUG)</em> enables waveforms, <em>SIM_FLAGS(UVM_VERBOSITY)</em> controls log detail. See the script comments for seed and other options.</p>
-<div class="literal-block-wrapper docutils container" id="id23">
-<div class="code-block-caption"><span class="caption-text">top_level.fdo</span><a class="headerlink" href="#id23" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id15">
+<div class="code-block-caption"><span class="caption-text">top_level.fdo</span><a class="headerlink" href="#id15" title="Link to this code"></a></div>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c"># PATH TO OFM</span>
 <span class="w"> </span><span class="k">set</span><span class="w"> </span>FIRMWARE_BASE<span class="w"> </span>..<span class="o">/</span>..<span class="o">/</span>..<span class="o">/</span>..<span class="o">/</span>..<span class="o">/</span>ndk-fpga
 
@@ -575,8 +580,8 @@ You can see there, three types of variables</p>
 </div>
 </div>
 <p><em>signals.fdo</em> adds signals to the waveform (paths start with <code class="docutils literal notranslate"><span class="pre">/testbench/</span></code>).</p>
-<div class="literal-block-wrapper docutils container" id="id24">
-<div class="code-block-caption"><span class="caption-text">signals.fdo</span><a class="headerlink" href="#id24" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id16">
+<div class="code-block-caption"><span class="caption-text">signals.fdo</span><a class="headerlink" href="#id16" title="Link to this code"></a></div>
 <div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="c"># add signals</span>
 
 <span class="w"> </span><span class="nv">add</span><span class="w"> </span>wave<span class="w"> </span><span class="o">-</span>noupdate<span class="w"> </span><span class="o">-</span>group<span class="w"> </span><span class="s2">&quot;RESET&quot;</span><span class="w"> </span><span class="s2">&quot;/testbench/reset/*&quot;</span>
@@ -593,15 +598,12 @@ The same command is used for all following steps; only the results change.</p>
 <p>You can now run the verification and observe the signals in a waveform.
 As you can see in the picture, there isn’t any data sent to the DUT. This first implementation does nothing.
 In the next chapters we will add UVCs to start generating and observing signals.</p>
-<figure class="align-center" id="id25">
+<figure class="align-center" id="id17">
 <img alt="WAVE - Create base environment" src="../../../_images/testbench_1_wave.png" />
 <figcaption>
-<p><span class="caption-text">Waveform displaying run of the dummy verification environment</span><a class="headerlink" href="#id25" title="Link to this image"></a></p>
+<p><span class="caption-text">Waveform displaying run of the dummy verification environment</span><a class="headerlink" href="#id17" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 </section>
 <hr class="docutils" />
 <section id="uvm-phases">
@@ -609,9 +611,6 @@ In the next chapters we will add UVCs to start generating and observing signals.
 <p>UVM components run in phases (e.g. <em>build_phase</em>, <em>connect_phase</em>, <em>run_phase</em>); you see them in
 <em>env.sv</em> and <em>test.sv</em>. For an overview of what each phase does, see <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a> (UVM concepts — Phases).
 Not every component implements every phase; for example, the NDK agents commonly don’t implement <em>check_phase</em>.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 </section>
 </section>
 <hr class="docutils" />
@@ -620,10 +619,10 @@ Not every component implements every phase; for example, the NDK agents commonly
 <p>Add stimulus by integrating existing NDK UVCs: <em>uvm_reset::agent</em> and <em>uvm_logic_vector_mvb::env_rx</em>.
 We map the FIFO’s simple interface (data, WR, full / data, RD, empty) to MVB and use <em>reset</em> for the reset signal.
 In <em>build_phase</em> you create config objects and the UVC instances; in <em>connect_phase</em> you connect reset sync and the virtual sequencer. RX UVC drives the DUT input; for custom sequences see <a class="reference internal" href="howto-extend_ver.html#uvm-howto-extend-verification"><span class="std std-ref">UVM HOWTO - Upgrade verification</span></a>.</p>
-<figure class="align-center" id="id26">
+<figure class="align-center" id="id18">
 <img alt="../../../_images/testbench_2.svg" src="../../../_images/testbench_2.svg" />
 <figcaption>
-<p><span class="caption-text">Add RX input and reset to the dummy verification environment</span><a class="headerlink" href="#id26" title="Link to this image"></a></p>
+<p><span class="caption-text">Add RX input and reset to the dummy verification environment</span><a class="headerlink" href="#id18" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <div class="line-block">
@@ -631,8 +630,8 @@ In <em>build_phase</em> you create config objects and the UVC instances; in <em>
 </div>
 <p>Extends verification environment by adding UVCs <em>uvm_logic_vector_mvb::env_rx</em>
 and <em>uvm_reset::agent</em>.</p>
-<div class="literal-block-wrapper docutils container" id="id27">
-<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id27" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id19">
+<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id19" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
@@ -681,6 +680,9 @@ and <em>uvm_reset::agent</em>.</p>
 <span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_rx</span><span class="p">);</span>
 <span class="w">         </span><span class="c1">// Creation of the m_rx</span>
 <span class="w">         </span><span class="n">m_rx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_rx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_rx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Create sequencer</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_sequencer&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 <span class="w">     </span><span class="k">endfunction</span>
 
 <span class="w">     </span><span class="c1">// Connect agent&#39;s ports with ports from scoreboard.</span>
@@ -699,8 +701,8 @@ and <em>uvm_reset::agent</em>.</p>
 <p>Add sequencers <em>reset</em> and <em>uvm_logic_vector</em> into the virtual sequencer. Virtual sequencer
 associates RX sequencer to simplify cooperation between sequences. Sequences generate
 input transactions to the dut. Here we generated high-level transactions.</p>
-<div class="literal-block-wrapper docutils container" id="id28">
-<div class="code-block-caption"><span class="caption-text">env/sequencer.sv</span><a class="headerlink" href="#id28" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id20">
+<div class="code-block-caption"><span class="caption-text">env/sequencer.sv</span><a class="headerlink" href="#id20" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">sequencer</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_sequencer</span><span class="p">;</span>
@@ -732,13 +734,12 @@ commands:</p>
 </ul>
 <p>In our case we want the code to continue when the sequence that generates input
 data has stopped. Using <em>join</em> would not work because the reset sequence never stops.</p>
-<div class="literal-block-wrapper docutils container" id="id29">
-<div class="code-block-caption"><span class="caption-text">test/base.sv</span><a class="headerlink" href="#id29" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id21">
+<div class="code-block-caption"><span class="caption-text">test/base.sv</span><a class="headerlink" href="#id21" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">base</span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_test</span><span class="p">;</span>
-<span class="w">     </span><span class="no">`m_uvm_object_registry_internal</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
-<span class="w">     </span><span class="no">`m_uvm_get_type_name_func</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
+<span class="w">     </span><span class="n">uvm_component_registry</span><span class="w"> </span><span class="p">#(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;test::base&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">type_id</span><span class="p">;</span>
 
 <span class="w">     </span><span class="c1">// test has to create top-level environment</span>
 <span class="w">     </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">env</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="w"> </span><span class="n">m_env</span><span class="p">;</span>
@@ -801,10 +802,10 @@ data has stopped. Using <em>join</em> would not work because the reset sequence 
 <section id="run-test">
 <h3>Run test<a class="headerlink" href="#run-test" title="Link to this heading"></a></h3>
 <p>Run the verification (same command as in <strong>Run First test</strong>: <code class="docutils literal notranslate"><span class="pre">vsim</span> <span class="pre">-do</span> <span class="pre">top_level.fdo</span></code>). You should see input on the RX interface in the waveform.</p>
-<figure class="align-center" id="id30">
+<figure class="align-center" id="id22">
 <img alt="WAVE - Add generating RX input" src="../../../_images/testbench_2_wave.png" />
 <figcaption>
-<p><span class="caption-text">Waveform displaying change when RX and reset are driven</span><a class="headerlink" href="#id30" title="Link to this image"></a></p>
+<p><span class="caption-text">Waveform displaying change when RX and reset are driven</span><a class="headerlink" href="#id22" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <div class="line-block">
@@ -830,17 +831,17 @@ in the testbench <code class="docutils literal notranslate"><span class="pre">uv
 <section id="drive-tx">
 <h2>Drive TX<a class="headerlink" href="#drive-tx" title="Link to this heading"></a></h2>
 <p>Add <em>uvm_logic_vector_mvb::env_tx</em> to the environment. It drives <em>DST_RDY</em> (FIFO read) so the FIFO can be read, and monitors DUT output for the scoreboard in the next step.</p>
-<figure class="align-center" id="id31">
+<figure class="align-center" id="id23">
 <img alt="../../../_images/testbench_3.svg" src="../../../_images/testbench_3.svg" />
 <figcaption>
-<p><span class="caption-text">Add TX driver into the verification environment</span><a class="headerlink" href="#id31" title="Link to this image"></a></p>
+<p><span class="caption-text">Add TX driver into the verification environment</span><a class="headerlink" href="#id23" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <div class="line-block">
 <div class="line"><br /></div>
 </div>
-<div class="literal-block-wrapper docutils container" id="id32">
-<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id32" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id24">
+<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id24" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
@@ -902,6 +903,9 @@ in the testbench <code class="docutils literal notranslate"><span class="pre">uv
 <span class="w">         </span><span class="n">uvm_config_db</span><span class="w"> </span><span class="p">#(</span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_item</span><span class="p">)</span><span class="o">::</span><span class="n">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m_config&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_cfg_tx</span><span class="p">);</span>
 <span class="w">         </span><span class="c1">// Creation of the m_tx</span>
 <span class="w">         </span><span class="n">m_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_tx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
+<span class="w">         </span><span class="c1">// Create sequencer</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_sequencer&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 <span class="w">     </span><span class="k">endfunction</span>
 
 <span class="w">     </span><span class="c1">// Connect agent&#39;s ports with ports from scoreboard.</span>
@@ -918,13 +922,13 @@ in the testbench <code class="docutils literal notranslate"><span class="pre">uv
 </pre></div>
 </div>
 </div>
-<section id="id9">
-<h3>Run test<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<section id="id1">
+<h3>Run test<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>Run the verification (same command as in <strong>Run First test</strong>: <code class="docutils literal notranslate"><span class="pre">vsim</span> <span class="pre">-do</span> <span class="pre">top_level.fdo</span></code>). You should see DST_RDY driven on the TX side and data accepted by the verification environment; check the waveform to confirm the TX interface is driven.</p>
-<figure class="align-center" id="id33">
+<figure class="align-center" id="id25">
 <img alt="../../../_images/testbench_3_wave.png" src="../../../_images/testbench_3_wave.png" />
 <figcaption>
-<p><span class="caption-text">Waveform displaying change when the TX interface are driven</span><a class="headerlink" href="#id33" title="Link to this image"></a></p>
+<p><span class="caption-text">Waveform displaying change when the TX interface are driven</span><a class="headerlink" href="#id25" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <div class="line-block">
@@ -935,10 +939,10 @@ in the testbench <code class="docutils literal notranslate"><span class="pre">uv
 <hr class="docutils" />
 <section id="model-and-scoreboard">
 <h2>Model and Scoreboard<a class="headerlink" href="#model-and-scoreboard" title="Link to this heading"></a></h2>
-<figure class="align-center" id="id34">
+<figure class="align-center" id="id26">
 <img alt="../../../_images/testbench_4.svg" src="../../../_images/testbench_4.svg" />
 <figcaption>
-<p><span class="caption-text">Add scoreboard and model to the verification</span><a class="headerlink" href="#id34" title="Link to this image"></a></p>
+<p><span class="caption-text">Add scoreboard and model to the verification</span><a class="headerlink" href="#id26" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <div class="line-block">
@@ -946,9 +950,9 @@ in the testbench <code class="docutils literal notranslate"><span class="pre">uv
 </div>
 <p>The model produces expected transactions from the same inputs as the DUT; the scoreboard compares them to DUT outputs
 (see <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a>, Model and scoreboard). For our FIFO, order is preserved so we use <em>uvm_common::comparer_ordered</em>.
-The code below shows the scoreboard (with <em>report_phase</em> printing <strong>VERIFICATION SUCCESS</strong> or <strong>VERIFICATION FAILED</strong>) and the model (a simple pass-through for the FIFO). For different model vs DUT transaction types, override <em>compare</em> in the comparer. Automatic testing looks for <strong>VERIFICATION SUCCESS</strong> in the transcript; see <span class="xref std std-ref">uvm_howto_others</span>.</p>
-<div class="literal-block-wrapper docutils container" id="id35">
-<div class="code-block-caption"><span class="caption-text">env/scoreboard.sv</span><a class="headerlink" href="#id35" title="Link to this code"></a></div>
+The code below shows the scoreboard (with <em>report_phase</em> printing <strong>VERIFICATION SUCCESS</strong> or <strong>VERIFICATION FAILED</strong>) and the model (a simple pass-through for the FIFO). For different model vs DUT transaction types, override <em>compare</em> in the comparer. Automatic testing looks for <strong>VERIFICATION SUCCESS</strong> in the transcript; see <a class="reference internal" href="howto-others.html#uvm-howto-others"><span class="std std-ref">UVM HOWTO - Multiver script</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="id27">
+<div class="code-block-caption"><span class="caption-text">env/scoreboard.sv</span><a class="headerlink" href="#id27" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">scoreboard</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_scoreboard</span><span class="p">;</span>
@@ -997,8 +1001,8 @@ The code below shows the scoreboard (with <em>report_phase</em> printing <strong
 commonly generated in a sequence. Then it is sent to the DUT and the Model.
 The DUT is a FIFO, so it does not change the input transaction and sends it directly to the output.
 So the model does the same: it only forwards data to the output and does not make any changes.</p>
-<div class="literal-block-wrapper docutils container" id="id36">
-<div class="code-block-caption"><span class="caption-text">env/model.sv</span><a class="headerlink" href="#id36" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id28">
+<div class="code-block-caption"><span class="caption-text">env/model.sv</span><a class="headerlink" href="#id28" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">model</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_scoreboard</span><span class="p">;</span>
@@ -1040,8 +1044,8 @@ So the model does the same: it only forwards data to the output and does not mak
 </div>
 </div>
 <p>Add the model and the scoreboard into the environment</p>
-<div class="literal-block-wrapper docutils container" id="id37">
-<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id37" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id29">
+<div class="code-block-caption"><span class="caption-text">env/env.sv</span><a class="headerlink" href="#id29" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">env</span><span class="w"> </span><span class="p">#(</span>
 <span class="w">     </span><span class="kt">int</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="n">DATA_WIDTH</span>
 <span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_env</span><span class="p">;</span>
@@ -1111,6 +1115,9 @@ So the model does the same: it only forwards data to the output and does not mak
 <span class="w">         </span><span class="c1">// Creation of the m_tx</span>
 <span class="w">         </span><span class="n">m_tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">env_tx</span><span class="w"> </span><span class="p">#(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_tx&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 
+<span class="w">         </span><span class="c1">// Create sequencer</span>
+<span class="w">         </span><span class="n">m_sequencer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequencer</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_sequencer&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
+
 <span class="w">         </span><span class="n">m_sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">scoreboard</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_sc&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
 
 <span class="w">         </span><span class="n">m_model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_fifox</span><span class="o">::</span><span class="n">model</span><span class="w"> </span><span class="p">#(</span><span class="n">DATA_WIDTH</span><span class="p">)</span><span class="o">::</span><span class="n">type_id</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="s">&quot;m_model&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">);</span>
@@ -1137,8 +1144,8 @@ So the model does the same: it only forwards data to the output and does not mak
 </div>
 </div>
 <p>Add scoreboard and model to verification environment package.</p>
-<div class="literal-block-wrapper docutils container" id="id38">
-<div class="code-block-caption"><span class="caption-text">env/pkg.sv</span><a class="headerlink" href="#id38" title="Link to this code"></a></div>
+<div class="literal-block-wrapper docutils container" id="id30">
+<div class="code-block-caption"><span class="caption-text">env/pkg.sv</span><a class="headerlink" href="#id30" title="Link to this code"></a></div>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="w"> </span><span class="no">`ifndef</span><span class="w"> </span><span class="n">FIFOX_ENV_SV</span>
 <span class="w"> </span><span class="no">`define</span><span class="w"> </span><span class="n">FIFOX_ENV_SV</span>
 <span class="w"> </span><span class="k">package</span><span class="w"> </span><span class="n">uvm_fifox</span><span class="p">;</span>
@@ -1154,8 +1161,8 @@ So the model does the same: it only forwards data to the output and does not mak
 </pre></div>
 </div>
 </div>
-<section id="id10">
-<h3>Run test<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<section id="id2">
+<h3>Run test<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p>Run the verification (same command as in <strong>Run First test</strong>: <code class="docutils literal notranslate"><span class="pre">vsim</span> <span class="pre">-do</span> <span class="pre">top_level.fdo</span></code>). If all transactions match, you will see <strong>VERIFICATION SUCCESS</strong> in the transcript.
 On failure you get <em>uvm_error</em> messages (e.g. <em>Transaction doesn’t match</em> when DUT output differs from the model).</p>
 <p>If you raise verbosity mode to <em>set SIM_FLAGS(UVM_VERBOSITY) UVM_LOW</em> in <em>Modules.tcl</em>
@@ -1170,7 +1177,7 @@ received by comparators from DUT and MODEL.</p>
 multiver), see the “Where to go next” section in the <a class="reference internal" href="howto-intro.html#uvm-howto-intro"><span class="std std-ref">UVM HOWTO — Introduction for Newcomers</span></a>.
 To extend this environment with a register model, custom sequences, or the UVM
 factory, continue with the <a class="reference internal" href="howto-extend_ver.html#uvm-howto-extend-verification"><span class="std std-ref">UVM HOWTO - Upgrade verification</span></a>. To run many
-parameter combinations automatically, see the <span class="xref std std-ref">uvm_howto_others</span>.</p>
+parameter combinations automatically, see the <a class="reference internal" href="howto-others.html#uvm-howto-others"><span class="std std-ref">UVM HOWTO - Multiver script</span></a>.</p>
 </section>
 </section>
 </section>

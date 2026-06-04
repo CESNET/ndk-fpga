@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cocotb tips &amp; tricks &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cocotbext-ndk" href="cocotbext.html" />
+    <link rel="prev" title="Getting Started with cocotb" href="basic_cocotb_test.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cocotb tips &amp; tricks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#random-seed">Random Seed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debug-logging">Debug Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-signals-on-mfb-mvb-axi4-stream-interfaces">Optional Signals on MFB/MVB/AXI4-Stream Interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-probes">Using probes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Cocotb tips &amp; tricks</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cocotb_tips_and_tricks.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cocotb-tips-tricks">
+<h1>Cocotb tips &amp; tricks<a class="headerlink" href="#cocotb-tips-tricks" title="Link to this heading"></a></h1>
+<p>This section consists of simple problems you may encounter when creating testbenches
+using <code class="docutils literal notranslate"><span class="pre">cocotb/cocotbext-ndk</span></code> frameworks and the solutions to those problems.</p>
+<section id="random-seed">
+<h2>Random Seed<a class="headerlink" href="#random-seed" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">RANDOM_SEED</span></code> environment variable controls the seed for random number generation in cocotb tests.</p>
+<p>By default, cocotb uses a different random seed for each simulation run, which means tests with random behavior (e.g., random packet generation, random delays, random backpressure) will produce different results each time.</p>
+<p>To reproduce a specific test run (e.g., when debugging a failure), set the seed to a fixed value:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">RANDOM_SEED</span><span class="o">=</span><span class="m">12345</span>
+make
+</pre></div>
+</div>
+<p>Alternatively, add <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">RANDOM_SEED</span> <span class="pre">:=</span> <span class="pre">12345</span></code> to your <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> for permanent setting.</p>
+<p>The seed value is logged at the start of each simulation run. When a test fails, note the seed value from the log and use it to reproduce the exact same conditions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using a fixed seed makes tests deterministic, which is useful for debugging but may hide timing-related issues that only occur with certain random patterns.</p>
+</div>
+</section>
+<section id="debug-logging">
+<h2>Debug Logging<a class="headerlink" href="#debug-logging" title="Link to this heading"></a></h2>
+<p>Components in <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> use <code class="docutils literal notranslate"><span class="pre">self.log</span></code> for debug messages. To enable debug logging, set the <code class="docutils literal notranslate"><span class="pre">COCOTB_LOG_LEVEL</span></code> environment variable before running the simulation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">COCOTB_LOG_LEVEL</span><span class="o">=</span>DEBUG
+make
+</pre></div>
+</div>
+<p>Alternatively, add <code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">COCOTB_LOG_LEVEL</span> <span class="pre">:=</span> <span class="pre">DEBUG</span></code> to your <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> for permanent setting.</p>
+<p>Available log levels are: <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">WARNING</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Debug logging increases simulation time and log size. Use only during development.</p>
+</div>
+</section>
+<section id="optional-signals-on-mfb-mvb-axi4-stream-interfaces">
+<h2>Optional Signals on MFB/MVB/AXI4-Stream Interfaces<a class="headerlink" href="#optional-signals-on-mfb-mvb-axi4-stream-interfaces" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> mechanism is available on MVB, MFB, AXI4-Stream and other interfaces. It allows handling signals that are not part of the standard driver/monitor. To use it:</p>
+<ol class="arabic">
+<li><p>Create extended driver/monitor classes with <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> list:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MVBDriverExt</span><span class="p">(</span><span class="n">MVBDriver</span><span class="p">):</span>
+    <span class="n">_optional_signals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;l3_csum_orig&quot;</span><span class="p">,</span> <span class="s2">&quot;l3_csum_en&quot;</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">MVBMonitorExt</span><span class="p">(</span><span class="n">MVBMonitor</span><span class="p">):</span>
+    <span class="n">_optional_signals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;l3_csum&quot;</span><span class="p">,</span> <span class="s2">&quot;l3_csum_ok&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create custom transaction class with the optional fields:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">MetadataTr</span><span class="p">(</span><span class="n">MvbTransaction</span><span class="p">):</span>
+    <span class="n">l3_csum_orig</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">l3_csum_en</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use the extended classes in your testbench:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">mvb_driver</span> <span class="o">=</span> <span class="n">MVBDriverExt</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;RX_MVB&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">mvb_monitor</span> <span class="o">=</span> <span class="n">MVBMonitorExt</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="s2">&quot;TX_MVB&quot;</span><span class="p">,</span> <span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="n">tr_type</span><span class="o">=</span><span class="n">MetadataTr</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create and send transactions with optional signals:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create transaction with optional signal values</span>
+<span class="n">tr</span> <span class="o">=</span> <span class="n">MetadataTr</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mh">0x1234</span><span class="p">,</span> <span class="n">l3_csum_orig</span><span class="o">=</span><span class="mh">0x5678</span><span class="p">,</span> <span class="n">l3_csum_en</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">mvb_driver</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> list tells the driver/monitor which additional signals to look for on the interface. Signals not present on the DUT will be silently ignored.</p>
+</div>
+<p>This feature is also available for:</p>
+<ul class="simple">
+<li><p><strong>MFB</strong> - optional signals are replicated across regions.</p></li>
+<li><p><strong>AXI4-Stream</strong> - control signals like <code class="docutils literal notranslate"><span class="pre">TLAST</span></code> and <code class="docutils literal notranslate"><span class="pre">TKEEP</span></code> are automatically handled by the driver.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each interface has its own default <code class="docutils literal notranslate"><span class="pre">_optional_signals</span></code> list. Check the driver/monitor source code for details.</p>
+</div>
+</section>
+<section id="using-probes">
+<h2>Using probes<a class="headerlink" href="#using-probes" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> framework includes a base class for creating probes for various purposes.
+It can be found at <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ofm/base/probe.py</span></code>. The
+probes typically read attributes of their connected agents, usually a monitor or a driver,
+perform calculations with them, and display the results to the terminal either at a specific
+time, periodically, or on request.</p>
+<p>The base <code class="docutils literal notranslate"><span class="pre">Probe</span></code> class offers a couple of methods to make this possible.</p>
+<p>To log a specific time interval, use the <code class="docutils literal notranslate"><span class="pre">add_log_interval</span></code> method. If you want the time interval
+to go to infinity, set the <code class="docutils literal notranslate"><span class="pre">stop_time</span></code> argument to <code class="docutils literal notranslate"><span class="pre">None</span></code>; however, don’t forget to also set a period,
+otherwise the probe will never log.</p>
+<p>Periodic logging can be achieved by setting a period using the <code class="docutils literal notranslate"><span class="pre">set_log_period</span></code> method.</p>
+<p>For cases where full control over when the probe starts and stops logging is needed, the <code class="docutils literal notranslate"><span class="pre">start_log</span></code>
+and <code class="docutils literal notranslate"><span class="pre">stop_log</span></code> methods are implemented.</p>
+<p>When it comes to specific implementations of probes, at the time of writing, there is only one,
+and that is <code class="docutils literal notranslate"><span class="pre">ThroughputProbe</span></code> for measuring throughput and efficiency.
+Check out <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ofm/utils/throughput_probe.py</span></code> for the implementation.</p>
+<p>Class <code class="docutils literal notranslate"><span class="pre">ThroughputProbe</span></code> further adds the <code class="docutils literal notranslate"><span class="pre">log_average_throughput</span></code> and <code class="docutils literal notranslate"><span class="pre">log_max_throughput</span></code> methods
+to log the average throughput and efficiency and the maximal possible average throughput,
+respectively. It is recommended to call these methods at the end of the test when all the transactions
+have been processed.</p>
+<p>To perform its task, a probe typically needs to read attributes from the probed agent synchronously.
+However, the names of the attributes of the agent may differ from the names of the attributes of the probe,
+or they may not be present at all; in that case, they need to be either calculated or set to a fixed value.</p>
+<p>To resolve this, it is recommended to use interfaces derived from the <code class="docutils literal notranslate"><span class="pre">ProbeInterface</span></code> class. This class
+offers two approaches for passing a value to the probe – a translation dictionary <code class="docutils literal notranslate"><span class="pre">interface_dict</span></code> and
+properties.</p>
+<p>The translation dictionary <code class="docutils literal notranslate"><span class="pre">interface_dict</span></code> should contain all needed attributes as its keys.
+The values linked to the keys should be either the names of the equivalent attributes of the agent,
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> to indicate that the value is returned by a property of the interface.</p>
+<p>If the value cannot be simply read from the agent object because some logic needs to be performed
+(e.g., the value must be calculated from multiple attributes, or the behavior depends on the type of the
+agent), a property with the same name as the key in <code class="docutils literal notranslate"><span class="pre">interface_dict</span></code> can be created, which overrides the
+dictionary entry.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The interface always looks for a property first. Only after it is not found does it try to get the value
+from the connected agent using <code class="docutils literal notranslate"><span class="pre">interface_dict</span></code>.</p>
+</div>
+<p>For a specific implementation of a probe interface, check out the different interfaces for
+<code class="docutils literal notranslate"><span class="pre">ThroughputProbe</span></code> in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ofm/utils/throughput_probe.py</span></code>.</p>
+<p>The setup of a probe can, for example, look like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">out_throughput_probe</span> <span class="o">=</span> <span class="n">ThroughputProbe</span><span class="p">(</span>
+    <span class="n">ThroughputProbeMfbInterface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="p">),</span>
+    <span class="n">throughput_units</span><span class="o">=</span><span class="s2">&quot;bits&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ThroughputProbe - OUT&quot;</span>
+<span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">out_throughput_probe</span><span class="o">.</span><span class="n">add_log_interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">out_throughput_probe</span><span class="o">.</span><span class="n">set_log_period</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Which then produces output like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#  10000.00ns INFO     cocotb.ThroughputProbe - OUT       Immediate throughput at 10.0 us: 134.5104 Gb/s, Immediate efficiency: 32.8395%</span>
+<span class="c1">#  20000.00ns INFO     cocotb.ThroughputProbe - OUT       Immediate throughput at 20.0 us: 134.8456 Gb/s, Immediate efficiency: 32.9213%</span>
+<span class="c1">#  30000.00ns INFO     cocotb.ThroughputProbe - OUT       Immediate throughput at 30.0 us: 134.9 Gb/s, Immediate efficiency: 32.9346%</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basic_cocotb_test.html" class="btn btn-neutral float-left" title="Getting Started with cocotb" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cocotbext.html" class="btn btn-neutral float-right" title="cocotbext-ndk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

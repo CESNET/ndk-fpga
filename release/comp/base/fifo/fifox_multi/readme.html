@@ -99,6 +99,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -236,6 +237,26 @@ but will also <strong>lower the component’s latency</strong>.</p>
 <td><p>In safe read mode it is safe to attempt reading (setting <code class="docutils literal notranslate"><span class="pre">RD</span></code> to <code class="docutils literal notranslate"><span class="pre">'1'</span></code>)
 from ports, that are currently empty.</p>
 <p>This mode leads to worse timing and is often not needed, so it can be disabled here.</p>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-fifox_multi-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“FULL”</p></td>
+<td><p>ARCHITECTURE SELECTION:
+1. FULL: [Shakedown -&gt; B-Shifter -&gt; Multi-FIFO -&gt; B-Shifter]</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Native gap removal; narrow MUXes (log2 scale).</p></li>
+</ul>
+<ul class="simple">
+<li><p>High resource usage (multiple FIFOs); async output path.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>SHAKEDOWN: [Single FIFO -&gt; MVB Shakedown]
++ Low resources; direct register output.
+- Throughput ~87%; wide MUXes (2x vs FULL); worse buffering (gaps in FIFO).</p></li>
+</ol>
 </td>
 </tr>
 </tbody>

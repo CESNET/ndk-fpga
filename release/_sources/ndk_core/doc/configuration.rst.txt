@@ -504,8 +504,3 @@ What can I do with the `app_conf.tcl` file
 * You can add a parameter to the VHDL package, which is used in the
   `application_core.vhd` component (the same package as in the `card_const.tcl`
   and `core_const.tcl`).
-
-Contact for author
-==================
-Send suggestions regarding missing information or unanswered questions to
-`valekv@cesnet.cz`.

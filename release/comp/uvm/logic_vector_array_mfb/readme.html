@@ -101,6 +101,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../avmm/readme.html">AVMM Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../avst_crdt/readme.html">AVST CRDT Agent</a></li>
@@ -126,6 +127,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -179,11 +181,11 @@
            <div itemprop="articleBody">
              
   <section id="logic-vector-array-mfb-environment">
-<span id="logic-vector-array-mfb-mfb"></span><h1>logic_vector_array_mfb environment<a class="headerlink" href="#logic-vector-array-mfb-environment" title="Link to this heading"></a></h1>
+<span id="logic-vector-array-mfb-env"></span><h1>logic_vector_array_mfb environment<a class="headerlink" href="#logic-vector-array-mfb-environment" title="Link to this heading"></a></h1>
 <p>This environment has two high-level agents. The first one is a logic vector array agent and it works with data. The second one is a logic vector agent which works with metadata.
 This package contains two environments. Environment RX generates data and metadata and sends them to the DUT. Environment TX generates the DST_RDY signal and
 observes the TX interface.</p>
-<img alt="logic_vector_array_mfb schema" class="align-center" src="../../comp/uvm/docs/byte_array_mfb_env.svg" />
+<img alt="logic_vector_array_mfb schema" class="align-center" src="../../../_images/byte_array_mfb_env.svg" />
 <p>The environment is configured by these four parameters: For more information see <a class="reference internal" href="../../mfb_tools/readme.html#mfb-bus"><span class="std std-ref">mfb documentation</span></a>.</p>
 <ul class="simple">
 <li><p>REGIONS</p></li>

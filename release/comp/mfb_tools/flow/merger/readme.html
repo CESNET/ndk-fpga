@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFB Merger &mdash; NDK-FPGA  documentation</title>
+  <title>MFB Merger Gen &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -81,7 +81,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">MFB Merger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html">MFB Merger Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../metadata_insertor/readme.html">Metadata Insertor</a></li>
@@ -121,6 +122,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -162,7 +164,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../mfb.html">MFB Tools</a></li>
-      <li class="breadcrumb-item active">MFB Merger</li>
+      <li class="breadcrumb-item active">MFB Merger Gen</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../../_sources/comp/mfb_tools/flow/merger/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -172,13 +174,60 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mfb-merger">
-<span id="id1"></span><h1>MFB Merger<a class="headerlink" href="#mfb-merger" title="Link to this heading"></a></h1>
+  <section id="mfb-merger-gen">
+<span id="mfb-merger"></span><h1>MFB Merger Gen<a class="headerlink" href="#mfb-merger-gen" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_merger">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MERGER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_merger" title="Link to this definition"></a></dt>
-<dd><p>Merges two input MVB+MFB interfaces in one output interface
-Contains input FIFOs and output PIPEs.</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_merger_gen">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MERGER_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_merger_gen" title="Link to this definition"></a></dt>
+<dd><p>MFB+MVB bus merger with generic number of inputs.</p>
+<p>This module merges multiple input MVB+MFB streams into a single output stream
+using a binary tree of 2:1 MFB_MERGER units. The number of inputs can be any
+positive integer (non-power-of-2 inputs are padded internally).</p>
+<section id="mvb-and-mfb-interface-usage">
+<h2>MVB and MFB Interface Usage<a class="headerlink" href="#mvb-and-mfb-interface-usage" title="Link to this heading"></a></h2>
+<p>The MVB interface carries header information (e.g., DMA descriptors) while
+the MFB interface carries the associated data payload. Each MVB header can
+be marked as having an associated payload frame using the <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD</span></code>
+signal. When <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD(i)(j)</span> <span class="pre">=</span> <span class="pre">'1'</span></code>, the j-th header on input i is
+associated with data on the MFB interface. The merger maintains this
+association throughout the merging process.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Related MVB headers and their corresponding MFB data frames must arrive at
+each input in the same order they are expected to appear on the output. The
+merger pairs headers with payloads based on arrival order, not by content
+matching. Out-of-order arrival will result in incorrect header-payload pairing.</p>
+</div>
+</section>
+<section id="rx-mvb-payload-signal-usage">
+<h2>RX_MVB_PAYLOAD Signal Usage<a class="headerlink" href="#rx-mvb-payload-signal-usage" title="Link to this heading"></a></h2>
+<p>This signal indicates which MVB headers have associated data payload on MFB.</p>
+<ul class="simple">
+<li><p>When <code class="docutils literal notranslate"><span class="pre">'1'</span></code>: The corresponding header has an associated data frame on MFB</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">'0'</span></code>: The header is standalone (control-only, no data payload)</p></li>
+</ul>
+<p>Each bit in <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD(i)</span></code> corresponds to one MVB header item on input i.</p>
+</section>
+<section id="rx-payload-en-generic">
+<h2>RX_PAYLOAD_EN Generic<a class="headerlink" href="#rx-payload-en-generic" title="Link to this heading"></a></h2>
+<p>Controls whether the MFB data path is implemented for each input port.</p>
+<ul class="simple">
+<li><p>When <code class="docutils literal notranslate"><span class="pre">true</span></code>: Full MVB+MFB merging with header-payload association</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">false</span></code>: Only MVB headers are processed; MFB path is bypassed</p></li>
+</ul>
+<p>Use <code class="docutils literal notranslate"><span class="pre">false</span></code> for inputs that only send control headers without data payload,
+reducing resource consumption by eliminating unnecessary MFB pipeline stages.</p>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Configurable number of input streams (any positive integer)</p></li>
+<li><p>Configurable MVB item count and MFB geometry</p></li>
+<li><p>Optional mid-stage MFB FIFOs for buffering</p></li>
+<li><p>Configurable input/output pipelining</p></li>
+<li><p>Timeout-based stream switching</p></li>
+<li><p>Metadata support on MFB interface</p></li>
+</ul>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -189,102 +238,124 @@ Contains input FIFOs and output PIPEs.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>TX MVB characteristics</p></td>
+<td><p>GENERAL PARAMETERS</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mvb_items"><td><p>MVB_ITEMS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-merger_inputs"><td><p>MERGER_INPUTS</p></td>
 <td><p>integer</p></td>
 <td><p>2</p></td>
-<td><p>number of headers</p></td>
+<td><p>Number of merger input streams
+Can be any positive integer (non-power-of-2 values are padded internally)</p></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>TX MFB characteristics</p></td>
+<td><p>MVB INTERFACE PARAMETERS</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-mvb_items"><td><p>MVB_ITEMS</p></td>
 <td><p>integer</p></td>
 <td><p>2</p></td>
-<td><p>number of regions in word</p></td>
+<td><p>Number of MVB header items (parallel headers per cycle)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-mfb_reg_size"><td><p>MFB_REG_SIZE</p></td>
-<td><p>integer</p></td>
-<td><p>1</p></td>
-<td><p>number of blocks in region</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
-<td><p>integer</p></td>
-<td><p>8</p></td>
-<td><p>number of items in block</p></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-mvb_item_width"><td><p>MVB_ITEM_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
-<td><p>width  of one item (in bits)</p></td>
+<td><p>Width of each MVB header item in bits</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
-<td><p>integer</p></td>
-<td><p>0</p></td>
-<td><p>width of MFB metadata</p></td>
-</tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>Others</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MFB INTERFACE PARAMETERS</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-hdr_width"><td><p>HDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>integer</p></td>
-<td><p>DMA_DOWNHDR_WIDTH</p></td>
-<td><p>Width of each MVB item
-DMA_DOWNHDR_WIDTH, DMA_UPHDR_WIDTH</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions per word</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-rx0_payload_enabled"><td><p>RX0_PAYLOAD_ENABLED</p></td>
-<td><p>boolean</p></td>
-<td><p>true</p></td>
-<td><p>Data/Payload MFB interface required/active on individual input ports
-Currently used only in SIMPLE architecture to optimize usage of input/output pipes</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-mfb_reg_size"><td><p>MFB_REG_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td><p>Number of blocks per region</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-rx1_payload_enabled"><td><p>RX1_PAYLOAD_ENABLED</p></td>
-<td><p>boolean</p></td>
-<td><p>true</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
-<td><p>boolean</p></td>
-<td><p>false</p></td>
-<td><p>To enable optional MFB FIFOs at input</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-input_fifo_size"><td><p>INPUT_FIFO_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
-<td><p>Size of input MVB and MFB FIFOs (in words)
-Minimum value is 2!</p></td>
+<td><p>Number of items per block</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-sw_timeout_width"><td><p>SW_TIMEOUT_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Width of one MFB item in bits</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td><p>Width of MFB metadata bus in bits</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>GENERAL PARAMETERS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-input_fifo_size"><td><p>INPUT_FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Depth of input MVB and MFB FIFOs in words
+Minimum value is 2</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-rx_payload_en"><td><p>RX_PAYLOAD_EN</p></td>
+<td><p>b_array_t(MERGER_INPUTS-1 downto 0)</p></td>
+<td><p>(others =&gt; true)</p></td>
+<td><p>MFB data payload enable for each input port
+RX_PAYLOAD_EN(i) = true: Full MVB+MFB operation on input i
+RX_PAYLOAD_EN(i) = false: MVB headers only on input i (MFB path optimized away)
+Use false for inputs that only carry control headers without data</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-sw_timeout_width"><td><p>SW_TIMEOUT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td><p>Width of timeout counter, determines the time when the switch to
-the next active MVB/MFB stream occurs.</p></td>
+<td><p>Width of stream switch timeout counter
+Timeout = 2^SW_TIMEOUT_WIDTH cycles of inactivity before switching
+Higher values reduce switching frequency but increase latency for
+the non-active stream. Lower values may create gaps between MFB
+packets during switching, reducing throughput (only one input port
+is read per cycle per merger stage)</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-in_pipe_en"><td><p>IN_PIPE_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-mid_mfb_fifos_en"><td><p>MID_MFB_FIFOS_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Enable optional MFB FIFOs at intermediate merger stages
+false: No FIFOs between merger stages (input FIFOs only)
+true: Adds MFB_FIFOX buffers at each internal tree stage</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-in_pipe_en"><td><p>IN_PIPE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
-<td><p>Input PIPEs enable
-Only used in architecture SIMPLE.
-Input registers is created when this is set to false.</p></td>
+<td><p>Enable input PIPE stages for all internal 2:1 merger units
+true: Uses MVB_PIPE and MFB_PIPE components for registered inputs
+false: Uses simple registers (combinatorial input path)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_merger-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
-<td><p>Output PIPE enable
-Only used in architecture SIMPLE.
-Output register is created when this is set to false.</p></td>
+<td><p>Enable output PIPE stage for all internal 2:1 merger units
+true: Uses MVB_PIPE and MFB_PIPE components for registered outputs
+false: Uses simple output registers</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“SHAKEDOWN”</p></td>
+<td><p>Architecture selection for internal FIFOX_MULTI component
+Supported values:
+* “SHAKEDOWN”: Handshake-based FIFO with better buffering and throughput
+* “FULL”: Standard implementation with wide MUXes</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
-<td><p>“ULTRASCALE”, “7SERIES”</p></td>
+<td><p>Target device family for FIFO/PIPE implementation
+Specifies the FPGA device family for optimal resource inference</p></td>
 </tr>
 </tbody>
 </table>
@@ -298,259 +369,658 @@ Output register is created when this is set to false.</p></td>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>Common interface</p></td>
+<td><p>COMMON SIGNALS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>System clock</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Synchronous reset (active high)</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX INTERFACES (per input port)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MVB header bus array (one per input port)
+RX_MVB_DATA(i) contains MVB_ITEMS headers, each MVB_ITEM_WIDTH bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-rx_mvb_payload"><td><p>RX_MVB_PAYLOAD</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Payload association flags array (one per input port)
+RX_MVB_PAYLOAD(i)(j) = ‘1’: Header j on input i has associated MFB data</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Header valid flags array (one per input port)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(MERGER_INPUTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Source ready array (one per input port)
+Backpressure from merger to upstream sender</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(MERGER_INPUTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Destination ready array (one per input port)
+Flow control from merger to upstream sender</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MFB data bus array (one per input port)
+Organized as: MFB_REGIONS x MFB_REG_SIZE x MFB_BLOCK_SIZE x MFB_ITEM_WIDTH bits</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_meta"><td><p>RX_MFB_META</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MFB metadata bus array (one per input port)
+Always valid when MFB data is valid; passed through unchanged</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Start of Frame flags array (one per input port)
+RX_MFB_SOF(i)(r) = ‘1’: Region r on input i contains SOF</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>End of Frame flags array (one per input port)
+RX_MFB_EOF(i)(r) = ‘1’: Region r on input i contains EOF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>SOF position array (one per input port)
+Indicates which block within the region contains the SOF</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>slv_array_t     (MERGER_INPUTS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EOF position array (one per input port)
+Indicates which item within the block contains the EOF</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(MERGER_INPUTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Source ready array (one per input port)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(MERGER_INPUTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Destination ready array (one per input port)</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX INTERFACE (merged output)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Merged MVB header bus
+Contains headers from all inputs, merged based on activity</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-tx_mvb_payload"><td><p>TX_MVB_PAYLOAD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Payload association flags for merged output
+Maintains the header-to-payload relationship from input streams</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Header valid flags for merged output</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Source ready - backpressure from downstream receiver
+Asserted when the merger has valid data to send</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Destination ready - flow control from downstream consumer
+When ‘1’, the consumer can accept new data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Merged MFB data bus
+Contains payload data from all inputs, synchronized with TX_MVB_DATA</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Merged MFB metadata bus
+Metadata from active input stream passed through unchanged</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Start of Frame flags for merged output</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>End of Frame flags for merged output</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>SOF position for merged output</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>EOF position for merged output</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Source ready - backpressure from downstream receiver
+Asserted when the merger has valid MFB data to send</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger_gen-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Destination ready - flow control from downstream consumer</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</dd></dl>
+
+</section>
+<section id="id1">
+<h1>MFB Merger<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_merger">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MERGER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_merger" title="Link to this definition"></a></dt>
+<dd><p>Merges two input MVB+MFB interfaces into a single output interface.</p>
+<p>The module alternates between two input streams (RX0 and RX1) and merges
+them into one output stream (TX). It handles both MVB (control headers)
+and MFB (data payload) interfaces simultaneously, maintaining association
+between headers and their corresponding data frames.</p>
+<section id="id2">
+<h2>MVB and MFB Interface Usage<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>The MVB interface carries header information (e.g., DMA descriptors) while
+the MFB interface carries the associated data payload. Each MVB header can
+be marked as having an associated payload frame using the <code class="docutils literal notranslate"><span class="pre">RXx_MVB_PAYLOAD</span></code>
+signal. When <code class="docutils literal notranslate"><span class="pre">RXx_MVB_PAYLOAD(i)</span> <span class="pre">=</span> <span class="pre">'1'</span></code>, the i-th header is associated with
+data on the MFB interface. The merger maintains this association throughout
+the merging process, ensuring headers and their payloads emerge together on
+the TX interface.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Related MVB headers and their corresponding MFB data frames must arrive at
+the input in the same order they are expected to appear on the output. The
+merger pairs headers with payloads based on arrival order, not by content
+matching. If a header with <code class="docutils literal notranslate"><span class="pre">RXx_MVB_PAYLOAD(i)='1'</span></code> arrives, the next MFB
+frame on that input port will be associated with that header. Out-of-order
+arrival will result in incorrect header-payload pairing.</p>
+</div>
+</section>
+<section id="rxx-mvb-payload-signal-usage">
+<h2>RXx_MVB_PAYLOAD Signal Usage<a class="headerlink" href="#rxx-mvb-payload-signal-usage" title="Link to this heading"></a></h2>
+<p>This signal indicates which MVB headers have associated data payload on MFB.</p>
+<ul class="simple">
+<li><p>When <code class="docutils literal notranslate"><span class="pre">'1'</span></code>: The corresponding header has an associated data frame on MFB</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">'0'</span></code>: The header is standalone (control-only, no data payload)</p></li>
+</ul>
+<p>Each bit in <code class="docutils literal notranslate"><span class="pre">RXx_MVB_PAYLOAD</span></code> corresponds to one MVB header item.</p>
+</section>
+<section id="rxx-payload-enabled-generic">
+<h2>RXx_PAYLOAD_ENABLED Generic<a class="headerlink" href="#rxx-payload-enabled-generic" title="Link to this heading"></a></h2>
+<p>Controls whether the MFB data path is implemented for each input port.</p>
+<ul class="simple">
+<li><p>When <code class="docutils literal notranslate"><span class="pre">true</span></code>: Full MVB+MFB merging with header-payload association</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">false</span></code>: Only MVB headers are processed; MFB path is bypassed</p></li>
+</ul>
+<p>Use <code class="docutils literal notranslate"><span class="pre">false</span></code> when an input port only sends control headers without data
+payload, reducing resource consumption by eliminating unnecessary MFB
+pipeline stages.</p>
+</section>
+<section id="id3">
+<h2>Features<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Configurable MVB item count and MFB geometry</p></li>
+<li><p>Optional input FIFOs for MFB interface</p></li>
+<li><p>Configurable input/output pipelining</p></li>
+<li><p>Timeout-based stream switching</p></li>
+<li><p>Metadata support on MFB interface</p></li>
+</ul>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MVB INTERFACE PARAMETERS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td><p>Number of MVB header items (parallel headers per cycle)
+Determines the width of MVB-related signals: MVB_ITEMS * HDR_WIDTH</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MFB INTERFACE PARAMETERS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions per word
+Each region can independently carry SOF/EOF markers</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-mfb_reg_size"><td><p>MFB_REG_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>1</p></td>
+<td><p>Number of blocks per region
+Affects EOF position width: log2(MFB_REG_SIZE * MFB_BLOCK_SIZE)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Number of items per block
+Combined with ITEM_WIDTH determines total MFB data width</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>32</p></td>
+<td><p>Width of one MFB item in bits
+Typical values: 32, 64, 128, 256</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-mfb_meta_width"><td><p>MFB_META_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><p>Width of MFB metadata bus in bits
+Set to 0 to disable metadata support
+Metadata is passed through unchanged for each region</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>GENERAL PARAMETERS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-hdr_width"><td><p>HDR_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>DMA_DOWNHDR_WIDTH</p></td>
+<td><p>Width of each MVB header item in bits
+Common values: DMA_DOWNHDR_WIDTH (downstream) or DMA_UPHDR_WIDTH (upstream)
+from dma_bus_pack package</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-rx0_payload_enabled"><td><p>RX0_PAYLOAD_ENABLED</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Enable MFB data payload processing on RX0 input port
+true: Full MVB+MFB operation with header-payload association
+false: MVB headers processed; MFB path optimized away (FAKE_PIPE)
+Use false when RX0 only carries standalone headers without data</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-rx1_payload_enabled"><td><p>RX1_PAYLOAD_ENABLED</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Enable MFB data payload processing on RX1 input port
+Same behavior as RX0_PAYLOAD_ENABLED but for the second input</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable optional MFB FIFOs at input ports for additional buffering
+true: Instantiates MFB_FIFOX buffers of INPUT_FIFO_SIZE depth
+false: Direct connection without input buffering</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-input_fifo_size"><td><p>INPUT_FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Depth of input MVB and MFB FIFOs in words
+Minimum value is 2
+Only used when IN_MFB_FIFO_EN = true</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-sw_timeout_width"><td><p>SW_TIMEOUT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Width of stream switch timeout counter
+Timeout = 2^SW_TIMEOUT_WIDTH cycles of inactivity before switching
+Higher values reduce switching frequency but increase latency for
+the non-active stream. Lower values may create bigger gaps between MFB
+packets during switching, reducing throughput (only one input port
+is read per cycle)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-in_pipe_en"><td><p>IN_PIPE_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable input PIPE stages for registered inputs
+true: Uses MVB_PIPE and MFB_PIPE components for registered inputs
+false: Uses simple registers (combinatorial input path)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Enable output PIPE stage for registered outputs
+true: Uses MVB_PIPE and MFB_PIPE components for registered outputs
+false: Uses simple output registers</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“SHAKEDOWN”</p></td>
+<td><p>Architecture selection for internal FIFOX_MULTI component
+Supported values:
+* “SHAKEDOWN”: Handshake-based FIFO with better buffering and throughput
+* “FULL”: Standard implementation with wide MUXes</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target device family for FIFO/PIPE implementation
+Specifies the FPGA device family for optimal resource inference</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>COMMON SIGNALS</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>System clock</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-reset"><td><p>RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Synchronous reset (active high)</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>RX interface 0</p></td>
+<td><p>RX INTERFACE 0 (MVB)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mvb_hdr"><td><p>RX0_MVB_HDR</p></td>
 <td><p>std_logic_vector(MVB_ITEMS*HDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>MVB header bus containing up to MVB_ITEMS headers in parallel
+Each header is HDR_WIDTH bits wide
+Format: {header[MVB_ITEMS-1], …, header[0]}</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mvb_payload"><td><p>RX0_MVB_PAYLOAD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>the header is associated with a payload frame on MFB</p></td>
+<td><p>Payload association flags for each MVB header item
+Bit i = ‘1’: Header i has associated data payload on MFB interface
+Bit i = ‘0’: Header i is standalone (control-only, no MFB data)
+This signal establishes the header-to-payload relationship that the
+merger maintains throughout the merging process</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mvb_vld"><td><p>RX0_MVB_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Header valid flags
+Bit i = ‘1’: Header i (and payload if RX0_MVB_PAYLOAD(i)=’1’) is valid</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mvb_src_rdy"><td><p>RX0_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Source ready - backpressure signal from downstream receiver
+When ‘0’, the receiver cannot accept data; hold all signals stable</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mvb_dst_rdy"><td><p>RX0_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_data"><td><p>RX0_MFB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_meta"><td><p>RX0_MFB_META</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>Allways valid, metadata merged by words</p></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_sof"><td><p>RX0_MFB_SOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_eof"><td><p>RX0_MFB_EOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_sof_pos"><td><p>RX0_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_eof_pos"><td><p>RX0_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_src_rdy"><td><p>RX0_MFB_SRC_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_dst_rdy"><td><p>RX0_MFB_DST_RDY</p></td>
-<td><p>std_logic</p></td>
-<td><p>out</p></td>
-<td></td>
+<td><p>Destination ready - flow control to upstream sender
+When ‘1’, the merger can accept a new header/payload combination</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>RX interface 1</p></td>
+<td><p>RX INTERFACE 0 (MFB)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mvb_hdr"><td><p>RX1_MVB_HDR</p></td>
-<td><p>std_logic_vector(MVB_ITEMS*HDR_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_data"><td><p>RX0_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>MFB data bus carrying payload data
+Organized as: MFB_REGIONS regions x MFB_REG_SIZE blocks x MFB_BLOCK_SIZE items x MFB_ITEM_WIDTH bits
+Total width: MFB_REGIONS * MFB_REG_SIZE * MFB_BLOCK_SIZE * MFB_ITEM_WIDTH bits</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mvb_payload"><td><p>RX1_MVB_PAYLOAD</p></td>
-<td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_meta"><td><p>RX0_MFB_META</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>the header is associated with a payload frame on MFB</p></td>
+<td><p>MFB metadata bus (optional)
+One metadata word per region, each MFB_META_WIDTH bits wide
+Always valid when MFB data is valid; passed through unchanged
+Tied to ‘0’ by default when MFB_META_WIDTH = 0</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mvb_vld"><td><p>RX1_MVB_VLD</p></td>
-<td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_sof"><td><p>RX0_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Start of Frame flags - one per region
+RX0_MFB_SOF(i) = ‘1’: Region i contains the start of a new packet</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mvb_src_rdy"><td><p>RX1_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_eof"><td><p>RX0_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>End of Frame flags - one per region
+RX0_MFB_EOF(i) = ‘1’: Region i contains the end of a packet</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_sof_pos"><td><p>RX0_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>SOF position within each region
+Indicates which block within the region contains the SOF
+Width: MFB_REGIONS * log2(MFB_REG_SIZE) bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_eof_pos"><td><p>RX0_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>EOF position within each block
+Indicates which item within the block contains the EOF
+Width: MFB_REGIONS * log2(MFB_REG_SIZE * MFB_BLOCK_SIZE) bits</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx0_mfb_src_rdy"><td><p>RX0_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Source ready - backpressure signal from downstream receiver</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mvb_dst_rdy"><td><p>RX1_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx0_mfb_dst_rdy"><td><p>RX0_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Destination ready - flow control to upstream sender</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX INTERFACE 1 (MVB)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mvb_hdr"><td><p>RX1_MVB_HDR</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*HDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MVB header bus (same format as RX0_MVB_HDR)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mvb_payload"><td><p>RX1_MVB_PAYLOAD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Payload association flags (same format as RX0_MVB_PAYLOAD)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mvb_vld"><td><p>RX1_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Header valid flags (same format as RX0_MVB_VLD)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mvb_src_rdy"><td><p>RX1_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Source ready (same format as RX0_MVB_SRC_RDY)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mvb_dst_rdy"><td><p>RX1_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Destination ready (same format as RX0_MVB_DST_RDY)</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX INTERFACE 1 (MFB)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mfb_data"><td><p>RX1_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>MFB data bus (same format as RX0_MFB_DATA)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mfb_meta"><td><p>RX1_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Allways valid, metadata merged by words</p></td>
+<td><p>MFB metadata bus (same format as RX0_MFB_META)</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mfb_sof"><td><p>RX1_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Start of Frame flags (same format as RX0_MFB_SOF)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mfb_eof"><td><p>RX1_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>End of Frame flags (same format as RX0_MFB_EOF)</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mfb_sof_pos"><td><p>RX1_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>SOF position (same format as RX0_MFB_SOF_POS)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mfb_eof_pos"><td><p>RX1_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>EOF position (same format as RX0_MFB_EOF_POS)</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-rx1_mfb_src_rdy"><td><p>RX1_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Source ready (same format as RX0_MFB_SRC_RDY)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-rx1_mfb_dst_rdy"><td><p>RX1_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Destination ready (same format as RX0_MFB_DST_RDY)</p></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>TX interface</p></td>
+<td><p>TX INTERFACE (MVB)</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mvb_hdr"><td><p>TX_MVB_HDR</p></td>
 <td><p>std_logic_vector(MVB_ITEMS*HDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Merged MVB header bus
+Contains headers from both RX0 and RX1, merged based on activity</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mvb_payload"><td><p>TX_MVB_PAYLOAD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>the header is associated with a payload frame on MFB</p></td>
+<td><p>Payload association flags for merged output
+Maintains the header-to-payload relationship from the input streams</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS          -1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Header valid flags for merged output</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Source ready - backpressure from downstream receiver
+Asserted when the merger has valid data to send</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Destination ready - flow control from downstream consumer
+When ‘1’, the consumer can accept new data</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX INTERFACE (MFB)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Merged MFB data bus
+Contains payload data from both RX0 and RX1, synchronized with TX_MVB_HDR</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_meta"><td><p>TX_MFB_META</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*MFB_META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>Allways valid, metadata merged by words</p></td>
+<td><p>Merged MFB metadata bus
+Metadata from active input stream passed through unchanged</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Start of Frame flags for merged output</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>End of Frame flags for merged output</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>SOF position for merged output</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>EOF position for merged output</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Source ready - backpressure from downstream receiver
+Asserted when the merger has valid MFB data to send</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_merger-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_merger-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Destination ready - flow control from downstream consumer</p></td>
 </tr>
 </tbody>
 </table>
+</section>
 </dd></dl>
 
-<p>There are three variants of MFB Merger:</p>
-<ol class="arabic">
-<li><p>MFB Merger Full</p>
-<blockquote>
-<div><p>Merges two input MVB+MFB interfaces in one output interface.
-Only contains 1 input register for each input interface and 1 output register.
-Has lower throughput compared to the OLD MFB Merger architecture,
-but much lesser resource consumption.
-This is the preffered architecture for this unit!</p>
-</div></blockquote>
-</li>
-<li><p>MFB Merger Gen</p>
-<blockquote>
-<div><p>MFB+MVB bus merger with generic number of inputs</p>
-</div></blockquote>
-</li>
-<li><p>MFB Merger Old</p>
-<blockquote>
-<div><p>Merges two input MVB+MFB interfaces in one output interface
-Contains input FIFOs and output PIPEs.
-This architecture has not been verified, as it is not supposed to be used.
-Use architecture FULL instead!</p>
-</div></blockquote>
-</li>
-</ol>
 </section>
 
 

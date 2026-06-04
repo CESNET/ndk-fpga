@@ -80,6 +80,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -135,7 +136,7 @@
 <section id="implemented-ip-cores">
 <h2>Implemented IP cores<a class="headerlink" href="#implemented-ip-cores" title="Link to this heading"></a></h2>
 <p>Right now, you can use two designs with Multirate IP. These designs have optimized parameters, so you do not need to change anything.
-These designs are 100GE and 25GE, the individual profiles that can be set are listed in <span class="xref std std-ref">Tab. 1</span>.
+These designs are 100GE and 25GE, the individual profiles that can be set are listed in <a class="reference internal" href="#f-tile-multirate-ip-variants"><span class="std std-ref">Tab. 1</span></a>.
 If you want to make a build with Multirate IP, check the <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> file for agi-fh400g, there are pseudo names for each Multirate IP core.</p>
 </section>
 <section id="build-tips">
@@ -143,8 +144,8 @@ If you want to make a build with Multirate IP, check the <code class="docutils l
 <p>The first step is to make a build. If an error during the build occurs, here are a few tips to help you to fix them.
 If you have a problem during the build with Timing analysis and it seems that it could be because of asynchronous clk signals, look into the <code class="docutils literal notranslate"><span class="pre">timing.sdc</span></code> file. There is the declaration of asynchronous clocks for both Multirate IP cores.
 If you have a problem with the Profile ID setup for Dynamic Reconfiguration, look into <code class="docutils literal notranslate"><span class="pre">multirate.qsf</span></code>. There is the declaration of profiles for both types of IP cores (100G and 25G) and it is set by its setup (the order of profiles when the IP was generated). These assignments allow you to set the order of all profiles (from 0 to …) for all IP cores.
-If you have other problems, look into Intel’s documentation: <span class="xref std std-ref">Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide</span> and <span class="xref std std-ref">Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide</span>.</p>
-<table class="docutils align-center" id="id1">
+If you have other problems, look into Intel’s documentation: <a class="reference external" href="https://cdrdv2-public.intel.com/773503/ug-714307-773503.pdf">Intel F-Tile Ethernet Multirate Intel FPGA IP User Guide</a> and <a class="reference external" href="https://www.intel.com/programmable/technical-pdfs/711009.pdf">Intel F-Tile Dynamic Reconfiguration Suite Intel FPGA IP User Guide</a>.</p>
+<span id="f-tile-multirate-ip-variants"></span><table class="docutils align-center" id="id1">
 <caption><span class="caption-text">Tab. 1 F-Tile_Multirate IPs variants</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 11.1%" />
@@ -205,7 +206,7 @@ There are five parameters, which have to be set to change the speed or type of F
 <li><p><code class="docutils literal notranslate"><span class="pre">-s_ch</span></code> Start_channel - represents which first IP from the range of IPs that you want to change the position of. The first IP is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">-ch</span></code>   Channels - indicates the number of channels from the <cite>start_channel</cite> that you want to change. There is a treatment in case of a non-valid range choice.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">-s_p</span></code>  Start_profile - this parameter needs to be set to the profile, which was applied as the last default profile after the build is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">-e_p</span></code>  End_profile - indicates a profile to which you want to change the IP core. <span class="xref std std-ref">Tab. 1</span> lists possible variants.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-e_p</span></code>  End_profile - indicates a profile to which you want to change the IP core. <a class="reference internal" href="#f-tile-multirate-ip-variants"><span class="std std-ref">Tab. 1</span></a> lists possible variants.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">-sp</span></code>   Speed - represents the speed of the implemented IP core, the values of speeds that you can use are shown in the _help_ also in the script.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">-d</span></code>    Device - represents the device, which is used for the implemented design. The default value is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>

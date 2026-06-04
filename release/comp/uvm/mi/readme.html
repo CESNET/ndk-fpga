@@ -98,6 +98,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../pma/readme.html">PMA agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../intel_mac_seg/readme.html">Intel MAC SEG</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../axi/readme.html">AXI Agent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../logic_vector_array_axi/readme.html">logic_vector_array_axi environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../packet_generators/flowtest/readme.html">FlowTest Sequence</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../avmm/readme.html">AVMM Agent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../avst_crdt/readme.html">AVST CRDT Agent</a></li>
@@ -123,6 +124,7 @@
 <p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
@@ -179,7 +181,7 @@
 <span id="uvm-mi"></span><h1>MI agent<a class="headerlink" href="#mi-agent" title="Link to this heading"></a></h1>
 <p>This package contains two UVM verification agents which generate transactions to the :ref:MI&lt;mi_bus&gt; interface. The slave agent is connected to the slave DUT port but acts as the master of this communication (the slave agent generates the requests for the DUT). The master agent is connected to the master DUT port but acts as the slave of this communication (it accepts the requests from the DUT).
 Both agents have three class parameters. <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> , <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> and <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code>. <code class="docutils literal notranslate"><span class="pre">META_WIDTH</span></code> has default value set to 0.</p>
-<a class="reference internal image-reference" href="../../comp/uvm/docs/MI_agent.svg"><img alt="../../comp/uvm/docs/MI_agent.svg" class="align-center" src="../../comp/uvm/docs/MI_agent.svg" style="width: 50%;" />
+<a class="reference internal image-reference" href="../../../_images/MI_agent.svg"><img alt="../../../_images/MI_agent.svg" class="align-center" src="../../../_images/MI_agent.svg" style="width: 50%;" />
 </a>
 <section id="sequence-item">
 <h2>Sequence_item<a class="headerlink" href="#sequence-item" title="Link to this heading"></a></h2>
