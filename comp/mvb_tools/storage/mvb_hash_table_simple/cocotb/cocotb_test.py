@@ -17,6 +17,7 @@ from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mi.drivers import MIRequestDriver as MIDriver
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
@@ -28,7 +29,6 @@ from cocotbext.ofm.utils.device import create_dtb_simple
 from cocotbext.ofm.utils.math import ceildiv
 from transaction import MvbReqTrHashTableSimple, MvbResTrHashTableSimple
 
-import itertools
 from math import log2
 import yaml
 
@@ -150,7 +150,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
     tb = testbench(dut, debug=True)
     await tb.reset()
 
-    tb.backpressure.start((1, i % 5) for i in itertools.count())
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     """Reading configuration from the component."""
     mvb_items = await tb.mi_interface.read32(_MVB_ITEMS)

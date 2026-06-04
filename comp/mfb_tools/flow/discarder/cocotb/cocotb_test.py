@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import itertools
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
@@ -13,6 +11,7 @@ from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.ver.generators import random_integers
 from cocotb_bus.drivers import BitDriver
@@ -107,9 +106,9 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # running simulated reset
     await tb.reset()
 
-    # staring the BitDriver (randomized DST_RDY)
-    tb.mvb_backpressure.start((1, i % 5) for i in itertools.count())
-    tb.mfb_backpressure.start((1, i % 5) for i in itertools.count())
+    # staring the BitDriver (randomized DST_RDY)
+    tb.mvb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
+    tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # dynamically getting the width of the data signal that will be set (useful if the width of the signal may change)
     mvb_data_width = tb.mvb_stream_in.item_widths["data"]

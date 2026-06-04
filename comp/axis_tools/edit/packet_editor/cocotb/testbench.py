@@ -5,6 +5,7 @@
 
 """Testbench for AXIS_PACKET_EDITOR component."""
 
+from cocotbext.ofm.utils.hex_formatter import format_bytes
 from dataclasses import dataclass
 from typing import List
 
@@ -39,17 +40,6 @@ class Axi4StreamMasterWithEdit(Axi4StreamMaster):
     _optional_signals = ["TLAST", "TKEEP", "EDIT_DATA", "EDIT_OFFSET", "EDIT_MASK", "EDIT_ENABLE"]
 
 
-def _format_packet_bytes(packet_bytes: bytes, label: str) -> str:
-    """Format packet bytes for display, 16 bytes per line."""
-    lines = [f"{label}:"]
-    for i in range(0, len(packet_bytes), 16):
-        chunk = packet_bytes[i:i+16]
-        hex_str = " ".join(f"{b:02X}" for b in chunk)
-        ascii_str = "".join(chr(b) if 32 <= b < 127 else "." for b in chunk)
-        lines.append(f"  {i:04X}: {hex_str:<48} {ascii_str}")
-    return "\n".join(lines)
-
-
 def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTransaction,
                           packet_num: int = 0, edit_instr: EditInstruction = None) -> tuple:
     """Compare two AXI4-Stream transactions with detailed mismatch output."""
@@ -75,9 +65,9 @@ def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTra
 
     msg = "\n".join(lines)
     if hasattr(expected, "TDATA") and expected.TDATA:
-        msg += "\n" + _format_packet_bytes(expected.TDATA, "Expected output bytes") + "\n"
+        msg += "\n" + format_bytes(expected.TDATA, label="Expected output bytes") + "\n"
     if hasattr(actual, "TDATA") and actual.TDATA:
-        msg += "\n" + _format_packet_bytes(actual.TDATA, "Actual output bytes") + "\n"
+        msg += "\n" + format_bytes(actual.TDATA, label="Actual output bytes") + "\n"
 
     return False, msg
 

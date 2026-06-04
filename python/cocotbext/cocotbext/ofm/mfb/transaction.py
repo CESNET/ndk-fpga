@@ -4,32 +4,36 @@
 
 from dataclasses import dataclass
 from ..base.transaction import Transaction
+from ..utils.hex_formatter import format_bytes
 
 
 @dataclass(slots=True)
 class MfbTransaction(Transaction):
     data: bytes = b""
 
-    def __repr__(self):
-        ret = ""
-        if hasattr(self, "meta"):
-            ret += "META:\n"
-            # ret += "{}".format(self.meta.to_bytes((self.meta.bit_length() + 7) // 8, byteorder='little'))
-            ret += "{:x}".format(self.meta)
-
-        if hasattr(self, "data"):
-            ret += "\nDATA:\n"
-            conv_hex = self.data.hex()
-            # Join every 8-character group with a space
-            with_space = ' '.join([conv_hex[i:i+8] for i in range(0, len(conv_hex), 8)])
-            # Join every 64-character section with a newline
-            formatted_string = '\n'.join([with_space[i:i+64+8] for i in range(0, len(with_space), 64+8)])
-
-            ret += formatted_string
-
-        return f"{ret}"
+    def __repr__(self) -> str:
+        """Return formatted hex representation of the transaction."""
+        # MfbTransaction does not have meta attribute, only MfbTransactionWithMeta does
+        if hasattr(self, "data") and self.data:
+            return format_bytes(self.data, label="DATA")
+        return super().__repr__()
 
 
 @dataclass(slots=True)
 class MfbTransactionWithMeta(MfbTransaction):
     meta: int = 0
+
+    def __repr__(self) -> str:
+        """Return formatted hex representation of the transaction."""
+        # Convert meta to bytes - handle 0 as special case (0.bit_length() returns 0)
+        meta_bytes = (
+            self.meta.to_bytes(1, byteorder='big') if self.meta == 0
+            else self.meta.to_bytes((self.meta.bit_length() + 7) // 8, byteorder='big')
+        )
+        ret = format_bytes(meta_bytes, label="META")
+        ret += "\n"
+
+        if hasattr(self, "data") and self.data:
+            ret += format_bytes(self.data, label="DATA")
+
+        return ret

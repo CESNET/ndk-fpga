@@ -4,13 +4,12 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import itertools
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
@@ -94,8 +93,8 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # running simulated reset
     await tb.reset()
 
-    # staring the BitDriver (randomized DST_RDY)
-    tb.backpressure.start((1, i % 5) for i in itertools.count())
+    # staring the BitDriver (randomized DST_RDY)
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # calculating width of the meta signal for a region
     meta_width = len(tb.stream_in.bus.meta) // len(tb.stream_in.bus.sof)

@@ -6,43 +6,23 @@
 """Cocotb tests for AXIS_HEAD_TRIMMER component."""
 
 import random
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from cocotbext.ofm.base.generators import ItemRateLimiter
+from cocotbext.ofm.ver.backpressure import BackpressureConfig, apply_backpressure
 from cocotbext.ofm.ver.generators import random_packets
 
 from testbench import Testbench, TrimInstruction
-
-
-@dataclass
-class BPCfg:
-    """Backpressure configuration."""
-    min_hold: int = 1
-    max_hold: int = 5
-    low_prob: float = 0.5
-
-
-async def _backpressure(signal, clock, cfg: Optional[BPCfg] = None):
-    """Apply random backpressure to a ready signal."""
-    cfg = cfg or BPCfg()
-    while True:
-        hold_cycles = random.randint(cfg.min_hold, cfg.max_hold)
-        if random.random() < cfg.low_prob:
-            signal.value = 0
-        else:
-            signal.value = 1
-        await ClockCycles(clock, hold_cycles)
 
 
 async def _run_test(
     dut,
     pkt_count: int = 10,
     pkt_range: Tuple[int, int] = (60, 8000),
-    tx_cfg: Optional[BPCfg] = None,
+    tx_cfg: Optional[BackpressureConfig] = None,
     test_name: str = "",
     zero_idles_chance: int = 50,
     max_idles: int = 5
@@ -59,7 +39,7 @@ async def _run_test(
 
     tx_task = None
     if tx_cfg:
-        tx_task = cocotb.start_soon(_backpressure(dut.TX_AXI_TREADY, dut.CLK, tx_cfg))
+        tx_task = cocotb.start_soon(apply_backpressure(dut.TX_AXI_TREADY, dut.CLK, tx_cfg))
 
     pkt_iter = random_packets(min_size=pkt_range[0], max_size=pkt_range[1], count=pkt_count)
 
@@ -114,7 +94,7 @@ async def run_test_random(dut, pkt_count=2000):
     await _run_test(
         dut, pkt_count=pkt_count,
         pkt_range=(60, 8000),
-        tx_cfg=BPCfg(1, 5, 0.5),
+        tx_cfg=BackpressureConfig(1, 5, 0.5),
         test_name="random",
         zero_idles_chance=50,
         max_idles=5
@@ -127,7 +107,7 @@ async def run_test_aggressive_backpressure(dut, pkt_count=1000):
     await _run_test(
         dut, pkt_count=pkt_count,
         pkt_range=(60, 1500),
-        tx_cfg=BPCfg(10, 30, 0.8),
+        tx_cfg=BackpressureConfig(10, 30, 0.8),
         test_name="aggressive_backpressure",
         zero_idles_chance=50,
         max_idles=5
@@ -140,7 +120,7 @@ async def run_test_jumbo_packets(dut, pkt_count=1000):
     await _run_test(
         dut, pkt_count=pkt_count,
         pkt_range=(4000, 9216),
-        tx_cfg=BPCfg(1, 5, 0.5),
+        tx_cfg=BackpressureConfig(1, 5, 0.5),
         test_name="jumbo_packets",
         zero_idles_chance=50,
         max_idles=5
@@ -153,7 +133,7 @@ async def run_test_small_packets(dut, pkt_count=2000):
     await _run_test(
         dut, pkt_count=pkt_count,
         pkt_range=(60, 75),
-        tx_cfg=BPCfg(1, 10, 0.3),
+        tx_cfg=BackpressureConfig(1, 10, 0.3),
         test_name="small_packets",
         zero_idles_chance=0,
         max_idles=10
