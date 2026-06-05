@@ -101,10 +101,14 @@ class testbench():
         all_parts = []
         for p in pb_parts:
             req_addr, req_len = p
-            while req_len > pcie_mrrs:
-                all_parts.append((req_addr, pcie_mrrs))
-                req_addr += pcie_mrrs
-                req_len -= pcie_mrrs
+            addr_offset = req_addr % 4
+            # Unaligned start reduces usable space in the first chunk
+            while req_len + addr_offset > pcie_mrrs:
+                chunk_len = pcie_mrrs - addr_offset
+                all_parts.append((req_addr, chunk_len))
+                req_addr += chunk_len
+                req_len -= chunk_len
+                addr_offset = 0  # subsequent chunks are dword-aligned
             all_parts.append((req_addr, req_len))
 
         # Need a clone of the base addres for TagMem transactions; necessary when addressing transactions wrapping around the Main Memory's end.
@@ -112,14 +116,15 @@ class testbench():
         # Create DMA headers and split packets accordingly to the instructions (all_parts)
         for p in all_parts:
             req_addr, req_len = p
+            addr_offset = req_addr % 4
 
             # Create DMA upstream header transaction
             hdr = DmaUphdr()
             # Total bytes is length + byte offset (lower 2 bits of address)
-            total_bytes = req_len + (req_addr % 4)
+            total_bytes = req_len + addr_offset
             hdr.dma_request_length = (total_bytes + 3) // 4 # Round up to dwords (ceildiv)
             hdr.dma_request_type = 0  # 0=Read
-            hdr.dma_request_firstib = req_addr % 4 # Invalid bytes at start = address offset
+            hdr.dma_request_firstib = addr_offset # Invalid bytes at start = address offset
             hdr.dma_request_lastib = (-total_bytes) % 4
             hdr.dma_request_tag = self.model_sent
             hdr.dma_request_unitid = 0
@@ -150,7 +155,7 @@ class testbench():
                 mem_word_addr = addr_extended & (bytes_per_word - 1)
             tagmem_tr.addr = addr_extended
             tagmem_tr.id = req_id
-            tagmem_tr.firstib = req_addr % 4  # Invalid bytes at start = address offset
+            tagmem_tr.firstib = addr_offset  # Invalid bytes at start = address offset
             # Connect to Scoreboard expected output
             self.tagmem_exp_output.append(tagmem_tr)
             # Update the word address (can accumulate over multiple words)
