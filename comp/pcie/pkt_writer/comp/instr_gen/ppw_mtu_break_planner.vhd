@@ -95,7 +95,18 @@ architecture FULL of PPW_MTU_BREAK_PLANNER is
     signal next_address_reg  : std_logic_vector(ADDRESS_WIDTH-1 downto 0);
     signal meta_reg          : std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
 
+    signal addr_offset_init : unsigned(1 downto 0);
+    signal first_chunk_len  : unsigned(log2(PKT_MTU+1)-1 downto 0);
+
 begin
+
+    -- Dword offset of the initial address (for unaligned start compensation).
+    -- When the address is not dword-aligned, the PCIe TLP must include extra
+    -- "invalid bytes" (firstib) at the beginning, reducing the usable space
+    -- in the first MPS-sized chunk.
+    addr_offset_init <= unsigned(RX_MVB_ADDRESS(1 downto 0));
+    first_chunk_len  <= resize(unsigned(PCIE_MPS), log2(PKT_MTU+1)) - resize(addr_offset_init, log2(PKT_MTU+1));
+
 
     RX_MVB_DST_RDY <= TX_MVB_DST_RDY and not (breaking and RX_MVB_SRC_RDY);
 
@@ -152,12 +163,12 @@ begin
             when ST_IDLE =>
                 s_tx_mvb_meta    <= RX_MVB_META;
                 s_tx_mvb_address <= RX_MVB_ADDRESS;
-                s_tx_mvb_length  <= std_logic_vector(resize(unsigned(PCIE_MPS), log2(PKT_MTU+1))) when (len_over_mps = '1') else RX_MVB_LENGTH;
+                s_tx_mvb_length  <= std_logic_vector(first_chunk_len) when (len_over_mps = '1') else RX_MVB_LENGTH;
                 s_tx_mvb_last    <= "0" when (len_over_mps = '1') else RX_MVB_LAST;
                 s_tx_mvb_valid   <= RX_MVB_VALID;
                 s_tx_mvb_src_rdy <= RX_MVB_SRC_RDY;
 
-                len2end  <= resize(unsigned(RX_MVB_LENGTH), LEN_WIDTH_EXT) - resize(unsigned(PCIE_MPS), LEN_WIDTH_EXT);
+                len2end  <= resize(unsigned(RX_MVB_LENGTH), LEN_WIDTH_EXT) - resize(first_chunk_len, LEN_WIDTH_EXT);
                 breaking <= '0';
 
             when ST_BREAK =>
@@ -180,7 +191,7 @@ begin
             if (TX_MVB_DST_RDY = '1') then
                 if (fsm_nstate = ST_BREAK) then
                     len2end_reg      <= len2end(log2(PKT_MTU+1)-1 downto 0);
-                    next_address_reg <= std_logic_vector(unsigned(s_tx_mvb_address) + unsigned(PCIE_MPS));
+                    next_address_reg <= std_logic_vector(unsigned(s_tx_mvb_address) + unsigned(s_tx_mvb_length));
                 end if;
             end if;
         end if;
