@@ -107,33 +107,45 @@ class Testbench():
         self.packets_received = 0
         # Track which IDs are currently in use (not yet received)
         self.ids_in_use = set()
+        # Read the RESP_IN_ORDER generic from the DUT to determine output ordering
+        self.resp_in_order = bool(dut.RESP_IN_ORDER.value)
 
         self.scoreboard = Scoreboard(dut)
 
         def compare_wrapper(actual):
             """
             Compare actual output with expected, providing detailed mismatch info.
-            Supports out-of-order packet arrival within reorder_depth window.
+            Supports in-order and out-of-order response checking based on self.resp_in_order.
             """
             if not self.exp_output:
                 cocotb.log.error("Received unexpected packet")
                 return
 
-            # Search for matching transaction by ID within reorder_depth window
-            reorder_depth = self.packets_expected
-            found_idx = None
-            for i in range(min(reorder_depth, len(self.exp_output))):
-                if self.exp_output[i].id == actual.id:
-                    found_idx = i
-                    break
+            if self.resp_in_order:
+                # In-order mode: response must match the oldest expected packet
+                if actual.id != self.exp_output[0].id:
+                    cocotb.log.error(f"Out-of-order response: expected ID {self.exp_output[0].id}, "
+                                     f"got ID {actual.id}")
+                    self.scoreboard.errors += 1
+                    assert False
+                expected = self.exp_output.pop(0)
+            else:
+                # Out-of-order mode: search for matching transaction by ID within reorder_depth window
+                reorder_depth = self.packets_expected
+                found_idx = None
+                for i in range(min(reorder_depth, len(self.exp_output))):
+                    if self.exp_output[i].id == actual.id:
+                        found_idx = i
+                        break
 
-            if found_idx is None:
-                cocotb.log.error(f"No matching expected transaction found for packet ID {actual.id} "
-                                 f"within reorder_depth={reorder_depth}")
-                self.scoreboard.errors += 1
-                assert False
+                if found_idx is None:
+                    cocotb.log.error(f"No matching expected transaction found for packet ID {actual.id} "
+                                     f"within reorder_depth={reorder_depth}")
+                    self.scoreboard.errors += 1
+                    assert False
 
-            expected = self.exp_output.pop(found_idx)
+                expected = self.exp_output.pop(found_idx)
+
             self.packets_received += 1
 
             # Free the address range by packet ID when packet is received
@@ -250,7 +262,7 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
         next_id = (next_id + 1) & id_mask
 
     # Wait for at least the first packet to reach the DUT's output
-    await ClockCycles(dut.CLK, 100)
+    await ClockCycles(dut.CLK, 1000)
     last_num = 0
     while (this_num := tb.user_resp_mon.frame_cnt) > last_num:
         last_num = this_num
