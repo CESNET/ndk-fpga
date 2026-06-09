@@ -140,7 +140,9 @@
 <h2>Basic description<a class="headerlink" href="#basic-description" title="Link to this heading"></a></h2>
 <p>This module accepts request instructions to read data from a memory device over the PCIe.
 The user provides the Address and Length of the requested data on the RX_USR interface.
-They also provide an ID, which will identify the read data received on the TX_USR interface, which may arrive out of order.</p>
+They also provide an ID, which will identify the read data received on the TX_USR interface.
+The read data can be output in the same order as the requests were received when RESP_IN_ORDER=True.
+When RESP_IN_ORDER=False, completed packets are output immediately regardless of request order.</p>
 <p>This module’s non-user interfaces (PCIE_UP, PCIE_DOWN) are compatible with the PTC module.
 The transactions it receives from the PTC module may come in parts and mixed with parts from other read data.
 However, the parts of one request will arrive in order.
@@ -149,13 +151,6 @@ This module pieces these parts together and marks them with the ID from the requ
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>To ensure correct function, DO NOT reuse IDs until appropriate response is received!
 </pre></div>
 </div>
-<p>Must still be tested in scenarios where:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li><p>requests generate multiple completions (FIP: Fixing In Process) and</p></li>
-<li><p>completions arrive out-of-order (in-order per same tag).</p></li>
-</ol>
-</div></blockquote>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -220,7 +215,14 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>4096</p></td>
 <td><p>Size of a RAM page (in bytes).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-resp_in_order"><td><p>RESP_IN_ORDER</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>When True, packets are output in the same order as the original requests.
+May lead to higher latency due to the reordering process.
+When False, completed packets are output immediately regardless of request order.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td></td>
