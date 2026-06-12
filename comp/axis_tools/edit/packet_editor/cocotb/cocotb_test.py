@@ -27,7 +27,7 @@ async def _run_test(
     dut,
     pkt_count: int = 1000,
     pkt_range: Tuple[int, int] = (60, 8000),
-    tx_cfg: Optional[BPCfg] = None,
+    tx_cfg: Optional[BackpressureConfig] = None,
     test_name: str = ""
 ):
     """Run randomized packet editing test."""
