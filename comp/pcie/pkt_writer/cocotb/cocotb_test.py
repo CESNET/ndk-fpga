@@ -8,6 +8,7 @@ import itertools
 from random import randint
 from math import log2, ceil
 from typing import Tuple
+from dataclasses import fields
 
 import cocotb
 import logging
@@ -19,10 +20,9 @@ from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
 from cocotbext.ofm.mvb.monitors import MVBMonitor
-from cocotbext.ofm.mvb.transaction import MvbTrClassic
+from cocotbext.ofm.mvb.transaction import MvbTrClassicSerializable, hdrfield, serializableheader
 from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
-from cocotbext.ofm.utils.header import SerializableHeader
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 
@@ -31,20 +31,18 @@ from drivers import MvbDriverAddressAndLength as MVBDriver
 
 
 # A copy from the dma_bus_pack.vhd
-class DmaUphdr(SerializableHeader):
-    items = [
-        ('dma_request_length', 11),
-        ('dma_request_type', 1),
-        ('dma_request_firstib', 2),
-        ('dma_request_lastib', 2),
-        ('dma_request_tag', 8),
-        ('dma_request_unitid', 8),
-        ('dma_request_global', 64),
-        ('dma_request_vfid', 8),
-        ('dma_request_pasid', 0),
-        ('dma_request_pasidvld', 0),
-        ('dma_request_relaxed', 1),
-    ]
+@serializableheader()
+class DmaUphdr(MvbTrClassicSerializable):
+    dma_request_length:  int = hdrfield(11)
+    dma_request_type:    int = hdrfield(1)
+    dma_request_firstib: int = hdrfield(2)
+    dma_request_lastib:  int = hdrfield(2)
+    dma_request_tag:     int = hdrfield(8)
+    dma_request_unitid:  int = hdrfield(8)
+    dma_request_global:  int = hdrfield(64)
+    dma_request_vfid:    int = hdrfield(8)
+    # pasid/pasidvld: width 0, carry no bits — OMIT
+    dma_request_relaxed: int = hdrfield(1)
 
 
 class testbench():
@@ -60,14 +58,16 @@ class testbench():
         self.mfb_tx_drv = BitDriver(dut.TX_MFB_DST_RDY, dut.CLK)
         self.mvb_tx_drv = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
         self.mfb_tx_mon = MFBMonitor(dut, "TX_MFB", dut.CLK)
-        self.mvb_tx_mon = MVBMonitor(dut, "TX_MVB", dut.CLK)
+        self.mvb_tx_mon = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=DmaUphdr)
 
-        self.model_sent = 0
         self.mvb_expected_output = []
         self.mfb_expected_output = []
         self.scoreboard = Scoreboard(dut)
         self.scoreboard.add_interface(self.mvb_tx_mon, self.mvb_expected_output)
         self.scoreboard.add_interface(self.mfb_tx_mon, self.mfb_expected_output)
+
+        self.model_sent = 0
+        self.tag_bitwidth = next(f.metadata['width'] for f in fields(DmaUphdr) if f.name == 'dma_request_tag')
 
         if debug:
             if self.mfb_rx_drv is not None:
@@ -119,26 +119,21 @@ class testbench():
         # Create DMA headers and split packets accordingly to the instructions (all_parts)
         for p in all_parts:
             addr, length = p
-            # Create DMA upstream header
-            hdr = DmaUphdr()
             # Total bytes is length + byte offset (lower 2 bits of address)
             total_bytes = length + (addr % 4)
-            hdr.dma_request_length = (total_bytes + 3) // 4  # Round up to dwords (ceildiv)
-            hdr.dma_request_type = 1  # 1=Write
-            hdr.dma_request_firstib = addr % 4  # Invalid bytes at start = address offset
-            hdr.dma_request_lastib = (-total_bytes) % 4
-            hdr.dma_request_tag = self.model_sent
-            hdr.dma_request_unitid = 0
-            hdr.dma_request_global = addr & ~3  # Dword-aligned address
-            hdr.dma_request_vfid = 0
-            hdr.dma_request_pasid = 0
-            hdr.dma_request_pasidvld = 0
-            hdr.dma_request_relaxed = 0
-            # Convert to MVB transaction
-            mvb_instr_model = MvbTrClassic()
-            mvb_instr_model.data = hdr.serialize()
+            # Create DMA upstream header transaction
+            hdr = DmaUphdr(
+                dma_request_length=(total_bytes + 3) // 4, # Round up to dwords (ceildiv)
+                dma_request_type=1, # 1=Write
+                dma_request_firstib=addr % 4, # Invalid bytes at start = address offset
+                dma_request_lastib=(-total_bytes) % 4,
+                dma_request_tag=self.model_sent & (2**self.tag_bitwidth - 1),
+                dma_request_unitid=0,
+                dma_request_global=addr & ~3, # Dword-aligned address
+                dma_request_vfid=0,
+                dma_request_relaxed=0)
             # Connect to Scoreboard expected output
-            self.mvb_expected_output.append(mvb_instr_model)
+            self.mvb_expected_output.append(hdr)
             self.mfb_expected_output.append(packet[0:length])
             self.model_sent += 1
             # Remove processed part from the packet
