@@ -132,9 +132,12 @@ class testbench():
                 dma_request_global=addr & ~3, # Dword-aligned address
                 dma_request_vfid=0,
                 dma_request_relaxed=0)
+
             # Connect to Scoreboard expected output
             self.mvb_expected_output.append(hdr)
-            self.mfb_expected_output.append(packet[0:length])
+            # Prepend invalid bytes (zeros) when address is not dword-aligned
+            offset = addr % 4
+            self.mfb_expected_output.append(b'\x00' * offset + packet[0:length])
             self.model_sent += 1
             # Remove processed part from the packet
             packet = packet[length:]
