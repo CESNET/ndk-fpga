@@ -9,7 +9,7 @@ from cocotb.types import LogicArray
 from cocotbext.ofm.base.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
 
-from .transaction import MvbTransaction, MvbTrClassic
+from .transaction import MvbTransaction, MvbTrClassic, MvbTrClassicSerializable
 
 
 class MVBMonitor(BusMonitor):
@@ -136,7 +136,10 @@ class MVBMonitor(BusMonitor):
                     if s in data_dict_items
                 }
 
-                mvb_tr = self.__tr_type(**kwargs)
+                if issubclass(self.__tr_type, MvbTrClassicSerializable):
+                    mvb_tr = self.__tr_type.deserialize(kwargs["data"])
+                else:
+                    mvb_tr = self.__tr_type(**kwargs)
                 self._recv(mvb_tr)
             vld >>= 1
 
