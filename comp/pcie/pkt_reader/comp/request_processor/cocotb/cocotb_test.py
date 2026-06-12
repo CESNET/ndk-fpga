@@ -49,9 +49,8 @@ class testbench():
         self.tag_q = deque(range(2**self.tag_bitwidth))
         # Queue of used tags to be recycled, filled by the PprProbe
         self.used_tags_q = deque()
-
-        # Setting up the probe to monitor received tags put them into the used_tags_q to recycle them.
-        self.mfb_throughput_probe = PprProbe(self.used_tags_q, PprProbeInterface(self.tx_mvb_mon))
+        # Setting up the probe to monitor received tags, then put them into the used_tags_q to recycle them.
+        self.tx_mvb_probe = PprProbe(self.used_tags_q, PprProbeInterface(self.tx_mvb_mon))
 
         self.scoreboard = Scoreboard(dut)
         self.scoreboard.add_interface(self.tx_mvb_mon, self.tx_mvb_exp_output)
@@ -84,7 +83,7 @@ class testbench():
         page_addr = req_addr >> log2_page_size
         # Packet goes over at least one page (comparing the top bits indicating the number of the page)
         if ((req_addr + req_len) >> log2_page_size) != (page_addr):
-            len_reminder = page_size - (req_addr & 2**log2_page_size-1)
+            len_reminder = page_size - (req_addr & (2**log2_page_size - 1))
             req_len -= len_reminder
             pb_parts.append((req_addr, len_reminder))
             while req_len > page_size:
