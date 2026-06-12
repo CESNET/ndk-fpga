@@ -106,10 +106,14 @@ class testbench():
         all_parts = []
         for p in pb_parts:
             addr, length = p
-            while length > pcie_mps:
-                all_parts.append((addr, pcie_mps))
-                addr += pcie_mps
-                length -= pcie_mps
+            addr_offset = addr % 4
+            # Unaligned start reduces usable space in the first chunk
+            while length + addr_offset > pcie_mps:
+                chunk_len = pcie_mps - addr_offset
+                all_parts.append((addr, chunk_len))
+                addr += chunk_len
+                length -= chunk_len
+                addr_offset = 0  # subsequent chunks are dword-aligned
             all_parts.append((addr, length))
 
         # Create DMA headers and split packets accordingly to the instructions (all_parts)
