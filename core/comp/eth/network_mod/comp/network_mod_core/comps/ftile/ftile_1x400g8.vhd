@@ -274,7 +274,8 @@ architecture FULL of FTILE_1X400G8 is
     signal reconfig_writedata_drp  : slv_array_t     (MI_SEL_RANGE-1 downto 0)(MI_DATA_WIDTH_PHY-1 downto 0);
 
     -- signal for Ftile interface
-    signal ftile_rx_rst_n             : std_logic;
+    signal ftile_rst_ack_n            : std_logic;
+    signal ftile_tx_rst_ack_n         : std_logic;
     signal ftile_rx_rst_ack_n         : std_logic;
     signal ftile_tx_lanes_stable      : std_logic;
     signal ftile_rx_pcs_ready         : std_logic;
@@ -284,6 +285,14 @@ architecture FULL of FTILE_1X400G8 is
     signal ftile_remote_fault         : std_logic;
     signal ftile_rx_hi_ber            : std_logic;
     signal ftile_rx_pcs_fully_aligned : std_logic;
+
+    -- Reset sequence controller signals
+    signal rst_seq_rst_n     : std_logic;
+    signal rst_seq_tx_rst_n  : std_logic;
+    signal rst_seq_rx_rst_n  : std_logic;
+    signal rst_seq_ready     : std_logic;
+    signal rst_seq_state     : std_logic_vector(3 downto 0);
+    signal rx_link_rst_req   : std_logic;
 
     -- signals for sync repeater
     signal ftile_tx_loop_data      : std_logic_vector(MAC_DATA_WIDTH      -1 downto 0);
@@ -327,7 +336,6 @@ architecture FULL of FTILE_1X400G8 is
     signal init_ready     : std_logic_vector(PMA_LANES   -1 downto 0);
 
     signal rx_link_cnt    : unsigned(RX_LINK_CNT_W-1 downto 0);
-    signal rx_link_rst    : std_logic;
 
     signal ftile_clk_out  : std_logic;
 
@@ -383,7 +391,7 @@ begin
         PMA_RESET                => mgmt_pma_reset,                 -- TODO
         PMA_RETUNE               => open,
         PMA_CONTROL              => open,
-        PMA_STATUS               => (others => '0'),
+        PMA_STATUS               => X"0000000" & rst_seq_state,
         PMA_PTRN_EN              => open,
         PMA_TX_DIS               => open,
         PMA_RX_OK                => (others => ftile_rx_pcs_ready), -- TODO
@@ -443,33 +451,35 @@ begin
     reconfig_waitrequest    (MI_SEL_RANGE-1 downto PMA_LANES+1) <= (others => '0');
     reconfig_readdata       (MI_SEL_RANGE-1 downto PMA_LANES+1) <= (others => (others => '0'));
 
-    -- monitoring RX link state
+    -- Monitoring RX link state and generating recovery request for FTILE_ETH_RST_SEQ
     process (CLK_ETH_IN)
     begin
         if rising_edge(CLK_ETH_IN) then
-            if ((ftile_rx_pcs_ready = '1') or (rx_link_rst = '1')) then
-                -- link is up, clear the counter
+            if (rst_seq_ready = '0') then
+                -- Reset sequence in progress, hold timer at zero
+                rx_link_cnt <= (others => '0');
+            elsif (ftile_rx_pcs_ready = '1') then
+                -- Link is up, clear the counter
                 rx_link_cnt <= (others => '0');
             else
-                -- link is down, increase the counter
+                -- Link is down, increase the counter
                 rx_link_cnt <= rx_link_cnt + 1;
             end if;
 
-            -- when its last bit (~100ms) is set, reset the link
-            if (rx_link_cnt(RX_LINK_CNT_W-1) = '1') then
-                rx_link_rst <= '1';
-            elsif (ftile_rx_rst_ack_n = '0' and rx_link_rst = '1') then
-                rx_link_rst <= '0';
+            -- Trigger RX link recovery when counter reaches ~100ms
+            if (rx_link_cnt(RX_LINK_CNT_W-1) = '1' and rx_link_rst_req = '0') then
+                rx_link_rst_req <= '1';
+            elsif (rst_seq_ready = '0') then
+                -- Clear request when reset sequence controller starts processing
+                rx_link_rst_req <= '0';
             end if;
 
             if (RESET_ETH = '1') then
-                rx_link_cnt <= (others => '0');
-                rx_link_rst <= '0';
+                rx_link_cnt     <= (others => '0');
+                rx_link_rst_req <= '0';
             end if;
         end if;
     end process;
-
-    ftile_rx_rst_n <= not rx_link_rst;
 
     xcvr_reconfig_inf_res_g: for xcvr in PMA_LANES-1 downto 0 generate
 
@@ -536,6 +546,30 @@ begin
     CLK_ETH_OUT <= ftile_clk_out;
 
     -- =========================================================================
+    -- F-Tile Ethernet Reset Sequence Controller
+    -- =========================================================================
+    rst_seq_i : entity work.FTILE_ETH_RST_SEQ
+    port map (
+        CLK             => CLK_ETH_IN,
+        RST             => RESET_ETH or mgmt_pma_reset,
+        -- Status inputs from F-Tile Ethernet IP
+        RST_ACK_N       => ftile_rst_ack_n,
+        TX_RST_ACK_N    => ftile_tx_rst_ack_n,
+        RX_RST_ACK_N    => ftile_rx_rst_ack_n,
+        TX_LANES_STABLE => ftile_tx_lanes_stable,
+        RX_PCS_READY    => ftile_rx_pcs_ready,
+        -- Reset outputs to F-Tile Ethernet IP (active low)
+        RST_N           => rst_seq_rst_n,
+        TX_RST_N        => rst_seq_tx_rst_n,
+        RX_RST_N        => rst_seq_rx_rst_n,
+        -- Status
+        READY           => rst_seq_ready,
+        DBG_STATE       => rst_seq_state,
+        -- RX link recovery trigger
+        RX_LINK_RST     => rx_link_rst_req
+    );
+
+    -- =========================================================================
     -- F-TILE Ethernet
     -- =========================================================================
     -- can't have more than 8 400g lines devided into 1 channel
@@ -552,11 +586,11 @@ begin
         i_rx_serial_n                   => QSFP_RX_N,
         i_clk_ref                       => FTILE_PLL_REFCLK,
         i_clk_sys                       => FTILE_PLL_CLK,
-        i_rst_n                         => not RESET_ETH,
-        i_tx_rst_n                      => '1',
-        i_rx_rst_n                      => ftile_rx_rst_n,
-        o_rst_ack_n                     => open,
-        o_tx_rst_ack_n                  => open,
+        i_rst_n                         => rst_seq_rst_n,
+        i_tx_rst_n                      => rst_seq_tx_rst_n,
+        i_rx_rst_n                      => rst_seq_rx_rst_n,
+        o_rst_ack_n                     => ftile_rst_ack_n,
+        o_tx_rst_ack_n                  => ftile_tx_rst_ack_n,
         o_rx_rst_ack_n                  => ftile_rx_rst_ack_n,
         o_cdr_lock                      => open,
         o_tx_pll_locked                 => open,
@@ -693,8 +727,8 @@ begin
                 RX_LINK_UP <= '0';
                 TX_LINK_UP <= '0';
             else
-                RX_LINK_UP <= ftile_rx_pcs_ready and ftile_rx_pcs_fully_aligned and (not ftile_remote_fault);
-                TX_LINK_UP <= ftile_tx_lanes_stable;
+                RX_LINK_UP <= rst_seq_ready and ftile_rx_pcs_ready and ftile_rx_pcs_fully_aligned and (not ftile_remote_fault);
+                TX_LINK_UP <= rst_seq_ready and ftile_tx_lanes_stable;
             end if;
         end if;
     end process;
