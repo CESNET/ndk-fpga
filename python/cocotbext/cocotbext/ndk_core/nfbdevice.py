@@ -7,6 +7,7 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import Timer, RisingEdge, FallingEdge
 from cocotb.utils import get_sim_steps
+from cocotb.handle import Force
 
 from cocotb import simulator
 
@@ -200,6 +201,9 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
 
         # iterating over ports
         for i, eth_core in enumerate(self._core.network_mod_i.eth_core_g if hasattr(self._core.network_mod_i, 'eth_core_g') else []):
+            eth_core.network_mod_core_i.TX_LINK_UP.value = Force(1)
+            eth_core.network_mod_core_i.RX_LINK_UP.value = Force(1)
+
             if hasattr(eth_core.network_mod_core_i, 'cmac_tx_lbus_rdy'):
                 eth_core.network_mod_core_i.cmac_tx_lbus_rdy.value = 1
                 eth_core.network_mod_core_i.cmac_rx_local_fault.value = 0
