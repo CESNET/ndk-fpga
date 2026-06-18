@@ -112,9 +112,13 @@ architecture FULL of RX_DMA_CALYPTE_HDR_INSERTOR is
     signal   tx_mfb_meta_arr    : slv_array_t(TX_REGIONS-1 downto 0)(PCIE_RQ_META_WIDTH-1 downto 0);
     signal   tx_mfb_eof_pos_arr : slv_array_t(TX_REGIONS-1 downto 0)(TX_EOF_POS_RGN_LEN -1 downto 0);
 
-    -- varies its value according to the generic parameters
-    signal shift_inc  : unsigned(1 downto 0);
-    signal init_shift : unsigned(1 downto 0);
+    -- The barrel shifter select is composed as {high_shift_val, low_shift_val}.
+    -- For AMD devices the PCIe header is in TX_MFB_DATA, so low_shift_val = '1'
+    -- and high_shift_val = "11" gives a net shift of 7*128 = 896 bit, which is
+    -- equivalent to 0 modulo the 1024 bit RX word. Therefore the IDLE entry value
+    -- for AMD is "11" while for Intel (low_shift_val = '0') it is "00".
+    constant INIT_SHIFT : unsigned(1 downto 0) := tsel(IS_INTEL, to_unsigned(0, 2), to_unsigned(3, 2));
+    constant SHIFT_INC  : unsigned(1 downto 0) := tsel(TX_REGIONS = 1, to_unsigned(1, 2), to_unsigned(2, 2));
 
     -- attribute mark_debug                       : string;
     -- attribute mark_debug of tprocess_pst       : signal is "true";
@@ -162,11 +166,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
-                if (not IS_INTEL) then
-                    high_shift_val_pst <= "11";
-                else
-                    high_shift_val_pst <= "00";
-                end if;
+                high_shift_val_pst <= INIT_SHIFT;
             elsif (TX_MFB_DST_RDY = '1') then
                 high_shift_val_pst <= high_shift_val_nst;
             end if;
@@ -312,6 +312,7 @@ begin
 
             case tprocess_pst is
                 when IDLE =>
+                    high_shift_val_nst <= INIT_SHIFT;
                     if (RX_MFB_SRC_RDY = '1'
                         and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
                         and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))) then
@@ -349,19 +350,20 @@ begin
                             -- derived from the RX_MFB_EOF_POS incremented by the size of the PCIe header.
                             TX_MFB_EOF_POS <= std_logic_vector(rx_mfb_eof_pos_u(TX_MFB_EOF_POS'high + 2 downto 2) + 4);
                         else
-                            high_shift_val_nst <= init_shift;
+                            high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
                         end if;
                     end if;
 
                 when TRANSACTION_SEND =>
-                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+                    high_shift_val_nst <= high_shift_val_pst + SHIFT_INC;
 
                     if ((RX_MFB_EOF = '1'
                          and ((16 + (resize(high_shift_val_pst, rx_mfb_eof_pos_u'length) + 1)*32) > rx_mfb_eof_pos_u))
                         or (RX_MFB_EOF = '0' and high_shift_val_pst = "11")
                     ) then
 
-                        high_shift_val_nst <= "11";
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst <= INIT_SHIFT;
                         TX_MFB_EOF         <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
 
                         if (RX_MFB_EOF = '0') then
@@ -374,16 +376,18 @@ begin
                     TX_MFB_SRC_RDY <= '1';
 
                 when DMA_HDR_SEND =>
-                    TX_MFB_DATA    <= (TX_MFB_DATA'high downto 128 + 64 => '0') & HDRM_DMA_HDR_DATA & HDRM_DMA_PCIE_HDR;
-                    TX_MFB_SOF     <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
-                    TX_MFB_EOF     <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
-                    TX_MFB_EOF_POS <= std_logic_vector(to_unsigned(5, TX_MFB_EOF_POS'length));
+                    high_shift_val_nst <= INIT_SHIFT;
+                    TX_MFB_DATA        <= (TX_MFB_DATA'high downto 128 + 64 => '0') & HDRM_DMA_HDR_DATA & HDRM_DMA_PCIE_HDR;
+                    TX_MFB_SOF         <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
+                    TX_MFB_EOF         <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                    TX_MFB_EOF_POS     <= std_logic_vector(to_unsigned(5, TX_MFB_EOF_POS'length));
 
                     if (HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
                         TX_MFB_SRC_RDY <= '1';
                     end if;
 
-                when PKT_DROP => null;
+                when PKT_DROP =>
+                    high_shift_val_nst <= INIT_SHIFT;
             end case;
         end process;
     end generate;
@@ -568,6 +572,7 @@ begin
 
             case tprocess_pst is
                 when IDLE =>
+                    high_shift_val_nst <= INIT_SHIFT;
                     if (RX_MFB_SRC_RDY = '1' and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
                         -- Maybe this is obsolete since when the packet should be dropped, no
                         -- HDRM_DATA_PCIE_HDR_SRC_RDY will be valid anyways
@@ -617,13 +622,13 @@ begin
                                    or (rx_mfb_eof_pos_u >= 80 and rx_mfb_eof_pos_u < 112)
                                    or (rx_mfb_eof_pos_u >= 112 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1')
                                ) then
-                                high_shift_val_nst <= init_shift;
+                                high_shift_val_nst <= INIT_SHIFT;
                                 TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & data_pcie_hdr_corr;
                                 TX_MFB_SOF(0)      <= '1';
                                 TX_MFB_SRC_RDY     <= '1';
                             end if;
                         else
-                            high_shift_val_nst <= init_shift;
+                            high_shift_val_nst <= INIT_SHIFT;
                             TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & HDRM_DATA_PCIE_HDR;
                             TX_MFB_SOF(0)      <= '1';
                             TX_MFB_SRC_RDY     <= '1';
@@ -632,10 +637,11 @@ begin
 
                 when TRANSACTION_SEND =>
 
-                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+                    high_shift_val_nst <= high_shift_val_pst + SHIFT_INC;
 
                     if (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 80) then
-                        high_shift_val_nst    <= "11";
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_DATA           <= (TX_MFB_DATA'high downto 128 + 64 + (TX_MFB_DATA'length / 2) => '0')
                                                  & HDRM_DMA_HDR_DATA
                                                  & HDRM_DMA_PCIE_HDR
@@ -646,12 +652,13 @@ begin
                         tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(5, TX_EOF_POS_RGN_LEN));
 
                     elsif (RX_MFB_EOF = '1' and (rx_mfb_eof_pos_u >= 80 and rx_mfb_eof_pos_u < 112)) then
-                        high_shift_val_nst    <= "11";
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_EOF            <= "10";
                         tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2) + 4);
 
                     elsif ((RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 112) and high_shift_val_pst = "11") then
-                        high_shift_val_nst    <= high_shift_val_pst;
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_DATA           <= (TX_MFB_DATA'high downto 128 + 64 + (TX_MFB_DATA'length / 2) => '0')
                                                  & HDRM_DMA_HDR_DATA
                                                  & HDRM_DMA_PCIE_HDR
@@ -662,7 +669,8 @@ begin
                         tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(5, TX_EOF_POS_RGN_LEN));
 
                     elsif (RX_MFB_EOF = '0' and high_shift_val_pst = "11") then
-                        high_shift_val_nst    <= high_shift_val_pst;
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_EOF            <= "01";
                         tx_mfb_eof_pos_arr(0) <= std_logic_vector(to_unsigned(3, TX_EOF_POS_RGN_LEN));
                     end if;
@@ -670,6 +678,7 @@ begin
                     TX_MFB_SRC_RDY <= '1';
 
                 when DMA_HDR_SEND =>
+                    high_shift_val_nst    <= INIT_SHIFT;
                     TX_MFB_DATA           <= (TX_MFB_DATA'high downto 128 + 64 => '0') & HDRM_DMA_HDR_DATA & HDRM_DMA_PCIE_HDR;
                     TX_MFB_SOF            <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
                     TX_MFB_EOF            <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
@@ -679,7 +688,8 @@ begin
                         TX_MFB_SRC_RDY <= '1';
                     end if;
 
-                when PKT_DROP => null;
+                when PKT_DROP =>
+                    high_shift_val_nst <= INIT_SHIFT;
             end case;
         end process;
     end generate;
@@ -815,6 +825,7 @@ begin
 
             case tprocess_pst is
                 when IDLE =>
+                    high_shift_val_nst <= INIT_SHIFT;
                     if (RX_MFB_SRC_RDY = '1'
                         and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
                         and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))) then
@@ -853,18 +864,19 @@ begin
                             -- derived from the RX_MFB_EOF_POS incremented by the size of the PCIe header.
                             TX_MFB_EOF_POS <= std_logic_vector(rx_mfb_eof_pos_u(TX_MFB_EOF_POS'high + 2 downto 2));
                         else
-                            high_shift_val_nst <= init_shift;
+                            high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
                         end if;
                     end if;
 
                 when TRANSACTION_SEND =>
-                    high_shift_val_nst <= high_shift_val_pst + shift_inc;
+                    high_shift_val_nst <= high_shift_val_pst + SHIFT_INC;
 
                     if ((RX_MFB_EOF = '1'
                          and ((((resize(high_shift_val_pst, rx_mfb_eof_pos_u'length) + 1)*32) > rx_mfb_eof_pos_u)))
                         or (RX_MFB_EOF = '0' and high_shift_val_pst = "11")
                     ) then
-                        high_shift_val_nst <= "11";
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst <= INIT_SHIFT;
                         TX_MFB_EOF         <= "1";
 
                         if (RX_MFB_EOF = '0') then
@@ -877,6 +889,7 @@ begin
                     TX_MFB_SRC_RDY <= '1';
 
                 when DMA_HDR_SEND =>
+                    high_shift_val_nst                      <= INIT_SHIFT;
                     TX_MFB_DATA                             <= (TX_MFB_DATA'high downto 64 => '0') & HDRM_DMA_HDR_DATA;
                     tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= HDRM_DMA_PCIE_HDR;
                     TX_MFB_SOF                              <= "1";
@@ -887,7 +900,8 @@ begin
                         TX_MFB_SRC_RDY <= '1';
                     end if;
 
-                when PKT_DROP => null;
+                when PKT_DROP =>
+                    high_shift_val_nst <= INIT_SHIFT;
             end case;
         end process;
     end generate;
@@ -1052,6 +1066,7 @@ begin
 
             case tprocess_pst is
                 when IDLE =>
+                    high_shift_val_nst <= INIT_SHIFT;
                     if (RX_MFB_SRC_RDY = '1' and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
                         -- Maybe this is obsolete since when the packet should be dropped, no
                         -- HDRM_DATA_PCIE_HDR_SRC_RDY will be valid anyways
@@ -1099,12 +1114,12 @@ begin
                             elsif ((rx_mfb_eof_pos_u >= 64 and rx_mfb_eof_pos_u < 96 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1')
                                    or rx_mfb_eof_pos_u >= 96
                                ) then
-                                high_shift_val_nst <= init_shift;
+                                high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
                                 TX_MFB_SOF(0)      <= '1';
                                 TX_MFB_SRC_RDY     <= '1';
                             end if;
                         else
-                            high_shift_val_nst                      <= init_shift;
+                            high_shift_val_nst                      <= INIT_SHIFT + SHIFT_INC;
                             tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= HDRM_DATA_PCIE_HDR;
                             TX_MFB_SOF(0)                           <= '1';
                             TX_MFB_SRC_RDY                          <= '1';
@@ -1112,10 +1127,12 @@ begin
                     end if;
 
                 when TRANSACTION_SEND =>
-                    high_shift_val_nst <= "00";
+                    high_shift_val_nst <= high_shift_val_pst + SHIFT_INC;
                     TX_MFB_SRC_RDY     <= '1';
 
                     if (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 96) then
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_DATA           <= (TX_MFB_DATA'high downto 64 + (TX_MFB_DATA'length / 2) => '0')
                                                  & HDRM_DMA_HDR_DATA
                                                  & bshifter_data_out(TX_MFB_DATA'length/2 -1 downto 0);
@@ -1125,15 +1142,20 @@ begin
                         tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(1, TX_EOF_POS_RGN_LEN));
 
                     elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 96) then
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_EOF            <= "10";
                         tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
 
                     elsif (RX_MFB_EOF = '0') then
+                        -- prepare shift counter for the next transaction
+                        high_shift_val_nst    <= INIT_SHIFT;
                         TX_MFB_EOF            <= "10";
                         tx_mfb_eof_pos_arr(1) <= (others => '1');
                     end if;
 
                 when DMA_HDR_SEND =>
+                    high_shift_val_nst                      <= INIT_SHIFT;
                     TX_MFB_DATA                             <= (TX_MFB_DATA'high downto 64 => '0') & HDRM_DMA_HDR_DATA;
                     tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= HDRM_DMA_PCIE_HDR;
                     TX_MFB_SOF                              <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
@@ -1144,22 +1166,12 @@ begin
                         TX_MFB_SRC_RDY <= '1';
                     end if;
 
-                when PKT_DROP => null;
+                when PKT_DROP =>
+                    high_shift_val_nst <= INIT_SHIFT;
             end case;
         end process;
     end generate;
 
-    -- Same for Intel ... the reset value must change
-    -- my attempt to make the set of constants which change according to the specified generic parameters
-    shift_cntr_incr_g : if (TX_REGIONS = 1) generate
-        init_shift <= "00";
-        shift_inc  <= "01";
-    else generate
-        init_shift <= "01";
-        -- increment by two, the barrel shifter remains the same for both of the configurations so the
-        -- shifting by two is needed
-        shift_inc  <= "10";
-    end generate;
 
     --=============================================================================================================
     -- Shifter of the output data
