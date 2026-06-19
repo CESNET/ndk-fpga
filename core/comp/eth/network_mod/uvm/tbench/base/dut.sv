@@ -130,6 +130,13 @@ module DUT_BASE #(
         assign usr_tx_hdr[eth_it].VLD     = usr_tx_hdr_vld    [(eth_it+1)*REGIONS-1 -: REGIONS];
         assign usr_tx_hdr[eth_it].SRC_RDY = usr_tx_hdr_src_rdy[eth_it];
         assign usr_tx_hdr_dst_rdy[eth_it] = usr_tx_hdr[eth_it].DST_RDY;
+
+
+        // SET LINK_UP TO 1
+        initial begin
+            force VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.RX_LINK_UP  = '1;
+            force VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.TX_LINK_UP  = '1;
+        end
     end
 
     NETWORK_MOD #(
