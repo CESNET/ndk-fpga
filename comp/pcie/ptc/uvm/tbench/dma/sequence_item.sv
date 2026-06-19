@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_item_rq  extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_dma::sequence_item_rq)
+    `ndk_object_utils(uvm_dma::sequence_item_rq)
 
     //rand uvm_ptc_info::sequence_item hdr;
     rand logic [sv_dma_bus_pack::DMA_REQUEST_LENGTH_W-1 : 0]  length;

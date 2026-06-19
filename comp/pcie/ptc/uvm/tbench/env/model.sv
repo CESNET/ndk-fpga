@@ -128,7 +128,8 @@ class tag_cbs #(int unsigned REGIONS, int unsigned TAG_WIDTH) extends uvm_event_
                 logic [sv_dma_bus_pack::DMA_UPHDR_WIDTH-1:0] dma_hdr_act = dma_hdr[(it+1)*sv_dma_bus_pack::DMA_UPHDR_WIDTH-1 -: sv_dma_bus_pack::DMA_UPHDR_WIDTH];
                 uvm_dma::sequence_item_rq act_dma_hdr;
 
-                act_dma_hdr = new();
+                act_dma_hdr = uvm_dma::sequence_item_rq::type_id::create("act_dma_hdr");
+                act_dma_hdr.start[{this.get_full_name, "_post_trigger"}] = $time();
                 act_dma_hdr.relaxed     = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_W-1 : sv_dma_bus_pack::DMA_REQUEST_RELAXED_O];
                 act_dma_hdr.pasidvld    = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASIDVLD_O];
                 act_dma_hdr.pasid       = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASID_O];
