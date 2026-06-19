@@ -6,27 +6,10 @@
 
 source "./signals.fdo"
 
-add_wave "-noupdate -color yellow -label CLK"   /testbench/DUT_U/VHDL_DUT_U/CLK
-add_wave "-noupdate -color yellow -label RESET"   /testbench/DUT_U/VHDL_DUT_U/RESET
-
-ctrl CONTROL /testbench/DUT_U/VHDL_DUT_U
-
-wr USER_INPUT /testbench/DUT_U/VHDL_DUT_U
-
-rd PCIE_OUTPUT /testbench/DUT_U/VHDL_DUT_U
-rd PCIE_PTR_UPD /testbench/DUT_U/dma_ptr_updater_i
-
-ints /testbench/DUT_U/VHDL_DUT_U
-
-ptr_updater /testbench/DUT_U
-high_level_view /testbench/DUT_U/VHDL_DUT_U
-hdr_ins /testbench/DUT_U/VHDL_DUT_U
-hdr_mgr /testbench/DUT_U/VHDL_DUT_U
-trans_buff /testbench/DUT_U/VHDL_DUT_U
-inp_buff /testbench/DUT_U/VHDL_DUT_U
-
-sw_mgr /testbench/DUT_U/VHDL_DUT_U
-conf_regs /testbench/DUT_U/VHDL_DUT_U
-pkt_cntrs /testbench/DUT_U/VHDL_DUT_U
+add_wave [list -noupdate -hex -group "ALL"] sim:/testbench/dut_i/VHDL_DUT_U/*
+add_wave [list -noupdate -hex -group "transaction_buffer"] sim:/testbench/dut_i/VHDL_DUT_U/transaction_buffer_i/*
+add_wave [list -noupdate -hex -group "hdr_insertor"] sim:/testbench/dut_i/VHDL_DUT_U/rx_dma_hdr_insertor_i/*
+add_wave [list -noupdate -hex -group "hdr_manager"] sim:/testbench/dut_i/VHDL_DUT_U/rx_dma_hdr_manager_i/*
+add_wave [list -noupdate -hex -group "sw_manager"] sim:/testbench/dut_i/VHDL_DUT_U/rx_dma_sw_manager_i/*
 
 config wave -signalnamewidth 1

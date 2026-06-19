@@ -42,23 +42,10 @@ SETTINGS = {
         "DEVICE"              : "\\\"AGILEX\\\"",
     },
     "_combinations_" : (
-    # (                                           ), # default
-    ("16_channels",                             ),
-    # ("32_channels",                             ),
-
-    (               "2_regions",                ),
-    # ("32_channels", "2_regions",                ),
-    # ("16_channels", "2_regions",                ),
-    #
-    # (                            "trbuf_reg_en",),
-    ("16_channels",              "trbuf_reg_en",),
-    # ("32_channels",              "trbuf_reg_en",),
-    # (               "2_regions", "trbuf_reg_en",),
-    # ("32_channels", "2_regions", "trbuf_reg_en",),
-    # ("16_channels", "2_regions", "trbuf_reg_en",),
-
-    # (               "2_regions",                 "intel_dev",),
-    ("16_channels", "2_regions",                 "intel_dev",),
+    (                                           ), # default
+    ("32_channels",              "trbuf_reg_en",),
+    ("16_channels", "2_regions", "trbuf_reg_en",),
+    ("16_channels",              "trbuf_reg_en", "intel_dev",),
     ("16_channels", "2_regions", "trbuf_reg_en", "intel_dev",),
     ),
 }
