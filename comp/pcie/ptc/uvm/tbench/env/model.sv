@@ -257,7 +257,7 @@ class model#(
             dma_tr.tag       = dma_info.tag;
             dma_tr.unit_id   = dma_info.unit_id;
             if (DMA_PORTS > 1) begin
-                dma_tr.unit_id[$clog2(DMA_PORTS)-1:0] = 0;
+                dma_tr.unit_id[sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] = 0;
             end
             dma_tr.data      = pcie_tr.data;
             `uvm_info(this.get_full_name(), $sformatf("\nDMA RC PORT %0d %s", dma_info.port, dma_tr.convert2string()), UVM_FULL);
@@ -301,7 +301,7 @@ class model#(
             rsp_tr.requester_id      = {8'b0,  rq_tr.vfid};
             unitid = rq_tr.unitid;
             if (DMA_PORTS > 1) begin
-                 unitid[$clog2(DMA_PORTS)-1:0] = dma;
+                 unitid[sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] = dma;
             end
 
             tags.get_dma2pcie(rq_tr.type_ide, dma, rq_tr.tag, unitid, rsp_tr.tag);
