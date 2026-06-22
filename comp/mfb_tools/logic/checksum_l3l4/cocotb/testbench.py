@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from scapy.all import raw, TCP, UDP, SCTP, ICMPv6EchoRequest
 
 from cocotbext.ofm.utils.scapy import ScapyPacketGenerator
+from cocotbext.ofm.base.generators import ItemRateLimiter
 from scoreboard import MfbChecksumL3L4Result, compare_checksums
 
 
@@ -99,9 +100,11 @@ class Testbench:
 
         # MFB driver for packet data
         self.mfb_driver = MFBDriver(dut, "RX_MFB", dut.CLK, mfb_params=mfb_params)
+        self.mfb_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
 
         # MVB driver for combined L3 and L4 metadata
         self.mvb_driver = MVBDriverExt(dut, "RX_MVB", dut.CLK)
+        self.mvb_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
 
         # MVB monitor for TX results
         self.mvb_tx_monitor = MVBMonitorExt(dut, "TX_MVB", dut.CLK, tr_type=MvbTxResult)
