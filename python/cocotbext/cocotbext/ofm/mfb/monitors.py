@@ -11,8 +11,6 @@ from cocotbext.ofm.mfb.transaction import MfbTransaction
 from math import log2
 from copy import copy
 
-# NOTE remove line 48 while/after reimplementing MFB driver !!!
-
 
 class MFBProtocolError(Exception):
     pass
