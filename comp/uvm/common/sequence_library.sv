@@ -31,17 +31,18 @@ class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, t
     task body();
         uvm_common::sequence_cfg state;
         uvm_object_wrapper wrap;
+        const string m_seqeuncer_name = m_sequencer != null ? m_sequencer.get_full_name() : "";
 
         if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
             state = null;
         end
 
         if (sequences.size() == 0) begin
-            `uvm_error(m_sequencer.get_full_name(), "Sequence library does not contain any sequences. Did you forget to call init_sequence_library() in the constructor?");
+            `uvm_error(m_seqeuncer_name, "Sequence library does not contain any sequences. Did you forget to call init_sequence_library() in the constructor?");
             return;
         end
 
-        `uvm_info(m_sequencer.get_full_name(), $sformatf("\nStarting sequence library %s with configuration %s",  get_type_name(), cfg.convert2string()), UVM_DEBUG);
+        `uvm_info(m_seqeuncer_name, $sformatf("\nStarting sequence library %s with configuration %s",  get_type_name(), cfg.convert2string()), UVM_DEBUG);
         sequences_executed = 0;
 
         while (sequences_executed < sequence_count && (state == null || !state.stopped())) begin
@@ -51,7 +52,7 @@ class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, t
             sequences_executed++;
         end
 
-      `uvm_info(m_sequencer.get_full_name(), $sformatf("\n\tEnding sequence library in phase\n%p", seqs_distrib), UVM_DEBUG);
+      `uvm_info(m_seqeuncer_name, $sformatf("\n\tEnding sequence library in phase\n%p", seqs_distrib), UVM_DEBUG);
     endtask
 
 
@@ -69,15 +70,15 @@ class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, t
         obj = factory.create_object_by_type(wrap, m_sequencer_path, $sformatf("%s:%0d", wrap.get_type_name(), seqs_distrib[wrap.get_type_name()]));
 
         if (!$cast(cast_sequence, obj)) begin
-            `uvm_error(m_sequencer.get_full_name(), $sformatf("\n\tCannot convert %s to sequence", obj.get_type_name()));
+            `uvm_error(m_sequencer_path, $sformatf("\n\tCannot convert %s to sequence", obj.get_type_name()));
             return;
         end
 
         cast_sequence.config_set(cfg);
-        `uvm_info(m_sequencer.get_full_name(), {"\n\tExecuting sequence ", cast_sequence.get_type_name()}, UVM_DEBUG);
+        `uvm_info(m_sequencer_path, {"\n\tExecuting sequence ", cast_sequence.get_type_name()}, UVM_DEBUG);
 
         if(!cast_sequence.randomize()) begin
-            `uvm_error(m_sequencer.get_full_name(), $sformatf("\n\tCannot randomize sequence %s", obj.get_type_name()));
+            `uvm_error(m_sequencer_path, $sformatf("\n\tCannot randomize sequence %s", obj.get_type_name()));
             return;
         end
         cast_sequence.start(m_sequencer, this);
