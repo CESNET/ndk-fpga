@@ -16,6 +16,7 @@ from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
+from cocotbext.ofm.base.generators import ItemRateLimiter
 
 
 class testbench():
@@ -30,6 +31,7 @@ class testbench():
         }
 
         self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
+        self.RX_MFB.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=70))
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
         self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK, mfb_params=mfb_params)
 
@@ -64,7 +66,10 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # tb.backpressure.start((1, i % 5) for i in itertools.count())
     tb.backpressure.start((1, random.randint(0, 5)) for i in itertools.count())
 
-    for transaction in random_packets(frame_size_min, frame_size_max, pkt_count):
+    # calculating number of bytes in an item
+    item_bytes = tb.dut.ITEM_WIDTH.value // 8
+
+    for transaction in random_packets(frame_size_min, frame_size_max, pkt_count, alignment=item_bytes):
         tb.model(transaction)
         # print("generated transaction: " + transaction.hex())
         tb.RX_MFB.append(transaction)
