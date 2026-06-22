@@ -137,7 +137,7 @@ begin
         METADATA_WIDTH    => 0,
         SPACE_SIZE        => SPACE_SIZE,
         SPACE_WORD_SIZE   => WORD_WIDTH/ITEM_WIDTH,
-        PKT_SIZE          => 2**(LENGTH_WIDTH-1),
+        PKT_SIZE          => 2**(LENGTH_WIDTH)-1,
         GAP_SIZE          => 4,
         GAP_SIZE_MIN      => 4,
         ALIGN             => BLOCK_SIZE,
