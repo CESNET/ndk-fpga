@@ -66,7 +66,7 @@ architecture FULL of MFB_GENERATOR_CORE_PACP is
     constant REGION_ITEMS   : natural := REGION_WIDTH/ITEM_WIDTH;
     constant WORD_ITEMS     : natural := WORD_WIDTH/ITEM_WIDTH;
 
-    constant SPACE_SIZE     : natural := 2**(LENGTH_WIDTH+1);
+    constant SPACE_SIZE     : natural := 2**(LENGTH_WIDTH)*REGIONS;
 
     constant SPACE_WORDS    : natural := SPACE_SIZE/WORD_ITEMS;
 
@@ -137,7 +137,7 @@ begin
         METADATA_WIDTH    => 0,
         SPACE_SIZE        => SPACE_SIZE,
         SPACE_WORD_SIZE   => WORD_WIDTH/ITEM_WIDTH,
-        PKT_SIZE          => 2**(LENGTH_WIDTH-1),
+        PKT_SIZE          => 2**(LENGTH_WIDTH)-1,
         GAP_SIZE          => 4,
         GAP_SIZE_MIN      => 4,
         ALIGN             => BLOCK_SIZE,
