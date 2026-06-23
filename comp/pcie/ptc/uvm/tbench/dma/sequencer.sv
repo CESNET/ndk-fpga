@@ -26,6 +26,8 @@ class seq_info;
             if (tags[unit_id].size() == 0) begin
                 tags.delete(unit_id);
             end
+        end else begin
+            `uvm_warning("seq_info", $sformatf("\n\tUnknown unitid 0x%h", unit_id));
         end
     endfunction
 endclass
