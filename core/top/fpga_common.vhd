@@ -968,6 +968,9 @@ begin
         PCIE_LANES          => PCIE_LANES,
         PCIE_GEN            => PCIE_GEN,
 
+        PCIE_CORE_DBG_ENABLE => PCIE_CORE_DEBUG_ENABLE,
+        PCIE_CTRL_DBG_ENABLE => PCIE_CTRL_DEBUG_ENABLE,
+
         PTC_DISABLE         => not PTC_ENABLE,
         DMA_BAR_ENABLE      => (DMA_TYPE = 4),
         XVC_ENABLE          => VIRTUAL_DEBUG_ENABLE,

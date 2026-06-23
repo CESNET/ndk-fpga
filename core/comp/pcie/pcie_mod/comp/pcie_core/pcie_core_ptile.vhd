@@ -8,8 +8,6 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-use work.combo_user_const.all;
-
 use work.math_pack.all;
 use work.type_pack.all;
 
@@ -988,7 +986,7 @@ begin
         DBG_CRDT_NPH_W => 12,
         DBG_CRDT_PD_W  => 16,
         DBG_CRDT_NPD_W => 16,
-        DBG_ENABLE     => PCIE_CORE_DEBUG_ENABLE,
+        DBG_ENABLE     => DBG_ENABLE,
         DEVICE         => DEVICE
     )
     port map (
