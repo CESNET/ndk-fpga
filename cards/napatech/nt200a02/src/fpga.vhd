@@ -13,8 +13,7 @@ use xpm.vcomponents.all;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.combo_const.all;
-use work.combo_user_const.all;
+use work.ndk_fpga_top_pkg.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -84,7 +83,6 @@ architecture FULL of FPGA is
     constant MISC_IN_WIDTH       : integer := 4;
     constant MISC_OUT_WIDTH      : integer := 4;
     constant ETH_LANES           : integer := 4;
-    constant DMA_ENDPOINTS       : integer := PCIE_ENDPOINTS;
     constant ETH_LANE_MAP        : integer_vector(2*ETH_LANES-1 downto 0) := (2, 0, 1, 3, 2, 0, 1, 3);
     constant ETH_LANE_RXPOLARITY : std_logic_vector(2*ETH_LANES-1 downto 0) := "01100111";
     constant ETH_LANE_TXPOLARITY : std_logic_vector(2*ETH_LANES-1 downto 0) := "00101100";
@@ -307,15 +305,8 @@ begin
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
         PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
 
-        DMA_ENDPOINTS           => DMA_ENDPOINTS,
-        DMA_MODULES             => DMA_MODULES,
-        DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
-        DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES,
-
         ETH_CORE_ARCH           => NET_MOD_ARCH,
         ETH_PORTS               => ETH_PORTS,
-        ETH_PORT_SPEED          => ETH_PORT_SPEED,
-        ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_LANES               => ETH_LANES,
         ETH_LANE_MAP            => ETH_LANE_MAP(ETH_PORTS*ETH_LANES-1 downto 0),
         ETH_LANE_RXPOLARITY     => ETH_LANE_RXPOLARITY(ETH_PORTS*ETH_LANES-1 downto 0),

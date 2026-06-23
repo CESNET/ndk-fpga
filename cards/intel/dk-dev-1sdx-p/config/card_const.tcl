@@ -22,6 +22,8 @@ set SDM_SYSMON_ARCH "S10_ADC"
 set BOOT_TYPE 0
 # Total number of DMA modules/streams in FW
 set DMA_MODULES [if {$DMA_TYPE == 4} {list 1} {list 2}]
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS [expr {($PCIE_ENDPOINT_MODE == 1 || $DMA_TYPE == 4) ? $PCIE_ENDPOINTS : 2*$PCIE_ENDPOINTS}]
 
 # Total number of QSFP cages
 set QSFP_CAGES       2

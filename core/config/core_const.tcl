@@ -86,23 +86,24 @@ if { $DMA_TYPE == 4 } {
     }
 }
 
-VhdlPkgProjectText $PROJECT_NAME
+VhdlPkgProjectText -pkg ndk_fpga_common_pkg $PROJECT_NAME
 
-VhdlPkgStr CARD_NAME     $CARD_NAME
-VhdlPkgStr PCIE_MOD_ARCH $PCIE_MOD_ARCH
-VhdlPkgStr NET_MOD_ARCH  $NET_MOD_ARCH
+VhdlPkgStr -pkg ndk_fpga_top_pkg CARD_NAME     $CARD_NAME
+VhdlPkgStr -pkg ndk_fpga_top_pkg PCIE_MOD_ARCH $PCIE_MOD_ARCH
+VhdlPkgStr -pkg ndk_fpga_top_pkg NET_MOD_ARCH  $NET_MOD_ARCH
 
-VhdlPkgInt    ETH_PORTS       $ETH_PORTS
-VhdlPkgIntArr ETH_PORT_SPEED  $ETH_PORTS
-VhdlPkgIntArr ETH_PORT_CHAN   $ETH_PORTS
-VhdlPkgIntArr EHIP_PORT_TYPE  $ETH_PORTS
-VhdlPkgIntArr ETH_PORT_RX_MTU $ETH_PORTS
-VhdlPkgIntArr ETH_PORT_TX_MTU $ETH_PORTS
+VhdlPkgInt -pkg ndk_fpga_top_pkg ETH_PORTS       $ETH_PORTS
 
-VhdlPkgIntArr ETH_CHAN_MAP    8
+VhdlPkgIntArr -pkg ndk_fpga_common_pkg ETH_PORT_SPEED  $ETH_PORTS
+VhdlPkgIntArr -pkg ndk_fpga_common_pkg ETH_PORT_CHAN   $ETH_PORTS
+VhdlPkgIntArr -pkg ndk_fpga_common_pkg EHIP_PORT_TYPE  $ETH_PORTS
+VhdlPkgIntArr -pkg ndk_fpga_common_pkg ETH_PORT_RX_MTU $ETH_PORTS
+VhdlPkgIntArr -pkg ndk_fpga_common_pkg ETH_PORT_TX_MTU $ETH_PORTS
 
-VhdlPkgInt  ETH_STREAMS_MODE $ETH_STREAMS_MODE
-VhdlPkgBool ETH_MAC_BYPASS   $ETH_MAC_BYPASS
+VhdlPkgIntArr -pkg ndk_fpga_common_pkg ETH_CHAN_MAP    8
+
+VhdlPkgInt  -pkg ndk_fpga_common_pkg ETH_STREAMS_MODE $ETH_STREAMS_MODE
+VhdlPkgBool -pkg ndk_fpga_common_pkg ETH_MAC_BYPASS   $ETH_MAC_BYPASS
 
 # ------------------------------------------------------------------------------
 # DMA Channel calculation
@@ -122,8 +123,8 @@ VhdlPkgBool ETH_MAC_BYPASS   $ETH_MAC_BYPASS
 # configuriong one direction with 0 channels available, then the corresponding
 # DMA controller is not initialized in the design.
 
-VhdlPkgBool RX_GEN_EN [expr {$DMA_RX_CHANNELS > 0 ? true : false}]
-VhdlPkgBool TX_GEN_EN [expr {$DMA_TX_CHANNELS > 0 ? true : false}]
+VhdlPkgBool -pkg ndk_fpga_common_pkg RX_GEN_EN [expr {$DMA_RX_CHANNELS > 0 ? true : false}]
+VhdlPkgBool -pkg ndk_fpga_common_pkg TX_GEN_EN [expr {$DMA_TX_CHANNELS > 0 ? true : false}]
 
 set dma_tx_chans_int $DMA_TX_CHANNELS
 set dma_rx_chans_int $DMA_RX_CHANNELS
@@ -145,39 +146,40 @@ if {$DMA_TX_CHANNELS == 0} {
 }
 # ------------------------------------------------------------------------------
 
-VhdlPkgInt  PCIE_LANES         $PCIE_LANES
-VhdlPkgInt  PCIE_GEN           $PCIE_GEN
-VhdlPkgInt  PCIE_ENDPOINTS     $PCIE_ENDPOINTS
-VhdlPkgInt  PCIE_ENDPOINT_MODE $PCIE_ENDPOINT_MODE
+VhdlPkgInt -pkg ndk_fpga_top_pkg PCIE_LANES         $PCIE_LANES
+VhdlPkgInt -pkg ndk_fpga_common_pkg PCIE_GEN           $PCIE_GEN
+VhdlPkgInt -pkg ndk_fpga_top_pkg PCIE_ENDPOINTS     $PCIE_ENDPOINTS
+VhdlPkgInt -pkg ndk_fpga_top_pkg PCIE_ENDPOINT_MODE $PCIE_ENDPOINT_MODE
 
-VhdlPkgInt  DMA_TYPE              $DMA_TYPE
-VhdlPkgInt  DMA_MODULES           $DMA_MODULES
-VhdlPkgInt  DMA_RX_CHANNELS       $dma_rx_chans_int
-VhdlPkgInt  DMA_TX_CHANNELS       $dma_tx_chans_int
-VhdlPkgInt  DMA_RX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MAX
-VhdlPkgInt  DMA_TX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX
-#VhdlPkgInt  DMA_RX_FRAME_SIZE_MIN $DMA_RX_FRAME_SIZE_MIN
-#VhdlPkgInt  DMA_TX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN
-VhdlPkgBool DMA_RX_BLOCKING_MODE $DMA_RX_BLOCKING_MODE
-VhdlPkgInt  DMA_RX_DATA_PTR_W    $DMA_RX_DATA_PTR_W
-VhdlPkgInt  DMA_RX_HDR_PTR_W     $DMA_RX_HDR_PTR_W
-VhdlPkgInt  DMA_TX_DATA_PTR_W    $DMA_TX_DATA_PTR_W
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_TYPE              $DMA_TYPE
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_MODULES           $DMA_MODULES
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_ENDPOINTS         $DMA_ENDPOINTS
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_RX_CHANNELS       $dma_rx_chans_int
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_TX_CHANNELS       $dma_tx_chans_int
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_RX_FRAME_SIZE_MAX $DMA_RX_FRAME_SIZE_MAX
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_TX_FRAME_SIZE_MAX $DMA_TX_FRAME_SIZE_MAX
+#VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_RX_FRAME_SIZE_MIN $DMA_RX_FRAME_SIZE_MIN
+#VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_TX_FRAME_SIZE_MIN $DMA_TX_FRAME_SIZE_MIN
+VhdlPkgBool -pkg ndk_fpga_common_pkg DMA_RX_BLOCKING_MODE $DMA_RX_BLOCKING_MODE
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_RX_DATA_PTR_W    $DMA_RX_DATA_PTR_W
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_RX_HDR_PTR_W     $DMA_RX_HDR_PTR_W
+VhdlPkgInt  -pkg ndk_fpga_common_pkg DMA_TX_DATA_PTR_W    $DMA_TX_DATA_PTR_W
 
-VhdlPkgBool DMA_GEN_LOOP_EN      $DMA_GEN_LOOP_EN
+VhdlPkgBool -pkg ndk_fpga_common_pkg DMA_GEN_LOOP_EN      $DMA_GEN_LOOP_EN
 
 # Other parameters
-VhdlPkgBool TSU_ENABLE    $TSU_ENABLE
-VhdlPkgInt  TSU_FREQUENCY $TSU_FREQUENCY
+VhdlPkgBool -pkg ndk_fpga_common_pkg TSU_ENABLE    $TSU_ENABLE
+VhdlPkgInt  -pkg ndk_fpga_common_pkg TSU_FREQUENCY $TSU_FREQUENCY
 
-VhdlPkgInt  MEM_PORTS     $MEM_PORTS
-VhdlPkgInt  HBM_PORTS     $HBM_PORTS
+VhdlPkgInt -pkg ndk_fpga_top_pkg MEM_PORTS     $MEM_PORTS
+VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_PORTS     $HBM_PORTS
 
-VhdlPkgBool VIRTUAL_DEBUG_ENABLE   $VIRTUAL_DEBUG_ENABLE
-VhdlPkgBool DMA_DEBUG_ENABLE       $DMA_DEBUG_ENABLE
-VhdlPkgBool PCIE_CORE_DEBUG_ENABLE $PCIE_CORE_DEBUG_ENABLE
-VhdlPkgBool PCIE_CTRL_DEBUG_ENABLE $PCIE_CTRL_DEBUG_ENABLE
+VhdlPkgBool -pkg ndk_fpga_common_pkg VIRTUAL_DEBUG_ENABLE   $VIRTUAL_DEBUG_ENABLE
+VhdlPkgBool -pkg ndk_fpga_common_pkg DMA_DEBUG_ENABLE       $DMA_DEBUG_ENABLE
+VhdlPkgBool -pkg ndk_fpga_common_pkg PCIE_CORE_DEBUG_ENABLE $PCIE_CORE_DEBUG_ENABLE
+VhdlPkgBool -pkg ndk_fpga_common_pkg PCIE_CTRL_DEBUG_ENABLE $PCIE_CTRL_DEBUG_ENABLE
 
-VhdlPkgBool MEASURE_FREQUENCIES    $MEASURE_FREQUENCIES
-VhdlPkgBool TS_DEMO_EN             $TS_DEMO_EN
-VhdlPkgBool LL_MODE                $LL_MODE
+VhdlPkgBool -pkg ndk_fpga_common_pkg MEASURE_FREQUENCIES    $MEASURE_FREQUENCIES
+VhdlPkgBool -pkg ndk_fpga_common_pkg TS_DEMO_EN             $TS_DEMO_EN
+VhdlPkgBool -pkg ndk_fpga_common_pkg LL_MODE                $LL_MODE
 

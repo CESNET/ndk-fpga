@@ -22,6 +22,8 @@ set SDM_SYSMON_ARCH "INTEL_SDM"
 set BOOT_TYPE 0
 # Total number of DMA modules/streams in FW
 set DMA_MODULES 1
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS [expr {$DMA_TYPE == 3 ? 4 : 1}]
 
 # Total number of QSFP cages
 set QSFP_CAGES 1

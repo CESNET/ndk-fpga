@@ -21,6 +21,10 @@ set CLV_MOD_ARCH "NONE"
 set SDM_SYSMON_ARCH "INTEL_SDM"
 # Boot controller type (5=OFS_PMCI/OFS_SPI)
 set BOOT_TYPE 5
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+# NOTE: fpga_common does not support 2 region for MFB (100 Gbps) >> 2 DMA Streams are needed (2 DMA Modules)
+#       2 Endpoints are set, but only 1 is used per DMA Module (division by 0 in rx_dma_medusa)
+set DMA_ENDPOINTS [expr {($DMA_TYPE == 3) ? (($DMA_MODULES == 4) ? 4 : 2) : 1}]
 
 # Total number of QSFP cages
 set QSFP_CAGES       4

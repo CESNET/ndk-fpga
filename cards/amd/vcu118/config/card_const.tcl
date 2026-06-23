@@ -20,6 +20,8 @@ set NET_MOD_ARCH "CMAC"
 set SDM_SYSMON_ARCH "USP_IDCOMP"
 # Boot controller type
 set BOOT_TYPE 0
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS $PCIE_ENDPOINTS
 
 # Total number of QSFP cages
 set QSFP_CAGES       $ETH_PORTS

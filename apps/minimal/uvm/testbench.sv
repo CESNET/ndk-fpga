@@ -277,6 +277,8 @@ module testbench;
         .ETH_MFB_REG_SIZE  (test_pkg::MFB_REG_SIZE),
         .ETH_CHANNELS      (test_pkg::ETH_CHANNELS),
         .ETH_STREAMS       (test_pkg::ETH_STREAMS),
+        .ETH_RX_MTU        (test_pkg::ETH_RX_MTU_ARRAY),
+        .ETH_TX_MTU        (test_pkg::ETH_TX_MTU_ARRAY),
         .PCIE_ENDPOINTS    (test_pkg::PCIE_ENDPOINTS),
         .DMA_MFB_REGIONS   (test_pkg::REGIONS),
         .DMA_MFB_REG_SIZE  (test_pkg::MFB_REG_SIZE),

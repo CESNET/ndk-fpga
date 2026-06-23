@@ -9,8 +9,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.combo_const.all;
-use work.combo_user_const.all;
+use work.ndk_fpga_top_pkg.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -266,13 +265,11 @@ architecture FULL of FPGA is
     );
     end component;
 
-    constant PCIE_LANES      : natural := 16;
     constant PCIE_CLKS       : natural := 2;
     constant PCIE_CONS       : natural := 1;
     constant MISC_IN_WIDTH   : natural := 4;
     constant MISC_OUT_WIDTH  : natural := 4;
     constant ETH_LANES       : natural := 4;
-    constant DMA_ENDPOINTS   : natural := tsel(DMA_TYPE = 4 or PCIE_ENDPOINT_MODE=1,PCIE_ENDPOINTS,2*PCIE_ENDPOINTS);
     constant STATUS_LEDS     : natural := 4; -- fake leds
 
     -- DDR4
@@ -355,8 +352,6 @@ begin
 
         ETH_CORE_ARCH           => NET_MOD_ARCH,
         ETH_PORTS               => ETH_PORTS, -- two QSFP cages as two ETH ports
-        ETH_PORT_SPEED          => ETH_PORT_SPEED,
-        ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_PORT_LEDS           => 1,
         ETH_LANES               => ETH_LANES,
 
@@ -370,12 +365,6 @@ begin
         PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
         PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-
-        DMA_ENDPOINTS           => DMA_ENDPOINTS,
-        DMA_MODULES             => DMA_MODULES,
-
-        DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
-        DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES,
 
         MEM_PORTS               => MEM_PORTS,
         MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH,

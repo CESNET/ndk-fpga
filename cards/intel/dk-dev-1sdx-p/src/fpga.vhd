@@ -8,8 +8,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.combo_const.all;
-use work.combo_user_const.all;
+use work.ndk_fpga_top_pkg.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -178,13 +177,11 @@ architecture FULL of FPGA is
     );
     end component;
 
-    constant PCIE_LANES     : integer := 16;
     constant PCIE_CLKS      : integer := 2;
     constant PCIE_CONS      : integer := 1;
     constant MISC_IN_WIDTH  : integer := 8;
     constant MISC_OUT_WIDTH : integer := 8;
     constant ETH_LANES      : integer := 4;
-    constant DMA_ENDPOINTS  : integer := tsel(PCIE_ENDPOINT_MODE=1 or DMA_TYPE = 4, PCIE_ENDPOINTS, 2*PCIE_ENDPOINTS);
 
     -- External memory interfaces (clocked at MEM_CLK)
     --constant DDR_PORTS          : integer := 2;
@@ -293,8 +290,6 @@ begin
 
         ETH_CORE_ARCH           => NET_MOD_ARCH,
         ETH_PORTS               => ETH_PORTS,
-        ETH_PORT_SPEED          => ETH_PORT_SPEED,
-        ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_LANES               => ETH_LANES,
 
         QSFP_PORTS              => 2,
@@ -308,12 +303,6 @@ begin
         PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
         PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-
-        DMA_ENDPOINTS           => DMA_ENDPOINTS,
-        DMA_MODULES             => DMA_MODULES,
-
-        DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
-        DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES,
 
         MEM_PORTS               => MEM_PORTS,
         MEM_ADDR_WIDTH          => MEM_ADDR_WIDTH,

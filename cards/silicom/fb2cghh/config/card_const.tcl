@@ -18,6 +18,8 @@ set PCIE_MOD_ARCH "USP"
 set SDM_SYSMON_ARCH "USP_IDCOMP"
 # Boot controller type
 set BOOT_TYPE 3
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS $PCIE_ENDPOINTS
 # Achitecture of Network module
 if { $ETH_PORT_SPEED(0) == 100 } {
     set NET_MOD_ARCH "CMAC"

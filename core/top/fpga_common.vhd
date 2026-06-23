@@ -12,7 +12,7 @@ use ieee.math_real.all;
 use ieee.fixed_pkg.all;
 
 use work.combo_const.all;
-use work.combo_user_const.all;
+use work.ndk_fpga_common_pkg.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -57,22 +57,10 @@ entity FPGA_COMMON is
         -- Connected PCIe endpoint mode: 0 = 1x16 lanes, 1 = 2x8 lanes
         PCIE_ENDPOINT_MODE      : natural := 0;
 
-        -- Number of instantiated DMA modules
-        DMA_MODULES             : natural := 1;
-        -- Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
-        DMA_ENDPOINTS           : natural := 1;
-        -- Number of DMA channels per DMA module
-        DMA_RX_CHANNELS         : natural := 4;
-        DMA_TX_CHANNELS         : natural := 4;
-
         -- Ethernet core architecture: E_TILE, F_TILE, CMAC
         ETH_CORE_ARCH           : string := "F_TILE";
         -- Number of Ethernet ports present on board
         ETH_PORTS               : natural := 1;
-        -- Speed for all Ethernet ports
-        ETH_PORT_SPEED          : integer_vector(ETH_PORTS-1 downto 0) := (others => 0);
-        -- Number of channels for all Ethernet ports
-        ETH_PORT_CHAN           : integer_vector(ETH_PORTS-1 downto 0) := (others => 0);
         -- Number of lanes per Ethernet port
         ETH_LANES               : natural := 8;
         -- Logical indexes and polarities of Ethernet lanes
@@ -330,6 +318,9 @@ architecture FULL of FPGA_COMMON is
     constant ETH_STREAMS         : natural := tsel((ETH_STREAMS_MODE = 1), (ETH_PORTS*ETH_PORT_CHANNELS), ETH_PORTS);
     -- Number of DMA streams
     constant DMA_STREAMS         : natural := DMA_MODULES;
+    -- DMA channels per DMA stream
+    constant DMAS_RX_CHANNELS    : natural := DMA_RX_CHANNELS/DMA_STREAMS;
+    constant DMAS_TX_CHANNELS    : natural := DMA_TX_CHANNELS/DMA_STREAMS;
 
     function f_get_eth_mfb_regions (P_ETH_STREAMS_MODE : natural) return natural is
     begin
@@ -681,7 +672,7 @@ architecture FULL of FPGA_COMMON is
 
     signal app_dma_rx_mvb_len            : std_logic_vector(DMA_STREAMS*DMA_MFB_REGIONS*log2(DMA_RX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal app_dma_rx_mvb_hdr_meta       : std_logic_vector(DMA_STREAMS*DMA_MFB_REGIONS*HDR_META_WIDTH-1 downto 0);
-    signal app_dma_rx_mvb_channel        : std_logic_vector(DMA_STREAMS*DMA_MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+    signal app_dma_rx_mvb_channel        : std_logic_vector(DMA_STREAMS*DMA_MFB_REGIONS*log2(DMAS_RX_CHANNELS)-1 downto 0);
     signal app_dma_rx_mvb_discard        : std_logic_vector(DMA_STREAMS*DMA_MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_vld            : std_logic_vector(DMA_STREAMS*DMA_MFB_REGIONS-1 downto 0);
     signal app_dma_rx_mvb_src_rdy        : std_logic_vector(DMA_STREAMS -1 downto 0);
@@ -697,7 +688,7 @@ architecture FULL of FPGA_COMMON is
 
     signal app_dma_tx_mvb_len            : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*log2(DMA_TX_FRAME_SIZE_MAX+1)-1 downto 0);
     signal app_dma_tx_mvb_hdr_meta       : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*HDR_META_WIDTH-1 downto 0);
-    signal app_dma_tx_mvb_channel        : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+    signal app_dma_tx_mvb_channel        : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS*log2(DMAS_TX_CHANNELS)-1 downto 0);
     signal app_dma_tx_mvb_vld            : slv_array_t(DMA_STREAMS -1 downto 0)(DMA_MFB_REGIONS-1 downto 0);
     signal app_dma_tx_mvb_src_rdy        : std_logic_vector(DMA_STREAMS -1 downto 0);
     signal app_dma_tx_mvb_dst_rdy        : std_logic_vector(DMA_STREAMS -1 downto 0);
@@ -710,7 +701,7 @@ architecture FULL of FPGA_COMMON is
     signal app_dma_tx_mfb_src_rdy        : std_logic_vector(DMA_STREAMS -1 downto 0);
     signal app_dma_tx_mfb_dst_rdy        : std_logic_vector(DMA_STREAMS -1 downto 0);
 
-    signal app_dma_tx_usr_choke          : std_logic_vector(DMA_STREAMS*DMA_TX_CHANNELS-1 downto 0);
+    signal app_dma_tx_usr_choke          : std_logic_vector(DMA_STREAMS*DMAS_TX_CHANNELS-1 downto 0);
 
     signal eth_rx_mvb_data               : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
     signal eth_rx_mvb_vld                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS-1 downto 0);
@@ -734,7 +725,7 @@ architecture FULL of FPGA_COMMON is
     signal eth_tx_mfb_src_rdy            : std_logic_vector(ETH_STREAMS-1 downto 0);
     signal eth_tx_mfb_dst_rdy            : std_logic_vector(ETH_STREAMS-1 downto 0) := (others => '1');
 
-    signal eth_tx_mvb_channel            : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*maximum(1,log2(DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS)))-1 downto 0);
+    signal eth_tx_mvb_channel            : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*maximum(1,log2(DMAS_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS)))-1 downto 0);
     signal eth_tx_mvb_timestamp_vld      : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS*48-1 downto 0);
     signal eth_tx_mvb_vld                : std_logic_vector(ETH_STREAMS*ETH_MFB_REGIONS-1 downto 0);
 
@@ -1416,13 +1407,13 @@ begin
 
         HDR_META_WIDTH       => HDR_META_WIDTH,
 
-        RX_CHANNELS          => DMA_RX_CHANNELS,
+        RX_CHANNELS          => DMAS_RX_CHANNELS,
         RX_DP_WIDTH          => DMA_RX_DATA_PTR_W,
         RX_HP_WIDTH          => DMA_RX_HDR_PTR_W,
         RX_BLOCKING_MODE     => DMA_RX_BLOCKING_MODE,
 
-        TX_CHANNELS          => DMA_TX_CHANNELS,
-        TX_SEL_CHANNELS      => minimum(8,DMA_TX_CHANNELS),
+        TX_CHANNELS          => DMAS_TX_CHANNELS,
+        TX_SEL_CHANNELS      => minimum(8,DMAS_TX_CHANNELS),
         TX_DP_WIDTH          => DMA_TX_DATA_PTR_W,
 
         RX_GEN_EN            => RX_GEN_EN,
@@ -1584,10 +1575,12 @@ begin
         ETH_CHANNELS          => ETH_STREAM_CHANNELS,
         ETH_MFB_REGIONS       => ETH_MFB_REGIONS,
         ETH_MFB_REGION_SIZE   => ETH_MFB_REGION_SIZE,
+        ETH_RX_MTU            => ETH_PORT_RX_MTU,
+        ETH_TX_MTU            => ETH_PORT_TX_MTU,
         PCIE_ENDPOINTS        => PCIE_ENDPOINTS,
         DMA_STREAMS           => DMA_STREAMS,
-        DMA_RX_CHANNELS       => DMA_RX_CHANNELS,
-        DMA_TX_CHANNELS       => DMA_TX_CHANNELS,
+        DMA_RX_CHANNELS       => DMAS_RX_CHANNELS,
+        DMA_TX_CHANNELS       => DMAS_TX_CHANNELS,
         DMA_HDR_META_WIDTH    => HDR_META_WIDTH,
         DMA_RX_FRAME_SIZE_MAX => DMA_RX_FRAME_SIZE_MAX,
         DMA_TX_FRAME_SIZE_MAX => DMA_TX_FRAME_SIZE_MAX,
@@ -1865,7 +1858,7 @@ begin
 
         LL_MODE           => LL_MODE,
         TS_DEMO_EN        => TS_DEMO_EN,
-        TX_DMA_CHANNELS   => DMA_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS),
+        TX_DMA_CHANNELS   => DMAS_TX_CHANNELS/(ETH_STREAMS/DMA_STREAMS),
 
         LANE_RX_POLARITY   => ETH_LANE_RXPOLARITY,
         LANE_TX_POLARITY   => ETH_LANE_TXPOLARITY,

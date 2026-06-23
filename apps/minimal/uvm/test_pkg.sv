@@ -16,6 +16,8 @@ package test_pkg;
     parameter ETH_STREAMS        = 2;
     parameter ETH_CHANNELS       = 4;
     parameter ETH_PKT_MTU        = 4096;
+    parameter int ETH_RX_MTU_ARRAY[ETH_STREAMS-1:0] = '{ETH_STREAMS{ETH_PKT_MTU}};
+    parameter int ETH_TX_MTU_ARRAY[ETH_STREAMS-1:0] = '{ETH_STREAMS{ETH_PKT_MTU}};
     parameter ETH_RX_HDR_WIDTH   = 102;
     parameter ETH_TX_HDR_WIDTH   = 25;
     parameter PCIE_ENDPOINTS     = 2;

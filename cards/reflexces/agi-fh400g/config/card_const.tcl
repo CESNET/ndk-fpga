@@ -25,6 +25,8 @@ if {$BOARD_REV == 0 || $BOARD_REV == 1} {
 
 # Boot controller type
 set BOOT_TYPE 2
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS [expr {$DMA_TYPE == 3 ? 4 : 1}]
 
 # Total number of QSFP cages
 set QSFP_CAGES       1
@@ -64,4 +66,4 @@ if {$TEST_FW_PCIE1_ONBOARD_DDR4} {
     set MEM_PORTS 1
 }
 
-VhdlPkgBool TEST_FW_PCIE1_ONBOARD_DDR4 $TEST_FW_PCIE1_ONBOARD_DDR4
+VhdlPkgBool -pkg ndk_fpga_top_pkg TEST_FW_PCIE1_ONBOARD_DDR4 $TEST_FW_PCIE1_ONBOARD_DDR4
