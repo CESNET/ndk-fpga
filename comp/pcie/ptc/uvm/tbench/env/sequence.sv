@@ -74,9 +74,11 @@ class sequence_base#(
         for(int unsigned it = 0; it <  DMA_PORTS; it++) begin
             fork
                 automatic int unsigned index = it;
-                for (int unsigned jt = 0; jt < 10; jt++) begin
-                    assert(dma_rq_seq[index].randomize());
-                    dma_rq_seq[index].start(p_sequencer.m_dma[index]);
+                begin
+                    for (int unsigned jt = 0; jt < 10; jt++) begin
+                        assert(dma_rq_seq[index].randomize());
+                        dma_rq_seq[index].start(p_sequencer.m_dma[index]);
+                    end
                     dma_stop[index] = 1;
                 end
             join_none
