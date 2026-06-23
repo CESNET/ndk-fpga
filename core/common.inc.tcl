@@ -28,6 +28,7 @@ set UCP_PREREQ [list $CARD_CONST $CORE_CONF $CARD_CONF [expr {[info exists APP_C
 
 # Let generate package from configuration files and add it to project
 lappend HIERARCHY(PACKAGES) [nb_generate_file_register_userpkg "combo_user_const" "" $UCP_PREREQ]
+lappend HIERARCHY(PACKAGES) [nb_generate_file_register_userpkg "ndk_app_pkg" "$env(NETCOPE_TEMP)ndk_app_pkg.vhd" $UCP_PREREQ]
 
 # Let generate DevTree.vhd and add it to project
 lappend HIERARCHY(PACKAGES) [nb_generate_file_register_devtree]
