@@ -11,7 +11,6 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 use work.eth_hdr_pack.all;
-use work.combo_user_const.all;
 
 architecture FULL of APPLICATION_CORE is
 
