@@ -61,8 +61,8 @@ class scoreboard #(
     protected uvm_common::comparer_base#(uvm_pcie::header) pcie_rq_cmp[PCIE_ENDPOINTS];
     protected uvm_common::comparer_base#(uvm_pcie::header) pcie_cc_cmp[PCIE_ENDPOINTS];
 
-    protected uvm_common::comparer_ordered#(uvm_dma::sequence_item_rc)                  dma_rc_cmp[PCIE_ENDPOINTS][DMA_PORTS];
-    protected mi_req_comparer                                                           mi_rq_cmp[PCIE_ENDPOINTS]; //CQ
+    protected uvm_ptc::scoreboard_dma_rc #(DMA_PORTS) dma_rc_cmp[PCIE_ENDPOINTS][DMA_PORTS];
+    protected mi_req_comparer                         mi_rq_cmp[PCIE_ENDPOINTS]; //CQ
 
     protected uvm_common::comparer_ordered#(uvm_pcie::header)  dma_cq_cmp[PCIE_ENDPOINTS][DMA_PORTS];
 
@@ -153,7 +153,7 @@ class scoreboard #(
 
                 dma_rq[pcie][dma]     = new({"dma_rq_", i_string, "_", dma_string}, this);
                 dma_cc[pcie][dma]     = new({"dma_cc_", i_string, "_", dma_string}, this);
-                dma_rc_cmp[pcie][dma] = uvm_common::comparer_ordered#(uvm_dma::sequence_item_rc)::type_id::create({"dma_rc_cmp_", i_string, "_", dma_string}, this);
+                dma_rc_cmp[pcie][dma] = uvm_ptc::scoreboard_dma_rc#(DMA_PORTS)::type_id::create({"dma_rc_cmp_", i_string, "_", dma_string}, this);
 
                 // CQ and CC
                 dma_cq_cmp[pcie][dma]  = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"dma_cq_cmp_", i_string, "_", dma_string}, this);
