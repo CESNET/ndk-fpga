@@ -17,20 +17,48 @@ class sequence_dma_rq#(
 ) extends uvm_common::sequence_base#(config_sequence, uvm_dma::sequence_item_rq);
     `uvm_object_param_utils(uvm_dma::sequence_dma_rq#(DMA_PORTS))
 
-    localparam MAX_REQUEST_SIZE = 128;
-    localparam MAX_PAYLOAD_SIZE = 64;
+    localparam PCIE_MAX_REQUEST_SIZE = 128;
+    localparam PCIE_MAX_PAYLOAD_SIZE = 64;
 
     rand logic [sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1:0] unit_id;
     rand int unsigned transactions;
+    rand int unsigned max_request_size;
+    rand int unsigned max_payload_size;
     //protected logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1:0] tags[logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1:0]];
     uvm_dma::seq_info info;
 
     constraint trans_const {
-        transactions inside {[20:60]};
+        transactions inside {[20:600]};
         if (DMA_PORTS > 1) {
 		    unit_id[($clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1) -1:0] == 0;
 	    }
     };
+
+    constraint c_max_request_size {
+        max_request_size dist {
+            `ndk_rand_dist_first(1, PCIE_MAX_REQUEST_SIZE, 8)    :/ 20,
+            `ndk_rand_dist      (1, PCIE_MAX_REQUEST_SIZE, 8, 1) :/ 5,
+            `ndk_rand_dist      (1, PCIE_MAX_REQUEST_SIZE, 8, 2) :/ 2,
+            `ndk_rand_dist      (1, PCIE_MAX_REQUEST_SIZE, 8, 3) :/ 1,
+            `ndk_rand_dist      (1, PCIE_MAX_REQUEST_SIZE, 8, 4) :/ 1,
+            `ndk_rand_dist      (1, PCIE_MAX_REQUEST_SIZE, 8, 5) :/ 2,
+            `ndk_rand_dist      (1, PCIE_MAX_REQUEST_SIZE, 8, 6) :/ 5,
+            `ndk_rand_dist_last (1, PCIE_MAX_REQUEST_SIZE, 8)    :/ 20
+        };
+    }
+
+    constraint c_max_payload_size {
+        max_payload_size dist {
+            `ndk_rand_dist_first(1, PCIE_MAX_PAYLOAD_SIZE, 8)    :/ 20,
+            `ndk_rand_dist      (1, PCIE_MAX_PAYLOAD_SIZE, 8, 1) :/ 5,
+            `ndk_rand_dist      (1, PCIE_MAX_PAYLOAD_SIZE, 8, 2) :/ 2,
+            `ndk_rand_dist      (1, PCIE_MAX_PAYLOAD_SIZE, 8, 3) :/ 1,
+            `ndk_rand_dist      (1, PCIE_MAX_PAYLOAD_SIZE, 8, 4) :/ 1,
+            `ndk_rand_dist      (1, PCIE_MAX_PAYLOAD_SIZE, 8, 5) :/ 2,
+            `ndk_rand_dist      (1, PCIE_MAX_PAYLOAD_SIZE, 8, 6) :/ 5,
+            `ndk_rand_dist_last (1, PCIE_MAX_PAYLOAD_SIZE, 8)    :/ 20
+        };
+    }
 
     function new(string name = "mi_cc_sequence");
         super.new(name);
@@ -56,8 +84,8 @@ class sequence_dma_rq#(
                 req.firstib inside {0};
                 req.lastib  inside {0};
                 req.length > 0;
-                (req.type_ide == 1) -> req.length <= MAX_PAYLOAD_SIZE;
-                (req.type_ide == 0) -> req.length <= MAX_REQUEST_SIZE;
+                (req.type_ide == 1) -> req.length <= max_payload_size;
+                (req.type_ide == 0) -> req.length <= max_request_size;
             }) else begin
                 `uvm_fatal(m_sequencer.get_full_name(), "\n\tsequence_dma_rq cannot randomize");
             end
