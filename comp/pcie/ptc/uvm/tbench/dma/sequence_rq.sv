@@ -20,17 +20,37 @@ class sequence_dma_rq#(
     localparam PCIE_MAX_REQUEST_SIZE = 128;
     localparam PCIE_MAX_PAYLOAD_SIZE = 64;
 
-    rand logic [sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1:0] unit_id;
+    rand logic [sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1:0] unit_id_new[];
+
     rand int unsigned transactions;
     rand int unsigned max_request_size;
     rand int unsigned max_payload_size;
-    //protected logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1:0] tags[logic [sv_dma_bus_pack::DMA_REQUEST_TAG_W-1:0]];
+
+    rand int unsigned type_ide_write;
+    rand int unsigned type_ide_read;
+
+    constraint c_type_ide {
+        type_ide_write + type_ide_read == 100;
+        type_ide_write inside {[0:100]};
+        type_ide_read  inside {[0:100]};
+    }
+
     uvm_dma::seq_info info;
 
     constraint trans_const {
         transactions inside {[20:600]};
+        unit_id_new.size() dist {
+                [1:5] :/ 20,
+                [5:15] :/ 10,
+                [15:50] :/ 5,
+                [50:100] :/ 2,
+                [100:300] :/ 1
+        };
+
         if (DMA_PORTS > 1) {
-		    unit_id[($clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1) -1:0] == 0;
+            foreach(unit_id_new[it]) {
+		        unit_id_new[it][($clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1) -1:0] == 0;
+            }
 	    }
     };
 
@@ -62,27 +82,44 @@ class sequence_dma_rq#(
 
     function new(string name = "mi_cc_sequence");
         super.new(name);
-        //tags.delete();
     endfunction
 
     task body;
         assert(uvm_config_db #(uvm_dma::seq_info)::get(m_sequencer, "", "info", info)) else begin
             `uvm_fatal(m_sequencer != null ? m_sequencer.get_full_name() : "", "\n\tCannot get tag manager");
         end;
-        info.requester_add(unit_id);
 
         req = uvm_dma::sequence_item_rq::type_id::create("req", m_sequencer);
 
         for (int unsigned it = 0; it < transactions; it++) begin
-            wait(info.tags[unit_id].size() < (256/DMA_PORTS));
-            //uvm_logic_vector::sequence_item #(1) hl_tr;
+            int unsigned unit_id;
+            int unsigned unit_id_old[];
+            logic [8-1:0] tags[];
+
+            //GET UNIT ID
+            unit_id_old = info.tags.find_index() with (1);
+            assert(std::randomize(unit_id) with {
+                if (unit_id_old.size() > 0) {
+                    unit_id dist   {unit_id_new /: 60, unit_id_old /: 40};
+                } else {
+                    unit_id inside {unit_id_new};
+                }
+            }) else begin
+                `uvm_fatal(this.get_full_name(), "\n\tCannot randomize unit id")
+            end
+
+            //GET USED TAGS
+            wait(info.tags[unit_id].size() < 256);
+            tags = info.tags[unit_id].find_index() with (1);
+
             start_item(req);
 
             assert(req.randomize() with {
+                req.type_ide dist { 0 :/ type_ide_read, 1 :/ type_ide_write};
                 req.unitid == unit_id;
-                (req.type_ide == 0) -> !(req.tag inside {info.tags[unit_id]});
-                req.firstib inside {0};
-                req.lastib  inside {0};
+                (req.type_ide == 0) -> !(req.tag inside {tags});
+                //req.firstib inside {0};
+                //req.lastib  inside {0};
                 req.length > 0;
                 (req.type_ide == 1) -> req.length <= max_payload_size;
                 (req.type_ide == 0) -> req.length <= max_request_size;

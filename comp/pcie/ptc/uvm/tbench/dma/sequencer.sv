@@ -6,18 +6,10 @@
 
 class seq_info;
 
-    logic [8-1:0] tags[int unsigned][logic [8-1:0]];
+    logic tags[int unsigned][logic [8-1:0]];
 
     function new();
         tags.delete();
-    endfunction
-
-
-    function void requester_add(int unsigned unit_id);
-        //Remove all tags from this requester ID
-        if (!tags.exists(unit_id)) begin
-            tags[unit_id].delete();
-        end
     endfunction
 
     function void requester_remove(int unsigned unit_id);
@@ -25,12 +17,15 @@ class seq_info;
     endfunction
 
     function void tag_add(int unsigned unit_id, logic [8-1:0] tag);
-        tags[unit_id][tag] = tag;
+        tags[unit_id][tag] = 1;
     endfunction
 
     function void tag_remove(int unsigned unit_id, logic [8-1:0] tag);
         if (tags.exists(unit_id)) begin
             tags[unit_id].delete(tag);
+            if (tags[unit_id].size() == 0) begin
+                tags.delete(unit_id);
+            end
         end
     endfunction
 endclass
