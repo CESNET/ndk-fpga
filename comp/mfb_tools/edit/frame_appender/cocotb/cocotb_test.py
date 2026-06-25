@@ -61,6 +61,8 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=1500)
     # Change MVB driver's IdleGenerator to ItemRateLimiter
     idle_gen_conf = dict(random_idles=True, max_idles=5, zero_idles_chance=50)
     tb.mvb_rx_drv.set_idle_generator(ItemRateLimiter(rate_percentage=30, **idle_gen_conf))
+    # Change MFB driver's IdleGenerator to ItemRateLimiter
+    tb.mfb_rx_drv.set_idle_generator(ItemRateLimiter(rate_percentage=30, **idle_gen_conf))
     await tb.reset()
 
     cocotb.log.info("\n--- Beginning the test ---\n")
@@ -68,10 +70,12 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=1500)
     tb.mfb_tx_drv.start((1, i % 3) for i in itertools.count())
     # Option to change MVB drivers Rate Limiter (0 = random Idles = inconsistent rate)
     tb.mvb_rx_drv.set_idle_generator(ItemRateLimiter(rate_percentage=0))
+    tb.mfb_rx_drv.set_idle_generator(ItemRateLimiter(rate_percentage=0))
 
     await ClockCycles(tb.dut.CLK, 10)
 
-    for mfb_pkt in random_packets(frame_size_min, frame_size_max, pkt_count):
+    item_bytes = tb.mfb_rx_drv._item_bytes
+    for mfb_pkt in random_packets(frame_size_min, frame_size_max, pkt_count, alignment=item_bytes):
         tb.mfb_rx_drv.append(mfb_pkt)
 
         mvb_tr = MvbTrClassic()

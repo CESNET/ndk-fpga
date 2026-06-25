@@ -15,6 +15,7 @@ from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 from cocotbext.ofm.mfb.transaction import MfbTransaction, MfbTransactionWithMeta
+from cocotbext.ofm.base.generators import ItemRateLimiter
 from random import randint
 
 
@@ -35,7 +36,8 @@ class testbench():
 
         # setting up the input driver and connecting it to signals begging with "RX"
         self.stream_in = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
-
+        # adding idle generator to driver
+        self.stream_in.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=70))
         # choosing the right transaction type based on legth of the meta signal
         self.trans_type = MfbTransactionWithMeta if len(self.stream_in.bus.meta) > 0 else MfbTransaction
 
@@ -99,8 +101,11 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # calculating width of the meta signal for a region
     meta_width = len(tb.stream_in.bus.meta) // len(tb.stream_in.bus.sof)
 
+    # calculating number of bytes in an item
+    item_bytes = tb.dut.ITEM_WIDTH.value // 8
+
     # generating random packets
-    for packet in random_packets(frame_size_min, frame_size_max, pkt_count):
+    for packet in random_packets(frame_size_min, frame_size_max, pkt_count, alignment=item_bytes):
         # creating a transaction object and adding data to it
         transaction      = tb.trans_type()
         transaction.data = packet
