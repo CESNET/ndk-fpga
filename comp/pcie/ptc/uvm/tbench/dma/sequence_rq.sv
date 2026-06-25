@@ -122,6 +122,7 @@ class sequence_dma_rq#(
                 req.type_ide dist { 0 :/ type_ide_read, 1 :/ type_ide_write};
                 req.unitid == unit_id;
                 (req.type_ide == 0) -> !(req.tag inside {tags});
+                req.length == 1 -> (unsigned'(req.firstib) + unsigned'(req.lastib)) < 4;
                 //req.firstib inside {0};
                 //req.lastib  inside {0};
                 req.length > 0;
