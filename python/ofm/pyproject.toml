@@ -14,6 +14,8 @@ dependencies = [
     "Pillow",
     "colorama",
     "pyyaml",
+    "nfb",
+#    "nfb @ ${NDK_SW_PYTHON_URL}pynfb",
 ]
 
 [project.scripts]
@@ -27,13 +29,6 @@ ofm-gls = "ofm.comp.mfb_tools.debug.gen_loop_switch.gen_loop_switch:main"
 test = [
     "flake8",
     "mypy",
-]
-
-nfb-pypi = [
-    "nfb",
-]
-nfb-env = [
-    "nfb @ ${NDK_SW_PYTHON_URL}pynfb",
 ]
 
 [build-system]
