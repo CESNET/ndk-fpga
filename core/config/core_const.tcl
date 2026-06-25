@@ -86,8 +86,6 @@ if { $DMA_TYPE == 4 } {
     }
 }
 
-VhdlPkgProjectText -pkg ndk_fpga_common_pkg $PROJECT_NAME
-
 VhdlPkgStr -pkg ndk_fpga_top_pkg CARD_NAME     $CARD_NAME
 VhdlPkgStr -pkg ndk_fpga_top_pkg PCIE_MOD_ARCH $PCIE_MOD_ARCH
 VhdlPkgStr -pkg ndk_fpga_top_pkg NET_MOD_ARCH  $NET_MOD_ARCH
