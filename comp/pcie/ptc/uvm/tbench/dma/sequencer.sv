@@ -27,7 +27,15 @@ class seq_info;
                 tags.delete(unit_id);
             end
         end else begin
-            `uvm_warning("seq_info", $sformatf("\n\tUnknown unitid 0x%h", unit_id));
+            const int unsigned indexes[] = tags.find_index() with (1);
+            string msg;
+
+            msg = "{";
+            foreach(indexes[it]) begin
+                msg = {msg, $sformatf(" 0x%0h", indexes[it])};
+            end
+            msg = {msg, "}"};
+            `uvm_warning("seq_info", $sformatf("\n\tUnknown unitid 0x%h\n\t%s", unit_id, msg));
         end
     endfunction
 endclass
