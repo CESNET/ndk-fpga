@@ -319,7 +319,11 @@ class model#(
                 3 : rsp_tr.fbe = 4'b1000;
                 default : rsp_tr.lbe = 'x;
             endcase
-            rsp_tr.lbe               = (rsp_tr.length != 1) ? rsp_tr.lbe : 0;
+
+            if (rsp_tr.length == 1) begin
+                rsp_tr.fbe = rsp_tr.fbe & rsp_tr.lbe;
+                rsp_tr.lbe = 0;
+            end
             rsp_tr.address           = rq_tr.global_id[64-1:2];
             rsp_tr.ph                = 0;
 
