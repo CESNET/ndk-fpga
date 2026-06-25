@@ -49,7 +49,7 @@ class sequence_dma_rq#(
 
         if (DMA_PORTS > 1) {
             foreach(unit_id_new[it]) {
-		        unit_id_new[it][($clog2(DMA_PORTS) > 1 ? $clog2(DMA_PORTS) : 1) -1:0] == 0;
+		        unit_id_new[it][sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] == 0;
             }
 	    }
     };
@@ -100,7 +100,7 @@ class sequence_dma_rq#(
             unit_id_old = info.tags.find_index() with (1);
             assert(std::randomize(unit_id) with {
                 if (unit_id_old.size() > 0) {
-                    unit_id dist   {unit_id_new /: 60, unit_id_old /: 40};
+                    unit_id dist   {unit_id_new :/ 60, unit_id_old :/ 40};
                 } else {
                     unit_id inside {unit_id_new};
                 }
@@ -109,7 +109,11 @@ class sequence_dma_rq#(
             end
 
             //GET USED TAGS
-            wait(info.tags[unit_id].size() < 256);
+            if (info.tags.exists(unit_id)) begin
+                wait(info.tags[unit_id].size() < 256);
+            end else begin
+                info.tags[unit_id].delete();
+            end
             tags = info.tags[unit_id].find_index() with (1);
 
             start_item(req);
