@@ -229,6 +229,7 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string ipv6_address;
 
         foreach (ipv6[i]) begin
+            // verilog_lint: waive numeric-format-string-style
             ipv6_address = $sformatf("%04h:%04h:%04h:%04h:%04h:%04h:%04h:%04h/128",
                             ipv6[i].address[127 : 112],
                             ipv6[i].address[111 : 96],
@@ -255,6 +256,7 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string mac_address;
 
         foreach (mac[i]) begin
+            // verilog_lint: waive numeric-format-string-style
             mac_address = $sformatf("%02h:%02h:%02h:%02h:%02h:%02h/48",
                             mac[i].address[47 : 40],
                             mac[i].address[39 : 32],

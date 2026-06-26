@@ -37,12 +37,12 @@ module pma_property #(int unsigned DATA_WIDTH) (
 
     assert property (valid_hdr_values)
         else begin
-            $error("When HDR_VLD occured 'h%0b, HDR has not valid value : 'h%0h", vif.HDR_VLD, vif.HDR);
+            $error("When HDR_VLD occured 'b%0b, HDR has not valid value : 'h%0h", vif.HDR_VLD, vif.HDR);
             $finish();
         end
     assert property (valid_header_once_per_two_clk_cycles)
         else begin
-            $error("After HDR_VLD 'h%0b another HDR_VLD occured : 'h%0h", $past(vif.HDR_VLD), vif.HDR_VLD);
+            $error("After HDR_VLD 'b%0b another HDR_VLD occured : 'h%0h", $past(vif.HDR_VLD), vif.HDR_VLD);
             $finish();
         end
 

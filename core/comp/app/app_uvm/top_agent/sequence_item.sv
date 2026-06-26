@@ -51,11 +51,11 @@ virtual class sequence_item#(int unsigned ITEM_WIDTH, int unsigned META_WIDTH) e
 
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % 32 == 0) begin
-                msg = { msg, $sformatf("\n\t%h", data[it])};
+                msg = { msg, $sformatf("\n\t0x%h", data[it])};
             end else if (it % 8 == 0) begin
-                msg = { msg, $sformatf("    %h", data[it])};
+                msg = { msg, $sformatf("    0x%h", data[it])};
             end else begin
-                msg = { msg, $sformatf(" %h", data[it])};
+                msg = { msg, $sformatf(" 0x%h", data[it])};
             end
         end
         return msg;
@@ -217,17 +217,17 @@ class sequence_eth_item#(int unsigned CHANNELS, int unsigned LENGTH_WIDTH, int u
         string msg = super.convert2string();
 
         msg = {msg, $sformatf("\tchannel       %0d\n", channel     )};
-        msg = {msg, $sformatf("\terror         %b\n", error        )};
-        msg = {msg, $sformatf("\terror_frame   %b\n", error_frame  )};
-        msg = {msg, $sformatf("\terror_min_mtu %b\n", error_min_mtu)};
-        msg = {msg, $sformatf("\terror_max_mtu %b\n", error_max_mtu)};
-        msg = {msg, $sformatf("\terror_crc     %b\n", error_crc    )};
-        msg = {msg, $sformatf("\terror_mac     %b\n", error_mac    )};
-        msg = {msg, $sformatf("\tbroadcast     %b\n", broadcast    )};
-        msg = {msg, $sformatf("\tmulticast     %b\n", multicast    )};
-        msg = {msg, $sformatf("\thit_mac_vld   %b\n", hit_mac_vld  )};
+        msg = {msg, $sformatf("\terror         0b%b\n", error        )};
+        msg = {msg, $sformatf("\terror_frame   0b%b\n", error_frame  )};
+        msg = {msg, $sformatf("\terror_min_mtu 0b%b\n", error_min_mtu)};
+        msg = {msg, $sformatf("\terror_max_mtu 0b%b\n", error_max_mtu)};
+        msg = {msg, $sformatf("\terror_crc     0b%b\n", error_crc    )};
+        msg = {msg, $sformatf("\terror_mac     0b%b\n", error_mac    )};
+        msg = {msg, $sformatf("\tbroadcast     0b%b\n", broadcast    )};
+        msg = {msg, $sformatf("\tmulticast     0b%b\n", multicast    )};
+        msg = {msg, $sformatf("\thit_mac_vld   0b%b\n", hit_mac_vld  )};
         msg = {msg, $sformatf("\thit_mac       %0d\n", hit_mac     )};
-        msg = {msg, $sformatf("\ttmimstemp_vld %b\n", timestamp_vld)};
+        msg = {msg, $sformatf("\ttmimstemp_vld 0b%b\n", timestamp_vld)};
         msg = {msg, $sformatf("\ttimestamp     0x%h\n", timestamp    )};
 
         return msg;

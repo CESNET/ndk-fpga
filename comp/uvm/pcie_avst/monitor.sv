@@ -68,7 +68,7 @@ class monitor#(
         ) else begin
             string msg;
 
-            msg = $sformatf("\n\tWrong position of SOP.\n\tSTRADDLING %0d SOP %b EOP %b VALID %b", STRADDLING, t.sop, t.eop, t.valid);
+            msg = $sformatf("\n\tWrong position of SOP.\n\tSTRADDLING %0d SOP 'b%b EOP 'b%b VALID 'b%b", STRADDLING, t.sop, t.eop, t.valid);
             `uvm_error(this.get_full_name(), msg);
         end
 

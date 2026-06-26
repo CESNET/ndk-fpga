@@ -41,7 +41,7 @@ class scoreboard_cmp_header #(type MODEL_ITEM, type DUT_ITEM, int unsigned META_
         {hdr_id, hdr_len} = tr.meta;
 
         msg = tr.time2string();
-        msg = {msg, $sformatf("\n\t\tDiscard         : %b",   tr.discard)};
+        msg = {msg, $sformatf("\n\t\tDiscard         : 0b%b",   tr.discard)};
         msg = {msg, $sformatf("\n\t\tChannel         : %0d",  tr.channel)};
         msg = {msg, $sformatf("\n\t\tDMA META        : 0x%h", tr.meta)};
         msg = {msg, $sformatf("\n\t\t - HDR ID       : 0x%h (%0d)", hdr_id, hdr_id)};
@@ -69,7 +69,7 @@ class scoreboard_cmp_header #(type MODEL_ITEM, type DUT_ITEM, int unsigned META_
         end
 
         error_msg = tr.time2string();
-        error_msg = {error_msg, $sformatf("\n\t\tDiscard         : %b",   discard)};
+        error_msg = {error_msg, $sformatf("\n\t\tDiscard         : 0b%b",   discard)};
         error_msg = {error_msg, $sformatf("\n\t\tChannel         : %0d",  channel)};
         error_msg = {error_msg, $sformatf("\n\t\tDMA META        : 0x%h", meta)};
         error_msg = {error_msg, $sformatf("\n\t\t - HDR ID       : 0x%h (%0d)", hdr_id, hdr_id)};

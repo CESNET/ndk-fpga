@@ -73,11 +73,11 @@ class sequence_item #(int unsigned DATA_WIDTH) extends uvm_common::sequence_item
 
         $sformat(s, {
             "%s\n",
-            "data:       h%0h\n",
-            "hdr:        d%0d\n",
-            "data_vld:   b%0b\n",
-            "hdr_vld:    b%0b\n",
-            "block_lock: b%0b\n"},
+            "data:       'h%0h\n",
+            "hdr:        %0d\n",
+            "data_vld:   'b%0b\n",
+            "hdr_vld:    'b%0b\n",
+            "block_lock: 'b%0b\n"},
             super.convert2string(),
             data,
             hdr,

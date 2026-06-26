@@ -84,7 +84,7 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     function string convert2string();
         string ret = "";
 
-        ret = $sformatf("\n\tRAEDY: %b\n", ready);
+        ret = $sformatf("\n\tRAEDY: 'b%b\n", ready);
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
             ret = {ret, $sformatf("\n\tREGION %0d\n\t\tVALID %0d\n\t\tSOP %0d\n\t\tEOP %0d EMTPY %0d\n\t\tMETA 0x%h\n\t\tDATA(HEX)", it, valid[it], sop[it], eop[it], empty[it], meta[it])};
@@ -92,7 +92,7 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
                 if (jt % 8 == 0) begin
                     ret = {ret, "\n\t\t"};
                 end
-                ret = {ret, $sformatf("%h ", data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
+                ret = {ret, $sformatf("'h%h ", data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
             end
         end
 

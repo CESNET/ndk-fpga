@@ -67,7 +67,7 @@ class sequence_item #(int unsigned UPDATE_CNT_WIDTH) extends uvm_common::sequenc
         string output_string = "";
 
         // Item stringifying
-        $sformat(output_string, {"\n\tINIT %0b\n\tINIT_ACK %0b\n\tUPDATE %0b\n\tUPDATE_CNT %0h\n"},
+        $sformat(output_string, {"\n\tINIT 'b%0b\n\tINIT_ACK 'b%0b\n\tUPDATE 'b%0b\n\tUPDATE_CNT 'h%0h\n"},
             init,
             init_ack,
             update,

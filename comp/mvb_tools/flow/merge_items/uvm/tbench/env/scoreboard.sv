@@ -88,7 +88,7 @@ class scoreboard #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH) extends uvm_sc
     function void report_phase(uvm_phase phase);
         string msg = "\n";
 
-        msg = {msg, $sformatf("\n\tDATA STUCK INSIDE\t\nRX0:%d, RX1:%d",  m_model.model_mvb_in0.used(), m_model.model_mvb_in1.used())};
+        msg = {msg, $sformatf("\n\tDATA STUCK INSIDE\t\nRX0 : %d, RX1 : %d",  m_model.model_mvb_in0.used(), m_model.model_mvb_in1.used())};
 
         if (this.success() && this.used() == 0) begin
             `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)

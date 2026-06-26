@@ -96,7 +96,7 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
                 tr_output_meta.time_array_add(tr_input_mvb.start);
 
                 if (this.get_report_verbosity_level() == 200) begin
-                    msg = {msg, $sformatf("\tHEADER %h\n",  header)};
+                    msg = {msg, $sformatf("\tHEADER 0x%h\n",  header)};
                 end
                 if (this.get_report_verbosity_level() == 300) begin
                     msg = {msg, $sformatf("\tPACKET NUMBER: %d SIZE OF PACKET %d\n",  pkt_cnt, size_of_pkt)};
@@ -113,7 +113,7 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
                 if (offset > size_of_sp) begin
                     msg = "";
                     msg = {msg, $sformatf("\n ================ OFFSET FATAL =============== \n")};
-                    msg = {msg, $sformatf("\tDATA HEADER %h\n",  header)};
+                    msg = {msg, $sformatf("\tDATA HEADER 0x%h\n",  header)};
                     msg = {msg, $sformatf("\n\tSUPERPACKET NUMBER: %d\n",  sp_cnt)};
                     msg = {msg, $sformatf("\tPACKET NUMBER: %d SIZE OF PACKET %d\n",  pkt_cnt, size_of_pkt)};
                     msg = {msg, $sformatf("\tData length of incoming transaction is wrong or there is a problem with parsing in model.")};

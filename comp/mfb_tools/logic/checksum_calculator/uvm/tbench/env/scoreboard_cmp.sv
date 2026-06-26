@@ -42,9 +42,9 @@ class chsum_calc_cmp #(MVB_DATA_WIDTH, MFB_META_WIDTH) extends uvm_common::compa
 
         {meta, bypass, data} = tr.data;
         msg = tr.time2string();
-        msg = {msg, $sformatf("\n\tbypass %b",  bypass)};
-        msg = {msg, $sformatf("\n\tmeta   %h",  meta)};
-        msg = {msg, $sformatf("\n\tdata   %h",  data)};
+        msg = {msg, $sformatf("\n\tbypass 0b%b",  bypass)};
+        msg = {msg, $sformatf("\n\tmeta   0x%h",  meta)};
+        msg = {msg, $sformatf("\n\tdata   0x%h",  data)};
         return msg;
     endfunction
 

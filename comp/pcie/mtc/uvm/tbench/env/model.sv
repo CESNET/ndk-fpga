@@ -13,7 +13,7 @@ class cc_mtc_item#(MFB_ITEM_WIDTH) extends uvm_common::sequence_item;
     function string convert2string();
         string msg;
 
-        msg = $sformatf( "\n\tDATA %s\n TAG %h\n ERROR %h", data_tr.convert2string(), tag, error);
+        msg = $sformatf( "\n\tDATA %s\n TAG 0x%h\n ERROR 0x%h", data_tr.convert2string(), tag, error);
         return msg;
     endfunction
 

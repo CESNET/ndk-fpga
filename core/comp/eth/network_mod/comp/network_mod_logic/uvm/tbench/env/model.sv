@@ -78,7 +78,7 @@ class model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH) extends uvm_component
 
             if (tx_channel >= CHANNELS) begin
                 string msg;
-                $swrite(msg, "\n\tTX: Wrong channel num %0d Channel range is 0-%0d", tx_channel, CHANNELS-1);
+                $swrite(msg, "\n\tTX: Wrong channel num %0d Channel range is 0 - %0d", tx_channel, CHANNELS-1);
                 `uvm_fatal(this.get_full_name(), msg);
             end else begin
                 `uvm_info(this.get_full_name(), $sformatf("\nTX send packet on channel %0d %s", tx_channel, tr_output.convert2string()), UVM_HIGH);

@@ -73,7 +73,7 @@ class sequence_item #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_c
         string output_string = "";
         string data = "";
 
-        $sformat(output_string, {"%s\n\tSRC_RDY: %b\n\tDST_RDY: %b\n"},
+        $sformat(output_string, {"%s\n\tSRC_RDY: 'b%b\n\tDST_RDY: 'b%b\n"},
             super.convert2string(),
             src_rdy,
             dst_rdy
@@ -81,7 +81,7 @@ class sequence_item #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_c
 
         // Add new line for each item with correspondence valid bit
         for (int i = 0 ; i < ITEMS ; i++) begin
-            $sformat(data, {"\tDATA: 'h%0h\tVLD: %b\n"},
+            $sformat(data, {"\tDATA: 'h%0h\tVLD: 'b%b\n"},
             this.data[i],
             this.vld[i]
             );

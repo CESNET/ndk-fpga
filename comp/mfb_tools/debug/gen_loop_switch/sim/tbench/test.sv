@@ -191,14 +191,14 @@ program TEST (
         mi_trans.be = '1;
         mi_trans.rw = 1;
 
-        $write("\n\n############ TEST CASE %4b ############\n\n",mux_sel);
+        $write("\n\n############ TEST CASE 0b%4b ############\n\n",mux_sel);
 
         ////////
         // Setup MUXes
         for (int i=0;i<4;i++) begin
             mi_trans.address = 4*i;
             mi_trans.data    = mux_sel>>i;
-            $write("addr: %x, data: %x\n",mi_trans.address,mi_trans.data);
+            $write("addr: 0x%x, data: 0x%x\n",mi_trans.address,mi_trans.data);
             mi_trans_mbx.put(mi_trans.copy());
         end
         ////////

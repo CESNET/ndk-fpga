@@ -37,7 +37,7 @@ class data_comparer #(int unsigned ITEM_WIDTH) extends
                         msg = $sformatf("%s\n\n\t", msg);
                     end
 
-                    msg = $sformatf("%s%0d: (%2h, %2h), ", msg, it, tr_dut.data[it], tr_model.data[it]);
+                    msg = $sformatf("%s%0d: (0x%2h, 0x%2h), ", msg, it, tr_dut.data[it], tr_model.data[it]);
                     newline_break_cntr++;
                     last_wrong_byte_idx = it;
 
@@ -159,7 +159,7 @@ class ptr_upd_data_parser #(
 
                 if (ret == 0) begin
                     `uvm_error(this.get_full_name(),
-                               $sformatf("\nThese fields should be 0: tag8: %b, tag9: %b, ln: %b", tag8, tag9, ln));
+                               $sformatf("\nThese fields should be 0: tag8: 0b%b, tag9: 0b%b, ln: 0b%b", tag8, tag9, ln));
                 end
 
                 dut_out_tr.data = dut_in_tr_data.data;
@@ -209,8 +209,8 @@ class ptr_upd_data_parser #(
 
                 if (ret == 0) begin
                     `uvm_error(this.get_full_name(),
-                               $sformatf({"\nThese fields should be 0: rq_type: %b, rq_id_enabled: %b, ",
-                                          "cptr_id: %b, dummy_length: %b"},
+                               $sformatf({"\nThese fields should be 0: rq_type: 0b%b, rq_id_enabled: 0b%b, ",
+                                          "cptr_id: 0b%b, dummy_length: 0b%b"},
                                          rq_type, rq_id_enabled, cptr_id, dummy_length));
                 end
             end

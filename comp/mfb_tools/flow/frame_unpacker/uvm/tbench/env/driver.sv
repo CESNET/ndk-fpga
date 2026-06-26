@@ -194,7 +194,7 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
                 debug_msg = {debug_msg, $sformatf("PAYLOAD LEN %d\n",  sp_st.hdr[16      -1 : 0     ])};
                 debug_msg = {debug_msg, $sformatf("L2 LEN %d\n",  sp_st.hdr[16+7    -1 : 16    ])};
                 debug_msg = {debug_msg, $sformatf("L3 LEN %d\n",  sp_st.hdr[16+7+9  -1 : 16+7  ])};
-                debug_msg = {debug_msg, $sformatf("FLAG   %b\n",  sp_st.hdr[16+7+9+3-1 : 16+7+9])};
+                debug_msg = {debug_msg, $sformatf("FLAG   0b%b\n",  sp_st.hdr[16+7+9+3-1 : 16+7+9])};
 
                 len_with_hdr = byte_array_new.size() + HEADER_SIZE/MFB_ITEM_WIDTH;
                 if (VERBOSITY >= 3) begin

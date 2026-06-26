@@ -58,7 +58,7 @@ class model#(INPUT_CHANNELS, OUTPUT_CHANNELS, RESET_TYPE, OPT_MODE) extends uvm_
         if (input_port >= INPUT_CHANNELS) begin
             string msg;
 
-            msg = $sformatf( "\n\tChannel %0d is out of boud [0:%0d]", input_port, INPUT_CHANNELS);
+            msg = $sformatf( "\n\tChannel %0d is out of boud [0 : %0d]", input_port, INPUT_CHANNELS);
             `uvm_error(this.get_full_name(), msg);
             return 0;
         end

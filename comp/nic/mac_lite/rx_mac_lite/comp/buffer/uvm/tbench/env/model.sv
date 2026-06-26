@@ -102,7 +102,7 @@ class model #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extends uvm
             drop = err | force_drop;
 
             meta_cnt++;
-            `uvm_info(this.get_full_name(), $sformatf("\n\tPacket %0d drop %b error %0d\n%s", meta_cnt, drop, err, tr_input.convert2string()), UVM_HIGH);
+            `uvm_info(this.get_full_name(), $sformatf("\n\tPacket %0d drop 0b%b error %0d\n%s", meta_cnt, drop, err, tr_input.convert2string()), UVM_HIGH);
 
             pkt_drop.push_back(drop);
             if (drop == 0) begin
@@ -124,7 +124,7 @@ class model #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extends uvm
             drop = pkt_drop.pop_front();
 
             pkt_cnt++;
-            `uvm_info(this.get_full_name(), $sformatf("\n\tPacket %0d drop %b\n%s", pkt_cnt, drop, tr_input.convert2string()), UVM_HIGH);
+            `uvm_info(this.get_full_name(), $sformatf("\n\tPacket %0d drop 0b%b\n%s", pkt_cnt, drop, tr_input.convert2string()), UVM_HIGH);
             if (drop == 0) begin
                 out_mfb_data.write(tr_input);
             end

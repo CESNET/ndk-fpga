@@ -87,7 +87,7 @@ class scoreboard extends uvm_scoreboard;
                 str = $sformatf( "\n\tError num %0d Packet num %0d", errors, compared);
                 str = {str, $sformatf("\n\tInput time %0dns",  tr_model_packet.time_last()/1ns)};
                 str = {str, $sformatf("\n\tPACKET FROM DUT\n\t%s\n\tEXPECTED PACKET\n\t%s",  tr_dut_packet.convert2string(), tr_model_packet.convert2string())};
-                str = {str, $sformatf("\n\tERROR FROM DUT\n\t%b\n\tEXPECTED ERROR\n\t%b",  tr_dut_error.data, tr_model_error.data)};
+                str = {str, $sformatf("\n\tERROR FROM DUT\n\t0b%b\n\tEXPECTED ERROR\n\t0b%b",  tr_dut_error.data, tr_model_error.data)};
                `uvm_error(this.get_full_name(), str);
             end
         end

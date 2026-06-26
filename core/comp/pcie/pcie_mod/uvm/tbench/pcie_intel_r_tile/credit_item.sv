@@ -60,7 +60,7 @@ class credit_item extends uvm_sequence_item;
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tINIT %0b\n\tINIT_ACK %0b\n\tUPDATE %0b\n\tUPDATE_CNT %0d\n",
+        output_string = $sformatf("\n\tINIT 0b%0b\n\tINIT_ACK 0b%0b\n\tUPDATE 0b%0b\n\tUPDATE_CNT %0d\n",
             init,
             init_ack,
             update,

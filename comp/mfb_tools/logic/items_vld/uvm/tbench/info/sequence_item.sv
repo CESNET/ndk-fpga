@@ -77,7 +77,7 @@ class sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence_i
         string ret;
 
 
-        ret = $sformatf("\n\tchsum_en : %b\n\tlength : %d\n\toffset : %d\n\tpayload_size : %d\n",
+        ret = $sformatf("\n\tchsum_en : 0b%b\n\tlength : %d\n\toffset : %d\n\tpayload_size : %d\n",
                      chsum_en, length, offset, payload_size);
 
         return ret;

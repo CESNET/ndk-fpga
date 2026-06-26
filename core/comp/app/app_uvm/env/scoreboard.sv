@@ -246,7 +246,7 @@ class scoreboard #(ETH_STREAMS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS,
             str = {str, $sformatf("\n\tDMA[%0d] MVB %s", it, dma_mvb_cmp[it].info())};
         end
 
-        str = {str, $sformatf("\n\tOther errors %0d\n\tModel used %b\n\tScoreboard used %b", errors, m_model.used(), this.used())};
+        str = {str, $sformatf("\n\tOther errors %0d\n\tModel used 0b%b\n\tScoreboard used 0b%b", errors, m_model.used(), this.used())};
 
         return str;
     endfunction

@@ -49,8 +49,8 @@ class model #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTAMP_WI
             input_meta.get(tr_input_meta);
 
             msg = "";
-            msg = {msg, $sformatf(" INPUT TS %h\n",  tr_input_meta.data[TIMESTAMP_WIDTH-1 : 0])};
-            msg = {msg, $sformatf(" INPUT META %h\n",  tr_input_meta.data[RX_MFB_META_WIDTH-1 : TIMESTAMP_WIDTH+$clog2(QUEUES)])};
+            msg = {msg, $sformatf(" INPUT TS 0x%h\n",  tr_input_meta.data[TIMESTAMP_WIDTH-1 : 0])};
+            msg = {msg, $sformatf(" INPUT META 0x%h\n",  tr_input_meta.data[RX_MFB_META_WIDTH-1 : TIMESTAMP_WIDTH+$clog2(QUEUES)])};
             msg = {msg, $sformatf(" %s\n",  tr_input_meta.convert2string())};
 
             tr_output_meta = uvm_logic_vector::sequence_item #(TX_MFB_META_WIDTH)::type_id::create("tr_output_meta");

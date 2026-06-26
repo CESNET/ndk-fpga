@@ -205,10 +205,10 @@ class dma_model #(
             debug_msg = { debug_msg, $sformatf("TRANSACTION : %0d\n", m_channel_info[channel].pcie_transactions)};
             debug_msg = { debug_msg, $sformatf("DROP        : %0d\n", drop)};
             debug_msg = { debug_msg, $sformatf("ADDR        : %0d\n", {addr, 2'b00})};
-            debug_msg = { debug_msg, $sformatf("HDR FLAG    : %0b\n", (hdr_inf != 1'b0))};
+            debug_msg = { debug_msg, $sformatf("HDR FLAG    : 0b%0b\n", (hdr_inf != 1'b0))};
             debug_msg = { debug_msg, $sformatf("DW CNT      : %0d\n", dword_cnt)};
-            debug_msg = { debug_msg, $sformatf("FBE         : %b\n", fbe_ext)};
-            debug_msg = { debug_msg, $sformatf("LBE         : %b\n", lbe_ext)};
+            debug_msg = { debug_msg, $sformatf("FBE         : 0b%b\n", fbe_ext)};
+            debug_msg = { debug_msg, $sformatf("LBE         : 0b%b\n", lbe_ext)};
             debug_msg = { debug_msg, $sformatf("DATA        : %s\n", cq_data_tr.convert2string())};
             debug_msg = { debug_msg,
                     $sformatf("================================================================================= \n")};

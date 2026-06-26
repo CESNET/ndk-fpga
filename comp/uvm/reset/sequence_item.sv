@@ -39,7 +39,7 @@ class sequence_item extends uvm_sequence_item;
     function string convert2string();
         string s = "";
 
-        $sformat (s, "RESET : %b", reset);
+        $sformat (s, "RESET : 'b%b", reset);
         return s;
     endfunction
 endclass

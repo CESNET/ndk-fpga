@@ -522,7 +522,7 @@ class monitor_RC #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep (%b) have to be all ones if tlast(%b) is not set", t.tkeep, t.tlast));
+                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep ('b%b) have to be all ones if tlast('b%b) is not set", t.tkeep, t.tlast));
             end
         end
 

@@ -107,7 +107,7 @@ class sequence_item extends uvm_sequence_item;
     function string convert2string();
         string ret;
 
-        ret = $sformatf( "\tAddress_type : 0x%h\n\tAddress : 0x%h\n\tDword count : %0d\n\tRequest_type : x%b\n\tIntel_type : 0x%h\n\tRequest_id : %0d\n\tTag : %0d\n\tTarget_function : 0x%h\n\tBar_aperture : %0d\n\tTransaction_class : 0x%h\n\tSnoop bit : 0x%h\n\tRelax bit : 0x%h\n\tID-based : 0x%h\n\tBar : %0d\n\tFBE : x%b\n\tLBE : x%b\n\ttph_present : 0x%h\n\ttph_type : 0x%h\n\ttph_st_tag : 0x%h\n", addr[2-1 : 0], addr[64-1 : 2], dw_count, req_type, intel_type, req_id, tag, t_func, bar_ap, tc, attr[0], attr[1], attr[2], bar, fbe, lbe, tph_present, tph_type, tph_st_tag);
+        ret = $sformatf( "\tAddress_type : 0x%h\n\tAddress : 0x%h\n\tDword count : %0d\n\tRequest_type : x0b%b\n\tIntel_type : 0x%h\n\tRequest_id : %0d\n\tTag : %0d\n\tTarget_function : 0x%h\n\tBar_aperture : %0d\n\tTransaction_class : 0x%h\n\tSnoop bit : 0x%h\n\tRelax bit : 0x%h\n\tID-based : 0x%h\n\tBar : %0d\n\tFBE : x0b%b\n\tLBE : x0b%b\n\ttph_present : 0x%h\n\ttph_type : 0x%h\n\ttph_st_tag : 0x%h\n", addr[2-1 : 0], addr[64-1 : 2], dw_count, req_type, intel_type, req_id, tag, t_func, bar_ap, tc, attr[0], attr[1], attr[2], bar, fbe, lbe, tph_present, tph_type, tph_st_tag);
 
         return ret;
     endfunction
