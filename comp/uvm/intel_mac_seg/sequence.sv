@@ -44,7 +44,7 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends uvm_sequence #(sequenc
         req.randomize();
         finish_item(req);
         get_response(rsp);
-	endtask
+    endtask
 
 
     // ------------------------------------------------------------------------
@@ -97,7 +97,7 @@ class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_b
         void'(req.randomize() with {ready == rdy.m_value;});
         finish_item(req);
         get_response(rsp);
-	endtask
+    endtask
 
 
     // ------------------------------------------------------------------------

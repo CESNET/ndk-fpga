@@ -52,9 +52,7 @@ class reg_sequence#(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) extends uvm
             regs[it].update(status);
         end
 
-		//just for synchronization
+        //just for synchronization
         m_regmodel_minimal.stream[0].channel[0].read(status, data, .parent(this));
     endtask
 endclass
-
-

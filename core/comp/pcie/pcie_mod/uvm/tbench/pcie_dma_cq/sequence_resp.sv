@@ -31,7 +31,7 @@ class sequence_resp extends uvm_sequence #(uvm_pcie::header);
         //$write("TEST AAA%s\n", response.convert2string());
     endfunction
 
-    virtual function void mid_do(uvm_sequence_item 	this_item);
+    virtual function void mid_do(uvm_sequence_item     this_item);
         uvm_pcie::header hdr;
 
         $cast(hdr, this_item);

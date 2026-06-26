@@ -48,7 +48,7 @@ module lii_property #(logic FAST_SOF, logic RESET_ENABLE, int unsigned DATA_WIDT
 
     // This property check if after SOF is EOF.
     property sof_eof_control;
-	    @(posedge vif.CLK)
+        @(posedge vif.CLK)
         disable iff(RESET == 1'b1)
             (vif.SOF) && (!vif.EOF) && (vif.RDY) |=>
             !((vif.SOF && !vif.EOF) || (vif.SOF && vif.EOF) && (vif.RDY)) throughout eof_seq;
@@ -57,7 +57,7 @@ module lii_property #(logic FAST_SOF, logic RESET_ENABLE, int unsigned DATA_WIDT
     // TODO: Repair property for TX MAC
     // This property check if after EOF is SOF
     //property no_data_after_eof;
-	//    @(posedge vif.CLK)
+    //    @(posedge vif.CLK)
     //    disable iff(RESET == 1'b1)
     //        (vif.EOF) && (!vif.SOF) && (vif.RDY) |=>
     //        !(!vif.SOF && vif.RDY) throughout sof_seq;

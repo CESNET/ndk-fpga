@@ -12,8 +12,8 @@
 class model extends uvm_component;
     `uvm_component_param_utils(uvm_mac_seg_rx::model)
 
-	localparam LOGIC_WIDTH = 6;
-	localparam ITEM_WIDTH = 8;
+    localparam LOGIC_WIDTH = 6;
+    localparam ITEM_WIDTH = 8;
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))                 rx_packet;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item#(LOGIC_WIDTH)) rx_error;
@@ -41,9 +41,9 @@ class model extends uvm_component;
         uvm_logic_vector::sequence_item#(1)           tx_tr_error;
 
         forever begin
-			logic [1-1:0] fcs_error;
-			logic [2-1:0] error;
-			logic [3-1:0] status;
+            logic [1-1:0] fcs_error;
+            logic [2-1:0] error;
+            logic [3-1:0] status;
 
             rx_packet.get(rx_tr_packet);
             rx_error.get(rx_tr_error);
@@ -52,13 +52,13 @@ class model extends uvm_component;
             packet_size_stats.next_val(rx_tr_packet.size());
 
             $cast(tx_tr_packet, rx_tr_packet.clone());
-			tx_tr_error = uvm_logic_vector::sequence_item#(1)::type_id::create("model_result_error");
-			{fcs_error, error, status} = rx_tr_error.data;
+            tx_tr_error = uvm_logic_vector::sequence_item#(1)::type_id::create("model_result_error");
+            {fcs_error, error, status} = rx_tr_error.data;
             tx_tr_error.data = fcs_error;
 
             if (tx_tr_packet.data.size() >= 60 ) begin
                 tx_packet.write(tx_tr_packet);
-			    tx_error.write(tx_tr_error);
+                tx_error.write(tx_tr_error);
             end else begin
                 // $write(tx_tr_packet.data.size(), " - undersized packet not writte\n");
             end

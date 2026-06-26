@@ -28,9 +28,9 @@ endclass
 class sequence_error#(LOGIC_WIDTH) extends uvm_logic_vector::sequence_simple#(LOGIC_WIDTH);
     `uvm_object_param_utils(uvm_mac_seg_rx::sequence_error#(LOGIC_WIDTH))
 
-	function new (string name = "");
-		super.new(name);
-	endfunction
+    function new (string name = "");
+        super.new(name);
+    endfunction
 
     task body;
         repeat(transaction_count)
@@ -71,8 +71,8 @@ class sequence_simple_1 extends uvm_sequence;
         rx_error  = sequence_error#(LOGIC_WIDTH)::type_id::create("avalon_rx_seq_base");
         reset_seq = uvm_reset::sequence_start::type_id::create("reset_simple");
 
-		rx_packet = rx_packet_lib;
-	endfunction
+        rx_packet = rx_packet_lib;
+    endfunction
 
     task error_rx();
         forever begin

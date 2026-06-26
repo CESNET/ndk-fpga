@@ -49,7 +49,7 @@ class model extends uvm_component;
             end
 
             tx_packet.write(rx_tr_packet);
-			tx_error.write(tx_tr_error);
+            tx_error.write(tx_tr_error);
         end
     endtask
 endclass

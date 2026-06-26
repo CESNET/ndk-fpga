@@ -39,7 +39,7 @@ virtual class base_reg_frontdoor  extends uvm_reg_frontdoor;
         super.new(name);
     endfunction
 
-    virtual function void do_copy (	uvm_object 	rhs	);
+    virtual function void do_copy(uvm_object rhs);
         base_reg_frontdoor c_rhs;
         super.do_copy(rhs);
         $cast(c_rhs, rhs);
@@ -71,7 +71,7 @@ class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int 
         sem = null;
     endfunction
 
-    virtual function void do_copy (	uvm_object 	rhs	);
+    virtual function void do_copy(uvm_object rhs);
         super.do_copy(rhs);
     endfunction
 

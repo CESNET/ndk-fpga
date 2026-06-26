@@ -31,12 +31,12 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
         uvm_logic_vector_array_intel_mac_seg::config_item m_env_tx_cfg;
         uvm_logic_vector_array_mfb::config_item           m_env_rx_cfg;
 
-		//reset
+        //reset
         m_reset_cfg = new();
         m_reset_cfg.active = UVM_ACTIVE;
         m_reset_cfg.interface_name = "RESET_IF";
         uvm_config_db#(uvm_reset::config_item)::set(this, "m_reset", "m_config", m_reset_cfg);
-		m_reset = uvm_reset::agent::type_id::create("m_reset", this);
+        m_reset = uvm_reset::agent::type_id::create("m_reset", this);
 
         m_env_tx_cfg = new();
         m_env_tx_cfg.active         = UVM_ACTIVE;
@@ -55,7 +55,7 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
 
         sc       = scoreboard::type_id::create("sc", this);
 
-		m_sequencer = sequencer::type_id::create("m_sequencer", this);
+        m_sequencer = sequencer::type_id::create("m_sequencer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -68,8 +68,7 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
         m_sequencer.rx_sequencer    = m_env_rx.m_sequencer;
         m_sequencer.reset_sequencer = m_reset.m_sequencer;
 
-		m_reset.sync_connect(m_env_tx.reset_sync);
-   		m_reset.sync_connect(m_env_rx.reset_sync);
+        m_reset.sync_connect(m_env_tx.reset_sync);
+           m_reset.sync_connect(m_env_rx.reset_sync);
  endfunction
 endclass
-

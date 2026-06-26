@@ -198,5 +198,3 @@ class sequence_dma_rq_lib #(
         this.add_sequence(uvm_dma::sequence_dma_rq#(DMA_PORTS)::get_type());
     endfunction
 endclass
-
-
