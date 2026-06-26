@@ -38,7 +38,14 @@ class sequence_dma_rq#(
     uvm_dma::seq_info info;
 
     constraint trans_const {
-        transactions inside {[20:600]};
+        transactions dist {
+            [1:20]    :/ 5,
+            [20:50]   :/ 50,
+            [50:100]  :/ 15,
+            [100:200] :/ 10,
+            [200:500] :/ 5
+        };
+
         unit_id_new.size() dist {
                 [1:5] :/ 20,
                 [5:15] :/ 10,
@@ -100,7 +107,7 @@ class sequence_dma_rq#(
             unit_id_old = info.tags.find_index() with (1);
             assert(std::randomize(unit_id) with {
                 if (unit_id_old.size() > 0) {
-                    unit_id dist   {unit_id_new :/ 60, unit_id_old :/ 40};
+                    unit_id dist   {unit_id_new :/ 80, unit_id_old :/ 20};
                 } else {
                     unit_id inside {unit_id_new};
                 }

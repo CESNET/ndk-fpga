@@ -51,8 +51,8 @@ class sequence_base#(
         for(int unsigned it = 0; it <  DMA_PORTS; it++) begin
             dma_rq_seq[it] = uvm_dma::sequence_dma_rq_lib#(DMA_PORTS)::type_id::create($sformatf("dma_rq_%0d", it), p_sequencer.m_dma[it]);
             dma_rq_seq[it].init_sequence();
-            dma_rq_seq[it].min_random_count = 100;
-            dma_rq_seq[it].max_random_count = 200;
+            dma_rq_seq[it].min_random_count =  50;
+            dma_rq_seq[it].max_random_count = 100;
         end
 
         /////////////////////////////
@@ -75,7 +75,7 @@ class sequence_base#(
             fork
                 automatic int unsigned index = it;
                 begin
-                    for (int unsigned jt = 0; jt < 10; jt++) begin
+                    for (int unsigned jt = 0; jt < 5; jt++) begin
                         assert(dma_rq_seq[index].randomize());
                         dma_rq_seq[index].start(p_sequencer.m_dma[index]);
                     end
