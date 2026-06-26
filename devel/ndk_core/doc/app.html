@@ -365,6 +365,16 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 <td><p>8</p></td>
 <td><p>ETH MFB: number of blocks in region</p></td>
 </tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-eth_rx_mtu"><td><p>ETH_RX_MTU</p></td>
+<td><p>integer_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>(others =&gt; 16383)</p></td>
+<td><p>ETH: Maximum allowed size of RX frame in bytes per Ethernet stream.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-eth_tx_mtu"><td><p>ETH_TX_MTU</p></td>
+<td><p>integer_vector(ETH_STREAMS-1 downto 0)</p></td>
+<td><p>(others =&gt; 16383)</p></td>
+<td><p>ETH: Maximum allowed size of TX frame in bytes per Ethernet stream.</p></td>
+</tr>
 <tr class="row-even" id="vhdl-gengeneric-application_core-pcie_endpoints"><td><p>PCIE_ENDPOINTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
