@@ -11,7 +11,7 @@ class scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sco
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))                  analysis_export_cq_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)) analysis_export_cq_meta;
     uvm_mtc::mi_subscriber #(MI_DATA_WIDTH, MI_ADDR_WIDTH) mi_scrb;
-    // DUT OUTPUT
+    // dut OUTPUT
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))                  analysis_export_cc_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)) analysis_export_cc_meta;
     uvm_analysis_export #(uvm_mi::sequence_item_response #(MI_DATA_WIDTH))                         analysis_export_cc_mi;
@@ -31,7 +31,7 @@ class scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sco
 
         analysis_export_cc_mi = new("analysis_export_cc_mi", this);
 
-        // DUT MODEL COMUNICATION
+        // dut MODEL COMUNICATION
         analysis_export_cc_data   = new("analysis_export_cc_data", this);
         analysis_export_cc_meta   = new("analysis_export_cc_meta", this);
     endfunction

@@ -22,5 +22,5 @@ lappend COMPONENTS [ list "CHANNEL_ROUTER_MODEL" "$OFM_PATH/comp/mvb_tools/flow/
 
 lappend MOD "$ENTITY_BASE/top_agent/pkg.sv"
 lappend MOD "$ENTITY_BASE/env/pkg.sv"
-lappend MOD "$ENTITY_BASE/property.sv"
+lappend MOD "$ENTITY_BASE/app_core_property.sv"
 

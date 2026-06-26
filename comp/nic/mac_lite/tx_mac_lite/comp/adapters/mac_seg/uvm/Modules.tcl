@@ -14,5 +14,5 @@ set COMPONENTS [ list \
 
 set MOD "$MOD $ENTITY_BASE/env/pkg.sv"
 set MOD "$MOD $ENTITY_BASE/test/pkg.sv"
-set MOD "$MOD $ENTITY_BASE/property.sv"
+set MOD "$MOD $ENTITY_BASE/mac_tx_property.sv"
 

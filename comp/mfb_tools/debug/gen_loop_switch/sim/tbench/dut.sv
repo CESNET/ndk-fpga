@@ -9,7 +9,7 @@
 import test_pkg::*;
 import math_pkg::*;
 
-module DUT (
+module dut (
     input logic MI_CLK,
     input logic MI_RESET,
     input logic CLK,

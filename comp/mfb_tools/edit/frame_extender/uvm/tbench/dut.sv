@@ -3,7 +3,7 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(
+module dut #(
     int unsigned MFB_REGIONS,
     int unsigned MFB_REGION_SIZE,
     int unsigned MFB_BLOCK_SIZE,

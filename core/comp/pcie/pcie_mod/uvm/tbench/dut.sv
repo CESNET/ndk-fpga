@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input  logic [PCIE_CONS*PCIE_CLKS-1 : 0] PCIE_SYSCLK_P,
     input  logic [PCIE_CONS*PCIE_CLKS-1 : 0] PCIE_SYSCLK_N,
     output logic [PCIE_ENDPOINTS-1 : 0]      PCIE_USER_CLK,

@@ -64,7 +64,7 @@ class scoreboard #(LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH, LUT_DEPTH) exten
             model_out_fifo.get(tr_model);
 
             debug_msg = {debug_msg, $sformatf("\n\t Model MVB TR: %s\n",  tr_model.convert2string())};
-            debug_msg = {debug_msg, $sformatf("\n\t DUT MVB TR: %s\n",  tr_dut.convert2string())};
+            debug_msg = {debug_msg, $sformatf("\n\t dut MVB TR: %s\n",  tr_dut.convert2string())};
             `uvm_info(this.get_full_name(), debug_msg ,UVM_MEDIUM);
 
             compared++;

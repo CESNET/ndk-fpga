@@ -1,4 +1,4 @@
-// discarder.sv: Retrieves the discard events from the DUT
+// discarder.sv: Retrieves the discard events from the dut
 // Copyright (C) 2025 CESNET z. s. p. o.
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause

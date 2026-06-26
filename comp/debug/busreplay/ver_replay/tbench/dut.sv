@@ -14,7 +14,7 @@
  */
 
 
-module DUT (
+module dut (
     input logic                 CLK,
     input logic                 RESET,
     iMi32.dut                   MI

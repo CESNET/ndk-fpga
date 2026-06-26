@@ -5,5 +5,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 lappend MOD "$ENTITY_BASE/interface.sv"
-lappend MOD "$ENTITY_BASE/property.sv"
+lappend MOD "$ENTITY_BASE/lii_property.sv"
 lappend MOD "$ENTITY_BASE/pkg.sv"

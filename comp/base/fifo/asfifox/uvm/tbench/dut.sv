@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     RX_CLK,
     input logic     TX_CLK,
     input logic     RX_RST,

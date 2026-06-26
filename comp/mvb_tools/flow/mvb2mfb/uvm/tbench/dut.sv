@@ -4,7 +4,7 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(
+module dut #(
     int unsigned MVB_ITEMS,
     int unsigned MVB_ITEM_WIDTH_RAW,
     int unsigned MFB_REGIONS,

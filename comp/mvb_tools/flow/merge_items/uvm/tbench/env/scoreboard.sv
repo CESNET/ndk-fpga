@@ -78,7 +78,7 @@ class scoreboard #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH) extends uvm_sc
         m_model_pipe0.model_mvb_out.connect(cmp0.analysis_imp_model);
         m_model_pipe1.model_mvb_out.connect(cmp1.analysis_imp_model);
 
-        // Processed data from the output of the DUT connected to the analysis fifo
+        // Processed data from the output of the dut connected to the analysis fifo
         analysis_imp_mvb_tx .connect(cmp .analysis_imp_dut);
         analysis_imp_mvb_tx0.connect(cmp0.analysis_imp_dut);
         analysis_imp_mvb_tx1.connect(cmp1.analysis_imp_dut);

@@ -8,4 +8,5 @@ lappend COMPONENTS [list "COMMON"       "$OFM_PATH/comp/uvm/common"         "FUL
 
 
 lappend MOD "$ENTITY_BASE/interface.sv"
+lappend MOD "$ENTITY_BASE/avst_property.sv"
 lappend MOD "$ENTITY_BASE/pkg.sv"

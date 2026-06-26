@@ -62,7 +62,7 @@ class scoreboard #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) exten
         // processed data from the output of the model connected to the analysis fifo
         m_model.out_data.connect(data_cmp.analysis_imp_model);
         m_model.out_meta.connect(meta_cmp.analysis_imp_model);
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_data.connect(data_cmp.analysis_imp_dut);
         out_meta.connect(meta_cmp.analysis_imp_dut);
 

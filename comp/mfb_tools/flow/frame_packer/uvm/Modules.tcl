@@ -15,7 +15,7 @@ lappend COMPONENTS [ list "SV_PROBE_UVM"               "$OFM_PATH/comp/uvm/probe
 
 lappend MOD "$ENTITY_BASE/tbench/info/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"
-lappend MOD "$ENTITY_BASE/tbench/property.sv"
+lappend MOD "$ENTITY_BASE/tbench/framepacker_bus_properties.sv"
 lappend MOD "$ENTITY_BASE/tbench/tests/pkg.sv"
 
 lappend MOD "$ENTITY_BASE/tbench/dut.sv"

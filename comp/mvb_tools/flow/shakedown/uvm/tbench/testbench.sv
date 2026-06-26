@@ -60,10 +60,10 @@ module testbench;
     end
 
     // --- //
-    // DUT //
+    // dut //
     // --- //
 
-    DUT #(
+    dut #(
         .RX_ITEMS     (RX_ITEMS),
         .TX_ITEMS     (TX_ITEMS),
         .ITEM_WIDTH   (ITEM_WIDTH),

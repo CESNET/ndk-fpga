@@ -65,7 +65,7 @@ class scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_E
         m_pipe_model.model_mvb_out.connect(cmp       .analysis_imp_model);
         m_status_model.model_out  .connect(status_cmp.analysis_imp_model);
 
-        // Connects output data of the DUT
+        // Connects output data of the dut
         analysis_imp_mvb_tx    .connect(cmp       .analysis_imp_dut);
         analysis_imp_mvb_status.connect(status_cmp.analysis_imp_dut);
 

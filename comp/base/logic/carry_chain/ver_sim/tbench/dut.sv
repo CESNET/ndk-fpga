@@ -17,7 +17,7 @@ import test_pkg::*;
 
 
 
-module DUT (
+module dut (
     input logic CLK,
     input logic RESET,
     iWordLinkRx.dut RX

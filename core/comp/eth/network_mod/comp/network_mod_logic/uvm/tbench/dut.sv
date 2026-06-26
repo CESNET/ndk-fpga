@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic                           CLK_USER,
     input logic                           CLK_CORE,
     input logic [RESET_USER_WIDTH-1:0]    RESET_USER,

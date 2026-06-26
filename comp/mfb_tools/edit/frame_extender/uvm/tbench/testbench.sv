@@ -64,10 +64,10 @@ module testbench;
     end
 
     // --- //
-    // DUT //
+    // dut //
     // --- //
 
-    DUT #(
+    dut #(
         .MFB_REGIONS       (MFB_REGIONS),
         .MFB_REGION_SIZE   (MFB_REGION_SIZE),
         .MFB_BLOCK_SIZE    (MFB_BLOCK_SIZE),

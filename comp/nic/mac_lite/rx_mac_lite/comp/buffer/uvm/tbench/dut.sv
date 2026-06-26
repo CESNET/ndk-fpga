@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-module DUT #(
+module dut #(
         REGIONS     ,
         REGION_SIZE ,
         BLOCK_SIZE  ,

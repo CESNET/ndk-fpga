@@ -3,7 +3,7 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS, bit RX_SHAKEDOWN_EN, int unsigned SW_TIMEOUT_W, string DEVICE)
+module dut #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS, bit RX_SHAKEDOWN_EN, int unsigned SW_TIMEOUT_W, string DEVICE)
 (
     input logic CLK,
     input logic RST,

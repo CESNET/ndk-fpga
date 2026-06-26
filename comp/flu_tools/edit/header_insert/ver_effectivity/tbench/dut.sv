@@ -1,5 +1,5 @@
 /*
- * DUT.sv: Design under test
+ * dut.sv: Design under test
  * Copyright (C) 2013 CESNET
  * Author: Lukas Kekely <kekely@cesnet.cz>
  *
@@ -12,7 +12,7 @@
 // ----------------------------------------------------------------------------
 import test_pkg::*; // Test constants
 
-module DUT (
+module dut (
    input logic CLK,
    input logic RESET,
    iFrameLinkURx.dut RX,
@@ -56,4 +56,4 @@ TOP_VER #(
 );
 
 
-endmodule : DUT
+endmodule : dut

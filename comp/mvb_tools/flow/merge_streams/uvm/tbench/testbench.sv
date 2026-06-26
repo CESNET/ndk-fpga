@@ -61,10 +61,10 @@ module testbench;
     end
 
     // --- //
-    // DUT //
+    // dut //
     // --- //
 
-    DUT #(
+    dut #(
         .MVB_ITEMS       (MVB_ITEMS),
         .MVB_ITEM_WIDTH  (MVB_ITEM_WIDTH),
         .RX_STREAMS      (RX_STREAMS),

@@ -42,8 +42,8 @@ module testbench;
         $stop(2);
     end
 
-    //DUT mapping
-    DUT DUT_U(
+    //dut mapping
+    dut DUT_U(
         .CLK        (CLK),
         .RST        (reset.RESET),
         .mfb_wr     (mfb_wr),

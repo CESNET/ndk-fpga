@@ -33,7 +33,7 @@ class delayer_cmp #(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH) extends uvm_common::compare
             dut_ts = tr_dut_second.time_last() - tr_dut_first.time_last();
             times2cmp.push_back(tr_dut_second);
 
-            // msg = {msg, $sformatf("DUT TS %0.2f\n",  (dut_ts/1ns))};
+            // msg = {msg, $sformatf("dut TS %0.2f\n",  (dut_ts/1ns))};
             // msg = {msg, $sformatf("SIZE OF TR %0d\n",  tr_model.item.data_tr.size())};
             $fwrite(fd,"%0.2f, %0.2f, %d, %0.2f, \n", dut_ts/1ns, tr_model.timestamp, tr_model.data_tr.size(), tr_model.time_last()/1ns);
             ts_stats.next_val(abs(signed'(tr_model.timestamp - dut_ts/1ns)));

@@ -7,7 +7,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RESET,
     mfb_if.dut_rx   mfb_rx,

@@ -49,7 +49,7 @@ class scoreboard #(DATA_WIDTH, ITEMS) extends uvm_scoreboard;
         analysis_imp_mvb_rx       .connect(m_pipe_model.model_mvb_in.analysis_export);
         // Connects output data of the models
         m_pipe_model.model_mvb_out.connect(cmp.analysis_imp_model);
-        // Connects output data of the DUT
+        // Connects output data of the dut
         analysis_imp_mvb_tx       .connect(cmp.analysis_imp_dut);
     endfunction
 

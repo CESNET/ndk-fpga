@@ -8,6 +8,8 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 import test::*;
 
+
+// verilog_lint: waive module-filename
 module testbench;
 
     localparam ITEM_WIDTH      = 32;
@@ -170,8 +172,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .PCIE_SYSCLK_P   (pcie_sysclk_p_logic),
         .PCIE_SYSCLK_N   (pcie_sysclk_n_logic),
         .PCIE_USER_CLK   (pcie_user_clk_logic),

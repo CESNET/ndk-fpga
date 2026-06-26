@@ -1,4 +1,4 @@
-// property.sv: Properties for DUT
+// property.sv: Properties for dut
 // Copyright (C) 2023 CESNET z. s. p. o.
 // Author(s): Jakub Cabal <cabal@cesnet.cz>
 

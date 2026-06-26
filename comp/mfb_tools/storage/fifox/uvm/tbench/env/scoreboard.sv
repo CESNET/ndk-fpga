@@ -54,7 +54,7 @@ class scoreboard#(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
         m_model.out_data.connect(model_data.analysis_export);
         m_model.out_meta.connect(model_meta.analysis_export);
 
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_data.connect(dut_data.analysis_export);
         out_meta.connect(dut_meta.analysis_export);
     endfunction

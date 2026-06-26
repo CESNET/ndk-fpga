@@ -37,7 +37,7 @@ interface crdt_if (input logic CLK);
     endclocking
 
     // ------------------------------------------------------------------------
-    // Connection to DUT
+    // Connection to dut
     modport dut_rx(input UPDATE, CNT_PH, CNT_NPH, CNT_CPLH, CNT_PD, CNT_NPD, CNT_CPLD, INIT_DONE);
     modport dut_tx(input INIT_DONE, output UPDATE, CNT_PH, CNT_NPH, CNT_CPLH, CNT_PD, CNT_NPD, CNT_CPLD);
 

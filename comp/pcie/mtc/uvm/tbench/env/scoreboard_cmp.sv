@@ -37,7 +37,7 @@ class mi_cmp_rq #(MI_DATA_WIDTH, type CLASS_TYPE) extends uvm_common::comparer_o
 
     virtual function string info(logic data = 0);
         string msg ="";
-        msg = $sformatf("\n\tErrors %0d Compared %0d Compared write tr %0d Compared read tr %0d Wait for tramsaction DUT(%0d) MODEL(%0d)", errors, compared, compared_write, compared_read, dut_items.size(), model_items.size());
+        msg = $sformatf("\n\tErrors %0d Compared %0d Compared write tr %0d Compared read tr %0d Wait for tramsaction dut(%0d) MODEL(%0d)", errors, compared, compared_write, compared_read, dut_items.size(), model_items.size());
         msg = {msg, super.info()};
         return msg;
     endfunction

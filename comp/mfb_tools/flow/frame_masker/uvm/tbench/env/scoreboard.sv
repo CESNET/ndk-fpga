@@ -70,7 +70,7 @@ class scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_scor
         m_model.out_data.connect(data_cmp.analysis_imp_model);
         m_model.out_meta.connect(meta_cmp.analysis_imp_model);
 
-        // connects the data and metadata from the DUT to the Comparator
+        // connects the data and metadata from the dut to the Comparator
         data_dut.connect(data_cmp.analysis_imp_dut);
         meta_dut.connect(meta_cmp.analysis_imp_dut);
 

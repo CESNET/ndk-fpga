@@ -1,10 +1,10 @@
-// dut.sv: Intel E-Tile DUT
+// dut.sv: Intel E-Tile dut
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(
+module dut #(
     string       ETH_CORE_ARCH,
     int unsigned ETH_PORTS,
     int unsigned ETH_PORT_SPEED[ETH_PORTS-1 : 0],

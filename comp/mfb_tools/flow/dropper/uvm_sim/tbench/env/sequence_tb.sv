@@ -54,7 +54,7 @@ class sequence_meta #(META_WIDTH, EXTENDED_META_WIDTH) extends uvm_sequence #(uv
         start_item(req);
         void'(std::randomize(m_meta));
         drop   = 1'b1;
-        // In the DUT the drop and metadata will be in one signal
+        // In the dut the drop and metadata will be in one signal
         req.data = {drop, m_meta};
         finish_item(req);
 
@@ -62,7 +62,7 @@ class sequence_meta #(META_WIDTH, EXTENDED_META_WIDTH) extends uvm_sequence #(uv
         start_item(req);
         void'(std::randomize(m_meta));
         drop   = 1'b0;
-        // In the DUT the drop and metadata will be in one signal
+        // In the dut the drop and metadata will be in one signal
         req.data = {drop, m_meta};
         finish_item(req);
 
@@ -70,7 +70,7 @@ class sequence_meta #(META_WIDTH, EXTENDED_META_WIDTH) extends uvm_sequence #(uv
         start_item(req);
         void'(std::randomize(m_meta));
         drop   = 1'b0;
-        // In the DUT the drop and metadata will be in one signal
+        // In the dut the drop and metadata will be in one signal
         req.data = {drop, m_meta};
         finish_item(req);
 
@@ -78,7 +78,7 @@ class sequence_meta #(META_WIDTH, EXTENDED_META_WIDTH) extends uvm_sequence #(uv
         start_item(req);
         void'(std::randomize(m_meta));
         drop   = 1'b1;
-        // In the DUT the drop and metadata will be in one signal
+        // In the dut the drop and metadata will be in one signal
         req.data = {drop, m_meta};
         finish_item(req);
 

@@ -65,8 +65,8 @@ module testbench #(
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT #(
+    // dut
+    dut #(
         .MVB_ITEMS          (MVB_ITEMS),
         .MVB_ITEM_WIDTH_RAW (MVB_ITEM_WIDTH_RAW),
         .MFB_REGIONS        (MFB_REGIONS),

@@ -18,6 +18,6 @@ lappend COMPONENTS \
 lappend MOD "$ENTITY_BASE/tbench/info/pkg.sv"  \
             "$ENTITY_BASE/tbench/env/pkg.sv"   \
             "$ENTITY_BASE/tbench/tests/pkg.sv" \
-            "$ENTITY_BASE/tbench/property.sv"  \
+            "$ENTITY_BASE/tbench/items_valid_property.sv"  \
             "$ENTITY_BASE/tbench/dut.sv"       \
             "$ENTITY_BASE/tbench/testbench.sv" \

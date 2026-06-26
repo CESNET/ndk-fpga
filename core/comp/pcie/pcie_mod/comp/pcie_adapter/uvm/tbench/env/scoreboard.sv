@@ -83,7 +83,7 @@ class scoreboard extends uvm_scoreboard;
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        //Sometime DUT can be quicker that model. Allow some delay to model.
+        //Sometime dut can be quicker that model. Allow some delay to model.
         // TODO: FIX in scoreboard. Timeout use time when first part of packet
         // received to monitor.
         m_pcie_cc.model_tr_timeout_set(100ns);

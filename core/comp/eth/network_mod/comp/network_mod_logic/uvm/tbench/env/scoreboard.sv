@@ -116,7 +116,7 @@ class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_
     // RX path
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_input_data[CHANNELS]; // data for model
 
-    uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_out_data; // MFB data from DUT
+    uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_out_data; // MFB data from dut
     uvm_analysis_export #(uvm_logic_vector::sequence_item#(HDR_WIDTH))               rx_out_hdr; // MVB headers used to identify channel
 
     //comparers

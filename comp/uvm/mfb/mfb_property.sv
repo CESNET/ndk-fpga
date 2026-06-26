@@ -72,6 +72,7 @@ module mfb_property #(
         endproperty
 
         for(genvar it = 0; it < REGIONS; it++) begin : gen_sof_pos_assert
+            assert property (sof_pos_undefined(it))
                 else begin
                     string num_it;
                     string hi_index;
@@ -100,6 +101,7 @@ module mfb_property #(
         endproperty
 
         for(genvar it = 0; it < REGIONS; it++) begin : gen_eof_pos_assert
+            assert property (eof_pos_undefined(it))
                 else begin
                     string num_it;
                     string hi_index;
@@ -175,6 +177,7 @@ module mfb_pcie_property #(
         endproperty
 
         for(genvar it = 1; it < REGIONS; it++) begin : gen_straddling_assert
+            assert property (prop_straddling(it))
                 else begin
                     `uvm_error($sformatf("%m"), $sformatf("\n\tWhen straddling is enabled before sof have to be eof.\n\tThis is broken at region %0d", it));
                 end
@@ -187,6 +190,7 @@ module mfb_pcie_property #(
         endproperty
 
         for(genvar it = 1; it < REGIONS; it++) begin : gen_nostraddling_assert
+            assert property (prop_nostraddling(it))
                 else begin
                     `uvm_error($sformatf("%m"), $sformatf("\n\tWhen straddling is Disabled Then SOP can be only in first region"));
                 end
@@ -196,4 +200,3 @@ endmodule
 
 
 `endif
-

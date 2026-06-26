@@ -52,7 +52,7 @@ class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
         // Processed data from the output of the model connected to the analysis fifo
         m_model.model_mvb_out.connect(cmp.analysis_imp_model);
 
-        // Processed data from the output of the DUT connected to the analysis fifo
+        // Processed data from the output of the dut connected to the analysis fifo
         analysis_imp_mvb_tx.connect(cmp.analysis_imp_dut);
 
     endfunction

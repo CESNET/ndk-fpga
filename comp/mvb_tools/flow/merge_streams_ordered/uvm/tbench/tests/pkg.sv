@@ -12,7 +12,7 @@ package test;
     `include "uvm_macros.svh"
     import uvm_pkg::*;
 
-    // DUT settings
+    // dut settings
     parameter MVB_ITEMS         = 1;
     parameter MVB_ITEM_WIDTH    = 32;
     parameter RX_STREAMS        = 32;

@@ -57,10 +57,10 @@ module testbench;
     end
 
     // --- //
-    // DUT //
+    // dut //
     // --- //
 
-    DUT #(
+    dut #(
         .REGIONS     (REGIONS),
         .REGION_SIZE (REGION_SIZE),
         .BLOCK_SIZE  (BLOCK_SIZE),

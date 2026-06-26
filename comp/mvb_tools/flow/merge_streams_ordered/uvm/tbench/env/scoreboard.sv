@@ -45,7 +45,7 @@ class scoreboard #(MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_scoreboard;
         end
         rx_sel_mvb_analysis_imp      .connect(m_model.rx_sel_mvb_analysis_fifo  .analysis_export);
 
-        // Connects output data of the DUT
+        // Connects output data of the dut
         tx_mvb_analysis_exp.connect(cmp.analysis_imp_dut);
 
         // Connects output data of the model

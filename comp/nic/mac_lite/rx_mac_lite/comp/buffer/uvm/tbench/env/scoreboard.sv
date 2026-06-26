@@ -60,7 +60,7 @@ class scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extend
         m_model.out_mfb_data.connect(data_cmp.analysis_imp_model);
         m_model.out_mvb_data.connect(meta_cmp.analysis_imp_model);
 
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_mfb_data.connect(data_cmp.analysis_imp_dut);
         out_mvb_data.connect(meta_cmp.analysis_imp_dut);
     endfunction

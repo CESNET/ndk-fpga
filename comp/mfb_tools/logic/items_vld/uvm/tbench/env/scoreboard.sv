@@ -64,7 +64,7 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
         // processed data from the output of the model connected to the analysis fifo
         m_model.out_mvb.connect(model_mvb.analysis_export);
         m_model.out_mvb_end.connect(model_mvb_end.analysis_export);
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_mvb.connect(dut_mvb.analysis_export);
         end_mvb.connect(dut_end_mvb.analysis_export);
 
@@ -88,8 +88,8 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
             msg = "\n";
             msg = {msg, $sformatf("MVB Model %s\n" , tr_model_mvb.convert2string())};
             msg = {msg, $sformatf("END Model %d\n" , tr_model_mvb_end.data)};
-            msg = {msg, $sformatf("MVB DUT %s\n"   , tr_dut_mvb.convert2string())};
-            msg = {msg, $sformatf("END DUT %d\n"   , tr_dut_end_mvb.data)};
+            msg = {msg, $sformatf("MVB dut %s\n"   , tr_dut_mvb.convert2string())};
+            msg = {msg, $sformatf("END dut %d\n"   , tr_dut_end_mvb.data)};
             `uvm_info(this.get_full_name(), msg, UVM_MEDIUM)
 
             compared++;

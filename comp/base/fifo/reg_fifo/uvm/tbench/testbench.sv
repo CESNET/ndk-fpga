@@ -45,7 +45,7 @@ module testbench;
         $stop(2);
     end
 
-    DUT DUT_U (
+    dut DUT_U (
         .CLK (CLK),
         .RST (reset.RESET),
 
