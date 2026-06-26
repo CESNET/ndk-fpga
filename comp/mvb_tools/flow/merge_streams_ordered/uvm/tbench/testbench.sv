@@ -17,9 +17,18 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if                                           reset_vif                      (CLK);
-    mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH)                rx_mvb_vif [RX_STREAMS -1 : 0] (CLK);
-    mvb_if #(MVB_ITEMS*RX_STREAMS, $clog2(RX_STREAMS)) rx_sel_mvb_vif                 (CLK);
-    mvb_if #(MVB_ITEMS*RX_STREAMS, MVB_ITEM_WIDTH)     tx_mvb_vif                     (CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS),
+        .ITEM_WIDTH (MVB_ITEM_WIDTH)
+    )                rx_mvb_vif [RX_STREAMS -1 : 0] (CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS*RX_STREAMS),
+        .ITEM_WIDTH ($clog2(RX_STREAMS))
+    ) rx_sel_mvb_vif                 (CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS*RX_STREAMS),
+        .ITEM_WIDTH (MVB_ITEM_WIDTH)
+    )     tx_mvb_vif                     (CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
@@ -30,16 +39,28 @@ module testbench;
     initial begin
         uvm_root m_root;
 
-        automatic virtual mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH) v_rx_mvb_vif [RX_STREAMS - 1 : 0] = rx_mvb_vif;
+        automatic virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS),
+            .ITEM_WIDTH (MVB_ITEM_WIDTH)
+        ) v_rx_mvb_vif [RX_STREAMS - 1 : 0] = rx_mvb_vif;
 
         // Configuration of the database
         uvm_config_db #(virtual reset_if)                                           ::set(null, "", "reset_vif",                        reset_vif);
         for (int port = 0; port < RX_STREAMS; port++) begin
-            uvm_config_db #(virtual mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH))            ::set(null, "", $sformatf("rx_mvb_vif_%0d", port),  v_rx_mvb_vif[port]);
+            uvm_config_db #(virtual mvb_if #(
+                .ITEMS      (MVB_ITEMS),
+                .ITEM_WIDTH (MVB_ITEM_WIDTH)
+            ))            ::set(null, "", $sformatf("rx_mvb_vif_%0d", port),  v_rx_mvb_vif[port]);
         end
 
-        uvm_config_db #(virtual mvb_if #(MVB_ITEMS*RX_STREAMS, $clog2(RX_STREAMS))) ::set(null, "", "rx_sel_mvb_vif",                   rx_sel_mvb_vif);
-        uvm_config_db #(virtual mvb_if #(MVB_ITEMS*RX_STREAMS, MVB_ITEM_WIDTH))     ::set(null, "", "tx_mvb_vif",                       tx_mvb_vif);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS*RX_STREAMS),
+            .ITEM_WIDTH ($clog2(RX_STREAMS))
+        )) ::set(null, "", "rx_sel_mvb_vif",                   rx_sel_mvb_vif);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS*RX_STREAMS),
+            .ITEM_WIDTH (MVB_ITEM_WIDTH)
+        ))     ::set(null, "", "tx_mvb_vif",                       tx_mvb_vif);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

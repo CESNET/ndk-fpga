@@ -22,8 +22,14 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
-    mvb_if #(1, 2)  mvb_rx(CLK);
-    mvb_if #(1, 2)  mvb_tx(CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (2)
+    )  mvb_rx(CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (2)
+    )  mvb_tx(CLK);
     reset_if        rst_if(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -35,8 +41,14 @@ module testbench;
     initial begin
         uvm_root m_root;
 
-        uvm_config_db#(virtual mvb_if #(1, 2))::set(null, "", "vif_rx", mvb_rx);
-        uvm_config_db#(virtual mvb_if #(1, 2))::set(null, "", "vif_tx", mvb_tx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (2)
+        ))::set(null, "", "vif_rx", mvb_rx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (2)
+        ))::set(null, "", "vif_tx", mvb_tx);
         uvm_config_db#(virtual reset_if)::set(null, "", "rst_vif", rst_if);
 
         m_root = uvm_root::get();

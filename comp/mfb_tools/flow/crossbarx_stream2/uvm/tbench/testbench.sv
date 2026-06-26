@@ -24,10 +24,28 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, USERMETA_W) mfb_rx(CLK);
-    mfb_if #(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W) mfb_tx(CLK);
-    mvb_if #(RX_MFB_REGIONS, RX_MVB_ITEM_W) mvb_rx(CLK);
-    mvb_if #(TX_MFB_REGIONS, USERMETA_W) mvb_tx(CLK);
+    mfb_if #(
+        .REGIONS     (RX_MFB_REGIONS),
+        .REGION_SIZE (RX_MFB_REGION_S),
+        .BLOCK_SIZE  (RX_MFB_BLOCK_S),
+        .ITEM_WIDTH  (RX_MFB_ITEM_W),
+        .META_WIDTH  (USERMETA_W)
+    ) mfb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (TX_MFB_REGIONS),
+        .REGION_SIZE (TX_MFB_REGION_S),
+        .BLOCK_SIZE  (TX_MFB_BLOCK_S),
+        .ITEM_WIDTH  (TX_MFB_ITEM_W),
+        .META_WIDTH  (USERMETA_W)
+    ) mfb_tx(CLK);
+    mvb_if #(
+        .ITEMS      (RX_MFB_REGIONS),
+        .ITEM_WIDTH (RX_MVB_ITEM_W)
+    ) mvb_rx(CLK);
+    mvb_if #(
+        .ITEMS      (TX_MFB_REGIONS),
+        .ITEM_WIDTH (USERMETA_W)
+    ) mvb_tx(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
@@ -41,10 +59,28 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, USERMETA_W))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W))::set(null, "", "vif_tx", mfb_tx);
-        uvm_config_db#(virtual mvb_if #(RX_MFB_REGIONS, RX_MVB_ITEM_W))::set(null, "", "vif_mvb_rx", mvb_rx);
-        uvm_config_db#(virtual mvb_if #(TX_MFB_REGIONS, USERMETA_W))::set(null, "", "vif_mvb_tx", mvb_tx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (RX_MFB_REGIONS),
+            .REGION_SIZE (RX_MFB_REGION_S),
+            .BLOCK_SIZE  (RX_MFB_BLOCK_S),
+            .ITEM_WIDTH  (RX_MFB_ITEM_W),
+            .META_WIDTH  (USERMETA_W)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (TX_MFB_REGIONS),
+            .REGION_SIZE (TX_MFB_REGION_S),
+            .BLOCK_SIZE  (TX_MFB_BLOCK_S),
+            .ITEM_WIDTH  (TX_MFB_ITEM_W),
+            .META_WIDTH  (USERMETA_W)
+        ))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (RX_MFB_REGIONS),
+            .ITEM_WIDTH (RX_MVB_ITEM_W)
+        ))::set(null, "", "vif_mvb_rx", mvb_rx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (TX_MFB_REGIONS),
+            .ITEM_WIDTH (USERMETA_W)
+        ))::set(null, "", "vif_mvb_tx", mvb_tx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

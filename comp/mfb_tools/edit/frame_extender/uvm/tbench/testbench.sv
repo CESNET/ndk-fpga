@@ -23,17 +23,51 @@ module testbench;
     // ---------- //
 
     reset_if                                                                               reset (CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)              mfb_rx(CLK);
-    mvb_if #(MFB_REGIONS, RX_MVB_ITEM_WIDTH)                                               mvb_rx(CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, USERMETA_WIDTH) mfb_tx(CLK);
-    mvb_if #(MFB_REGIONS, USERMETA_WIDTH)                                                  mvb_tx(CLK);
+   mfb_if #(
+       .REGIONS     (MFB_REGIONS),
+       .REGION_SIZE (MFB_REGION_SIZE),
+       .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+       .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+       .META_WIDTH  (0)
+   )              mfb_rx(CLK);
+   mvb_if #(
+       .ITEMS      (MFB_REGIONS),
+       .ITEM_WIDTH (RX_MVB_ITEM_WIDTH)
+   )                                               mvb_rx(CLK);
+   mfb_if #(
+       .REGIONS     (MFB_REGIONS),
+       .REGION_SIZE (MFB_REGION_SIZE),
+       .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+       .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+       .META_WIDTH  (USERMETA_WIDTH)
+   ) mfb_tx(CLK);
+   mvb_if #(
+       .ITEMS      (MFB_REGIONS),
+       .ITEM_WIDTH (USERMETA_WIDTH)
+   )                                                  mvb_tx(CLK);
 
     // ----- //
     // Tests //
     // ----- //
 
-    typedef test::test_base  #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) test_base;
-    typedef test::test_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) test_speed;
+    typedef test::test_base #(
+        .MFB_REGIONS       (MFB_REGIONS),
+        .MFB_REGION_SIZE   (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE    (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH    (MFB_ITEM_WIDTH),
+        .PKT_MTU           (PKT_MTU),
+        .USERMETA_WIDTH    (USERMETA_WIDTH),
+        .RX_MVB_ITEM_WIDTH (RX_MVB_ITEM_WIDTH)
+    ) test_base;
+    typedef test::test_speed #(
+        .MFB_REGIONS       (MFB_REGIONS),
+        .MFB_REGION_SIZE   (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE    (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH    (MFB_ITEM_WIDTH),
+        .PKT_MTU           (PKT_MTU),
+        .USERMETA_WIDTH    (USERMETA_WIDTH),
+        .RX_MVB_ITEM_WIDTH (RX_MVB_ITEM_WIDTH)
+    ) test_speed;
 
 
     initial begin #(4*CLK_PERIOD) RST_INIT <= 1'b0; end
@@ -47,10 +81,28 @@ module testbench;
         // ---------------------- //
 
         uvm_config_db #(virtual reset_if)                                                                              ::set(null, "", "vif_reset",  reset);
-        uvm_config_db #(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0))             ::set(null, "", "vif_rx_mfb", mfb_rx);
-        uvm_config_db #(virtual mvb_if #(MFB_REGIONS, RX_MVB_ITEM_WIDTH))                                              ::set(null, "", "vif_rx_mvb", mvb_rx);
-        uvm_config_db #(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, USERMETA_WIDTH))::set(null, "", "vif_tx_mfb", mfb_tx);
-        uvm_config_db #(virtual mvb_if #(MFB_REGIONS, USERMETA_WIDTH))                                                 ::set(null, "", "vif_tx_mvb", mvb_tx);
+        uvm_config_db #(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))             ::set(null, "", "vif_rx_mfb", mfb_rx);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (MFB_REGIONS),
+            .ITEM_WIDTH (RX_MVB_ITEM_WIDTH)
+        ))                                              ::set(null, "", "vif_rx_mvb", mvb_rx);
+        uvm_config_db #(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (USERMETA_WIDTH)
+        ))::set(null, "", "vif_tx_mfb", mfb_tx);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (MFB_REGIONS),
+            .ITEM_WIDTH (USERMETA_WIDTH)
+        ))                                                 ::set(null, "", "vif_tx_mvb", mvb_tx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

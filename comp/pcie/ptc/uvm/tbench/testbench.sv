@@ -26,21 +26,62 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
-    mfb_if #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, ITEM_WIDTH, 0)                        DMA_RX_MFB  [DMA_PORTS](CLK_DMA);
-    mvb_if #(DMA_MVB_UP_ITEMS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                                           DMA_RX_MVB  [DMA_PORTS](CLK_DMA);
+    mfb_if #(
+        .REGIONS (DMA_MFB_UP_REGIONS),
+        .REGION_SIZE (MFB_UP_REG_SIZE),
+        .BLOCK_SIZE (MFB_UP_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    )                        DMA_RX_MFB  [DMA_PORTS](CLK_DMA);
+    mvb_if #(
+        .ITEMS (DMA_MVB_UP_ITEMS),
+        .ITEM_WIDTH (sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+    )                                           DMA_RX_MVB  [DMA_PORTS](CLK_DMA);
 
     localparam RQ_META_WIDTH = uvm_pcie_mfb::meta_width_get(uvm_pcie_mfb::MFB_RQ, uvm_pcie_mfb::DEV_INTEL);
-    mfb_if #(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, ITEM_WIDTH, 0)  RQ_MFB(CLK);
-    mvb_if #(MFB_UP_REGIONS, RQ_META_WIDTH)                                      RQ_MVB(CLK);
+    mfb_if #(
+        .REGIONS (MFB_UP_REGIONS),
+        .REGION_SIZE (MFB_UP_REG_SIZE),
+        .BLOCK_SIZE (MFB_UP_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    )  RQ_MFB(CLK);
+    mvb_if #(
+        .ITEMS (MFB_UP_REGIONS),
+        .ITEM_WIDTH (RQ_META_WIDTH)
+    )                                      RQ_MVB(CLK);
 
     localparam RC_META_WIDTH = uvm_pcie_mfb::meta_width_get(uvm_pcie_mfb::MFB_RC, uvm_pcie_mfb::DEV_INTEL);
-    mfb_if #(MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, ITEM_WIDTH, RC_META_WIDTH)          RC_MFB(CLK);
+    mfb_if #(
+        .REGIONS (MFB_DOWN_REGIONS),
+        .REGION_SIZE (MFB_DOWN_REG_SIZE),
+        .BLOCK_SIZE (MFB_DOWN_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (RC_META_WIDTH)
+    )          RC_MFB(CLK);
 
-    mfb_if #(DMA_MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, ITEM_WIDTH, 0)                  DMA_TX_MFB[DMA_PORTS](CLK_DMA);
-    mvb_if #(DMA_MVB_DOWN_ITEMS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                                       DMA_TX_MVB[DMA_PORTS](CLK_DMA);
+    mfb_if #(
+        .REGIONS (DMA_MFB_DOWN_REGIONS),
+        .REGION_SIZE (MFB_DOWN_REG_SIZE),
+        .BLOCK_SIZE (MFB_DOWN_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    )                  DMA_TX_MFB[DMA_PORTS](CLK_DMA);
+    mvb_if #(
+        .ITEMS (DMA_MVB_DOWN_ITEMS),
+        .ITEM_WIDTH (sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+    )                                       DMA_TX_MVB[DMA_PORTS](CLK_DMA);
 
-    axi_if #(RQ_AXI_ITEMS, 32,uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)) AXI_RQ(CLK);
-    axi_if #(RC_AXI_ITEMS, 32,uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)) AXI_RC(CLK);
+    axi_if #(
+        .ITEMS       (RQ_AXI_ITEMS),
+        .ITEM_WIDTH  (32),
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
+    ) AXI_RQ(CLK);
+    axi_if #(
+        .ITEMS       (RC_AXI_ITEMS),
+        .ITEM_WIDTH  (32),
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC))
+    ) AXI_RC(CLK);
 
     reset_if RST_DMA(CLK_DMA);
     pullup(RST_DMA.RESET);
@@ -66,32 +107,91 @@ module testbench;
     // Start of tests
     initial begin
         uvm_root m_root;
-        automatic virtual mfb_if #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, ITEM_WIDTH, 0) v_UP_MFB[DMA_PORTS]  = DMA_RX_MFB;
-        automatic virtual mvb_if #(DMA_MVB_UP_ITEMS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                    v_UP_MVB[DMA_PORTS]  = DMA_RX_MVB;
-        automatic virtual mfb_if #(DMA_MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, ITEM_WIDTH, 0) v_DOWN_MFB[DMA_PORTS] = DMA_TX_MFB;
-        automatic virtual mvb_if #(DMA_MVB_DOWN_ITEMS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                                        v_DOWN_MVB[DMA_PORTS] = DMA_TX_MVB;
+        automatic virtual mfb_if #(
+            .REGIONS (DMA_MFB_UP_REGIONS),
+            .REGION_SIZE (MFB_UP_REG_SIZE),
+            .BLOCK_SIZE (MFB_UP_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (0)
+        ) v_UP_MFB[DMA_PORTS]  = DMA_RX_MFB;
+        automatic virtual mvb_if #(
+            .ITEMS (DMA_MVB_UP_ITEMS),
+            .ITEM_WIDTH (sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+        )                    v_UP_MVB[DMA_PORTS]  = DMA_RX_MVB;
+        automatic virtual mfb_if #(
+            .REGIONS (DMA_MFB_DOWN_REGIONS),
+            .REGION_SIZE (MFB_DOWN_REG_SIZE),
+            .BLOCK_SIZE (MFB_DOWN_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (0)
+        ) v_DOWN_MFB[DMA_PORTS] = DMA_TX_MFB;
+        automatic virtual mvb_if #(
+            .ITEMS (DMA_MVB_DOWN_ITEMS),
+            .ITEM_WIDTH (sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+        )                                        v_DOWN_MVB[DMA_PORTS] = DMA_TX_MVB;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", RST);
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset_dma", RST_DMA);
 
-        uvm_config_db#(virtual mfb_if #(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", "vif_pcie_rq_mfb", RQ_MFB);
-        uvm_config_db#(virtual mvb_if #(MFB_UP_REGIONS, RQ_META_WIDTH))::set(null, "", "vif_pcie_rq_mvb", RQ_MVB);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS (MFB_UP_REGIONS),
+            .REGION_SIZE (MFB_UP_REG_SIZE),
+            .BLOCK_SIZE (MFB_UP_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (0)
+        ))::set(null, "", "vif_pcie_rq_mfb", RQ_MFB);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS (MFB_UP_REGIONS),
+            .ITEM_WIDTH (RQ_META_WIDTH)
+        ))::set(null, "", "vif_pcie_rq_mvb", RQ_MVB);
 
-        uvm_config_db#(virtual mfb_if #(MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, ITEM_WIDTH, RC_META_WIDTH))::set(null, "", "vif_pcie_rc_mfb", RC_MFB);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS (MFB_DOWN_REGIONS),
+            .REGION_SIZE (MFB_DOWN_REG_SIZE),
+            .BLOCK_SIZE (MFB_DOWN_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (RC_META_WIDTH)
+        ))::set(null, "", "vif_pcie_rc_mfb", RC_MFB);
 
-        uvm_config_db#(virtual axi_if #(RQ_AXI_ITEMS, 32, uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)))::set(null, "", "vif_pcie_rq_axi", AXI_RQ);
-        uvm_config_db#(virtual axi_if #(RC_AXI_ITEMS, 32, uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)))::set(null, "", "vif_pcie_rc_axi", AXI_RC);
+        uvm_config_db#(virtual axi_if #(
+            .ITEMS       (RQ_AXI_ITEMS),
+            .ITEM_WIDTH  (32),
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
+        ))::set(null, "", "vif_pcie_rq_axi", AXI_RQ);
+        uvm_config_db#(virtual axi_if #(
+            .ITEMS       (RC_AXI_ITEMS),
+            .ITEM_WIDTH  (32),
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC))
+        ))::set(null, "", "vif_pcie_rc_axi", AXI_RC);
 
         for (int i = 0; i < DMA_PORTS; i++) begin
             string i_string;
             i_string.itoa(i);
 
-            uvm_config_db#(virtual mfb_if #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",i_string, "_rq_mfb"}, v_UP_MFB[i]);
-            uvm_config_db#(virtual mvb_if #(DMA_MVB_UP_ITEMS, sv_dma_bus_pack::DMA_UPHDR_WIDTH))::set(null, "", {"vif_dma_",i_string, "_rq_mvb"}, v_UP_MVB[i]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS (DMA_MFB_UP_REGIONS),
+                .REGION_SIZE (MFB_UP_REG_SIZE),
+                .BLOCK_SIZE (MFB_UP_BLOCK_SIZE),
+                .ITEM_WIDTH (ITEM_WIDTH),
+                .META_WIDTH (0)
+            ))::set(null, "", {"vif_dma_",i_string, "_rq_mfb"}, v_UP_MFB[i]);
+            uvm_config_db#(virtual mvb_if #(
+                .ITEMS (DMA_MVB_UP_ITEMS),
+                .ITEM_WIDTH (sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+            ))::set(null, "", {"vif_dma_",i_string, "_rq_mvb"}, v_UP_MVB[i]);
 
-            uvm_config_db#(virtual mfb_if #(DMA_MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",i_string, "_rc_mfb"}, v_DOWN_MFB[i]);
-            uvm_config_db#(virtual mvb_if #(DMA_MVB_DOWN_ITEMS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))::set(null, "", {"vif_dma_",i_string, "_rc_mvb"}, v_DOWN_MVB[i]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS (DMA_MFB_DOWN_REGIONS),
+                .REGION_SIZE (MFB_DOWN_REG_SIZE),
+                .BLOCK_SIZE (MFB_DOWN_BLOCK_SIZE),
+                .ITEM_WIDTH (ITEM_WIDTH),
+                .META_WIDTH (0)
+            ))::set(null, "", {"vif_dma_",i_string, "_rc_mfb"}, v_DOWN_MFB[i]);
+            uvm_config_db#(virtual mvb_if #(
+                .ITEMS (DMA_MVB_DOWN_ITEMS),
+                .ITEM_WIDTH (sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+            ))::set(null, "", {"vif_dma_",i_string, "_rc_mvb"}, v_DOWN_MVB[i]);
         end
 
         m_root = uvm_root::get();

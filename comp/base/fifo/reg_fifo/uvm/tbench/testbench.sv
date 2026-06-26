@@ -18,8 +18,14 @@ module testbench;
     // Interfaces
     reset_if reset (CLK);
 
-    mvb_if #(1, DATA_WIDTH) mvb_rx(CLK);
-    mvb_if #(1, DATA_WIDTH) mvb_tx(CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (DATA_WIDTH)
+    ) mvb_rx(CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (DATA_WIDTH)
+    ) mvb_tx(CLK);
 
     always #(CLK_PERIOD) CLK = ~CLK;
 
@@ -31,8 +37,14 @@ module testbench;
         // Configuration of database
         uvm_config_db #(virtual reset_if)::set(null, "", "vif_reset", reset);
 
-        uvm_config_db #(virtual mvb_if #(1, DATA_WIDTH))::set(null, "", "vif_mvb_rx", mvb_rx);
-        uvm_config_db #(virtual mvb_if #(1, DATA_WIDTH))::set(null, "", "vif_mvb_tx", mvb_tx);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (DATA_WIDTH)
+        ))::set(null, "", "vif_mvb_rx", mvb_rx);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (DATA_WIDTH)
+        ))::set(null, "", "vif_mvb_tx", mvb_tx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

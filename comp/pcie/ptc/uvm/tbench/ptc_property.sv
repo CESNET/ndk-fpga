@@ -122,17 +122,17 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
             );
         end else begin : gen_line_123
             axi_property #(
-                RQ_AXI_ITEMS,
-                32,
-                uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)
+                .ITEMS      (RQ_AXI_ITEMS),
+                .ITEM_WIDTH (32),
+                .TUSER_WIDTH(uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
             ) AXI_RQ (
                 .RESET (RESET),
                 .vif   (rq_axi_vif)
             );
             axi_property  #(
-                RC_AXI_ITEMS,
-                32,
-                uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)
+                .ITEMS      (RC_AXI_ITEMS),
+                .ITEM_WIDTH (32),
+                .TUSER_WIDTH(uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC))
             ) AXI_RC (
                 .RESET (RESET_DMA),
                 .vif   (rc_axi_vif)

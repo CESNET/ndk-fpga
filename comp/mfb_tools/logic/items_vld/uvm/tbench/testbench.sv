@@ -23,9 +23,21 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) mfb_rx(CLK);
-    mvb_if #(MVB_ITEMS, MVB_DATA_WIDTH)                                                mvb_tx(CLK);
-    mvb_if #(MVB_ITEMS, 1)                                                             mvb_end(CLK);
+    mfb_if #(
+        .REGIONS     (MFB_REGIONS),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH)
+    ) mfb_rx(CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS),
+        .ITEM_WIDTH (MVB_DATA_WIDTH)
+    )                                                mvb_tx(CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS),
+        .ITEM_WIDTH (1)
+    )                                                             mvb_end(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
@@ -38,9 +50,21 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mvb_if #(MVB_ITEMS, MVB_DATA_WIDTH))::set(null, "", "vif_mvb_tx", mvb_tx);
-        uvm_config_db#(virtual mvb_if #(MVB_ITEMS, 1))::set(null, "", "vif_mvb_end", mvb_end);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS),
+            .ITEM_WIDTH (MVB_DATA_WIDTH)
+        ))::set(null, "", "vif_mvb_tx", mvb_tx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS),
+            .ITEM_WIDTH (1)
+        ))::set(null, "", "vif_mvb_end", mvb_end);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

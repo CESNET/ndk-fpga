@@ -24,9 +24,24 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if                                                                                                        reset     (CLK);
-    mfb_if #(MFB_REGIONS  , MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH) mfb_cc    (CLK);
-    mfb_if #(MFB_REGIONS  , MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) mfb_cq    (CLK);
-    mi_if  # (MI_DATA_WIDTH, MI_ADDR_WIDTH)                                                                         mi_config (CLK);
+    mfb_if #(
+        .REGIONS     (MFB_REGIONS),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .META_WIDTH  (sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+    ) mfb_cc    (CLK);
+    mfb_if #(
+        .REGIONS     (MFB_REGIONS),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .META_WIDTH  (sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+    ) mfb_cq    (CLK);
+    mi_if #(
+        .DATA_WIDTH (MI_DATA_WIDTH),
+        .ADDR_WIDTH (MI_ADDR_WIDTH)
+    )                                                                         mi_config (CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
@@ -39,9 +54,24 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS  , MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))::set(null, "", "vif_cq", mfb_cq);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS  , MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH))::set(null, "", "vif_cc", mfb_cc);
-        uvm_config_db#(virtual mi_if  #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi", mi_config);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+        ))::set(null, "", "vif_cq", mfb_cq);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+        ))::set(null, "", "vif_cc", mfb_cc);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (MI_DATA_WIDTH),
+            .ADDR_WIDTH (MI_ADDR_WIDTH)
+        ))::set(null, "", "vif_mi", mi_config);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

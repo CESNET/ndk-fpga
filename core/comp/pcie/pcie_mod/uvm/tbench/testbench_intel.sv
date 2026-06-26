@@ -39,17 +39,60 @@ module testbench;
     reset_if  mi_reset(MI_CLK);
     reset_if  dma_reset(DMA_CLK);
     // For Intel (AVALON)
-    avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_DOWN_META_W) avst_down[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W)   avst_up[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    avst_if #(
+        .REGIONS(CQ_MFB_REGIONS),
+        .REGION_SIZE(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .META_WIDTH(AVST_DOWN_META_W)
+    ) avst_down[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    avst_if #(
+        .REGIONS(CC_MFB_REGIONS),
+        .REGION_SIZE(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .META_WIDTH(AVST_UP_META_W)
+    ) avst_up[PCIE_ENDPOINTS](PCIE_USER_CLK);
     // For Intel and Xilinx (MFB)
-    mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, /*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH*/ 0)  dma_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                                  dma_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, /*sv_pcie_meta_pack::PCIE_RC_META_WIDTH*/ 0)  dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                                dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(
+        .REGIONS(RQ_MFB_REGIONS),
+        .REGION_SIZE(RQ_MFB_REGION_SIZE),
+        .BLOCK_SIZE(RQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .META_WIDTH(/*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH*/ 0)
+    ) dma_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mvb_if #(
+        .ITEMS(RQ_MFB_REGIONS),
+        .ITEM_WIDTH(sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+    ) dma_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(
+        .REGIONS(RC_MFB_REGIONS),
+        .REGION_SIZE(RC_MFB_REGION_SIZE),
+        .BLOCK_SIZE(RC_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .META_WIDTH(/*sv_pcie_meta_pack::PCIE_RC_META_WIDTH*/ 0)
+    ) dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mvb_if #(
+        .ITEMS(RC_MFB_REGIONS),
+        .ITEM_WIDTH(sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+    ) dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
 
-    mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)  dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH)  dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mi_if  #(32, 32) config_mi[PCIE_ENDPOINTS] (MI_CLK);
+    mfb_if #(
+        .REGIONS(CQ_MFB_REGIONS),
+        .REGION_SIZE(CQ_MFB_REGION_SIZE),
+        .BLOCK_SIZE(CQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .META_WIDTH(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+    ) dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(
+        .REGIONS(CC_MFB_REGIONS),
+        .REGION_SIZE(CC_MFB_REGION_SIZE),
+        .BLOCK_SIZE(CC_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .META_WIDTH(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+    ) dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mi_if #(
+        .DATA_WIDTH(32),
+        .ADDR_WIDTH(32)
+    ) config_mi[PCIE_ENDPOINTS](MI_CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
@@ -123,21 +166,64 @@ module testbench;
         uvm_root m_root;
 
         // AVALON interface
-        automatic virtual avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_DOWN_META_W) v_avst_down[PCIE_ENDPOINTS] = avst_down;
-        automatic virtual avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W)   v_avst_up[PCIE_ENDPOINTS] = avst_up;
+        automatic virtual avst_if #(
+            .REGIONS(CQ_MFB_REGIONS),
+            .REGION_SIZE(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(ITEM_WIDTH),
+            .META_WIDTH(AVST_DOWN_META_W)
+        ) v_avst_down[PCIE_ENDPOINTS] = avst_down;
+        automatic virtual avst_if #(
+            .REGIONS(CC_MFB_REGIONS),
+            .REGION_SIZE(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(ITEM_WIDTH),
+            .META_WIDTH(AVST_UP_META_W)
+        ) v_avst_up[PCIE_ENDPOINTS] = avst_up;
 
         // DMA
-        automatic virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0) v_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mfb;
-        automatic virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                                 v_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mvb;
-        automatic virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0) v_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mfb;
-        automatic virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                               v_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS(RQ_MFB_REGIONS),
+            .REGION_SIZE(RQ_MFB_REGION_SIZE),
+            .BLOCK_SIZE(RQ_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(ITEM_WIDTH),
+            .META_WIDTH(0)
+        ) v_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS(RQ_MFB_REGIONS),
+            .ITEM_WIDTH(sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+        ) v_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS(RC_MFB_REGIONS),
+            .REGION_SIZE(RC_MFB_REGION_SIZE),
+            .BLOCK_SIZE(RC_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(ITEM_WIDTH),
+            .META_WIDTH(0)
+        ) v_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS(RC_MFB_REGIONS),
+            .ITEM_WIDTH(sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+        ) v_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mvb;
 
-        automatic virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) v_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cq_mfb;
-        automatic virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH) v_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cc_mfb;
+        automatic virtual mfb_if #(
+            .REGIONS(CQ_MFB_REGIONS),
+            .REGION_SIZE(CQ_MFB_REGION_SIZE),
+            .BLOCK_SIZE(CQ_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(ITEM_WIDTH),
+            .META_WIDTH(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+        ) v_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cq_mfb;
+        automatic virtual mfb_if #(
+            .REGIONS(CC_MFB_REGIONS),
+            .REGION_SIZE(CC_MFB_REGION_SIZE),
+            .BLOCK_SIZE(CC_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH(ITEM_WIDTH),
+            .META_WIDTH(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+        ) v_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cc_mfb;
 
-        automatic virtual mi_if #(32, 32)                                                                                   v_mi_config[PCIE_ENDPOINTS]       = config_mi;
-        automatic virtual reset_if                                                                                          v_pcie_user_reset[PCIE_ENDPOINTS] = pcie_user_reset;
-        automatic virtual reset_if                                                                                          v_pcie_sysrst_n[PCIE_CONS]        = pcie_sysrst_n;
+        automatic virtual mi_if #(
+            .DATA_WIDTH(32),
+            .ADDR_WIDTH(32)
+        ) v_mi_config[PCIE_ENDPOINTS] = config_mi;
+        automatic virtual reset_if v_pcie_user_reset[PCIE_ENDPOINTS] = pcie_user_reset;
+        automatic virtual reset_if v_pcie_sysrst_n[PCIE_CONS]        = pcie_sysrst_n;
 
 
         for (int unsigned pcie_con = 0; pcie_con < PCIE_CONS; pcie_con++) begin
@@ -147,21 +233,64 @@ module testbench;
         for (int unsigned pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
             string i_string;
             i_string.itoa(pcie_e);
-            uvm_config_db#(virtual mi_if #(32, 32))::set(null, "", {"vif_mi_",i_string}, v_mi_config[pcie_e]);
+            uvm_config_db#(virtual mi_if #(
+                .DATA_WIDTH(32),
+                .ADDR_WIDTH(32)
+            ))::set(null, "", {"vif_mi_",i_string}, v_mi_config[pcie_e]);
             uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_",i_string}, v_pcie_user_reset[pcie_e]);
-            uvm_config_db#(virtual avst_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_DOWN_META_W))::set(null, "", {"vif_pcie_", i_string, "_down_avst"}, v_avst_down[pcie_e]);
-            uvm_config_db#(virtual avst_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE, ITEM_WIDTH, AVST_UP_META_W))::set(null, "",   {"vif_pcie_", i_string, "_up_avst"}  , v_avst_up[pcie_e]);
+            uvm_config_db#(virtual avst_if #(
+                .REGIONS(CQ_MFB_REGIONS),
+                .REGION_SIZE(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE),
+                .ITEM_WIDTH(ITEM_WIDTH),
+                .META_WIDTH(AVST_DOWN_META_W)
+            ))::set(null, "", {"vif_pcie_", i_string, "_down_avst"}, v_avst_down[pcie_e]);
+            uvm_config_db#(virtual avst_if #(
+                .REGIONS(CC_MFB_REGIONS),
+                .REGION_SIZE(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE),
+                .ITEM_WIDTH(ITEM_WIDTH),
+                .META_WIDTH(AVST_UP_META_W)
+            ))::set(null, "", {"vif_pcie_", i_string, "_up_avst"}, v_avst_up[pcie_e]);
 
             for (int dma = 0; dma < DMA_PORTS; dma++) begin
                 string dma_string;
                 dma_string = $sformatf("%0d_%0d", pcie_e, dma);
-                uvm_config_db#(virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",dma_string, "_rq_mfb"}, v_rq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH))::set(null, "", {"vif_dma_", dma_string, "_rq_mvb"}, v_rq_mvb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",dma_string, "_rc_mfb"}, v_rc_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))::set(null, "", {"vif_dma_",dma_string, "_rc_mvb"}, v_rc_mvb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS(RQ_MFB_REGIONS),
+                    .REGION_SIZE(RQ_MFB_REGION_SIZE),
+                    .BLOCK_SIZE(RQ_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH(ITEM_WIDTH),
+                    .META_WIDTH(0)
+                ))::set(null, "", {"vif_dma_",dma_string, "_rq_mfb"}, v_rq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mvb_if #(
+                    .ITEMS(RQ_MFB_REGIONS),
+                    .ITEM_WIDTH(sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+                ))::set(null, "", {"vif_dma_", dma_string, "_rq_mvb"}, v_rq_mvb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS(RC_MFB_REGIONS),
+                    .REGION_SIZE(RC_MFB_REGION_SIZE),
+                    .BLOCK_SIZE(RC_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH(ITEM_WIDTH),
+                    .META_WIDTH(0)
+                ))::set(null, "", {"vif_dma_",dma_string, "_rc_mfb"}, v_rc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mvb_if #(
+                    .ITEMS(RC_MFB_REGIONS),
+                    .ITEM_WIDTH(sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+                ))::set(null, "", {"vif_dma_",dma_string, "_rc_mvb"}, v_rc_mvb[pcie_e][dma]);
 
-                uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))::set(null, "", {"vif_dma_cq_",dma_string, "_mfb"}, v_cq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH))::set(null, "", {"vif_dma_cc_",dma_string, "_mfb"}, v_cc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS(CQ_MFB_REGIONS),
+                    .REGION_SIZE(CQ_MFB_REGION_SIZE),
+                    .BLOCK_SIZE(CQ_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH(ITEM_WIDTH),
+                    .META_WIDTH(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+                ))::set(null, "", {"vif_dma_cq_",dma_string, "_mfb"}, v_cq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS(CC_MFB_REGIONS),
+                    .REGION_SIZE(CC_MFB_REGION_SIZE),
+                    .BLOCK_SIZE(CC_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH(ITEM_WIDTH),
+                    .META_WIDTH(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+                ))::set(null, "", {"vif_dma_cc_",dma_string, "_mfb"}, v_cc_mfb[pcie_e][dma]);
             end
         end
 
@@ -176,8 +305,15 @@ module testbench;
         uvm_config_db#(uvm_bitstream_t)::set(null, "", "recording_detail", 0);
 
         //REWRITE PCIE
-        uvm_pcie::root::type_id::set_inst_override(uvm_pcie_avst::root#(
-            CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE, 27, STRADDLING)::get_type(), "uvm_test_top.*" );
+        uvm_pcie::root::type_id::set_inst_override(
+            uvm_pcie_avst::root#(
+                .REGIONS(CQ_MFB_REGIONS),
+                .REGIONS_SIZE(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE),
+                .RDY_LATENCY(27),
+                .STRADDLING(STRADDLING)
+            )::get_type(),
+            "uvm_test_top.*"
+        );
 
         run_test();
         $stop(2);

@@ -19,8 +19,20 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, RX_ITEM_WIDTH, 0) mfb_rx(CLK);
-    mfb_if #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0) mfb_tx(CLK);
+    mfb_if #(
+        .REGIONS     (RX_REGIONS),
+        .REGION_SIZE (RX_REGION_SIZE),
+        .BLOCK_SIZE  (RX_BLOCK_SIZE),
+        .ITEM_WIDTH  (RX_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (TX_REGIONS),
+        .REGION_SIZE (TX_REGION_SIZE),
+        .BLOCK_SIZE  (TX_BLOCK_SIZE),
+        .ITEM_WIDTH  (TX_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_tx(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
@@ -33,8 +45,20 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, RX_ITEM_WIDTH, 0))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (RX_REGIONS),
+            .REGION_SIZE (RX_REGION_SIZE),
+            .BLOCK_SIZE  (RX_BLOCK_SIZE),
+            .ITEM_WIDTH  (RX_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (TX_REGIONS),
+            .REGION_SIZE (TX_REGION_SIZE),
+            .BLOCK_SIZE  (TX_BLOCK_SIZE),
+            .ITEM_WIDTH  (TX_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_tx", mfb_tx);
 
         m_root = uvm_root::get();
         m_root.set_report_id_action_hier("ILLEGALNAME",UVM_NO_ACTION);

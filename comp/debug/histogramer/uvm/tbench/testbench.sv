@@ -23,18 +23,22 @@ module testbench #(
 
     localparam int unsigned ADDR_WIDTH = $clog2(BOX_CNT);
 
-    typedef uvm_component_registry#(test::ex_test #(
-        INPUT_WIDTH,
-        BOX_WIDTH,
-        BOX_CNT,
-        READ_PRIOR,
-        CLEAR_BY_READ,
-        CLEAR_BY_RST,
-        DEVICE,
-        REQ_WIDTH,
-        RESP_WIDTH,
-        ADDR_WIDTH
-    ), "test::ex_test") type_id;
+    typedef uvm_component_registry #(
+        .T(test::ex_test #(
+                .INPUT_WIDTH  (INPUT_WIDTH),
+                .BOX_WIDTH    (BOX_WIDTH),
+                .BOX_CNT      (BOX_CNT),
+                .READ_PRIOR   (READ_PRIOR),
+                .CLEAR_BY_READ(CLEAR_BY_READ),
+                .CLEAR_BY_RST (CLEAR_BY_RST),
+                .DEVICE       (DEVICE),
+                .REQ_WIDTH    (REQ_WIDTH),
+                .RESP_WIDTH   (RESP_WIDTH),
+                .ADDR_WIDTH   (ADDR_WIDTH)
+            )
+        ),
+        .Tname("test::ex_test")
+    ) type_id;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
@@ -44,8 +48,14 @@ module testbench #(
     // Interfaces
     reset_if reset(CLK);
 
-    mvb_if #(1, REQ_WIDTH)  mvb_req  (CLK);
-    mvb_if #(1, RESP_WIDTH) mvb_resp (CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (REQ_WIDTH)
+    )  mvb_req  (CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (RESP_WIDTH)
+    ) mvb_resp (CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
@@ -58,8 +68,14 @@ module testbench #(
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
 
-        uvm_config_db#(virtual mvb_if #(1, REQ_WIDTH)) ::set(null, "", "vif_req",  mvb_req);
-        uvm_config_db#(virtual mvb_if #(1, RESP_WIDTH))::set(null, "", "vif_resp", mvb_resp);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (REQ_WIDTH)
+        )) ::set(null, "", "vif_req",  mvb_req);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (RESP_WIDTH)
+        ))::set(null, "", "vif_resp", mvb_resp);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

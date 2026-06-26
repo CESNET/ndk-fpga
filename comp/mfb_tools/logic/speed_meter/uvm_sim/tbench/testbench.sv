@@ -18,9 +18,24 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) mfb_rx(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) mfb_tx(CLK);
-    mi_if #(MI_DATA_WIDTH, MI_ADDRESS_WIDTH) mi_config(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_tx(CLK);
+    mi_if #(
+        .DATA_WIDTH (MI_DATA_WIDTH),
+        .ADDR_WIDTH (MI_ADDRESS_WIDTH)
+    ) mi_config(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
@@ -41,9 +56,24 @@ module testbench;
         uvm_root m_root;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_tx);
-        uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDRESS_WIDTH))::set(null, "", "vif_mi", mi_config);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (MI_DATA_WIDTH),
+            .ADDR_WIDTH (MI_ADDRESS_WIDTH)
+        ))::set(null, "", "vif_mi", mi_config);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

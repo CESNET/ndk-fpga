@@ -19,7 +19,13 @@ module testbench;
     reset_if                           reset(CLK);
     pullup(reset.dut.RESET);
     intel_mac_seg_if #(test::SEGMENTS) rx_mac_seg(CLK);
-    mfb_if #(test::REGIONS, test::REGION_SIZE, 8, 8, 1) tx_mac_seg(CLK);
+    mfb_if #(
+        .REGIONS     (test::REGIONS),
+        .REGION_SIZE (test::REGION_SIZE),
+        .BLOCK_SIZE  (8),
+        .ITEM_WIDTH  (8),
+        .META_WIDTH  (1)
+    ) tx_mac_seg(CLK);
 
     always #(test::CLK_PERIOD/2) CLK = ~CLK;
     assign rx_mac_seg.READY = 1'b1;
@@ -70,7 +76,13 @@ module testbench;
 
         uvm_config_db#(virtual reset_if)::set(null, "", "RESET_IF", reset);
         uvm_config_db#(virtual intel_mac_seg_if #(test::SEGMENTS))::set(null, "", "RX_MAC_SEQ_IF", rx_mac_seg);
-        uvm_config_db#(virtual mfb_if #(test::REGIONS, test::REGION_SIZE, 8, 8, 1))::set(null, "", "TX_MAC_SEQ_IF", tx_mac_seg);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (test::REGIONS),
+            .REGION_SIZE (test::REGION_SIZE),
+            .BLOCK_SIZE  (8),
+            .ITEM_WIDTH  (8),
+            .META_WIDTH  (1)
+        ))::set(null, "", "TX_MAC_SEQ_IF", tx_mac_seg);
 
         m_root = uvm_root::get();
         m_root.set_report_id_action_hier("ILLEGALNAME",UVM_NO_ACTION);

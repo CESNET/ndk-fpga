@@ -22,15 +22,29 @@ module testbench;
     // ---------- //
 
     reset_if                            reset             (CLK);
-    mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH) mvb_rx[RX_STREAMS](CLK);
-    mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH) mvb_tx            (CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS),
+        .ITEM_WIDTH (MVB_ITEM_WIDTH)
+    ) mvb_rx[RX_STREAMS](CLK);
+    mvb_if #(
+        .ITEMS      (MVB_ITEMS),
+        .ITEM_WIDTH (MVB_ITEM_WIDTH)
+    ) mvb_tx            (CLK);
 
     // ----- //
     // Tests //
     // ----- //
 
-    typedef test::test_base  #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) test_base;
-    typedef test::test_speed #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) test_speed;
+    typedef test::test_base #(
+        .MVB_ITEMS      (MVB_ITEMS),
+        .MVB_ITEM_WIDTH (MVB_ITEM_WIDTH),
+        .RX_STREAMS     (RX_STREAMS)
+    ) test_base;
+    typedef test::test_speed #(
+        .MVB_ITEMS      (MVB_ITEMS),
+        .MVB_ITEM_WIDTH (MVB_ITEM_WIDTH),
+        .RX_STREAMS     (RX_STREAMS)
+    ) test_speed;
 
     // Start of tests
     initial begin
@@ -40,14 +54,23 @@ module testbench;
         // Database configuration //
         // ---------------------- //
 
-        automatic virtual mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH) v_mvb_rx[RX_STREAMS] = mvb_rx;
+        automatic virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS),
+            .ITEM_WIDTH (MVB_ITEM_WIDTH)
+        ) v_mvb_rx[RX_STREAMS] = mvb_rx;
 
         // Database configuration
         uvm_config_db #(virtual reset_if)::set(null, "", "vif_reset", reset);
         for (int unsigned i = 0; i < RX_STREAMS; i++) begin
-            uvm_config_db #(virtual mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH))::set(null, "", $sformatf("vif_rx_mvb_%0d", i), v_mvb_rx[i]);
+            uvm_config_db #(virtual mvb_if #(
+                .ITEMS      (MVB_ITEMS),
+                .ITEM_WIDTH (MVB_ITEM_WIDTH)
+            ))::set(null, "", $sformatf("vif_rx_mvb_%0d", i), v_mvb_rx[i]);
         end
-        uvm_config_db #(virtual mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH))::set(null, "", "vif_tx_mvb", mvb_tx);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS),
+            .ITEM_WIDTH (MVB_ITEM_WIDTH)
+        ))::set(null, "", "vif_tx_mvb", mvb_tx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;

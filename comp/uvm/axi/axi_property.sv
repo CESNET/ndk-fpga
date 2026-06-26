@@ -85,9 +85,9 @@ module axi_xilinx_property #(
 
 
     axi_property #(
-        ITEMS,
-        ITEM_WIDTH,
-        TUSER_WIDTH
+        .ITEMS(ITEMS),
+        .ITEM_WIDTH(ITEM_WIDTH),
+        .TUSER_WIDTH(TUSER_WIDTH)
     )
     base (
         .RESET (RESET),

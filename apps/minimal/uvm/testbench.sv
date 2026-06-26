@@ -16,17 +16,74 @@ module testbench;
 
     /////////////////////////
     // PARAMETRIZE TESTS
-    typedef test::base#(test_pkg::ETH_STREAMS, test_pkg::ETH_CHANNELS, test_pkg::ETH_PKT_MTU, test_pkg::ETH_RX_HDR_WIDTH, test_pkg::ETH_TX_HDR_WIDTH, test_pkg::DMA_STREAMS, test_pkg::DMA_RX_CHANNELS, test_pkg::DMA_TX_CHANNELS, test_pkg::DMA_HDR_META_WIDTH, test_pkg::DMA_PKT_MTU,
-                        test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::MEM_PORTS, test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_BURST_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH)
-                        test_base;
+    typedef test::base#(
+        .ETH_STREAMS       (test_pkg::ETH_STREAMS       ),
+        .ETH_CHANNELS      (test_pkg::ETH_CHANNELS      ),
+        .ETH_PKT_MTU       (test_pkg::ETH_PKT_MTU       ),
+        .ETH_RX_HDR_WIDTH  (test_pkg::ETH_RX_HDR_WIDTH  ),
+        .ETH_TX_HDR_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH  ),
+        .DMA_STREAMS       (test_pkg::DMA_STREAMS       ),
+        .DMA_RX_CHANNELS   (test_pkg::DMA_RX_CHANNELS   ),
+        .DMA_TX_CHANNELS   (test_pkg::DMA_TX_CHANNELS   ),
+        .DMA_HDR_META_WIDTH(test_pkg::DMA_HDR_META_WIDTH),
+        .DMA_PKT_MTU       (test_pkg::DMA_PKT_MTU       ),
+        .REGIONS           (test_pkg::REGIONS           ),
+        .MFB_REG_SIZE      (test_pkg::MFB_REG_SIZE      ),
+        .MFB_BLOCK_SIZE    (test_pkg::MFB_BLOCK_SIZE    ),
+        .MFB_ITEM_WIDTH    (test_pkg::MFB_ITEM_WIDTH    ),
+        .MEM_PORTS         (test_pkg::MEM_PORTS         ),
+        .MEM_ADDR_WIDTH    (test_pkg::MEM_ADDR_WIDTH    ),
+        .MEM_BURST_WIDTH   (test_pkg::MEM_BURST_WIDTH   ),
+        .MEM_DATA_WIDTH    (test_pkg::MEM_DATA_WIDTH    ),
+        .MI_DATA_WIDTH     (test_pkg::MI_DATA_WIDTH     ),
+        .MI_ADDR_WIDTH     (test_pkg::MI_ADDR_WIDTH     )
+    ) test_base;
 
-    typedef test::full_speed#(test_pkg::ETH_STREAMS, test_pkg::ETH_CHANNELS, test_pkg::ETH_PKT_MTU, test_pkg::ETH_RX_HDR_WIDTH, test_pkg::ETH_TX_HDR_WIDTH, test_pkg::DMA_STREAMS, test_pkg::DMA_RX_CHANNELS, test_pkg::DMA_TX_CHANNELS, test_pkg::DMA_HDR_META_WIDTH, test_pkg::DMA_PKT_MTU,
-                        test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::MEM_PORTS, test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_BURST_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH)
-                        test_full_speed;
+    typedef test::full_speed#(
+        .ETH_STREAMS       (test_pkg::ETH_STREAMS       ),
+        .ETH_CHANNELS      (test_pkg::ETH_CHANNELS      ),
+        .ETH_PKT_MTU       (test_pkg::ETH_PKT_MTU       ),
+        .ETH_RX_HDR_WIDTH  (test_pkg::ETH_RX_HDR_WIDTH  ),
+        .ETH_TX_HDR_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH  ),
+        .DMA_STREAMS       (test_pkg::DMA_STREAMS       ),
+        .DMA_RX_CHANNELS   (test_pkg::DMA_RX_CHANNELS   ),
+        .DMA_TX_CHANNELS   (test_pkg::DMA_TX_CHANNELS   ),
+        .DMA_HDR_META_WIDTH(test_pkg::DMA_HDR_META_WIDTH),
+        .DMA_PKT_MTU       (test_pkg::DMA_PKT_MTU       ),
+        .REGIONS           (test_pkg::REGIONS           ),
+        .MFB_REG_SIZE      (test_pkg::MFB_REG_SIZE      ),
+        .MFB_BLOCK_SIZE    (test_pkg::MFB_BLOCK_SIZE    ),
+        .MFB_ITEM_WIDTH    (test_pkg::MFB_ITEM_WIDTH    ),
+        .MEM_PORTS         (test_pkg::MEM_PORTS         ),
+        .MEM_ADDR_WIDTH    (test_pkg::MEM_ADDR_WIDTH    ),
+        .MEM_BURST_WIDTH   (test_pkg::MEM_BURST_WIDTH   ),
+        .MEM_DATA_WIDTH    (test_pkg::MEM_DATA_WIDTH    ),
+        .MI_DATA_WIDTH     (test_pkg::MI_DATA_WIDTH     ),
+        .MI_ADDR_WIDTH     (test_pkg::MI_ADDR_WIDTH     )
+    ) test_full_speed;
 
-    typedef test::fifo#(test_pkg::ETH_STREAMS, test_pkg::ETH_CHANNELS, test_pkg::ETH_PKT_MTU, test_pkg::ETH_RX_HDR_WIDTH, test_pkg::ETH_TX_HDR_WIDTH, test_pkg::DMA_STREAMS, test_pkg::DMA_RX_CHANNELS, test_pkg::DMA_TX_CHANNELS, test_pkg::DMA_HDR_META_WIDTH, test_pkg::DMA_PKT_MTU,
-                        test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::MEM_PORTS, test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_BURST_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH)
-                        test_fifo;
+    typedef test::fifo#(
+        .ETH_STREAMS       (test_pkg::ETH_STREAMS       ),
+        .ETH_CHANNELS      (test_pkg::ETH_CHANNELS      ),
+        .ETH_PKT_MTU       (test_pkg::ETH_PKT_MTU       ),
+        .ETH_RX_HDR_WIDTH  (test_pkg::ETH_RX_HDR_WIDTH  ),
+        .ETH_TX_HDR_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH  ),
+        .DMA_STREAMS       (test_pkg::DMA_STREAMS       ),
+        .DMA_RX_CHANNELS   (test_pkg::DMA_RX_CHANNELS   ),
+        .DMA_TX_CHANNELS   (test_pkg::DMA_TX_CHANNELS   ),
+        .DMA_HDR_META_WIDTH(test_pkg::DMA_HDR_META_WIDTH),
+        .DMA_PKT_MTU       (test_pkg::DMA_PKT_MTU       ),
+        .REGIONS           (test_pkg::REGIONS           ),
+        .MFB_REG_SIZE      (test_pkg::MFB_REG_SIZE      ),
+        .MFB_BLOCK_SIZE    (test_pkg::MFB_BLOCK_SIZE    ),
+        .MFB_ITEM_WIDTH    (test_pkg::MFB_ITEM_WIDTH    ),
+        .MEM_PORTS         (test_pkg::MEM_PORTS         ),
+        .MEM_ADDR_WIDTH    (test_pkg::MEM_ADDR_WIDTH    ),
+        .MEM_BURST_WIDTH   (test_pkg::MEM_BURST_WIDTH   ),
+        .MEM_DATA_WIDTH    (test_pkg::MEM_DATA_WIDTH    ),
+        .MI_DATA_WIDTH     (test_pkg::MI_DATA_WIDTH     ),
+        .MI_ADDR_WIDTH     (test_pkg::MI_ADDR_WIDTH     )
+    ) test_fifo;
 
 
     /////////////////////////
@@ -65,22 +122,61 @@ module testbench;
     pullup(reset_app.RESET);
 
     // ETHERNET I/O INTERFACE
-    mvb_if #(test_pkg::REGIONS,  test_pkg::ETH_RX_HDR_WIDTH)                                                                            eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0)                          eth_rx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
+    mvb_if #(
+        .ITEMS      (test_pkg::REGIONS),
+        .ITEM_WIDTH (test_pkg::ETH_RX_HDR_WIDTH)
+    )                                                                            eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
+    mfb_if #(
+        .REGIONS     (test_pkg::REGIONS),
+        .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+        .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    )                          eth_rx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
+    mfb_if #(
+        .REGIONS     (test_pkg::REGIONS),
+        .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+        .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+        .META_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH)
+    ) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     // DMA I/O INTERFACE
     localparam DMA_RX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS);
     localparam DMA_TX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS) + 1;
-    mvb_if #(test_pkg::REGIONS,   DMA_RX_MVB_WIDTH)                                                            dma_rx_mvb[test_pkg::DMA_STREAMS](APP_CLK);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) dma_rx_mfb[test_pkg::DMA_STREAMS](APP_CLK);
-    mvb_if #(test_pkg::REGIONS,   DMA_TX_MVB_WIDTH)                                                            dma_tx_mvb[test_pkg::DMA_STREAMS](APP_CLK);
-    mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) dma_tx_mfb[test_pkg::DMA_STREAMS](APP_CLK);
+    mvb_if #(
+        .ITEMS      (test_pkg::REGIONS),
+        .ITEM_WIDTH (DMA_RX_MVB_WIDTH)
+    )                                                            dma_rx_mvb[test_pkg::DMA_STREAMS](APP_CLK);
+    mfb_if #(
+        .REGIONS     (test_pkg::REGIONS),
+        .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+        .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) dma_rx_mfb[test_pkg::DMA_STREAMS](APP_CLK);
+    mvb_if #(
+        .ITEMS      (test_pkg::REGIONS),
+        .ITEM_WIDTH (DMA_TX_MVB_WIDTH)
+    )                                                            dma_tx_mvb[test_pkg::DMA_STREAMS](APP_CLK);
+    mfb_if #(
+        .REGIONS     (test_pkg::REGIONS),
+        .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+        .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) dma_tx_mfb[test_pkg::DMA_STREAMS](APP_CLK);
 
     //CONFIGURE INTERFACE
-    mi_if#(test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH) config_if(MI_CLK);
+    mi_if #(
+        .DATA_WIDTH (test_pkg::MI_DATA_WIDTH),
+        .ADDR_WIDTH (test_pkg::MI_ADDR_WIDTH)
+    ) config_if(MI_CLK);
 
     //TSU INTERFACE
-    mvb_if #(1, 64) m_tsu (APP_CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (64)
+    ) m_tsu (APP_CLK);
 
 
     /////////////////////////
@@ -127,7 +223,11 @@ module testbench;
 
     for (genvar mem_it = 0; mem_it < test_pkg::MEM_PORTS; mem_it++) begin : gen_mem_it
         reset_if                                                                                 mem_reset(MEM_CLK[mem_it]);
-        avmm_if#(test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MEM_BURST_WIDTH)  mem      (MEM_CLK[mem_it]);
+        avmm_if#(
+            .ADDRESS_WIDTH(test_pkg::MEM_ADDR_WIDTH),
+            .DATA_WIDTH   (test_pkg::MEM_DATA_WIDTH),
+            .BURST_WIDTH  (test_pkg::MEM_BURST_WIDTH)
+        ) mem (MEM_CLK[mem_it]);
 
         assign reset_logic_mem[mem_it] = mem_reset.RESET;
         assign mem_ready        [mem_it] = mem.READY; // : in  std_logic_vector(MEM_PORTS-1 downto 0);
@@ -144,7 +244,11 @@ module testbench;
         initial begin
             //RESET
             uvm_config_db#(virtual reset_if)::set(null, "", $sformatf("RESET_MEM_%0d", mem_it), mem_reset);
-            uvm_config_db#(virtual avmm_if#(test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MEM_BURST_WIDTH))::set(null, "", $sformatf("MEM_%0d", mem_it), mem);
+            uvm_config_db#(virtual avmm_if#(
+                .ADDRESS_WIDTH(test_pkg::MEM_ADDR_WIDTH),
+                .DATA_WIDTH   (test_pkg::MEM_DATA_WIDTH),
+                .BURST_WIDTH  (test_pkg::MEM_BURST_WIDTH)
+            ))::set(null, "", $sformatf("MEM_%0d", mem_it), mem);
         end
     end
 
@@ -440,14 +544,47 @@ module testbench;
     initial begin
         uvm_root m_root;
         // CONNECT INTERFACES
-        automatic virtual mvb_if #(test_pkg::REGIONS, test_pkg::ETH_RX_HDR_WIDTH)                                                    vir_eth_rx_mvb[test_pkg::ETH_STREAMS] = eth_rx_mvb;
-        automatic virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) vir_eth_rx_mfb[test_pkg::ETH_STREAMS] = eth_rx_mfb;
-        automatic virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH) vir_eth_tx_mfb[test_pkg::ETH_STREAMS] = eth_tx_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS      (test_pkg::REGIONS),
+            .ITEM_WIDTH (test_pkg::ETH_RX_HDR_WIDTH)
+        )                                                    vir_eth_rx_mvb[test_pkg::ETH_STREAMS] = eth_rx_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS     (test_pkg::REGIONS),
+            .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+            .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ) vir_eth_rx_mfb[test_pkg::ETH_STREAMS] = eth_rx_mfb;
+        automatic virtual mfb_if #(
+            .REGIONS     (test_pkg::REGIONS),
+            .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+            .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+            .META_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH)
+        ) vir_eth_tx_mfb[test_pkg::ETH_STREAMS] = eth_tx_mfb;
         // DMA I/O INTERFACE
-        automatic virtual mvb_if #(test_pkg::REGIONS, DMA_TX_MVB_WIDTH)                                                              vir_dma_tx_mvb[test_pkg::DMA_STREAMS] = dma_tx_mvb;
-        automatic virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) vir_dma_tx_mfb[test_pkg::DMA_STREAMS] = dma_tx_mfb;
-        automatic virtual mvb_if #(test_pkg::REGIONS, DMA_RX_MVB_WIDTH)                                                              vir_dma_rx_mvb[test_pkg::DMA_STREAMS] = dma_rx_mvb;
-        automatic virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0) vir_dma_rx_mfb[test_pkg::DMA_STREAMS] = dma_rx_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS      (test_pkg::REGIONS),
+            .ITEM_WIDTH (DMA_TX_MVB_WIDTH)
+        )                                                              vir_dma_tx_mvb[test_pkg::DMA_STREAMS] = dma_tx_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS     (test_pkg::REGIONS),
+            .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+            .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ) vir_dma_tx_mfb[test_pkg::DMA_STREAMS] = dma_tx_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS      (test_pkg::REGIONS),
+            .ITEM_WIDTH (DMA_RX_MVB_WIDTH)
+        )                                                              vir_dma_rx_mvb[test_pkg::DMA_STREAMS] = dma_rx_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS     (test_pkg::REGIONS),
+            .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+            .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ) vir_dma_rx_mfb[test_pkg::DMA_STREAMS] = dma_rx_mfb;
 
 
         /////////////////////////////////////////////
@@ -456,19 +593,52 @@ module testbench;
             string it_num;
             it_num.itoa(it);
 
-            uvm_config_db#(virtual mvb_if #(test_pkg::REGIONS, test_pkg::ETH_RX_HDR_WIDTH)                                          )::set(null, "", {"ETH_RX_MVB_", it_num}, vir_eth_rx_mvb[it]);
-            uvm_config_db#(virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0))::set(null, "", {"ETH_RX_MFB_", it_num}, vir_eth_rx_mfb[it]);
-            uvm_config_db#(virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, test_pkg::ETH_TX_HDR_WIDTH))::set(null, "", {"ETH_TX_MFB_", it_num}, vir_eth_tx_mfb[it]);
+            uvm_config_db#(virtual mvb_if #(
+                .ITEMS      (test_pkg::REGIONS),
+                .ITEM_WIDTH (test_pkg::ETH_RX_HDR_WIDTH)
+            )                                          )::set(null, "", {"ETH_RX_MVB_", it_num}, vir_eth_rx_mvb[it]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS     (test_pkg::REGIONS),
+                .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+                .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+                .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+                .META_WIDTH  (0)
+            ))::set(null, "", {"ETH_RX_MFB_", it_num}, vir_eth_rx_mfb[it]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS     (test_pkg::REGIONS),
+                .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+                .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+                .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+                .META_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH)
+            ))::set(null, "", {"ETH_TX_MFB_", it_num}, vir_eth_tx_mfb[it]);
         end
         //SAVE DMA interface to configuration database
         for (int unsigned it = 0; it < test_pkg::DMA_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
 
-            uvm_config_db#(virtual mvb_if #(test_pkg::REGIONS,   DMA_TX_MVB_WIDTH)                                                        )::set(null, "", {"DMA_TX_MVB_", it_num}, vir_dma_tx_mvb[it]);
-            uvm_config_db#(virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0))::set(null, "", {"DMA_TX_MFB_", it_num}, vir_dma_tx_mfb[it]);
-            uvm_config_db#(virtual mvb_if #(test_pkg::REGIONS,   DMA_RX_MVB_WIDTH)                                                        )::set(null, "", {"DMA_RX_MVB_", it_num}, vir_dma_rx_mvb[it]);
-            uvm_config_db#(virtual mfb_if #(test_pkg::REGIONS, test_pkg::MFB_REG_SIZE, test_pkg::MFB_BLOCK_SIZE, test_pkg::MFB_ITEM_WIDTH, 0))::set(null, "", {"DMA_RX_MFB_", it_num}, vir_dma_rx_mfb[it]);
+            uvm_config_db#(virtual mvb_if #(
+                .ITEMS      (test_pkg::REGIONS),
+                .ITEM_WIDTH (DMA_TX_MVB_WIDTH)
+            )                                                        )::set(null, "", {"DMA_TX_MVB_", it_num}, vir_dma_tx_mvb[it]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS     (test_pkg::REGIONS),
+                .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+                .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+                .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+                .META_WIDTH  (0)
+            ))::set(null, "", {"DMA_TX_MFB_", it_num}, vir_dma_tx_mfb[it]);
+            uvm_config_db#(virtual mvb_if #(
+                .ITEMS      (test_pkg::REGIONS),
+                .ITEM_WIDTH (DMA_RX_MVB_WIDTH)
+            )                                                        )::set(null, "", {"DMA_RX_MVB_", it_num}, vir_dma_rx_mvb[it]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS     (test_pkg::REGIONS),
+                .REGION_SIZE (test_pkg::MFB_REG_SIZE),
+                .BLOCK_SIZE  (test_pkg::MFB_BLOCK_SIZE),
+                .ITEM_WIDTH  (test_pkg::MFB_ITEM_WIDTH),
+                .META_WIDTH  (0)
+            ))::set(null, "", {"DMA_RX_MFB_", it_num}, vir_dma_rx_mfb[it]);
         end
 
         //SAVE RESETS interface to configuration database
@@ -482,10 +652,16 @@ module testbench;
         uvm_config_db#(virtual reset_if)::set(null, "", "RESET_APP",     reset_app);
 
         //CONFIGURE INF
-        uvm_config_db#(virtual mi_if#(test_pkg::MI_DATA_WIDTH, test_pkg::MI_ADDR_WIDTH))::set(null, "", "MI_INTERFACE", config_if);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (test_pkg::MI_DATA_WIDTH),
+            .ADDR_WIDTH (test_pkg::MI_ADDR_WIDTH)
+        ))::set(null, "", "MI_INTERFACE", config_if);
 
         //TSU
-        uvm_config_db#(virtual mvb_if #(1, 64))::set(null, "", "TSU_INTERFACE", m_tsu);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (64)
+        ))::set(null, "", "TSU_INTERFACE", m_tsu);
 
         /////////////////////////////////////////////
         // RUN TEST

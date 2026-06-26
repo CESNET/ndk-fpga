@@ -12,8 +12,20 @@ import test_param::*;
 module testbench;
 
     //TESTS
-    typedef test::ex_test#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) ex_test;
-    typedef test::speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)   speed;
+    typedef test::ex_test #(
+        .MFB_REGIONS     (MFB_REGIONS),
+        .MFB_REGION_SIZE (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .MFB_META_WIDTH  (MFB_META_WIDTH)
+    ) ex_test;
+    typedef test::speed #(
+        .MFB_REGIONS     (MFB_REGIONS),
+        .MFB_REGION_SIZE (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .MFB_META_WIDTH  (MFB_META_WIDTH)
+    ) speed;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Signals
@@ -26,9 +38,24 @@ module testbench;
     reset_if reset_tx(TX_CLK);
     pullup(reset_rx.RESET);
     pullup(reset_tx.RESET);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_rx(RX_CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_tx(TX_CLK);
-    mvb_if #(MFB_REGIONS, MFB_META_WIDTH) mvb_tx(TX_CLK);
+   mfb_if #(
+       .REGIONS     (MFB_REGIONS),
+       .REGION_SIZE (MFB_REGION_SIZE),
+       .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+       .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+       .META_WIDTH  (MFB_META_WIDTH)
+   ) mfb_rx(RX_CLK);
+   mfb_if #(
+       .REGIONS     (MFB_REGIONS),
+       .REGION_SIZE (MFB_REGION_SIZE),
+       .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+       .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+       .META_WIDTH  (0)
+   ) mfb_tx(TX_CLK);
+   mvb_if #(
+       .ITEMS      (MFB_REGIONS),
+       .ITEM_WIDTH (MFB_META_WIDTH)
+   ) mvb_tx(TX_CLK);
     // Probes
     bind RX_MAC_LITE_BUFFER : DUT_U.VHDL_DUT_U probe_inf #(2*REGIONS) probe_drop(
         .event_signal(s_rx_src_rdy_orig_reg              ),
@@ -49,9 +76,24 @@ module testbench;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset_rx", reset_rx);
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset_tx", reset_tx);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_tx);
-        uvm_config_db#(virtual mvb_if #(MFB_REGIONS, MFB_META_WIDTH))::set(null, "", "vif_mvb_tx", mvb_tx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (MFB_META_WIDTH)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (MFB_REGIONS),
+            .ITEM_WIDTH (MFB_META_WIDTH)
+        ))::set(null, "", "vif_mvb_tx", mvb_tx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
