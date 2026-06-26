@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-function int unsigned encode_fbe(logic [32/8-1 : 0] be);
+function static int unsigned encode_fbe(logic [32/8-1 : 0] be);
     automatic int unsigned it = 0;
 
     if (be != 0) begin
@@ -16,7 +16,7 @@ function int unsigned encode_fbe(logic [32/8-1 : 0] be);
     return it;
 endfunction
 
-function int unsigned encode_lbe(logic [32/8-1 : 0] be);
+function static int unsigned encode_lbe(logic [32/8-1 : 0] be);
      automatic int unsigned it  = 32/8;
 
     if (be != 0) begin

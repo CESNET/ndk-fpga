@@ -61,7 +61,7 @@ package sv_dma_bus_pack;
     parameter DMA_DOWNHDR_WIDTH             = DMA_COMPLETION_W;
 
     // Byte Enable conversion functions
-    function logic[2-1 : 0] encode_fbe(logic [4-1 : 0] be, logic one_dw = 0);
+    function automatic logic[2-1 : 0] encode_fbe(logic [4-1 : 0] be, logic one_dw = 0);
         logic[2-1 : 0] ret;
         if (one_dw) begin
             casex (be)
@@ -89,7 +89,7 @@ package sv_dma_bus_pack;
         return ret;
     endfunction
 
-    function logic[2-1 : 0] encode_lbe(logic [4-1 : 0] be);
+    function automatic logic[2-1 : 0] encode_lbe(logic [4-1 : 0] be);
         logic[2-1 : 0] ret;
         casex (be)
             4'b0000 : ret = 2'b00;
@@ -101,7 +101,7 @@ package sv_dma_bus_pack;
         return ret;
     endfunction
 
-    function logic[4-1 : 0] decode_lbe(logic [1 : 0] ib);
+    function automatic logic[4-1 : 0] decode_lbe(logic [1 : 0] ib);
         logic[4-1 : 0] be;
         case (ib)
             2'b00 : be = 4'b1111;
@@ -113,7 +113,7 @@ package sv_dma_bus_pack;
         return be;
     endfunction
 
-    function logic[4-1 : 0] decode_fbe(logic [1 : 0] ib);
+    function automatic logic[4-1 : 0] decode_fbe(logic [1 : 0] ib);
         logic[4-1 : 0] be;
         case (ib)
             2'b00 : be = 4'b1111;

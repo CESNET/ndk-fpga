@@ -31,34 +31,34 @@ program TEST (
     WordLinkDriver #(2*CARRY_WIDTH+1) driver;
 
 
-    task createGeneratorEnvironment();
+    task automatic createGeneratorEnvironment();
         generator = new("Generator", 0);
         blueprint = new;
         blueprint.dataSize = (2*CARRY_WIDTH+1-1)/8 + 1;
         generator.blueprint = blueprint;
     endtask
 
-    task createEnvironment();
+    task automatic createEnvironment();
         driver  = new("Driver", generator.transMbx, RX);
         driver.txDelayEn_wt = 0;
     endtask
 
-    task resetDesign();
+    task automatic resetDesign();
         RESET=1;
         #RESET_TIME RESET = 0;
     endtask
 
-    task enableTestEnvironment();
+    task automatic enableTestEnvironment();
         driver.setEnabled();
     endtask
 
-    task disableTestEnvironment();
+    task automatic disableTestEnvironment();
         wait(!driver.busy);
         driver.setDisabled();
     endtask
 
 
-    task test1();
+    task automatic test1();
         $write("\n\n############ TEST CASE 1 ############\n\n");
         enableTestEnvironment();
         generator.setEnabled(TRANSACTION_COUNT);

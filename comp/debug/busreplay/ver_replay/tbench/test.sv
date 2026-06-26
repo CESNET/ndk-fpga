@@ -24,7 +24,7 @@ program TEST (
 );
 
 
-    task createEnvironment();
+    task automatic createEnvironment();
         dpiconnect(0, MI);
         dpiconnect_devicetree_addcomponent(0, {"\
             replay {\
@@ -33,12 +33,12 @@ program TEST (
             };"});
     endtask
 
-    task resetDesign();
+    task automatic resetDesign();
         RESET=1;
         #100ns RESET = 0;
     endtask
 
-    task configDesign();
+    task automatic configDesign();
         int ret;
         string params;
         params = $sformatf("-w %s", "dump.txt"); // EDIT THIS: change file path!
@@ -46,7 +46,7 @@ program TEST (
         dpicall("busreplay", params, ret);
     endtask
 
-    task enableTestEnvironment();
+    task automatic enableTestEnvironment();
         int ret;
         dpiwait(0, 1); // synchronization
         dpicall("busreplay", "-e 1", ret);

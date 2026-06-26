@@ -5,7 +5,7 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This low level sequence define bus functionality
-function logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
+function automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
     automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] ret = '0;
 
     if(intel) begin
@@ -69,7 +69,7 @@ function logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(uvm_pcie_h
 endfunction
 
 
-function logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_meta(uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
+function automatic logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_meta(uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
     automatic logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] ret = '0;
     if(intel) begin
         ret[32-1 : 0]  = 6'd26;
