@@ -252,7 +252,7 @@ class env #(
             mem_cfg.interface_name = {"MEM_", it_num};
             mem_cfg.generated_memory_file_type = uvm_avmm::config_item::RANDOM;
             uvm_config_db#(uvm_avmm::config_item)::set(this, {"m_memory_", it_num}, "m_config", mem_cfg);
-            m_memory[it] = uvm_avmm::agent_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create( {"m_memory_", it_num}, this);;
+            m_memory[it] = uvm_avmm::agent_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create( {"m_memory_", it_num}, this);
         end
         uvm_config_db#(uvm_reset::env_config_item#(MEM_PORTS))::set(this, "m_resets_mem", "m_config", m_resets_mem_config);
         m_resets_mem = uvm_reset::env#(MEM_PORTS)::type_id::create("m_resets_mem", this);

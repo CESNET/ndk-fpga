@@ -161,7 +161,7 @@ class env #(
         cfg_mi.agent.active         = UVM_ACTIVE;
         cfg_mi.agent.interface_name = "vif_mi";
         uvm_config_db#(uvm_mi::regmodel_config)::set(this, "m_regmodel", "m_config", cfg_mi);
-        m_regmodel = uvm_mi::regmodel#(uvm_network_mod_env::regmodel #(ETH_PORTS, ETH_PORT_CHAN), MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);;
+        m_regmodel = uvm_mi::regmodel#(uvm_network_mod_env::regmodel #(ETH_PORTS, ETH_PORT_CHAN), MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);
 
         cfg_mi_phy  = new();
         cfg_mi_phy.active         = UVM_ACTIVE;

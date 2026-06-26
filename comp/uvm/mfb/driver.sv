@@ -97,7 +97,7 @@ class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned B
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        req = uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");;
+        req = uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");
 
         forever begin
             // Get new sequence item to drive to interface

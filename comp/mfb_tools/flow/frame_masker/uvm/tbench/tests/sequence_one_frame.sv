@@ -34,7 +34,7 @@ class sequence_one_frame #(
         for (int unsigned region = 0; region < REGIONS; region++) begin
             for (int unsigned index = 0; index < REGION_SIZE; index++) begin
                 if (state_packet == state_packet_space_new) begin
-                    space_size = $urandom_range(space_size_min, space_size_max);;
+                    space_size = $urandom_range(space_size_min, space_size_max);
                     state_packet = state_packet_space;
                 end
 
