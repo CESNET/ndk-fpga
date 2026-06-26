@@ -81,9 +81,25 @@ class scoreboard#(
     function void report_phase(uvm_phase phase);
         string msg = "";
         if (this.success() == 1 && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(),
+                      {
+                          msg, "\n",
+                          "\n\t---------------------------------------",
+                          "\n\t----     VERIFICATION SUCCESS      ----",
+                          "\n\t---------------------------------------"
+                      },
+                      UVM_NONE
+            );
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(),
+                      {
+                          msg, "\n",
+                          "\n\t---------------------------------------",
+                          "\n\t----       VERIFICATION FAIL       ----",
+                          "\n\t---------------------------------------"
+                      },
+                      UVM_NONE
+            );
         end
     endfunction
 

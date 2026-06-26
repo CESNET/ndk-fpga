@@ -56,9 +56,9 @@ class sequence_dma_rq#(
 
         if (DMA_PORTS > 1) {
             foreach(unit_id_new[it]) {
-		        unit_id_new[it][sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] == 0;
+                unit_id_new[it][sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] == 0;
             }
-	    }
+        }
     };
 
     constraint c_max_request_size {
