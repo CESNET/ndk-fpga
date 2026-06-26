@@ -8,8 +8,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.combo_const.all;
-use work.combo_user_const.all;
+use work.ndk_fpga_top_pkg.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -293,13 +292,11 @@ architecture FULL of FPGA is
         );
     end component sodimm_cal;
 
-    constant PCIE_LANES      : integer := 16;
     constant PCIE_CLKS       : integer := 2;
     constant PCIE_CONS       : integer := 1;
     constant MISC_IN_WIDTH   : integer := 64;
     constant MISC_OUT_WIDTH  : integer := 64 + 5;
     constant ETH_LANES       : integer := 8;
-    constant DMA_ENDPOINTS   : integer := tsel(DMA_TYPE=3, 4, 1); -- 400G DMA Medusa = 4x DMA_ENDPOINT
     constant MEM_PORTS       : integer := DDR4_PORTS;
     constant MEM_ADDR_WIDTH  : integer := 27;
     constant MEM_DATA_WIDTH  : integer := 512;
@@ -358,8 +355,6 @@ begin
 
         ETH_CORE_ARCH           => NET_MOD_ARCH,
         ETH_PORTS               => ETH_PORTS,
-        ETH_PORT_SPEED          => ETH_PORT_SPEED,
-        ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_PORT_LEDS           => 8,
         ETH_LANES               => ETH_LANES,
 
@@ -382,12 +377,7 @@ begin
 
         PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
-        PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-
-        DMA_ENDPOINTS           => DMA_ENDPOINTS,
-        DMA_MODULES             => DMA_MODULES,
-        DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
-        DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES
+        PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE
     )
     port map(
         SYSCLK                  => AG_SYSCLK1_P,

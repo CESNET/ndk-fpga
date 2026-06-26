@@ -51,38 +51,42 @@ entity PCIE is
         -- Other configuration
         -- =====================================================================
         -- Total number of DMA_EP, DMA_EP=PCIE_EP or 2*DMA_EP=PCIE_EP
-        DMA_PORTS           : natural := 2;
+        DMA_PORTS            : natural := 2;
         -- Connected PCIe endpoint type
-        PCIE_ENDPOINT_TYPE  : string  := "P_TILE";
+        PCIE_ENDPOINT_TYPE   : string  := "P_TILE";
         -- Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8
-        PCIE_ENDPOINT_MODE  : natural := 0;
+        PCIE_ENDPOINT_MODE   : natural := 0;
         -- Number of PCIe endpoints
-        PCIE_ENDPOINTS      : natural := 1;
+        PCIE_ENDPOINTS       : natural := 1;
         -- Number of PCIe clocks per PCIe connector
-        PCIE_CLKS           : natural := 2;
+        PCIE_CLKS            : natural := 2;
         -- Number of PCIe connectors
-        PCIE_CONS           : natural := 1;
+        PCIE_CONS            : natural := 1;
         -- Number of PCIe lanes in each PCIe connector
-        PCIE_LANES          : natural := 16;
+        PCIE_LANES           : natural := 16;
         -- PCIe generation number
-        PCIE_GEN            : natural := 4;
+        PCIE_GEN             : natural := 4;
         -- Width of CARD/FPGA ID number
-        CARD_ID_WIDTH       : natural := 0;
+        CARD_ID_WIDTH        : natural := 0;
         -- Disable PTC module and allows direct connection of the DMA module to
         -- the PCIe IP RQ and RC interfaces.
-        PTC_DISABLE         : boolean := false;
+        PTC_DISABLE          : boolean := false;
         -- Enable CQ/CC interface for DMA-BAR, condition DMA_PORTS=PCIE_ENDPOINTS
-        DMA_BAR_ENABLE      : boolean := false;
+        DMA_BAR_ENABLE       : boolean := false;
         -- Enable of XCV IP, for Xilinx only
-        XVC_ENABLE          : boolean := false;
+        XVC_ENABLE           : boolean := false;
+        -- Enable of PCIe core debug logic
+        PCIE_CORE_DBG_ENABLE : boolean := false;
+        -- Enable of PCIe controller debug logic
+        PCIE_CTRL_DBG_ENABLE : boolean := false;
         -- Width of MISC signal between Top-Level FPGA design and PCIE core logic
-        MISC_TOP2PCIE_WIDTH : natural := 1;
+        MISC_TOP2PCIE_WIDTH  : natural := 1;
         -- Width of MISC signal between PCIE core logic and Top-Level FPGA design
-        MISC_PCIE2TOP_WIDTH : natural := 1;
+        MISC_PCIE2TOP_WIDTH  : natural := 1;
         -- Dynamic routing parameters of the DMA bus
-        DMA_ROUTE           : dma_route_path_array_t := core_pcie_get_dma_route(DMA_PORTS, PCIE_ENDPOINTS);
+        DMA_ROUTE            : dma_route_path_array_t := core_pcie_get_dma_route(DMA_PORTS, PCIE_ENDPOINTS);
         -- FPGA device
-        DEVICE              : string  := "STRATIX10"
+        DEVICE               : string  := "STRATIX10"
     );
     port (
         -- =====================================================================
@@ -395,6 +399,7 @@ begin
         PCIE_LANES          => PCIE_LANES,
         PCIE_GEN            => PCIE_GEN,
         MI_WIDTH            => 32,
+        DBG_ENABLE          => PCIE_CORE_DBG_ENABLE,
         XVC_ENABLE          => XVC_ENABLE,
         CARD_ID_WIDTH       => CARD_ID_WIDTH,
         RESET_WIDTH         => RESET_WIDTH,
@@ -528,6 +533,7 @@ begin
             RQ_MFB_ITEM_WIDTH   => RQ_MFB_ITEM_WIDTH,
             RQ_MFB_REGIONS_DMA  => RQ_MFB_REGIONS,
             DMA_PORTS           => DMA_PORTS_PER_EP,
+            DBG_ENABLE          => PCIE_CTRL_DBG_ENABLE,
             PTC_DISABLE         => PTC_DISABLE,
             DMA_BAR_ENABLE      => DMA_BAR_ENABLE,
             ENDPOINT_TYPE       => PCIE_ENDPOINT_TYPE,

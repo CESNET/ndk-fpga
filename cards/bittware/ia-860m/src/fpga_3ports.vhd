@@ -8,8 +8,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.combo_const.all;
-use work.combo_user_const.all;
+use work.ndk_fpga_top_pkg.all;
 
 use work.math_pack.all;
 use work.type_pack.all;
@@ -95,13 +94,11 @@ end entity;
 
 architecture FULL of FPGA is
 
-    constant PCIE_LANES      : integer := 16;
     constant PCIE_CLKS       : integer := 2;
     constant PCIE_CONS       : integer := 1;
     constant MISC_IN_WIDTH   : integer := 64;
     constant MISC_OUT_WIDTH  : integer := 64 + 5;
     constant ETH_LANES       : integer := 8;
-    constant DMA_ENDPOINTS   : integer := tsel(DMA_TYPE=3, 4, 1);
     constant QSFP_PORTS      : natural := 3;
     constant DEVICE          : string  := "AGILEX";
     -- VSR mode 00 (low loss) doesn't work for IA-860m. Therefore, mode 10 (VSR disabled) must be used.
@@ -165,8 +162,6 @@ begin
 
         ETH_CORE_ARCH           => NET_MOD_ARCH,
         ETH_PORTS               => ETH_PORTS,
-        ETH_PORT_SPEED          => ETH_PORT_SPEED,
-        ETH_PORT_CHAN           => ETH_PORT_CHAN,
         ETH_PORT_LEDS           => 1,
         ETH_LANES               => ETH_LANES,
         FTILE_VSR_MODE_SEL      => VSR_MODE_SEL,
@@ -190,12 +185,7 @@ begin
 
         PCIE_ENDPOINTS          => PCIE_ENDPOINTS,
         PCIE_ENDPOINT_TYPE      => PCIE_MOD_ARCH,
-        PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE,
-
-        DMA_ENDPOINTS           => DMA_ENDPOINTS,
-        DMA_MODULES             => DMA_MODULES,
-        DMA_RX_CHANNELS         => DMA_RX_CHANNELS/DMA_MODULES,
-        DMA_TX_CHANNELS         => DMA_TX_CHANNELS/DMA_MODULES
+        PCIE_ENDPOINT_MODE      => PCIE_ENDPOINT_MODE
     )
     port map(
         SYSCLK                  => SYSCLK_100_P,

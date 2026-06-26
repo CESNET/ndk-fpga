@@ -13,7 +13,6 @@ use work.type_pack.all;
 use work.math_pack.all;
 use work.type_pack.all;
 use work.eth_hdr_pack.all;
-use work.combo_user_const.all;
 use work.dma_bus_pack.all;
 
 entity APPLICATION_CORE is
@@ -26,6 +25,10 @@ entity APPLICATION_CORE is
         ETH_MFB_REGIONS       : natural := 1;
         -- ETH MFB: number of blocks in region
         ETH_MFB_REGION_SIZE   : natural := 8;
+        -- ETH: Maximum allowed size of RX frame in bytes per Ethernet stream.
+        ETH_RX_MTU            : integer_vector(ETH_STREAMS-1 downto 0) := (others => 16383);
+        -- ETH: Maximum allowed size of TX frame in bytes per Ethernet stream.
+        ETH_TX_MTU            : integer_vector(ETH_STREAMS-1 downto 0) := (others => 16383);
         -- Number of instantiated PCIe endpoints
         PCIE_ENDPOINTS        : natural := 1;
         -- DMA: number of DMA streams

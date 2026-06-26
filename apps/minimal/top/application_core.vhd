@@ -11,7 +11,6 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 use work.eth_hdr_pack.all;
-use work.combo_user_const.all;
 
 architecture FULL of APPLICATION_CORE is
 
@@ -143,8 +142,8 @@ begin
         report "APPLICATION: The number of DMA_STREAMS must be equal to ETH_STREAMS, or DMA_STREAMS must be 1 and DMA_STREAMS < ETH_STREAMS!"
         severity failure;
 
-    mtu_assert_g: for p in 0 to ETH_PORTS-1 generate
-        assert ((DMA_RX_FRAME_SIZE_MAX = ETH_PORT_RX_MTU(p)) and (DMA_TX_FRAME_SIZE_MAX = ETH_PORT_TX_MTU(p)) and (DMA_RX_FRAME_SIZE_MAX = DMA_TX_FRAME_SIZE_MAX))
+    mtu_assert_g: for p in 0 to ETH_STREAMS-1 generate
+        assert ((DMA_RX_FRAME_SIZE_MAX = ETH_RX_MTU(p)) and (DMA_TX_FRAME_SIZE_MAX = ETH_TX_MTU(p)) and (DMA_RX_FRAME_SIZE_MAX = DMA_TX_FRAME_SIZE_MAX))
             report "APPLICATION: The maximum frame size for RX/TX DMA and RX/TX ETH must be the same or the user must implement the conversion of frames with incompatible sizes in their own application logic!"
             severity failure;
     end generate;

@@ -8,8 +8,6 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-use work.combo_user_const.all;
-
 use work.math_pack.all;
 use work.type_pack.all;
 use work.dma_bus_pack.all;
@@ -53,6 +51,8 @@ entity PCIE_CTRL is
         -- =====================================================================
         -- Others configuration
         -- =====================================================================
+        -- Enable of PCIe controller debug logic
+        DBG_ENABLE          : boolean := false;
         -- Number of DMA ports per one PCIe EP (allowed values: 1, 2)
         DMA_PORTS           : natural := 1;
         -- Disable PTC module and allows direct connection of the DMA module to
@@ -277,7 +277,7 @@ architecture FULL of PCIE_CTRL is
 
     constant CC_MFB_MERGER_CNT_MAX : natural := 4;
 
-    constant DEBUG_EN              : boolean := PCIE_CTRL_DEBUG_ENABLE;
+    constant DEBUG_EN              : boolean := DBG_ENABLE;
     -- Number of Streaming Debug Probes for each Master.
     constant DBG_PROBES            : natural := 4;
     -- Address offset for each Streaming Debug Probe.

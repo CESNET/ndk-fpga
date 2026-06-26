@@ -19,6 +19,9 @@ set NET_MOD_ARCH     "F_TILE"
 set SDM_SYSMON_ARCH  "INTEL_SDM"
 # Boot controller type (5=OFS_PMCI)
 set BOOT_TYPE        0
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS [expr {$DMA_TYPE == 3 ? 4 : 1}]
+
 if {$BMC_ENABLE} {
     set BOOT_TYPE    5
 }

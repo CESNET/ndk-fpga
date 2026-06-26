@@ -38,6 +38,9 @@ vhdl_ls_toml:
 	@touch DevTree_paths.txt
 	@$(NETCOPE_ENV) $(TCLSH) $(SYNTHFILES) -t generate_file -p $(shell pwd -P)/$(TOP_LEVEL_ENT).netcope_tmp/DevTree.vhd
 	@$(NETCOPE_ENV) $(TCLSH) $(SYNTHFILES) -t generate_file -p $(shell pwd -P)/$(TOP_LEVEL_ENT).netcope_tmp/netcope_const.vhd
+	@$(NETCOPE_ENV) $(TCLSH) $(SYNTHFILES) -t generate_file -p $(shell pwd -P)/$(TOP_LEVEL_ENT).netcope_tmp/ndk_fpga_common_pkg.vhd
+	@$(NETCOPE_ENV) $(TCLSH) $(SYNTHFILES) -t generate_file -p $(shell pwd -P)/$(TOP_LEVEL_ENT).netcope_tmp/ndk_app_pkg.vhd
+	@$(NETCOPE_ENV) $(TCLSH) $(SYNTHFILES) -t generate_file -p $(shell pwd -P)/$(TOP_LEVEL_ENT).netcope_tmp/ndk_fpga_top_pkg.vhd
 	@make SYNTHFILES=Vivado.tcl TARGET=ttarget_vhdl_ls_toml comp
 
 include $(OFM_PATH)/build/Makefile

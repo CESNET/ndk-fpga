@@ -19,6 +19,8 @@ set NET_MOD_ARCH "F_TILE"
 set SDM_SYSMON_ARCH "INTEL_SDM"
 # Boot controller type - SDM
 set BOOT_TYPE 4
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS [expr {$DMA_TYPE == 3 ? 4 : 1}]
 
 # Total number of QSFP cages
 set QSFP_CAGES       1
@@ -53,4 +55,4 @@ if {!($DDR4_PORTS == 0 || $DDR4_PORTS == 4) } {
 # This setup value is defined as half of pll frequency
 set TSU_FREQUENCY 415039062
 
-setVhdlPkgInt DDR4_PORTS $DDR4_PORTS
+setVhdlPkgInt -pkg ndk_fpga_top_pkg DDR4_PORTS $DDR4_PORTS

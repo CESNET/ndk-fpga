@@ -57,6 +57,8 @@ entity PCIE_CORE is
         -- =====================================================================
         -- MI width - for access to debugging probes
         MI_WIDTH            : natural := 32;
+        -- Enable of PCIe core debug logic
+        DBG_ENABLE          : boolean := false;
         -- Enable of XCV IP, for Xilinx only
         XVC_ENABLE          : boolean := false;
         -- Width of CARD/FPGA ID number

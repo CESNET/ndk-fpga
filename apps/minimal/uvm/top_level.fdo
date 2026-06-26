@@ -19,7 +19,6 @@ set ARCHGRP_UVM(APP_CORE_ENABLE) true
 # convert array to list
 set ARCHGRP_L [array get ARCHGRP_UVM]
 
-lappend PACKAGES   "./config/ndk_const.vhd"
 lappend COMPONENTS [list "DUT_ENTITY" "$FIRMWARE_BASE/core/top"       $ARCHGRP_L]
 lappend COMPONENTS [list "DUT_INTEL"  "../top"                        $ARCHGRP_L]
 lappend COMPONENTS [list "VER"        "."                             "FULL"]

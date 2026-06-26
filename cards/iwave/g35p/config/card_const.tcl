@@ -19,6 +19,8 @@ set PCIE_MOD_ARCH "USP"
 set SDM_SYSMON_ARCH "EMPTY"
 # Boot controller type
 set BOOT_TYPE 0
+# Total number of DMA endpoints (one or two DMA endpoints per PCIe endpoint)
+set DMA_ENDPOINTS $PCIE_ENDPOINTS
 # Achitecture of Network module
 set NET_MOD_ARCH "CMAC"
 
