@@ -9,16 +9,16 @@ class monitor#(
     int unsigned REGION_SIZE,
     int unsigned META_WIDTH,
     logic STRADDLING,
-    direction_t dir
+    direction_t DIR
 ) extends uvm_pcie::monitor;
     `ndk_component_param_utils(
-        uvm_pcie_avst::monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, dir),
-        $sformatf("uvm_pcie_avst::monitor#(%0d,%0d,%0d,%0d,%s)",REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, dir)
+        uvm_pcie_avst::monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIR),
+        $sformatf("uvm_pcie_avst::monitor#(%0d,%0d,%0d,%0d,%s)",REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIR)
     );
 
     localparam int unsigned ITEM_WIDTH = 32;
 
-    typedef monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, dir) this_type;
+    typedef monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIR) this_type;
     uvm_analysis_imp#(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH), this_type) port_avst;
 
 
@@ -75,7 +75,7 @@ class monitor#(
         for (int unsigned it = 0; it < REGIONS; it++) begin
             if (t.valid[it] == 1'b1) begin
                 if (data.size() == 0 && t.sop[it] == 1) begin
-                    case(dir)
+                    case(DIR)
                         AVST_UP: begin
                             bar = 0;
                             {error, prefix, hdr} = t.meta[it];

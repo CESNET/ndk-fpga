@@ -72,10 +72,10 @@ class sequence_mfb_data #(ITEM_WIDTH) extends uvm_sequence #(uvm_logic_vector_ar
 
     // In body you have to define how the MFB data will looks like
     task body;
-        localparam header_width = 8;
+        localparam HEADER_WIDTH = 8;
 
         logic[ITEM_WIDTH-1 : 0]   m_data[];
-        logic[header_width-1 : 0] header;
+        logic[HEADER_WIDTH-1 : 0] header;
 
         req = uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)::type_id::create("req");
 
@@ -93,7 +93,7 @@ class sequence_mfb_data #(ITEM_WIDTH) extends uvm_sequence #(uvm_logic_vector_ar
         std::randomize(m_data);
         // Header contains only data size
         header   = m_data.size();
-        req.data = new[m_data.size()+header_width/ITEM_WIDTH];
+        req.data = new[m_data.size()+HEADER_WIDTH/ITEM_WIDTH];
         req.data = {header, m_data};
         finish_item(req);
 
