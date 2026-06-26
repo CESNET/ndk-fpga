@@ -37,7 +37,7 @@ class monitor extends uvm_monitor;
         forever begin
             rq_mvb.get(tr_meta);
 
-            tr_rq = uvm_dma::sequence_item_rq::type_id::create("rq_item.item", this);
+            tr_rq = uvm_dma::sequence_item_rq::type_id::create("tr_rq", this);
             tr_rq.time_array_add(tr_meta.start);
 
             tr_rq.relaxed     = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_W-1 : sv_dma_bus_pack::DMA_REQUEST_RELAXED_O];

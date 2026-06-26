@@ -62,14 +62,14 @@ class sequence_simple_1 extends uvm_sequence;
     virtual function void seq_create();
               uvm_logic_vector_array::sequence_lib#(8) rx_packet_lib;
 
-        rx_packet_lib = uvm_logic_vector_array::sequence_lib#(8)::type_id::create("seq_data");
+        rx_packet_lib = uvm_logic_vector_array::sequence_lib#(8)::type_id::create("rx_packet_lib");
         rx_packet_lib.init_sequence();
         rx_packet_lib.add_sequence(seq_small_pkt::get_type());
         rx_packet_lib.min_random_count = 100;
         rx_packet_lib.max_random_count = 200;
 
-        rx_error  = sequence_error#(LOGIC_WIDTH)::type_id::create("avalon_rx_seq_base");
-        reset_seq = uvm_reset::sequence_start::type_id::create("reset_simple");
+        rx_error  = sequence_error#(LOGIC_WIDTH)::type_id::create("rx_error");
+        reset_seq = uvm_reset::sequence_start::type_id::create("reset_seq");
 
         rx_packet = rx_packet_lib;
     endfunction

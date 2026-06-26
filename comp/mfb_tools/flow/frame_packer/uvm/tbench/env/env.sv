@@ -149,7 +149,7 @@ class env #(
         m_reset            = uvm_reset::agent::type_id::create("m_reset", this);
         m_generator        = uvm_framepacker::generator #(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH, MFB_ITEM_WIDTH)::type_id::create("m_generator", this);
         m_scoreboard       = scoreboard #(RX_CHANNELS, PKT_MTU, HDR_META_WIDTH,  MFB_ITEM_WIDTH)::type_id::create("m_scoreboard", this);
-        vscr               = uvm_framepacker::virt_sequencer#(MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("mfb_vscr",this);
+        vscr               = uvm_framepacker::virt_sequencer#(MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("vscr",this);
         for (int unsigned it = 0; it < RX_CHANNELS; it++) begin
             m_flow_ctrl[it] = uvm_logic_vector_mvb::env_tx #(1, 2)::type_id::create($sformatf("m_flow_ctrl_%0d", it), this);
         end

@@ -19,9 +19,9 @@ class virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDT
 
     virtual function void init();
 
-        m_reset                     = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset                     = uvm_reset::sequence_start::type_id::create("m_reset");
         m_logic_vector_array_sq_lib = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("m_logic_vector_array_sq_lib");
-        m_meta_sq                   = uvm_logic_vector::sequence_endless#(META_WIDTH)::type_id::create("m_mfb_meta_sq");
+        m_meta_sq                   = uvm_logic_vector::sequence_endless#(META_WIDTH)::type_id::create("m_meta_sq");
 
         m_logic_vector_array_sq_lib.init_sequence();
         m_logic_vector_array_sq_lib.min_random_count = 50;

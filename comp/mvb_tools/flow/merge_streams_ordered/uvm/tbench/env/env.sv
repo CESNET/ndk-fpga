@@ -72,7 +72,7 @@ class env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_env;
         // Creation of the scoreboard
         m_scbrd = scoreboard #(MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_scbrd", this);
         // Creation of the virtual sequencer
-        m_virt_sqcr = uvm_mvb_merge_streams_ordered::virt_sequencer #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("r", this);
+        m_virt_sqcr = uvm_mvb_merge_streams_ordered::virt_sequencer #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_virt_sqcr", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

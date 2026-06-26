@@ -21,7 +21,7 @@ class virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PC
     // uvm_mtc::reg_sequence     m_reg;
     virtual function void init(uvm_pcie_hdr::sync_tag tag_sync);
 
-        m_reset = uvm_reset::sequence_start::type_id::create("rst_seq");
+        m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
 
         m_pcie_hdr = uvm_pcie_hdr::sequence_lib #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX)::type_id::create("m_pcie_hdr");
         m_pcie_hdr.init_sequence();

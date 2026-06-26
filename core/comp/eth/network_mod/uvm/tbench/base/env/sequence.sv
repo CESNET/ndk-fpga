@@ -80,14 +80,14 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
         // USR SEQURENCE RX
         seq_sync_usr_rx = uvm_common::sequences_cfg_sync#(2)::type_id::create("seq_sync_usr_rx", m_sequencer);
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.usr_rx_data, "", "state", seq_sync_usr_rx.cfg[0]);
-        lib_usr_rx_data = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("usr_rx_data", p_sequencer.usr_rx_data);
+        lib_usr_rx_data = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("lib_usr_rx_data", p_sequencer.usr_rx_data);
         lib_usr_rx_data.max_random_count = 20;
         lib_usr_rx_data.min_random_count = 10;
         lib_usr_rx_data.init_sequence();
 
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.usr_rx_meta, "", "state", seq_sync_usr_rx.cfg[1]);
-        lib_usr_rx_meta = uvm_logic_vector::sequence_simple#(ETH_TX_HDR_WIDTH)::type_id::create("usr_rx_meta" , p_sequencer.usr_rx_meta);
+        lib_usr_rx_meta = uvm_logic_vector::sequence_simple#(ETH_TX_HDR_WIDTH)::type_id::create("lib_usr_rx_meta" , p_sequencer.usr_rx_meta);
         //lib_usr_rx_meta.config_set();
 
         // MAC Check configuration

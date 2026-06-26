@@ -68,7 +68,7 @@ class speed extends uvm_test;
     endtask
 
     virtual function void init();
-        m_reset      = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset      = uvm_reset::sequence_start::type_id::create("m_reset");
     endfunction
 
 

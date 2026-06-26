@@ -50,7 +50,7 @@ class virt_sequence #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_IT
 
     virtual function void init(uvm_phase phase);
 
-        m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset");
         m_reset.reset.length_min = 10;
         m_mfb_data_sq_lib   = uvm_logic_vector_array::sequence_lib #(RX_MFB_ITEM_W)::type_id::create("m_mfb_data_sq_lib");
         m_mfb_meta_sq       = uvm_logic_vector::sequence_endless #(USERMETA_W)::type_id::create("m_mfb_meta_sq");

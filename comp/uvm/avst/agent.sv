@@ -50,7 +50,7 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
 
         // Create monitor
         m_monitor   = monitor #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_monitor", this);
-        m_stat      = statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_statistic", this);
+        m_stat      = statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_stat", this);
     endfunction
 
     virtual function uvm_active_passive_enum get_is_active();
@@ -131,7 +131,7 @@ class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
 
         // Create monitor
         m_monitor   = monitor #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_monitor", this);
-        m_stat      = statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_statistic", this);
+        m_stat      = statistic#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_stat", this);
     endfunction
 
     virtual function uvm_active_passive_enum get_is_active();

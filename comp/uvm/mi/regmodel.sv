@@ -26,7 +26,7 @@ class reg2bus #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned M
 
    function void build_phase(uvm_phase phase);
         predictor = new("predictor", this);
-        adapter   = reg2bus_adapter#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("reg2mi", ,this.get_full_name());
+        adapter   = reg2bus_adapter#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("adapter", ,this.get_full_name());
         frontdoor = reg2bus_frontdoor #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("frontdoor", this);
         monitor   = reg2bus_monitor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("monitor", this);
     endfunction

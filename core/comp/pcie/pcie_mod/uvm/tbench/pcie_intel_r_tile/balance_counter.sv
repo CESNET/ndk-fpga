@@ -74,7 +74,7 @@ class balance_counter extends uvm_component;
         uvm_avst_crdt::sequence_item #(2) avst_crdt_hdr_item;
         avst_crdt_hdr_in[index].get(avst_crdt_hdr_item);
 
-        credit_item_out = credit_item::type_id::create("credit_item");
+        credit_item_out = credit_item::type_id::create("credit_item_out");
         credit_item_out.init       = avst_crdt_hdr_item.init;
         credit_item_out.init_ack   = avst_crdt_hdr_item.init_ack;
         credit_item_out.update     = avst_crdt_hdr_item.update;
@@ -85,7 +85,7 @@ class balance_counter extends uvm_component;
         uvm_avst_crdt::sequence_item #(4) avst_crdt_data_item;
         avst_crdt_data_in[index].get(avst_crdt_data_item);
 
-        credit_item_out = credit_item::type_id::create("credit_item");
+        credit_item_out = credit_item::type_id::create("credit_item_out");
         credit_item_out.init       = avst_crdt_data_item.init;
         credit_item_out.init_ack   = avst_crdt_data_item.init_ack;
         credit_item_out.update     = avst_crdt_data_item.update;

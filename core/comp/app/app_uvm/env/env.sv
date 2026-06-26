@@ -215,7 +215,7 @@ class env #(
         m_resets_gen_config.interface_name[3] = "RESET_USER_X4";
         m_resets_gen_config.driver_delay      = 40ns;
         uvm_config_db#(uvm_reset::env_config_item#(4))::set(this, "m_reset_gen", "m_config", m_resets_gen_config);
-        m_resets_gen = uvm_reset::env#(4)::type_id::create("m_reset_gen", this);
+        m_resets_gen = uvm_reset::env#(4)::type_id::create("m_resets_gen", this);
 
         m_resets_mi_config = new();
         m_resets_mi_config.active         = UVM_PASSIVE;
@@ -352,7 +352,7 @@ class env #(
     task run_eth_meta(uvm_logic_vector::sequencer#(ETH_RX_HDR_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH) meta_seq;
 
-        meta_seq = uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
+        meta_seq = uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("meta_seq", this);
 
         forever begin
             //mvb_seq.set_starting_phase(phase);
@@ -373,7 +373,7 @@ class env #(
     task run_dma_meta(uvm_logic_vector::sequencer#(DMA_RX_MVB_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH) meta_seq;
 
-        meta_seq = uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
+        meta_seq = uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("meta_seq", this);
 
         forever begin
             //mvb_seq.set_starting_phase(phase);

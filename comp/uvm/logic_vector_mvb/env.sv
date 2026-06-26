@@ -57,7 +57,7 @@ class env_rx #(
 
         uvm_logic_vector::monitor#(ITEM_WIDTH)::type_id::set_inst_override(monitor #(ITEMS, ITEM_WIDTH)::get_type(), {this.get_full_name(), ".m_logic_vector_agent.*"});
 
-        m_meter              = uvm_logic_vector::meter#(ITEM_WIDTH)::type_id::create("m_logic_vector_meter", this);
+        m_meter              = uvm_logic_vector::meter#(ITEM_WIDTH)::type_id::create("m_meter", this);
         m_logic_vector_agent = uvm_logic_vector::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_agent", this);
         m_mvb_agent          = uvm_mvb::agent_rx #(ITEMS, ITEM_WIDTH)::type_id::create("m_mvb_agent", this);
 
@@ -175,7 +175,7 @@ class env_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_env;
         uvm_config_db #(uvm_mvb::config_item)::set(this, "m_mvb_agent", "m_config", mvb_agent_cfg);
 
         uvm_logic_vector::monitor#(ITEM_WIDTH)::type_id::set_inst_override(monitor #(ITEMS, ITEM_WIDTH)::get_type(), {this.get_full_name(), ".m_logic_vector_agent.*"});
-        m_meter              = uvm_logic_vector::meter#(ITEM_WIDTH)::type_id::create("m_logic_vector_meter", this);
+        m_meter              = uvm_logic_vector::meter#(ITEM_WIDTH)::type_id::create("m_meter", this);
 
         m_logic_vector_agent = uvm_logic_vector::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_agent", this);
         m_mvb_agent        = uvm_mvb::agent_tx #(ITEMS, ITEM_WIDTH)::type_id::create("m_mvb_agent", this);

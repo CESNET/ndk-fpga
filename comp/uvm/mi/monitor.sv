@@ -36,8 +36,8 @@ class monitor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned M
 
     task run_phase(uvm_phase phase);
         forever begin
-            request = sequence_item_request#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("monitor_rq");
-            response = sequence_item_response#(DATA_WIDTH)::type_id::create("monitor_rs");
+            request = sequence_item_request#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("request");
+            response = sequence_item_response#(DATA_WIDTH)::type_id::create("response");
 
             @(vif.monitor_cb);
             //send request

@@ -40,8 +40,8 @@ class driver#(
             wait(data_fifo.size() < 8 || meta_fifo.size() < 8);
             seq_item_port.get_next_item(req);
 
-            data = uvm_logic_vector_array::sequence_item #(32)           ::type_id::create("mfb_fifo", this);
-            meta = uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))::type_id::create("mfb_fifo", this);
+            data = uvm_logic_vector_array::sequence_item #(32)           ::type_id::create("data", this);
+            meta = uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))::type_id::create("meta", this);
 
             if (DEVICE == DEV_XILINX) begin
                 if (DIR ==  MFB_CC) begin

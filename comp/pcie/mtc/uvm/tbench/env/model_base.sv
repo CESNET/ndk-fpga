@@ -162,8 +162,8 @@ class model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR
 
         cc_tr           = new();
 
-        cc_data_tr = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("cc_data_tr_item");
-        cc_meta_tr = uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)::type_id::create("cc_meta_tr_item");
+        cc_data_tr = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("cc_data_tr");
+        cc_meta_tr = uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)::type_id::create("cc_meta_tr");
         cc_meta_tr.data = '0;
 
         tag = info.tag;

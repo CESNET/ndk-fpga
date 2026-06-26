@@ -32,7 +32,7 @@ class model #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH) extends uvm_compone
             model_mvb_in0.get(tr_mvb_in0);
             model_mvb_in1.get(tr_mvb_in1);
 
-            tr_mvb_out = uvm_logic_vector::sequence_item #(TX_ITEM_WIDTH)::type_id::create("tr_mvb_out_item");
+            tr_mvb_out = uvm_logic_vector::sequence_item #(TX_ITEM_WIDTH)::type_id::create("tr_mvb_out");
 
             tr_mvb_out.data = { tr_mvb_in1.data, tr_mvb_in0.data };
             tr_mvb_out.time_array_add(tr_mvb_in0.start);

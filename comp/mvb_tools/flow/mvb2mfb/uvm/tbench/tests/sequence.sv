@@ -20,7 +20,7 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
 
     virtual function void init(uvm_phase phase);
 
-        m_reset             = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset             = uvm_reset::sequence_start::type_id::create("m_reset");
 
         m_mvb_data_seq      = uvm_logic_vector::sequence_simple #(MVB_ITEM_WIDTH)::type_id::create("m_mvb_data_seq");
         m_mvb_data_seq.transaction_count_min = 5000;

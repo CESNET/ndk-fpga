@@ -21,10 +21,10 @@ class virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_
 
     virtual function void init(uvm_phase phase);
 
-        m_reset             = uvm_reset::sequence_start::type_id::create("m_reset_seq");
-        m_byte_array_sq_lib = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_byte_array_seq_lib");
+        m_reset             = uvm_reset::sequence_start::type_id::create("m_reset");
+        m_byte_array_sq_lib = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_byte_array_sq_lib");
         m_info              = uvm_superpacket_header::sequence_simple#(MVB_ITEM_WIDTH, HEADER_SIZE)::type_id::create("m_info");
-        m_size_sq_lib       = uvm_superpacket_size::sequence_lib#(MIN_SIZE, PKT_MTU)::type_id::create("m_size_seq_lib");
+        m_size_sq_lib       = uvm_superpacket_size::sequence_lib#(MIN_SIZE, PKT_MTU)::type_id::create("m_size_sq_lib");
 
         m_byte_array_sq_lib.init_sequence();
         m_byte_array_sq_lib.cfg = new();

@@ -78,7 +78,7 @@ class sequence_resp extends uvm_sequence #(uvm_pcie::header);
 
             //cc_hdr = hdr.pop_front();
             cq_num = $urandom_range(0, info.rq_hdr.size()-1); //Cahnge randomize to 0 gauss distribution. when head have the moust generated top transaction
-            rc_hdr = uvm_pcie::completer_header::type_id::create("cc_hdr", m_sequencer);
+            rc_hdr = uvm_pcie::completer_header::type_id::create("rc_hdr", m_sequencer);
 
             //
             start_item(rc_hdr);

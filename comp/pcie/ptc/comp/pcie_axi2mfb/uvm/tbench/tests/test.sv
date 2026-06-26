@@ -28,7 +28,7 @@ class ex_test extends uvm_test;
 
         // Declaring the sequence library reference and initializing it
         uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) mfb_seq;
-        mfb_seq = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("mfb_tx_seq", this);
+        mfb_seq = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("mfb_seq", this);
 
         mfb_seq.add_sequence(uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::get_type());
         mfb_seq.min_random_count = 10;

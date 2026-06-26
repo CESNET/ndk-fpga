@@ -54,7 +54,7 @@ class agent_rx extends uvm_agent;
         // Create a statistics gatherer
         m_statistics = statistics::type_id::create("m_statistics", this);
         // Create a coverage gatherer
-        m_coverage = coverage::type_id::create("coverage", this);
+        m_coverage = coverage::type_id::create("m_coverage", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -136,7 +136,7 @@ class agent_tx extends uvm_agent;
         // Create a statistics gatherer
         m_statistics = statistics::type_id::create("m_statistics", this);
         // Create a coverage gatherer
-        m_coverage = coverage::type_id::create("coverage", this);
+        m_coverage = coverage::type_id::create("m_coverage", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);

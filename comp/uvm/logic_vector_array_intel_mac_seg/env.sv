@@ -105,7 +105,7 @@ class env_rx #(int unsigned SEGMENTS) extends uvm_env;
             sequence_lib_rx#(SEGMENTS) intel_mac_seg;
 
             if (m_config.lib_type == config_item::BASE) begin
-                intel_mac_seg = sequence_lib_rx#(SEGMENTS)::type_id::create("avalon_rx_seq_base", this);
+                intel_mac_seg = sequence_lib_rx#(SEGMENTS)::type_id::create("intel_mac_seg", this);
             end else begin
                 `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
             end

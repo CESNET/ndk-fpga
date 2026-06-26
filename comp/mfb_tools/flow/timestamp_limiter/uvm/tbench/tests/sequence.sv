@@ -21,7 +21,7 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
 
     virtual function void init(uvm_timestamp_limiter::regmodel #(QUEUES) m_regmodel, uvm_phase phase);
 
-        m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset");
         m_mfb_data_sq_lib        = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_mfb_data_sq_lib");
         m_mfb_meta_sq            = uvm_timestamp_limiter::sequence_meta#(RX_MFB_META_WIDTH, TIMESTAMP_WIDTH, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_FORMAT, QUEUES)::type_id::create("m_mfb_meta_sq");
         m_mfb_meta_sq.m_regmodel = m_regmodel;

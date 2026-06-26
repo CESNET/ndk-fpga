@@ -167,8 +167,8 @@ class slow_dma_down_test extends uvm_test;
     virtual task rq_seq;
         uvm_mfb::sequence_lib_tx#(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, 32, 0) rq_mfb_lib;
         uvm_axi::sequence_lib_tx #(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH, MFB_UP_REGIONS) rq_axi_lib;
-        rq_mfb_lib = uvm_mfb::sequence_lib_tx#(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, 32, 0)::type_id::create("mfb_eth_rq_seq", this);
-        rq_axi_lib = uvm_axi::sequence_lib_tx #(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH, MFB_UP_REGIONS)::type_id::create("axi_rq_seq", this);
+        rq_mfb_lib = uvm_mfb::sequence_lib_tx#(MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, 32, 0)::type_id::create("rq_mfb_lib", this);
+        rq_axi_lib = uvm_axi::sequence_lib_tx #(RQ_TDATA_WIDTH, RQ_TUSER_WIDTH, MFB_UP_REGIONS)::type_id::create("rq_axi_lib", this);
 
         rq_mfb_lib.init_sequence();
         rq_mfb_lib.min_random_count = 60;

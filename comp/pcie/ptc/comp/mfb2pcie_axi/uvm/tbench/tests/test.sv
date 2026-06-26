@@ -28,7 +28,7 @@ class ex_test extends uvm_test;
 
         // Declaring the sequence library reference and initializing it
         uvm_axi::sequence_lib_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS) axi_seq;
-        axi_seq = uvm_axi::sequence_lib_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("axi_tx_seq", this);
+        axi_seq = uvm_axi::sequence_lib_tx #(DATA_WIDTH, TUSER_WIDTH, REGIONS)::type_id::create("axi_seq", this);
 
         axi_seq.init_sequence();
         axi_seq.min_random_count = 10;

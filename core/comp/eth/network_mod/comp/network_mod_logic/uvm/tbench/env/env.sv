@@ -46,8 +46,8 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
         m_user_rx_mfb_config.interface_name = "vif_user_rx_mfb";
         m_user_rx_mfb_config.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_rx_mfb_env_", "m_config", m_user_rx_mfb_config);
-        m_user_rx_mfb_env = uvm_logic_vector_array_mfb::env_rx#(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_user_rx_mfb_env_", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_rx_mfb_env", "m_config", m_user_rx_mfb_config);
+        m_user_rx_mfb_env = uvm_logic_vector_array_mfb::env_rx#(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_user_rx_mfb_env", this);
 
         // CORE (TX) environment
         for(int i = 0; i < ETH_CHANNELS; i++) begin
@@ -84,15 +84,15 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
         m_user_tx_mfb_config.interface_name = "vif_user_tx_mfb";
         m_user_tx_mfb_config.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_tx_mfb_env_", "m_config", m_user_tx_mfb_config);
-        m_user_tx_mfb_env = uvm_logic_vector_array_mfb::env_tx#(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_user_tx_mfb_env_", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_tx_mfb_env", "m_config", m_user_tx_mfb_config);
+        m_user_tx_mfb_env = uvm_logic_vector_array_mfb::env_tx#(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_user_tx_mfb_env", this);
 
         m_user_tx_mvb_config = new;
         m_user_tx_mvb_config.active = UVM_ACTIVE;
         m_user_tx_mvb_config.interface_name = "vif_user_tx_mvb";
 
-        uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, "m_user_tx_mvb_env_", "m_config", m_user_tx_mvb_config);
-        m_user_tx_mvb_env = uvm_logic_vector_mvb::env_tx#(USER_REGIONS, USER_MVB_WIDTH)::type_id::create("m_user_tx_mvb_env_", this);
+        uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, "m_user_tx_mvb_env", "m_config", m_user_tx_mvb_config);
+        m_user_tx_mvb_env = uvm_logic_vector_mvb::env_tx#(USER_REGIONS, USER_MVB_WIDTH)::type_id::create("m_user_tx_mvb_env", this);
 
         // MVB discard --------------------------------------------------------------------------------------------------------------------------------------------------
         for(int i = 0; i < ETH_CHANNELS; i++) begin

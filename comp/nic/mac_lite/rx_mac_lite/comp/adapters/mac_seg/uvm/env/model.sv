@@ -52,7 +52,7 @@ class model extends uvm_component;
             packet_size_stats.next_val(rx_tr_packet.size());
 
             $cast(tx_tr_packet, rx_tr_packet.clone());
-            tx_tr_error = uvm_logic_vector::sequence_item#(1)::type_id::create("model_result_error");
+            tx_tr_error = uvm_logic_vector::sequence_item#(1)::type_id::create("tx_tr_error");
             {fcs_error, error, status} = rx_tr_error.data;
             tx_tr_error.data = fcs_error;
 

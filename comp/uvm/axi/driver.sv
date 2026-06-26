@@ -30,7 +30,7 @@ class driver_rx #(
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        rsp = sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("mfb_rsp");
+        rsp = sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("rsp");
 
         forever begin
             // Get new sequence item to drive to interface
@@ -93,7 +93,7 @@ class driver_tx #(
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        rsp = sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("mfb_rsp");
+        rsp = sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)::type_id::create("rsp");
 
         forever begin
             // Get new sequence item to drive to interface

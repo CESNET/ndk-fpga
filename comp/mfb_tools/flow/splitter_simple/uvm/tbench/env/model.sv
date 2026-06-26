@@ -63,7 +63,7 @@ class model #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_component;
             //save it for data
             headers.push_back(tr_in);
             //Create output header
-            tr_out = uvm_logic_vector::sequence_item #(META_WIDTH)::type_id::create("tr_output_meta", this);
+            tr_out = uvm_logic_vector::sequence_item #(META_WIDTH)::type_id::create("tr_out", this);
             tr_out.start = tr_in.start;
             tr_out.data  = tr_in.data[META_WIDTH-1:0];
             channel      = tr_in.data[SEL_WIDTH + META_WIDTH-1 : META_WIDTH];

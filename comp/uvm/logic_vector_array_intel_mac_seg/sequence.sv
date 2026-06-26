@@ -154,7 +154,7 @@ virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel
         hl_tr_err = null;
 
         req = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("req");
-        gen = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("reg");
+        gen = uvm_intel_mac_seg::sequence_item #(SEGMENTS)::type_id::create("gen");
 
         prepare_valid_delay_fifo();
 

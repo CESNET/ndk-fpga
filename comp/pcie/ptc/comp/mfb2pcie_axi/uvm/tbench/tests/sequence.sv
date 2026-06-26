@@ -18,9 +18,9 @@ class virt_sequence#(ITEM_WIDTH) extends uvm_sequence;
 
     virtual function void init();
 
-        m_reset      = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset      = uvm_reset::sequence_start::type_id::create("m_reset");
 
-        m_logic_vector_array_sq_lib   = uvm_logic_vector_array::sequence_lib#(32)::type_id::create("m_logic_vector_array_seq_lib");
+        m_logic_vector_array_sq_lib   = uvm_logic_vector_array::sequence_lib#(32)::type_id::create("m_logic_vector_array_sq_lib");
 
         m_logic_vector_array_sq_lib.init_sequence();
         m_logic_vector_array_sq_lib.cfg = new();

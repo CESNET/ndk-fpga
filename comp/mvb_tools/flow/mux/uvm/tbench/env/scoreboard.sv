@@ -34,7 +34,7 @@ class scoreboard #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_scoreboard;
     function void build_phase(uvm_phase phase);
         m_model = model #(ITEMS, ITEM_WIDTH, RX_MVB_CNT)::type_id::create("m_model", this);
 
-        comparer                = uvm_mvb_mux::mvb_comparer #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_comparer", this);
+        comparer                = uvm_mvb_mux::mvb_comparer #(ITEMS, ITEM_WIDTH)::type_id::create("comparer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);

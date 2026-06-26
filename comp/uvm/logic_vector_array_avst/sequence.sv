@@ -147,7 +147,7 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
         state_packet = state_packet_space_new;
 
         req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
-        gen = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("reg");
+        gen = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("gen");
 
         //send empty frame to get first response
         send_empty_frame();

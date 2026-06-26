@@ -29,7 +29,7 @@ class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned I
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        rsp = sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");
+        rsp = sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("rsp");
 
         forever begin
             // Get new sequence item to drive to interface
@@ -89,7 +89,7 @@ class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned I
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rsp");
+        req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
 
         forever begin
             // Get new sequence item to drive to interface

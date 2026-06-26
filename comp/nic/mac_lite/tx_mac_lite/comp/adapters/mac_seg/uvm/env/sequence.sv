@@ -46,14 +46,14 @@ class sequence_simple_1#(SEGMENTS) extends uvm_sequence;
     virtual function void seq_create();
         uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH) rx_seq_data_lib;
 
-        rx_seq_meta = sequence_meta::type_id::create("seq_meta");
-        rx_seq_data_lib = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("seq_data");
+        rx_seq_meta = sequence_meta::type_id::create("rx_seq_meta");
+        rx_seq_data_lib = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("rx_seq_data_lib");
         rx_seq_data_lib.init_sequence();
         rx_seq_data_lib.min_random_count = 50;
         rx_seq_data_lib.max_random_count = 100;
         rx_seq_data_lib.cfg = new();
 
-        reset_seq   = uvm_reset::sequence_start::type_id::create("reset_simple");
+        reset_seq   = uvm_reset::sequence_start::type_id::create("reset_seq");
 
         rx_seq_data = rx_seq_data_lib;
         //rx_seq_data = uvm_logic_vector_array::sequence_simple#(ITEM_WIDTH)::type_id::create("seq_data");

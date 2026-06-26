@@ -90,7 +90,7 @@ class driver_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsi
 
     // Run - starts the processing in driver
     task run_phase(uvm_phase phase);
-        rsp = sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("mi_master");
+        rsp = sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("rsp");
         forever begin
             // Pull sequence item (transaction) from the low level sequencer.
             seq_item_port.try_next_item(req);

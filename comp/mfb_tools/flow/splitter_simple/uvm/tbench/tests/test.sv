@@ -23,8 +23,8 @@ class ex_test extends uvm_test;
         uvm_reset::sequence_reset reset;
         uvm_reset::sequence_run   run;
 
-        reset = uvm_reset::sequence_reset::type_id::create("reset_reset");
-        run   = uvm_reset::sequence_run::type_id::create("reset_run");
+        reset = uvm_reset::sequence_reset::type_id::create("reset");
+        run   = uvm_reset::sequence_run::type_id::create("run");
         run.length_min = 1000;
         run.length_max = 2000;
 

@@ -40,7 +40,7 @@ class model extends uvm_component;
             rx_packet.get(rx_tr_packet);
             rx_error.get(rx_tr_error);
 
-            tx_tr_error = uvm_logic_vector::sequence_item#(LOGIC_WIDTH)::type_id::create("model_tx_meta");
+            tx_tr_error = uvm_logic_vector::sequence_item#(LOGIC_WIDTH)::type_id::create("tx_tr_error");
             tx_tr_error.data = 'z;
             if (rx_tr_error.data == 0) begin
                 tx_tr_error.data[5] = 1'b0;

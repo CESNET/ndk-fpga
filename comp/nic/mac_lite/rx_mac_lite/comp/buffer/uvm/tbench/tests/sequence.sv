@@ -25,8 +25,8 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
         uvm_logic_vector_array::config_sequence mfb_cfg;
 
         //RESET
-        m_reset_rx          = uvm_reset::sequence_start::type_id::create("m_reset_rx_seq", p_sequencer);
-        m_reset_tx          = uvm_reset::sequence_start::type_id::create("m_reset_tx_seq", p_sequencer);
+        m_reset_rx          = uvm_reset::sequence_start::type_id::create("m_reset_rx", p_sequencer);
+        m_reset_tx          = uvm_reset::sequence_start::type_id::create("m_reset_tx", p_sequencer);
 
         //RX
         m_mfb_data_sq_lib   = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_mfb_data_sq_lib", p_sequencer);

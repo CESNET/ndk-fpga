@@ -30,7 +30,7 @@ class driver_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_drive
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        rsp = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_rsp");
+        rsp = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("rsp");
 
         forever begin
             seq_item_port.try_next_item(req);
@@ -87,7 +87,7 @@ class driver_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_drive
     // ------------------------------------------------------------------------
     // Starts driving signals to interface
     task run_phase(uvm_phase phase);
-        rsp = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_rsp");
+        rsp = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("rsp");
 
         forever begin
             seq_item_port.try_next_item(req);

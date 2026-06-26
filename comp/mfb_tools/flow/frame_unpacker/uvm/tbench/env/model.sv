@@ -78,8 +78,8 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
 
             while(offset != size_of_sp) begin
 
-                tr_output_packet = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_output_packet_item");
-                tr_output_meta   = uvm_logic_vector::sequence_item #(HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("tr_output_packet_item");
+                tr_output_packet = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_output_packet");
+                tr_output_meta   = uvm_logic_vector::sequence_item #(HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("tr_output_meta");
 
                 header                     = extract_header(tr_input_packet, offset);
                 size_of_pkt                = header[16-1 : 0];

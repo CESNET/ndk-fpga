@@ -53,7 +53,7 @@ class model #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTAMP_WI
             msg = {msg, $sformatf(" INPUT META %h\n",  tr_input_meta.data[RX_MFB_META_WIDTH-1 : TIMESTAMP_WIDTH+$clog2(QUEUES)])};
             msg = {msg, $sformatf(" %s\n",  tr_input_meta.convert2string())};
 
-            tr_output_meta = uvm_logic_vector::sequence_item #(TX_MFB_META_WIDTH)::type_id::create("tr_output_data_item");
+            tr_output_meta = uvm_logic_vector::sequence_item #(TX_MFB_META_WIDTH)::type_id::create("tr_output_meta");
             tr_output_meta.time_array_add(tr_input_meta.start);
 
             tr_output_meta.data = tr_input_meta.data[RX_MFB_META_WIDTH-1 : TIMESTAMP_WIDTH+$clog2(QUEUES)];
