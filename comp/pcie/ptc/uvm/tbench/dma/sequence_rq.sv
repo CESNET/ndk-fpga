@@ -80,7 +80,7 @@ class sequence_dma_rq#(
         };
     }
 
-    function new(string name = "mi_cc_sequence");
+    function new(string name = "uvm_dma::sequence_dma_rq");
         super.new(name);
     endfunction
 
@@ -140,6 +140,38 @@ class sequence_dma_rq#(
     endtask
 endclass
 
+
+class sequence_dma_rq_stop#(
+    int unsigned DMA_PORTS
+) extends uvm_common::sequence_base#(config_sequence, uvm_dma::sequence_item_rq);
+    `uvm_object_param_utils(uvm_dma::sequence_dma_rq#(DMA_PORTS))
+
+    time wait_time_min = 40ns;
+    time wait_time_max = 10us;
+    rand time wait_time;
+
+    constraint c_max_payload_size {
+        wait_time dist {
+            `ndk_rand_dist_first(wait_time_min, wait_time_max, 8)    :/ 30,
+            `ndk_rand_dist      (wait_time_min, wait_time_max, 8, 1) :/ 64,
+            `ndk_rand_dist      (wait_time_min, wait_time_max, 8, 2) :/ 32,
+            `ndk_rand_dist      (wait_time_min, wait_time_max, 8, 3) :/ 16,
+            `ndk_rand_dist      (wait_time_min, wait_time_max, 8, 4) :/ 8,
+            `ndk_rand_dist      (wait_time_min, wait_time_max, 8, 5) :/ 4,
+            `ndk_rand_dist      (wait_time_min, wait_time_max, 8, 6) :/ 2,
+            `ndk_rand_dist_last (wait_time_min, wait_time_max, 8)    :/ 1
+        };
+    }
+
+    function new(string name = "mi_cc_sequence");
+        super.new(name);
+    endfunction
+
+    task body;
+        #(wait_time);
+    endtask
+endclass
+
 class sequence_dma_rq_lib #(
     int unsigned DMA_PORTS
 ) extends uvm_common::sequence_library#(config_sequence, uvm_dma::sequence_item_rq);
@@ -155,6 +187,7 @@ class sequence_dma_rq_lib #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
+        this.add_sequence(uvm_dma::sequence_dma_rq_stop#(DMA_PORTS)::get_type());
         this.add_sequence(uvm_dma::sequence_dma_rq#(DMA_PORTS)::get_type());
     endfunction
 endclass
