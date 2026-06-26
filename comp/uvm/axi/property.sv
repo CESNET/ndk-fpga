@@ -95,7 +95,7 @@ module axi_xilinx_property #(
     );
 
     //Check straddling
-    generate if (STRADDLING  != 1'b0) begin
+    generate if (STRADDLING  != 1'b0) begin : gen_straddling
         //assert property (@(posedge vif.CLK) disable iff(RESET) vif.TLAST === 1'b0)
         //    else begin
         //        `uvm_error($sformatf("%m"), "\n\tIf Straddling is enabled then, last have to be set to zero");

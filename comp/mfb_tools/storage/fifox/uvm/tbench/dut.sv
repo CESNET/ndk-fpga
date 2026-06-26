@@ -20,10 +20,10 @@ module DUT (
     logic [REGIONS*(REGION_SIZE <= 1 ? 1 : $clog2(REGION_SIZE))-1:0] tx_sof_pos;
 
     generate
-        if (REGION_SIZE > 1) begin
+        if (REGION_SIZE > 1) begin : gen_REGION_SIZE_1
             assign rx_sof_pos = mfb_rx.SOF_POS;
             assign mfb_tx.SOF_POS = tx_sof_pos;
-        end else begin
+        end else begin : gen_line_26
             assign rx_sof_pos = 'x;
         end
     endgenerate

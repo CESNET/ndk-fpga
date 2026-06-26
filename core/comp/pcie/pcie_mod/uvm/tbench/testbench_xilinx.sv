@@ -68,10 +68,10 @@ module testbench;
     //bind TAG_PROBE : DUT_U.VHDL_DUT_U. pcie_ctrl_g[it].pcie_ctrl_i.ptc_i  probe_inf #(2*REGIONS) probe_drop({tagm_mvb_out_src_rdy & tagm_mvb_out_src_rdy},
     //                                                                                                        {s_rx_eof_orig_reg, s_rx_force_drop_reg}, PCIE_USER_CLK);
     generate
-        if (PCIE_ENDPOINTS == 1) begin
+        if (PCIE_ENDPOINTS == 1) begin : gen_PCIE_ENDPOINTS_1
             bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
                             {tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}, {tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}, CLK);
-        end else begin
+        end else begin : gen_line_74
             $error("\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n");
         end
     endgenerate
@@ -84,15 +84,15 @@ module testbench;
     always #(DMA_CLK_PERIOD) DMA_CLK               = ~DMA_CLK;
     always #(MI_CLK_PERIOD) MI_CLK                 = ~MI_CLK;
 
-    for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
+    for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin : gen_pcie_e
         assign pcie_user_reset[pcie_e].RESET = pcie_user_reset_logic[pcie_e];
     end
 
-    for (genvar pcie_clks = 0; pcie_clks < PCIE_CONS*PCIE_CLKS; pcie_clks++) begin
+    for (genvar pcie_clks = 0; pcie_clks < PCIE_CONS*PCIE_CLKS; pcie_clks++) begin : gen_pcie_clks
         assign pcie_sysclk_p_logic[pcie_clks] = PCIE_SYSCLK_P;
         assign pcie_sysclk_n_logic[pcie_clks] = PCIE_SYSCLK_N;
     end
-    for (genvar pcie_c = 0; pcie_c < PCIE_CONS; pcie_c++) begin
+    for (genvar pcie_c = 0; pcie_c < PCIE_CONS; pcie_c++) begin : gen_pcie_c
         assign pcie_sysrst_n_logic[pcie_c] = pcie_sysrst_n[pcie_c].RESET;
         // assign INIT_DONE_N = !pcie_sysrst_n[pcie_c].RESET;
     end
@@ -194,7 +194,7 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // GRAY BOX CONNECTION
     generate
-        for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
+        for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin : gen_pcie_e_greybox
 
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_hip_clk[pcie_e] = PCIE_USER_CLK;
 

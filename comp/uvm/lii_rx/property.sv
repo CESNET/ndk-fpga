@@ -59,7 +59,7 @@ module lii_property_rx #(logic FAST_SOF, logic RESET_ENABLE, int unsigned DATA_W
     // -----------------------
 
     generate
-        if (RESET_ENABLE == 1'b1) begin
+        if (RESET_ENABLE == 1'b1) begin : gen_reset_enable
             assert property (sof_eof_control)
                 else begin
                     $error("After SOF is not EOF");

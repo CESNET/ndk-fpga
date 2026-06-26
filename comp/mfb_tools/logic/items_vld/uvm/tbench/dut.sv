@@ -21,7 +21,7 @@ module DUT (
     logic                                  mvb_src_rdy;
 
     generate
-        for (genvar r = 0; r < MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < MFB_REGIONS; r++) begin : gen_r
             assign offset  [(r+1)*OFFSET_WIDTH-1 : r*OFFSET_WIDTH] = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH-1              : r*META_WIDTH];
             assign length  [(r+1)*LENGTH_WIDTH-1 : r*LENGTH_WIDTH] = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH+LENGTH_WIDTH-1 : OFFSET_WIDTH+(r*META_WIDTH)];
             assign rx_en[r]                                        = mfb_rx.META[(r*META_WIDTH)+META_WIDTH-1                : OFFSET_WIDTH+LENGTH_WIDTH+(r*META_WIDTH)];
@@ -30,7 +30,7 @@ module DUT (
 
     logic [((MFB_REGION_SIZE != 1) ? MFB_REGIONS*$clog2(MFB_REGION_SIZE) : MFB_REGIONS)-1 : 0] sof_pos;
     generate
-        if (MFB_REGION_SIZE != 1) begin
+        if (MFB_REGION_SIZE != 1) begin : gen_MFB_REGION_SIZE_1
             assign sof_pos = mfb_rx.SOF_POS;
         end else
             assign sof_pos = '0;

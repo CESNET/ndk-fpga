@@ -80,7 +80,7 @@ module PROPERTY #(
         .vif   (cq_mfb)
     );
 
-    generate if (ENDPOINT_TYPE == "R_TILE") begin
+    generate if (ENDPOINT_TYPE == "R_TILE") begin : gen_ENDPOINT_TYPE_R_TILE
         property no_fall_init;
             @(posedge avst_down.CLK) disable iff(RST)
             $rose(avst_down.READY) |=> always avst_down.READY;

@@ -125,7 +125,7 @@ module testbench;
     assign reset_dma_x2.RESET  = reset_logic_dma_x2[0];
     assign reset_app.RESET     = reset_logic_app[0];
 
-    for (genvar mem_it = 0; mem_it < test_pkg::MEM_PORTS; mem_it++) begin
+    for (genvar mem_it = 0; mem_it < test_pkg::MEM_PORTS; mem_it++) begin : gen_mem_it
         reset_if                                                                                 mem_reset(MEM_CLK[mem_it]);
         avmm_if#(test_pkg::MEM_ADDR_WIDTH, test_pkg::MEM_DATA_WIDTH, test_pkg::MEM_BURST_WIDTH)  mem      (MEM_CLK[mem_it]);
 
@@ -174,7 +174,7 @@ module testbench;
     logic [test_pkg::ETH_STREAMS-1:0]                                                                                                eth_tx_mfb_src_rdy;
     logic [test_pkg::ETH_STREAMS-1:0]                                                                                                eth_tx_mfb_dst_rdy;
 
-    for (genvar eth_it = 0; eth_it < test_pkg::ETH_STREAMS; eth_it++) begin
+    for (genvar eth_it = 0; eth_it < test_pkg::ETH_STREAMS; eth_it++) begin : gen_eth_it
         //ETH RX
         assign eth_rx_mvb_data[(eth_it+1)*test_pkg::REGIONS*test_pkg::ETH_RX_HDR_WIDTH-1 -: test_pkg::REGIONS*test_pkg::ETH_RX_HDR_WIDTH] = eth_rx_mvb[eth_it].DATA;
         assign eth_rx_mvb_vld[(eth_it+1)*test_pkg::REGIONS-1 -: test_pkg::REGIONS]                                                        = eth_rx_mvb[eth_it].VLD;
@@ -232,9 +232,9 @@ module testbench;
     logic [test_pkg::DMA_STREAMS-1:0]                                                                                            dma_tx_mfb_src_rdy;
     logic [test_pkg::DMA_STREAMS-1:0]                                                                                            dma_tx_mfb_dst_rdy;
 
-    for (genvar dma_it = 0; dma_it < test_pkg::DMA_STREAMS; dma_it++) begin
+    for (genvar dma_it = 0; dma_it < test_pkg::DMA_STREAMS; dma_it++) begin : gen_dma_it
         //DMA RX
-        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin
+        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_dma_region
             assign dma_rx_mvb_len[(dma_it*test_pkg::REGIONS + dma_region + 1)*$clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)]         = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)];
             assign dma_rx_mvb_hdr_meta[(dma_it*test_pkg::REGIONS + dma_region + 1)*test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH]          = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH];
             assign dma_rx_mvb_channel[(dma_it*test_pkg::REGIONS + dma_region + 1)*$clog2(test_pkg::DMA_RX_CHANNELS)-1 -: $clog2(test_pkg::DMA_RX_CHANNELS)] = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS)-1 -: $clog2(test_pkg::DMA_TX_CHANNELS)];
@@ -252,7 +252,7 @@ module testbench;
         assign dma_rx_mfb[dma_it].DST_RDY = dma_rx_mfb_dst_rdy[dma_it];
 
         //DMA TX
-        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin
+        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_dma_region
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)]                                                                  = dma_tx_mvb_len[(dma_it*test_pkg::REGIONS + dma_region + 1) * $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)];
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH]                                        = dma_tx_mvb_hdr_meta[(dma_it*test_pkg::REGIONS + dma_region + 1) * test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH];
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS)-1 -: $clog2(test_pkg::DMA_RX_CHANNELS)] = dma_tx_mvb_channel[(dma_it*test_pkg::REGIONS + dma_region + 1) *  $clog2(test_pkg::DMA_RX_CHANNELS)-1 -: $clog2(test_pkg::DMA_RX_CHANNELS)];

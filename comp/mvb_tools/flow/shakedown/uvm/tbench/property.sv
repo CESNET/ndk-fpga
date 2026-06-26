@@ -27,7 +27,7 @@ module mvb_shakedown_property #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH) (
     // ----------------- //
 
     generate;
-        for (genvar i = 0; i < TX_ITEMS; i++) begin
+        for (genvar i = 0; i < TX_ITEMS; i++) begin : gen_i
             mvb_property #(
                 .ITEMS      (1),
                 .ITEM_WIDTH (ITEM_WIDTH)

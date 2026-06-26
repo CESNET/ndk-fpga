@@ -168,7 +168,7 @@ module DUT #(
             assign eth_rx[eth_it].READY = 1'b1; // it have to be allways ready
 
             // TX
-            for (genvar reg_it = 0; reg_it < ETH_PORT_CHAN[eth_it]; reg_it++) begin
+            for (genvar reg_it = 0; reg_it < ETH_PORT_CHAN[eth_it]; reg_it++) begin : gen_reg_it
                 assign eth_tx[eth_it].DATA[reg_it]   = { << ITEM_WIDTH {avst_tx_data[(ETH_PORT_CHAN[eth_it] - reg_it)*AVST_ITEMS*ITEM_WIDTH-1 -: AVST_ITEMS*ITEM_WIDTH]}};
                 assign eth_tx[eth_it].META[reg_it]   = avst_tx_meta[(reg_it+1)*1-1 -: 1];
                 assign eth_tx[eth_it].EMPTY[reg_it]  = avst_tx_empty[(reg_it+1)*$clog2(AVST_ITEMS)-1 -: $clog2(AVST_ITEMS)];

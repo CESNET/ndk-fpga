@@ -73,8 +73,8 @@ module testbench;
     );
 
     generate
-        if (DEMUX_VERSION != "logic") begin
-            for (genvar i = 0; i < TX_PORTS; i++) begin
+        if (DEMUX_VERSION != "logic") begin : gen_DEMUX_VERSION_logic
+            for (genvar i = 0; i < TX_PORTS; i++) begin : gen_i
                 mvb_property #(
                     .ITEMS      (ITEMS),
                     .ITEM_WIDTH (ITEM_WIDTH)

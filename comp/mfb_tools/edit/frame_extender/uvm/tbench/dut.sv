@@ -77,7 +77,7 @@ module DUT #(
     );
 
     generate;
-        for (genvar i = 0; i < MFB_REGIONS; i++) begin
+        for (genvar i = 0; i < MFB_REGIONS; i++) begin : gen_i
             logic [RX_MVB_ITEM_WIDTH-1 : 0] rx_mvb_slice;
             assign rx_mvb_slice = mvb_rx.DATA[RX_MVB_ITEM_WIDTH*(i+1)-1 -: RX_MVB_ITEM_WIDTH];
 

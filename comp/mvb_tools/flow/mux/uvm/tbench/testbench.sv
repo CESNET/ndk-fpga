@@ -65,7 +65,7 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Properties
-    for (genvar port = 0; port < RX_MVB_CNT; port++) begin
+    for (genvar port = 0; port < RX_MVB_CNT; port++) begin : gen_port
         mvb_property #(
             .ITEMS       (ITEMS),
             .ITEM_WIDTH  (ITEM_WIDTH)

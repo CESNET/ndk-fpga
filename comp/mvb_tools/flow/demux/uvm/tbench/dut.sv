@@ -25,12 +25,13 @@ module DUT (
     logic [TX_PORTS -1 : 0]                       tx_mvb_src_rdy;
     logic [TX_PORTS -1 : 0]                       tx_mvb_dst_rdy;
 
-    for (genvar it = 0; it < ITEMS; it++) begin
-        assign RX_DATA[(it+1) * ITEM_WIDTH -1 -: ITEM_WIDTH] = rx_mvb.DATA[it * TOTAL_ITEM_WIDTH + ITEM_WIDTH -1 -: ITEM_WIDTH];
+    for (genvar it = 0; it < ITEMS; it++) begin : gen_items
+        assign RX_DATA[(it+1) * ITEM_WIDTH -1 -: ITEM_WIDTH] =
+            rx_mvb.DATA[it * TOTAL_ITEM_WIDTH + ITEM_WIDTH -1 -: ITEM_WIDTH];
         assign RX_SEL[(it+1) * SEL_WIDTH -1 -: SEL_WIDTH]    = rx_mvb.DATA[(it+1) * TOTAL_ITEM_WIDTH -1 -: SEL_WIDTH];
     end
 
-    for (genvar it = 0; it < TX_PORTS; it++) begin
+    for (genvar it = 0; it < TX_PORTS; it++) begin : gen_tx_ports
         assign tx_mvb[it].DATA    = tx_mvb_data[(it+1) * ITEMS * ITEM_WIDTH -1 -: ITEMS * ITEM_WIDTH];
         assign tx_mvb[it].VLD     = tx_mvb_vld[(it+1) * ITEMS -1 -: ITEMS];
         assign tx_mvb[it].SRC_RDY = tx_mvb_src_rdy[it];

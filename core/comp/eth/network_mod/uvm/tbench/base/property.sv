@@ -70,7 +70,7 @@ module PROPERTY #(
 );
 
 generate;
-    for (genvar i = 0; i < ETH_PORTS; i++) begin
+    for (genvar i = 0; i < ETH_PORTS; i++) begin : gen_i
         mfb_property #(
             .REGIONS     (REGIONS         ),
             .REGION_SIZE (REGION_SIZE     ),

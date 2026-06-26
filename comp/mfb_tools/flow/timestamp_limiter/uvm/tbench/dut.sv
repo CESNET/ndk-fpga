@@ -21,9 +21,9 @@ module DUT (
     logic [MFB_REGIONS*MFB_META_WIDTH-1 : 0]  meta;
     logic [MFB_REGIONS*R_QUEUES-1 : 0]        mfb_queue;
 
-    for (genvar regions = 0; regions < MFB_REGIONS; regions++) begin
+    for (genvar regions = 0; regions < MFB_REGIONS; regions++) begin : gen_regions
         assign timestamp [(regions+1)*TIMESTAMP_WIDTH-1 -: TIMESTAMP_WIDTH] = mfb_rx.META[regions*RX_MFB_META_WIDTH + TIMESTAMP_WIDTH                            -1 -: TIMESTAMP_WIDTH];
-        if (QUEUES !=1) begin
+        if (QUEUES !=1) begin : gen_QUEUES_1
             assign mfb_queue [(regions+1)*$clog2(QUEUES)       -1 -: $clog2(QUEUES)       ] = mfb_rx.META[regions*RX_MFB_META_WIDTH + TIMESTAMP_WIDTH + $clog2(QUEUES)           -1 -: $clog2(QUEUES) ];
         end
         assign meta      [(regions+1)*MFB_META_WIDTH -1 -: MFB_META_WIDTH ] = mfb_rx.META[regions*RX_MFB_META_WIDTH + TIMESTAMP_WIDTH + $clog2(QUEUES) + MFB_META_WIDTH-1 -: MFB_META_WIDTH ];

@@ -91,14 +91,14 @@ module DUT (
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_cq_mfb_src_rdy;
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_cq_mfb_dst_rdy;
 
-    for (genvar pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin
-        for (genvar dma = 0; dma < DMA_PORTS; dma++) begin
+    for (genvar pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin : gen_pcie_endpoint
+        for (genvar dma = 0; dma < DMA_PORTS; dma++) begin : gen_dma_port
             localparam int unsigned DMA_IT = pcie*DMA_PORTS +  dma;
 
-            for (genvar dma_region = 0; dma_region < RQ_MFB_REGIONS; dma_region++) begin
+            for (genvar dma_region = 0; dma_region < RQ_MFB_REGIONS; dma_region++) begin : gen_rq_dma_region
                 assign dma_rq_mvb_vld[DMA_IT*RQ_MFB_REGIONS + dma_region] = dma_rq_mvb[pcie][dma].VLD[dma_region];
             end
-            for (genvar dma_region = 0; dma_region < RC_MFB_REGIONS; dma_region++) begin
+            for (genvar dma_region = 0; dma_region < RC_MFB_REGIONS; dma_region++) begin : gen_rc_dma_region
                 assign dma_rc_mvb[pcie][dma].VLD[dma_region] = dma_rc_mvb_vld[DMA_IT*RC_MFB_REGIONS + dma_region];
             end
 
@@ -106,7 +106,7 @@ module DUT (
             //assign dma_rq_mfb_meta[(dma_it+1)*RQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH                 -1 -: RQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH]          = dma_rq_mfb[pcie][dma].META;
             assign dma_rq_mfb_sof[(DMA_IT+1)*RQ_MFB_REGIONS                                                        -1 -: RQ_MFB_REGIONS]                                                = dma_rq_mfb[pcie][dma].SOF;
             assign dma_rq_mfb_eof[(DMA_IT+1)*RQ_MFB_REGIONS                                                        -1 -: RQ_MFB_REGIONS]                                                = dma_rq_mfb[pcie][dma].EOF;
-            if (RQ_MFB_REGION_SIZE > 1) begin
+            if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_rq
                 assign dma_rq_mfb_sof_pos[(DMA_IT+1)*RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE)                     -1 -: RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE)]                     = dma_rq_mfb[pcie][dma].SOF_POS;
             end
             assign dma_rq_mfb_eof_pos[(DMA_IT+1)*RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE)       -1 -: RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE)]   = dma_rq_mfb[pcie][dma].EOF_POS;
@@ -121,7 +121,7 @@ module DUT (
             assign dma_cc_mfb_meta[(DMA_IT+1)*CC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CC_META_WIDTH                  -1 -: CC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CC_META_WIDTH]   = dma_cc_mfb[pcie][dma].META;
             assign dma_cc_mfb_sof[(DMA_IT+1)*CC_MFB_REGIONS                                                        -1 -: CC_MFB_REGIONS]                                          = dma_cc_mfb[pcie][dma].SOF;
             assign dma_cc_mfb_eof[(DMA_IT+1)*CC_MFB_REGIONS                                                        -1 -: CC_MFB_REGIONS]                                          = dma_cc_mfb[pcie][dma].EOF;
-            if (RQ_MFB_REGION_SIZE > 1) begin
+            if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_cc
                 assign dma_cc_mfb_sof_pos[(DMA_IT+1)*CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE)                         -1 -: CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE)]           = dma_cc_mfb[pcie][dma].SOF_POS;
             end
             assign dma_cc_mfb_eof_pos[(DMA_IT+1)*CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE)       -1 -: CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE)]           = dma_cc_mfb[pcie][dma].EOF_POS;
@@ -132,7 +132,7 @@ module DUT (
             //assign dma_rc_mfb[pcie][dma].META    = dma_rc_mfb_meta[(dma_it+1)*RC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RC_META_WIDTH                 -1 -: RC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RC_META_WIDTH];
             assign dma_rc_mfb[pcie][dma].SOF     = dma_rc_mfb_sof[(DMA_IT+1)*RC_MFB_REGIONS                                                        -1 -: RC_MFB_REGIONS];
             assign dma_rc_mfb[pcie][dma].EOF     = dma_rc_mfb_eof[(DMA_IT+1)*RC_MFB_REGIONS                                                        -1 -: RC_MFB_REGIONS];
-            if (RQ_MFB_REGION_SIZE > 1) begin
+            if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_rc
                 assign dma_rc_mfb[pcie][dma].SOF_POS = dma_rc_mfb_sof_pos[(DMA_IT+1)*RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE)                         -1 -: RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE)];
             end
             assign dma_rc_mfb[pcie][dma].EOF_POS = dma_rc_mfb_eof_pos[(DMA_IT+1)*RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE)       -1 -: RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE)];
@@ -147,7 +147,7 @@ module DUT (
             assign dma_cq_mfb[pcie][dma].META    = dma_cq_mfb_meta[(DMA_IT+1)*CQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CQ_META_WIDTH                    -1 -: CQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CQ_META_WIDTH];
             assign dma_cq_mfb[pcie][dma].SOF     = dma_cq_mfb_sof[(DMA_IT+1)*CQ_MFB_REGIONS                                                        -1 -: CQ_MFB_REGIONS];
             assign dma_cq_mfb[pcie][dma].EOF     = dma_cq_mfb_eof[(DMA_IT+1)*CQ_MFB_REGIONS                                                        -1 -: CQ_MFB_REGIONS];
-            if (RQ_MFB_REGION_SIZE > 1) begin
+            if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_cq
                 assign dma_cq_mfb[pcie][dma].SOF_POS = dma_cq_mfb_sof_pos[(DMA_IT+1)*CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE)                         -1 -: CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE)];
             end
             assign dma_cq_mfb[pcie][dma].EOF_POS = dma_cq_mfb_eof_pos[(DMA_IT+1)*CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE)       -1 -: CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE)];

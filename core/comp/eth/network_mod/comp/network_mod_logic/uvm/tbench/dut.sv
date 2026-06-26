@@ -56,7 +56,7 @@ module DUT (
 
     generate
 
-        for (genvar i = 0; i < ETH_CHANNELS; i++) begin
+        for (genvar i = 0; i < ETH_CHANNELS; i++) begin : gen_i
             assign core_mfb_tx[i].DATA    = tx_mfb_data[i];
             assign core_mfb_tx[i].SOF     = tx_mfb_sof[i];
             assign core_mfb_tx[i].EOF     = tx_mfb_eof[i];
@@ -162,7 +162,7 @@ module DUT (
 
     // MVB discard inf --------------------------------
     generate
-        for (genvar j = 0; j < ETH_CHANNELS; j++) begin
+        for (genvar j = 0; j < ETH_CHANNELS; j++) begin : gen_j
             assign  mvb_data[j] = VHDL_DUT_U.rx_g[j].rx_mac_g.rx_mac_i.s_stin_discarded;
             assign  mvb_vld[j]  = VHDL_DUT_U.rx_g[j].rx_mac_g.rx_mac_i.s_stin_valid;
         end

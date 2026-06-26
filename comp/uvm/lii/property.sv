@@ -68,7 +68,7 @@ module lii_property #(logic FAST_SOF, logic RESET_ENABLE, int unsigned DATA_WIDT
     // -----------------------
 
     generate
-        if (FAST_SOF == 1'b1) begin
+        if (FAST_SOF == 1'b1) begin : gen_fast_sof
             assert property (eof_after_eeof)
                 else begin
                     $error("After EEOF 'h%0h is not EOF: 'h%0h", vif.EEOF, vif.EOF);
@@ -84,7 +84,7 @@ module lii_property #(logic FAST_SOF, logic RESET_ENABLE, int unsigned DATA_WIDT
     endgenerate
 
     generate
-        if (RESET_ENABLE == 1'b1) begin
+        if (RESET_ENABLE == 1'b1) begin : gen_reset_enable
             assert property (sof_eof_control)
                 else begin
                     $error("After SOF is not EOF");

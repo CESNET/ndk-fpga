@@ -65,7 +65,7 @@ module DUT (
 
     assign avst_down.READY = down_ready;
     generate
-        for (genvar r = 0; r < CQ_MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < CQ_MFB_REGIONS; r++) begin : gen_cq_regions
             assign {down_bar_range [(r+1)*BAR_RANGE_WIDTH-1 -: BAR_RANGE_WIDTH],
                     down_prefix    [(r+1)*PREFIX_WIDTH-1    -: PREFIX_WIDTH],
                     down_hdr       [(r+1)*HDR_WIDTH-1       -: HDR_WIDTH]
@@ -74,14 +74,14 @@ module DUT (
             assign down_data[(r+1)*256-1 -: 256] = avst_down.DATA[r] ;
             assign down_empty[(r+1)*3-1 -: 3]    = avst_down.EMPTY[r];
 
-            if (ENDPOINT_TYPE == "R_TILE") begin
+            if (ENDPOINT_TYPE == "R_TILE") begin : gen_ENDPOINT_TYPE_R_TILE
                 assign down_valid[r] = avst_down.VALID[r] & down_ready;
-            end else begin
+            end else begin : gen_line_79
                 assign down_valid[r] = avst_down.VALID[r];
             end
         end
 
-        for (genvar r = 0; r < CC_MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < CC_MFB_REGIONS; r++) begin : gen_cc_regions
             assign avst_up.META[r] = {
                     up_error  [r],
                     up_prefix [(r+1)*PREFIX_WIDTH-1    : r*PREFIX_WIDTH],

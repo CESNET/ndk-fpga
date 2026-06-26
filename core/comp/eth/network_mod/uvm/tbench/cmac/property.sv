@@ -127,7 +127,7 @@ module PROPERTY_CMAC #(
 
     // LBUS properties
     generate;
-        for (genvar i = 0; i < ETH_PORTS; i++) begin
+        for (genvar i = 0; i < ETH_PORTS; i++) begin : gen_i
             lbus_property LBUS_TX_PROPERTY (
                 .RESET(rst_eth[i].RESET),
                 .vif  (eth_tx [i]      )

@@ -26,7 +26,7 @@ module DUT #(
     logic [MVB_ITEMS*MVB_ITEM_WIDTH_RAW-1 : 0] mvb_data;
 
     generate
-        for (genvar i = 0; i < MVB_ITEMS; i++) begin
+        for (genvar i = 0; i < MVB_ITEMS; i++) begin : gen_i
             assign mvb_data[(i+1)*MVB_ITEM_WIDTH_RAW-1 : MVB_ITEM_WIDTH_RAW*i] = mvb_rx.DATA[i*MVB_ITEM_WIDTH +: MVB_ITEM_WIDTH_RAW];
             assign mvb_meta[(i+1)*MFB_META_WIDTH-1 : MFB_META_WIDTH*i]         = mvb_rx.DATA[i*MVB_ITEM_WIDTH+MVB_ITEM_WIDTH_RAW +: MFB_META_WIDTH];
         end

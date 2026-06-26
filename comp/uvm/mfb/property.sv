@@ -64,15 +64,14 @@ module mfb_property #(
         vif.SRC_RDY |-> !$isunknown(vif.SOF);
     endproperty
 
-    generate if (REGION_SIZE > 1) begin
+    generate if (REGION_SIZE > 1) begin : gen_sof_pos
         property sof_pos_undefined (int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
             (vif.SRC_RDY && vif.SOF[region]) |-> !$isunknown(vif.SOF_POS[(region+1)*$clog2(REGION_SIZE) -1 -: $clog2(REGION_SIZE)]);
         endproperty
 
-        for(genvar it = 0; it < REGIONS; it++) begin
-            assert property (sof_pos_undefined(it))
+        for(genvar it = 0; it < REGIONS; it++) begin : gen_sof_pos_assert
                 else begin
                     string num_it;
                     string hi_index;
@@ -93,15 +92,14 @@ module mfb_property #(
     endproperty
 
 
-    generate if (REGION_SIZE * BLOCK_SIZE > 1) begin
+    generate if (REGION_SIZE * BLOCK_SIZE > 1) begin : gen_eof_pos
         property eof_pos_undefined (int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
             (vif.SRC_RDY && vif.EOF[region]) |-> !$isunknown(vif.EOF_POS[(region+1)*$clog2(REGION_SIZE * BLOCK_SIZE) -1 -: $clog2(REGION_SIZE * BLOCK_SIZE)]);
         endproperty
 
-        for(genvar it = 0; it < REGIONS; it++) begin
-            assert property (eof_pos_undefined(it))
+        for(genvar it = 0; it < REGIONS; it++) begin : gen_eof_pos_assert
                 else begin
                     string num_it;
                     string hi_index;
@@ -169,28 +167,26 @@ module mfb_pcie_property #(
         .vif   (vif  )
     );
 
-    generate if (STRADDLING  == 1'b1) begin
+    generate if (STRADDLING  == 1'b1) begin : gen_straddling
         property prop_straddling(int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
             vif.SRC_RDY && vif.SOF[region] |-> vif.EOF[region-1];
         endproperty
 
-        for(genvar it = 1; it < REGIONS; it++) begin
-            assert property (prop_straddling(it))
+        for(genvar it = 1; it < REGIONS; it++) begin : gen_straddling_assert
                 else begin
                     `uvm_error($sformatf("%m"), $sformatf("\n\tWhen straddling is enabled before sof have to be eof.\n\tThis is broken at region %0d", it));
                 end
         end
-    end else begin
+    end else begin : gen_nostraddling
         property prop_nostraddling(int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
             vif.SRC_RDY && (vif.SOF[region] == 0);
         endproperty
 
-        for(genvar it = 1; it < REGIONS; it++) begin
-            assert property (prop_nostraddling(it))
+        for(genvar it = 1; it < REGIONS; it++) begin : gen_nostraddling_assert
                 else begin
                     `uvm_error($sformatf("%m"), $sformatf("\n\tWhen straddling is Disabled Then SOP can be only in first region"));
                 end

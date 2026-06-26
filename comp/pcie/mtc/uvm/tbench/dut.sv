@@ -21,7 +21,7 @@ module DUT(
     logic [((MFB_REGION_SIZE != 1) ? MFB_REGIONS*$clog2(MFB_REGION_SIZE) : MFB_REGIONS)-1 : 0] cc_sof_pos;
 
     generate
-        if (MFB_REGIONS*MFB_REGION_SIZE != 1) begin
+        if (MFB_REGIONS*MFB_REGION_SIZE != 1) begin : gen_MFB_REGIONS_MFB_REGION_SIZE_1
             assign cq_sof_pos = mfb_cq.SOF_POS;
         end else
             assign cq_sof_pos = '0;

@@ -48,27 +48,27 @@ module avst_pcie_propert #(
         .vif   (vif  )
     );
 
-    generate if (STRADDLING  == 1'b1) begin
+    generate if (STRADDLING  == 1'b1) begin : gen_straddling
         property prop_straddling(int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
             vif.SRC_RDY && vif.SOP[region] |-> vif.EOP[region-1];
         endproperty
 
-        for(genvar it = 1; it < REGIONS; it++) begin
+        for(genvar it = 1; it < REGIONS; it++) begin : gen_straddling_assert
             assert property (prop_straddling(it))
                 else begin
                     `uvm_error(module_name, $sformatf("\n\tWhen straddling is enabled before sof have to be eof.\n\tThis is broken at region %0d", it));
                 end
         end
-    end else begin
+    end else begin : gen_nostraddling
         property prop_nostraddling(int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
             vif.SRC_RDY && (vif.SOP[region] == 0);
         endproperty
 
-        for(genvar it = 1; it < REGIONS; it++) begin
+        for(genvar it = 1; it < REGIONS; it++) begin : gen_nostraddling_assert
             assert property (prop_nostraddling(it))
                 else begin
                     `uvm_error($sformatf("%m"), $sformatf("\n\tWhen straddling is Disabled Then SOP can be only in first region"));

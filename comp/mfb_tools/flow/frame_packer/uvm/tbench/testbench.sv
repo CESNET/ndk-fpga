@@ -87,7 +87,7 @@ module testbench;
     //);
 
     //Internal connection
-    generate for (genvar i = 0; i < RX_CHANNELS; i++) begin
+    generate for (genvar i = 0; i < RX_CHANNELS; i++) begin : gen_i
             assign mvb_flow_ctrl[i].DATA[0]    = DUT_U.VHDL_DUT_U.ver_mod_g[i].ver_mod_i.VER_EOF;
             assign mvb_flow_ctrl[i].DATA[1]    = DUT_U.VHDL_DUT_U.ver_mod_g[i].ver_mod_i.VER_LAST;
             assign mvb_flow_ctrl[i].VLD        = DUT_U.VHDL_DUT_U.ver_mod_g[i].ver_mod_i.VER_VLD;

@@ -25,7 +25,7 @@ module DUT (
     logic [MFB_REGIONS*MFB_META_WIDTH-1 : 0] mvb_meta;
 
     generate
-        for (genvar r = 0; r < MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < MFB_REGIONS; r++) begin : gen_r
             assign mvb_tx.DATA[(r*WHOLE_MVB_META_W)+MVB_DATA_WIDTH                 -1 -: MVB_DATA_WIDTH] = mvb_data[(r+1)*MVB_DATA_WIDTH-1 -: MVB_DATA_WIDTH];
             assign mvb_tx.DATA[(r*WHOLE_MVB_META_W)+MVB_DATA_WIDTH+1               -1 -: 1             ] = mvb_chsum_bypass[r              -: 1             ];
             assign mvb_tx.DATA[(r*WHOLE_MVB_META_W)+MVB_DATA_WIDTH+1+MFB_META_WIDTH-1 -: MFB_META_WIDTH] = mvb_meta[(r+1)*MFB_META_WIDTH-1 -: MFB_META_WIDTH];

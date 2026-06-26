@@ -17,7 +17,7 @@ module DUT (
     logic[(REGIONS*8)-1 : 0] mfb_be = '1;
     localparam SOF_POS_WIDTH = ((REGION_SIZE*REGIONS) < 2) ? 1 : (REGIONS*$clog2(REGION_SIZE));
     logic [SOF_POS_WIDTH -1:0] sof_pos;
-    if ((REGIONS*$clog2(REGION_SIZE)) == 0) begin
+    if ((REGIONS*$clog2(REGION_SIZE)) == 0) begin : gen_REGIONS_clog2_REGION_SIZE_0
         assign sof_pos = '0;
     end else
         assign sof_pos = mfb_rx.SOF_POS;

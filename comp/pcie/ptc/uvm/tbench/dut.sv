@@ -80,7 +80,7 @@ module DUT (
     logic [MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE*MFB_DOWN_BLOCK_SIZE-1:0]            axi_rc_keep;
     // PCIE_AXI doesnt support more that 32 DWORDS.
     generate
-        if (IS_INTEL == 0) begin
+        if (IS_INTEL == 0) begin : gen_IS_INTEL_0
             assign AXI_RQ.TDATA = axi_rq_data;
             assign AXI_RQ.TKEEP = axi_rq_keep;
             assign axi_rc_data = AXI_RC.TDATA;
@@ -89,7 +89,7 @@ module DUT (
     endgenerate
 
     generate
-        for (genvar it = 0; it < MFB_UP_REGIONS; it++) begin
+        for (genvar it = 0; it < MFB_UP_REGIONS; it++) begin : gen_rq_it
             assign RQ_MVB.DATA[(it+1)*(sv_pcie_meta_pack::PCIE_RQ_META_WIDTH) -1 -: sv_pcie_meta_pack::PCIE_RQ_META_WIDTH] =
                 // LBE, FBE, PREFIX, HDR
                 {4'b1111, 4'b1111,
@@ -98,7 +98,7 @@ module DUT (
                 };
         end
 
-        for (genvar it = 0; it < MFB_UP_REGIONS; it++) begin
+        for (genvar it = 0; it < MFB_UP_REGIONS; it++) begin : gen_rc_it
             assign {
                         pcie_rc_prefix[(it+1)*32-1 -: 32],
                         pcie_rc_hdr[(it+1)*sv_pcie_meta_pack::PCIE_META_CPL_HDR_W-1 -: sv_pcie_meta_pack::PCIE_META_CPL_HDR_W]
@@ -108,7 +108,7 @@ module DUT (
 
 
     generate
-        for (genvar i = 0; i < DMA_PORTS; i++) begin
+        for (genvar i = 0; i < DMA_PORTS; i++) begin : gen_i
             assign DMA_TX_MFB[i].DATA    = down_mfb_data[i];
             assign DMA_TX_MFB[i].SOF     = down_mfb_sof[i];
             assign DMA_TX_MFB[i].EOF     = down_mfb_eof[i];
@@ -121,7 +121,7 @@ module DUT (
             assign up_mfb_sof[i]       = DMA_RX_MFB[i].SOF;
             assign up_mfb_eof[i]       = DMA_RX_MFB[i].EOF;
 
-            if ((DMA_MFB_UP_REGIONS*$clog2(MFB_UP_REG_SIZE)) == 0) begin
+            if ((DMA_MFB_UP_REGIONS*$clog2(MFB_UP_REG_SIZE)) == 0) begin : gen_DMA_MFB_UP_REGIONS_clog2_MFB_UP_REG_SIZE
                 assign up_mfb_sof_pos[i] = '0;
             end else
                 assign up_mfb_sof_pos[i]   = DMA_RX_MFB[i].SOF_POS;
@@ -143,13 +143,13 @@ module DUT (
         end
     endgenerate
 
-    if (DEVICE == "STRATIX10" || DEVICE == "AGILEX") begin
+    if (DEVICE == "STRATIX10" || DEVICE == "AGILEX") begin : gen_DEVICE_STRATIX10_DEVICE_AGILEX
         assign RQ_MVB.SRC_RDY      = RQ_MFB.SRC_RDY;
         assign RQ_MVB.DST_RDY      = RQ_MFB.DST_RDY;
     end
     assign RQ_MFB.SOF_POS      = rq_mfb_sof_pos;
 
-    if ((DMA_MFB_DOWN_REGIONS*$clog2(MFB_DOWN_REG_SIZE)) == 0) begin
+    if ((DMA_MFB_DOWN_REGIONS*$clog2(MFB_DOWN_REG_SIZE)) == 0) begin : gen_DMA_MFB_DOWN_REGIONS_clog2_MFB_DOWN_REG_
         assign rc_mfb_sof_pos = '0;
     end else
         assign rc_mfb_sof_pos = RC_MFB.SOF_POS;

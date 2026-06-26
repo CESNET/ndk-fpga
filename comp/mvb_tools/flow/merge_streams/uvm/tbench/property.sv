@@ -14,7 +14,7 @@ module mvb_merge_streams_property #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) (
     // ----------------- //
 
     generate;
-        for (genvar i = 0; i < RX_STREAMS; i++) begin
+        for (genvar i = 0; i < RX_STREAMS; i++) begin : gen_i
             mvb_property #(
                 .ITEMS      (MVB_ITEMS),
                 .ITEM_WIDTH (MVB_ITEM_WIDTH)

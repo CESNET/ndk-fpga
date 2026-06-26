@@ -115,7 +115,7 @@ module lbus_property
     end
 
     generate;
-        for (genvar i = 0; i < 4; i++) begin
+        for (genvar i = 0; i < 4; i++) begin : gen_valid_assertions
             assert property (valid_data(i))
             else begin
                 `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: DATA must be always valid if the ENA is valid", i));
@@ -138,7 +138,7 @@ module lbus_property
             end
         end
 
-        for (genvar i = 1; i < 4; i++) begin
+        for (genvar i = 1; i < 4; i++) begin : gen_no_gaps_assertions
             assert property (no_gaps(i))
             else begin
                 `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: Gaps between valid segments are prohibited", i));

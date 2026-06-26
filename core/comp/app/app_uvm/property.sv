@@ -45,7 +45,7 @@ module app_core_property #(ETH_STREAMS, DMA_STREAMS, REGIONS, MFB_REGION_SIZE, M
         //    .RESET (RESET),
         //    .vif   (eth_tx_mvb[eth_it])
         //);
-        if (CHECK_RX == 1'b1) begin
+        if (CHECK_RX == 1'b1) begin : gen_CHECK_RX_1_b1
             mfb_property #(
                 .REGIONS      (REGIONS),
                 .REGION_SIZE  (MFB_REGION_SIZE),
@@ -94,7 +94,7 @@ module app_core_property #(ETH_STREAMS, DMA_STREAMS, REGIONS, MFB_REGION_SIZE, M
         );
 
 
-        if (CHECK_RX == 1'b1) begin
+        if (CHECK_RX == 1'b1) begin : gen_CHECK_RX_1_b1
             mfb_property #(
                 .REGIONS      (REGIONS),
                 .REGION_SIZE  (MFB_REGION_SIZE),

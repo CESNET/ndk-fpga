@@ -19,7 +19,7 @@ module DUT (
     logic [RX_STREAMS -1 : 0]               rx_mvb_src_rdy;
     logic [RX_STREAMS -1 : 0]               rx_mvb_dst_rdy;
 
-    for (genvar port = 0; port < RX_STREAMS; port++) begin
+    for (genvar port = 0; port < RX_STREAMS; port++) begin : gen_port
         assign rx_mvb_data[port]    = rx_mvb[port].DATA;
         assign rx_mvb_vld[port]     = rx_mvb[port].VLD;
         assign rx_mvb_src_rdy[port] = rx_mvb[port].SRC_RDY;

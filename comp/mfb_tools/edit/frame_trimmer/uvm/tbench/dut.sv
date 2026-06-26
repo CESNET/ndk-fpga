@@ -18,10 +18,10 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU, 
     logic [((REGION_SIZE != 1) ? REGIONS*$clog2(REGION_SIZE) : REGIONS)-1 : 0] mfb_tx_sof_pos;
 
     generate
-        if (REGION_SIZE != 1) begin
+        if (REGION_SIZE != 1) begin : gen_REGION_SIZE_1
             assign mfb_rx_sof_pos = mfb_rx.SOF_POS;
             assign mfb_tx.SOF_POS = mfb_tx_sof_pos;
-        end else begin
+        end else begin : gen_line_24
             assign mfb_rx_sof_pos = '0;
             assign mfb_tx.SOF_POS = '0;
         end
@@ -64,7 +64,7 @@ module DUT #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU, 
     );
 
     generate;
-        for (genvar i = 0; i < REGIONS; i++) begin
+        for (genvar i = 0; i < REGIONS; i++) begin : gen_i
             logic [META_WIDTH+1+$clog2(PKT_MTU+1)-1 : 0] mfb_rx_meta_slice;
 
             assign mfb_rx_meta_slice = mfb_rx.META[(META_WIDTH+1+$clog2(PKT_MTU+1))*(i+1)-1 -: META_WIDTH+1+$clog2(PKT_MTU+1)];

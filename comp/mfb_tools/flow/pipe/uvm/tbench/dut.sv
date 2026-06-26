@@ -16,7 +16,7 @@ module DUT(
     logic [((REGION_SIZE != 1) ? REGIONS*$clog2(REGION_SIZE) : REGIONS*1)-1:0] rx_sof_pos;
     logic [((REGION_SIZE != 1) ? REGIONS*$clog2(REGION_SIZE) : REGIONS*1)-1:0] tx_sof_pos;
     generate
-        if (REGION_SIZE != 1) begin
+        if (REGION_SIZE != 1) begin : gen_REGION_SIZE_1
             assign  mfb_rd.SOF_POS = tx_sof_pos;
             assign  rx_sof_pos = mfb_wr.SOF_POS;
         end
@@ -56,7 +56,7 @@ module DUT(
         .TX_DST_RDY     (mfb_rd.DST_RDY)
     );
 
-    if (USE_DST_RDY == 0) begin
+    if (USE_DST_RDY == 0) begin : gen_USE_DST_RDY_0
         assign mfb_rd.DST_RDY = 1;
     end
 
