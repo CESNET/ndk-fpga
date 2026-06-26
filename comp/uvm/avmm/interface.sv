@@ -15,14 +15,14 @@ interface avmm_if #(
     initial VALID_PARAMETERS : assert(ADDRESS_WIDTH > 0 && DATA_WIDTH > 0 && BURST_WIDTH > 0);
 
     // Bus structure of AVMM
-    wire logic                       READY;
-    wire logic                       READ;
-    wire logic                       WRITE;
-    wire logic [ADDRESS_WIDTH-1 : 0] ADDRESS;
-    wire logic [DATA_WIDTH   -1 : 0] READDATA;
-    wire logic                       READDATAVALID;
-    wire logic [DATA_WIDTH   -1 : 0] WRITEDATA;
-    wire logic [BURST_WIDTH  -1 : 0] BURSTCOUNT;
+    wire                       READY;
+    wire                       READ;
+    wire                       WRITE;
+    wire [ADDRESS_WIDTH-1 : 0] ADDRESS;
+    wire [DATA_WIDTH   -1 : 0] READDATA;
+    wire                       READDATAVALID;
+    wire [DATA_WIDTH   -1 : 0] WRITEDATA;
+    wire [BURST_WIDTH  -1 : 0] BURSTCOUNT;
 
     // ---------------------- //
     // Driver clocking blocks //

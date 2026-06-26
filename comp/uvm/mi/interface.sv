@@ -15,18 +15,18 @@
 interface mi_if #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) (input logic CLK);
 
     //COMMON INTERFACE
-    wire logic [ADDR_WIDTH-1:0] ADDR;
-    wire logic [DATA_WIDTH/8-1:0] BE;
+    wire [ADDR_WIDTH-1:0] ADDR;
+    wire [DATA_WIDTH/8-1:0] BE;
     //WRITE INTERFEC
-    wire logic WR;
-    wire logic [DATA_WIDTH-1:0] DWR;
-    wire logic [META_WIDTH-1:0] META;
+    wire WR;
+    wire [DATA_WIDTH-1:0] DWR;
+    wire [META_WIDTH-1:0] META;
     //READ INTERFACE
-    wire logic RD;
-    wire logic [DATA_WIDTH-1:0] DRD;
+    wire RD;
+    wire [DATA_WIDTH-1:0] DRD;
     //ACCEPTING INTERFACE
-    wire logic ARDY;
-    wire logic DRDY;
+    wire ARDY;
+    wire DRDY;
 
 
     clocking cb_master @(posedge CLK);

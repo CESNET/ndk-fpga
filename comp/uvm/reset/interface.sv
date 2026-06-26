@@ -11,7 +11,7 @@
 
 interface reset_if (input logic CLK);
 
-    wire logic RESET;
+    wire RESET;
 
     clocking driver_cb @(posedge CLK);
         output RESET;

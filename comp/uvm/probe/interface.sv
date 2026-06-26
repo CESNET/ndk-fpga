@@ -9,9 +9,9 @@
 */
 
 interface probe_inf #(int unsigned DATA_WIDTH) (
-    input wire logic event_signal,
-    input wire logic [DATA_WIDTH-1:0] event_data,
-    input wire logic CLK);
+    input wire event_signal,
+    input wire [DATA_WIDTH-1:0] event_data,
+    input wire CLK);
 
     import uvm_pkg::*;
     localparam string PATH = $psprintf("%m");

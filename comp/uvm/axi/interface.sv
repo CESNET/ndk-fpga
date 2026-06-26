@@ -16,12 +16,12 @@ interface axi_if #(
 
     // ------------------------------------------------------------------------
     // Bus structure of AXI
-    wire logic [ITEMS*ITEM_WIDTH -1 : 0] TDATA;
-    wire logic [TUSER_WIDTH      -1 : 0] TUSER;
-    wire logic [ITEMS            -1 : 0] TKEEP;
-    wire logic                           TLAST;
-    wire logic                           TVALID;
-    wire logic                           TREADY;
+    wire [ITEMS*ITEM_WIDTH -1 : 0] TDATA;
+    wire [TUSER_WIDTH      -1 : 0] TUSER;
+    wire [ITEMS            -1 : 0] TKEEP;
+    wire                           TLAST;
+    wire                           TVALID;
+    wire                           TREADY;
 
 
     // ------------------------------------------------------------------------

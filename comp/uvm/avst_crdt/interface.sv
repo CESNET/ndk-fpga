@@ -9,10 +9,10 @@ interface avst_crdt_if #(int unsigned UPDATE_CNT_WIDTH) (input logic CLK);
     // Bus structure of credit control //
     // ------------------------------- //
 
-    wire logic                          INIT;
-    wire logic                          INIT_ACK;
-    wire logic                          UPDATE;
-    wire logic [UPDATE_CNT_WIDTH-1 : 0] UPDATE_CNT;
+    wire                          INIT;
+    wire                          INIT_ACK;
+    wire                          UPDATE;
+    wire [UPDATE_CNT_WIDTH-1 : 0] UPDATE_CNT;
 
     // RX driver clocking block
     clocking driver_rx_cb @(posedge CLK);

@@ -18,13 +18,13 @@ interface avst_if #(
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb
-    wire logic [REGION_SIZE * ITEM_WIDTH-1 : 0] DATA [REGIONS];
-    wire logic [META_WIDTH-1 : 0]               META [REGIONS];
-    wire logic [$clog2(REGION_SIZE) -1 : 0]     EMPTY[REGIONS];
-    wire logic [REGIONS          -1 : 0] SOP;
-    wire logic [REGIONS          -1 : 0] EOP;
-    wire logic [REGIONS          -1 : 0] VALID;
-    wire logic READY;
+    wire [REGION_SIZE * ITEM_WIDTH-1 : 0] DATA [REGIONS];
+    wire [META_WIDTH-1 : 0]               META [REGIONS];
+    wire [$clog2(REGION_SIZE) -1 : 0]     EMPTY[REGIONS];
+    wire [REGIONS          -1 : 0] SOP;
+    wire [REGIONS          -1 : 0] EOP;
+    wire [REGIONS          -1 : 0] VALID;
+    wire READY;
 
 
     // ------------------------------------------------------------------------

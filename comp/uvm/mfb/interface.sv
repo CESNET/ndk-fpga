@@ -17,14 +17,14 @@ interface mfb_if #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb
-    wire logic [WORD_WIDTH       -1 : 0] DATA;
-    wire logic [META_WORD_WIDTH  -1 : 0] META;
-    wire logic [SOF_POS_WIDTH    -1 : 0] SOF_POS;
-    wire logic [EOF_POS_WIDTH    -1 : 0] EOF_POS;
-    wire logic [REGIONS          -1 : 0] SOF;
-    wire logic [REGIONS          -1 : 0] EOF;
-    wire logic SRC_RDY;
-    wire logic DST_RDY;
+    wire [WORD_WIDTH       -1 : 0] DATA;
+    wire [META_WORD_WIDTH  -1 : 0] META;
+    wire [SOF_POS_WIDTH    -1 : 0] SOF_POS;
+    wire [EOF_POS_WIDTH    -1 : 0] EOF_POS;
+    wire [REGIONS          -1 : 0] SOF;
+    wire [REGIONS          -1 : 0] EOF;
+    wire SRC_RDY;
+    wire DST_RDY;
 
 
     // ------------------------------------------------------------------------
