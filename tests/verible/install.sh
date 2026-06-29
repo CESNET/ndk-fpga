@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# install.sh: Install script for the Verible GitLab stage runner.
+# install.sh: Install script for the Verible linter runner.
 # Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 # SPDX-License-Identifier: BSD-3-Clause
