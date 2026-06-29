@@ -69,14 +69,16 @@ module dut (
 
     always @(posedge CLK)
     begin
-        if (axi_rready)
+        if (axi_rready) begin
             axi_rvalid <= axi_arvalid;
+        end
     end
 
     always @(posedge CLK)
     begin
-        if (axi_bready)
+        if (axi_bready) begin
             axi_bvalid <= axi_wvalid;
+        end
     end
 
 endmodule

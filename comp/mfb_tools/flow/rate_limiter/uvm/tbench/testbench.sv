@@ -38,7 +38,9 @@ module testbench;
     ) mfb_tx(CLK);
 
     // Define clock ticking
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // Start of tests
     initial begin

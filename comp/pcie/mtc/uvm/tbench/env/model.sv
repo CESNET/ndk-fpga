@@ -202,7 +202,7 @@ virtual class model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_
                 for (int unsigned it = 0; it < info.dw_cnt; it++) begin
                     do begin
                         analysis_imp_cc_mi.get(mi_cc_tr);
-                    end while(mi_cc_tr.drdy !== 1);
+                    end while (mi_cc_tr.drdy !== 1);
                     data_fifo.push_back(mi_cc_tr.drd);
                 end
             end

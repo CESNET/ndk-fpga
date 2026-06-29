@@ -66,8 +66,10 @@ module fix_bind #(int unsigned PORTS, int unsigned CHANNELS);
                 .CLK         (RX_CLK                             )
             );
     end
-    else begin : gen_line_41
-        initial `uvm_fatal($sformatf("%m"), $sformatf("AN UNSUPPORTED COMBINATION: PORTS(%0d)!!!\n", PORTS));
+    else begin : gen_PORTS_unsupported
+        initial begin
+            `uvm_fatal($sformatf("%m"), $sformatf("AN UNSUPPORTED COMBINATION: PORTS(%0d)!!!\n", PORTS));
+        end
     end
 
 endmodule

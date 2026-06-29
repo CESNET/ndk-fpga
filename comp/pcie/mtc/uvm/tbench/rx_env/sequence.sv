@@ -38,8 +38,9 @@ function automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(
         ret[64-1 : 48] = cq_header_req.req_id;
         if (|cq_header_req.addr[64-1 : 32]) begin
             ret[128-1 : 64] = {cq_header_req.addr[32-1 : 2], cq_header_req.addr[2-1 : 0], cq_header_req.addr[64-1 : 32]};
-        end else
+        end else begin
             ret[128-1 : 64] = {32'h0000, cq_header_req.addr[2-1 : 0], cq_header_req.addr[32-1 : 2]};
+        end
     end else begin
         // ADDR TYPE
         ret[1 : 0]     = cq_header_req.addr[2-1 : 0];

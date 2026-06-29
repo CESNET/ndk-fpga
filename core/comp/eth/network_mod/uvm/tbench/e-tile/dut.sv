@@ -136,7 +136,9 @@ module dut #(
             logic [ETH_PORT_CHAN[eth_it]*$clog2(AVST_ITEMS)-1 : 0]    avst_tx_empty;
             logic CLK_ETH_GEN = 1'b0;
 
-            always #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH_GEN = ~CLK_ETH_GEN;
+            always begin
+                #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH_GEN = ~CLK_ETH_GEN;
+            end
             // RX
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_data  = { <<ITEM_WIDTH { {>>{ eth_rx[eth_it].DATA}} }};
 

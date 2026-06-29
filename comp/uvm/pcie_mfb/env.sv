@@ -217,7 +217,10 @@ class env_tx #(
 
             fork
                 forever begin
-                    assert(seq_mfb.randomize()) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_mfb sequence");
+                    assert(seq_mfb.randomize())
+                    else begin
+                        `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_mfb sequence");
+                    end
                     seq_mfb.start(m_mfb.m_sequencer);
                 end
             join
@@ -274,5 +277,3 @@ class env_mvb_tx #(
         m_mvb.analysis_port.connect(m_monitor_cast.port_mvb);
     endfunction
 endclass
-
-

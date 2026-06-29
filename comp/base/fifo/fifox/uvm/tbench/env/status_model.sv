@@ -44,9 +44,12 @@ class status_model #(STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSE
         forever begin
 
             wr_and_rd_en_in.get({ wr_en, rd_en });
-            if (wr_en) status++;
-            if (rd_en) status--;
-
+            if (wr_en) begin
+                status++;
+            end
+            if (rd_en) begin
+                status--;
+            end
             logic_status = status;
             afull  = (status >= ITEMS - ALMOST_FULL_OFFSET) ? 1 : 0;
             aempty = (status <= ALMOST_EMPTY_OFFSET)        ? 1 : 0;

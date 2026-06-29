@@ -111,7 +111,7 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
                             send_empty_frame();
                         end
                         get_response(rsp);
-                    end while(rsp.ready != 1);
+                    end while (rsp.ready != 1);
                     //assert(std::randomize(simple_reg.latency_cnt) with {simple_reg.latency_cnt inside {[0 : (READY_LATENCY - 1)]}; }) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize latency");
                     //for (int unsigned it = 0; it < simple_reg.latency_cnt; it++) begin
                     //    send_empty_frame();
@@ -747,6 +747,3 @@ class sequence_lib_rx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, in
         this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
     endfunction
 endclass
-
-
-

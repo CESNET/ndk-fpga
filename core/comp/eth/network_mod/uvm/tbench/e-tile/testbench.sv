@@ -137,11 +137,21 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
-    always #(CLK_USR_PERIOD/2) CLK_USR = ~CLK_USR;
-    always #(CLK_MI_PERIOD/2)     CLK_MI     = ~CLK_MI    ;
-    always #(CLK_MI_PHY_PERIOD/2) CLK_MI_PHY = ~CLK_MI_PHY;
-    always #(CLK_MI_PMD_PERIOD/2) CLK_MI_PMD = ~CLK_MI_PMD;
-    always #(CLK_TSU_PERIOD/2)    CLK_TSU    = ~CLK_TSU   ;
+    always begin
+        #(CLK_USR_PERIOD/2) CLK_USR = ~CLK_USR;
+    end
+    always begin
+        #(CLK_MI_PERIOD/2) CLK_MI     = ~CLK_MI    ;
+    end
+    always begin
+        #(CLK_MI_PHY_PERIOD/2) CLK_MI_PHY = ~CLK_MI_PHY;
+    end
+    always begin
+        #(CLK_MI_PMD_PERIOD/2) CLK_MI_PMD = ~CLK_MI_PMD;
+    end
+    always begin
+        #(CLK_TSU_PERIOD/2) CLK_TSU    = ~CLK_TSU   ;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // CONFIGURE and RUN VERIFICATION

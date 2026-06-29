@@ -27,7 +27,9 @@ module testbench;
     reset_if                           reset(CLK);
     pullup(reset.RESET);
 
-    always #(test::CLK_PERIOD/2) CLK = ~CLK;
+    always begin
+        #(test::CLK_PERIOD/2) CLK = ~CLK;
+    end
 
     TX_MAC_LITE_ADAPTER_MAC_SEG  #(
         .REGIONS      (test::REGIONS),

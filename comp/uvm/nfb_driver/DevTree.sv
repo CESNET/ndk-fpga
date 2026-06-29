@@ -17,7 +17,9 @@ class dev_tree;
         int dt;
 
         dt = $fopen(file_name, "r");
-        if (dt == 0) `uvm_fatal(`__FILE__, $sformatf("\n\tDevTree Cannot open file : %s for writing\n", file_name));
+        if (dt == 0) begin
+            `uvm_fatal(`__FILE__, $sformatf("\n\tDevTree Cannot open file : %s for writing\n", file_name));
+        end
         $fread(data, dt);
         $fclose(dt);
     endfunction

@@ -68,9 +68,15 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD_USER) CLK_USER = ~CLK_USER;
-    always #(CLK_PERIOD_CORE) CLK_CORE = ~CLK_CORE;
-    always #(CLK_PERIOD_CORE) MI_CLK   = ~MI_CLK;
+    always begin
+        #(CLK_PERIOD_USER) CLK_USER = ~CLK_USER;
+    end
+    always begin
+        #(CLK_PERIOD_CORE) CLK_CORE = ~CLK_CORE;
+    end
+    always begin
+        #(CLK_PERIOD_CORE) MI_CLK   = ~MI_CLK;
+    end
 
     reset_if reset(CLK_USER);
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------

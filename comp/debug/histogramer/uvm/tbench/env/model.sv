@@ -88,23 +88,28 @@ class model #(
 
         //$write("New val %d (addr %d)\n", val, addr);
 
-        if ( ! boxes.exists(addr))
+        if ( ! boxes.exists(addr)) begin
             boxes[addr] = 0;
+        end
 
         // Handle box overflow
-        if (boxes[addr] != 2 ** BOX_WIDTH - 1)
+        if (boxes[addr] != 2 ** BOX_WIDTH - 1) begin
             boxes[addr] ++;
+        end
     endfunction
 
     function box_t read(addr_t addr);
         box_t box = 0;
 
-        if (boxes.exists(addr))
+        if (boxes.exists(addr)) begin
             box = boxes[addr];
+        end
 
-        if (CLEAR_BY_READ)
+        if (CLEAR_BY_READ) begin
+
             boxes[addr] = 0;
 
+        end
         //$write("Read addr %d, box %d\n", addr, box);
         return box;
     endfunction

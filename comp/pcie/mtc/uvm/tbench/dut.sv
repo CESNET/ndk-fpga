@@ -23,25 +23,32 @@ module dut(
     generate
         if (MFB_REGIONS*MFB_REGION_SIZE != 1) begin : gen_MFB_REGIONS_MFB_REGION_SIZE_1
             assign cq_sof_pos = mfb_cq.SOF_POS;
-        end else
+        end else begin : gen_MFB_REGIONS_MFB_REGION_SIZE_eq_1
             assign cq_sof_pos = '0;
+        end
     endgenerate
 
     assign mfb_cc.SOF_POS = cc_sof_pos;
 
     generate
-        if (BYTES_LEN_MAX == 128)
+        if (BYTES_LEN_MAX == 128) begin : gen_BYTES_LEN_MAX_128
             assign ctl_max_payload_size = 3'b000;
-        if (BYTES_LEN_MAX == 256)
+        end
+        if (BYTES_LEN_MAX == 256) begin : gen_BYTES_LEN_MAX_256
             assign ctl_max_payload_size = 3'b001;
-        if (BYTES_LEN_MAX == 512)
+        end
+        if (BYTES_LEN_MAX == 512) begin : gen_BYTES_LEN_MAX_512
             assign ctl_max_payload_size = 3'b010;
-        if (BYTES_LEN_MAX == 1024)
+        end
+        if (BYTES_LEN_MAX == 1024) begin : gen_BYTES_LEN_MAX_1024
             assign ctl_max_payload_size = 3'b011;
-        if (BYTES_LEN_MAX == 2048)
+        end
+        if (BYTES_LEN_MAX == 2048) begin : gen_BYTES_LEN_MAX_2048
             assign ctl_max_payload_size = 3'b100;
-        if (BYTES_LEN_MAX == 4096)
+        end
+        if (BYTES_LEN_MAX == 4096) begin : gen_BYTES_LEN_MAX_4096
             assign ctl_max_payload_size = 3'b101;
+        end
     endgenerate
 
     MTC #(

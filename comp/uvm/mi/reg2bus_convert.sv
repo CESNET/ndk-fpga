@@ -93,7 +93,7 @@ class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int 
             request.wr   = 0;
             request.rd   = 1'b1;
             finish_item(request);
-        end while(request.ardy != 1'b1);
+        end while (request.ardy != 1'b1);
         sem.put();
     endtask
 
@@ -120,7 +120,7 @@ class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int 
             request.wr   = 1'b1;
             request.rd   = 1'b0;
             finish_item(request);
-        end while(request.ardy != 1'b1);
+        end while (request.ardy != 1'b1);
         sem.put();
     endtask
 

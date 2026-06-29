@@ -77,7 +77,7 @@ class ex_test extends uvm_test;
         time_start = $time();
         do begin
             #(600ns);
-        end while((time_start + 10ms) > $time() && m_env.used());
+        end while ((time_start + 10ms) > $time() && m_env.used());
         phase.drop_objection(this);
     endtask
 

@@ -114,7 +114,9 @@ class env_rx #(int unsigned SEGMENTS) extends uvm_env;
             intel_mac_seg.max_random_count = 100;
 
             forever begin
-                if(!intel_mac_seg.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize byte_array_intel_mac_seg rx_seq");
+                if(!intel_mac_seg.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize byte_array_intel_mac_seg rx_seq");
+                end
                 intel_mac_seg.start(m_intel_mac_seg_agent.m_sequencer);
             end
         end

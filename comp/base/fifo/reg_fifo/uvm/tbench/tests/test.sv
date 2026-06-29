@@ -28,7 +28,9 @@ class ex_test extends uvm_test;
 
     task test_wait_result(time time_length);
         time start_time = $time();
-        while ($time()-start_time < time_length && m_env.sc.used() !== 0) #(600ns);
+        while ($time()-start_time < time_length && m_env.sc.used() !== 0) begin
+        #(600ns);
+    end
     endtask
 
     // Build phase function, e.g. the creation of test's internal objects

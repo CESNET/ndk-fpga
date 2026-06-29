@@ -48,7 +48,9 @@ class driver#(
                     logic [32-1:0] hdr_data[3];
                     uvm_pcie::completer_header hdr_cast;
 
-                    assert($cast(hdr_cast, req)) else `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    assert($cast(hdr_cast, req)) else begin
+                        `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    end
 
                     uvm_pcie_axi::hdr_cc_set(hdr_data, hdr_cast);
                     data.data = {hdr_data, req.data};
@@ -58,7 +60,9 @@ class driver#(
                     logic [8-1:0] target_fce = 0;
                     uvm_pcie::request_header hdr_cast;
 
-                    assert($cast(hdr_cast, req)) else `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    assert($cast(hdr_cast, req)) else begin
+                        `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    end
 
                     uvm_pcie_axi::hdr_rq_set(hdr_data, hdr_cast);
                     data.data = {hdr_data, req.data};

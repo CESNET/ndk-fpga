@@ -123,9 +123,9 @@ module dut (
 
             if ((DMA_MFB_UP_REGIONS*$clog2(MFB_UP_REG_SIZE)) == 0) begin : gen_DMA_MFB_UP_REGIONS_clog2_MFB_UP_REG_SIZE
                 assign up_mfb_sof_pos[i] = '0;
-            end else
+            end else begin : gen_DMA_MFB_UP_REGIONS_clog2_MFB_UP_REG_SIZE_nonzero
                 assign up_mfb_sof_pos[i]   = DMA_RX_MFB[i].SOF_POS;
-
+            end
             assign up_mfb_eof_pos[i]   = DMA_RX_MFB[i].EOF_POS;
             assign up_mfb_src_rdy[i]   = DMA_RX_MFB[i].SRC_RDY;
             assign DMA_RX_MFB[i].DST_RDY   = up_mfb_dst_rdy[i];
@@ -151,9 +151,9 @@ module dut (
 
     if ((DMA_MFB_DOWN_REGIONS*$clog2(MFB_DOWN_REG_SIZE)) == 0) begin : gen_DMA_MFB_DOWN_REGIONS_clog2_MFB_DOWN_REG_
         assign rc_mfb_sof_pos = '0;
-    end else
+    end else begin : gen_DMA_MFB_DOWN_REGIONS_clog2_MFB_DOWN_REG_SIZE_nonzero
         assign rc_mfb_sof_pos = RC_MFB.SOF_POS;
-
+    end
     PCIE_TRANSACTION_CTRL_WRAPPER #(
         .DMA_PORTS            (DMA_PORTS)           ,
         .MVB_UP_ITEMS         (MVB_UP_ITEMS)        ,

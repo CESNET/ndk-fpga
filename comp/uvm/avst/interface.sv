@@ -14,7 +14,9 @@ interface avst_if #(
     input logic CLK
 );
 
-    initial VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && ITEM_WIDTH > 0);
+    initial begin
+        VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && ITEM_WIDTH > 0);
+    end
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb

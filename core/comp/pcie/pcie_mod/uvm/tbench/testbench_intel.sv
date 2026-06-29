@@ -96,11 +96,11 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_P = ~PCIE_SYSCLK_P;
-    always #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_N = ~PCIE_SYSCLK_N;
-    always #(DMA_CLK_PERIOD) PCIE_USER_CLK         = ~PCIE_USER_CLK;
-    always #(DMA_CLK_PERIOD) DMA_CLK               = ~DMA_CLK;
-    always #(MI_CLK_PERIOD) MI_CLK                 = ~MI_CLK;
+    always begin #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_P = ~PCIE_SYSCLK_P; end
+    always begin #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_N = ~PCIE_SYSCLK_N; end
+    always begin #(DMA_CLK_PERIOD) PCIE_USER_CLK = ~PCIE_USER_CLK; end
+    always begin #(DMA_CLK_PERIOD) DMA_CLK = ~DMA_CLK; end
+    always begin #(MI_CLK_PERIOD) MI_CLK = ~MI_CLK; end
 
 
     //BUGFIX QUESTASIM

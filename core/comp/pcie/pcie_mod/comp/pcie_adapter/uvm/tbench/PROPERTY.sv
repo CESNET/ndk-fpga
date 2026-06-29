@@ -83,6 +83,7 @@ module PROPERTY #(
     generate if (ENDPOINT_TYPE == "R_TILE") begin : gen_ENDPOINT_TYPE_R_TILE
         property no_fall_init;
             @(posedge avst_down.CLK) disable iff(RST)
+            // verilog_lint: waive explicit-begin
             $rose(avst_down.READY) |=> always avst_down.READY;
         endproperty
 

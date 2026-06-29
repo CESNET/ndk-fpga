@@ -40,7 +40,6 @@ class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
         m_regmodel_channel.upd_timeout_reg.write(status, upd_timeout, .parent(this));
         m_regmodel_channel.exper_reg.write(status, p2p_enable, .parent(this));
         m_regmodel_channel.control_reg.write(status,  32'h1,  .parent(this));
-
         do begin
             #(300ns)
             m_regmodel_channel.status_reg.read(status, data, .parent(this));

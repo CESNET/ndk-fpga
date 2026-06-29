@@ -75,11 +75,13 @@ class model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR
             hdr_offset = sv_pcie_meta_pack::PCIE_META_REQ_HDR_W/MFB_ITEM_WIDTH;
         end else if(DEVICE == "STRATIX10" || DEVICE == "AGILEX") begin
             if (hdr[29] == 1'b1) begin
-                if (ENDPOINT_TYPE == "H_TILE")
+                if (ENDPOINT_TYPE == "H_TILE") begin
                     hdr_offset = sv_pcie_meta_pack::PCIE_META_REQ_HDR_W/MFB_ITEM_WIDTH;
+                end
             end else begin
-                if (ENDPOINT_TYPE == "H_TILE")
+                if (ENDPOINT_TYPE == "H_TILE") begin
                     hdr_offset = sv_pcie_meta_pack::PCIE_META_REQ_HDR_W/MFB_ITEM_WIDTH-1;
+                end
             end
         end
 

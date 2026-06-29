@@ -32,8 +32,9 @@ module dut (
     generate
         if (MFB_REGION_SIZE != 1) begin : gen_MFB_REGION_SIZE_1
             assign sof_pos = mfb_rx.SOF_POS;
-        end else
+        end else begin : gen_MFB_REGION_SIZE_eq_1
             assign sof_pos = '0;
+        end
     endgenerate
 
     assign mvb_tx.SRC_RDY  = mvb_src_rdy;

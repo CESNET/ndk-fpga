@@ -16,7 +16,9 @@ module testbench;
     logic CLK = 0;
     pullup(reset.RESET);
 
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // ---------- //
     // Interfaces //

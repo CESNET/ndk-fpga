@@ -38,8 +38,9 @@ class pool extends uvm_object_string_pool #(uvm_event);
     endfunction
 
     static function this_type get_global_pool ();
-        if (m_global_pool==null)
+        if (m_global_pool==null) begin
             m_global_pool = new("global_pool");
+        end
         return m_global_pool;
     endfunction
 endclass

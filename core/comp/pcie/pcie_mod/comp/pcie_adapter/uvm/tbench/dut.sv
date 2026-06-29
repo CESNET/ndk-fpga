@@ -58,9 +58,11 @@ module dut (
     logic down_ready;
 
 
-    initial assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 && CC_MFB_ITEM_WIDTH == 32) else begin
-        $error("SUPPORT ONLY 32 ITEM_WIDTH\n");
-        $stop();
+    initial begin
+        assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 && CC_MFB_ITEM_WIDTH == 32) else begin
+            $error("SUPPORT ONLY 32 ITEM_WIDTH\n");
+            $stop();
+        end
     end
 
     assign avst_down.READY = down_ready;
@@ -76,7 +78,7 @@ module dut (
 
             if (ENDPOINT_TYPE == "R_TILE") begin : gen_ENDPOINT_TYPE_R_TILE
                 assign down_valid[r] = avst_down.VALID[r] & down_ready;
-            end else begin : gen_line_79
+            end else begin : gen_ENDPOINT_TYPE_not_R_TILE
                 assign down_valid[r] = avst_down.VALID[r];
             end
         end

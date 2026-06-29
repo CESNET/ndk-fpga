@@ -36,7 +36,6 @@ class model #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_component;
             do begin
                 model_mvb_in[sel].get(tr_mvb_in);
             end while (tr_mvb_in.src_rdy !== 'b1 || tr_mvb_in.dst_rdy != 'b1);
-
             model_mvb_out.write(tr_mvb_in);
         end
     endtask

@@ -12,7 +12,9 @@ interface avmm_if #(
     input logic CLK
 );
 
-    initial VALID_PARAMETERS : assert(ADDRESS_WIDTH > 0 && DATA_WIDTH > 0 && BURST_WIDTH > 0);
+    initial begin
+        VALID_PARAMETERS : assert(ADDRESS_WIDTH > 0 && DATA_WIDTH > 0 && BURST_WIDTH > 0);
+    end
 
     // Bus structure of AVMM
     wire                       READY;

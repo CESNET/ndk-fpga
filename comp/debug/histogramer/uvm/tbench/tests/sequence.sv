@@ -47,12 +47,13 @@ class sequence_read #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH) extends sequence_base
 
     // Generates transactions
     task body;
-        for (int addr = 0 ; addr < 2 ** ADDR_WIDTH; addr ++)
+        for (int addr = 0 ; addr < 2 ** ADDR_WIDTH; addr ++) begin
             read_req(addr);
-
+        end
         // Test clear by read
-        for (int addr = 0 ; addr < 2 ** ADDR_WIDTH; addr ++)
+        for (int addr = 0 ; addr < 2 ** ADDR_WIDTH; addr ++) begin
             read_req(addr);
+        end
     endtask
 
 endclass
@@ -79,10 +80,15 @@ class sequence_rand #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH, READ_OCCURENCE, WRITE
         req = uvm_logic_vector::sequence_item#(DATA_WIDTH)::type_id::create("req");
         `uvm_info(get_full_name(), "sequence_rand is running", UVM_DEBUG)
 
-        if (read)
+        if (read) begin
+
             read_req(addr);
-        else
+
+        end else begin
+
             write_req(val);
+
+        end
     endtask
 
 endclass

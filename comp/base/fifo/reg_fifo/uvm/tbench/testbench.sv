@@ -27,7 +27,9 @@ module testbench;
         .ITEM_WIDTH (DATA_WIDTH)
     ) mvb_tx(CLK);
 
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests

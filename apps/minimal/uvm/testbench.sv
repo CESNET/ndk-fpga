@@ -181,10 +181,18 @@ module testbench;
 
     /////////////////////////
     // CLOCK GENERATION
-    always #(test_pkg::CLK_PERIOD/2)  CLK_USER_X1 = ~CLK_USER_X1;
-    always #(test_pkg::CLK_PERIOD/4)  CLK_USER_X2 = ~CLK_USER_X2;
-    always #(test_pkg::CLK_PERIOD/6)  CLK_USER_X3 = ~CLK_USER_X3;
-    always #(test_pkg::CLK_PERIOD/8)  CLK_USER_X4 = ~CLK_USER_X4;
+    always begin
+        #(test_pkg::CLK_PERIOD/2) CLK_USER_X1 = ~CLK_USER_X1;
+    end
+    always begin
+        #(test_pkg::CLK_PERIOD/4) CLK_USER_X2 = ~CLK_USER_X2;
+    end
+    always begin
+        #(test_pkg::CLK_PERIOD/6) CLK_USER_X3 = ~CLK_USER_X3;
+    end
+    always begin
+        #(test_pkg::CLK_PERIOD/8) CLK_USER_X4 = ~CLK_USER_X4;
+    end
 
     /////////////////////////
     // RESETS
@@ -239,7 +247,9 @@ module testbench;
         assign mem.READDATA   = mem_readdata     [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ]; // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
         assign mem_readdatavalid[mem_it] = mem.READDATAVALID; // : in  std_logic_vector(MEM_PORTS-1 downto 0);
 
-        always #(test_pkg::MEM_CLK_PERIOD[mem_it]/2)  MEM_CLK[mem_it] = ~MEM_CLK[mem_it];
+        always begin
+            #(test_pkg::MEM_CLK_PERIOD[mem_it]/2) MEM_CLK[mem_it] = ~MEM_CLK[mem_it];
+        end
 
         initial begin
             //RESET

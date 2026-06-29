@@ -140,12 +140,16 @@ class root#(
 
         fork
             forever begin
-                assert(req.randomize()) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                assert(req.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                end
                 req.start(m_avst_down.m_sequencer);
             end
 
             forever begin
-                assert(res.randomize()) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                assert(res.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                end
                 res.start(m_avst_down.m_sequencer);
             end
         join

@@ -27,8 +27,9 @@ class scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSE
 
         analysis_imp_mvb_rx = new("analysis_imp_mvb_rx",     this);
         analysis_imp_mvb_tx = new("analysis_imp_mvb_tx",     this);
-        if (!IMPL_SHAKEDOWN) analysis_imp_mvb_status = new("analysis_imp_mvb_status", this);
-
+        if (!IMPL_SHAKEDOWN) begin
+            analysis_imp_mvb_status = new("analysis_imp_mvb_status", this);
+        end
     endfunction
 
     function int unsigned success();

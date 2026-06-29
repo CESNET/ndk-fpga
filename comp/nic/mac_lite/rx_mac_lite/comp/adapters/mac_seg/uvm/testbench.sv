@@ -27,7 +27,9 @@ module testbench;
         .META_WIDTH  (1)
     ) tx_mac_seg(CLK);
 
-    always #(test::CLK_PERIOD/2) CLK = ~CLK;
+    always begin
+        #(test::CLK_PERIOD/2) CLK = ~CLK;
+    end
     assign rx_mac_seg.READY = 1'b1;
 
     RX_MAC_LITE_ADAPTER_MAC_SEG  #(

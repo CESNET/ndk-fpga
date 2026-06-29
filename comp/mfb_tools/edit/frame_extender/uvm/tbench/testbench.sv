@@ -16,7 +16,9 @@ module testbench;
     logic CLK = 0;
     logic RST_INIT = 1'b1;
 
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // ---------- //
     // Interfaces //

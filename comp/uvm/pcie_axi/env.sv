@@ -95,7 +95,9 @@ class env_rx #(
             seq.init_sequence(seq_cfg);
 
             forever begin
-                if(!seq.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                if(!seq.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                end
                 seq.start(m_axi.m_sequencer);
             end
         end
@@ -169,7 +171,9 @@ class env_tx #(
             seq.init_sequence();
 
             forever begin
-                if(!seq.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                if(!seq.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                end
                 seq.start(m_axi.m_sequencer);
             end
         end

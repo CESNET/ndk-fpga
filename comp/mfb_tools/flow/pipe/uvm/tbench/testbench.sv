@@ -32,7 +32,9 @@ module testbench;
     ) mfb_rd(CLK);
 
     //Clock
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     //Start of tests
     initial begin

@@ -120,7 +120,9 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
                 verbosity = this.get_report_verbosity_level(UVM_INFO, "avst_seq");
                 m_avst_agent.m_sequencer.set_report_verbosity_level(verbosity >= 300 ? verbosity - 300 : 0);
 
-                if(!avst_seq.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize logic_vector_array_mfb rx_seq");
+                if(!avst_seq.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize logic_vector_array_mfb rx_seq");
+                end
                 avst_seq.start(m_avst_agent.m_sequencer);
             end
         end

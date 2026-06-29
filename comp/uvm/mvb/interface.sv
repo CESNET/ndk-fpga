@@ -6,7 +6,9 @@
 
 // Definition of mvb interface.
 interface mvb_if #(int unsigned ITEMS, int unsigned ITEM_WIDTH) (input logic CLK);
-    initial VALID_PARAMETERS : assert(ITEMS > 0 && ITEM_WIDTH > 0);
+    initial begin
+        VALID_PARAMETERS : assert(ITEMS > 0 && ITEM_WIDTH > 0);
+    end
 
     // ------------------------------------------------------------------------
     // Parameters
