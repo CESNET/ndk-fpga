@@ -30,7 +30,11 @@ module testbench;
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_tx(TX_CLK);
     mvb_if #(MFB_REGIONS, MFB_META_WIDTH) mvb_tx(TX_CLK);
     // Probes
-    bind RX_MAC_LITE_BUFFER : DUT_U.VHDL_DUT_U probe_inf #(2*REGIONS) probe_drop(s_rx_src_rdy_orig_reg, {s_rx_eof_orig_reg, s_rx_force_drop_reg}, RX_CLK);
+    bind RX_MAC_LITE_BUFFER : DUT_U.VHDL_DUT_U probe_inf #(2*REGIONS) probe_drop(
+        .event_signal(s_rx_src_rdy_orig_reg              ),
+        .event_data  ({s_rx_eof_orig_reg, s_rx_force_drop_reg}),
+        .CLK         (RX_CLK                             )
+    );
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking

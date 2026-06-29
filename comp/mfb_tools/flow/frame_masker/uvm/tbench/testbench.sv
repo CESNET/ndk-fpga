@@ -31,7 +31,11 @@ module testbench;
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_unmasked_tx(CLK);
     mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_original_tx(CLK);
 
-    bind MFB_FRAME_MASKER : DUT_U.VHDL_DUT_U probe_inf#(REGIONS*2) probe_mask2discard(TX_DST_RDY & TX_SRC_RDY_UNMASKED, {TX_SOF_UNMASKED, TX_MASK}, CLK);
+    bind MFB_FRAME_MASKER : DUT_U.VHDL_DUT_U probe_inf#(REGIONS*2) probe_mask2discard(
+        .event_signal(TX_DST_RDY & TX_SRC_RDY_UNMASKED),
+        .event_data  ({TX_SOF_UNMASKED, TX_MASK}      ),
+        .CLK         (CLK                              )
+    );
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
