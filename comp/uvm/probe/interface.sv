@@ -14,7 +14,7 @@ interface probe_inf #(int unsigned DATA_WIDTH) (
     input wire CLK);
 
     import uvm_pkg::*;
-    localparam string PATH = $psprintf("%m");
+    localparam string PATH = $sformatf("%m");
 
     class probe_event_component;
         uvm_event probe_event;

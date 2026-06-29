@@ -179,6 +179,7 @@ class sequence_simple_gauss #(int unsigned ITEM_WIDTH) extends uvm_common::seque
 
     function int gaussian_dist();
         int unsigned value;
+        // verilog_lint: waive invalid-system-task-function
         value = $dist_normal($urandom(), mean, std_deviation);
 
         if (cfg.array_size_min < value && value < cfg.array_size_max) begin
@@ -463,6 +464,7 @@ class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple
     endfunction
 
     function int inverted_gaussian_dist();
+        // verilog_lint: waive invalid-system-task-function
         int value = $dist_normal($urandom(), mean, mean/3);
         value = math_min(value, data_size_max);
         value = math_max(value, data_size_min);
