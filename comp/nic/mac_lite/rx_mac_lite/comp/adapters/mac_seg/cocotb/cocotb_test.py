@@ -54,7 +54,7 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=2048)
 
     for transaction in random_packets(frame_size_min, frame_size_max, pkt_count):
         tb.model(transaction)
-        cocotb.log.info("generated transaction: " + transaction.hex())
+        #cocotb.log.info("generated transaction: " + transaction.hex())
         tb.stream_in.append(transaction)
 
     last_num = 0
