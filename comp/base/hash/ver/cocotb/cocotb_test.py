@@ -151,7 +151,7 @@ async def run_test(dut, trans_cnt=10000):
         transaction["SEED"] = randint(0, 2**seed_width-1)
         transaction["META"] = randint(0, 2**meta_width-1)
 
-        cocotb.log.info(f"{i=}, {transaction=}")
+        #cocotb.log.info(f"{i=}, {transaction=}")
 
         hash = hash_func(transaction["KEY"].to_bytes(key_width_bytes, "little"), transaction["SEED"].to_bytes(seed_width_bytes, "little"))
 
