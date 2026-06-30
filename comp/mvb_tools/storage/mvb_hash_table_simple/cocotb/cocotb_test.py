@@ -147,7 +147,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
     #     pkt_count: how many random packets are to be generated.
 
     cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
-    tb = testbench(dut, debug=True)
+    tb = testbench(dut, debug=False)
     await tb.reset()
 
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
@@ -247,7 +247,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
         mvb_req_tr = MvbReqTrHashTableSimple()
         mvb_req_tr.key = int_transaction
 
-        cocotb.log.info(f"generated transaction: {hex(mvb_req_tr.key)}")
+        #cocotb.log.info(f"generated transaction: {hex(mvb_req_tr.key)}")
         tb.stream_in.append(mvb_req_tr)
 
     last_num = 0
