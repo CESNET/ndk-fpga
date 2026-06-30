@@ -23,17 +23,37 @@ class tag_register#(int unsigned TAG_WIDTH) extends uvm_object;
         super.new(name);
     endfunction
 
-    function void register_pcie_tag(int unsigned type_tr, int unsigned length, logic [8-1:0] unit_id, logic [TAG_WIDTH-1:0] dma_tag, logic [TAG_WIDTH-1:0] pcie_tag);
+    function void register_pcie_tag(
+                int unsigned type_tr,
+                int unsigned length,
+                logic [8-1:0] unit_id,
+                logic [TAG_WIDTH-1:0] dma_tag,
+                logic [TAG_WIDTH-1:0] pcie_tag
+    );
+
         dma_info_t info;
 
-        `uvm_info(this.get_full_name(), $sformatf("\nTAG REGISTER\n\tTYPE %0d\n\tlength %0d\n\tunit ID %0d(0x%h)\n\tdma tag %0d(0x%h)\n\tpcie tag %0d(0x%h)",
-                                        type_tr, length, unit_id, unit_id, dma_tag, dma_tag, pcie_tag, pcie_tag), UVM_DEBUG);
+        `uvm_info(
+            this.get_full_name(),
+            {
+                 $sformatf("\nTAG REGISTER\n\tTYPE %0d\n", type_tr),
+                 $sformatf("\tlength %0d\n", length),
+                 $sformatf("\tunit ID %0d(0x%h)\n", unit_id, unit_id),
+                 $sformatf("\tdma tag %0d(0x%h)\n\tpcie tag %0d(0x%h)", dma_tag, dma_tag, pcie_tag, pcie_tag)
+            },
+            UVM_DEBUG
+        );
+
         if (type_tr == 0) begin
             //check if there isnt
             if (pcie2dma.exists(pcie_tag)) begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tPCIE tag %0d(0x%h) already exists", pcie_tag, pcie_tag));
+                `uvm_error(this.get_full_name(),
+                           $sformatf("\n\tPCIE tag %0d(0x%h) already exists", pcie_tag, pcie_tag)
+                );
             end else if (dma2pcie.exists({unit_id, dma_tag})) begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tDMA unit id 0x%h tag %0d(0x%h) already exists", unit_id, dma_tag, dma_tag));
+                `uvm_error(this.get_full_name(),
+                           $sformatf("\n\tDMA unit id 0x%h tag %0d(0x%h) already exists", unit_id, dma_tag, dma_tag)
+                );
             end else begin
                 //dma to pcie
                 dma2pcie[{unit_id, dma_tag}] = pcie_tag;
@@ -49,9 +69,19 @@ class tag_register#(int unsigned TAG_WIDTH) extends uvm_object;
         end
     endfunction
 
-    task get_dma2pcie(input logic type_tr, int unsigned dma_port, logic [TAG_WIDTH-1:0] dma_tag, logic [8-1:0] dma_unit_id, output logic [TAG_WIDTH-1:0] pcie_tag);
-        `uvm_info(this.get_full_name(), $sformatf("\nTAG TRANSLATE DMA TO PCIE\n\ttype %0d\n\tdma port %0d \n\tdma tag %0d(0x%h)\n\tunit id %0d(0x%h)",
-                                                 type_tr, dma_port, dma_tag, dma_tag, dma_unit_id, dma_unit_id), UVM_FULL);
+    task get_dma2pcie(
+                input logic type_tr,
+                int unsigned dma_port,
+                logic [TAG_WIDTH-1:0] dma_tag,
+                logic [8-1:0] dma_unit_id,
+                output logic [TAG_WIDTH-1:0] pcie_tag
+    );
+
+        `uvm_info(this.get_full_name(), $sformatf("\nTAG TRANSLATE DMA TO PCIE\n\ttype %0d\n\tdma port %0d\n",
+                                                   "\tdma tag %0d(0x%h)\n\tunit id %0d(0x%h)",
+                                                   type_tr, dma_port, dma_tag, dma_tag,
+                                                   dma_unit_id, dma_unit_id), UVM_FULL);
+
         if (type_tr == 0) begin
             wait(dma2pcie.exists({dma_unit_id, dma_tag}));
             pcie_tag = dma2pcie[{dma_unit_id, dma_tag}];
@@ -64,7 +94,10 @@ class tag_register#(int unsigned TAG_WIDTH) extends uvm_object;
     function dma_info_t get_pcie2dma(logic [TAG_WIDTH-1:0] pcie_tag, int unsigned last);
         dma_info_t info;
 
-        `uvm_info(this.get_full_name(), $sformatf("\nTAG TRANSLATE PCIE TO DMA \n\tpcie tag %0d(0x%h)\n\tlast %0d", pcie_tag, pcie_tag, last), UVM_FULL);
+        `uvm_info(this.get_full_name(),
+                  $sformatf("\nTAG TRANSLATE PCIE TO DMA \n\tpcie tag %0d(0x%h)\n\tlast %0d", pcie_tag, pcie_tag, last),
+                  UVM_FULL
+        );
 
         if (!pcie2dma.exists(pcie_tag)) begin
             `uvm_error(this.get_full_name(), $sformatf("\n\tPCIE tag doesnt exist %0d(0x%h)", pcie_tag, pcie_tag));
@@ -124,31 +157,47 @@ class tag_cbs #(int unsigned REGIONS, int unsigned TAG_WIDTH) extends uvm_event_
         {dma_hdr, tags, vld} = c_data.data;
         for (int unsigned it = 0; it < REGIONS; it++) begin
             if (vld[it] == 1) begin
-                logic [TAG_WIDTH-1:0] tag_act                            = tags   [(it+1)*TAG_WIDTH-1 -: TAG_WIDTH];
-                logic [sv_dma_bus_pack::DMA_UPHDR_WIDTH-1:0] dma_hdr_act = dma_hdr[(it+1)*sv_dma_bus_pack::DMA_UPHDR_WIDTH-1 -: sv_dma_bus_pack::DMA_UPHDR_WIDTH];
+                logic [TAG_WIDTH-1:0] tag_act = tags   [(it+1)*TAG_WIDTH-1 -: TAG_WIDTH];
+                logic [sv_dma_bus_pack::DMA_UPHDR_WIDTH-1:0] dma_hdr_act =
+                            dma_hdr[(it+1)*sv_dma_bus_pack::DMA_UPHDR_WIDTH-1 -: sv_dma_bus_pack::DMA_UPHDR_WIDTH];
                 uvm_dma::sequence_item_rq act_dma_hdr;
 
-                act_dma_hdr = new();
-                act_dma_hdr.relaxed     = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_W-1 : sv_dma_bus_pack::DMA_REQUEST_RELAXED_O];
-                act_dma_hdr.pasidvld    = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASIDVLD_O];
-                act_dma_hdr.pasid       = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASID_O];
-                act_dma_hdr.vfid        = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_PASID_O-1 : sv_dma_bus_pack::DMA_REQUEST_VFID_O];
-                act_dma_hdr.global_id   = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_VFID_O-1 : sv_dma_bus_pack::DMA_REQUEST_GLOBAL_O];
-                act_dma_hdr.unitid      = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_GLOBAL_O-1 : sv_dma_bus_pack::DMA_REQUEST_UNITID_O];
-                act_dma_hdr.tag         = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_UNITID_O-1 : sv_dma_bus_pack::DMA_REQUEST_TAG_O];
-                act_dma_hdr.lastib      = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_TAG_O-1 : sv_dma_bus_pack::DMA_REQUEST_LASTIB_O];
-                act_dma_hdr.firstib     = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_LASTIB_O-1 : sv_dma_bus_pack::DMA_REQUEST_FIRSTIB_O];
-                act_dma_hdr.type_ide    = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_FIRSTIB_O-1 : sv_dma_bus_pack::DMA_REQUEST_TYPE_O];
-                act_dma_hdr.length      = dma_hdr_act[sv_dma_bus_pack::DMA_REQUEST_TYPE_O-1 : sv_dma_bus_pack::DMA_REQUEST_LENGTH_O]; // Size in DWORDS
+                act_dma_hdr = uvm_dma::sequence_item_rq::type_id::create("act_dma_hdr");
+                act_dma_hdr.start[{this.get_full_name, "_post_trigger"}] = $time();
+                {
+                    act_dma_hdr.relaxed,
+                    act_dma_hdr.pasidvld,
+                    act_dma_hdr.pasid,
+                    act_dma_hdr.vfid,
+                    act_dma_hdr.global_id,
+                    act_dma_hdr.unitid,
+                    act_dma_hdr.tag,
+                    act_dma_hdr.lastib,
+                    act_dma_hdr.firstib,
+                    act_dma_hdr.type_ide,
+                    act_dma_hdr.length
+                } = dma_hdr_act;
 
                 transactions++;
-                `uvm_info(this.get_full_name(), $sformatf("\n\tTag translaction %0d WR(%0d) DMA TAG : 0x%h DMA ID : 0x%h => PCIE tag 0x%h", transactions, act_dma_hdr.type_ide, act_dma_hdr.tag, act_dma_hdr.unitid, tag_act), UVM_HIGH);
+                begin
+                    const string info_msg = $sformatf (
+                            "\n\tTag translaction %0d WR(%0d) DMA TAG : 0x%h DMA ID : 0x%h => PCIE tag 0x%h",
+                            transactions, act_dma_hdr.type_ide, act_dma_hdr.tag, act_dma_hdr.unitid, tag_act
+                    );
+                    `uvm_info(this.get_full_name(), info_msg, UVM_HIGH);
+                end
 
                 if ($isunknown(tag_act)) begin
                     `uvm_error(this.get_full_name(), $sformatf("\n\tUndefined Value in TAG assigment 0x%h", tag_act));
                 end
 
-                registration.register_pcie_tag(act_dma_hdr.type_ide, act_dma_hdr.length*4, act_dma_hdr.unitid, act_dma_hdr.tag, tag_act);
+                registration.register_pcie_tag(
+                        act_dma_hdr.type_ide,
+                        act_dma_hdr.length*4,
+                        act_dma_hdr.unitid,
+                        act_dma_hdr.tag,
+                        tag_act
+               );
             end
         end
     endfunction
@@ -222,7 +271,9 @@ class model#(
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        uvm_probe::pool::get_global_pool().get({ "probe_event_component_", cfg.path, ".probe_tag" }).add_callback(tags_cbs);
+        uvm_probe::pool::get_global_pool().get(
+                { "probe_event_component_", cfg.path, ".probe_tag" }
+        ).add_callback(tags_cbs);
         tags_cbs.registration = tags;
     endfunction
 
@@ -244,7 +295,10 @@ class model#(
             dma_tr.start = pcie_tr.start;
 
             rc_transactions++;
-            `uvm_info(this.get_full_name(), $sformatf("\nGET PCIE RC TRANSACTION %0d %s", rc_transactions, pcie_tr.convert2string()), UVM_FULL);
+            `uvm_info(this.get_full_name(),
+                      $sformatf("\nGET PCIE RC TRANSACTION %0d %s", rc_transactions, pcie_tr.convert2string()),
+                      UVM_FULL
+            );
 
             move       = pcie_tr.lower_address & 2'b11;
             pcie_tag   = pcie_tr.tag;
@@ -256,10 +310,13 @@ class model#(
             dma_tr.tag       = dma_info.tag;
             dma_tr.unit_id   = dma_info.unit_id;
             if (DMA_PORTS > 1) begin
-                dma_tr.unit_id[$clog2(DMA_PORTS)-1:0] = 0;
+                dma_tr.unit_id[sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] = 0;
             end
             dma_tr.data      = pcie_tr.data;
-            `uvm_info(this.get_full_name(), $sformatf("\nDMA RC PORT %0d %s", dma_info.port, dma_tr.convert2string()), UVM_FULL);
+            `uvm_info(this.get_full_name(),
+                      $sformatf("\nDMA RC PORT %0d %s", dma_info.port, dma_tr.convert2string()),
+                      UVM_FULL
+            );
 
             dma_rc[dma_info.port].write(dma_tr);
         end
@@ -285,7 +342,10 @@ class model#(
             rsp_tr.pcie_type  = 5'b0;
 
 
-            `uvm_info(this.get_full_name(), $sformatf("\nGET DMA RX [%0d] TRANSACTION %0d %s", dma, rq_tr_tmp, rq_tr.convert2string()), UVM_FULL);
+            `uvm_info(this.get_full_name(),
+                      $sformatf("\nGET DMA RX [%0d] TRANSACTION %0d %s", dma, rq_tr_tmp, rq_tr.convert2string()),
+                      UVM_FULL
+            );
 
             rsp_tr.traffic_class     = 0;
             rsp_tr.id_based_ordering = 0;
@@ -300,7 +360,7 @@ class model#(
             rsp_tr.requester_id      = {8'b0,  rq_tr.vfid};
             unitid = rq_tr.unitid;
             if (DMA_PORTS > 1) begin
-                 unitid[$clog2(DMA_PORTS)-1:0] = dma;
+                 unitid[sv_dma_bus_pack::DMA_REQUEST_UNITID_W-1 -: $clog2(DMA_PORTS)] = dma;
             end
 
             tags.get_dma2pcie(rq_tr.type_ide, dma, rq_tr.tag, unitid, rsp_tr.tag);
@@ -318,11 +378,18 @@ class model#(
                 3 : rsp_tr.fbe = 4'b1000;
                 default : rsp_tr.lbe = 'x;
             endcase
-            rsp_tr.lbe               = (rsp_tr.length != 1) ? rsp_tr.lbe : 0;
+
+            if (rsp_tr.length == 1) begin
+                rsp_tr.fbe = rsp_tr.fbe & rsp_tr.lbe;
+                rsp_tr.lbe = 0;
+            end
             rsp_tr.address           = rq_tr.global_id[64-1:2];
             rsp_tr.ph                = 0;
 
-            `uvm_info(this.get_full_name(), $sformatf("\nPCIE RQ transaction %0d %s", rq_tr_tmp,  rsp_tr.convert2string()), UVM_MEDIUM);
+            `uvm_info(this.get_full_name(),
+                      $sformatf("\nPCIE RQ transaction %0d %s", rq_tr_tmp,  rsp_tr.convert2string()),
+                      UVM_MEDIUM
+            );
             //change tag and pic
             pcie_rq.write(rsp_tr);
         end
@@ -348,7 +415,13 @@ class model#(
             msg = $sformatf("\n\tSuccess %0d Transaction in\n\t\tPcie RC : %0d", this.success(), pcie_rc.used());
 
             for (int unsigned it = 0; it < DMA_PORTS; it++) begin
-                msg = {msg, $sformatf("\n\t\tdma rq [%0d] : %0d (processed %0d)", it,  dma_rq[it].used(), rq_transactions[it])};
+                string msg_new;
+
+                msg_new = $sformatf(
+                                "\n\t\tdma rq [%0d] : %0d (processed %0d)",
+                                it,  dma_rq[it].used(), rq_transactions[it]
+                         );
+                msg = {msg, msg_new};
             end
             `uvm_error(this.get_full_name(), msg);
         end

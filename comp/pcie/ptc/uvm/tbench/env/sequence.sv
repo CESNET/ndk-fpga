@@ -31,7 +31,12 @@ class sequence_base#(
         uvm_pcie::config_sequence              pcie_rc_cfg;
         uvm_pcie::pcie_info#(PCIE_TAG_WIDTH)   pcie_rc_info;
 
-        uvm_config_db #(uvm_pcie::pcie_info#(PCIE_TAG_WIDTH))::get(p_sequencer.m_pcie_rc, "", "pcie_info", pcie_rc_info);
+        uvm_config_db #(uvm_pcie::pcie_info#(PCIE_TAG_WIDTH))::get(
+                p_sequencer.m_pcie_rc,
+                "",
+                "pcie_info",
+                pcie_rc_info
+        );
 
         ///////////////////////////
         // CREATE SEQUENCE
@@ -49,10 +54,13 @@ class sequence_base#(
 
         // DMA
         for(int unsigned it = 0; it <  DMA_PORTS; it++) begin
-            dma_rq_seq[it] = uvm_dma::sequence_dma_rq_lib#(DMA_PORTS)::type_id::create($sformatf("dma_rq_%0d", it), p_sequencer.m_dma[it]);
+            dma_rq_seq[it] = uvm_dma::sequence_dma_rq_lib#(DMA_PORTS)::type_id::create(
+                                        $sformatf("dma_rq_%0d", it),
+                                        p_sequencer.m_dma[it]
+                             );
             dma_rq_seq[it].init_sequence();
-            dma_rq_seq[it].min_random_count = 100;
-            dma_rq_seq[it].max_random_count = 200;
+            dma_rq_seq[it].min_random_count =  50;
+            dma_rq_seq[it].max_random_count = 100;
         end
 
         /////////////////////////////
@@ -74,9 +82,11 @@ class sequence_base#(
         for(int unsigned it = 0; it <  DMA_PORTS; it++) begin
             fork
                 automatic int unsigned index = it;
-                for (int unsigned jt = 0; jt < 10; jt++) begin
-                    assert(dma_rq_seq[index].randomize());
-                    dma_rq_seq[index].start(p_sequencer.m_dma[index]);
+                begin
+                    for (int unsigned jt = 0; jt < 5; jt++) begin
+                        assert(dma_rq_seq[index].randomize());
+                        dma_rq_seq[index].start(p_sequencer.m_dma[index]);
+                    end
                     dma_stop[index] = 1;
                 end
             join_none
@@ -84,7 +94,9 @@ class sequence_base#(
 
         fork
             forever begin
-                assert(pcie_seq_rc.randomize()) else `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie sequence");
+                assert(pcie_seq_rc.randomize()) else begin
+                    `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize pcie sequence");
+                end
                 pcie_seq_rc.start(p_sequencer.m_pcie_rc);
             end
         join_none

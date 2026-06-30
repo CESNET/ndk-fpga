@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class sequence_item_rq  extends uvm_common::sequence_item;
-    `uvm_object_param_utils(uvm_dma::sequence_item_rq)
+    `ndk_object_utils(uvm_dma::sequence_item_rq)
 
     //rand uvm_ptc_info::sequence_item hdr;
     rand logic [sv_dma_bus_pack::DMA_REQUEST_LENGTH_W-1 : 0]  length;
@@ -77,8 +77,10 @@ class sequence_item_rq  extends uvm_common::sequence_item;
         string msg = $sformatf("\n\tDMA RC DATA : size(%0d) ", data.size());
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % 8 == 0) begin
+                // verilog_lint: waive numeric-format-string-style
                 msg = {msg, $sformatf("\n\t\t%h", data[it])};
             end else begin
+                // verilog_lint: waive numeric-format-string-style
                 msg = {msg, $sformatf("  %h", data[it])};
             end
         end
@@ -89,8 +91,11 @@ class sequence_item_rq  extends uvm_common::sequence_item;
         string msg = "";
 
         msg = this.time2string();
-        msg = {msg, $sformatf("\tLength : %d\n\tType : %b\n\tFirstIB : %0d\n\tlastIB : %0d\n\ttag : %0d(0x%h)\n\tunitid : 0x%h\n\tglobal : 0x%h\n\tvfid : 0x%h\n\tpasid : 0x%h\n\tpasidvld : %b\n\trelaxed : %b\n",
-                     length != 0 ? length : 1024, type_ide, firstib, lastib, tag, tag, unitid, global_id, vfid, pasid, pasidvld, relaxed)};
+        msg = {msg, $sformatf({"\tLength : %0d\n\tType : %0d\n\tFirstIB : %0d\n\tlastIB : %0d\n",
+                                 "\ttag : %0d(0x%h)\n\tunitid : 0x%h\n\tglobal : 0x%h\n\tvfid : 0x%h\n",
+                                 "\tpasid : 0x%h\n\tpasidvld : %0d\n\trelaxed : %0d\n"},
+                                 length != 0 ? length : 1024, type_ide, firstib, lastib, tag, tag,
+                                 unitid, global_id, vfid, pasid, pasidvld, relaxed)};
         msg = {msg, convert2string_data()};
         return msg;
     endfunction
@@ -151,7 +156,7 @@ class sequence_item_rc  extends uvm_common::sequence_item;
     function string convert2string_header();
         string msg = "";
         msg = {msg, $sformatf("\n\tDMA RC HEADER : ")};
-        msg = {msg, $sformatf("\n\t\tlength %0d\n\t\tcompleted %b", length, completed)};
+        msg = {msg, $sformatf("\n\t\tlength %0d\n\t\tcompleted 0b%b", length, completed)};
         msg = {msg, $sformatf("\n\t\ttag : %0d(0x%0h)\n\t\tunit_id 0x%h", tag, tag, unit_id)};
         return msg;
     endfunction
@@ -160,8 +165,10 @@ class sequence_item_rc  extends uvm_common::sequence_item;
         string msg = $sformatf("\n\tDMA RC DATA : size(%0d) ", data.size());
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % 8 == 0) begin
+                // verilog_lint: waive numeric-format-string-style
                 msg = {msg, $sformatf("\n\t\t%h", data[it])};
             end else begin
+                // verilog_lint: waive numeric-format-string-style
                 msg = {msg, $sformatf("  %h", data[it])};
             end
         end

@@ -29,7 +29,14 @@ class scoreboard #(
     logic DMA_BAR_ENABLE,
     string PCIE_ENDPOINT_TYPE
 ) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_pcie_top::scoreboard #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE))
+    `uvm_component_param_utils(uvm_pcie_top::scoreboard #(
+            REGIONS,
+            PCIE_ENDPOINTS,
+            DMA_PORTS,
+            ITEM_WIDTH,
+            DMA_BAR_ENABLE,
+            PCIE_ENDPOINT_TYPE
+    ))
 
 
     ////////////////////////
@@ -61,8 +68,8 @@ class scoreboard #(
     protected uvm_common::comparer_base#(uvm_pcie::header) pcie_rq_cmp[PCIE_ENDPOINTS];
     protected uvm_common::comparer_base#(uvm_pcie::header) pcie_cc_cmp[PCIE_ENDPOINTS];
 
-    protected uvm_common::comparer_ordered#(uvm_dma::sequence_item_rc)                  dma_rc_cmp[PCIE_ENDPOINTS][DMA_PORTS];
-    protected mi_req_comparer                                                           mi_rq_cmp[PCIE_ENDPOINTS]; //CQ
+    protected uvm_ptc::scoreboard_dma_rc #(DMA_PORTS) dma_rc_cmp[PCIE_ENDPOINTS][DMA_PORTS];
+    protected mi_req_comparer                         mi_rq_cmp[PCIE_ENDPOINTS]; //CQ
 
     protected uvm_common::comparer_ordered#(uvm_pcie::header)  dma_cq_cmp[PCIE_ENDPOINTS][DMA_PORTS];
 
@@ -123,7 +130,10 @@ class scoreboard #(
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_model = model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE)::type_id::create("m_model", this);
+        m_model = model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE)::type_id::create(
+                    "m_model",
+                    this
+                  );
 
         for (int unsigned pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin
             string i_string;
@@ -135,13 +145,25 @@ class scoreboard #(
             //mi_req[pcie] = uvm_mtc::mi_subscriber #(32, 32)::type_id::create({"mi_rq_", i_string}, this);
 
             if (DMA_PORTS > 1) begin
-                pcie_rq_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::header)::type_id::create({"pcie_rq_cmp_", i_string}, this);
-                pcie_cc_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::header)::type_id::create({"pcie_cc_cmp_", i_string}, this);
+                pcie_rq_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::header)::type_id::create(
+                                        {"pcie_rq_cmp_", i_string},
+                                        this
+                                    );
+                pcie_cc_cmp[pcie] = uvm_common::comparer_unordered#(uvm_pcie::header)::type_id::create(
+                                        {"pcie_cc_cmp_", i_string},
+                                        this
+                                    );
             end else begin
                 // When there are only one DMA port then all transaction on
                 // PCIE have to be ordered
-                pcie_rq_cmp[pcie] = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"pcie_rq_cmp_", i_string}, this);
-                pcie_cc_cmp[pcie] = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"pcie_cc_cmp_", i_string}, this);
+                pcie_rq_cmp[pcie] = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create(
+                                        {"pcie_rq_cmp_", i_string},
+                                        this
+                                    );
+                pcie_cc_cmp[pcie] = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create(
+                                        {"pcie_cc_cmp_", i_string},
+                                        this
+                                    );
             end
 
             mi_rq_cmp[pcie] = mi_req_comparer::type_id::create({"mi_rq_cmp", i_string}, this);
@@ -153,10 +175,16 @@ class scoreboard #(
 
                 dma_rq[pcie][dma]     = new({"dma_rq_", i_string, "_", dma_string}, this);
                 dma_cc[pcie][dma]     = new({"dma_cc_", i_string, "_", dma_string}, this);
-                dma_rc_cmp[pcie][dma] = uvm_common::comparer_ordered#(uvm_dma::sequence_item_rc)::type_id::create({"dma_rc_cmp_", i_string, "_", dma_string}, this);
+                dma_rc_cmp[pcie][dma] = uvm_ptc::scoreboard_dma_rc#(DMA_PORTS)::type_id::create(
+                                            {"dma_rc_cmp_", i_string, "_", dma_string},
+                                            this
+                                        );
 
                 // CQ and CC
-                dma_cq_cmp[pcie][dma]  = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create({"dma_cq_cmp_", i_string, "_", dma_string}, this);
+                dma_cq_cmp[pcie][dma]  = uvm_common::comparer_ordered#(uvm_pcie::header)::type_id::create(
+                                             {"dma_cq_cmp_", i_string, "_", dma_string},
+                                             this
+                                         );
             end
         end
     endfunction
@@ -198,15 +226,30 @@ class scoreboard #(
     endfunction
 
     virtual function void report_phase(uvm_phase phase);
-        if (this.success() && this.used() == 0) begin
-            `uvm_info(this.get_full_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", UVM_NONE)
+        string msg = "";
+
+        msg = $sformatf("\n\tsuccess %0d used %0d", this.success(), this.used());
+        if (this.success() == 1 && this.used() == 0) begin
+            `uvm_info(get_type_name(),
+                      {
+                          msg, "\n",
+                          "\n\t---------------------------------------",
+                          "\n\t----     VERIFICATION SUCCESS      ----",
+                          "\n\t---------------------------------------"
+                      },
+                      UVM_NONE
+            );
         end else begin
-            string msg;
-
-            msg = $sformatf("\n\tsuccess %0d used %0d", this.success(), this.used());
-            `uvm_info(this.get_full_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(),
+                      {
+                          msg, "\n",
+                          "\n\t---------------------------------------",
+                          "\n\t----       VERIFICATION FAIL       ----",
+                          "\n\t---------------------------------------"
+                      },
+                      UVM_NONE
+            );
         end
-
     endfunction
 endclass
 
