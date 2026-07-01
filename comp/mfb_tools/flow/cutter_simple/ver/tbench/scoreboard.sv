@@ -26,13 +26,23 @@ class ScoreboardDriverCbs extends DriverCbs;
    endtask
 
    virtual task post_tx(Transaction transaction, string inst);
-      MfbTransaction #(ITEM_WIDTH,1) tr;
-      MfbTransaction #(ITEM_WIDTH,1) tr_cutted;
+      localparam int CUT_OFFSET_WIDTH = ($clog2(MAX_CUT_OFFSET) > 1) ? $clog2(MAX_CUT_OFFSET) : 1;
+
+      MfbTransaction #(ITEM_WIDTH,CUT_OFFSET_WIDTH+1) tr;
+      MfbTransaction #(ITEM_WIDTH,CUT_OFFSET_WIDTH+1) tr_cutted;
+      int cut_offset = 0;
       int size_after_cut;
 
       $cast(tr, transaction);
       //$write("tr: \n");
       //tr.display();
+
+      if (MAX_CUT_OFFSET == 1) begin
+         cut_offset = tr.meta[1];
+      end else if (MAX_CUT_OFFSET > 1) begin
+         cut_offset = tr.meta[CUT_OFFSET_WIDTH:1];
+      end
+      //$write("Cut offser: %d\n", cut_offset);
 
       size_after_cut = tr.data.size() - CUTTED_ITEMS;
       //$write("New size: %d\n", size_after_cut);
@@ -41,9 +51,14 @@ class ScoreboardDriverCbs extends DriverCbs;
       tr_cutted.meta = tr.meta;
 
 
-      if (tr.meta == 1) begin
+      if (tr.meta[0] == 1) begin
          tr_cutted.data = new[size_after_cut];
-         for (int i=0; i<size_after_cut; i++) begin
+         // copy before cut data
+         for (int i=0; i<cut_offset; i++) begin
+            tr_cutted.data[i] = tr.data[i];
+         end
+         // copy after cut data
+         for (int i=cut_offset; i<size_after_cut; i++) begin
             tr_cutted.data[i] = tr.data[i+CUTTED_ITEMS];
          end
       end else begin

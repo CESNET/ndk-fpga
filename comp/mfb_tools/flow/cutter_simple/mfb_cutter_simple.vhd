@@ -22,8 +22,8 @@ entity MFB_CUTTER_SIMPLE is
         --
         -- Frame size restrictions:
         --
-        -- * For REGION_SIZE =  1: MIN = (CUTTED_ITEMS+1)*ITEM_WIDTH bits
-        -- * For REGION_SIZE >= 2: MIN = (REGION_SIZE*BLOCK_SIZE+CUTTED_ITEMS)*ITEM_WIDTH bits
+        -- * For REGION_SIZE =  1: MIN = (CUTTED_ITEMS+CUT_OFF+1)*ITEM_WIDTH bits
+        -- * For REGION_SIZE >= 2: MIN = (REGION_SIZE*BLOCK_SIZE+CUTTED_ITEMS+CUT_OFF)*ITEM_WIDTH bits
         -- =======================================================================
         REGIONS        : natural := 2; -- any positive
         REGION_SIZE    : natural := 8; -- any power of two
@@ -41,8 +41,9 @@ entity MFB_CUTTER_SIMPLE is
         -- OTHER CONFIGURATION:
         -- =======================================================================
 
-        -- Count of cutted items from SOF. Maximum value is REGION_SIZE*BLOCK_SIZE.
-        CUTTED_ITEMS   : natural := 4
+        -- Count of cutted items from SOF+CUT_OFF. Maximum value is REGION_SIZE*BLOCK_SIZE.
+        CUTTED_ITEMS   : natural := 4;
+        MAX_CUT_OFFSET : natural := 0 -- any power of two
     );
     port (
         -- =======================================================================
@@ -66,6 +67,8 @@ entity MFB_CUTTER_SIMPLE is
         RX_DST_RDY : out std_logic;
         -- Enable of cutting, valid with each SOF.
         RX_CUT     : in  std_logic_vector(REGIONS-1 downto 0);
+        -- Cut offset. Maximum value is MAX_CUT_OFFSET.
+        RX_CUT_OFF : in  std_logic_vector(REGIONS*max(1,log2(MAX_CUT_OFFSET))-1 downto 0) := (others => '0');
 
         -- =======================================================================
         -- OUTPUT MFB INTERFACE
@@ -94,10 +97,15 @@ architecture FULL of MFB_CUTTER_SIMPLE is
     constant REGION_BLOCKS      : natural := REGION_SIZE;
     constant SOF_POS_WIDTH      : natural := max(1,log2(REGION_SIZE));
     constant EOF_POS_WIDTH      : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
+    constant CUT_OFF_WIDTH      : natural := max(1,log2(MAX_CUT_OFFSET));
+    constant CUT_OFF_WORD_WIDTH : natural := log2(((MAX_CUT_OFFSET+WORD_ITEMS-1)/WORD_ITEMS)+1);
+    constant LOG2_WORD_ITEMS    : natural := log2(WORD_ITEMS);
     constant LOG2_REGION_ITEMS  : natural := log2(REGION_ITEMS);
     constant LOG2_BLOCK_SIZE    : natural := log2(BLOCK_SIZE);
+    constant CUT_POS_WIDTH      : natural := max(CUT_OFF_WIDTH,LOG2_WORD_ITEMS)+1;
 
     signal s_rx_sof_vld               : std_logic_vector(REGIONS-1 downto 0);
+    signal s_rx_eof_vld               : std_logic_vector(REGIONS-1 downto 0);
     signal s_rx_sof_pos_arr           : slv_array_t(REGIONS-1 downto 0)(SOF_POS_WIDTH-1 downto 0);
     signal s_rx_eof_pos_arr           : slv_array_t(REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
     signal s_rx_meta_arr              : slv_array_t(REGIONS-1 downto 0)(META_WIDTH-1 downto 0);
@@ -105,7 +113,10 @@ architecture FULL of MFB_CUTTER_SIMPLE is
     signal s_rx_sof_pos_items_arr     : uns_array_t(REGIONS-1 downto 0)(LOG2_REGION_ITEMS-1 downto 0);
     signal s_sof_items                : std_logic_vector(WORD_ITEMS-1 downto 0);
     signal s_mux_sel                  : std_logic_vector(WORD_ITEMS-1 downto 0);
-    signal s_mux_sel_prev             : std_logic_vector(WORD_ITEMS downto 0);
+    signal s_sof_sel                  : std_logic_vector(WORD_ITEMS-1 downto 0);
+    signal s_sof_sel_prev             : std_logic_vector(WORD_ITEMS downto 0);
+    signal s_cut_sel                  : std_logic_vector(WORD_ITEMS-1 downto 0);
+    signal s_cut_sel_prev             : std_logic_vector(WORD_ITEMS downto 0) := (others => '0');
 
     signal s_cutted_items             : uns_array_t(REGIONS-1 downto 0)(LOG2_REGION_ITEMS downto 0);
     signal s_new_eof_pos_curr_arr_wid : uns_array_t(REGIONS-1 downto 0)(LOG2_REGION_ITEMS downto 0);
@@ -148,6 +159,26 @@ architecture FULL of MFB_CUTTER_SIMPLE is
     signal s_tx_sof                   : std_logic_vector(REGIONS-1 downto 0);
     signal s_tx_src_rdy               : std_logic;
 
+    signal s_rx_cut_off_arr           : slv_array_t(REGIONS-1 downto 0)(CUT_OFF_WIDTH-1 downto 0);
+
+    signal s_rx_cut_off_pos_arr       : uns_array_t(REGIONS-1 downto 0)(CUT_POS_WIDTH-1 downto 0);
+    signal s_rx_cut_off_words_arr     : uns_array_t(REGIONS-1 downto 0)(CUT_OFF_WORD_WIDTH-1 downto 0);
+    signal s_rx_cut_off_items_arr     : uns_array_t(REGIONS-1 downto 0)(LOG2_WORD_ITEMS-1 downto 0);
+    signal s_rx_cut_off_items_reg     : uns_array_t(REGIONS-1 downto 0)(LOG2_WORD_ITEMS-1 downto 0);
+    signal s_rx_cut_word_items_arr    : uns_array_t(REGIONS+1-1 downto 0)(LOG2_WORD_ITEMS-1 downto 0);
+    signal s_rx_cut_word              : std_logic_vector(REGIONS+1-1 downto 0);
+    signal s_rx_cut_word_vld          : std_logic_vector(REGIONS-1 downto 0);
+
+    signal s_cut_off_word_cnt_arr     : uns_array_t(REGIONS-1 downto 0)(CUT_OFF_WORD_WIDTH-1 downto 0);
+    signal s_cut_off_rem_words_arr    : uns_array_t(REGIONS-1 downto 0)(CUT_OFF_WORD_WIDTH-1 downto 0);
+
+    signal s_cut_items                : slv_array_t(REGIONS+1-1 downto 0)(WORD_ITEMS-1 downto 0);
+    signal s_cut_items_or             : std_logic_vector(WORD_ITEMS-1 downto 0);
+
+    signal s_from_prev_region         : std_logic_vector(REGIONS downto 0);
+    signal s_word_sof_region          : std_logic_vector(log2(REGIONS)-1 downto 0);
+    signal s_word_sof_region_reg      : std_logic_vector(log2(REGIONS)-1 downto 0);
+
 begin
 
     -----------------------------------------------------------------------------
@@ -156,14 +187,154 @@ begin
 
     RX_DST_RDY   <= s_rx_dst_rdy or not RX_SRC_RDY;
     s_rx_sof_vld <= RX_SOF and RX_SRC_RDY;
+    s_rx_eof_vld <= RX_EOF and RX_SRC_RDY;
 
     s_rx_sof_pos_arr <= slv_array_downto_deser(RX_SOF_POS,REGIONS,SOF_POS_WIDTH);
     s_rx_eof_pos_arr <= slv_array_downto_deser(RX_EOF_POS,REGIONS,EOF_POS_WIDTH);
     s_rx_meta_arr    <= slv_array_downto_deser(RX_META,REGIONS,META_WIDTH   );
+    s_rx_cut_off_arr <= slv_array_downto_deser(RX_CUT_OFF,REGIONS,CUT_OFF_WIDTH);
 
     -----------------------------------------------------------------------------
     -- COMPUTE SELECTS FOR MULTIPLEXORS
     -----------------------------------------------------------------------------
+    -- offset start word
+    s_rx_cut_off_words_arr_g : for r in 0 to REGIONS-1 generate
+        s_rx_cut_off_words_arr_nb_g : if REGION_BLOCKS > 1 generate
+            s_rx_cut_off_pos_arr(r)   <= resize(unsigned(s_rx_cut_off_arr(r)),CUT_POS_WIDTH) + (unsigned(s_rx_sof_pos_arr(r)) & to_unsigned(0,LOG2_BLOCK_SIZE)) + r*REGION_ITEMS;
+        end generate;
+
+        s_rx_cut_off_words_arr_bb_g : if REGION_BLOCKS < 2 generate
+            s_rx_cut_off_pos_arr(r)   <= resize(unsigned(s_rx_cut_off_arr(r)),CUT_POS_WIDTH) + r*REGION_ITEMS;
+        end generate;
+
+        s_rx_cut_off_words_arr(r) <= s_rx_cut_off_pos_arr(r)(LOG2_WORD_ITEMS + CUT_OFF_WORD_WIDTH -1 downto LOG2_WORD_ITEMS);
+        s_rx_cut_off_items_arr(r) <= s_rx_cut_off_pos_arr(r)(LOG2_WORD_ITEMS-1 downto 0);
+    end generate;
+
+    -- offset pos
+    off_pos_cnt_g : for r in 0 to REGIONS-1 generate
+        -- cut pos counter
+        off_pos_cnt_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    s_cut_off_word_cnt_arr(r) <= (others => '1');
+                elsif (s_rx_sof_vld(r) = '1' and s_rx_dst_rdy = '1') then
+                    s_cut_off_word_cnt_arr(r) <= s_rx_cut_off_words_arr(r) - 1;
+                elsif (s_rx_dst_rdy = '1' and RX_SRC_RDY = '1') then
+                    s_cut_off_word_cnt_arr(r) <= s_cut_off_word_cnt_arr(r) - 1;
+                end if;
+            end if;
+        end process;
+
+        -- cut pos vld logic
+        cut_word_vld_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    s_rx_cut_word_vld(r) <= '0';
+                elsif (s_rx_sof_vld(r) = '1' and s_rx_dst_rdy = '1') then
+                    if ((nor s_rx_cut_off_words_arr(r)) = '1') then -- cut is in SOF
+                        s_rx_cut_word_vld(r) <= '0';
+                    else
+                        s_rx_cut_word_vld(r) <= '1';
+                    end if;
+                elsif (s_rx_dst_rdy = '1' and RX_SRC_RDY = '1') then
+                    if ((nor s_cut_off_word_cnt_arr(r)) = '1') then -- word with cut position
+                        s_rx_cut_word_vld(r) <= '0';
+                    end if;
+                end if;
+            end if;
+        end process;
+
+        s_cut_off_rem_words_arr(r) <= s_rx_cut_off_words_arr(r) when s_rx_sof_vld(r) = '1' else s_cut_off_word_cnt_arr(r);                                    -- remaining items in word
+        s_rx_cut_word(r)           <= nor s_cut_off_rem_words_arr(r) when s_rx_sof_vld(r) = '1' else nor s_cut_off_rem_words_arr(r) and s_rx_cut_word_vld(r); -- word with cut offset
+    end generate;
+
+    -- cut word cnt selection based on SOF region for packet for prev word
+    s_rx_cut_word_g : if REGIONS = 1 generate
+        s_rx_cut_word(REGIONS) <= nor s_cut_off_word_cnt_arr(0) and s_rx_cut_word_vld(0) and s_from_prev_region(REGIONS);
+    else generate
+        s_rx_cut_word(REGIONS) <= nor s_cut_off_word_cnt_arr(to_integer(unsigned(s_word_sof_region_reg))) and s_rx_cut_word_vld(to_integer(unsigned(s_word_sof_region_reg))) and s_from_prev_region(REGIONS);
+    end generate;
+
+
+    -- offset item pos reg
+    s_rx_cut_off_items_reg_g : for r in 0 to REGIONS-1 generate
+        s_rx_cut_off_items_reg_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (s_rx_sof_vld(r) = '1' and s_rx_dst_rdy = '1') then
+                    s_rx_cut_off_items_reg(r) <= s_rx_cut_off_items_arr(r);
+                end if;
+            end if;
+        end process;
+
+        s_rx_cut_word_items_arr(r) <= s_rx_cut_off_items_arr(r) when s_rx_sof_vld(r) = '1' else s_rx_cut_off_items_reg(r);
+    end generate;
+
+    s_rx_cut_word_items_arr_g : if REGIONS = 1 generate
+        s_rx_cut_word_items_arr(REGIONS) <= s_rx_cut_off_items_reg(0);
+    else generate
+        s_rx_cut_word_items_arr(REGIONS) <= s_rx_cut_off_items_reg(to_integer(unsigned(s_word_sof_region_reg)));
+    end generate;
+
+    -- convert valid cut offset to one-hot format (last is for cut for paket started in prev word)
+    off_pos_onehot_g : for r in 0 to REGIONS+1-1 generate
+
+        sof_pos_item_onehot_i : entity work.BIN2HOT
+        generic map (
+            DATA_WIDTH => LOG2_WORD_ITEMS
+        )
+        port map (
+            EN     => s_rx_cut_word(r),
+            INPUT  => std_logic_vector(s_rx_cut_word_items_arr(r)),
+            OUTPUT => s_cut_items(r)
+        );
+    end generate;
+
+    -- merge all cut offsets
+    s_cut_items_or <= or_array(s_cut_items);
+
+    -- packet continues from prev region
+    s_from_prev_region_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RESET = '1') then
+                s_from_prev_region(0) <= '0';
+            elsif (s_rx_dst_rdy = '1' and RX_SRC_RDY = '1') then
+                s_from_prev_region(0) <= s_from_prev_region(REGIONS);
+            end if;
+        end if;
+    end process;
+
+    s_from_prev_region_g : for r in 0 to REGIONS-1 generate
+        s_from_prev_region(r+1) <= (RX_SOF(r) and not     RX_EOF(r) and not s_from_prev_region(r)) or
+                                   (RX_SOF(r) and         RX_EOF(r) and     s_from_prev_region(r)) or
+                                   (not RX_SOF(r) and not RX_EOF(r) and     s_from_prev_region(r));
+    end generate;
+
+    -- SOF region decoder (decoder get last SOF)
+    s_word_sof_region_i : entity work.DEC1FN2B
+    generic map (
+        ITEMS  => REGIONS
+    )
+    port map (
+        ENABLE => s_from_prev_region(REGIONS) and or RX_SOF,
+        DI     => RX_SOF,
+        ADDR   => s_word_sof_region
+    );
+
+    s_word_sof_region_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RESET = '1') then
+                s_word_sof_region_reg <= (others => '0');
+            elsif (or s_rx_sof_vld = '1') then
+                s_word_sof_region_reg <= s_word_sof_region;
+            end if;
+        end if;
+    end process;
 
     -- convert valid SOF_POS to one-hot format
     sof_pos_onehot_g : for r in 0 to REGIONS-1 generate
@@ -189,16 +360,26 @@ begin
     -- compute selections of data multiplexors
     mux_sel_g : for r in 0 to REGIONS-1 generate
         mux_sel_g2 : for i in 0 to REGION_ITEMS-1 generate
-            s_mux_sel(r*REGION_ITEMS+i)        <= RX_CUT(r) when (s_sof_items(r*REGION_ITEMS+i) = '1') else s_mux_sel_prev(r*REGION_ITEMS+i);
-            s_mux_sel_prev(r*REGION_ITEMS+i+1) <= s_mux_sel(r*REGION_ITEMS+i);
+            -- sof mask
+            s_sof_sel(r*REGION_ITEMS+i)        <= RX_CUT(r) when (s_sof_items(r*REGION_ITEMS+i) = '1') else s_sof_sel_prev(r*REGION_ITEMS+i);
+            s_sof_sel_prev(r*REGION_ITEMS+i+1) <= s_sof_sel(r*REGION_ITEMS+i);
+
+            -- cut mask
+            s_cut_sel(r*REGION_ITEMS+i)        <= '0' when (s_sof_items(r*REGION_ITEMS+i) = '1' and s_cut_items_or(r*REGION_ITEMS+i) = '0') else
+                                                  s_sof_sel(r*REGION_ITEMS+i) when (s_cut_items_or(r*REGION_ITEMS+i) = '1') else
+                                                  s_cut_sel_prev(r*REGION_ITEMS+i);
+            s_cut_sel_prev(r*REGION_ITEMS+i+1) <= '0' when (s_sof_items(r*REGION_ITEMS+i) = '1' and s_cut_items_or(r*REGION_ITEMS+i) = '0') else s_cut_sel(r*REGION_ITEMS+i);
         end generate;
     end generate;
+    -- final mux sel
+    s_mux_sel <= s_sof_sel and s_cut_sel when MAX_CUT_OFFSET > 0 else s_sof_sel;
 
     mux_sel_prev_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s_rx_dst_rdy = '1') then
-                s_mux_sel_prev(0) <= s_mux_sel_prev(WORD_ITEMS);
+                s_sof_sel_prev(0) <= s_sof_sel_prev(WORD_ITEMS);
+                s_cut_sel_prev(0) <= s_cut_sel_prev(WORD_ITEMS);
             end if;
         end if;
     end process;
