@@ -196,8 +196,8 @@ items which have been cut out.</p>
 <td><p>=====</p></td>
 <td><p>Frame size restrictions:</p>
 <ul class="simple">
-<li><p>For REGION_SIZE =  1: MIN = (CUTTED_ITEMS+1)*ITEM_WIDTH bits</p></li>
-<li><p>For REGION_SIZE &gt;= 2: MIN = (REGION_SIZE*BLOCK_SIZE+CUTTED_ITEMS)*ITEM_WIDTH bits</p></li>
+<li><p>For REGION_SIZE =  1: MIN = (CUTTED_ITEMS+CUT_OFF+1)*ITEM_WIDTH bits</p></li>
+<li><p>For REGION_SIZE &gt;= 2: MIN = (REGION_SIZE*BLOCK_SIZE+CUTTED_ITEMS+CUT_OFF)*ITEM_WIDTH bits</p></li>
 </ul>
 </td>
 </tr>
@@ -244,7 +244,12 @@ items which have been cut out.</p>
 <tr class="row-even" id="vhdl-gengeneric-mfb_cutter_simple-cutted_items"><td><p>CUTTED_ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td><p>Count of cutted items from SOF. Maximum value is REGION_SIZE*BLOCK_SIZE.</p></td>
+<td><p>Count of cutted items from SOF+CUT_OFF. Maximum value is REGION_SIZE*BLOCK_SIZE.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_cutter_simple-max_cut_offset"><td><p>MAX_CUT_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>any power of two</p></td>
 </tr>
 </tbody>
 </table>
@@ -322,47 +327,52 @@ items which have been cut out.</p>
 <td><p>in</p></td>
 <td><p>Enable of cutting, valid with each SOF.</p></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-rx_cut_off"><td><p>RX_CUT_OFF</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(MAX_CUT_OFFSET))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Cut offset. Maximum value is MAX_CUT_OFFSET.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>OUTPUT MFB INTERFACE</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_data"><td><p>TX_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_data"><td><p>TX_DATA</p></td>
 <td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_meta"><td><p>TX_META</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_meta"><td><p>TX_META</p></td>
 <td><p>std_logic_vector(REGIONS*META_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>valid on SOF</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_sof"><td><p>TX_SOF</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_sof"><td><p>TX_SOF</p></td>
 <td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_eof"><td><p>TX_EOF</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_eof"><td><p>TX_EOF</p></td>
 <td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_sof_pos"><td><p>TX_SOF_POS</p></td>
 <td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_eof_pos"><td><p>TX_EOF_POS</p></td>
 <td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mfb_cutter_simple-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mfb_cutter_simple-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
