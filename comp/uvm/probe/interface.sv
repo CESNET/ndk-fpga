@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
+// verilog_lint: waive interface-name-style
 interface probe_inf #(int unsigned DATA_WIDTH) (
     input wire event_signal,
     input wire [DATA_WIDTH-1:0] event_data,

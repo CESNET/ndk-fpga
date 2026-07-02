@@ -10,6 +10,7 @@
 */
 
 // Definition of LII interface.
+// verilog_lint: waive interface-name-style
 interface lii_if_rx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) (input logic CLK, RESET);
 
     // Variables
