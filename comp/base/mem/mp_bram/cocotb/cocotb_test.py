@@ -41,10 +41,8 @@ async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=
 
     addr_width = len(tb.stream_in.bus.WR_ADDR[0])
 
-    cocotb.log.info("-------------------------------------Write and immediate read---------------------------------")
-
-    for transaction in random_packets(item_width_min, item_width_max, pkt_count):
-        cocotb.log.info(f"generated transaction: {transaction.hex()}")
+    for i, transaction in enumerate(random_packets(item_width_min, item_width_max, pkt_count)):
+        #cocotb.log.info(f"generated transaction: {transaction.hex()}")
 
         address = randint(0, (2**addr_width-1)-(len(transaction)*8))
 
@@ -53,10 +51,13 @@ async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=
         tb.ref_ram.write(address, transaction) # writting transaction to reference RAM
 
         output = await tb.stream_in.read(address, len(transaction), parallel=parallel_read)
-        cocotb.log.info(f"received transaction:  {output.hex()}")
+        #cocotb.log.info(f"received transaction:  {output.hex()}")
 
         if output != transaction:
             raise TestFailure(f"Expected {transaction.hex()}, got {output.hex()}")
+
+        if i % 100 == 0:
+            cocotb.log.info(f"Processed requests {i}/{pkt_count}.")
 
     cocotb.log.info("--------------------Comparing end state of reference RAM and simulated RAM--------------------")
 
@@ -72,19 +73,23 @@ async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=
 
 @cocotb.test()
 async def test_simple(dut):
+    "Serial write and read"
     await write_read_test(dut)
 
 
 @cocotb.test()
 async def test_parallel_write(dut):
+    "Parallel write, serial read"
     await write_read_test(dut, parallel_write=True)
 
 
 @cocotb.test()
 async def test_parallel_read(dut):
+    "Serial write, parallel read"
     await write_read_test(dut, parallel_read=True)
 
 
 @cocotb.test()
 async def test_parallel_write_read(dut):
+    "Parallel write and read"
     await write_read_test(dut, parallel_write=True, parallel_read=True)
