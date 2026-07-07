@@ -92,7 +92,20 @@
 <li class="toctree-l3"><a class="reference internal" href="#example">Example</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#gitlab-runner">GitLab Runner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verible-runner-script">Verible Runner Script</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#exclusions">Exclusions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#line-length-fix-script">Line Length Fix Script</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#why-this-script-exists">Why this script exists</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-it-works">How it works</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spacing-revert">Spacing revert</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#limitations">Limitations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#line-length-manual-fix-script">Line Length Manual Fix Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gitlab-ci">GitLab CI</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a></li>
 </ul>
 </li>
@@ -155,11 +168,127 @@ The rule configuration is defined in the <em>rules</em> file in this directory.<
 </div>
 </section>
 </section>
-<section id="gitlab-runner">
-<h2>GitLab Runner<a class="headerlink" href="#gitlab-runner" title="Link to this heading"></a></h2>
-<p>The current implementation of the GitLab runner applies the Verible linter to each modified source file (<em>.sv</em> file) within a GitLab merge request and displays the output in the GitLab log, if a rule is violated.
-It uses the rule configuration defined in the <em>rules</em> file in this directory.
-The runner needs to be provided with a GitLab API token.</p>
+<section id="verible-runner-script">
+<h2>Verible Runner Script<a class="headerlink" href="#verible-runner-script" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">verible_runner.py</span></code> script in this directory runs the Verible linter over all <code class="docutils literal notranslate"><span class="pre">*.sv</span></code> files in the repository and reports any violations.
+It is intended to be executed from the repository root so that paths in the <em>exclusions</em> file resolve correctly:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tests/verible/verible_runner.py
+</pre></div>
+</div>
+<p>The script uses the rule configuration from the <em>rules</em> file in this directory and exits with a non-zero status if any violation is reported.</p>
+<section id="exclusions">
+<h3>Exclusions<a class="headerlink" href="#exclusions" title="Link to this heading"></a></h3>
+<p>The <em>exclusions</em> file lists directories to skip during the scan.
+Each non-empty, non-comment line is a directory path relative to the repository root, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extra</span><span class="o">/</span>
+<span class="n">comp</span><span class="o">/</span><span class="n">base</span><span class="o">/</span><span class="n">ver</span><span class="o">/</span>
+<span class="n">comp</span><span class="o">/</span><span class="n">mfb_tools</span><span class="o">/</span><span class="n">debug</span><span class="o">/</span><span class="n">gen_loop_switch</span><span class="o">/</span><span class="n">sim</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>The directory and everything beneath it is excluded.
+Lines beginning with <code class="docutils literal notranslate"><span class="pre">#</span></code> and empty lines are ignored.
+Paths are normalized, so a trailing slash is optional.
+To exclude a verification directory, append its path (relative to the repository root) to this file.</p>
+</section>
+</section>
+<section id="line-length-fix-script">
+<h2>Line Length Fix Script<a class="headerlink" href="#line-length-fix-script" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">line_length_fix.py</span></code> script in this directory attempts to auto-fix <code class="docutils literal notranslate"><span class="pre">line-length</span></code> linter violations using <code class="docutils literal notranslate"><span class="pre">verible-verilog-format</span></code>.
+It is intended to be executed from the repository root, same as <code class="docutils literal notranslate"><span class="pre">verible_runner.py</span></code>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tests/verible/line_length_fix.py<span class="w">             </span><span class="c1"># dry-run (shows diffs, no changes)</span>
+python3<span class="w"> </span>tests/verible/line_length_fix.py<span class="w"> </span>--apply<span class="w">      </span><span class="c1"># modify files in-place</span>
+python3<span class="w"> </span>tests/verible/line_length_fix.py<span class="w"> </span>--quiet<span class="w">      </span><span class="c1"># summary only, no per-file diffs</span>
+python3<span class="w"> </span>tests/verible/line_length_fix.py<span class="w"> </span>--files<span class="w"> </span>path/a.sv<span class="w"> </span>path/b.sv
+</pre></div>
+</div>
+<section id="why-this-script-exists">
+<h3>Why this script exists<a class="headerlink" href="#why-this-script-exists" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">verible-verilog-lint</span></code> has an <code class="docutils literal notranslate"><span class="pre">--autofix</span></code> flag, but it does <strong>not</strong> support the <code class="docutils literal notranslate"><span class="pre">line-length</span></code> rule (it only fixes trivial rules like trailing spaces or repeated semicolons).
+<code class="docutils literal notranslate"><span class="pre">verible-verilog-format</span></code> can wrap long lines, but it is a holistic formatter: a full run rewrites indentation, alignment, and token spacing across the entire file.
+There is no built-in “fix only line-length” mode.</p>
+<p>This script bridges that gap by formatting <strong>only the violating lines</strong> via the formatter’s <code class="docutils literal notranslate"><span class="pre">--lines=N</span></code> flag, leaving the rest of the file untouched.</p>
+</section>
+<section id="how-it-works">
+<h3>How it works<a class="headerlink" href="#how-it-works" title="Link to this heading"></a></h3>
+<p>For each <code class="docutils literal notranslate"><span class="pre">*.sv</span></code> file (using the same exclusions as <code class="docutils literal notranslate"><span class="pre">verible_runner.py</span></code>):</p>
+<ol class="arabic simple">
+<li><p>Runs <code class="docutils literal notranslate"><span class="pre">verible-verilog-lint</span></code> with only the <code class="docutils literal notranslate"><span class="pre">line-length</span></code> rule to find violating line numbers.</p></li>
+<li><p>Formats each violating line with <code class="docutils literal notranslate"><span class="pre">verible-verilog-format</span> <span class="pre">--lines=N</span> <span class="pre">--inplace</span></code>, using <code class="docutils literal notranslate"><span class="pre">--column_limit=120</span></code> (auto-detected from the <em>rules</em> file), <code class="docutils literal notranslate"><span class="pre">--indentation_spaces=4</span></code>, <code class="docutils literal notranslate"><span class="pre">--try_wrap_long_lines=true</span></code>, and all <code class="docutils literal notranslate"><span class="pre">*_alignment=preserve</span></code> flags to minimize non-line-length changes.</p></li>
+<li><p>Processes lines <strong>bottom-to-top</strong> so that line expansions (1 line → 2+) don’t shift the line numbers of remaining violations above.</p></li>
+<li><p><strong>Reverts incidental spacing changes</strong> on touched lines (see below).</p></li>
+<li><p>Re-lints to report any violations that could not be auto-fixed.</p></li>
+</ol>
+</section>
+<section id="spacing-revert">
+<h3>Spacing revert<a class="headerlink" href="#spacing-revert" title="Link to this heading"></a></h3>
+<p>The formatter removes spaces between tokens on lines it touches (e.g. <code class="docutils literal notranslate"><span class="pre">env</span> <span class="pre">#(</span></code> → <code class="docutils literal notranslate"><span class="pre">env#(</span></code>), which are changes unrelated to line length.
+By default, the script reverts these using regex rules applied <strong>only to lines the formatter changed</strong> (identified via <code class="docutils literal notranslate"><span class="pre">difflib</span></code>); untouched lines are not affected.</p>
+<p>The current rules restore the space before <code class="docutils literal notranslate"><span class="pre">#(</span></code> (parameterized type / instance syntax).
+To add more patterns, extend the <code class="docutils literal notranslate"><span class="pre">_SPACING_RESTORE_RULES</span></code> list in the script:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">_SPACING_RESTORE_RULES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\w)#\(&quot;</span><span class="p">),</span> <span class="sa">r</span><span class="s2">&quot;\1 #(&quot;</span><span class="p">),</span>   <span class="c1"># env#( → env #(</span>
+    <span class="c1"># (re.compile(r&quot;...&quot;), r&quot;...&quot;),         # add more here</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">--no-revert-spacing</span></code> to disable this feature and keep the raw formatter output.</p>
+</section>
+<section id="options">
+<h3>Options<a class="headerlink" href="#options" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--apply</span></code></dt><dd><p>Modify files in-place. Without this, runs in dry-run mode (shows unified diffs, modifies nothing).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--line-length</span> <span class="pre">N</span></code></dt><dd><p>Maximum line length (default: auto-detected from the <em>rules</em> file, currently 120).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--quiet</span></code></dt><dd><p>Suppress per-file reports and diffs; show summary only.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--files</span> <span class="pre">PATH</span> <span class="pre">[PATH</span> <span class="pre">...]</span></code></dt><dd><p>Process specific files instead of scanning the whole repository.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-revert-spacing</span></code></dt><dd><p>Do not revert incidental spacing changes introduced by the formatter.</p>
+</dd>
+</dl>
+</section>
+<section id="limitations">
+<h3>Limitations<a class="headerlink" href="#limitations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Not all violations can be auto-fixed.</strong> Long string literals cannot be split, and some parameterized <code class="docutils literal notranslate"><span class="pre">#(...)</span></code> constructs are not wrapped by <code class="docutils literal notranslate"><span class="pre">--try_wrap_long_lines</span></code> (which verible itself calls “a short-term measure to reduce risk-of-harm”). These are reported as <code class="docutils literal notranslate"><span class="pre">remaining</span></code> for manual fixing.</p></li>
+<li><p><strong>Spacing revert is not exhaustive.</strong> Even with revert enabled, some non-line-length changes may remain on touched lines (e.g. operator spacing inside wrapped expressions). Always review with <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">diff</span></code> after <code class="docutils literal notranslate"><span class="pre">--apply</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">line-length</span></code> rule is the only rule targeted. Other linter rules from the <em>rules</em> file are not affected.</p></li>
+</ul>
+</section>
+</section>
+<section id="line-length-manual-fix-script">
+<h2>Line Length Manual Fix Script<a class="headerlink" href="#line-length-manual-fix-script" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">line_length_manual_fix.py</span></code> script is a <strong>second-pass</strong> fixer for line-length violations that <code class="docutils literal notranslate"><span class="pre">verible-verilog-format</span></code> could not handle (the ones reported as <code class="docutils literal notranslate"><span class="pre">remaining</span></code> by <code class="docutils literal notranslate"><span class="pre">line_length_fix.py</span></code>).</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>tests/verible/line_length_manual_fix.py<span class="w">             </span><span class="c1"># dry-run</span>
+python3<span class="w"> </span>tests/verible/line_length_manual_fix.py<span class="w"> </span>--apply<span class="w">      </span><span class="c1"># modify files</span>
+python3<span class="w"> </span>tests/verible/line_length_manual_fix.py<span class="w"> </span>--quiet<span class="w">      </span><span class="c1"># summary only</span>
+python3<span class="w"> </span>tests/verible/line_length_manual_fix.py<span class="w"> </span>--files<span class="w"> </span>path/a.sv
+</pre></div>
+</div>
+<p>Strategies (applied per violating line, bottom-to-top):</p>
+<ol class="arabic simple">
+<li><p><strong>Wrap parameter lists</strong>: <code class="docutils literal notranslate"><span class="pre">Type</span> <span class="pre">#(A,</span> <span class="pre">B,</span> <span class="pre">C,</span> <span class="pre">...)</span></code> is split into multi-line at commas, matching the codebase style.  Joins continuation lines first if the <code class="docutils literal notranslate"><span class="pre">#(</span></code> spans multiple lines.  Uses the innermost <code class="docutils literal notranslate"><span class="pre">#(</span></code> when nested.</p></li>
+<li><p><strong>Move inline comment</strong>: if a <code class="docutils literal notranslate"><span class="pre">//</span> <span class="pre">comment</span></code> pushes the line over the limit, it is moved to the line above.</p></li>
+<li><p><strong>Waiver</strong>: for lines that cannot be broken (long expressions, type declarations with no comma breakpoints), inserts <code class="docutils literal notranslate"><span class="pre">//</span> <span class="pre">verilog_lint:</span> <span class="pre">waive</span> <span class="pre">line-length</span></code> on the line above.  This is the verible in-file waiver syntax that suppresses the violation for the next non-comment line.</p></li>
+</ol>
+<p>Typical workflow:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Step 1: auto-fix what the formatter can wrap</span>
+<span class="n">python3</span> <span class="n">tests</span><span class="o">/</span><span class="n">verible</span><span class="o">/</span><span class="n">line_length_fix</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">apply</span>
+
+<span class="c1"># Step 2: fix the rest (wrap param lists, move comments, waive unbreakable)</span>
+<span class="n">python3</span> <span class="n">tests</span><span class="o">/</span><span class="n">verible</span><span class="o">/</span><span class="n">line_length_manual_fix</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">apply</span>
+
+<span class="c1"># Step 3: verify</span>
+<span class="n">python3</span> <span class="n">tests</span><span class="o">/</span><span class="n">verible</span><span class="o">/</span><span class="n">verible_runner</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</section>
+<section id="gitlab-ci">
+<h2>GitLab CI<a class="headerlink" href="#gitlab-ci" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">veriblelint</span></code> job, defined in <code class="docutils literal notranslate"><span class="pre">tests/ci/check.gitlab-ci.yaml</span></code>, runs the Verible linter in GitLab CI as part of the <code class="docutils literal notranslate"><span class="pre">check</span></code> stage.
+It installs Verible through <code class="docutils literal notranslate"><span class="pre">tests/verible/install.sh</span></code> and then executes <code class="docutils literal notranslate"><span class="pre">tests/verible/verible_runner.py</span></code>, which lints every <code class="docutils literal notranslate"><span class="pre">*.sv</span></code> file in the repository (skipping the directories listed in the <em>exclusions</em> file) using the rule configuration from the <em>rules</em> file in this directory.
+Any violation is printed to the job log and causes the job to fail.</p>
 </section>
 <section id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Link to this heading"></a></h2>
