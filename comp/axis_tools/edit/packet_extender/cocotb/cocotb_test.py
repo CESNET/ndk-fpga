@@ -44,10 +44,11 @@ async def _run_test(
     pkt_iter = random_packets(min_size=pkt_range[0], max_size=pkt_range[1], count=pkt_count)
 
     for i, pkt_data in enumerate(pkt_iter):
-        # Extension length is random within the supported range.
-        ext_len = random.randint(0, tb.max_ext_len)
+        # Extension lengths are random within the supported ranges.
+        ext_len_s = random.randint(0, tb.max_ext_len_s)
+        ext_len_e = random.randint(0, tb.max_ext_len_e)
 
-        ext_instr = ExtendInstruction(ext_len=ext_len)
+        ext_instr = ExtendInstruction(ext_len_s=ext_len_s, ext_len_e=ext_len_e)
 
         await tb.send_packet_with_ext(pkt_data=pkt_data, ext_instr=ext_instr)
 
