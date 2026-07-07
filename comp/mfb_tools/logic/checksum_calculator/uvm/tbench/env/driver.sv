@@ -5,8 +5,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class driver#(ITEM_WIDTH, META_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_checksum_calculator::driver#(ITEM_WIDTH, META_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
+    `uvm_component_param_utils(
+        uvm_checksum_calculator::driver #(ITEM_WIDTH, META_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
+    // verilog_lint: waive line-length
     uvm_seq_item_pull_port #(uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH), uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)) seq_item_port_info;
 
     mailbox#(uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)) frame_export;

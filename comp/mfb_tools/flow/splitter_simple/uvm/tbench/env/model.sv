@@ -73,7 +73,8 @@ class model #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_component;
                 msg = $sformatf( "\n\tWrong channel num %0d Channel range is 0 - %0d", channel, CHANNELS-1);
                 `uvm_fatal(this.get_full_name(), msg);
             end else begin
-                `uvm_info(this.get_full_name(), $sformatf("\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
                 out_meta[channel].write(tr_out);
             end
         end
@@ -107,7 +108,8 @@ class model #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_component;
                 msg = $sformatf( "\n\tWrong channel num %0d Channel range is 0 - %0d", channel, CHANNELS-1);
                 `uvm_fatal(this.get_full_name(), msg);
             end else begin
-                `uvm_info(this.get_full_name(), $sformatf("\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
                 out_data[channel].write(tr_out);
             end
         end

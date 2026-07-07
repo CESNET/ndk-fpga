@@ -22,6 +22,7 @@ class discarder #(int unsigned MFB_REGIONS) extends uvm_component;
         super.connect_phase(phase);
 
         probe_callback = frame_masker::probe_cbs #(MFB_REGIONS)::type_id::create("probe_callback", this);
+        // verilog_lint: waive line-length
         uvm_probe::pool::get_global_pool().get({"probe_event_component_", DUT_PATH, ".probe_mask2discard"}).add_callback(probe_callback);
     endfunction
 

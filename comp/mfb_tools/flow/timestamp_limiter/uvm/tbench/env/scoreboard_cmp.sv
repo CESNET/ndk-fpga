@@ -6,7 +6,12 @@
 
 let abs(a) = (a < 0) ? -a : a;
 
-class delayer_cmp #(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH) extends uvm_common::comparer_base_unordered#(uvm_timestamp_limiter::ts_limiter_item#(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH), uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH));
+class delayer_cmp #(
+    MFB_ITEM_WIDTH,
+    TIMESTAMP_WIDTH
+) extends
+    uvm_common::comparer_base_unordered #(uvm_timestamp_limiter::ts_limiter_item #(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH),
+                                          uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
     `uvm_component_param_utils(uvm_timestamp_limiter::delayer_cmp #(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH))
 
     protected DUT_ITEM times2cmp[$];
@@ -35,7 +40,8 @@ class delayer_cmp #(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH) extends uvm_common::compare
 
             // msg = {msg, $sformatf("dut TS %0.2f\n",  (dut_ts/1ns))};
             // msg = {msg, $sformatf("SIZE OF TR %0d\n",  tr_model.item.data_tr.size())};
-            $fwrite(fd,"%0.2f, %0.2f, %d, %0.2f, \n", dut_ts/1ns, tr_model.timestamp, tr_model.data_tr.size(), tr_model.time_last()/1ns);
+            $fwrite(fd, "%0.2f, %0.2f, %d, %0.2f, \n", dut_ts / 1ns, tr_model.timestamp, tr_model.data_tr.size(),
+                    tr_model.time_last() / 1ns);
             ts_stats.next_val(abs(signed'(tr_model.timestamp - dut_ts/1ns)));
         end
         `uvm_info(get_type_name(), msg, UVM_MEDIUM)

@@ -3,7 +3,14 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-virtual class trim_sequence_length_base #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_logic_vector::sequence_simple #(META_WIDTH+1+$clog2(PKT_MTU+1));
+virtual class trim_sequence_length_base #(
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends uvm_logic_vector::sequence_simple #(META_WIDTH + 1 + $clog2(
+    PKT_MTU + 1
+));
     `uvm_object_param_utils(test::trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
     `m_uvm_get_type_name_func(test::trim_sequence_length_base)
 
@@ -32,7 +39,12 @@ virtual class trim_sequence_length_base #(int unsigned BLOCK_SIZE, int unsigned 
 
 endclass
 
-class trim_sequence_random_length #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU);
+class trim_sequence_random_length #(
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU);
     `uvm_object_param_utils(test::trim_sequence_random_length #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
     `m_uvm_get_type_name_func(test::trim_sequence_random_length)
 
@@ -74,7 +86,12 @@ class trim_sequence_random_length #(int unsigned BLOCK_SIZE, int unsigned ITEM_W
 
 endclass
 
-class trim_sequence_original_length #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU);
+class trim_sequence_original_length #(
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU);
     `uvm_object_param_utils(test::trim_sequence_original_length #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
     `m_uvm_get_type_name_func(test::trim_sequence_original_length)
 
@@ -117,7 +134,12 @@ class trim_sequence_original_length #(int unsigned BLOCK_SIZE, int unsigned ITEM
 
 endclass
 
-class trim_sequence_minimal_length #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU);
+class trim_sequence_minimal_length #(
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends trim_sequence_length_base #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU);
     `uvm_object_param_utils(test::trim_sequence_minimal_length #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
     `m_uvm_get_type_name_func(test::trim_sequence_minimal_length)
 
@@ -160,7 +182,15 @@ class trim_sequence_minimal_length #(int unsigned BLOCK_SIZE, int unsigned ITEM_
 
 endclass
 
-class trim_sequence_library #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_common::sequence_library #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(META_WIDTH+1+$clog2(PKT_MTU+1)));
+class trim_sequence_library #(
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends uvm_common::sequence_library
+    #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(META_WIDTH + 1 + $clog2(
+    PKT_MTU + 1
+)));
     `uvm_object_param_utils(test::trim_sequence_library #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
     `uvm_sequence_library_utils(test::trim_sequence_library #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
 

@@ -5,7 +5,9 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Reusable high level sequence. Contains transaction, which has only data part
-class sequence_logic_vector #(DATA_WIDTH) extends uvm_common::sequence_base #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(DATA_WIDTH));
+class sequence_logic_vector #(
+    DATA_WIDTH
+) extends uvm_common::sequence_base #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(DATA_WIDTH));
     `uvm_object_param_utils(uvm_network_mod_env::sequence_logic_vector#(DATA_WIDTH))
 
     int unsigned transaction_count_min = 100;

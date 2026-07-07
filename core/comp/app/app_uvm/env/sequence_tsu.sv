@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class sequence_tsu extends uvm_common::sequence_base #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(64));
+class sequence_tsu
+    extends uvm_common::sequence_base #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(64));
 
     `ndk_object_utils(uvm_app_core::sequence_tsu);
 

@@ -5,7 +5,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Slave
-class sequence_slave_simple #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_sequence #(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
+class sequence_slave_simple #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_sequence #(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
     `ndk_object_param_utils(
         uvm_avmm::sequence_slave_simple#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_slave_simple#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -42,7 +46,12 @@ class sequence_slave_simple #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDT
 endclass
 
 // Master
-class sequence_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
+class sequence_master #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item_response #(DATA_WIDTH),
+                                      sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
     `ndk_object_param_utils(
         uvm_avmm::sequence_master#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -77,7 +86,9 @@ class sequence_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int
     task pre_body();
         super.pre_body();
 
-        assert(uvm_config_db #(uvm_tlm_analysis_fifo #(response_item #(DATA_WIDTH)))::get(m_sequencer, "", "response_in", response_in))
+        assert (uvm_config_db #(uvm_tlm_analysis_fifo #(response_item #(DATA_WIDTH)))::get(
+            m_sequencer, "", "response_in", response_in
+        ))
         else begin
             `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot get response input fifo");
         end
@@ -135,7 +146,11 @@ class sequence_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int
 
 endclass
 
-class sequence_master_endless #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_endless #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_endless#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master_endless#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -164,7 +179,11 @@ class sequence_master_endless #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WI
 endclass
 
 // Always sets the READY signals
-class sequence_master_fullspeed #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_fullspeed #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_fullspeed#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master_fullspeed#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -227,7 +246,11 @@ class sequence_master_fullspeed #(int unsigned ADDRESS_WIDTH, int unsigned DATA_
 
 endclass
 
-class sequence_master_static_latency #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_static_latency #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_static_latency#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master_static_latency#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -284,7 +307,11 @@ class sequence_master_static_latency #(int unsigned ADDRESS_WIDTH, int unsigned 
 
 endclass
 
-class sequence_master_dynamic_latency #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_dynamic_latency #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_dynamic_latency#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master_dynamic_latency#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -317,10 +344,15 @@ class sequence_master_dynamic_latency #(int unsigned ADDRESS_WIDTH, int unsigned
 
 endclass
 
-class sequence_master_dynamic_minmax_latency #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_dynamic_minmax_latency #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_dynamic_minmax_latency#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
-        $sformatf("uvm_avmm::sequence_master_dynamic_minmax_latency#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
+                            $sformatf("uvm_avmm::sequence_master_dynamic_minmax_latency #(%0d,%0d,%0d)", ADDRESS_WIDTH,
+                                      DATA_WIDTH, BURST_WIDTH)
     )
 
     // Constructor
@@ -337,7 +369,14 @@ class sequence_master_dynamic_minmax_latency #(int unsigned ADDRESS_WIDTH, int u
         while (current_transaction_count < transaction_count) begin
             if (response_in.try_get(response)) begin
                 // Randomize latency
-                std::randomize(latency) with { latency dist { latency_min := 50, latency_max := 50 }; }; // 50% min / 50% max
+                std::randomize(
+                    latency
+                ) with {
+                    latency dist {
+                        latency_min := 50,
+                        latency_max := 50
+                    };
+                };  // 50% min / 50% max
                 latency_wait(response.timestamp);
 
                 send_response(response);
@@ -351,7 +390,11 @@ class sequence_master_dynamic_minmax_latency #(int unsigned ADDRESS_WIDTH, int u
 
 endclass
 
-class sequence_master_bursting #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_bursting #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_bursting#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master_bursting#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -389,7 +432,11 @@ class sequence_master_bursting #(int unsigned ADDRESS_WIDTH, int unsigned DATA_W
             // Bursting logic
             if (excited_counter == 0) begin
                 std::randomize(latency)        with { latency inside { [latency_min : latency_max] }; };
-                std::randomize(excited_counter) with { excited_counter inside { [excited_count_min : excited_count_max] }; };
+                std::randomize(
+                    excited_counter
+                ) with {
+                    excited_counter inside {[excited_count_min : excited_count_max]};
+                };
                 excited_first = 1;
             end
 
@@ -413,7 +460,11 @@ class sequence_master_bursting #(int unsigned ADDRESS_WIDTH, int unsigned DATA_W
 
 endclass
 
-class sequence_master_random_access #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
+class sequence_master_random_access #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends sequence_master_static_latency #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH);
     `ndk_object_param_utils(
         uvm_avmm::sequence_master_random_access#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_master_random_access#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)
@@ -449,7 +500,12 @@ class sequence_master_random_access #(int unsigned ADDRESS_WIDTH, int unsigned D
 
 endclass
 
-class sequence_library_master #(int unsigned ADDRESS_WIDTH, int unsigned DATA_WIDTH, int unsigned BURST_WIDTH) extends uvm_common::sequence_library #(config_sequence, sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
+class sequence_library_master #(
+    int unsigned ADDRESS_WIDTH,
+    int unsigned DATA_WIDTH,
+    int unsigned BURST_WIDTH
+) extends uvm_common::sequence_library #(config_sequence, sequence_item_response #(DATA_WIDTH),
+                                         sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
     `ndk_object_param_utils(
         uvm_avmm::sequence_library_master#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::sequence_library_master#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)

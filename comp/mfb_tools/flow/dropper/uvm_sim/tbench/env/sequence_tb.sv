@@ -31,7 +31,10 @@ class sequence_mfb_data #(DATA_WIDTH) extends uvm_sequence #(uvm_logic_vector_ar
 
 endclass
 
-class sequence_meta #(META_WIDTH, EXTENDED_META_WIDTH) extends uvm_sequence #(uvm_logic_vector::sequence_item #(EXTENDED_META_WIDTH));
+class sequence_meta #(
+    META_WIDTH,
+    EXTENDED_META_WIDTH
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #(EXTENDED_META_WIDTH));
 
     `uvm_object_param_utils(uvm_dropper::sequence_meta#(META_WIDTH, EXTENDED_META_WIDTH))
 

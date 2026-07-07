@@ -47,7 +47,7 @@ module testbench;
         ) v_rx_mvb_vif [RX_STREAMS - 1 : 0] = rx_mvb_vif;
 
         // Configuration of the database
-        uvm_config_db #(virtual reset_if)                                           ::set(null, "", "reset_vif",                        reset_vif);
+        uvm_config_db #(virtual reset_if)::set(null, "", "reset_vif", reset_vif);
         for (int port = 0; port < RX_STREAMS; port++) begin
             uvm_config_db #(virtual mvb_if #(
                 .ITEMS      (MVB_ITEMS),

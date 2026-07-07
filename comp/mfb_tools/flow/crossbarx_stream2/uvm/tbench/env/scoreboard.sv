@@ -50,7 +50,9 @@ class scoreboard #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_
     function void build_phase(uvm_phase phase);
         m_model = model#(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W)::type_id::create("m_model", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_mfb_crossbarx_stream2::cxs2_comparer #(uvm_logic_vector_array::sequence_item#(RX_MFB_ITEM_W))::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(USERMETA_W))::type_id::create("meta_cmp", this);
 
         data_cmp.model_tr_timeout_set(100000ns);
@@ -77,9 +79,16 @@ class scoreboard #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

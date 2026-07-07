@@ -5,8 +5,18 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_PORTS-1:0], int unsigned ETH_PORT_CHAN[ETH_PORTS-1:0], REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_network_mod_env::scoreboard #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH));
+class scoreboard #(
+    ETH_CORE_ARCH,
+    ETH_PORTS,
+    int unsigned ETH_PORT_SPEED[ETH_PORTS-1:0],
+    int unsigned ETH_PORT_CHAN[ETH_PORTS-1:0],
+    REGIONS,
+    ITEM_WIDTH,
+    ETH_TX_HDR_WIDTH,
+    ETH_RX_HDR_WIDTH
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(uvm_network_mod_env::scoreboard #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED,
+                                   ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH));
 
     //eports
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) eth_rx_data[ETH_PORTS];
@@ -22,10 +32,14 @@ class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_POR
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(64)) tsu;
 
     //comparators
+    // verilog_lint: waive line-length
     protected uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) m_eth_tx_data[ETH_PORTS];
+    // verilog_lint: waive line-length
     protected uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(1))                m_eth_tx_hdr[ETH_PORTS];
 
+    // verilog_lint: waive line-length
     protected uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) m_usr_tx_data[ETH_PORTS];
+    // verilog_lint: waive line-length
     protected uvm_network_mod_env::comparer_tx_hdr#(ETH_RX_HDR_WIDTH)                            m_usr_tx_hdr[ETH_PORTS];
 
     // Timestamp checker
@@ -37,7 +51,16 @@ class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_POR
     protected uvm_logic_vector_array::meter#(ITEM_WIDTH) m_usr_rx_meter[ETH_PORTS];
     protected uvm_logic_vector_array::meter#(ITEM_WIDTH) m_usr_tx_meter[ETH_PORTS];
 
-    protected model #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH) m_model;
+    protected model #(
+        ETH_CORE_ARCH,
+        ETH_PORTS,
+        ETH_PORT_SPEED,
+        ETH_PORT_CHAN,
+        REGIONS,
+        ITEM_WIDTH,
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH
+    ) m_model;
     // Constructor of environment.
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -84,22 +107,40 @@ class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_POR
     // Create base components of environment.
     function void build_phase(uvm_phase phase);
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
+            // verilog_lint: waive line-length
             m_eth_tx_data[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create($sformatf("m_eth_tx_data_%0d", it), this);
+            // verilog_lint: waive line-length
             m_eth_tx_hdr [it] = uvm_common::comparer_ordered#(uvm_logic_vector::sequence_item#(1))::type_id::create($sformatf("m_eth_tx_hdr_%0d", it), this);
 
+            // verilog_lint: waive line-length
             m_usr_tx_data[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create($sformatf("m_usr_tx_data_%0d", it), this);
+            // verilog_lint: waive line-length
             m_usr_tx_hdr [it] = uvm_network_mod_env::comparer_tx_hdr#(ETH_RX_HDR_WIDTH)::type_id::create($sformatf("m_usr_tx_hdr_%0d", it), this);
 
             //METERS
+            // verilog_lint: waive line-length
             m_eth_rx_meter[it] = uvm_logic_vector_array::meter#(ITEM_WIDTH)::type_id::create($sformatf("m_eth_rx_meter_%0d", it), this);
+            // verilog_lint: waive line-length
             m_eth_tx_meter[it] = uvm_logic_vector_array::meter#(ITEM_WIDTH)::type_id::create($sformatf("m_eth_tx_meter_%0d", it), this);
+            // verilog_lint: waive line-length
             m_usr_rx_meter[it] = uvm_logic_vector_array::meter#(ITEM_WIDTH)::type_id::create($sformatf("m_usr_rx_meter_%0d", it), this);
+            // verilog_lint: waive line-length
             m_usr_tx_meter[it] = uvm_logic_vector_array::meter#(ITEM_WIDTH)::type_id::create($sformatf("m_usr_tx_meter_%0d", it), this);
 
+            // verilog_lint: waive line-length
             m_timestamp_checker[it] = timestamp_checker #(ETH_RX_HDR_WIDTH)::type_id::create($sformatf("m_timestamp_checker_%0d", it), this);
         end
 
-        m_model = model#(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("m_model", this);
+        m_model = model #(
+            ETH_CORE_ARCH,
+            ETH_PORTS,
+            ETH_PORT_SPEED,
+            ETH_PORT_CHAN,
+            REGIONS,
+            ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH
+        )::type_id::create("m_model", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.
@@ -141,9 +182,16 @@ class scoreboard #(ETH_CORE_ARCH, ETH_PORTS, int unsigned ETH_PORT_SPEED[ETH_POR
 
         msg = {msg, $sformatf("\n\tSuccess %0d Used %0d", this.success(), this.used())};
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 

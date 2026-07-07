@@ -10,7 +10,15 @@
 */
 
 // Definition of LII interface.
-interface lii_if #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) (input logic CLK, RESET);
+interface lii_if #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) (
+    input logic CLK,
+    RESET
+);
 
     // Variables
     localparam BYTES_VLD_LENGTH = $clog2(DATA_WIDTH/8)+1;
@@ -54,9 +62,18 @@ interface lii_if #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WI
     endclocking
 
     // Connection to DUT.
-    modport dut_tx(output DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR, input RDY);
-    modport dut_rx_eth_phy(input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, META, CRCERR, output RDY, LINK_STATUS, RXDECERR, RXSEQERR);
-    modport dut_rx(input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR, output RDY);
+    modport dut_tx(
+        output DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR,
+        input RDY
+    );
+    modport dut_rx_eth_phy(
+        input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, META, CRCERR,
+        output RDY, LINK_STATUS, RXDECERR, RXSEQERR
+    );
+    modport dut_rx(
+        input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR,
+        output RDY
+    );
 
     // Specify wires and direction used for each connection for driver and monitor.
     modport driver_tx(clocking driver_tx_cb);

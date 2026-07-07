@@ -6,7 +6,11 @@
 
 `include "const.sv"
 
-class sequence_base #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH) extends uvm_sequence #(uvm_logic_vector::sequence_item #(DATA_WIDTH));
+class sequence_base #(
+    DATA_WIDTH,
+    INPUT_WIDTH,
+    ADDR_WIDTH
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #(DATA_WIDTH));
     `uvm_object_utils(test::sequence_base#(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH))
 
     uvm_logic_vector::sequence_item #(DATA_WIDTH) req;
@@ -58,7 +62,13 @@ class sequence_read #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH) extends sequence_base
 
 endclass
 
-class sequence_rand #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH, READ_OCCURENCE, WRITE_OCCURENCE) extends sequence_base #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH);
+class sequence_rand #(
+    DATA_WIDTH,
+    INPUT_WIDTH,
+    ADDR_WIDTH,
+    READ_OCCURENCE,
+    WRITE_OCCURENCE
+) extends sequence_base #(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH);
     `uvm_object_utils(test::sequence_rand#(DATA_WIDTH, INPUT_WIDTH, ADDR_WIDTH, READ_OCCURENCE, WRITE_OCCURENCE))
 
     rand bit                            read;

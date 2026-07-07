@@ -15,7 +15,8 @@ class env #(
     USE_DST_RDY
 ) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USE_DST_RDY));
+    `uvm_component_param_utils(
+        uvm_mfb_pipe::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USE_DST_RDY));
 
     uvm_mfb_pipe::virt_sequencer#(ITEM_WIDTH, META_WIDTH) vscr;
 
@@ -63,8 +64,20 @@ class env #(
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_rx_env", "m_config", mfb_rx_cfg);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_tx_env", "m_config", mfb_tx_cfg);
 
-        mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rx_env", this);
-        mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_tx_env", this);
+        mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("mfb_rx_env", this);
+        mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("mfb_tx_env", this);
 
         m_scoreboard  = scoreboard #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_scoreboard", this);
         vscr   = uvm_mfb_pipe::virt_sequencer#(ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);

@@ -8,7 +8,14 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     // declare the Environment reference variable
-    uvm_mfb_to_lbus_adapter::env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE) m_env;
+    uvm_mfb_to_lbus_adapter::env #(
+        RX_REGIONS,
+        RX_REGION_SIZE,
+        RX_BLOCK_SIZE,
+        TX_REGIONS,
+        TX_REGION_SIZE,
+        TX_BLOCK_SIZE
+    ) m_env;
     int unsigned timeout;
 
     // ------------------------------------------------------------------------
@@ -21,14 +28,16 @@ class ex_test extends uvm_test;
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
         // Initializing the reference to the environment
-        m_env = uvm_mfb_to_lbus_adapter::env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE)::type_id::create("m_env", this);
+        m_env = uvm_mfb_to_lbus_adapter::env #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, TX_REGIONS, TX_REGION_SIZE,
+                                              TX_BLOCK_SIZE)::type_id::create("m_env", this);
     endfunction
 
     virtual task tx_seq(uvm_phase phase);
 
         // Declaring the sequence library reference and initializing it
         uvm_mfb::sequence_lib_tx #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0) mfb_seq;
-        mfb_seq = uvm_mfb::sequence_lib_tx #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0)::type_id::create("mfb_seq", this);
+        mfb_seq = uvm_mfb::sequence_lib_tx
+            #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0)::type_id::create("mfb_seq", this);
 
         mfb_seq.init_sequence();
         mfb_seq.min_random_count = 100;
@@ -83,7 +92,9 @@ class ex_test extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 endclass

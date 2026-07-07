@@ -11,7 +11,8 @@ class env_rx #(
     int unsigned READY_LATENCY,
     logic STRADDLING
 ) extends uvm_pcie_avst::env_rx#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING);
-    `uvm_component_param_utils(uvm_pcie_intel_r_tile::env_rx#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING));
+    `uvm_component_param_utils(
+        uvm_pcie_intel_r_tile::env_rx #(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING));
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
@@ -21,7 +22,8 @@ class env_rx #(
         //register driver in factory
         //uvm_pcie::monitor::type_id::set_inst_override(uvm_pcie_avst::monitor #(REGIONS, REGION_SIZE, META_WIDTH, DIRECTION)::get_type(), "m_monitor", this);
         // FIRST REGISTRATION of OVERRIDE WIN.
-        uvm_pcie::driver::type_id::set_inst_override(driver#(REGIONS, REGION_SIZE, META_WIDTH)::get_type(), "m_driver", this);
+        uvm_pcie::driver::type_id::set_inst_override(driver #(REGIONS, REGION_SIZE, META_WIDTH)::get_type(), "m_driver",
+                                                     this);
 
         //uvm_pcie::env_rx::build_phase(phase);
         super.build_phase(phase);

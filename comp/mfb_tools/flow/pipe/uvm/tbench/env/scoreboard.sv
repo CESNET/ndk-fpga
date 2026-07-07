@@ -46,7 +46,9 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
     function void build_phase(uvm_phase phase);
         m_model = model #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_model", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(META_WIDTH))::type_id::create("meta_cmp", this);
         data_cmp.model_tr_timeout_set(10ns);
         meta_cmp.model_tr_timeout_set(10ns);
@@ -65,9 +67,15 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
     virtual function void report_phase(uvm_phase phase);
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                        ), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      ), UVM_NONE)
         end
 
     endfunction

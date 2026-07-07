@@ -10,7 +10,9 @@ class sequence_base_mfb_cc #(
     meta_position_t META_TYPE
 ) extends uvm_common::sequence_base#(
     uvm_mfb::config_sequence,
-    uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, (META_TYPE !=  MFB_META_NONE) ? meta_width_get(MFB_CC) : 0)
+    uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, (META_TYPE != MFB_META_NONE) ? meta_width_get(
+    MFB_CC
+) : 0)
 );
     `ndk_object_utils(
         uvm_pcie_mfb::sequence_base_mfb_cc#(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE),
@@ -48,7 +50,9 @@ class sequence_lib_mfb_cc #(
     meta_position_t META_TYPE
 ) extends uvm_common::sequence_library#(
     uvm_mfb::config_sequence,
-    uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, (META_TYPE !=  MFB_META_NONE) ? meta_width_get(MFB_CC) : 0)
+    uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, (META_TYPE != MFB_META_NONE) ? meta_width_get(
+    MFB_CC
+) : 0)
 );
 
     `ndk_object_utils(
@@ -66,7 +70,12 @@ class sequence_lib_mfb_cc #(
     // can be useful in specific tests
     virtual function void init_sequence(uvm_mfb::config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_pcie_mfb::sequence_base_mfb_cc #(REGIONS, REGION_SIZE, BLOCK_SIZE, META_TYPE)::get_type());
+        this.add_sequence(uvm_pcie_mfb::sequence_base_mfb_cc #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            META_TYPE
+        )::get_type());
     endfunction
 endclass
 

@@ -32,7 +32,8 @@ class agent #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_agen
 
         m_monitor = monitor#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("m_monitor", this);
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("m_sequencer", this);
+            m_sequencer =
+                sequencer #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::type_id::create("m_sequencer", this);
         end
     endfunction
 

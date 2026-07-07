@@ -6,7 +6,11 @@
 
 
 // Reusable high level sequence. Contains transaction, which has only data part.
-class sequence_simple#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+class sequence_simple #(
+    USR_RX_PKT_SIZE_MAX,
+    RX_CHANNELS,
+    HDR_META_WIDTH
+) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
     `uvm_object_param_utils(uvm_meta::sequence_simple#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 
     rand int unsigned transaction_count;
@@ -37,7 +41,11 @@ class sequence_simple#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends
     endtask
 endclass
 
-class sequence_simple_rand#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+class sequence_simple_rand #(
+    USR_RX_PKT_SIZE_MAX,
+    RX_CHANNELS,
+    HDR_META_WIDTH
+) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
     `uvm_object_param_utils(uvm_meta::sequence_simple_rand#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 
     rand int unsigned transaction_count;
@@ -47,7 +55,11 @@ class sequence_simple_rand#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) ex
     rand int unsigned channel_min;
 
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
-    constraint channel_num_c {channel_min inside {[0 : RX_CHANNELS]}; channel_max inside {[0 : RX_CHANNELS]}; channel_min <= channel_max;}
+    constraint channel_num_c {
+        channel_min inside {[0 : RX_CHANNELS]};
+        channel_max inside {[0 : RX_CHANNELS]};
+        channel_min <= channel_max;
+    }
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence");
@@ -65,7 +77,11 @@ class sequence_simple_rand#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) ex
     endtask
 endclass
 
-class sequence_simple_rand_dist#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+class sequence_simple_rand_dist #(
+    USR_RX_PKT_SIZE_MAX,
+    RX_CHANNELS,
+    HDR_META_WIDTH
+) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
     `uvm_object_param_utils(uvm_meta::sequence_simple_rand_dist#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 
     rand int unsigned transaction_count;
@@ -92,7 +108,11 @@ class sequence_simple_rand_dist#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDT
     endtask
 endclass
 
-class sequence_simple_channel#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+class sequence_simple_channel #(
+    USR_RX_PKT_SIZE_MAX,
+    RX_CHANNELS,
+    HDR_META_WIDTH
+) extends uvm_sequence #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
     `uvm_object_param_utils(uvm_meta::sequence_simple_channel#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 
     rand int unsigned transaction_count;
@@ -122,7 +142,11 @@ endclass
 
 //////////////////////////////////////
 // TX LIBRARY
-class sequence_lib#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH) extends uvm_sequence_library#(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+class sequence_lib #(
+    USR_RX_PKT_SIZE_MAX,
+    RX_CHANNELS,
+    HDR_META_WIDTH
+) extends uvm_sequence_library #(sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
   `uvm_object_param_utils(uvm_meta::sequence_lib#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
   `uvm_sequence_library_utils(uvm_meta::sequence_lib#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
 

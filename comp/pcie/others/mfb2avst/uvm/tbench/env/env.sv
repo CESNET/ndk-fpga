@@ -8,15 +8,40 @@
 // This environment containts two mii agents.
 class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_pcie_mfb2avst::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY));
+    `uvm_component_param_utils(
+        uvm_pcie_mfb2avst::env #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            META_WIDTH,
+            READY_LATENCY
+        )
+            );
 
-    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)                 mfb_rx_env;
+    uvm_logic_vector_array_mfb::env_rx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        META_WIDTH
+    ) mfb_rx_env;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array_mfb::config_item                                                                                        mfb_rx_cfg;
-    uvm_logic_vector_array_avst::env_tx #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY) avst_env;
+    uvm_logic_vector_array_avst::env_tx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE*MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        META_WIDTH,
+        READY_LATENCY
+    ) avst_env;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array_avst::config_item                                                                                       avst_cfg;
 
     uvm_pcie_mfb2avst::virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH) vscr;
+    // verilog_lint: waive line-length
     uvm_reset::agent                                                                                             m_reset;
+    // verilog_lint: waive line-length
     uvm_reset::config_item                                                                                       m_config_reset;
 
     scoreboard #(MFB_ITEM_WIDTH, META_WIDTH) m_scoreboard;
@@ -53,8 +78,20 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_W
         uvm_config_db #(uvm_logic_vector_array_avst::config_item)::set(this, "avst_env", "m_config", avst_cfg);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_rx_env", "m_config", mfb_rx_cfg);
 
-        avst_env   = uvm_logic_vector_array_avst::env_tx #(MFB_REGIONS, MFB_REGION_SIZE*MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_env", this);
-        mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_rx_env", this);
+        avst_env   = uvm_logic_vector_array_avst::env_tx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE*MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            META_WIDTH,
+            READY_LATENCY
+        )::type_id::create("avst_env", this);
+        mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("mfb_rx_env", this);
 
         m_scoreboard = scoreboard #(MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("m_scoreboard", this);
         vscr         = uvm_pcie_mfb2avst::virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);

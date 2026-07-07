@@ -21,12 +21,14 @@ class virt_sequence extends uvm_sequence;
 
         m_reset      = uvm_reset::sequence_start::type_id::create("m_reset");
 
+        // verilog_lint: waive line-length
         m_byte_array_sq_lib   = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("m_byte_array_sq_lib");
 
         m_byte_array_sq_lib.init_sequence();
         m_byte_array_sq_lib.min_random_count   = 60;
         m_byte_array_sq_lib.max_random_count   = 80;
 
+        // verilog_lint: waive line-length
         m_logic_vector_sq_endless = uvm_logic_vector::sequence_endless#(META_WIDTH)::type_id::create("m_logic_vector_sq_endless");
 
     endfunction

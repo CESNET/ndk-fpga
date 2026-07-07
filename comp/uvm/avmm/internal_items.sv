@@ -69,7 +69,8 @@ class request_item #(
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tREQUEST ITEM:\n\tTYPE: %s \n\tADDRESS: 'h%0h \n\tWRITEDATA: 'h%0h \n\tBURSTCOUNT: %0d \n",
+        output_string = $sformatf(
+            "\n\tREQUEST ITEM:\n\tTYPE: %s \n\tADDRESS: 'h%0h \n\tWRITEDATA: 'h%0h \n\tBURSTCOUNT: %0d \n",
                             request_type.name(),
                             address,
                             writedata,

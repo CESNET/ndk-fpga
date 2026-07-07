@@ -26,7 +26,9 @@ class simple_sequence extends uvm_sequence #(uvm_mvb::sequence_item #(1, 2));
 
     task body;
         repeat (trans_count) begin
-            `uvm_do_with(req, {req.vld[0] == 2'b1; req.dst_rdy == 2'b1; req.src_rdy == 2'b1; req.data[0] inside {[2'b01 : 2'b10]};});
+            `uvm_do_with(
+                req,
+                {req.vld[0] == 2'b1; req.dst_rdy == 2'b1; req.src_rdy == 2'b1; req.data[0] inside {[2'b01 : 2'b10]};});
         end
     endtask
 
@@ -50,7 +52,9 @@ class simple_invalid_sequence extends uvm_sequence #(uvm_mvb::sequence_item #(1,
 
     task body;
         repeat (trans_count) begin
-            `uvm_do_with(req, {req.vld[0] == 2'b1; req.dst_rdy == 2'b1; req.src_rdy == 2'b1; req.data[0] inside {2'b00, 2'b11};});
+            `uvm_do_with(
+                req,
+                {req.vld[0] == 2'b1; req.dst_rdy == 2'b1; req.src_rdy == 2'b1; req.data[0] inside {2'b00, 2'b11};});
         end
     endtask
 

@@ -46,7 +46,8 @@ class probe_cbs #(int unsigned REGIONS) extends uvm_event_callback;
                     if (sof[r] == 1) begin
                         if (mask[r] == 1) begin
                             highest_mask_index_found = 1;
-                            discard[discard_cnt] = 0; // using "discard_cnt" instead of "r" as index to shake down Discard values
+                            // using "discard_cnt" instead of "r" as index to shake down Discard values
+                            discard[discard_cnt] = 0;
                             discard_cnt++; // shift index to store the next Discard
                         end
                         else if (highest_mask_index_found == 1) begin

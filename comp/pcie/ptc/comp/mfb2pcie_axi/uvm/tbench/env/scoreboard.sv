@@ -32,8 +32,10 @@ class scoreboard#(ITEM_WIDTH) extends uvm_scoreboard;
     function void build_phase(uvm_phase phase);
         m_model = uvm_pcie_mfb2avst::model#(ITEM_WIDTH, 0)::type_id::create("m_model", this);
 
+        // verilog_lint: waive line-length
         input_data = uvm_common::subscriber #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create("input_data", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create("data_cmp", this);
 
         data_cmp.model_tr_timeout_set(10ns);
@@ -56,9 +58,18 @@ class scoreboard#(ITEM_WIDTH) extends uvm_scoreboard;
         msg = {msg, $sformatf("\tCompared/errors: %0d/%0d\n",  data_cmp.compared, data_cmp.errors)};
 
         if (this.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
 
     endfunction

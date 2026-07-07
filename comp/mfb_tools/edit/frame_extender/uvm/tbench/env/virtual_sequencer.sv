@@ -10,7 +10,9 @@ class virtual_sequencer #(
     `uvm_component_param_utils(uvm_mfb_frame_extender::virtual_sequencer #(MFB_ITEM_WIDTH, RX_MVB_ITEM_WIDTH))
 
     uvm_reset::sequencer                                                                                        m_reset;
+    // verilog_lint: waive line-length
     sequencer_length_extractor  #(MFB_ITEM_WIDTH)                                                               m_rx_mfb;
+    // verilog_lint: waive line-length
     uvm_logic_vector::sequencer #(RX_MVB_ITEM_WIDTH)                                                            m_rx_mvb;
 
     function new(string name = "virtual_sequencer", uvm_component parent = null);

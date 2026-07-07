@@ -4,8 +4,17 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN) extends uvm_scoreboard;
-    `uvm_component_utils(uvm_fifox_multi::scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN))
+class scoreboard #(
+    DATA_WIDTH,
+    ITEMS,
+    WRITE_PORTS,
+    READ_PORTS,
+    ALMOST_FULL_OFFSET,
+    ALMOST_EMPTY_OFFSET,
+    IMPL_SHAKEDOWN
+) extends uvm_scoreboard;
+    `uvm_component_utils(uvm_fifox_multi::scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET,
+                             ALMOST_EMPTY_OFFSET, IMPL_SHAKEDOWN))
 
     // Analysis components.
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(DATA_WIDTH)) analysis_imp_mvb_rx;
@@ -46,6 +55,7 @@ class scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSE
 
     function void build_phase(uvm_phase phase);
 
+        // verilog_lint: waive line-length
         cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(DATA_WIDTH))::type_id::create("cmp", this);
         cmp.model_tr_timeout_set(200us);
 
@@ -55,7 +65,8 @@ class scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSE
             status_cmp = uvm_fifox::status_comparer #(0)::type_id::create("status_cmp", this);
             status_cmp.model_tr_timeout_set(200us);
 
-            m_status_model = status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET)::type_id::create("m_status_model", this);
+            m_status_model = status_model #(ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSET,
+                                           ALMOST_EMPTY_OFFSET)::type_id::create("m_status_model", this);
         end
 
     endfunction
@@ -83,9 +94,16 @@ class scoreboard #(DATA_WIDTH, ITEMS, WRITE_PORTS, READ_PORTS, ALMOST_FULL_OFFSE
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

@@ -19,6 +19,7 @@ class virt_sequence#(ITEM_WIDTH) extends uvm_sequence;
 
         m_reset      = uvm_reset::sequence_start::type_id::create("m_reset");
 
+        // verilog_lint: waive line-length
         m_logic_vector_array_sq_lib   = uvm_logic_vector_array::sequence_lib#(32)::type_id::create("m_logic_vector_array_sq_lib");
 
         m_logic_vector_array_sq_lib.init_sequence();

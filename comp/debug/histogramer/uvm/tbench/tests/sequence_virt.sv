@@ -54,7 +54,13 @@ class virt_sequence #(
         m_reset     = uvm_reset::sequence_start::type_id::create("m_reset");
 
         seq_read = test::sequence_read#(REQ_WIDTH, INPUT_WIDTH, ADDR_WIDTH)::type_id::create("seq_read");
-        seq_rand  = test::sequence_rand#(REQ_WIDTH, INPUT_WIDTH, ADDR_WIDTH, READ_OCCURENCE, WRITE_OCCURENCE)::type_id::create("seq_rand");
+        seq_rand  = test::sequence_rand#(
+            REQ_WIDTH,
+            INPUT_WIDTH,
+            ADDR_WIDTH,
+            READ_OCCURENCE,
+            WRITE_OCCURENCE
+        )::type_id::create("seq_rand");
     endfunction
 
     virtual task run_reset();

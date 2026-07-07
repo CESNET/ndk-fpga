@@ -25,7 +25,8 @@ class virt_sequence#(ITEM_WIDTH, RX_MVB_CNT) extends uvm_sequence;
 
         for (int port = 0; port < RX_MVB_CNT; port++) begin
 
-            m_logic_vector_sq[port] = uvm_logic_vector::sequence_simple#(ITEM_WIDTH)::type_id::create($sformatf("m_logic_vector_sq_%0d", port));
+            m_logic_vector_sq[port] = uvm_logic_vector::sequence_simple #(ITEM_WIDTH)::type_id::create(
+                $sformatf("m_logic_vector_sq_%0d", port));
 
         end
     endfunction

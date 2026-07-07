@@ -14,7 +14,8 @@ class env #(
     logic STRADDLING
 ) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, DEVICE, STRADDLING));
+    `uvm_component_param_utils(
+        uvm_pcie_cc_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, DEVICE, STRADDLING));
 
     localparam ITEM_WIDTH = 32;
     localparam PCIE_ITEMS = MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
@@ -59,8 +60,19 @@ class env #(
         uvm_config_db #(uvm_pcie::config_item)::set(this, "axi_cc_env", "m_config", axi_cc_cfg);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_cc_env", "m_config", mfb_cc_cfg);
 
-        axi_cc_env    = uvm_pcie_axi::env_tx #(PCIE_ITEMS, uvm_pcie_axi::AXI_CC, DEVICE, STRADDLING)::type_id::create("axi_cc_env", this);
-        mfb_cc_env    = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("mfb_cc_env", this);
+        axi_cc_env    = uvm_pcie_axi::env_tx #(
+            PCIE_ITEMS,
+            uvm_pcie_axi::AXI_CC,
+            DEVICE,
+            STRADDLING
+        )::type_id::create("axi_cc_env", this);
+        mfb_cc_env    = uvm_logic_vector_array_mfb::env_rx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            ITEM_WIDTH,
+            0
+        )::type_id::create("mfb_cc_env", this);
 
         m_scoreboard = scoreboard::type_id::create("m_scoreboard", this);
         vscr         = uvm_pcie_cc_mfb2axi::virt_sequencer::type_id::create("vscr",this);

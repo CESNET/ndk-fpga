@@ -74,8 +74,16 @@ class agent #(type TR_TYPE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) ex
             reset_sync.push_back(m_driver.reset_sync);
             reset_sync.push_back(m_sequencer.reset_sync);
 
-            uvm_config_db#(uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)))::set(this, "m_driver", "fifo_mvb", fifo_mvb);
-            uvm_config_db#(uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)))::set(this, "m_driver", "fifo_mfb", fifo_mfb);
+            uvm_config_db #(uvm_common::fifo #(sequence_item #(
+                ITEM_WIDTH,
+                META_WIDTH
+            )))::set(this, "m_driver", "fifo_mvb",
+                                                                                           fifo_mvb);
+            uvm_config_db #(uvm_common::fifo #(sequence_item #(
+                ITEM_WIDTH,
+                META_WIDTH
+            )))::set(this, "m_driver", "fifo_mfb",
+                                                                                           fifo_mfb);
         end
     endfunction
 endclass

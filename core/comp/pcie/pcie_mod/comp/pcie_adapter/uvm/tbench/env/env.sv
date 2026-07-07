@@ -50,11 +50,42 @@ class env #(
     protected uvm_crdt::agent_tx m_crdt_agent_down;
 
     //TODO: MFB ROOT
-    localparam uvm_pcie_mfb::device_t MFB_DEVICE = (DEVICE == "STRATIX10" || DEVICE == "AGILEX") ? uvm_pcie_mfb::DEV_INTEL : uvm_pcie_mfb::DEV_XILINX;
-    protected uvm_pcie_mfb::env_rx #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_RQ, PCIE_META_TYPE, RQ_STRADDLING, MFB_DEVICE) m_mfb_rq_env;
-    protected uvm_pcie_mfb::env_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_RC, PCIE_META_TYPE, MFB_DEVICE)                m_mfb_rc_env;
-    protected uvm_pcie_mfb::env_tx #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CQ, PCIE_META_TYPE, MFB_DEVICE)                m_mfb_cq_env;
-    protected uvm_pcie_mfb::env_rx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CC, PCIE_META_TYPE, CC_STRADDLING, MFB_DEVICE) m_mfb_cc_env;
+    localparam uvm_pcie_mfb::device_t MFB_DEVICE = (DEVICE == "STRATIX10" || DEVICE == "AGILEX") ?
+        uvm_pcie_mfb::DEV_INTEL : uvm_pcie_mfb::DEV_XILINX;
+    protected uvm_pcie_mfb::env_rx #(
+        RQ_MFB_REGIONS,
+        RQ_MFB_REGION_SIZE,
+        RQ_MFB_BLOCK_SIZE,
+        uvm_pcie_mfb::MFB_RQ,
+        PCIE_META_TYPE,
+        RQ_STRADDLING,
+        MFB_DEVICE
+    ) m_mfb_rq_env;
+    protected uvm_pcie_mfb::env_tx #(
+        RC_MFB_REGIONS,
+        RC_MFB_REGION_SIZE,
+        RC_MFB_BLOCK_SIZE,
+        uvm_pcie_mfb::MFB_RC,
+        PCIE_META_TYPE,
+        MFB_DEVICE
+    ) m_mfb_rc_env;
+    protected uvm_pcie_mfb::env_tx #(
+        CQ_MFB_REGIONS,
+        CQ_MFB_REGION_SIZE,
+        CQ_MFB_BLOCK_SIZE,
+        uvm_pcie_mfb::MFB_CQ,
+        PCIE_META_TYPE,
+        MFB_DEVICE
+    ) m_mfb_cq_env;
+    protected uvm_pcie_mfb::env_rx #(
+        CC_MFB_REGIONS,
+        CC_MFB_REGION_SIZE,
+        CC_MFB_BLOCK_SIZE,
+        uvm_pcie_mfb::MFB_CC,
+        PCIE_META_TYPE,
+        CC_STRADDLING,
+        MFB_DEVICE
+    ) m_mfb_cc_env;
 
     //MFB INTERFACE
     protected model      m_model;
@@ -121,28 +152,58 @@ class env #(
         m_mfb_rq_cfg.interface_name    = "vif_usr_rq";
         m_mfb_rq_cfg.active            = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_mfb_rq_env", "m_config", m_mfb_rq_cfg);
-        m_mfb_rq_env = uvm_pcie_mfb::env_rx #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_RQ, PCIE_META_TYPE, RQ_STRADDLING, MFB_DEVICE)::type_id::create("m_mfb_rq_env", this);
+        m_mfb_rq_env = uvm_pcie_mfb::env_rx #(
+            RQ_MFB_REGIONS,
+            RQ_MFB_REGION_SIZE,
+            RQ_MFB_BLOCK_SIZE,
+            uvm_pcie_mfb::MFB_RQ,
+            PCIE_META_TYPE,
+            RQ_STRADDLING,
+            MFB_DEVICE
+        )::type_id::create("m_mfb_rq_env", this);
 
         m_mfb_rc_cfg    = new();
         m_mfb_rc_cfg.interface_name    = "vif_usr_rc";
         m_mfb_rc_cfg.active            = UVM_ACTIVE;
         //m_mfb_rc_cfg.seq_cfg.straddling_set(RC_AXI_STRADDLING);
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_mfb_rc_env", "m_config", m_mfb_rc_cfg);
-        m_mfb_rc_env = uvm_pcie_mfb::env_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_RC, PCIE_META_TYPE, MFB_DEVICE)::type_id::create("m_mfb_rc_env", this);
+        m_mfb_rc_env = uvm_pcie_mfb::env_tx #(
+            RC_MFB_REGIONS,
+            RC_MFB_REGION_SIZE,
+            RC_MFB_BLOCK_SIZE,
+            uvm_pcie_mfb::MFB_RC,
+            PCIE_META_TYPE,
+            MFB_DEVICE
+        )::type_id::create("m_mfb_rc_env", this);
 
         m_mfb_cq_cfg    = new();
         m_mfb_cq_cfg.interface_name  = "vif_usr_cq";
         m_mfb_cq_cfg.active          = UVM_ACTIVE;
         //m_mfb_cq_cfg.seq_cfg.straddling_set(CQ_AXI_STRADDLING);
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_mfb_cq_env", "m_config", m_mfb_cq_cfg);
-        m_mfb_cq_env = uvm_pcie_mfb::env_tx #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CQ, PCIE_META_TYPE, MFB_DEVICE)::type_id::create("m_mfb_cq_env", this);
+        m_mfb_cq_env = uvm_pcie_mfb::env_tx #(
+            CQ_MFB_REGIONS,
+            CQ_MFB_REGION_SIZE,
+            CQ_MFB_BLOCK_SIZE,
+            uvm_pcie_mfb::MFB_CQ,
+            PCIE_META_TYPE,
+            MFB_DEVICE
+        )::type_id::create("m_mfb_cq_env", this);
 
         m_mfb_cc_cfg    = new();
         m_mfb_cc_cfg.interface_name    = "vif_usr_cc";
         m_mfb_cc_cfg.active            = UVM_ACTIVE;
         //m_mfb_cc_cfg.seq_cfg.straddling_set(CC_AXI_STRADDLING);
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_mfb_cc_env", "m_config", m_mfb_cc_cfg);
-        m_mfb_cc_env = uvm_pcie_mfb::env_rx #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, uvm_pcie_mfb::MFB_CC, PCIE_META_TYPE, CC_STRADDLING, MFB_DEVICE)::type_id::create("m_mfb_cc_env", this);
+        m_mfb_cc_env = uvm_pcie_mfb::env_rx #(
+            CC_MFB_REGIONS,
+            CC_MFB_REGION_SIZE,
+            CC_MFB_BLOCK_SIZE,
+            uvm_pcie_mfb::MFB_CC,
+            PCIE_META_TYPE,
+            CC_STRADDLING,
+            MFB_DEVICE
+        )::type_id::create("m_mfb_cc_env", this);
 
         m_model      = model     ::type_id::create("m_model", this);
         m_scoreboard = scoreboard::type_id::create("m_scoreboard", this);

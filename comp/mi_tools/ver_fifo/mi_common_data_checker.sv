@@ -43,7 +43,8 @@ class mi_common_data_checker #(MI_WIDTH, MI_META_WIDTH);
         end
     endfunction
 
-    function void cmp(ref sv_mi_pkg::MiTransaction #(MI_WIDTH, MI_WIDTH, MI_META_WIDTH) expected[$], sv_mi_pkg::MiTransaction #(MI_WIDTH, MI_WIDTH, MI_META_WIDTH) get);
+    function void cmp(ref sv_mi_pkg::MiTransaction #(MI_WIDTH, MI_WIDTH, MI_META_WIDTH) expected[$],
+                      sv_mi_pkg::MiTransaction #(MI_WIDTH, MI_WIDTH, MI_META_WIDTH) get);
         if( expected.size() == 0) begin
             get.display("UNEXPECTED TRANSACTION");
             $stop();

@@ -175,7 +175,7 @@ module testbench;
         automatic virtual mvb_if #(
             .ITEMS (REGIONS),
             .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
-        )                                                                                vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
+        ) vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
         automatic virtual avst_if #(
             .REGIONS     (ETH_PORT_CHAN[0]),
             .REGION_SIZE (REGION_SIZE * BLOCK_SIZE),
@@ -216,7 +216,7 @@ module testbench;
             uvm_config_db#(virtual mvb_if #(
                 .ITEMS (REGIONS),
                 .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
-            )                                                                               )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
+            ) )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
 
             uvm_config_db#(virtual avst_if #(
                 .REGIONS     (ETH_PORT_CHAN[0]),

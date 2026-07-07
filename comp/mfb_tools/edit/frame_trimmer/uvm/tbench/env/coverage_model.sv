@@ -39,7 +39,11 @@ class coverage_model #(int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int uns
         }
     endgroup
 
-    covergroup trim_covergroup(string name = "trim_covergroup") with function sample(bit trim_en, int unsigned trim_len, bit is_trim_nop);
+    covergroup trim_covergroup(
+        string name = "trim_covergroup"
+    ) with function sample (
+        bit trim_en, int unsigned trim_len, bit is_trim_nop
+    );
         option.name = name;
         option.per_instance = 1;
 

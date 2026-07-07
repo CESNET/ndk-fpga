@@ -81,7 +81,8 @@ class model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH) extends uvm_component
                 $swrite(msg, "\n\tTX: Wrong channel num %0d Channel range is 0 - %0d", tx_channel, CHANNELS-1);
                 `uvm_fatal(this.get_full_name(), msg);
             end else begin
-                `uvm_info(this.get_full_name(), $sformatf("\nTX send packet on channel %0d %s", tx_channel, tr_output.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nTX send packet on channel %0d %s", tx_channel, tr_output.convert2string()), UVM_HIGH);
                 tx_output[tx_channel].write(tr_output);
             end
         end
@@ -118,9 +119,11 @@ class model #(CHANNELS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH) extends uvm_component
                  tr_out.meta.data = {channel, pkt_size};
 
                  rx_output.write(tr_out);
-                `uvm_info(this.get_full_name(), $sformatf("\nRX Send packet on channel %0d %s", index, tr_data.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nRX Send packet on channel %0d %s", index, tr_data.convert2string()), UVM_HIGH);
             end else begin
-                `uvm_info(this.get_full_name(), $sformatf("\nRX Discrad packet on channel %0d %s", index, tr_data.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nRX Discrad packet on channel %0d %s", index, tr_data.convert2string()), UVM_HIGH);
             end
         end
     endtask

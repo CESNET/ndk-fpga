@@ -68,10 +68,34 @@ class meter #(int unsigned ITEM_WIDTH) extends uvm_subscriber#(sequence_item #(I
 
                 msg = $sformatf("\nMeter information time [%0dns, %0dns]\n", start_time/1ns, stop_time/1ns);
                 data_size.count(min, max, avg, std_dev);
-                msg = {msg, $sformatf("\tData size:\n\t\tMIN : %0.2f (%0.2f B) \n\t\tMAX : %0.2f (%0.2f B)\n\t\tAVG STD_DEV : %0.2f %0.2f (%0.2f B %0.2f B)\n", min, min*KOEF, max, max*KOEF, avg, std_dev, avg*KOEF, std_dev*KOEF)};
+                msg = {
+                    msg,
+                    $sformatf(
+                        "\tData size:\n\t\tMIN : %0.2f (%0.2f B) \n\t\tMAX : %0.2f (%0.2f B)\n\t\tAVG STD_DEV : %0.2f %0.2f (%0.2f B %0.2f B)\n"
+                            ,
+                        min,
+                        min * KOEF,
+                        max,
+                        max * KOEF,
+                        avg,
+                        std_dev,
+                        avg * KOEF,
+                        std_dev * KOEF
+                    )
+                };
 
                 speed.count(min, max, avg, std_dev);
-                msg = {msg, $sformatf("\tspeed :\n\t\tMIN : %0.2f Gb/s \n\t\tMAX : %0.2f Gb/s\n\t\tAVG STD_DEV : %0.2f Gb/s %0.2f Gb/s\n", min*KOEF, max*KOEF, avg*KOEF, std_dev*KOEF)};
+                msg = {
+                    msg,
+                    $sformatf(
+                        "\tspeed :\n\t\tMIN : %0.2f Gb/s \n\t\tMAX : %0.2f Gb/s\n\t\tAVG STD_DEV : %0.2f Gb/s %0.2f Gb/s\n"
+                            ,
+                        min * KOEF,
+                        max * KOEF,
+                        avg * KOEF,
+                        std_dev * KOEF
+                    )
+                };
 
                 `uvm_info(this.get_full_name(), msg, UVM_LOW);
                 speed.reset();

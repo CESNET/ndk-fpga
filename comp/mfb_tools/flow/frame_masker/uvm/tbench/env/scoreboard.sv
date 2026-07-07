@@ -53,7 +53,9 @@ class scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_scor
         m_model = model #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_model", this);
         m_discarder = discarder #(MFB_REGIONS)::type_id::create("m_discarder", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(MFB_META_WIDTH))      ::type_id::create("meta_cmp", this);
 
     endfunction
@@ -80,9 +82,16 @@ class scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_scor
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

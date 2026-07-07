@@ -5,8 +5,15 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH);
-    `uvm_component_param_utils(uvm_mtc::model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+class model_base #(
+    MFB_ITEM_WIDTH,
+    DEVICE,
+    ENDPOINT_TYPE,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH);
+    `uvm_component_param_utils(
+        uvm_mtc::model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
     localparam IS_XILINX_DEV   = (DEVICE == "ULTRASCALE" || DEVICE == "7SERIES");
@@ -165,15 +172,18 @@ class model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR
         cc_tr           = new();
 
         cc_data_tr = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("cc_data_tr");
+        // verilog_lint: waive line-length
         cc_meta_tr = uvm_logic_vector::sequence_item #(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)::type_id::create("cc_meta_tr");
         cc_meta_tr.data = '0;
 
         tag = info.tag;
         if (IS_INTEL_DEV) begin
             dw_cnt = (info.tr_type != uvm_pcie_hdr::TYPE_ERR) ? info.dw_cnt : 1;
+            // verilog_lint: waive line-length
             hdr = {info.req_id, tag, 1'b0, low_addr, 16'h0, comp_st, 1'b0, byte_cnt[12-1 : 0], 8'b01001010, 1'b0, info.tc, 1'b0, info.attr[2], 4'b0000, info.attr[2-1 : 0], info.addr_type, dw_cnt[10-1 : 0]};
         end else begin
             dw_cnt = (info.tr_type != uvm_pcie_hdr::TYPE_ERR) ? info.dw_cnt : 0;
+            // verilog_lint: waive line-length
             hdr = {1'b0, info.attr, info.tc, 1'b0, bus_num, info.func_id, tag , info.req_id, 1'b0, 1'b0, comp_st, dw_cnt, 2'b00, 1'b0, byte_cnt, 6'b000000, info.addr_type, 1'b0, low_addr};
             meta = {8'b00000000, info.tph_st_tag, 5'b00000, info.tph_type, info.tph_present, info.lbe, info.fbe};
         end
@@ -181,13 +191,24 @@ class model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR
         cc_meta_tr.data[sv_pcie_meta_pack::PCIE_META_CPL_HDR_W-1 : 0] = hdr;
         if (!IS_MFB_META_DEV) begin
             if ((info.tr_type == uvm_pcie_hdr::TYPE_ERR) && IS_XILINX_DEV) begin
-                cc_data_tr.data = {hdr[1*32-1 : 0*32], hdr[2*32-1 : 1*32], hdr[3*32-1 : 2*32], meta[1*32-1 : 0*32], 32'h0, 32'h0, 32'h0, 32'h0, data};
+                cc_data_tr.data = {
+                    hdr[1*32-1 : 0*32],
+                    hdr[2*32-1 : 1*32],
+                    hdr[3*32-1 : 2*32],
+                    meta[1*32-1 : 0*32],
+                    32'h0,
+                    32'h0,
+                    32'h0,
+                    32'h0,
+                    data
+                };
             end else begin
                 cc_data_tr.data = {hdr[1*32-1 : 0*32], hdr[2*32-1 : 1*32], hdr[3*32-1 : 2*32], data};
             end
         end else begin
             if ((info.tr_type == uvm_pcie_hdr::TYPE_ERR)) begin
                 cc_data_tr.data = {32'h0, data};
+                // verilog_lint: waive line-length
                 cc_meta_tr.data[sv_pcie_meta_pack::PCIE_CC_META_WIDTH-1 : sv_pcie_meta_pack::PCIE_META_CPL_HDR_W] = meta;
             end else begin
                 cc_data_tr.data = data;

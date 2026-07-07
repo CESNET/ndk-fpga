@@ -17,7 +17,7 @@ class env #(
 ) extends uvm_env;
 
     `uvm_component_param_utils(uvm_tx_dma_calypte_cq::env #(DEVICE, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE,
-                                                            MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX));
+                                   MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX));
 
     sequencer #(DATA_POINTER_WIDTH)                                              m_sequencer [CHANNELS];
     driver #(DEVICE, MFB_ITEM_WIDTH, CHANNELS, DATA_POINTER_WIDTH, PCIE_LEN_MAX) m_driver    [CHANNELS];

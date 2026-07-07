@@ -75,7 +75,11 @@ class model_input_fifo#(ITEM_WIDTH, META_WIDTH) extends uvm_component;
     endtask
 endclass
 
-class comparer_meta #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_tagged#(model_data#(ITEM_WIDTH, META_WIDTH), uvm_logic_vector::sequence_item#(META_WIDTH));
+class comparer_meta #(
+    ITEM_WIDTH,
+    META_WIDTH
+) extends uvm_common::comparer_base_tagged
+    #(model_data #(ITEM_WIDTH, META_WIDTH), uvm_logic_vector::sequence_item #(META_WIDTH));
     `uvm_component_param_utils(net_mod_logic_env::comparer_meta#(ITEM_WIDTH, META_WIDTH))
 
     function new(string name, uvm_component parent = null);
@@ -88,7 +92,11 @@ class comparer_meta #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_
     endfunction
 endclass
 
-class comparer_data #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_tagged#(model_data#(ITEM_WIDTH, META_WIDTH), uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
+class comparer_data #(
+    ITEM_WIDTH,
+    META_WIDTH
+) extends uvm_common::comparer_base_tagged
+    #(model_data #(ITEM_WIDTH, META_WIDTH), uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `uvm_component_param_utils(net_mod_logic_env::comparer_data#(ITEM_WIDTH, META_WIDTH))
 
     function new(string name, uvm_component parent = null);
@@ -102,7 +110,8 @@ endclass
 
 
 class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_LITE_REGIONS) extends uvm_scoreboard;
-    `uvm_component_param_utils(net_mod_logic_env::scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_LITE_REGIONS))
+    `uvm_component_param_utils(
+        net_mod_logic_env::scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_LITE_REGIONS))
 
     // TX path
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))         tx_input_data;
@@ -114,10 +123,12 @@ class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_
     protected uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)) tx_compare[CHANNELS];
 
     // RX path
-    uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_input_data[CHANNELS]; // data for model
+    // data for model
+    uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_input_data[CHANNELS];
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))        rx_out_data; // MFB data from dut
-    uvm_analysis_export #(uvm_logic_vector::sequence_item#(HDR_WIDTH))               rx_out_hdr; // MVB headers used to identify channel
+    // MVB headers used to identify channel
+    uvm_analysis_export #(uvm_logic_vector::sequence_item#(HDR_WIDTH))               rx_out_hdr;
 
     //comparers
     // Thing about comparer. Comparing have to be same as because output have to be tagged same.
@@ -157,7 +168,8 @@ class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_
             string it_string;
             it_string.itoa(it);
 
-            tx_compare[it] = uvm_common::comparer_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create({"tx_compare_", it_string}, this);
+            tx_compare[it] = uvm_common::comparer_ordered #(
+                uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))::type_id::create({"tx_compare_", it_string}, this);
         end
 
         rx_compare_data = comparer_data #(ITEM_WIDTH, HDR_WIDTH)::type_id::create("rx_compare_data", this);
@@ -220,9 +232,16 @@ class scoreboard #(CHANNELS, REGIONS, ITEM_WIDTH, META_WIDTH, HDR_WIDTH, RX_MAC_
         $swrite(msg, "%s\n\tRX path OUTPUT META : %s", msg,  rx_compare_meta.info());
 
         if (this.success() == 1 && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 

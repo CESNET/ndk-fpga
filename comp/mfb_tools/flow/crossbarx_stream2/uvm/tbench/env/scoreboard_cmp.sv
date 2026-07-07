@@ -23,7 +23,16 @@ class cxs2_comparer #(type CLASS_TYPE) extends uvm_common::comparer_ordered#(CLA
             end
         end
 
-        `uvm_info(this.get_full_name(), $sformatf("\n======= COMPARE: Transaction %0d =======\nMODEL ITEM : %s\nDUT ITEM : %s\n", compared, model_item2string(tr_model), dut_item2string(tr_dut)), UVM_MEDIUM);
+        `uvm_info(this.get_full_name(), $sformatf(
+                  "\n======= COMPARE: Transaction %0d =======\nMODEL ITEM : %s\nDUT ITEM : %s\n",
+                  compared,
+                  model_item2string(
+                      tr_model
+                  ),
+                  dut_item2string(
+                      tr_dut
+                  )
+                  ), UVM_MEDIUM);
         return ret;
     endfunction
 

@@ -89,7 +89,13 @@ module mvb_property #(int unsigned ITEMS, int unsigned ITEM_WIDTH)
     for(genvar it = 0; it < ITEMS; it++) begin : gen_items
         assert property (item_undefined(it))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tMVB interface when SRC RDY VLD[%0d] is asserted then propper part of DATA[%0d-1 -: %0d] have to be valid", it, (it+1)*ITEM_WIDTH, it*ITEM_WIDTH));
+            `uvm_error(module_name, $sformatf(
+                       "\n\tMVB interface when SRC RDY VLD[%0d] is asserted then propper part of DATA[%0d-1 -: %0d] have to be valid"
+                           ,
+                       it,
+                       (it + 1) * ITEM_WIDTH,
+                       it * ITEM_WIDTH
+                       ));
             end
     end
 

@@ -118,30 +118,36 @@ module lbus_property
         for (genvar i = 0; i < 4; i++) begin : gen_valid_assertions
             assert property (valid_data(i))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: DATA must be always valid if the ENA is valid", i));
+                `uvm_error(module_name, $sformatf(
+                           "\n\tLBUS Interface: Segment %0d: DATA must be always valid if the ENA is valid", i));
             end
             assert property (valid_sop(i))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: SOP must be always valid if the ENA is valid", i));
+                `uvm_error(module_name, $sformatf(
+                           "\n\tLBUS Interface: Segment %0d: SOP must be always valid if the ENA is valid", i));
             end
             assert property (valid_eop(i))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: EOP must be always valid if the ENA is valid", i));
+                `uvm_error(module_name, $sformatf(
+                           "\n\tLBUS Interface: Segment %0d: EOP must be always valid if the ENA is valid", i));
             end
             assert property (valid_err(i))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: ERR must be always valid if the EOP is valid", i));
+                `uvm_error(module_name, $sformatf(
+                           "\n\tLBUS Interface: Segment %0d: ERR must be always valid if the EOP is valid", i));
             end
             assert property (valid_mty(i))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: MTY must be always valid if the EOP is valid", i));
+                `uvm_error(module_name, $sformatf(
+                           "\n\tLBUS Interface: Segment %0d: MTY must be always valid if the EOP is valid", i));
             end
         end
 
         for (genvar i = 1; i < 4; i++) begin : gen_no_gaps_assertions
             assert property (no_gaps(i))
             else begin
-                `uvm_error(module_name, $sformatf("\n\tLBUS Interface: Segment %0d: Gaps between valid segments are prohibited", i));
+                `uvm_error(module_name, $sformatf(
+                           "\n\tLBUS Interface: Segment %0d: Gaps between valid segments are prohibited", i));
             end
         end
     endgenerate

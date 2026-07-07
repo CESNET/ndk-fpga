@@ -96,7 +96,8 @@ class monitor_CC #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -147,7 +148,8 @@ class monitor_CC #(
             end
 
             assert(!(data.size() > 0 && sof_vld[0] == 1 && sof[0] != 0)) else begin
-                `uvm_fatal(this.get_full_name(), "\nPacket can start in REGION only if previous region packet stop or it is first region!!!")
+                `uvm_fatal(this.get_full_name(),
+                           "\nPacket can start in REGION only if previous region packet stop or it is first region!!!")
             end
         end else begin
             sof_vld = 1'b1;
@@ -160,7 +162,8 @@ class monitor_CC #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
            end
         end
 
@@ -208,7 +211,8 @@ class monitor_CQ #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -278,7 +282,10 @@ class monitor_CQ #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set\n%s", t.convert2string()));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set\n%s",
+                           t.convert2string()
+                           ));
            end
         end
 
@@ -331,7 +338,8 @@ class monitor_RQ #(
         super.new(name, parent);
         // STRADDLING is supported only when ITES is 16
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -405,7 +413,8 @@ class monitor_RQ #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
            end
         end
 
@@ -454,7 +463,8 @@ class monitor_RC #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -522,7 +532,12 @@ class monitor_RC #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep ('b%b) have to be all ones if tlast('b%b) is not set", t.tkeep, t.tlast));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep ('b%b) have to be all ones if tlast('b%b) is not set"
+                               ,
+                           t.tkeep,
+                           t.tlast
+                           ));
             end
         end
 

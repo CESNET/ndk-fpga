@@ -3,7 +3,14 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module dut #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDTH, int unsigned SHAKE_PORTS, bit USE_MUX_IMPL, string DEVICE)
+module dut #(
+    int unsigned RX_ITEMS,
+    int unsigned TX_ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned SHAKE_PORTS,
+    bit USE_MUX_IMPL,
+    string DEVICE
+)
 (
     input logic CLK,
     input logic RST,

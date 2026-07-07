@@ -5,7 +5,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 //Note: use comparer_ordered in case of one channel setting
-class comparer_superpacket #(type CLASS_TYPE) extends uvm_common::comparer_taged#(CLASS_TYPE); // comparer_ordered#(CLASS_TYPE);
+class comparer_superpacket #(
+    type CLASS_TYPE
+) extends uvm_common::comparer_taged #(CLASS_TYPE);  // comparer_ordered #(CLASS_TYPE);
     `uvm_component_param_utils(uvm_framepacker::comparer_superpacket #(CLASS_TYPE))
 
     function new(string name, uvm_component parent = null);
@@ -18,7 +20,15 @@ class comparer_superpacket #(type CLASS_TYPE) extends uvm_common::comparer_taged
 
 endclass
 
-class comparer_meta #(RX_CHANNELS, PKT_MTU, META_WIDTH) extends uvm_common::comparer_unordered#(uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1));
+class comparer_meta #(
+    RX_CHANNELS,
+    PKT_MTU,
+    META_WIDTH
+) extends uvm_common::comparer_unordered #(uvm_logic_vector::sequence_item #($clog2(
+    RX_CHANNELS
+) + $clog2(
+    PKT_MTU + 1
+) + META_WIDTH + 1));
     `uvm_component_param_utils(uvm_framepacker::comparer_meta #(RX_CHANNELS, PKT_MTU, META_WIDTH))
 
     function new(string name, uvm_component parent = null);

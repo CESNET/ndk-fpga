@@ -11,7 +11,15 @@
 
 // Definition of LII interface.
 // verilog_lint: waive interface-name-style
-interface lii_if_rx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) (input logic CLK, RESET);
+interface lii_if_rx #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) (
+    input logic CLK,
+    RESET
+);
 
     // Variables
     localparam BYTES_VLD_LENGTH = $clog2(DATA_WIDTH/8)+1;
@@ -36,18 +44,26 @@ interface lii_if_rx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META
 
     // Driver clocking block.
     clocking driver_cb @(posedge CLK);
-        input  SOF, EOF, EEOF, BYTES_VLD, DATA, EDB, RDY, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR, RXLOCERR, CRC_OK, CRC_VLD, RESET;
+        input SOF, EOF, EEOF, BYTES_VLD, DATA, EDB, RDY, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR,
+            RXLOCERR, CRC_OK, CRC_VLD, RESET;
     endclocking
 
     // Monitor point of view (clocking block).
     clocking monitor_cb @(posedge CLK);
-        input  SOF, EOF, EEOF, BYTES_VLD, DATA, EDB, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR, RXLOCERR, CRC_OK, CRC_VLD;
+        input SOF, EOF, EEOF, BYTES_VLD, DATA, EDB, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR, RXLOCERR,
+            CRC_OK, CRC_VLD;
         input  RESET, RDY;
     endclocking
 
     // Connection to DUT.
-    modport dut_tx(output DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, RDY, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR, RXLOCERR, CRC_OK, CRC_VLD);
-    modport dut_rx(input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, RDY, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR, RXLOCERR, CRC_OK, CRC_VLD);
+    modport dut_tx(
+        output DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, RDY, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR,
+            RXLOCERR, CRC_OK, CRC_VLD
+    );
+    modport dut_rx(
+        input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, RDY, LINK_STATUS, ERR, RXSEQERR, RXBLKERR, RXIDLE, RXRMTERR,
+            RXLOCERR, CRC_OK, CRC_VLD
+    );
 
     // Specify wires and direction used for each connection for driver and monitor.
     modport driver(clocking driver_cb);

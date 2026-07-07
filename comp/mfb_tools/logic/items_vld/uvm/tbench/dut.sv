@@ -22,8 +22,11 @@ module dut (
 
     generate
         for (genvar r = 0; r < MFB_REGIONS; r++) begin : gen_r
+            // verilog_lint: waive line-length
             assign offset  [(r+1)*OFFSET_WIDTH-1 : r*OFFSET_WIDTH] = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH-1              : r*META_WIDTH];
+            // verilog_lint: waive line-length
             assign length  [(r+1)*LENGTH_WIDTH-1 : r*LENGTH_WIDTH] = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH+LENGTH_WIDTH-1 : OFFSET_WIDTH+(r*META_WIDTH)];
+            // verilog_lint: waive line-length
             assign rx_en[r]                                        = mfb_rx.META[(r*META_WIDTH)+META_WIDTH-1                : OFFSET_WIDTH+LENGTH_WIDTH+(r*META_WIDTH)];
         end
     endgenerate

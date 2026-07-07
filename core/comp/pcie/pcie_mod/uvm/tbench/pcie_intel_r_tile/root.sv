@@ -46,7 +46,8 @@ class root #(
             );
         end
 
-        uvm_pcie_avst::env_rx#(REGIONS, REGIONS_SIZE, AVST_META_DOWN, RDY_LATENCY, STRADDLING)::type_id::set_inst_override(
+        uvm_pcie_avst::env_rx
+            #(REGIONS, REGIONS_SIZE, AVST_META_DOWN, RDY_LATENCY, STRADDLING)::type_id::set_inst_override(
             env_rx#(REGIONS, REGIONS_SIZE, AVST_META_DOWN, RDY_LATENCY, STRADDLING)::get_type(),
             "m_avst_down",
             this
@@ -71,29 +72,38 @@ class root #(
             m_avst_crdt_up_hdr_cfg = new();
             m_avst_crdt_up_hdr_cfg.active = UVM_ACTIVE;
             m_avst_crdt_up_hdr_cfg.interface_name = $sformatf("%s_crdt_up_hdr_%0d", m_config.interface_name, i);
-            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_up_hdr_%0d", i), "m_config", m_avst_crdt_up_hdr_cfg);
+            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_up_hdr_%0d", i), "m_config",
+                                                            m_avst_crdt_up_hdr_cfg);
+            // verilog_lint: waive line-length
             m_avst_crdt_up_hdr[i] = uvm_avst_crdt::agent_rx_hdr::type_id::create($sformatf("m_avst_crdt_up_hdr_%0d", i), this);
 
             // UP DATA
             m_avst_crdt_up_data_cfg = new();
             m_avst_crdt_up_data_cfg.active = UVM_ACTIVE;
             m_avst_crdt_up_data_cfg.interface_name = $sformatf("%s_crdt_up_data_%0d", m_config.interface_name, i);
-            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_up_data_%0d", i), "m_config", m_avst_crdt_up_data_cfg);
+            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_up_data_%0d", i), "m_config",
+                                                            m_avst_crdt_up_data_cfg);
+            // verilog_lint: waive line-length
             m_avst_crdt_up_data[i] = uvm_avst_crdt::agent_rx_data::type_id::create($sformatf("m_avst_crdt_up_data_%0d", i), this);
 
             // DOWN HDR
             m_avst_crdt_down_hdr_cfg = new();
             m_avst_crdt_down_hdr_cfg.active = UVM_ACTIVE;
             m_avst_crdt_down_hdr_cfg.interface_name = $sformatf("%s_crdt_down_hdr_%0d", m_config.interface_name, i);
-            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_down_hdr_%0d", i), "m_config", m_avst_crdt_down_hdr_cfg);
+            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_down_hdr_%0d", i), "m_config",
+                                                            m_avst_crdt_down_hdr_cfg);
+            // verilog_lint: waive line-length
             m_avst_crdt_down_hdr[i] = uvm_avst_crdt::agent_tx_hdr::type_id::create($sformatf("m_avst_crdt_down_hdr_%0d", i), this);
 
             // DOWN DATA
             m_avst_crdt_down_data_cfg = new();
             m_avst_crdt_down_data_cfg.active = UVM_ACTIVE;
             m_avst_crdt_down_data_cfg.interface_name = $sformatf("%s_crdt_down_data_%0d", m_config.interface_name, i);
-            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_down_data_%0d", i), "m_config", m_avst_crdt_down_data_cfg);
-            m_avst_crdt_down_data[i] = uvm_avst_crdt::agent_tx_data::type_id::create($sformatf("m_avst_crdt_down_data_%0d", i), this);
+            // verilog_lint: waive line-length
+            uvm_config_db #(uvm_avst_crdt::config_item)::set(this, $sformatf("m_avst_crdt_down_data_%0d", i), "m_config",
+                                                            m_avst_crdt_down_data_cfg);
+            m_avst_crdt_down_data[i] =
+                uvm_avst_crdt::agent_tx_data::type_id::create($sformatf("m_avst_crdt_down_data_%0d", i), this);
         end
 
         m_transaction_approver = transaction_approver::type_id::create("m_transaction_approver", this);
@@ -109,8 +119,9 @@ class root #(
         super.connect_phase(phase);
 
         // Approver on DOWN
-        uvm_config_db #(mailbox #(balance_item))::set(this.m_avst_down, "m_driver", "mailbox", m_transaction_approver.m_mailbox);
-        uvm_config_db #(event)                  ::set(this.m_avst_down, "m_driver", "approve", m_transaction_approver.approve);
+        uvm_config_db #(mailbox #(balance_item))::set(this.m_avst_down, "m_driver", "mailbox",
+                                                    m_transaction_approver.m_mailbox);
+        uvm_config_db #(event)::set(this.m_avst_down, "m_driver", "approve", m_transaction_approver.approve);
         for (int unsigned i = 0; i < 3; i++) begin
             m_avst_crdt_down_hdr [i].analysis_port.connect(m_transaction_approver.avst_crdt_hdr_in [i]);
             m_avst_crdt_down_data[i].analysis_port.connect(m_transaction_approver.avst_crdt_data_in[i]);
@@ -167,13 +178,19 @@ class root #(
         sequence_returning_data m_crdt_up_data_sequence_returning[3];
 
         for (int unsigned i = 0; i < 3; i++) begin
+            // verilog_lint: waive line-length
             m_crdt_up_hdr_sequence_init [i] = uvm_avst_crdt::sequence_rx_initializing_hdr::type_id::create($sformatf("m_crdt_up_hdr_sequence_init_%0d", i));
+            // verilog_lint: waive line-length
             m_crdt_up_data_sequence_init[i] = uvm_avst_crdt::sequence_rx_initializing_data::type_id::create($sformatf("m_crdt_up_data_sequence_init_%0d", i));
 
+            // verilog_lint: waive line-length
             m_crdt_down_hdr_sequence_init_ack [i] = uvm_avst_crdt::sequence_tx_ack_hdr::type_id::create($sformatf("m_crdt_down_hdr_sequence_init_ack_%0d", i));
+            // verilog_lint: waive line-length
             m_crdt_down_data_sequence_init_ack[i] = uvm_avst_crdt::sequence_tx_ack_data::type_id::create($sformatf("m_crdt_down_data_sequence_init_ack_%0d", i));
 
+            // verilog_lint: waive line-length
             m_crdt_up_hdr_sequence_returning [i] = sequence_returning_hdr::type_id::create($sformatf("m_crdt_up_hdr_sequence_returning_%0d", i));
+            // verilog_lint: waive line-length
             m_crdt_up_data_sequence_returning[i] = sequence_returning_data::type_id::create($sformatf("m_crdt_up_data_sequence_returning_%0d", i));
         end
 

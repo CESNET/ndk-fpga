@@ -5,7 +5,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class env #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET) extends uvm_env;
-    `uvm_component_param_utils(uvm_fifox::env #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET));
+    `uvm_component_param_utils(
+        uvm_fifox::env #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET));
 
     uvm_reset::agent m_reset;
 
@@ -66,12 +67,19 @@ class env #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OF
         m_config_mvb_status.active         = UVM_PASSIVE;
         m_config_mvb_status.interface_name = "vif_mvb_status";
         m_config_mvb_status.coverage       = 1;
-        uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_status", "m_config", m_config_mvb_status);
+        uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_mvb_status", "m_config",
+                                                               m_config_mvb_status);
         // Creation of the m_env_mvb_status
         m_env_mvb_status = uvm_logic_vector_mvb::env_tx #(1, STATUS_WIDTH+2)::type_id::create("m_env_mvb_status", this);
 
         // Creation of the scoreboard
-        sc = scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET)::type_id::create("sc", this);
+        sc = scoreboard #(
+            DATA_WIDTH,
+            STATUS_WIDTH,
+            ITEMS,
+            ALMOST_FULL_OFFSET,
+            ALMOST_EMPTY_OFFSET
+        )::type_id::create("sc", this);
         // Creation of the virtual sequencer
         vscr = virt_sequencer #(DATA_WIDTH)::type_id::create("vscr", this);
 

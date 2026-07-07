@@ -72,7 +72,13 @@ class model extends uvm_component;
 
         packet_size_stats.count(min, max, avg, std_dev);
 
-        msg = $sformatf( "\n\tPacket size statistic\n\t\tmin %0d\n\t\tmax %0d\n\t\tavg %0d\n\t\tstd deviation %0d\n", min, max, avg, std_dev);
+        msg = $sformatf(
+            "\n\tPacket size statistic\n\t\tmin %0d\n\t\tmax %0d\n\t\tavg %0d\n\t\tstd deviation %0d\n",
+            min,
+            max,
+            avg,
+            std_dev
+        );
         `uvm_info(this.get_full_name(), msg, UVM_NONE);
     endfunction
 

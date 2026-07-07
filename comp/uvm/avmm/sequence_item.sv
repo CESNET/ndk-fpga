@@ -80,7 +80,9 @@ class sequence_item_request #(
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tREQUEST:\n\tREADY: 'b%0b \n\tREAD: 'b%0b \n\tWRITE: 'b%0b \n\tADDRESS: 'h%0h \n\tWRITEDATA: 'h%0h \n\tBURSTCOUNT: %0d \n",
+        output_string = $sformatf(
+            "\n\tREQUEST:\n\tREADY: 'b%0b \n\tREAD: 'b%0b \n\tWRITE: 'b%0b \n\tADDRESS: 'h%0h \n\tWRITEDATA: 'h%0h \n\tBURSTCOUNT: %0d \n"
+                ,
                             ready,
                             read,
                             write,

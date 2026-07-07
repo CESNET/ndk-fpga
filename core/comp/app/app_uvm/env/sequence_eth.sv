@@ -13,7 +13,8 @@ class sequence_eth#(
     int unsigned CHANNELS,
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
-) extends uvm_common::sequence_base #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
+) extends uvm_common::sequence_base
+    #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_app_core::sequence_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
         $sformatf("uvm_app_core::sequence_eth#(%0d,%0d,%0d)",
@@ -45,7 +46,8 @@ class sequence_eth#(
             state = null;
         end
 
-        req = uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)::type_id::create("req", m_sequencer);
+        req = uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)::type_id::create(
+            "req", m_sequencer);
         while (it < transactions && (state == null || !state.stopped())) begin
             logic [32-1:0] time_act_sec;
             logic [32-1:0] time_act_nano_sec;
@@ -61,7 +63,8 @@ class sequence_eth#(
                 req.timestamp_vld dist { 1'b1 :/ 80, 1'b0 :/20};
                 req.timestamp_vld -> req.timestamp == {time_act_sec, time_act_nano_sec};
             }) else begin
-                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize uvm_app_core_top_agent::sequence_eth_item");
+                `uvm_fatal(m_sequencer.get_full_name(),
+                           "\n\tCannot randomize uvm_app_core_top_agent::sequence_eth_item");
             end
             finish_item(req);
             it++;
@@ -75,7 +78,8 @@ class sequence_flowtest_eth #(
     int unsigned CHANNELS,
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
-) extends uvm_common::sequence_base #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
+) extends uvm_common::sequence_base
+    #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_app_core::sequence_flowtest_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
         $sformatf("uvm_app_core::sequence_flowtest_eth#(%0d,%0d,%0d)",
@@ -128,8 +132,12 @@ class sequence_flowtest_eth #(
     rand int unsigned forward_packet_number;
     rand int unsigned reverse_packet_number;
 
-    constraint c_forward_packet_number { forward_packet_number inside { [forward_packet_number_min : forward_packet_number_max] }; }
-    constraint c_reverse_packet_number { reverse_packet_number inside { [reverse_packet_number_min : reverse_packet_number_max] }; }
+    constraint c_forward_packet_number {
+        forward_packet_number inside {[forward_packet_number_min : forward_packet_number_max]};
+    }
+    constraint c_reverse_packet_number {
+        reverse_packet_number inside {[reverse_packet_number_min : reverse_packet_number_max]};
+    }
 
     // ------------- //
     // IPv4 ADRESSES //
@@ -311,9 +319,11 @@ class sequence_flowtest_eth #(
         string ipv6_addresses = get_ipv6_addresses();
         string mac_addresses  = get_mac_addresses();
 
-        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s", // Creating string of the options
+        // Creating string of the options
+        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s",
                                        config_filepath,
                                        seed,
+                                       // verilog_lint: waive line-length
                                        (config_generator_config_filepath != "") ? { "--config \"", config_generator_config_filepath, "\"" } : "",
                                        (ipv4_addresses != "") ? { "--ipv4 \"", ipv4_addresses, "\"" } : "",
                                        (ipv6_addresses != "") ? { "--ipv6 \"", ipv6_addresses, "\"" } : "",
@@ -321,6 +331,7 @@ class sequence_flowtest_eth #(
                                        $sformatf("--packet-min-size %0d", cfg.array_size_min),
                                        $sformatf("--packet-max-size %0d", cfg.array_size_max)
                                        );
+        // verilog_lint: waive line-length
         config_generator_execute_command = { uvm_packet_generators::CONFIG_GENERATOR_EXECUTE_PATH, " ", config_generator_parameters }; // Creating string of the config generator call command
 
         // Try generate config file
@@ -333,12 +344,15 @@ class sequence_flowtest_eth #(
         string profile_generator_parameters;
         string profile_generator_execute_command;
 
+        // verilog_lint: waive line-length
         profile_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s --forward-packet-number %0d --reverse-packet-number %0d", // Creating string of the options
                                         profile_filepath,
                                         seed,
+                                        // verilog_lint: waive line-length
                                         (profile_generator_config_filepath != "") ? { "--config \"", profile_generator_config_filepath, "\"" } : "",
                                         forward_packet_number,
                                         reverse_packet_number);
+        // verilog_lint: waive line-length
         profile_generator_execute_command = { uvm_packet_generators::PROFILE_GENERATOR_EXECUTE_PATH, " ", profile_generator_parameters }; // Creating string of the profile generator call command
 
         // Try generate profile file
@@ -379,9 +393,11 @@ class sequence_flowtest_eth #(
             output_filepath = { m_sequencer.get_full_name(), ".pcap" };
         end
 
-        `uvm_info(get_full_name(), $sformatf("\n\tsequence_flowtest is running\n\t\tpcap_name%s", output_filepath), UVM_DEBUG);
+        `uvm_info(get_full_name(), $sformatf("\n\tsequence_flowtest is running\n\t\tpcap_name%s", output_filepath),
+                  UVM_DEBUG);
 
-        generator_parameters = $sformatf("-p %s -c %s -o \"%s\" -r %s --seed %0d %s %s", // Creating string of the options
+        // Creating string of the options
+        generator_parameters = $sformatf("-p %s -c %s -o \"%s\" -r %s --seed %0d %s %s",
                                 profile_filepath,
                                 config_filepath,
                                 output_filepath,
@@ -389,7 +405,8 @@ class sequence_flowtest_eth #(
                                 seed,
                                 (skip_unknown ? "--skip-unknown" : ""),
                                 (no_collision_check ? "--no-collision-check" : ""));
-        generator_execute_command = { uvm_packet_generators::GENERATOR_EXECUTE_PATH, " ", generator_parameters }; // Creating string of the generator call command
+        // Creating string of the generator call command
+        generator_execute_command = { uvm_packet_generators::GENERATOR_EXECUTE_PATH, " ", generator_parameters };
 
         assert($system(generator_execute_command) == 0) else begin
             `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", generator_execute_command))
@@ -401,7 +418,8 @@ class sequence_flowtest_eth #(
         end
 
         void'(reader.open(output_filepath)); // Try open an output pcap
-        req = uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)::type_id::create("req", m_sequencer);
+        req = uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)::type_id::create(
+            "req", m_sequencer);
         while( reader.read(data) == uvm_pcap::RET_OK && (state == null || !state.stopped())) begin
             logic [32-1:0] time_act_sec;
             logic [32-1:0] time_act_nano_sec;
@@ -415,7 +433,8 @@ class sequence_flowtest_eth #(
                 req.timestamp_vld dist { 1'b1 :/ 80, 1'b0 :/20};
                 req.timestamp_vld -> req.timestamp == {time_act_sec, time_act_nano_sec};
             }) else begin
-                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize uvm_app_core_top_agent::sequence_eth_item");
+                `uvm_fatal(m_sequencer.get_full_name(),
+                           "\n\tCannot randomize uvm_app_core_top_agent::sequence_eth_item");
             end
 
             if (data.size() < cfg.array_size_min) begin
@@ -439,7 +458,8 @@ class sequence_search_eth  #(
     int unsigned CHANNELS,
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
-) extends uvm_common::sequence_base #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
+) extends uvm_common::sequence_base
+    #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_app_core::sequence_search_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
         $sformatf("uvm_app_core::sequence_search_eth#(%0d,%0d,%0d)",
@@ -569,7 +589,12 @@ class sequence_search_eth  #(
     function string proto_dist_gen(int unsigned weight[], string proto[]);
         string ret = "";
         if (weight.size() != proto.size()) begin
-            `uvm_fatal(m_sequencer.get_full_name(), $sformatf(" \n\uvm_packet_generators::sequence_search#(%0d) weight(%0d) and proto(%0d) size is not same", ITEM_WIDTH, weight.size(), proto.size()));
+            `uvm_fatal(m_sequencer.get_full_name(), $sformatf(
+                       " \n\uvm_packet_generators::sequence_search #(%0d) weight(%0d) and proto(%0d) size is not same",
+                       ITEM_WIDTH,
+                       weight.size(),
+                       proto.size()
+                       ));
         end
         for(int unsigned it = 0; it < weight.size(); it++) begin
             if (it != 0) begin
@@ -583,6 +608,7 @@ class sequence_search_eth  #(
 
     function void configure(string file_json);
         int file;
+        // verilog_lint: waive line-length
         string rule_ipv6 = {"\t{ \"min\" : \"0x00000000000000000000000000000000\", \"max\" : \"0xffffffffffffffffffffffffffffffff\" }", generate_ipv6_rule()};
         string rule_ipv4 = {"\t{ \"min\" : \"0x00000000\", \"max\" : \"0xffffffff\" }", generate_ipv4_rule()};
 
@@ -592,24 +618,32 @@ class sequence_search_eth  #(
         end
         $fwrite(file, "{\n");
         //ETH
-        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d, \"size_min\" : %0d, \"size_max\" : %0d},\n", packet_err_prob, cfg.array_size_min, cfg.array_size_max);
-        $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
-        $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
-        $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n",  proto_dist_gen(ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
-        $fwrite(file, "\"MPLS\" : { \"weight\" : %s},\n", proto_dist_gen(mpls_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
+        $fwrite(file, "\"packet\" : { \"err_probability\" : %0d, \"size_min\" : %0d, \"size_max\" : %0d},\n",
+                packet_err_prob, cfg.array_size_min, cfg.array_size_max);
+        $fwrite(file, "\"ETH\"  : { \"weight\" : %s},\n", proto_dist_gen(
+                eth_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
+        $fwrite(file, "\"VLAN\" : { \"weight\" : %s},\n", proto_dist_gen(
+                vlan_next_prot, {"IPv4", "IPv6", "VLAN", "TRILL", "MPLS", "Empty", "PPP"}));
+        $fwrite(file, "\"PPP\" : { \"weight\" : %s},\n", proto_dist_gen(
+                ppp_next_prot, {"IPv4", "IPv6", "MPLS", "Empty"}));
+        $fwrite(file, "\"MPLS\" : { \"weight\" : %s},\n", proto_dist_gen(mpls_next_prot, {"IPv4", "IPv6", "MPLS",
+                                                                                          "Empty"}));
         $fwrite(file, "\"TCP\" : { \"weight\" : %s},\n",  proto_dist_gen(proto_next_prot, {"Empty", "Payload"}));
         $fwrite(file, "\"UDP\" : { \"weight\" : %s},\n",  proto_dist_gen(udp_next_prot, {"Empty", "Payload", "VXLAN"}));
         $fwrite(file, "\"GRE\" : { \"weight\" : %s},\n",  proto_dist_gen(gre_next_prot, {"ETH", "IPv4", "IPv6"}));
 
         $fwrite(file, "\"IPv4\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv4, "],", "\n\t\"dst\" : ", "[\n", rule_ipv4, "]"});
-        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv4_next_prot, {"Payload", "Empty", "ICMPv4", "UDP", "TCP", "SCTP", "GRE"}));
+        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv4_next_prot, {"Payload", "Empty", "ICMPv4",
+                                                                                       "UDP", "TCP", "SCTP", "GRE"}));
 
         $fwrite(file, "\"IPv6\" : { \"values\" : {");
         $fwrite(file, {"\n\t\"src\" : ", "[\n", rule_ipv6, "],", "\n\t\"dst\" : ", "[\n", rule_ipv6, "]"});
-        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext", "GRE"}));
+        $fwrite(file, "\n\t},\n\t\"weight\" : %s},\n", proto_dist_gen(
+                ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext", "GRE"}));
 
-        $fwrite(file, "\"IPv6Ext\" : { \"weight\" : %s}\n", proto_dist_gen(ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext", "GRE"}));
+        $fwrite(file, "\"IPv6Ext\" : { \"weight\" : %s}\n", proto_dist_gen(
+                ipv6_next_prot, {"Payload", "Empty", "ICMPv6", "UDP", "TCP", "SCTP", "IPv6Ext", "GRE"}));
 
         $fwrite(file, "\n\t}\n");
         $fclose(file);
@@ -672,9 +706,20 @@ class sequence_search_eth  #(
         `uvm_info(get_full_name(), $sformatf("\n\tsequence_search is running\n\t\tpcap_name%s", pcap_file), UVM_DEBUG);
 
         this.configure(config_json);
-        pkt_gen_params = $sformatf("-a %s -f \"%s\" -p %0d --mindepth %0d --maxdepth %0d -c %s -s %0d", algorithm == 0 ? "rand" : "dfs",  pcap_file, transaction_count, dfs_mindepth, dfs_maxdepth, config_json, pkt_gen_seed);
+        pkt_gen_params = $sformatf(
+            "-a %s -f \"%s\" -p %0d --mindepth %0d --maxdepth %0d -c %s -s %0d",
+            algorithm == 0 ? "rand" : "dfs",
+            pcap_file,
+            transaction_count,
+            dfs_mindepth,
+            dfs_maxdepth,
+            config_json,
+            pkt_gen_seed
+        );
         if($system({uvm_packet_generators::PKT_GEN_PATH, " ", pkt_gen_params, " >> pkt_gen_out"}) != 0) begin
-            `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", {uvm_packet_generators::PKT_GEN_PATH, " ", pkt_gen_params}))
+            `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", {
+                                                              uvm_packet_generators::PKT_GEN_PATH, " ", pkt_gen_params
+                                                              }))
         end
 
         if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
@@ -682,7 +727,8 @@ class sequence_search_eth  #(
         end
 
         void'(reader.open(pcap_file));
-        req = uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)::type_id::create("req", m_sequencer);
+        req = uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH)::type_id::create(
+            "req", m_sequencer);
         while(reader.read(data) == uvm_pcap::RET_OK && (state == null || !state.stopped())) begin
             logic [32-1:0] time_act_sec;
             logic [32-1:0] time_act_nano_sec;
@@ -699,7 +745,8 @@ class sequence_search_eth  #(
                 req.timestamp_vld dist { 1'b1 :/ 80, 1'b0 :/20};
                 req.timestamp_vld -> req.timestamp == {time_act_sec, time_act_nano_sec};
             }) else begin
-                `uvm_fatal(m_sequencer.get_full_name(), "\n\tCannot randomize uvm_app_core_top_agent::sequence_eth_item");
+                `uvm_fatal(m_sequencer.get_full_name(),
+                           "\n\tCannot randomize uvm_app_core_top_agent::sequence_eth_item");
             end
 
             if (data.size() < cfg.array_size_min) begin
@@ -724,7 +771,8 @@ class sequence_library_eth #(
     int unsigned CHANNELS,
     int unsigned LENGTH_WIDTH,
     int unsigned ITEM_WIDTH
-) extends uvm_common::sequence_library #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
+) extends uvm_common::sequence_library
+    #(config_sequence_eth, uvm_app_core_top_agent::sequence_eth_item #(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_app_core::sequence_library_eth#(CHANNELS, LENGTH_WIDTH, ITEM_WIDTH),
         $sformatf("uvm_app_core::sequence_library_eth#(%0d,%0d,%0d)",

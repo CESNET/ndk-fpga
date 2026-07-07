@@ -126,7 +126,8 @@ class scoreboard #(
 
             if (tr_model_data.compare(tr_dut_data) == 0) begin
                 errors_data++;
-                $swrite(msg, "\Output does'nt match\n\tModel:\n%s\n\n\tDUT:\n%s", resp_to_string(tr_model_data.data), resp_to_string(tr_dut_data.data));
+                $swrite(msg, "\Output does'nt match\n\tModel:\n%s\n\n\tDUT:\n%s", resp_to_string(tr_model_data.data),
+                        resp_to_string(tr_dut_data.data));
                 `uvm_fatal(get_type_name(), $sformatf("%s", msg))
             end
         end
@@ -142,9 +143,18 @@ class scoreboard #(
         $swrite(msg, "%sErrors:                                 %0d \n", msg, errors_data);
 
         if (errors_data == 0 && this.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
     endfunction
 

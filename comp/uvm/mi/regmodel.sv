@@ -26,7 +26,11 @@ class reg2bus #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned M
 
    function void build_phase(uvm_phase phase);
         predictor = new("predictor", this);
-        adapter   = reg2bus_adapter#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("adapter", ,this.get_full_name());
+        adapter   = reg2bus_adapter#(
+            DATA_WIDTH,
+            ADDR_WIDTH,
+            META_WIDTH
+        )::type_id::create("adapter", ,this.get_full_name());
         frontdoor = reg2bus_frontdoor #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("frontdoor", this);
         monitor   = reg2bus_monitor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH)::type_id::create("monitor", this);
     endfunction
@@ -49,7 +53,12 @@ class regmodel_config;
 endclass
 
 
-class regmodel #(type REG_TYPE, int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_env;
+class regmodel #(
+    type REG_TYPE,
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends uvm_env;
     `ndk_component_param_utils(
         uvm_mi::regmodel#(REG_TYPE, DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::regmodel#(%s,%0d,%0d,%0d)", $typename(REG_TYPE), DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -72,7 +81,9 @@ class regmodel #(type REG_TYPE, int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH
         end
 
         if (m_config.agent.active == UVM_PASSIVE) begin
-            `uvm_fatal(this.get_full_name(), "\n\tThis component doesnt support PASSIVE version. It is implemented in future if it will be needed")
+            `uvm_fatal(
+                this.get_full_name(),
+                "\n\tThis component doesnt support PASSIVE version. It is implemented in future if it will be needed")
         end
 
         uvm_config_db#(uvm_mi::config_item)::set(this, "m_agent", "m_config", m_config.agent);

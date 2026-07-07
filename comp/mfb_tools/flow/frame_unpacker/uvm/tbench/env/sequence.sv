@@ -5,7 +5,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // This low level sequence define bus functionality
-class logic_vector_array_sequence #(MFB_ITEM_WIDTH) extends uvm_sequence#(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
+class logic_vector_array_sequence #(
+    MFB_ITEM_WIDTH
+) extends uvm_sequence #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
     `uvm_object_param_utils(uvm_superunpacketer::logic_vector_array_sequence #(MFB_ITEM_WIDTH))
 
     mailbox#(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) tr_export;

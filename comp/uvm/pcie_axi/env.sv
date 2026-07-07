@@ -47,7 +47,8 @@ class env_rx #(
         end
 
         //register driver in factory
-        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING)::get(), "m_monitor", this);
+        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING)::get(), "m_monitor",
+                                                      this);
         uvm_pcie::driver::type_id::set_inst_override(driver#(ITEMS, DIR)::get_type(), "m_driver", this);
 
         super.build_phase(phase);
@@ -83,8 +84,16 @@ class env_rx #(
         if (get_is_active() == UVM_ACTIVE) begin
             unique case (DIR)
                 AXI_RQ: seq = uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH)::type_id::create("seq", this);
-                AXI_RC: seq = uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING)::type_id::create("seq", this);
-                AXI_CQ: seq = uvm_pcie_axi::sequence_lib_cq#(ITEMS, ITEM_WIDTH, STRADDLING)::type_id::create("seq", this);
+                AXI_RC: seq = uvm_pcie_axi::sequence_lib_rc#(
+                    ITEMS,
+                    ITEM_WIDTH,
+                    STRADDLING
+                )::type_id::create("seq", this);
+                AXI_CQ: seq = uvm_pcie_axi::sequence_lib_cq#(
+                    ITEMS,
+                    ITEM_WIDTH,
+                    STRADDLING
+                )::type_id::create("seq", this);
                 AXI_CC: seq = uvm_pcie_axi::sequence_lib_cc#(ITEMS, ITEM_WIDTH)::type_id::create("seq", this);
             endcase
 
@@ -140,7 +149,8 @@ class env_tx #(
 
         //Override monitor
         //uvm_pcie::monitor::type_id::set_inst_override(monitor#(ITEMS, DIR, STRADDLING)::get_type(), "m_monitor", this);
-        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING)::get(), "m_monitor", this);
+        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING)::get(), "m_monitor",
+                                                      this);
 
         super.build_phase(phase);
 

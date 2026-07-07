@@ -138,6 +138,7 @@ module testbench;
 
     property sof_follows_eof;
         @(posedge mfb_tx.CLK) disable iff(reset.RESET || START)
+        // verilog_lint: waive line-length
         (mfb_tx.SRC_RDY && (mfb_tx.SOF != 0) && (mfb_tx.EOF != 0) && (mfb_tx.SOF_POS > mfb_tx.EOF_POS[5:4])) |-> (mfb_tx.SOF_POS == mfb_tx.EOF_POS[5:4] + 1);
     endproperty
 
@@ -148,12 +149,16 @@ module testbench;
 
     assert property (sof_always_at_begin)
         else begin
-            `uvm_error(module_name, "\n\tMFB_TO_LBUS_RECONF/UVM: When only SOF is present, it needs to be on the beginning of the word!");
+        `uvm_error(
+            module_name,
+            "\n\tMFB_TO_LBUS_RECONF/UVM: When only SOF is present, it needs to be on the beginning of the word!");
         end
 
     assert property (sof_follows_eof)
         else begin
-            `uvm_error(module_name, "\n\tMFB_TO_LBUS_RECONF/UVM: When SOF follows the EOF (e.g. two packets are in the word), the SOF needs to follow immediately after the EOF, no empty blocks shall be between them.");
+        `uvm_error(module_name,
+                   "\n\tMFB_TO_LBUS_RECONF/UVM: When SOF follows the EOF (e.g. two packets are in the word), the SOF needs to follow immediately after the EOF, no empty blocks shall be between them."
+                       );
         end
 
 endmodule

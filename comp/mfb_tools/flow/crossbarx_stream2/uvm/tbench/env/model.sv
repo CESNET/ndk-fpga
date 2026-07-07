@@ -99,6 +99,7 @@ class model #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_compo
                 mod_sof_trim = mod_sof_size;
             end
 
+            // verilog_lint: waive line-length
             tr_output_data = uvm_logic_vector_array::sequence_item #(RX_MFB_ITEM_W)::type_id::create("tr_output_data", this);
             tr_output_data.data = new[mfb_new_size];
 

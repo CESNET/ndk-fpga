@@ -8,16 +8,22 @@ class scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sco
     `uvm_component_param_utils(uvm_mtc::scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     // MODEL INPUT
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))                  analysis_export_cq_data;
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)) analysis_export_cq_meta;
     uvm_mtc::mi_subscriber #(MI_DATA_WIDTH, MI_ADDR_WIDTH) mi_scrb;
     // dut OUTPUT
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))                  analysis_export_cc_data;
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)) analysis_export_cc_meta;
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_mi::sequence_item_response #(MI_DATA_WIDTH))                         analysis_export_cc_mi;
 
     // COMPARERS
     uvm_mtc::mi_cmp_rq #(MI_DATA_WIDTH, uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0))   m_mi_cmp_rq;
+    // verilog_lint: waive line-length
     protected uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)) m_mi_cmp_meta_rs;
     uvm_mtc::mi_cmp_rs #(MFB_ITEM_WIDTH) m_mi_cmp_rs;
 
@@ -61,7 +67,12 @@ class scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sco
         m_model = model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_model", this);
 
 
-        m_mi_cmp_rq      = uvm_mtc::mi_cmp_rq #(MI_DATA_WIDTH, uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0))::type_id::create("m_mi_cmp_rq", this);
+        m_mi_cmp_rq      = uvm_mtc::mi_cmp_rq #(MI_DATA_WIDTH, uvm_mi::sequence_item_request #(
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH,
+            0
+        ))::type_id::create("m_mi_cmp_rq", this);
+        // verilog_lint: waive line-length
         m_mi_cmp_meta_rs = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH))::type_id::create("m_mi_cmp_meta_rs", this);
         m_mi_cmp_rs      = uvm_mtc::mi_cmp_rs #(MFB_ITEM_WIDTH)::type_id::create("m_mi_cmp_rs", this);
 
@@ -92,9 +103,16 @@ class scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sco
 
         msg = {msg, $sformatf("\n\tSuccess %0d Used %0d", this.success(), this.used())};
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

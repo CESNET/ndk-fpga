@@ -27,7 +27,7 @@ package test;
     parameter ETH_TX_HDR_WIDTH = 1                    + 8                 + 16                 ; // =25
     parameter META_WIDTH = ETH_TX_HDR_WIDTH;   // Note that this width must be great enought to map all splitter outputs
     //                           ETH_RX_HDR_TIMESTAMP_W + ETH_RX_HDR_TIMESTAMPVLD_W + ETH_RX_HDR_HITMAC_W + ETH_RX_HDR_HITMACVLD_W -> ETH_RX_HDR_ERROR_W + ETH_RX_HDR_PORT_W + ETH_RX_HDR_LENGTH_W
-    parameter ETH_RX_HDR_WIDTH = 64                     + 1                         + 4                   + 9*1                                          + 8                 + 16; // = 102
+    parameter ETH_RX_HDR_WIDTH = 64 + 1 + 4 + 9 * 1 + 8 + 16;  // = 102
     parameter USER_MVB_WIDTH = ETH_RX_HDR_WIDTH;
 
     parameter MI_DATA_WIDTH = 32;

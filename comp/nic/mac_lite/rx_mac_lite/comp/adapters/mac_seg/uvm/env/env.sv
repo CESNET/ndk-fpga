@@ -47,7 +47,8 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
         m_env_rx_cfg = new();
         m_env_rx_cfg.active         = UVM_ACTIVE;
         m_env_rx_cfg.interface_name = "RX_MAC_SEQ_IF";
-        uvm_config_db#(uvm_logic_vector_array_intel_mac_seg::config_item)::set(this, "m_env_rx", "m_config", m_env_rx_cfg);
+        uvm_config_db #(uvm_logic_vector_array_intel_mac_seg::config_item)::set(this, "m_env_rx", "m_config",
+                                                                               m_env_rx_cfg);
         m_env_rx = uvm_logic_vector_array_intel_mac_seg::env_rx#(SEGMENTS)::type_id::create("m_env_rx", this);
 
         m_env_tx_cfg = new();
@@ -55,7 +56,13 @@ class env#(SEGMENTS, REGIONS, REGION_SIZE) extends uvm_env;
         m_env_tx_cfg.interface_name = "TX_MAC_SEQ_IF";
         m_env_tx_cfg.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_EOF;
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_env_tx_cfg);
-        m_env_tx = uvm_logic_vector_array_mfb::env_tx  #(REGIONS, REGION_SIZE, 8, 8, 1)::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx  #(
+            REGIONS,
+            REGION_SIZE,
+            8,
+            8,
+            1
+        )::type_id::create("m_env_tx", this);
 
         sc       = scoreboard::type_id::create("sc", this);
 

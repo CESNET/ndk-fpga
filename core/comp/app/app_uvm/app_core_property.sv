@@ -21,8 +21,16 @@ module app_core_property #(ETH_STREAMS, DMA_STREAMS, REGIONS, MFB_REGION_SIZE, M
     );
 
 
-    localparam DMA_RX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS);
-    localparam DMA_TX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS) + 1;
+    localparam DMA_RX_MVB_WIDTH = $clog2(
+        test_pkg::DMA_PKT_MTU + 1
+    ) + test_pkg::DMA_HDR_META_WIDTH + $clog2(
+        test_pkg::DMA_TX_CHANNELS
+    );
+    localparam DMA_TX_MVB_WIDTH = $clog2(
+        test_pkg::DMA_PKT_MTU + 1
+    ) + test_pkg::DMA_HDR_META_WIDTH + $clog2(
+        test_pkg::DMA_RX_CHANNELS
+    ) + 1;
 
     ////////////////////////////////////////
     // ETH INTERFACE

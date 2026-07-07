@@ -13,12 +13,15 @@ class sequence_lib_rx #(
     int unsigned BLOCK_SIZE,
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
-) extends uvm_common::sequence_library#(config_sequence, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
+) extends uvm_common::sequence_library
+    #(config_sequence, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
   `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_lib_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_lib_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
-  `uvm_sequence_library_utils(uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `uvm_sequence_library_utils(
+        uvm_logic_vector_array_mfb::sequence_lib_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -29,12 +32,24 @@ class sequence_lib_rx #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_simple #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_full_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_stop #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_burst #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_position #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_simple
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_full_speed
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_stop
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_burst
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_position
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 
@@ -48,9 +63,11 @@ class sequence_lib_rx_speed #(
 ) extends sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
           uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-          $sformatf("uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_lib_rx_speed #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
       )
-    `uvm_sequence_library_utils(uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `uvm_sequence_library_utils(
+        uvm_logic_vector_array_mfb::sequence_lib_rx_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
     function new(string name = "sequence_lib_rx_speed");
         super.new(name);
@@ -59,7 +76,8 @@ class sequence_lib_rx_speed #(
 
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(sequence_rx_full_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            sequence_rx_full_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 
@@ -73,9 +91,11 @@ class sequence_lib_rx_pcie #(
 ) extends sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
   `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_lib_rx_pcie#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_lib_rx_pcie#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_lib_rx_pcie #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
-  `uvm_sequence_library_utils(uvm_logic_vector_array_mfb::sequence_lib_rx_pcie#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
+    `uvm_sequence_library_utils(
+        uvm_logic_vector_array_mfb::sequence_lib_rx_pcie #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))
 
   function new(string name = "sequence_lib_rx_pcie");
     super.new(name);
@@ -86,10 +106,18 @@ class sequence_lib_rx_pcie #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_stop #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_rx_pcie_burst #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_stop
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_rx_pcie_burst
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 

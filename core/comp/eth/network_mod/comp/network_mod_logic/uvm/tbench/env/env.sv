@@ -5,17 +5,67 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USER_MVB_WIDTH, ETH_CHANNELS, RX_MAC_LITE_REGIONS) extends uvm_env;
-    `uvm_component_param_utils(net_mod_logic_env::env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USER_MVB_WIDTH, ETH_CHANNELS, RX_MAC_LITE_REGIONS));
+class env_base #(
+    USER_REGIONS,
+    USER_REGION_SIZE,
+    CORE_REGIONS,
+    CORE_REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    META_WIDTH,
+    USER_MVB_WIDTH,
+    ETH_CHANNELS,
+    RX_MAC_LITE_REGIONS
+) extends uvm_env;
+    `uvm_component_param_utils(
+        net_mod_logic_env::env_base #(
+            USER_REGIONS,
+            USER_REGION_SIZE,
+            CORE_REGIONS,
+            CORE_REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            USER_MVB_WIDTH,
+            ETH_CHANNELS,
+            RX_MAC_LITE_REGIONS
+        ));
 
     // TX path
-    uvm_logic_vector_array_mfb::env_rx #(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_user_rx_mfb_env;
-    uvm_logic_vector_array_mfb::env_tx #(CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0         ) m_core_tx_mfb_env[ETH_CHANNELS];
+    uvm_logic_vector_array_mfb::env_rx #(
+        USER_REGIONS,
+        USER_REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH
+    ) m_user_rx_mfb_env;
+    uvm_logic_vector_array_mfb::env_tx #(
+        CORE_REGIONS,
+        CORE_REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        0
+    ) m_core_tx_mfb_env[ETH_CHANNELS];
 
     // RX path
-    uvm_logic_vector_array_mfb::env_rx #(CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0         ) m_core_rx_mfb_env[ETH_CHANNELS]; // no META
-    uvm_logic_vector_array_mfb::env_tx #(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0         ) m_user_tx_mfb_env; // no META
-    uvm_logic_vector_mvb::env_tx       #(USER_REGIONS, USER_MVB_WIDTH                                      ) m_user_tx_mvb_env;
+    uvm_logic_vector_array_mfb::env_rx #(
+        CORE_REGIONS,
+        CORE_REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        0
+    ) m_core_rx_mfb_env[ETH_CHANNELS]; // no META
+    uvm_logic_vector_array_mfb::env_tx #(
+        USER_REGIONS,
+        USER_REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        0
+    ) m_user_tx_mfb_env; // no META
+    uvm_logic_vector_mvb::env_tx       #(
+        USER_REGIONS,
+        USER_MVB_WIDTH
+    ) m_user_tx_mvb_env;
 
     // MVB discard
     uvm_logic_vector_mvb::env_tx #(RX_MAC_LITE_REGIONS, 1) m_mvb_discard_env[ETH_CHANNELS];
@@ -46,8 +96,10 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
         m_user_rx_mfb_config.interface_name = "vif_user_rx_mfb";
         m_user_rx_mfb_config.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_rx_mfb_env", "m_config", m_user_rx_mfb_config);
-        m_user_rx_mfb_env = uvm_logic_vector_array_mfb::env_rx#(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_user_rx_mfb_env", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_rx_mfb_env", "m_config",
+                                                                     m_user_rx_mfb_config);
+        m_user_rx_mfb_env = uvm_logic_vector_array_mfb::env_rx #(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH,
+                                                                META_WIDTH)::type_id::create("m_user_rx_mfb_env", this);
 
         // CORE (TX) environment
         for(int i = 0; i < ETH_CHANNELS; i++) begin
@@ -59,8 +111,11 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
             m_core_tx_mfb_config[i].interface_name = {"vif_core_tx_mfb_", i_string};
             m_core_tx_mfb_config[i].meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_core_tx_mfb_env_", i_string}, "m_config", m_core_tx_mfb_config[i]);
-            m_core_tx_mfb_env[i] = uvm_logic_vector_array_mfb::env_tx#(CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create({"m_core_tx_mfb_env_", i_string}, this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_core_tx_mfb_env_", i_string},
+                                                                         "m_config", m_core_tx_mfb_config[i]);
+            m_core_tx_mfb_env[i] =
+                uvm_logic_vector_array_mfb::env_tx #(CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH,
+                                                    0)::type_id::create({"m_core_tx_mfb_env_", i_string}, this);
         end
 
         // RX path ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -72,10 +127,14 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
             m_core_rx_mfb_config[i] = new;
             m_core_rx_mfb_config[i].active = UVM_ACTIVE;
             m_core_rx_mfb_config[i].interface_name = {"vif_core_rx_mfb_", i_string};
-            m_core_rx_mfb_config[i].meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF; // meta not actually needed
+            // meta not actually needed
+            m_core_rx_mfb_config[i].meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_core_rx_mfb_env_", i_string}, "m_config", m_core_rx_mfb_config[i]);
-            m_core_rx_mfb_env[i] = uvm_logic_vector_array_mfb::env_rx#(CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create({"m_core_rx_mfb_env_", i_string}, this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_core_rx_mfb_env_", i_string},
+                                                                         "m_config", m_core_rx_mfb_config[i]);
+            m_core_rx_mfb_env[i] =
+                uvm_logic_vector_array_mfb::env_rx #(CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH,
+                                                    0)::type_id::create({"m_core_rx_mfb_env_", i_string}, this);
         end
 
         // USER (TX) environment
@@ -84,15 +143,24 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
         m_user_tx_mfb_config.interface_name = "vif_user_tx_mfb";
         m_user_tx_mfb_config.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
-        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_tx_mfb_env", "m_config", m_user_tx_mfb_config);
-        m_user_tx_mfb_env = uvm_logic_vector_array_mfb::env_tx#(USER_REGIONS, USER_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_user_tx_mfb_env", this);
+        uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_user_tx_mfb_env", "m_config",
+                                                                     m_user_tx_mfb_config);
+        m_user_tx_mfb_env = uvm_logic_vector_array_mfb::env_tx#(
+            USER_REGIONS,
+            USER_REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            0
+        )::type_id::create("m_user_tx_mfb_env", this);
 
         m_user_tx_mvb_config = new;
         m_user_tx_mvb_config.active = UVM_ACTIVE;
         m_user_tx_mvb_config.interface_name = "vif_user_tx_mvb";
 
-        uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, "m_user_tx_mvb_env", "m_config", m_user_tx_mvb_config);
-        m_user_tx_mvb_env = uvm_logic_vector_mvb::env_tx#(USER_REGIONS, USER_MVB_WIDTH)::type_id::create("m_user_tx_mvb_env", this);
+        uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_user_tx_mvb_env", "m_config",
+                                                               m_user_tx_mvb_config);
+        m_user_tx_mvb_env =
+            uvm_logic_vector_mvb::env_tx #(USER_REGIONS, USER_MVB_WIDTH)::type_id::create("m_user_tx_mvb_env", this);
 
         // MVB discard --------------------------------------------------------------------------------------------------------------------------------------------------
         for(int i = 0; i < ETH_CHANNELS; i++) begin
@@ -104,14 +172,23 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
             m_mvb_discard_config.active = UVM_PASSIVE;
             m_mvb_discard_config.interface_name = {"vif_mvb_discard_", i_string};
 
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, {"m_mvb_discard_env_", i_string}, "m_config", m_mvb_discard_config);
-            m_mvb_discard_env[i] = uvm_logic_vector_mvb::env_tx#(RX_MAC_LITE_REGIONS, 1)::type_id::create({"m_mvb_discard_env_", i_string}, this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, {"m_mvb_discard_env_", i_string}, "m_config",
+                                                                   m_mvb_discard_config);
+            m_mvb_discard_env[i] = uvm_logic_vector_mvb::env_tx #(RX_MAC_LITE_REGIONS, 1)::type_id::create(
+                {"m_mvb_discard_env_", i_string}, this);
         end
 
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         // Scoreboard
-        sc = scoreboard #(ETH_CHANNELS, USER_REGIONS, ITEM_WIDTH, META_WIDTH, USER_MVB_WIDTH, RX_MAC_LITE_REGIONS)::type_id::create("sc", this);
+        sc = scoreboard #(
+            ETH_CHANNELS,
+            USER_REGIONS,
+            ITEM_WIDTH,
+            META_WIDTH,
+            USER_MVB_WIDTH,
+            RX_MAC_LITE_REGIONS
+        )::type_id::create("sc", this);
 
         // Configuration interface
         m_mi_config = new;
@@ -119,7 +196,8 @@ class env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE,
         m_mi_config.agent.active         = UVM_ACTIVE;
         m_mi_config.agent.interface_name = "MI_INTERFACE";
         uvm_config_db #(uvm_mi::regmodel_config)::set(this, "m_regmodel", "m_config", m_mi_config);
-        m_regmodel = uvm_mi::regmodel #(net_mod_logic_env::mac_reg#(ETH_CHANNELS), 32, 32)::type_id::create("m_regmodel", this);
+        m_regmodel =
+            uvm_mi::regmodel #(net_mod_logic_env::mac_reg #(ETH_CHANNELS), 32, 32)::type_id::create("m_regmodel", this);
 
     endfunction
 

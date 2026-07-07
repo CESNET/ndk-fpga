@@ -31,7 +31,13 @@ class pool extends uvm_object_string_pool #(uvm_event);
             foreach (m_global_pool.pool[it]) begin
                 items = {items, "\t", it, "\n"};
             end
-           `uvm_fatal(this.get_full_name(), {"Probe : ", key , " was not located in the Global Pool of Probes! Check the name of your Probe.\nAccessible events:\n", items});
+            `uvm_fatal(this.get_full_name(), {
+                       "Probe : ",
+                       key,
+                       " was not located in the Global Pool of Probes! Check the name of your Probe.\nAccessible events:\n"
+                           ,
+                       items
+                       });
         end
 
         return super.get(key);

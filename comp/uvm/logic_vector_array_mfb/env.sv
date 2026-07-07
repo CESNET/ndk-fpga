@@ -14,7 +14,8 @@ class env_rx #(
 ) extends uvm_env;
     `ndk_component_param_utils(
         uvm_logic_vector_array_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::env_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::env_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, BLOCK_SIZE,
+                  ITEM_WIDTH, META_WIDTH)
     );
 
     //localparam  ITEM_WIDTH = 32;
@@ -60,23 +61,37 @@ class env_rx #(
         mfb_agent_cfg.active = m_config.active;
         mfb_agent_cfg.interface_name = m_config.interface_name;
 
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", logic_vector_array_agent_cfg);
-        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config", logic_vector_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config",
+                                                           logic_vector_agent_cfg);
         uvm_config_db #(uvm_mfb::config_item)::set(this, "m_mfb_agent", "m_config", mfb_agent_cfg);
 
-        uvm_logic_vector_array::monitor #(ITEM_WIDTH)::type_id::set_inst_override(monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {this.get_full_name(), ".m_logic_vector_array_agent.*"});
-        uvm_logic_vector::monitor#(META_WIDTH)::type_id::set_inst_override(monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {this.get_full_name(), ".m_logic_vector_agent.*"});
+        uvm_logic_vector_array::monitor #(ITEM_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_array_agent.*"});
+        uvm_logic_vector::monitor #(META_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_agent.*"});
 
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent = uvm_logic_vector_array::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_array_agent", this);
         m_logic_vector_agent = uvm_logic_vector::agent#(META_WIDTH)::type_id::create("m_logic_vector_agent", this);
-        m_mfb_agent        = uvm_mfb::agent_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb_agent", this);
+        m_mfb_agent        = uvm_mfb::agent_rx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_mfb_agent", this);
 
         if (m_config.active == UVM_ACTIVE) begin
             m_sequencer = sequencer_rx #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
         end
 
         if (m_config.coverage == 1) begin
-            m_cover = uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
+            m_cover = uvm_mfb::coverage_model
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
         end else begin
             m_cover = null;
         end
@@ -107,7 +122,8 @@ class env_rx #(
             m_sequencer.m_meta = m_logic_vector_agent.m_sequencer;
             m_sequencer.meta_behav = m_config.meta_behav;
             reset_sync.push_back(m_mfb_agent.m_sequencer.reset_sync);
-            uvm_config_db #(sequencer_rx #(ITEM_WIDTH, META_WIDTH))::set(this, "m_mfb_agent.m_sequencer", "hl_sqr", m_sequencer);
+            uvm_config_db #(sequencer_rx #(ITEM_WIDTH, META_WIDTH))::set(this, "m_mfb_agent.m_sequencer", "hl_sqr",
+                                                                       m_sequencer);
         end
 
         if (m_config.coverage == 1) begin
@@ -117,12 +133,31 @@ class env_rx #(
 
     virtual task run_phase(uvm_phase phase);
         if (m_config.active == UVM_ACTIVE) begin
-            uvm_common::sequence_library#(config_sequence, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)) mfb_seq;
+            uvm_common::sequence_library #(config_sequence, uvm_mfb::sequence_item
+                                           #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)) mfb_seq;
 
             case (m_config.lib_type)
-                config_item::BASE  : mfb_seq = sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-                config_item::PCIE  : mfb_seq = sequence_lib_rx_pcie#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-                config_item::SPEED : mfb_seq = sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                config_item::BASE  : mfb_seq = sequence_lib_rx#(
+                    REGIONS,
+                    REGION_SIZE,
+                    BLOCK_SIZE,
+                    ITEM_WIDTH,
+                    META_WIDTH
+                )::type_id::create("mfb_seq", this);
+                config_item::PCIE  : mfb_seq = sequence_lib_rx_pcie#(
+                    REGIONS,
+                    REGION_SIZE,
+                    BLOCK_SIZE,
+                    ITEM_WIDTH,
+                    META_WIDTH
+                )::type_id::create("mfb_seq", this);
+                config_item::SPEED : mfb_seq = sequence_lib_rx_speed#(
+                    REGIONS,
+                    REGION_SIZE,
+                    BLOCK_SIZE,
+                    ITEM_WIDTH,
+                    META_WIDTH
+                )::type_id::create("mfb_seq", this);
                 default : begin `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type"); end
             endcase
 
@@ -147,10 +182,17 @@ class env_rx #(
 endclass
 
 
-class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_env;
+class env_tx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_env;
     `ndk_component_param_utils(
         uvm_logic_vector_array_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::env_tx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::env_tx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, BLOCK_SIZE,
+                  ITEM_WIDTH, META_WIDTH)
     );
 
     //localparam  ITEM_WIDTH = 32;
@@ -195,19 +237,33 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
         mfb_agent_cfg.active = m_config.active;
         mfb_agent_cfg.interface_name = m_config.interface_name;
 
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", logic_vector_array_agent_cfg);
-        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config", logic_vector_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config",
+                                                           logic_vector_agent_cfg);
         uvm_config_db #(uvm_mfb::config_item)::set(this, "m_mfb_agent", "m_config", mfb_agent_cfg);
 
-        uvm_logic_vector_array::monitor#(ITEM_WIDTH)::type_id::set_inst_override(monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {this.get_full_name(), ".m_logic_vector_array_agent.*"});
-        uvm_logic_vector::monitor#(META_WIDTH)::type_id::set_inst_override(monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {this.get_full_name(), ".m_logic_vector_agent.*"});
+        uvm_logic_vector_array::monitor #(ITEM_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_array_agent.*"});
+        uvm_logic_vector::monitor #(META_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_agent.*"});
 
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent = uvm_logic_vector_array::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_array_agent", this);
         m_logic_vector_agent = uvm_logic_vector::agent#(META_WIDTH)::type_id::create("m_logic_vector_agent", this);
-        m_mfb_agent        = uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb_agent", this);
+        m_mfb_agent        = uvm_mfb::agent_tx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_mfb_agent", this);
 
         if (m_config.coverage == 1) begin
-            m_cover = uvm_mfb::coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
+            m_cover = uvm_mfb::coverage_model
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_cover", this);
         end else begin
             m_cover = null;
         end
@@ -243,9 +299,27 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOC
 
         if (m_config.active == UVM_ACTIVE) begin
             case (m_config.lib_type)
-                config_item::BASE  : mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-                config_item::PCIE  : mfb_seq = uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
-                config_item::SPEED : mfb_seq = uvm_mfb::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("mfb_seq", this);
+                config_item::BASE  : mfb_seq = uvm_mfb::sequence_lib_tx#(
+                    REGIONS,
+                    REGION_SIZE,
+                    BLOCK_SIZE,
+                    ITEM_WIDTH,
+                    META_WIDTH
+                )::type_id::create("mfb_seq", this);
+                config_item::PCIE  : mfb_seq = uvm_mfb::sequence_lib_tx#(
+                    REGIONS,
+                    REGION_SIZE,
+                    BLOCK_SIZE,
+                    ITEM_WIDTH,
+                    META_WIDTH
+                )::type_id::create("mfb_seq", this);
+                config_item::SPEED : mfb_seq = uvm_mfb::sequence_lib_tx_speed#(
+                    REGIONS,
+                    REGION_SIZE,
+                    BLOCK_SIZE,
+                    ITEM_WIDTH,
+                    META_WIDTH
+                )::type_id::create("mfb_seq", this);
                 default : begin `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type"); end
             endcase
 

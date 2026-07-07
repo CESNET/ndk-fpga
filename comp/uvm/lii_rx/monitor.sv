@@ -12,7 +12,12 @@
 `define LII_MONITOR_SV
 
 // Definition of LII monitor
-class monitor #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_monitor;
+class monitor #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_monitor;
 
     `uvm_component_param_utils(uvm_lii_rx::monitor #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))
 

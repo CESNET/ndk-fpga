@@ -3,21 +3,33 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class coverage_model #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned EXTENSION_ITEM_WIDTH) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(EXTENSION_ITEM_WIDTH));
+class coverage_model #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned EXTENSION_ITEM_WIDTH
+) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(EXTENSION_ITEM_WIDTH));
     `uvm_component_param_utils(uvm_mfb_frame_extender::coverage_model #(MFB_BLOCK_SIZE, PKT_MTU, EXTENSION_ITEM_WIDTH))
 
     localparam int unsigned MAX_DATA_LENGTH = PKT_MTU;
     localparam int unsigned MIN_DATA_LENGTH = 64;
 
-    localparam int unsigned MAX_EXTENSION_ONLY_LENGTH = MAX_DATA_LENGTH - (MAX_DATA_LENGTH % MFB_BLOCK_SIZE); // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to MAX_DATA_LENGTH
-    localparam int unsigned MAX_EXTENSION_LENGTH      = (MAX_DATA_LENGTH-MIN_DATA_LENGTH) - ((MAX_DATA_LENGTH-MIN_DATA_LENGTH) % MFB_BLOCK_SIZE); // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to (MAX_DATA_LENGTH-MIN_DATA_LENGTH)
-    localparam int unsigned MIN_EXTENSION_LENGTH      = 60 - (60 % MFB_BLOCK_SIZE) + MFB_BLOCK_SIZE; // The closest value divisible by MFB_BLOCK_SIZE and greater than or equal to 60
+    localparam int unsigned MAX_EXTENSION_ONLY_LENGTH = MAX_DATA_LENGTH - (MAX_DATA_LENGTH % MFB_BLOCK_SIZE)
+        ;  // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to MAX_DATA_LENGTH
+    localparam int unsigned MAX_EXTENSION_LENGTH = (MAX_DATA_LENGTH - MIN_DATA_LENGTH) -
+        ((MAX_DATA_LENGTH - MIN_DATA_LENGTH) % MFB_BLOCK_SIZE)
+        ;  // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to (MAX_DATA_LENGTH-MIN_DATA_LENGTH)
+    localparam int unsigned MIN_EXTENSION_LENGTH = 60 - (60 % MFB_BLOCK_SIZE) +
+        MFB_BLOCK_SIZE;  // The closest value divisible by MFB_BLOCK_SIZE and greater than or equal to 60
 
     // ----------- //
     // Covergroups //
     // ----------- //
 
-    covergroup extension_covergroup(string name = "extension_covergroup") with function sample(bit ext_en, bit ext_only, int unsigned ext_size, int unsigned frame_length);
+    covergroup extension_covergroup(
+        string name = "extension_covergroup"
+    ) with function sample (
+        bit ext_en, bit ext_only, int unsigned ext_size, int unsigned frame_length
+    );
         option.name = name;
         option.per_instance = 1;
 
@@ -61,7 +73,10 @@ class coverage_model #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int un
         extension_mode_x_data_size : cross extension_mode, data_size
         {
             ignore_bins only_mode = binsof(extension_mode) intersect { 2'b11 };
-            ignore_bins ext_mode_x_max_size = binsof(extension_mode) intersect { 2'b10 } && binsof(data_size) intersect { MAX_DATA_LENGTH };
+            ignore_bins ext_mode_x_max_size =
+                binsof (extension_mode) intersect {2'b10} && binsof (data_size) intersect {
+                MAX_DATA_LENGTH
+            };
         }
     endgroup
 

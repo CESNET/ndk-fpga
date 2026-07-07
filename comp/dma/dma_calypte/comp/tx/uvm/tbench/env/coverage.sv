@@ -5,11 +5,20 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class coverage #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)
-    extends uvm_subscriber #(uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH));
+    extends uvm_subscriber #(uvm_mfb::sequence_item #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH
+    ));
 
-    `uvm_component_param_utils(uvm_tx_dma_calypte::coverage #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
+    `uvm_component_param_utils(
+        uvm_tx_dma_calypte::coverage #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
-    covergroup m_cov_seq_item_sof_eof_count with function sample(uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) seq_item);
+    covergroup m_cov_seq_item_sof_eof_count with function sample (
+        uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) seq_item
+    );
         // -----------------------------------------------------------------------------
         // Coverage of packet begins
         // -----------------------------------------------------------------------------
@@ -35,7 +44,8 @@ class coverage #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, M
         end
     endfunction
 
-    virtual function void write(uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) t);
+    virtual function void write(
+        uvm_mfb::sequence_item #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) t);
         if (MFB_REGIONS == 2) begin
             m_cov_seq_item_sof_eof_count.sample(t);
         end

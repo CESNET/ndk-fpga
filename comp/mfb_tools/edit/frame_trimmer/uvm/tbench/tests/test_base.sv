@@ -4,7 +4,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) extends uvm_test;
-    typedef uvm_component_registry #(test::test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU), "test::test_base") type_id;
+    typedef uvm_component_registry #(test::test_base #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH,
+        PKT_MTU
+    ),
+                                    "test::test_base") type_id;
 
     // Verification environment
     uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) m_env;
@@ -17,11 +25,13 @@ class test_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        m_env = uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_env", this);
+        m_env = uvm_mfb_frame_trimmer::env
+            #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_env", this);
     endfunction
 
     task run_phase(uvm_phase phase);
         time end_time;
+        // verilog_lint: waive line-length
         virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) m_virtual_sequence = virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_virtual_sequence", this);
 
         // Raise objection

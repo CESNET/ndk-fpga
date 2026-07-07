@@ -4,7 +4,12 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_item;
+class sequence_item #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_common::sequence_item;
 
     // ------------------------------------------------------------------------
     // Registration of object tools
@@ -87,7 +92,18 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
         ret = $sformatf("\n\tRAEDY: 'b%b\n", ready);
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
-            ret = {ret, $sformatf("\n\tREGION %0d\n\t\tVALID %0d\n\t\tSOP %0d\n\t\tEOP %0d EMTPY %0d\n\t\tMETA 0x%h\n\t\tDATA(HEX)", it, valid[it], sop[it], eop[it], empty[it], meta[it])};
+            ret = {
+                ret,
+                $sformatf(
+                    "\n\tREGION %0d\n\t\tVALID %0d\n\t\tSOP %0d\n\t\tEOP %0d EMTPY %0d\n\t\tMETA 0x%h\n\t\tDATA(HEX)",
+                    it,
+                    valid[it],
+                    sop[it],
+                    eop[it],
+                    empty[it],
+                    meta[it]
+                )
+            };
             for (int unsigned jt = 0; jt < REGION_SIZE; jt++) begin
                 if (jt % 8 == 0) begin
                     ret = {ret, "\n\t\t"};

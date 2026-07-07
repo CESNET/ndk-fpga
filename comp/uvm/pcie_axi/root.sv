@@ -46,25 +46,41 @@ class root#(
         m_cq_cfg.interface_name    = {m_config.interface_name, "_cq"};
         m_cq_cfg.active    = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_cq", "m_config", m_cq_cfg);
-        m_cq = uvm_pcie_axi::env_rx#(AXI_ITEMS, uvm_pcie_axi::AXI_CQ, DEVICE, CQ_STRADDLING)::type_id::create("m_cq", this);
+        m_cq = uvm_pcie_axi::env_rx#(
+            AXI_ITEMS,
+            uvm_pcie_axi::AXI_CQ,
+            DEVICE,
+            CQ_STRADDLING
+        )::type_id::create("m_cq", this);
 
         m_cc_cfg    = new();
         m_cc_cfg.interface_name    = {m_config.interface_name, "_cc"};
         m_cc_cfg.active    = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_cc", "m_config", m_cc_cfg);
-        m_cc = uvm_pcie_axi::env_tx#(AXI_ITEMS, uvm_pcie_axi::AXI_CC, DEVICE, CC_STRADDLING)::type_id::create("m_cc", this);
+        m_cc = uvm_pcie_axi::env_tx#(
+            AXI_ITEMS,
+            uvm_pcie_axi::AXI_CC,
+            DEVICE,
+            CC_STRADDLING
+        )::type_id::create("m_cc", this);
 
         m_rq_cfg    = new();
         m_rq_cfg.interface_name    = {m_config.interface_name, "_rq"};
         m_rq_cfg.active    = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_rq", "m_config", m_rq_cfg);
-        m_rq = uvm_pcie_axi::env_tx#(AXI_ITEMS, uvm_pcie_axi::AXI_RQ, DEVICE, RQ_STRADDLING)::type_id::create("m_rq", this);
+        m_rq = uvm_pcie_axi::env_tx#(
+            AXI_ITEMS,
+            uvm_pcie_axi::AXI_RQ,
+            DEVICE,
+            RQ_STRADDLING
+        )::type_id::create("m_rq", this);
 
         m_rc_cfg    = new();
         m_rc_cfg.interface_name    = {m_config.interface_name, "_rc"};
         m_rc_cfg.active    = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_rc", "m_config", m_rc_cfg);
-        m_rc = uvm_pcie_axi::env_rx#(AXI_ITEMS, uvm_pcie_axi::AXI_RC, DEVICE, RC_STRADDLING)::type_id::create("m_rc", this);
+        m_rc = uvm_pcie_axi::env_rx #(AXI_ITEMS, uvm_pcie_axi::AXI_RC, DEVICE, RC_STRADDLING)::type_id::create("m_rc",
+                                                                                                              this);
     endfunction
 
     virtual function void bar_register(uvm_pcie::bar_config cfg);

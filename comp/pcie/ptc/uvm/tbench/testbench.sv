@@ -90,7 +90,8 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // PROBE
-    bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+    bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.ptc_i
+        probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
         .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
         .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
         .CLK         (CLK)

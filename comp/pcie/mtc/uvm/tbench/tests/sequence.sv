@@ -4,8 +4,18 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN, PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN, PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+class virt_seq #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    PCIE_LEN_MIN,
+    PCIE_LEN_MAX,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_sequence;
+    `uvm_object_param_utils(test::virt_seq #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PCIE_LEN_MIN,
+                                PCIE_LEN_MAX, MI_DATA_WIDTH, MI_ADDR_WIDTH))
     `uvm_declare_p_sequencer(uvm_mtc::sequencer#(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
 
@@ -23,7 +33,11 @@ class virt_seq#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PC
 
         m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
 
-        m_pcie_hdr = uvm_pcie_hdr::sequence_lib #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX)::type_id::create("m_pcie_hdr");
+        m_pcie_hdr = uvm_pcie_hdr::sequence_lib #(
+            IS_XILINX_DEV,
+            PCIE_LEN_MIN,
+            PCIE_LEN_MAX
+        )::type_id::create("m_pcie_hdr");
         m_pcie_hdr.init_sequence();
         m_pcie_hdr.cfg = new();
         m_pcie_hdr.cfg.tag_sync = tag_sync;

@@ -28,7 +28,8 @@ class regmodel_top #(int unsigned CHANNELS, int unsigned POINTER_WIDTH) extends 
             string it_num;
             it_num.itoa(it);
             //CREATE
-            m_regmodel_channel[it] = uvm_tx_dma_calypte_regs::regmodel_channel #(POINTER_WIDTH)::type_id::create({"m_regmodel_channel_", it_num}, , get_full_name());
+            m_regmodel_channel[it] = uvm_tx_dma_calypte_regs::regmodel_channel #(POINTER_WIDTH)::type_id::create(
+                {"m_regmodel_channel_", it_num},, get_full_name());
             //BUILD and CONFIGURE register
             m_regmodel_channel[it].build('h0, bus_width);
             m_regmodel_channel[it].configure(this, {"m_regmodel_channel_", it_num});

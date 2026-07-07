@@ -6,7 +6,8 @@
 
 
 class model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_items_valid::model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH))
+    `uvm_component_param_utils(
+        uvm_items_valid::model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH))
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) input_mfb;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(META_WIDTH))           input_meta;
@@ -28,7 +29,8 @@ class model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_W
         out_cnt = 0;
     endfunction
 
-    task extract_valid_data(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) frame, int unsigned offset, int unsigned length);
+    task extract_valid_data(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) frame, int unsigned offset,
+                            int unsigned length);
         uvm_logic_vector::sequence_item #(MVB_DATA_WIDTH) out_mvb_tr;
         uvm_logic_vector::sequence_item #(1)              out_mvb_end_tr;
         string msg = "";

@@ -5,7 +5,12 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This is mfb rx agent, which declares basic components.
-class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_agent;
+class agent_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_agent;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
@@ -44,7 +49,12 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
+            m_sequencer = sequencer #(
+                REGIONS,
+                REGION_SIZE,
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create("m_sequencer", this);
             m_driver    = driver_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_driver", this);
         end
 
@@ -65,7 +75,9 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual avst_if #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual avst_if #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             string str;
             str = {"\n\tCannot find 'avst_if' with name : ", m_config.interface_name};
             `uvm_fatal(this.get_full_name(), str);
@@ -86,7 +98,12 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
 endclass
 
 // This is mfb tx agent, which declares basic components.
-class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_agent;
+class agent_tx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_agent;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
@@ -125,7 +142,12 @@ class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
+            m_sequencer = sequencer #(
+                REGIONS,
+                REGION_SIZE,
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create("m_sequencer", this);
             m_driver    = driver_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_driver", this);
         end
 
@@ -146,7 +168,9 @@ class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned IT
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual avst_if #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual avst_if #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             `uvm_fatal(this.get_full_name(), "Cannot find 'avst_if' inside uvm_config_db, probably not set!")
         end
 

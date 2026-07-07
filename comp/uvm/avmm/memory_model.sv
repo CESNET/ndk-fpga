@@ -150,7 +150,9 @@ class memory_model #(
                 // Protocol check
                 assert(write_request.request_type != READ)
                 else begin
-                    `uvm_error(this.get_full_name(), "AVMM Interface: A READ request cannot be sent while burst WRITE request is being processed.")
+                    `uvm_error(
+                        this.get_full_name(),
+                        "AVMM Interface: A READ request cannot be sent while burst WRITE request is being processed.")
                 end
 
                 // Update the state properties

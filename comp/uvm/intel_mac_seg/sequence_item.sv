@@ -66,7 +66,11 @@ class sequence_item #(int unsigned SEGMENTS) extends uvm_common::sequence_item;
         string s = "";
         s = $sformatf("intel_seq_mac::sequence_item valid %d ready %d\n\t", valid, ready);
         for (int unsigned it = 0; it < SEGMENTS; it++) begin
-            s = {s, $sformatf("Item %d:\n\t\tDATA : 'h%h\n\t\tinframe 'b%b\n\t\teop_empty %d\n\t\t, fcs_error : 'b%b\n\t\terror : 'b%b\n\t\t status data: 'b%b\n",
+            s = {
+                s,
+                $sformatf(
+                    "Item %d:\n\t\tDATA : 'h%h\n\t\tinframe 'b%b\n\t\teop_empty %d\n\t\t, fcs_error : 'b%b\n\t\terror : 'b%b\n\t\t status data: 'b%b\n"
+                        ,
                     it, data[it], inframe[it], eop_empty[it], fcs_error[it], error[it], status_data[it])};
         end
        return s;

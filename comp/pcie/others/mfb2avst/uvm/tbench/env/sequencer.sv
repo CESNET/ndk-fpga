@@ -9,6 +9,7 @@ class virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH) extends uvm_sequencer;
     `uvm_component_param_utils(uvm_pcie_mfb2avst::virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH))
 
     uvm_reset::sequencer                                                                            m_reset;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH)                                              m_logic_vector_array_scr;
     uvm_logic_vector::sequencer#(META_WIDTH)                                                        m_logic_vector_scr;
 

@@ -4,15 +4,24 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_logic_vector_array::monitor #(ITEM_WIDTH);
-    `ndk_component_param_utils(
-        uvm_logic_vector_array_avst::monitor_logic_vector_array#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::monitor_logic_vector_array#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+class monitor_logic_vector_array #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends uvm_logic_vector_array::monitor #(ITEM_WIDTH);
+    `ndk_component_param_utils(uvm_logic_vector_array_avst::monitor_logic_vector_array
+                                   #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+                               $sformatf(
+                                   "uvm_logic_vector_array_avst::monitor_logic_vector_array #(%0d,%0d,%0d,%0d,%0d)",
+                                   REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
 
     // Analysis port
     typedef monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) this_type;
-    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
+    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH), this_type)
+        analysis_export;
 
     localparam EMPTY_WIDTH = $clog2(REGION_SIZE);
 
@@ -48,7 +57,8 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
                 if (|tr.valid == 0 && inframe) begin
                     valid_cnt++;
                     if (valid_cnt > READY_LATENCY) begin
-                        `uvm_error(this.get_full_name(), "\n\tValid has not been triggered within READY_LATENCY inside of frame")
+                        `uvm_error(this.get_full_name(),
+                                   "\n\tValid has not been triggered within READY_LATENCY inside of frame")
                     end
                 end
             end else begin
@@ -71,7 +81,10 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
 
                 if (tr.sop[it]) begin
                     if (hi_tr != null) begin
-                        `uvm_error(this.get_full_name(), "\n\tSOF has been set before previous frame haven't correctly ended. EOF haven't been set on end of packet")
+                        `uvm_error(
+                            this.get_full_name(),
+                            // verilog_lint: waive line-length
+                            "\n\tSOF has been set before previous frame haven't correctly ended. EOF haven't been set on end of packet")
                     end
                     inframe = 1'b1;
                     hi_tr = uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)::type_id::create("hi_tr");
@@ -88,7 +101,9 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
 
                 if (tr.eop[it] && hi_tr != null) begin
                     if (hi_tr == null) begin
-                        `uvm_error(this.get_full_name(), "\n\tEOF has been set before frame heve been started. SOF havent been set before this EOF")
+                        `uvm_error(
+                            this.get_full_name(),
+                            "\n\tEOF has been set before frame heve been started. SOF havent been set before this EOF")
                     end else begin
                         inframe = 1'b0;
                         hi_tr.data = data;
@@ -104,15 +119,27 @@ class monitor_logic_vector_array #(int unsigned REGIONS, int unsigned REGION_SIZ
     endfunction
 endclass
 
-class monitor_logic_vector #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_logic_vector::monitor#(META_WIDTH);
+class monitor_logic_vector #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends uvm_logic_vector::monitor #(META_WIDTH);
     `ndk_component_param_utils(
         uvm_logic_vector_array_avst::monitor_logic_vector#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::monitor_logic_vector#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+        $sformatf("uvm_logic_vector_array_avst::monitor_logic_vector #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
 
     typedef monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) this_type;
     // Analysis port
-    uvm_analysis_imp #(uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
+    uvm_analysis_imp #(uvm_avst::sequence_item #(
+        REGIONS,
+        REGION_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH
+    ), this_type) analysis_export;
 
     uvm_reset::sync_terminate reset_sync;
     config_item::meta_type    meta_behav;
@@ -137,7 +164,8 @@ class monitor_logic_vector #(int unsigned REGIONS, int unsigned REGION_SIZE, int
                 if (|tr.valid == 0 && inframe) begin
                     valid_cnt++;
                     if (valid_cnt > READY_LATENCY) begin
-                        `uvm_error(this.get_full_name(), "\n\tValid has not been triggered within READY_LATENCY inside of frame")
+                        `uvm_error(this.get_full_name(),
+                                   "\n\tValid has not been triggered within READY_LATENCY inside of frame")
                     end
                 end
             end else begin

@@ -4,7 +4,12 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class meta_sequence #(META_WIDTH, CHANNELS) extends uvm_sequence#(uvm_logic_vector::sequence_item#($clog2(CHANNELS) + META_WIDTH));
+class meta_sequence #(
+    META_WIDTH,
+    CHANNELS
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #($clog2(
+    CHANNELS
+) + META_WIDTH));
     `uvm_object_param_utils(test::meta_sequence #(META_WIDTH, CHANNELS));
 
     function new (string name = "meta_sequence");
@@ -16,7 +21,10 @@ class meta_sequence #(META_WIDTH, CHANNELS) extends uvm_sequence#(uvm_logic_vect
             req = uvm_logic_vector::sequence_item#($clog2(CHANNELS) + META_WIDTH)::type_id::create("req");
 
             start_item(req);
-            assert(req.randomize() with {data[$clog2(CHANNELS) + META_WIDTH-1 : META_WIDTH] inside {[0: CHANNELS-1]}; });
+            assert (req.randomize() with {
+                data[$clog2(
+                    CHANNELS)+META_WIDTH-1 : META_WIDTH] inside {[0 : CHANNELS - 1]};
+            });
             finish_item(req);
         end
     endtask

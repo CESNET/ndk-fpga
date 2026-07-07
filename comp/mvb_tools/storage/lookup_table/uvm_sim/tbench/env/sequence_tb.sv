@@ -5,7 +5,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // This MI sequence define bus functionality
-class sequence_mi#(DATA_WIDTH, ADDR_WIDTH, CLK_PERIOD, META_WIDTH = 0) extends uvm_mi::sequence_slave_sim#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_mi #(
+    DATA_WIDTH,
+    ADDR_WIDTH,
+    CLK_PERIOD,
+    META_WIDTH = 0
+) extends uvm_mi::sequence_slave_sim #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `uvm_object_param_utils(uvm_lookup_table::sequence_mi #(DATA_WIDTH, ADDR_WIDTH, CLK_PERIOD, META_WIDTH))
 
     function new (string name = "sequence_mi");

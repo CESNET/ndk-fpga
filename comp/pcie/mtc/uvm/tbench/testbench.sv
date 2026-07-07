@@ -23,7 +23,7 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
-    reset_if                                                                                                        reset     (CLK);
+    reset_if reset (CLK);
     mfb_if #(
         .REGIONS     (MFB_REGIONS),
         .REGION_SIZE (MFB_REGION_SIZE),

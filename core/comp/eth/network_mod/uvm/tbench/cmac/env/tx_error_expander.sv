@@ -19,7 +19,10 @@ class tx_error_expander extends uvm_subscriber #(uvm_logic_vector::sequence_item
     endfunction
 
     function void write(uvm_logic_vector::sequence_item #(INPUT_ITEM_WIDTH) t);
-        uvm_logic_vector::sequence_item #(OUTPUT_ITEM_WIDTH) item = uvm_logic_vector::sequence_item #(OUTPUT_ITEM_WIDTH)::type_id::create("item");
+        uvm_logic_vector::sequence_item #(OUTPUT_ITEM_WIDTH)
+            item = uvm_logic_vector::sequence_item #(OUTPUT_ITEM_WIDTH)::type_id::create(
+            "item"
+        );
 
         item.data = {OUTPUT_ITEM_WIDTH{t.data}};
 

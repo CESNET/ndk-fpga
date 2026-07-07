@@ -48,7 +48,8 @@ class scoreboard #(int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends
         super.build_phase(phase);
 
         for (int unsigned i = 0; i < RX_STREAMS; i++) begin
-            comparer[i] = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(MVB_ITEM_WIDTH))::type_id::create($sformatf("comparer_%0d", i), this);
+            comparer[i] = uvm_common::comparer_ordered #(
+                uvm_logic_vector::sequence_item #(MVB_ITEM_WIDTH))::type_id::create($sformatf("comparer_%0d", i), this);
             comparer[i].model_tr_timeout_set(200us);
         end
 
@@ -74,9 +75,16 @@ class scoreboard #(int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends
         super.report_phase(phase);
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                // verilog_lint: waive line-length
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(get_type_name(),
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                          ,
+                      UVM_NONE)
         end
     endfunction
 

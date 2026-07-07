@@ -66,7 +66,8 @@ class agent_rx extends uvm_agent;
 
         // Get interface instance
         if(!uvm_config_db #(virtual crdt_if)::get(null, "", m_config.interface_name, vif)) begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find 'crdt_if' with name %s, probably not set!", m_config.interface_name));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find 'crdt_if' with name %s, probably not set!", m_config.interface_name));
         end
 
         // Connect driver if the agent is active

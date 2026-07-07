@@ -13,7 +13,8 @@ class virt_sequence#(
     int unsigned RX_CHANNELS,
     int unsigned PKT_MTU
 ) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, PKT_MTU))
+    `uvm_object_param_utils(
+        test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_CHANNELS, PKT_MTU))
     `uvm_declare_p_sequencer(uvm_framepacker::virt_sequencer#(MFB_ITEM_WIDTH, PKT_MTU, RX_CHANNELS, HDR_META_WIDTH))
 
     function new (string name = "virt_sequence");

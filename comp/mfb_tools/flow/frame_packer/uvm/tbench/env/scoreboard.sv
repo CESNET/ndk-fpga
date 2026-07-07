@@ -9,11 +9,14 @@ class scoreboard #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uv
     `uvm_component_utils(uvm_framepacker::scoreboard #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH))
 
     // RX
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))                   analysis_imp_mfb_rx_data;
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector::sequence_item#($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1))) analysis_imp_mvb_rx;
 
     // TX
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))  analysis_imp_mfb_tx_data;
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1))       analysis_imp_mvb_tx;
 
     //Comparer
@@ -53,10 +56,15 @@ class scoreboard #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uv
         m_model = model #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH)::type_id::create("m_model", this);
         //data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))::type_id::create("data_cmp", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_framepacker::comparer_superpacket #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))::type_id::create("data_cmp", this);
         data_cmp.model_tr_timeout_set(500us);
 
-        meta_cmp = uvm_framepacker::comparer_meta #(RX_CHANNELS, PKT_MTU, META_WIDTH)::type_id::create("meta_cmp", this);
+        meta_cmp = uvm_framepacker::comparer_meta #(
+            RX_CHANNELS,
+            PKT_MTU,
+            META_WIDTH
+        )::type_id::create("meta_cmp", this);
         meta_cmp.model_tr_timeout_set(500us);
     endfunction
 
@@ -76,9 +84,15 @@ class scoreboard #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uv
     virtual function void report_phase(uvm_phase phase);
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                        ), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      ), UVM_NONE)
         end
 
     endfunction

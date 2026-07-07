@@ -26,13 +26,20 @@ module dut (
 
     generate
         for (genvar r = 0; r < MFB_REGIONS; r++) begin : gen_r
+            // verilog_lint: waive line-length
             assign mvb_tx.DATA[(r*WHOLE_MVB_META_W)+MVB_DATA_WIDTH                 -1 -: MVB_DATA_WIDTH] = mvb_data[(r+1)*MVB_DATA_WIDTH-1 -: MVB_DATA_WIDTH];
+            // verilog_lint: waive line-length
             assign mvb_tx.DATA[(r*WHOLE_MVB_META_W)+MVB_DATA_WIDTH+1               -1 -: 1             ] = mvb_chsum_bypass[r              -: 1             ];
+            // verilog_lint: waive line-length
             assign mvb_tx.DATA[(r*WHOLE_MVB_META_W)+MVB_DATA_WIDTH+1+MFB_META_WIDTH-1 -: MFB_META_WIDTH] = mvb_meta[(r+1)*MFB_META_WIDTH-1 -: MFB_META_WIDTH];
 
+            // verilog_lint: waive line-length
             assign offset  [(r+1)*OFFSET_WIDTH-1 -: OFFSET_WIDTH]     = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH               -1 -: OFFSET_WIDTH   ];
+            // verilog_lint: waive line-length
             assign length  [(r+1)*LENGTH_WIDTH-1 -: LENGTH_WIDTH]     = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH+LENGTH_WIDTH  -1 -: LENGTH_WIDTH   ];
+            // verilog_lint: waive line-length
             assign chsum_en[r                    -: 1           ]     = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH+LENGTH_WIDTH+1-1 -: 1              ];
+            // verilog_lint: waive line-length
             assign meta    [(r+1)*MFB_META_WIDTH-1 -: MFB_META_WIDTH] = mfb_rx.META[(r*META_WIDTH)+META_WIDTH                 -1 -: MFB_META_WIDTH ];
         end
     endgenerate

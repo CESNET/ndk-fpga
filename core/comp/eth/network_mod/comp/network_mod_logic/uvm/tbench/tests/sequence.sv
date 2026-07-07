@@ -18,7 +18,10 @@ class meta_sequence #(META_WIDTH, CHANNELS) extends uvm_sequence#(uvm_logic_vect
 
             start_item(req);
             //                                                   +ETH_TX_HDR_PORT_O (channel offset)
-            assert(req.randomize() with {data[$clog2(CHANNELS)-1 +16: 0 +16] inside {[0: CHANNELS-1]}; }); // comment this line if CHANNELS == 1
+            assert (req.randomize() with {
+                data[$clog2(
+                    CHANNELS)-1+16:0+16] inside {[0 : CHANNELS - 1]};
+            });  // comment this line if CHANNELS == 1
             finish_item(req);
         end
     endtask

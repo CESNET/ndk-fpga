@@ -77,7 +77,8 @@ module lii_property #(logic FAST_SOF, logic RESET_ENABLE, int unsigned DATA_WIDT
 
             assert property (byte_valid_control)
                 else begin
-                    $error("After EEOF: 'h%0h is not BYTES_VLD: 'h%0h equal to EDB: 'h%0h", $past(vif.EEOF), $past(vif.EDB), vif.BYTES_VLD);
+                $error("After EEOF: 'h%0h is not BYTES_VLD: 'h%0h equal to EDB: 'h%0h", $past(vif.EEOF),
+                       $past(vif.EDB), vif.BYTES_VLD);
                     $finish();
                 end
         end

@@ -20,7 +20,11 @@ class virt_sequence#(MI_DATA_WIDTH, MI_ADDRESS_WIDTH, CLK_PERIOD) extends uvm_se
     virtual function void init(uvm_phase phase);
 
         m_reset_sq    = uvm_reset::sequence_start::type_id::create("m_reset_sq");
-        m_mi_sq       = uvm_mi2axi4lite::sequence_mi#(MI_DATA_WIDTH, MI_ADDRESS_WIDTH, CLK_PERIOD)::type_id::create("m_mi_sq");
+        m_mi_sq       = uvm_mi2axi4lite::sequence_mi#(
+            MI_DATA_WIDTH,
+            MI_ADDRESS_WIDTH,
+            CLK_PERIOD
+        )::type_id::create("m_mi_sq");
 
         this.phase = phase;
 

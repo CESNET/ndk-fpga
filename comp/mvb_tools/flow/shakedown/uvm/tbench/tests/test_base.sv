@@ -22,7 +22,10 @@ class test_base #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITE
 
     task run_phase(uvm_phase phase);
         time end_time;
-        virtual_sequence_base #(TX_ITEMS, ITEM_WIDTH) m_virtual_sequence = virtual_sequence_base #(TX_ITEMS, ITEM_WIDTH)::type_id::create("m_virtual_sequence", this);
+        virtual_sequence_base #(TX_ITEMS, ITEM_WIDTH) m_virtual_sequence = virtual_sequence_base #(
+            TX_ITEMS,
+            ITEM_WIDTH
+        )::type_id::create("m_virtual_sequence", this);
 
         // Raise objection
         phase.raise_objection(this);

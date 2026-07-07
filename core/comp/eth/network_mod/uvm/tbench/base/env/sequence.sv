@@ -4,9 +4,41 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, int unsigned ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(uvm_network_mod_env::virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
-    `uvm_declare_p_sequencer(uvm_network_mod_env::sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
+class virt_sequence_port #(
+    ETH_TX_HDR_WIDTH,
+    ETH_RX_HDR_WIDTH,
+    ITEM_WIDTH,
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    int unsigned ETH_PORT_CHAN,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        uvm_network_mod_env::virt_sequence_port #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ));
+    `uvm_declare_p_sequencer(
+        uvm_network_mod_env::sequencer_port #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ));
 
 
     localparam int unsigned RX_MAC_COUNT = 16;
@@ -20,8 +52,28 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
 
     protected uvm_logic_vector_array::config_sequence usr_rx_seq_cfg;
 
-    uvm_network_mod_env::sequence_mac_check_configuration    #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequence_mac_check_configuration;
-    uvm_network_mod_env::sequence_frame_length_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequence_frame_length_configuration;
+    uvm_network_mod_env::sequence_mac_check_configuration    #(
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH,
+        ITEM_WIDTH,
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ETH_PORT_CHAN,
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) m_sequence_mac_check_configuration;
+    uvm_network_mod_env::sequence_frame_length_configuration #(
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH,
+        ITEM_WIDTH,
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ETH_PORT_CHAN,
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) m_sequence_frame_length_configuration;
 
     rand int unsigned transactions_approx;
     constraint c_transactions {
@@ -80,6 +132,7 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
         // USR SEQURENCE RX
         seq_sync_usr_rx = uvm_common::sequences_cfg_sync#(2)::type_id::create("seq_sync_usr_rx", m_sequencer);
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.usr_rx_data, "", "state", seq_sync_usr_rx.cfg[0]);
+        // verilog_lint: waive line-length
         lib_usr_rx_data = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("lib_usr_rx_data", p_sequencer.usr_rx_data);
         lib_usr_rx_data.max_random_count = 20;
         lib_usr_rx_data.min_random_count = 10;
@@ -87,13 +140,34 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
 
 
         uvm_config_db#(uvm_common::sequence_cfg)::set(p_sequencer.usr_rx_meta, "", "state", seq_sync_usr_rx.cfg[1]);
+        // verilog_lint: waive line-length
         lib_usr_rx_meta = uvm_logic_vector::sequence_simple#(ETH_TX_HDR_WIDTH)::type_id::create("lib_usr_rx_meta" , p_sequencer.usr_rx_meta);
         //lib_usr_rx_meta.config_set();
 
         // MAC Check configuration
-        m_sequence_mac_check_configuration = uvm_network_mod_env::sequence_mac_check_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequence_mac_check_configuration");
+        m_sequence_mac_check_configuration = uvm_network_mod_env::sequence_mac_check_configuration #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )::type_id::create("m_sequence_mac_check_configuration");
         // Frame lengths configuration
-        m_sequence_frame_length_configuration = uvm_network_mod_env::sequence_frame_length_configuration #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequence_frame_length_configuration");
+        m_sequence_frame_length_configuration = uvm_network_mod_env::sequence_frame_length_configuration #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )::type_id::create("m_sequence_frame_length_configuration");
 
         usr_rx_data  = lib_usr_rx_data;
         usr_rx_meta  = lib_usr_rx_meta;
@@ -101,9 +175,44 @@ class virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGION
 endclass
 
 
-class virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, int unsigned ETH_PORT_CHAN[ETH_PORTS], MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(uvm_network_mod_env::virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
-    `uvm_declare_p_sequencer(uvm_network_mod_env::sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
+class virt_sequence_simple #(
+    ETH_PORTS,
+    ETH_TX_HDR_WIDTH,
+    ETH_RX_HDR_WIDTH,
+    ITEM_WIDTH,
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    int unsigned ETH_PORT_CHAN[ETH_PORTS],
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        uvm_network_mod_env::virt_sequence_simple #(
+            ETH_PORTS,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ));
+    `uvm_declare_p_sequencer(
+        uvm_network_mod_env::sequencer #(
+            ETH_PORTS,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ));
 
     uvm_sequence#(uvm_reset::sequence_item) usr_rst;
     uvm_sequence#(uvm_reset::sequence_item) mi_rst;
@@ -111,7 +220,17 @@ class virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_
     uvm_sequence#(uvm_reset::sequence_item) mi_pmd_rst;
 
     //uvm_pkg::
-    virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) port[ETH_PORTS];
+    virt_sequence_port#(
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH,
+        ITEM_WIDTH,
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ETH_PORT_CHAN[0],
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) port[ETH_PORTS];
     protected uvm_logic_vector_array::config_sequence usr_rx_seq_cfg[ETH_PORTS];
     //MI SEQUENCE
 
@@ -145,7 +264,9 @@ class virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_
         mi_pmd_rst = uvm_reset::sequence_start::type_id::create("mi_pmd_rst", p_sequencer.mi_pmd_rst);
 
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
-            port[it] = virt_sequence_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create($sformatf("port_%0d", it), p_sequencer.port[it]);
+            port[it] = virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE,
+                                           BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create(
+                $sformatf("port_%0d", it), p_sequencer.port[it]);
             port[it].packet_size_set(usr_rx_seq_cfg[it]);
         end
 

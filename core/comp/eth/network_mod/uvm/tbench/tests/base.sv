@@ -21,11 +21,15 @@ class base #(
     int unsigned MI_DATA_WIDTH    ,
     int unsigned MI_ADDR_WIDTH)
 extends uvm_test;
-    typedef uvm_component_registry #(test::base #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH), "test::base") type_id;
+    typedef uvm_component_registry #(
+        test::base #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH,
+                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH), "test::base") type_id;
 
     localparam time TIMEOUT_MAX = 200us;
 
-    uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
+    uvm_network_mod_env::env
+        #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS,
+          REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -42,7 +46,8 @@ extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH,
+        m_env = uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH,
+                                          ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH,
                             MI_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
@@ -50,9 +55,22 @@ extends uvm_test;
     // Create environment and Run sequences o their sequencers
     virtual task run_phase(uvm_phase phase);
         time time_start;
-        uvm_network_mod_env::virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) seq;
+        uvm_network_mod_env::virt_sequence_simple#(
+            ETH_PORTS,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ) seq;
 
-        seq = uvm_network_mod_env::virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("seq", m_env.m_sequencer);
+        seq = uvm_network_mod_env::virt_sequence_simple
+            #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE,
+              ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("seq", m_env.m_sequencer);
         seq.packet_size_set(test::PACKET_SIZE_MIN, test::PACKET_SIZE_MAX);
         assert(seq.randomize());
 

@@ -26,13 +26,20 @@ module dut (
     logic [RX_MFB_REGIONS-1 : 0]            mvb_rx_mod_eof_type;// [IN_STREAMS-1:0];
 
     for (genvar rr = 0; rr < RX_MFB_REGIONS; rr++) begin : gen_rr
+        // verilog_lint: waive line-length
         assign mvb_rx_usermeta     [(rr+1)*USERMETA_W -1 -: USERMETA_W] = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W-1 -: USERMETA_W];
         assign mvb_rx_discard      [rr]                                 = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W];
+        // verilog_lint: waive line-length
         assign mvb_rx_mod_sof_size [(rr+1)*MOD_W      -1 -: MOD_W]      = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W+MOD_W+1-1 -: MOD_W];
+        // verilog_lint: waive line-length
         assign mvb_rx_mod_sof_en   [rr]                                 = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W+MOD_W+1];
+        // verilog_lint: waive line-length
         assign mvb_rx_mod_sof_type [rr]                                 = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W+MOD_W+2];
+        // verilog_lint: waive line-length
         assign mvb_rx_mod_eof_size [(rr+1)*MOD_W      -1 -: MOD_W]      = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W+MOD_W+3+MOD_W-1 -: MOD_W];
+        // verilog_lint: waive line-length
         assign mvb_rx_mod_eof_en   [rr]                                 = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W+MOD_W+3+MOD_W];
+        // verilog_lint: waive line-length
         assign mvb_rx_mod_eof_type [rr]                                 = mvb_rx.DATA[(rr*RX_MVB_ITEM_W)+USERMETA_W+MOD_W+3+MOD_W+1];
     end
 

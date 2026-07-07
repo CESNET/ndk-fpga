@@ -5,7 +5,13 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This is mfb rx agent, which declares basic components.
-class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_agent;
+class agent_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_agent;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
@@ -45,14 +51,44 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BL
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
-            m_driver    = driver_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_driver", this);
+            m_sequencer = sequencer #(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create("m_sequencer", this);
+            m_driver    = driver_rx #(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create("m_driver", this);
         end
 
         // Create monitor
-        m_monitor        = monitor        #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_monitor", this);
-        m_stat           = statistic      #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_stat", this);
-        m_coverage_model = coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_coverage_model", this);
+        m_monitor        = monitor        #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_monitor", this);
+        m_stat           = statistic      #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_stat", this);
+        m_coverage_model = coverage_model #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_coverage_model", this);
     endfunction
 
     virtual function uvm_active_passive_enum get_is_active();
@@ -67,7 +103,9 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BL
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             string str;
            str = $sformatf("Cannot find 'mfb_if' with name %s, probably not set!", m_config.interface_name);
             `uvm_fatal(this.get_full_name(), str);
@@ -89,7 +127,13 @@ class agent_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BL
 endclass
 
 // This is mfb tx agent, which declares basic components.
-class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_agent;
+class agent_tx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_agent;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
@@ -129,14 +173,44 @@ class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BL
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
-            m_driver    = driver_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_driver", this);
+            m_sequencer = sequencer #(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create("m_sequencer", this);
+            m_driver    = driver_tx #(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create("m_driver", this);
         end
 
         // Create monitor
-        m_monitor        = monitor        #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_monitor", this);
-        m_stat           = statistic      #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_stat", this);
-        m_coverage_model = coverage_model #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_coverage_model", this);
+        m_monitor        = monitor        #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_monitor", this);
+        m_stat           = statistic      #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_stat", this);
+        m_coverage_model = coverage_model #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_coverage_model", this);
     endfunction
 
     virtual function uvm_active_passive_enum get_is_active();
@@ -151,8 +225,11 @@ class agent_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BL
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
-            `uvm_fatal(this.get_full_name(), {"Cannot find 'mfb_if' '", m_config.interface_name, "', probably not set!"});
+        if (!uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
+            `uvm_fatal(this.get_full_name(), {"Cannot find 'mfb_if' '", m_config.interface_name, "', probably not set!"
+                       });
         end
 
         // Connect driver if the agent is active

@@ -63,7 +63,17 @@ class meter #(int unsigned ITEM_WIDTH) extends uvm_subscriber#(sequence_item #(I
                 msg = $sformatf("\nMeter information time [%0dns, %0dns]\n", start_time/1ns, stop_time/1ns);
 
                 speed.count(min, max, avg, std_dev);
-                msg = {msg, $sformatf("\tspeed :\n\t\tMIN : %0.2f MT/s \n\t\tMAX : %0.2f MT/s\n\t\tAVG STD_DEV : %0.2f MT/s %0.2f MT/s\n", min, max, avg, std_dev)};
+                msg = {
+                    msg,
+                    $sformatf(
+                        "\tspeed :\n\t\tMIN : %0.2f MT/s \n\t\tMAX : %0.2f MT/s\n\t\tAVG STD_DEV : %0.2f MT/s %0.2f MT/s\n"
+                            ,
+                        min,
+                        max,
+                        avg,
+                        std_dev
+                    )
+                };
 
                 `uvm_info(this.get_full_name(), msg, UVM_LOW);
                 speed.reset();
@@ -90,7 +100,16 @@ class meter #(int unsigned ITEM_WIDTH) extends uvm_subscriber#(sequence_item #(I
         speed.next_val((real'(words)/(diff/1000ms))/1000000.0);
         msg = $sformatf("\nMeter information time [%0dns, %0dns]\n", start_time/1ns, stop_time/1ns);
         speed.count(min, max, avg, std_dev);
-        msg = {msg, $sformatf("\tspeed :\n\t\tMIN : %0.2f MT/s \n\t\tMAX : %0.2f MT/s\n\t\tAVG STD_DEV : %0.2f MT/s %0.2f MT/s\n", min, max, avg, std_dev)};
+        msg = {
+            msg,
+            $sformatf(
+                "\tspeed :\n\t\tMIN : %0.2f MT/s \n\t\tMAX : %0.2f MT/s\n\t\tAVG STD_DEV : %0.2f MT/s %0.2f MT/s\n",
+                min,
+                max,
+                avg,
+                std_dev
+            )
+        };
         `uvm_info(this.get_full_name(), msg, UVM_LOW);
     endfunction
 endclass

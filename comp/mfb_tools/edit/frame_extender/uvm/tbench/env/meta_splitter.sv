@@ -3,7 +3,10 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class meta_splitter #(int unsigned USERMETA_WIDTH, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH));
+class meta_splitter #(
+    int unsigned USERMETA_WIDTH,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH));
     `uvm_component_param_utils(uvm_mfb_frame_extender::meta_splitter #(USERMETA_WIDTH, RX_MVB_ITEM_WIDTH))
 
     // Outputs
@@ -18,7 +21,9 @@ class meta_splitter #(int unsigned USERMETA_WIDTH, int unsigned RX_MVB_ITEM_WIDT
     endfunction
 
     function void write(uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH) t);
+        // verilog_lint: waive line-length
         uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH-USERMETA_WIDTH) out_extension_item = uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH-USERMETA_WIDTH)::type_id::create("out_extension_item");
+        // verilog_lint: waive line-length
         uvm_logic_vector::sequence_item #(USERMETA_WIDTH)                   out_meta_item      = uvm_logic_vector::sequence_item #(USERMETA_WIDTH)                  ::type_id::create("out_meta_item");
 
         out_extension_item.data = t.data[RX_MVB_ITEM_WIDTH-USERMETA_WIDTH-1 -: RX_MVB_ITEM_WIDTH-USERMETA_WIDTH];

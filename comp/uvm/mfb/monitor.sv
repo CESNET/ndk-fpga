@@ -5,7 +5,13 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mfb monitor
-class monitor #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_monitor;
+class monitor #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_monitor;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
@@ -54,6 +60,7 @@ class monitor #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLO
                 si.sof[it]      = vif.monitor_cb.SOF[it];
                 si.eof[it]      = vif.monitor_cb.EOF[it];
 
+                // verilog_lint: waive line-length
                 si.data[it]   = vif.monitor_cb.DATA[(it+1)*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH -1 -: REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH];
                 if (META_WIDTH > 0) begin
                     si.meta[it]    = vif.monitor_cb.META[(it+1)*META_WIDTH                        -1 -: META_WIDTH];
@@ -61,12 +68,13 @@ class monitor #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLO
                     si.meta[it]    = 'x;
                 end
                 if ($clog2(REGION_SIZE) > 0) begin
-                    si.sof_pos[it] = vif.monitor_cb.SOF_POS[(it+1)*$clog2(REGION_SIZE)            -1 -: $clog2(REGION_SIZE)];
+                    si.sof_pos[it] = vif.monitor_cb.SOF_POS[(it+1)*$clog2(REGION_SIZE)-1-:$clog2(REGION_SIZE)];
                 end else begin
                     si.sof_pos[it] = 'x;
                 end
                 if ($clog2(REGION_SIZE*BLOCK_SIZE) > 0) begin
-                    si.eof_pos[it] = vif.monitor_cb.EOF_POS[(it+1)*$clog2(REGION_SIZE*BLOCK_SIZE) -1 -: $clog2(REGION_SIZE*BLOCK_SIZE)];
+                    si.eof_pos[it] =
+                        vif.monitor_cb.EOF_POS[(it+1)*$clog2(REGION_SIZE*BLOCK_SIZE)-1-:$clog2(REGION_SIZE*BLOCK_SIZE)];
                 end else begin
                     si.eof_pos[it] = 'x;
                 end

@@ -14,7 +14,8 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_mvb_merge_streams_ordered::env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_env", this);
+        m_env =
+            uvm_mvb_merge_streams_ordered::env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_env", this);
     endfunction
 
 

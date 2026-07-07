@@ -63,7 +63,11 @@ class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
             compared++;
             if (tr_model.compare(tr_dut) == 0) begin
                 errors++;
-                msg = $sformatf("\nTransactions doesnt match\n\tMODEL Transaction\n%s\n\n\tDUT Transaction\n%s", tr_model.convert2string(), tr_dut.convert2string());
+                msg = $sformatf(
+                    "\nTransactions doesnt match\n\tMODEL Transaction\n%s\n\n\tDUT Transaction\n%s",
+                    tr_model.convert2string(),
+                    tr_dut.convert2string()
+                );
                 `uvm_error(this.get_full_name(), msg);
             end
         end
@@ -77,9 +81,18 @@ class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
         msg = {msg, $sformatf("Errors : %d \n",  errors)};
 
         if (errors == 0 && this.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
 
     endfunction

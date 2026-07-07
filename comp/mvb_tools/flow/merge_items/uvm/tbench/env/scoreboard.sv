@@ -52,15 +52,24 @@ class scoreboard #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH) extends uvm_sc
     endfunction
 
     function void build_phase(uvm_phase phase);
+        // verilog_lint: waive line-length
         cmp  = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(TX_ITEM_WIDTH)) ::type_id::create("cmp",  this);
+        // verilog_lint: waive line-length
         cmp0 = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(RX0_ITEM_WIDTH))::type_id::create("cmp0", this);
+        // verilog_lint: waive line-length
         cmp1 = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(RX1_ITEM_WIDTH))::type_id::create("cmp1", this);
         cmp .model_tr_timeout_set(200us);
         cmp0.model_tr_timeout_set(200us);
         cmp1.model_tr_timeout_set(200us);
 
-        m_model       = model               #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH)::type_id::create("m_model",       this);
+        m_model       = model               #(
+            RX0_ITEM_WIDTH,
+            RX1_ITEM_WIDTH,
+            TX_ITEM_WIDTH
+        )::type_id::create("m_model",       this);
+        // verilog_lint: waive line-length
         m_model_pipe0 = uvm_pipe::model #(RX0_ITEM_WIDTH)                               ::type_id::create("m_model_pipe0", this);
+        // verilog_lint: waive line-length
         m_model_pipe1 = uvm_pipe::model #(RX1_ITEM_WIDTH)                               ::type_id::create("m_model_pipe1", this);
 
     endfunction
@@ -88,12 +97,26 @@ class scoreboard #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH) extends uvm_sc
     function void report_phase(uvm_phase phase);
         string msg = "\n";
 
-        msg = {msg, $sformatf("\n\tDATA STUCK INSIDE\t\nRX0 : %d, RX1 : %d",  m_model.model_mvb_in0.used(), m_model.model_mvb_in1.used())};
+        msg = {
+            msg,
+            $sformatf(
+                "\n\tDATA STUCK INSIDE\t\nRX0 : %d, RX1 : %d",
+                m_model.model_mvb_in0.used(),
+                m_model.model_mvb_in1.used()
+            )
+        };
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

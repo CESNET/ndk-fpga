@@ -16,7 +16,8 @@ class sequence_down #(
 );
     `ndk_object_param_utils(
         uvm_pcie_avst::sequence_down#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING),
-        $sformatf("uvm_pcie_avst::sequence_down#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)
+                            $sformatf("uvm_pcie_avst::sequence_down #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                                      META_WIDTH, READY_LATENCY, STRADDLING)
     );
     `uvm_declare_p_sequencer(uvm_avst::sequencer #(REGIONS, REGION_SIZE, 32, META_WIDTH));
 
@@ -225,9 +226,11 @@ class sequence_lib_down #(
 
   `ndk_object_param_utils(
         uvm_pcie_avst::sequence_lib_down#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING),
-        $sformatf("uvm_pcie_avst::sequence_lib_down#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)
+        $sformatf("uvm_pcie_avst::sequence_lib_down #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, META_WIDTH,
+                  READY_LATENCY, STRADDLING)
     )
-  `uvm_sequence_library_utils(uvm_pcie_avst::sequence_lib_down#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING))
+    `uvm_sequence_library_utils(
+        uvm_pcie_avst::sequence_lib_down #(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -238,7 +241,8 @@ class sequence_lib_down #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_pcie_avst::sequence_down #(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)::get_type());
+        this.add_sequence(
+            uvm_pcie_avst::sequence_down #(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)::get_type());
     endfunction
 endclass
 

@@ -63,7 +63,9 @@ class statistics extends uvm_subscriber #(sequence_item);
                 else begin
                     assert(t.eop[i] !== 1'b1)
                     else begin
-                       `uvm_error(this.get_full_name(), "\n\tThe EOP was set before a new packet transfer started. A SOP wasn't set before this EOP")
+                        `uvm_error(this.get_full_name(),
+                                   "\n\tThe EOP was set before a new packet transfer started. A SOP wasn't set before this EOP"
+                                       )
                     end
                 end
             end
@@ -78,7 +80,9 @@ class statistics extends uvm_subscriber #(sequence_item);
 
                 assert(t.sop[i] !== 1'b1)
                 else begin
-                    `uvm_error(this.get_full_name(), "\n\tThe SOP was before the last packet transfer correctly ended. A EOP wasn't set at the end of the packet transfer")
+                    `uvm_error(this.get_full_name(),
+                               "\n\tThe SOP was before the last packet transfer correctly ended. A EOP wasn't set at the end of the packet transfer"
+                                   )
                 end
             end
         end
@@ -112,7 +116,9 @@ class statistics extends uvm_subscriber #(sequence_item);
                 end_time   = step_end_time;
 
                 stats.count(min, max, avg, std_dev);
-                msg = $sformatf("\n\tData Speed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s",
+                msg = $sformatf(
+                    "\n\tData Speed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s"
+                        ,
                         start_time/1ns, end_time/1ns, avg, std_dev, min, max);
 
                 `uvm_info(this.get_full_name(), msg, UVM_LOW);

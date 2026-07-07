@@ -5,7 +5,8 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This low level sequence define bus functionality
-function automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
+function automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(
+    uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
     automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] ret = '0;
 
     if(intel) begin
@@ -37,7 +38,9 @@ function automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(
         // REQ ID
         ret[64-1 : 48] = cq_header_req.req_id;
         if (|cq_header_req.addr[64-1 : 32]) begin
-            ret[128-1 : 64] = {cq_header_req.addr[32-1 : 2], cq_header_req.addr[2-1 : 0], cq_header_req.addr[64-1 : 32]};
+            ret[128-1 : 64] = {
+                cq_header_req.addr[32-1 : 2], cq_header_req.addr[2-1 : 0], cq_header_req.addr[64-1 : 32]
+            };
         end else begin
             ret[128-1 : 64] = {32'h0000, cq_header_req.addr[2-1 : 0], cq_header_req.addr[32-1 : 2]};
         end
@@ -70,7 +73,8 @@ function automatic logic [sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_hdr(
 endfunction
 
 
-function automatic logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_meta(uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
+function automatic logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] gen_meta(
+    uvm_pcie_hdr::sequence_item cq_header_req, logic intel);
     automatic logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] ret = '0;
     if(intel) begin
         ret[32-1 : 0]  = 6'd26;
@@ -91,7 +95,11 @@ function automatic logic [sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-sv_pcie_meta_pac
 endfunction
 
 
-class logic_vector_array_sequence#(ITEM_WIDTH, string DEVICE, string ENDPOINT_TYPE) extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
+class logic_vector_array_sequence #(
+    ITEM_WIDTH,
+    string DEVICE,
+    string ENDPOINT_TYPE
+) extends uvm_sequence #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `uvm_object_param_utils(uvm_pcie_cq::logic_vector_array_sequence#(ITEM_WIDTH, DEVICE, ENDPOINT_TYPE))
 
     localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
@@ -164,7 +172,11 @@ endclass
 
 
 
-class logic_vector_sequence#(META_WIDTH, string DEVICE, string ENDPOINT_TYPE) extends uvm_sequence #(uvm_logic_vector::sequence_item#(META_WIDTH));
+class logic_vector_sequence #(
+    META_WIDTH,
+    string DEVICE,
+    string ENDPOINT_TYPE
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #(META_WIDTH));
     `uvm_object_param_utils(uvm_pcie_cq::logic_vector_sequence#(META_WIDTH, DEVICE, ENDPOINT_TYPE))
 
     localparam IS_INTEL_DEV    = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
@@ -196,7 +208,8 @@ class logic_vector_sequence#(META_WIDTH, string DEVICE, string ENDPOINT_TYPE) ex
                 // Add PCIe HDR to metadata
                 req.data[sv_pcie_meta_pack::PCIE_META_REQ_HDR_W-1 : 0] = gen_hdr(cq_header_req, IS_INTEL_DEV);
             end
-            req.data[sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-1 : sv_pcie_meta_pack::PCIE_META_REQ_HDR_W] = gen_meta(cq_header_req, IS_INTEL_DEV);
+            req.data[sv_pcie_meta_pack::PCIE_CQ_META_WIDTH-1 : sv_pcie_meta_pack::PCIE_META_REQ_HDR_W] =
+                gen_meta(cq_header_req, IS_INTEL_DEV);
 
             finish_item(req);
         end

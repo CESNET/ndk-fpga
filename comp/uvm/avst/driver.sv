@@ -5,7 +5,12 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Driver of mfb rx interface
-class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+class driver_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
 
     // ------------------------------------------------------------------------
     // Register component to database
@@ -70,7 +75,12 @@ class driver_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned I
 endclass
 
 // Driver of mfb tx interface
-class driver_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+class driver_tx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_driver #(sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
     `ndk_component_param_utils(
         uvm_avst::driver_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH),
         $sformatf("uvm_avst::driver_tx#(%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)

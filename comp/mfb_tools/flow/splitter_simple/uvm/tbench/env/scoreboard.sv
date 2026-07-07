@@ -5,7 +5,11 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class comparer_data #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_ordered#(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH), uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
+class comparer_data #(
+    ITEM_WIDTH,
+    META_WIDTH
+) extends uvm_common::comparer_base_ordered
+    #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH), uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `uvm_component_param_utils(uvm_splitter_simple::comparer_data #(ITEM_WIDTH, META_WIDTH))
 
     function new(string name, uvm_component parent = null);
@@ -18,7 +22,11 @@ class comparer_data #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_
 
 endclass
 
-class comparer_meta #(ITEM_WIDTH, META_WIDTH) extends uvm_common::comparer_base_ordered#(uvm_logic_vector::sequence_item #(META_WIDTH), uvm_logic_vector::sequence_item #(META_WIDTH));
+class comparer_meta #(
+    ITEM_WIDTH,
+    META_WIDTH
+) extends uvm_common::comparer_base_ordered
+    #(uvm_logic_vector::sequence_item #(META_WIDTH), uvm_logic_vector::sequence_item #(META_WIDTH));
     `uvm_component_param_utils(uvm_splitter_simple::comparer_meta #(ITEM_WIDTH, META_WIDTH))
 
     function new(string name, uvm_component parent = null);
@@ -73,8 +81,14 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_scoreboard;
             string it_string;
 
             it_string.itoa(it);
-            compare_data[it] = comparer_data #(ITEM_WIDTH, META_WIDTH)::type_id::create({"compare_data_", it_string}, this);
-            compare_meta[it] = comparer_meta #(ITEM_WIDTH, META_WIDTH)::type_id::create({"compare_meta_", it_string}, this);
+            compare_data[it] = comparer_data #(
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create({"compare_data_", it_string}, this);
+            compare_meta[it] = comparer_meta #(
+                ITEM_WIDTH,
+                META_WIDTH
+            )::type_id::create({"compare_meta_", it_string}, this);
         end
 
     endfunction
@@ -129,9 +143,16 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_scoreboard;
         string msg = "";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 

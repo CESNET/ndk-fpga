@@ -41,8 +41,11 @@ module testbench;
     logic [CQ_MFB_REGIONS*PREFIX_WIDTH   -1 : 0] down_prefix[PCIE_CONS]   ;
     logic [CQ_MFB_REGIONS*BAR_RANGE_WIDTH-1 : 0] down_bar_range[PCIE_CONS];
 
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*CC_MFB_REGIONS*HDR_WIDTH                                                                 -1: 0] up_hdr[PCIE_CONS];
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*CC_MFB_REGIONS*PREFIX_WIDTH                                                              -1: 0] up_prefix[PCIE_CONS];
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*CC_MFB_REGIONS                                                                           -1: 0] up_error[PCIE_CONS];
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -120,13 +123,16 @@ module testbench;
     //                                                                                                        {s_rx_eof_orig_reg, s_rx_force_drop_reg}, PCIE_USER_CLK);
     generate
         if (PCIE_ENDPOINTS == 1) begin : gen_PCIE_ENDPOINTS_1
-            bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                             .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                             .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                             .CLK         (CLK)
                         );
         end else begin : gen_line_74
-            $error("\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n");
+            $error(
+                "\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n"
+            );
         end
     endgenerate
 
@@ -229,8 +235,10 @@ module testbench;
         automatic virtual mi_if #(
             .DATA_WIDTH (32),
             .ADDR_WIDTH (32)
-        )                                                                                   v_mi_config[PCIE_ENDPOINTS]       = config_mi;
+        ) v_mi_config[PCIE_ENDPOINTS]       = config_mi;
+        // verilog_lint: waive line-length
         automatic virtual reset_if                                                                                          v_pcie_user_reset[PCIE_ENDPOINTS] = pcie_user_reset;
+        // verilog_lint: waive line-length
         automatic virtual reset_if                                                                                          v_pcie_sysrst_n[PCIE_CONS]        = pcie_sysrst_n;
 
         for (int unsigned pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
@@ -240,7 +248,8 @@ module testbench;
                 .DATA_WIDTH (32),
                 .ADDR_WIDTH (32)
             ))::set(null, "", {"vif_mi_",i_string}, v_mi_config[pcie_e]);
-            uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_",i_string}, v_pcie_user_reset[pcie_e]);
+            uvm_config_db #(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_", i_string},
+                                                  v_pcie_user_reset[pcie_e]);
             uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_sysrst_n_",i_string}, v_pcie_sysrst_n[pcie_e]);
 
             // AXI
@@ -363,31 +372,53 @@ module testbench;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_phy_link_status[pcie_e][0]  = 1'b1;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_phy_link_status[pcie_e][1]  = 1'b1;
 
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_DATA  = cq_axi[pcie_e].TDATA;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_USER  = cq_axi[pcie_e].TUSER;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_LAST  = cq_axi[pcie_e].TLAST;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_KEEP  = cq_axi[pcie_e].TKEEP;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_VALID = cq_axi[pcie_e].TVALID;
+            // verilog_lint: waive line-length
             assign cq_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_READY;
 
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_DATA  = rc_axi[pcie_e].TDATA;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_USER  = rc_axi[pcie_e].TUSER;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_LAST  = rc_axi[pcie_e].TLAST;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_KEEP  = rc_axi[pcie_e].TKEEP;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_VALID = rc_axi[pcie_e].TVALID;
+            // verilog_lint: waive line-length
             assign rc_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_READY;
 
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_DATA;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_USER;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_LAST;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_KEEP;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_VALID;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cc_axi_ready[pcie_e][0] = cc_axi[pcie_e].TREADY;
 
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_DATA;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_USER;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_LAST;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_KEEP;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_VALID;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_rq_axi_ready[pcie_e][0] = rq_axi[pcie_e].TREADY;
 

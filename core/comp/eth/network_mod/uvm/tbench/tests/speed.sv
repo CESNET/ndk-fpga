@@ -20,12 +20,18 @@ class speed #(
 
     int unsigned MI_DATA_WIDTH,
     int unsigned MI_ADDR_WIDTH
-) extends base #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH);
-    typedef uvm_component_registry#(test::speed #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH), "test::speed") type_id;
+) extends base #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS,
+                 REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH);
+    typedef uvm_component_registry
+        #(test::speed #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH,
+                       REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH), "test::speed")
+        type_id;
 
     localparam time TIMEOUT_MAX = 200us;
 
-    uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
+    uvm_network_mod_env::env
+        #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS,
+          REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -45,19 +51,23 @@ class speed #(
         // USR
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
             uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH
-                    )::type_id::set_inst_override(uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH
+                )::type_id::set_inst_override(
+                uvm_logic_vector_array_mfb::sequence_lib_rx_speed
+                    #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH
                 )::get_type(),{this.get_full_name(), $sformatf(".m_env.m_usr_rx_%0d.*", it)});
 
-            uvm_mfb::sequence_lib_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)
-                    ::type_id::set_inst_override(uvm_mfb::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)
+            uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::set_inst_override(
+                uvm_mfb::sequence_lib_tx_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)
                 ::get_type(),{this.get_full_name(), $sformatf(".m_env.m_usr_tx_data_%0d.*", it)});
 
-            uvm_mvb::sequence_lib_tx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::set_inst_override(uvm_mvb::sequence_lib_tx_speed#(REGIONS, ETH_RX_HDR_WIDTH)
+            uvm_mvb::sequence_lib_tx #(REGIONS, ETH_RX_HDR_WIDTH)::type_id::set_inst_override(
+                uvm_mvb::sequence_lib_tx_speed #(REGIONS, ETH_RX_HDR_WIDTH)
                 ::get_type(),{this.get_full_name(), $sformatf(".m_env.m_usr_tx_hdr_%0d.*", it)});
         end
 
         // ETH
-        m_env = uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH,
+        m_env = uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH,
+                                          ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH,
                             MI_ADDR_WIDTH)::type_id::create("m_env", this);
         m_env.eth_full_speed_set();
     endfunction
@@ -66,9 +76,22 @@ class speed #(
     // Create environment and Run sequences o their sequencers
     virtual task run_phase(uvm_phase phase);
         time time_start;
-        uvm_network_mod_env::virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) seq;
+        uvm_network_mod_env::virt_sequence_simple#(
+            ETH_PORTS,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ) seq;
 
-        seq = uvm_network_mod_env::virt_sequence_simple#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("seq", m_env.m_sequencer);
+        seq = uvm_network_mod_env::virt_sequence_simple
+            #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE,
+              ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("seq", m_env.m_sequencer);
         seq.packet_size_set(test::PACKET_SIZE_MIN, test::PACKET_SIZE_MAX);
         assert(seq.randomize());
 

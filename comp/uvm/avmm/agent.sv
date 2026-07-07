@@ -55,8 +55,16 @@ class agent_slave #(
 
         // Create sequencer and driver if the agent is active
         if(get_is_active() == UVM_ACTIVE) begin
-            m_sequencer = sequencer_slave #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::type_id::create("m_sequencer", this);
-            m_driver    = driver_slave    #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::type_id::create("m_driver",    this);
+            m_sequencer = sequencer_slave #(
+                ADDRESS_WIDTH,
+                DATA_WIDTH,
+                BURST_WIDTH
+            )::type_id::create("m_sequencer", this);
+            m_driver    = driver_slave    #(
+                ADDRESS_WIDTH,
+                DATA_WIDTH,
+                BURST_WIDTH
+            )::type_id::create("m_driver",    this);
         end
 
         // Create monitor
@@ -74,9 +82,12 @@ class agent_slave #(
         super.connect_phase(phase);
 
         // Get interface instance
-        assert(uvm_config_db #(virtual avmm_if #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))::get(null, "", m_config.interface_name, vif))
+        assert (uvm_config_db #(virtual avmm_if #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))::get(
+            null, "", m_config.interface_name, vif
+        ))
         else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find '%s' interface inside uvm_config_db, probably not set!", m_config.interface_name))
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find '%s' interface inside uvm_config_db, probably not set!", m_config.interface_name))
         end
 
         // Connect driver if the agent is active
@@ -161,10 +172,26 @@ class agent_master #(
             // Set configuration object for the memory model
             uvm_config_db #(config_item)::set(this, "m_memory_model", "m_config", m_config);
 
-            m_sequencer          = sequencer_master   #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::type_id::create("m_sequencer",          this);
-            m_driver             = driver_master      #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::type_id::create("m_driver",             this);
-            m_memory_model       = memory_model       #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::type_id::create("m_memory_model",       this);
-            m_request_subscriber = request_subscriber #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)::type_id::create("m_request_subscriber", this);
+            m_sequencer          = sequencer_master   #(
+                ADDRESS_WIDTH,
+                DATA_WIDTH,
+                BURST_WIDTH
+            )::type_id::create("m_sequencer",          this);
+            m_driver             = driver_master      #(
+                ADDRESS_WIDTH,
+                DATA_WIDTH,
+                BURST_WIDTH
+            )::type_id::create("m_driver",             this);
+            m_memory_model       = memory_model       #(
+                ADDRESS_WIDTH,
+                DATA_WIDTH,
+                BURST_WIDTH
+            )::type_id::create("m_memory_model",       this);
+            m_request_subscriber = request_subscriber #(
+                ADDRESS_WIDTH,
+                DATA_WIDTH,
+                BURST_WIDTH
+            )::type_id::create("m_request_subscriber", this);
         end
 
         // Creates monitor
@@ -181,9 +208,12 @@ class agent_master #(
 
         super.connect_phase(phase);
 
-        assert(uvm_config_db #(virtual avmm_if #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))::get(null, "", m_config.interface_name, vif))
+        assert (uvm_config_db #(virtual avmm_if #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH))::get(
+            null, "", m_config.interface_name, vif
+        ))
         else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find '%s' interface inside uvm_config_db, probably not set!", m_config.interface_name))
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find '%s' interface inside uvm_config_db, probably not set!", m_config.interface_name))
         end
 
         // Connect monitor

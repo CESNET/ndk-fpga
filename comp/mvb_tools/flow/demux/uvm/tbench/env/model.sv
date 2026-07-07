@@ -12,6 +12,7 @@ class model #(ITEM_WIDTH, TX_PORTS) extends uvm_component;
     // Model input
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(ITEM_WIDTH + $clog2(TX_PORTS)))  rx_mvb_analysis_fifo;
     // Model output
+    // verilog_lint: waive line-length
     uvm_analysis_port     #(uvm_logic_vector::sequence_item #(ITEM_WIDTH))                     tx_mvb_analysis_imp [TX_PORTS - 1 : 0];
 
     function new(string name = "model", uvm_component parent = null);

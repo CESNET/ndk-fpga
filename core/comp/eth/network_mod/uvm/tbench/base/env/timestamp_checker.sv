@@ -53,7 +53,10 @@ class timestamp_checker #(int unsigned DUT_ITEM_WIDTH) extends uvm_component;
 
             // Check that the timestamp value does not decrease over time
             if (dut_timestamp < previous_dut_timestamp) begin
-                `uvm_error(get_full_name(), $sformatf("\n\tThe timestamp value must not decrease over time. Current: 0x%0h, Previous: 0x%0h", dut_timestamp, previous_dut_timestamp))
+                `uvm_error(get_full_name(),
+                           $sformatf(
+                               "\n\tThe timestamp value must not decrease over time. Current: 0x%0h, Previous: 0x%0h",
+                               dut_timestamp, previous_dut_timestamp))
             end
 
             // The timestamp obtained from the DUT may be duplicated
@@ -68,7 +71,9 @@ class timestamp_checker #(int unsigned DUT_ITEM_WIDTH) extends uvm_component;
                 waiting_for_model_item = 0;
 
                 if (dut_timestamp < model_item.data) begin
-                    `uvm_error(get_full_name(), $sformatf("\n\tThe timestamp (#%0d) obtained from the DUT has an unknown origin", dut_timestamp_counter));
+                    `uvm_error(
+                        get_full_name(), $sformatf(
+                        "\n\tThe timestamp (#%0d) obtained from the DUT has an unknown origin", dut_timestamp_counter));
                 end
             end while (dut_timestamp > model_item.data);
 
@@ -85,7 +90,8 @@ class timestamp_checker #(int unsigned DUT_ITEM_WIDTH) extends uvm_component;
 
         assert(this.success())
         else begin
-            `uvm_error(get_full_name(), $sformatf("\n\tThe timestamp (#%0d) obtained from the DUT has an unknown origin", dut_timestamp_counter));
+            `uvm_error(get_full_name(), $sformatf(
+                       "\n\tThe timestamp (#%0d) obtained from the DUT has an unknown origin", dut_timestamp_counter));
         end
     endfunction
 

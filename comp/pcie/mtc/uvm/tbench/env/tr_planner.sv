@@ -7,7 +7,10 @@
 class tr_planner #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
     `uvm_component_param_utils(uvm_mtc::tr_planner #(MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
-    uvm_analysis_imp#(uvm_logic_vector::sequence_item #(MI_DATA_WIDTH), tr_planner #(MI_DATA_WIDTH, MI_ADDR_WIDTH)) analysis_imp;
+    uvm_analysis_imp#(uvm_logic_vector::sequence_item #(MI_DATA_WIDTH), tr_planner #(
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    )) analysis_imp;
     uvm_logic_vector::sequence_item #(MI_DATA_WIDTH) mi_array[$];
 
     function new(string name, uvm_component parent);

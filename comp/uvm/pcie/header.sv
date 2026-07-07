@@ -113,6 +113,7 @@ class header extends uvm_common::sequence_item;
         msg = super.convert2string();
         msg = {msg, $sformatf("\nheader type %s\n", hdr_type)};
         msg = {msg, $sformatf("\tfmt : 0x%h type : 0x%h trafic_class : 0x%h\n", fmt, pcie_type[5-1:0], traffic_class)};
+        // verilog_lint: waive line-length
         msg = {msg, $sformatf("\t(id_ordering, relax_ordering, no_snoop   : 'b%b,'b%b,'b%b\n", id_based_ordering, relaxed_ordering, no_snoop)};
         msg = {msg, $sformatf("\t(th, td, ep   : 'b%b,'b%b,'b%b\n", th, td, ep)};
         msg = {msg, $sformatf("\tat : 0x%h length %0d", at, length != 0 ? length : 1024)};
@@ -180,6 +181,7 @@ class request_header extends header;
 
     function string convert2string();
         string msg = super.convert2string();
+        // verilog_lint: waive line-length
         msg = {msg, $sformatf("\trequester id : 0x%h tag : %0d(0x%h)\n\ttfbe : 'b%b lbe : 'b%b\n\taddress : 0x%h ph 0x%h", requester_id, tag, tag, fbe, lbe, {address, 2'b00}, ph)};
         msg = {msg, this.convert_data2string()};
         return msg;
@@ -249,7 +251,9 @@ class completer_header extends header;
 
     function string convert2string();
         string msg = super.convert2string();
+        // verilog_lint: waive line-length
         msg = {msg, $sformatf("\n\tcompleter id : 0x%h status : 0x%h\n\tbcm : 'b%b\n\tbyte_count : %0d", completer_id, compl_status, bcm, byte_count)};
+        // verilog_lint: waive line-length
         msg = {msg, $sformatf("\n\trequester id : 0x%h tag : %0d(0x%0h)\n\tlower_address 0x%h", requester_id, tag, tag, lower_address)};
         msg = {msg, this.convert_data2string()};
         return msg;

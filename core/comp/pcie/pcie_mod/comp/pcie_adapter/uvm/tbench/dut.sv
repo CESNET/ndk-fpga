@@ -30,10 +30,18 @@ module dut (
     localparam AXI_ITEMS     = CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
     localparam IS_INTEL_DEV  = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
 
-    localparam RC_SOF_POS_WIDTH   = (RC_MFB_REGION_SIZE == 1) ? RC_MFB_REGIONS : (RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE));
-    localparam CC_SOF_POS_WIDTH   = (CC_MFB_REGION_SIZE == 1) ? CC_MFB_REGIONS : (CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE));
-    localparam RQ_SOF_POS_WIDTH   = (RQ_MFB_REGION_SIZE == 1) ? RQ_MFB_REGIONS : (RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE));
-    localparam CQ_SOF_POS_WIDTH   = (CQ_MFB_REGION_SIZE == 1) ? CQ_MFB_REGIONS : (CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE));
+    localparam RC_SOF_POS_WIDTH = (RC_MFB_REGION_SIZE == 1) ? RC_MFB_REGIONS : (RC_MFB_REGIONS * $clog2(
+        RC_MFB_REGION_SIZE
+    ));
+    localparam CC_SOF_POS_WIDTH = (CC_MFB_REGION_SIZE == 1) ? CC_MFB_REGIONS : (CC_MFB_REGIONS * $clog2(
+        CC_MFB_REGION_SIZE
+    ));
+    localparam RQ_SOF_POS_WIDTH = (RQ_MFB_REGION_SIZE == 1) ? RQ_MFB_REGIONS : (RQ_MFB_REGIONS * $clog2(
+        RQ_MFB_REGION_SIZE
+    ));
+    localparam CQ_SOF_POS_WIDTH = (CQ_MFB_REGION_SIZE == 1) ? CQ_MFB_REGIONS : (CQ_MFB_REGIONS * $clog2(
+        CQ_MFB_REGION_SIZE
+    ));
     localparam HDR_WIDTH       = 128;
     localparam PREFIX_WIDTH    = 32;
     localparam BAR_RANGE_WIDTH = 3;
@@ -59,7 +67,9 @@ module dut (
 
 
     initial begin
-        assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 && CC_MFB_ITEM_WIDTH == 32) else begin
+        assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 &&
+                CC_MFB_ITEM_WIDTH == 32)
+        else begin
             $error("SUPPORT ONLY 32 ITEM_WIDTH\n");
             $stop();
         end

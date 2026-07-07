@@ -19,7 +19,9 @@ class sequence_data  extends uvm_sequence#(
 
 
     task body;
-        uvm_config_db#(uvm_common::fifo#(uvm_logic_vector_array::sequence_item #(32)))::get(m_sequencer, "" , "in_fifo", fifo);
+        // verilog_lint: waive line-length
+        uvm_config_db #(uvm_common::fifo #(uvm_logic_vector_array::sequence_item #(32)))::get(m_sequencer, "", "in_fifo",
+                                                                                           fifo);
 
         forever begin
             fifo.get(req);
@@ -48,6 +50,7 @@ class sequence_meta#(
     endfunction
 
     task body;
+        // verilog_lint: waive line-length
         uvm_config_db#(uvm_common::fifo#(uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))))::get(m_sequencer, "" , "in_fifo", fifo);
 
         forever begin

@@ -69,7 +69,7 @@ module testbench;
         // Database configuration //
         // ---------------------- //
 
-        uvm_config_db #(virtual reset_if)                                                                              ::set(null, "", "vif_reset", reset);
+        uvm_config_db #(virtual reset_if)::set(null, "", "vif_reset", reset);
         uvm_config_db #(virtual mfb_if #(
             .REGIONS     (REGIONS),
             .REGION_SIZE (REGION_SIZE),

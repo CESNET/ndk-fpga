@@ -89,7 +89,9 @@ class sequence_item_rq  extends uvm_common::sequence_item;
         string msg = "";
 
         msg = this.time2string();
+        // verilog_lint: waive line-length
         msg = {msg, $sformatf("\tLength : %d\n\tType : 0b%b\n\tFirstIB : %0d\n\tlastIB : %0d\n\ttag : %0d(0x%h)\n\tunitid : 0x%h\n\tglobal : 0x%h\n\tvfid : 0x%h\n\tpasid : 0x%h\n\tpasidvld : 0b%b\n\trelaxed : 0b%b\n",
+                     // verilog_lint: waive line-length
                      length != 0 ? length : 1024, type_ide, firstib, lastib, tag, tag, unitid, global_id, vfid, pasid, pasidvld, relaxed)};
         msg = {msg, convert2string_data()};
         return msg;

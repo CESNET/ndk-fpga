@@ -63,7 +63,11 @@ class scoreboard extends uvm_scoreboard;
             if (tr_model.compare(tr_dut) == 0) begin
                 string msg;
                 error++;
-                msg = $sformatf( "\n\tPacket comparison failed! \n\tModel packet:\n%s\n\tDUT packet:\n%s", tr_model.convert2string(), tr_dut.convert2string());
+                msg = $sformatf(
+                    "\n\tPacket comparison failed! \n\tModel packet:\n%s\n\tDUT packet:\n%s",
+                    tr_model.convert2string(),
+                    tr_dut.convert2string()
+                );
                 `uvm_error(this.get_full_name(), msg);
             end
         end
@@ -76,9 +80,16 @@ class scoreboard extends uvm_scoreboard;
 
         msg = {msg, $sformatf("Compared packets: %0d",  compared)};
        if(error == 0 && dut_data.used() == 0 && model_data.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
        end else begin
-             `uvm_info(get_type_name(), {msg, "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      }, UVM_NONE)
        end
 
     endfunction

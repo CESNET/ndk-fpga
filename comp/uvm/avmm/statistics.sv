@@ -34,8 +34,13 @@ class statistics #(
     `uvm_analysis_imp_decl(_master)
 
     typedef statistics #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH) this_type;
+    // verilog_lint: waive line-length
     uvm_analysis_imp_slave  #(sequence_item_response #(DATA_WIDTH), this_type)                            analysis_export_slave;
-    uvm_analysis_imp_master #(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH), this_type) analysis_export_master;
+    uvm_analysis_imp_master #(sequence_item_request #(
+        ADDRESS_WIDTH,
+        DATA_WIDTH,
+        BURST_WIDTH
+    ), this_type) analysis_export_master;
 
     // Constructor
     function new(string name = "statistics", uvm_component parent = null);
@@ -93,11 +98,15 @@ class statistics #(
                 end_time   = step_end_time;
 
                 read_stats.count(min, max, avg, std_dev);
-                read_msg = $sformatf("\n\tResponse Read Data Speed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s",
+                read_msg = $sformatf(
+                    "\n\tResponse Read Data Speed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s"
+                        ,
                         start_time/1ns, end_time/1ns, avg, std_dev, min, max);
 
                 write_stats.count(min, max, avg, std_dev);
-                write_msg = $sformatf("\n\tRequest Write Data Speed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s",
+                write_msg = $sformatf(
+                    "\n\tRequest Write Data Speed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s"
+                        ,
                         start_time/1ns, end_time/1ns, avg, std_dev, min, max);
 
                 `uvm_info(this.get_full_name(), { read_msg, "\n", write_msg }, UVM_LOW);

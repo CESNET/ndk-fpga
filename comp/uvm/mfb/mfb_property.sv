@@ -69,6 +69,7 @@ module mfb_property #(
         property sof_pos_undefined (int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
+            // verilog_lint: waive line-length
             (vif.SRC_RDY && vif.SOF[region]) |-> !$isunknown(vif.SOF_POS[(region+1)*$clog2(REGION_SIZE) -1 -: $clog2(REGION_SIZE)]);
         endproperty
 
@@ -79,7 +80,13 @@ module mfb_property #(
                     string hi_index;
                     num_it.itoa(it);
                     hi_index.itoa((it+1)*$clog2(REGION_SIZE));
-                    `uvm_error(module_name, {"\n\tMFB interface: if SRC_RDY and SOF[", num_it, "] is asserted then coresponding part of SOF_POS [", hi_index ,"-1 -: $clog2(REGION_SIZE)] have to be valid" });
+                    `uvm_error(module_name, {
+                               "\n\tMFB interface: if SRC_RDY and SOF[",
+                               num_it,
+                               "] is asserted then coresponding part of SOF_POS [",
+                               hi_index,
+                               "-1 -: $clog2(REGION_SIZE)] have to be valid"
+                               });
                 end
         end
     end endgenerate
@@ -98,6 +105,7 @@ module mfb_property #(
         property eof_pos_undefined (int unsigned region);
             @(posedge vif.CLK)
             disable iff(RESET)
+            // verilog_lint: waive line-length
             (vif.SRC_RDY && vif.EOF[region]) |-> !$isunknown(vif.EOF_POS[(region+1)*$clog2(REGION_SIZE * BLOCK_SIZE) -1 -: $clog2(REGION_SIZE * BLOCK_SIZE)]);
         endproperty
 
@@ -108,7 +116,13 @@ module mfb_property #(
                     string hi_index;
                     num_it.itoa(it);
                     hi_index.itoa((it+1)*$clog2(REGION_SIZE * BLOCK_SIZE));
-                    `uvm_error(module_name, {"\n\tMFB interface: if SRC_RDY and EOF[", num_it, "] is asserted then coresponding part of EOF_POS [", hi_index ,"-1 -: $clog2(REGION_SIZE)] have to be valid" });
+                    `uvm_error(module_name, {
+                               "\n\tMFB interface: if SRC_RDY and EOF[",
+                               num_it,
+                               "] is asserted then coresponding part of EOF_POS [",
+                               hi_index,
+                               "-1 -: $clog2(REGION_SIZE)] have to be valid"
+                               });
                 end
         end
     end endgenerate

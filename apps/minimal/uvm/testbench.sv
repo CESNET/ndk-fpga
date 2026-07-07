@@ -125,7 +125,9 @@ module testbench;
     mvb_if #(
         .ITEMS      (test_pkg::REGIONS),
         .ITEM_WIDTH (test_pkg::ETH_RX_HDR_WIDTH)
-    )                                                                            eth_rx_mvb[test_pkg::ETH_STREAMS](APP_CLK);
+    ) eth_rx_mvb[test_pkg::ETH_STREAMS] (
+        APP_CLK
+    );
     mfb_if #(
         .REGIONS     (test_pkg::REGIONS),
         .REGION_SIZE (test_pkg::MFB_REG_SIZE),
@@ -141,8 +143,16 @@ module testbench;
         .META_WIDTH  (test_pkg::ETH_TX_HDR_WIDTH)
     ) eth_tx_mfb[test_pkg::ETH_STREAMS](APP_CLK);
     // DMA I/O INTERFACE
-    localparam DMA_RX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS);
-    localparam DMA_TX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS) + 1;
+    localparam DMA_RX_MVB_WIDTH = $clog2(
+        test_pkg::DMA_PKT_MTU + 1
+    ) + test_pkg::DMA_HDR_META_WIDTH + $clog2(
+        test_pkg::DMA_TX_CHANNELS
+    );
+    localparam DMA_TX_MVB_WIDTH = $clog2(
+        test_pkg::DMA_PKT_MTU + 1
+    ) + test_pkg::DMA_HDR_META_WIDTH + $clog2(
+        test_pkg::DMA_RX_CHANNELS
+    ) + 1;
     mvb_if #(
         .ITEMS      (test_pkg::REGIONS),
         .ITEM_WIDTH (DMA_RX_MVB_WIDTH)
@@ -230,7 +240,7 @@ module testbench;
     assign reset_app.RESET     = reset_logic_app[0];
 
     for (genvar mem_it = 0; mem_it < test_pkg::MEM_PORTS; mem_it++) begin : gen_mem_it
-        reset_if                                                                                 mem_reset(MEM_CLK[mem_it]);
+        reset_if mem_reset (MEM_CLK[mem_it]);
         avmm_if#(
             .ADDRESS_WIDTH(test_pkg::MEM_ADDR_WIDTH),
             .DATA_WIDTH   (test_pkg::MEM_DATA_WIDTH),
@@ -241,10 +251,14 @@ module testbench;
         assign mem_ready        [mem_it] = mem.READY; // : in  std_logic_vector(MEM_PORTS-1 downto 0);
         assign mem.READ       = mem_read [mem_it]; // : out std_logic_vector(MEM_PORTS-1 downto 0);
         assign mem.WRITE      = mem_write[mem_it]; // : out std_logic_vector(MEM_PORTS-1 downto 0);
-        assign mem.ADDRESS    = mem_address      [(mem_it+1)*test_pkg::MEM_ADDR_WIDTH-1  -: test_pkg::MEM_ADDR_WIDTH ]; // : out std_logic_vector(MEM_PORTS*MEM_ADDR_WIDTH-1 downto 0);
-        assign mem.BURSTCOUNT = mem_burstcount   [(mem_it+1)*test_pkg::MEM_BURST_WIDTH-1 -: test_pkg::MEM_BURST_WIDTH]; // : out std_logic_vector(MEM_PORTS*MEM_BURST_WIDTH-1 downto 0);
-        assign mem.WRITEDATA  = mem_writedata    [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ]; // : out std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
-        assign mem.READDATA   = mem_readdata     [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ]; // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        // : out std_logic_vector(MEM_PORTS*MEM_ADDR_WIDTH-1 downto 0);
+        assign mem.ADDRESS    = mem_address      [(mem_it+1)*test_pkg::MEM_ADDR_WIDTH-1  -: test_pkg::MEM_ADDR_WIDTH ];
+        // : out std_logic_vector(MEM_PORTS*MEM_BURST_WIDTH-1 downto 0);
+        assign mem.BURSTCOUNT = mem_burstcount   [(mem_it+1)*test_pkg::MEM_BURST_WIDTH-1 -: test_pkg::MEM_BURST_WIDTH];
+        // : out std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        assign mem.WRITEDATA  = mem_writedata    [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ];
+        // : in  std_logic_vector(MEM_PORTS*MEM_DATA_WIDTH-1 downto 0);
+        assign mem.READDATA   = mem_readdata     [(mem_it+1)*test_pkg::MEM_DATA_WIDTH -1 -: test_pkg::MEM_DATA_WIDTH ];
         assign mem_readdatavalid[mem_it] = mem.READDATAVALID; // : in  std_logic_vector(MEM_PORTS-1 downto 0);
 
         always begin
@@ -271,42 +285,72 @@ module testbench;
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS-1:0]                            eth_rx_mvb_vld;
     logic [test_pkg::ETH_STREAMS-1:0]                                                eth_rx_mvb_dst_rdy;
     logic [test_pkg::ETH_STREAMS-1:0]                                                eth_rx_mvb_src_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH-1:0] eth_rx_mfb_data;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS-1:0]                                                                          eth_rx_mfb_sof;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS-1:0]                                                                          eth_rx_mfb_eof;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)-1:0]                                           eth_rx_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)-1:0]                  eth_rx_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS-1:0]                                                                                                eth_rx_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS-1:0]                                                                                                eth_rx_mfb_dst_rdy;
     //ETH TX
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*test_pkg::ETH_TX_HDR_WIDTH-1:0]                                               eth_tx_mfb_meta;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH-1:0] eth_tx_mfb_data;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS-1:0]                                                                          eth_tx_mfb_sof;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS-1:0]                                                                          eth_tx_mfb_eof;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)-1:0]                                           eth_tx_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)-1:0]                  eth_tx_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS-1:0]                                                                                                eth_tx_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::ETH_STREAMS-1:0]                                                                                                eth_tx_mfb_dst_rdy;
 
     for (genvar eth_it = 0; eth_it < test_pkg::ETH_STREAMS; eth_it++) begin : gen_eth_it
         //ETH RX
+        // verilog_lint: waive line-length
         assign eth_rx_mvb_data[(eth_it+1)*test_pkg::REGIONS*test_pkg::ETH_RX_HDR_WIDTH-1 -: test_pkg::REGIONS*test_pkg::ETH_RX_HDR_WIDTH] = eth_rx_mvb[eth_it].DATA;
+        // verilog_lint: waive line-length
         assign eth_rx_mvb_vld[(eth_it+1)*test_pkg::REGIONS-1 -: test_pkg::REGIONS]                                                        = eth_rx_mvb[eth_it].VLD;
+        // verilog_lint: waive line-length
         assign eth_rx_mvb_src_rdy[eth_it]                                                                                                     = eth_rx_mvb[eth_it].SRC_RDY;
+        // verilog_lint: waive line-length
         assign eth_rx_mvb[eth_it].DST_RDY                                                                                                     = eth_rx_mvb_dst_rdy[eth_it];
+        // verilog_lint: waive line-length
         assign eth_rx_mfb_data[(eth_it+1)*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH-1 -: test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH] = eth_rx_mfb[eth_it].DATA;
+        // verilog_lint: waive line-length
         assign eth_rx_mfb_sof[(eth_it+1)*test_pkg::REGIONS-1 -: test_pkg::REGIONS]                                                    = eth_rx_mfb[eth_it].SOF;
+        // verilog_lint: waive line-length
         assign eth_rx_mfb_eof[(eth_it+1)*test_pkg::REGIONS-1 -: test_pkg::REGIONS]                                                    = eth_rx_mfb[eth_it].EOF;
+        // verilog_lint: waive line-length
         assign eth_rx_mfb_sof_pos[(eth_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)-1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)] = eth_rx_mfb[eth_it].SOF_POS;
+        // verilog_lint: waive line-length
         assign eth_rx_mfb_eof_pos[(eth_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)-1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)] = eth_rx_mfb[eth_it].EOF_POS;
+        // verilog_lint: waive line-length
         assign eth_rx_mfb_src_rdy[eth_it]                                                                                                 = eth_rx_mfb[eth_it].SRC_RDY;
+        // verilog_lint: waive line-length
         assign eth_rx_mfb[eth_it].DST_RDY                                                                                          = eth_rx_mfb_dst_rdy[eth_it];
         //ETH TX
+        // verilog_lint: waive line-length
         assign eth_tx_mfb[eth_it].META     = eth_tx_mfb_meta[(eth_it+1)*test_pkg::REGIONS*test_pkg::ETH_TX_HDR_WIDTH-1 -: test_pkg::REGIONS*test_pkg::ETH_TX_HDR_WIDTH];
+        // verilog_lint: waive line-length
         assign eth_tx_mfb[eth_it].DATA     = eth_tx_mfb_data[(eth_it+1)*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH-1 -: test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH];
         assign eth_tx_mfb[eth_it].SOF      = eth_tx_mfb_sof[(eth_it+1)*test_pkg::REGIONS-1 -: test_pkg::REGIONS];
         assign eth_tx_mfb[eth_it].EOF      = eth_tx_mfb_eof[(eth_it+1)*test_pkg::REGIONS-1 -: test_pkg::REGIONS];
+        // verilog_lint: waive line-length
         assign eth_tx_mfb[eth_it].SOF_POS  = eth_tx_mfb_sof_pos[(eth_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)-1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)];
+        // verilog_lint: waive line-length
         assign eth_tx_mfb[eth_it].EOF_POS  = eth_tx_mfb_eof_pos[(eth_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)-1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)];
         assign eth_tx_mfb[eth_it].SRC_RDY  = eth_tx_mfb_src_rdy[eth_it];
         assign eth_tx_mfb_dst_rdy[eth_it]  = eth_tx_mfb[eth_it].DST_RDY;
@@ -323,12 +367,19 @@ module testbench;
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS-1:0]                                   dma_rx_mvb_vld;
     logic [test_pkg::DMA_STREAMS-1:0]                                                        dma_rx_mvb_src_rdy;
     logic [test_pkg::DMA_STREAMS-1:0]                                                        dma_rx_mvb_dst_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH-1:0] dma_rx_mfb_data;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS-1:0]                                                                          dma_rx_mfb_sof;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS-1:0]                                                                          dma_rx_mfb_eof;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)-1:0]                                           dma_rx_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)-1:0]                  dma_rx_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS-1:0]                                                                                            dma_rx_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS-1:0]                                                                                            dma_rx_mfb_dst_rdy;
     //DMA TX
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::DMA_PKT_MTU+1)-1:0]   dma_tx_mvb_len;
@@ -338,48 +389,71 @@ module testbench;
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS-1:0]                                   dma_tx_mvb_vld;
     logic [test_pkg::DMA_STREAMS-1:0]                                                       dma_tx_mvb_src_rdy;
     logic [test_pkg::DMA_STREAMS-1:0]                                                       dma_tx_mvb_dst_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH-1:0] dma_tx_mfb_data;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS-1:0]                                                                          dma_tx_mfb_sof;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS-1:0]                                                                          dma_tx_mfb_eof;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)-1:0]                                           dma_tx_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)-1:0]                  dma_tx_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS-1:0]                                                                                            dma_tx_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [test_pkg::DMA_STREAMS-1:0]                                                                                            dma_tx_mfb_dst_rdy;
 
     for (genvar dma_it = 0; dma_it < test_pkg::DMA_STREAMS; dma_it++) begin : gen_dma_it
         //DMA RX
         for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_dma_region
+            // verilog_lint: waive line-length
             assign dma_rx_mvb_len[(dma_it*test_pkg::REGIONS + dma_region + 1)*$clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)]         = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)];
+            // verilog_lint: waive line-length
             assign dma_rx_mvb_hdr_meta[(dma_it*test_pkg::REGIONS + dma_region + 1)*test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH]          = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH];
+            // verilog_lint: waive line-length
             assign dma_rx_mvb_channel[(dma_it*test_pkg::REGIONS + dma_region + 1)*$clog2(test_pkg::DMA_RX_CHANNELS)-1 -: $clog2(test_pkg::DMA_RX_CHANNELS)] = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS)-1 -: $clog2(test_pkg::DMA_TX_CHANNELS)];
+            // verilog_lint: waive line-length
             assign dma_rx_mvb_vld[dma_it*test_pkg::REGIONS + dma_region]                                                                                    = dma_rx_mvb[dma_it].VLD[dma_region];
         end
         assign dma_rx_mvb_src_rdy[dma_it]  = dma_rx_mvb[dma_it].SRC_RDY;
         assign dma_rx_mvb[dma_it].DST_RDY  = dma_rx_mvb_dst_rdy[dma_it];
 
+        // verilog_lint: waive line-length
         assign dma_rx_mfb_data[(dma_it+1)*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH -1 -: test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH]    = dma_rx_mfb[dma_it].DATA;
+        // verilog_lint: waive line-length
         assign dma_rx_mfb_sof[(dma_it+1)*test_pkg::REGIONS -1 -: test_pkg::REGIONS]                                                                                 = dma_rx_mfb[dma_it].SOF;
+        // verilog_lint: waive line-length
         assign dma_rx_mfb_eof[(dma_it+1)*test_pkg::REGIONS -1 -: test_pkg::REGIONS]                                                                                 = dma_rx_mfb[dma_it].EOF;
+        // verilog_lint: waive line-length
         assign dma_rx_mfb_sof_pos[(dma_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE) -1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)]                                                   = dma_rx_mfb[dma_it].SOF_POS;
+        // verilog_lint: waive line-length
         assign dma_rx_mfb_eof_pos[(dma_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE) -1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)] = dma_rx_mfb[dma_it].EOF_POS;
         assign dma_rx_mfb_src_rdy[dma_it] = dma_rx_mfb[dma_it].SRC_RDY;
         assign dma_rx_mfb[dma_it].DST_RDY = dma_rx_mfb_dst_rdy[dma_it];
 
         //DMA TX
         for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_dma_region
+            // verilog_lint: waive line-length
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)]                                                                  = dma_tx_mvb_len[(dma_it*test_pkg::REGIONS + dma_region + 1) * $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)];
+            // verilog_lint: waive line-length
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH]                                        = dma_tx_mvb_hdr_meta[(dma_it*test_pkg::REGIONS + dma_region + 1) * test_pkg::DMA_HDR_META_WIDTH-1 -: test_pkg::DMA_HDR_META_WIDTH];
+            // verilog_lint: waive line-length
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS)-1 -: $clog2(test_pkg::DMA_RX_CHANNELS)] = dma_tx_mvb_channel[(dma_it*test_pkg::REGIONS + dma_region + 1) *  $clog2(test_pkg::DMA_RX_CHANNELS)-1 -: $clog2(test_pkg::DMA_RX_CHANNELS)];
+            // verilog_lint: waive line-length
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS)+1-1 -: 1]                               = dma_tx_mvb_discard[dma_it*test_pkg::REGIONS + dma_region];
             assign dma_tx_mvb[dma_it].VLD[dma_region] = dma_tx_mvb_vld[dma_it*test_pkg::REGIONS + dma_region];
         end
         assign dma_tx_mvb[dma_it].SRC_RDY = dma_tx_mvb_src_rdy[dma_it];
         assign dma_tx_mvb_dst_rdy[dma_it] = dma_tx_mvb[dma_it].DST_RDY;
 
+        // verilog_lint: waive line-length
         assign dma_tx_mfb[dma_it].DATA    = dma_tx_mfb_data[(dma_it+1)*test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH -1 -: test_pkg::REGIONS*test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE*test_pkg::MFB_ITEM_WIDTH];
         assign dma_tx_mfb[dma_it].SOF     = dma_tx_mfb_sof[(dma_it+1)*test_pkg::REGIONS -1 -: test_pkg::REGIONS];
         assign dma_tx_mfb[dma_it].EOF     = dma_tx_mfb_eof[(dma_it+1)*test_pkg::REGIONS -1 -: test_pkg::REGIONS];
+        // verilog_lint: waive line-length
         assign dma_tx_mfb[dma_it].SOF_POS = dma_tx_mfb_sof_pos[(dma_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE) -1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE)];
+        // verilog_lint: waive line-length
         assign dma_tx_mfb[dma_it].EOF_POS = dma_tx_mfb_eof_pos[(dma_it+1)*test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE) -1 -: test_pkg::REGIONS*$clog2(test_pkg::MFB_REG_SIZE*test_pkg::MFB_BLOCK_SIZE)];
         assign dma_tx_mfb[dma_it].SRC_RDY = dma_tx_mfb_src_rdy[dma_it];
         assign dma_tx_mfb_dst_rdy[dma_it] = dma_tx_mfb[dma_it].DST_RDY;
@@ -440,56 +514,76 @@ module testbench;
         .PCIE_LINK_UP          (), //  : in  std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
         .ETH_RX_LINK_UP        (), //  : in  std_logic_vector(ETH_STREAMS*ETH_CHANNELS-1 downto 0);
 
-        .ETH_RX_MVB_DATA       (eth_rx_mvb_data),    //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
+        //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*ETH_RX_HDR_WIDTH-1 downto 0);
+        .ETH_RX_MVB_DATA       (eth_rx_mvb_data),
         .ETH_RX_MVB_VLD        (eth_rx_mvb_vld),     //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0);
         .ETH_RX_MVB_SRC_RDY    (eth_rx_mvb_src_rdy), //  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
         .ETH_RX_MVB_DST_RDY    (eth_rx_mvb_dst_rdy), //  : out std_logic_vector(ETH_STREAMS-1 downto 0);
 
-        .ETH_RX_MFB_DATA       (eth_rx_mfb_data),    //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        .ETH_RX_MFB_DATA       (eth_rx_mfb_data),
         .ETH_RX_MFB_SOF        (eth_rx_mfb_sof),     //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0);
         .ETH_RX_MFB_EOF        (eth_rx_mfb_eof),     //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0);
-        .ETH_RX_MFB_SOF_POS    (eth_rx_mfb_sof_pos), //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-        .ETH_RX_MFB_EOF_POS    (eth_rx_mfb_eof_pos), //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        .ETH_RX_MFB_SOF_POS    (eth_rx_mfb_sof_pos),
+        //  : in  std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        .ETH_RX_MFB_EOF_POS    (eth_rx_mfb_eof_pos),
         .ETH_RX_MFB_SRC_RDY    (eth_rx_mfb_src_rdy), //  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
         .ETH_RX_MFB_DST_RDY    (eth_rx_mfb_dst_rdy), //  : out std_logic_vector(ETH_STREAMS-1 downto 0);
 
-        .ETH_TX_MFB_DATA       (eth_tx_mfb_data),    //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-        .ETH_TX_MFB_HDR        (eth_tx_mfb_meta),    //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0) := (others => '0');
+        //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        .ETH_TX_MFB_DATA       (eth_tx_mfb_data),
+        //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*ETH_TX_HDR_WIDTH-1 downto 0) := (others => '0');
+        .ETH_TX_MFB_HDR        (eth_tx_mfb_meta),
         .ETH_TX_MFB_SOF        (eth_tx_mfb_sof),     //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0);
         .ETH_TX_MFB_EOF        (eth_tx_mfb_eof),     //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS-1 downto 0);
-        .ETH_TX_MFB_SOF_POS    (eth_tx_mfb_sof_pos), //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-        .ETH_TX_MFB_EOF_POS    (eth_tx_mfb_eof_pos), //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        .ETH_TX_MFB_SOF_POS    (eth_tx_mfb_sof_pos),
+        //  : out std_logic_vector(ETH_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        .ETH_TX_MFB_EOF_POS    (eth_tx_mfb_eof_pos),
         .ETH_TX_MFB_SRC_RDY    (eth_tx_mfb_src_rdy), //  : out std_logic_vector(ETH_STREAMS-1 downto 0);
         .ETH_TX_MFB_DST_RDY    (eth_tx_mfb_dst_rdy), //  : in  std_logic_vector(ETH_STREAMS-1 downto 0);
 
-        .DMA_RX_MVB_LEN        (dma_tx_mvb_len),      //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
-        .DMA_RX_MVB_HDR_META   (dma_tx_mvb_hdr_meta), //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-        .DMA_RX_MVB_CHANNEL    (dma_tx_mvb_channel),  //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+        //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
+        .DMA_RX_MVB_LEN        (dma_tx_mvb_len),
+        //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        .DMA_RX_MVB_HDR_META   (dma_tx_mvb_hdr_meta),
+        //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_RX_CHANNELS)-1 downto 0);
+        .DMA_RX_MVB_CHANNEL    (dma_tx_mvb_channel),
         .DMA_RX_MVB_DISCARD    (dma_tx_mvb_discard),  //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
         .DMA_RX_MVB_VLD        (dma_tx_mvb_vld),      //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
         .DMA_RX_MVB_SRC_RDY    (dma_tx_mvb_src_rdy),  //   : out std_logic_vector(DMA_STREAMS-1 downto 0);
         .DMA_RX_MVB_DST_RDY    (dma_tx_mvb_dst_rdy),  //   : in  std_logic_vector(DMA_STREAMS-1 downto 0);
 
-        .DMA_RX_MFB_DATA       (dma_tx_mfb_data),    //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        .DMA_RX_MFB_DATA       (dma_tx_mfb_data),
         .DMA_RX_MFB_SOF        (dma_tx_mfb_sof),     //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
         .DMA_RX_MFB_EOF        (dma_tx_mfb_eof),     //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
-        .DMA_RX_MFB_SOF_POS    (dma_tx_mfb_sof_pos), //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-        .DMA_RX_MFB_EOF_POS    (dma_tx_mfb_eof_pos), //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        .DMA_RX_MFB_SOF_POS    (dma_tx_mfb_sof_pos),
+        //   : out std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        .DMA_RX_MFB_EOF_POS    (dma_tx_mfb_eof_pos),
         .DMA_RX_MFB_SRC_RDY    (dma_tx_mfb_src_rdy), //   : out std_logic_vector(DMA_STREAMS-1 downto 0);
         .DMA_RX_MFB_DST_RDY    (dma_tx_mfb_dst_rdy), //   : in  std_logic_vector(DMA_STREAMS-1 downto 0);
 
-        .DMA_TX_MVB_LEN        (dma_rx_mvb_len),     //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
-        .DMA_TX_MVB_HDR_META   (dma_rx_mvb_hdr_meta),//  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
-        .DMA_TX_MVB_CHANNEL    (dma_rx_mvb_channel), //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+        //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_PKT_MTU+1)-1 downto 0);
+        .DMA_TX_MVB_LEN        (dma_rx_mvb_len),
+        //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*DMA_HDR_META_WIDTH-1 downto 0);
+        .DMA_TX_MVB_HDR_META   (dma_rx_mvb_hdr_meta),
+        //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*log2(DMA_TX_CHANNELS)-1 downto 0);
+        .DMA_TX_MVB_CHANNEL    (dma_rx_mvb_channel),
         .DMA_TX_MVB_VLD        (dma_rx_mvb_vld),     //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
         .DMA_TX_MVB_SRC_RDY    (dma_rx_mvb_src_rdy), //  : in  std_logic_vector(DMA_STREAMS-1 downto 0);
         .DMA_TX_MVB_DST_RDY    (dma_rx_mvb_dst_rdy), //  : out std_logic_vector(DMA_STREAMS-1 downto 0);
 
-        .DMA_TX_MFB_DATA       (dma_rx_mfb_data),    //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
+        .DMA_TX_MFB_DATA       (dma_rx_mfb_data),
         .DMA_TX_MFB_SOF        (dma_rx_mfb_sof),     //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
         .DMA_TX_MFB_EOF        (dma_rx_mfb_eof),     //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS-1 downto 0);
-        .DMA_TX_MFB_SOF_POS    (dma_rx_mfb_sof_pos), //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-        .DMA_TX_MFB_EOF_POS    (dma_rx_mfb_eof_pos), //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
+        .DMA_TX_MFB_SOF_POS    (dma_rx_mfb_sof_pos),
+        //  : in  std_logic_vector(DMA_STREAMS*MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+        .DMA_TX_MFB_EOF_POS    (dma_rx_mfb_eof_pos),
         .DMA_TX_MFB_SRC_RDY    (dma_rx_mfb_src_rdy), //  : in  std_logic_vector(DMA_STREAMS-1 downto 0);
         .DMA_TX_MFB_DST_RDY    (dma_rx_mfb_dst_rdy), //  : out std_logic_vector(DMA_STREAMS-1 downto 0);
 
@@ -507,7 +601,8 @@ module testbench;
 
         .TSU_CLK    (APP_CLK), //: in std_logic
         .TSU_RESET  (1'b0), //: in std_logic;
-        .TSU_TS_NS  (m_tsu.DATA[64-1 : 0]), //: in std_logic_vector(64-1 downto 0);  -- Timestamp from TSU in nanoseconds format
+        //: in std_logic_vector(64-1 downto 0);  -- Timestamp from TSU in nanoseconds format
+        .TSU_TS_NS  (m_tsu.DATA[64-1 : 0]),
         .TSU_TS_VLD (m_tsu.SRC_RDY & m_tsu.VLD[0]), //: in std_logic;
 
         .EMIF_RST_REQ          (), // : out std_logic_vector(MEM_PORTS-1 downto 0);
@@ -576,7 +671,7 @@ module testbench;
         automatic virtual mvb_if #(
             .ITEMS      (test_pkg::REGIONS),
             .ITEM_WIDTH (DMA_TX_MVB_WIDTH)
-        )                                                              vir_dma_tx_mvb[test_pkg::DMA_STREAMS] = dma_tx_mvb;
+        ) vir_dma_tx_mvb[test_pkg::DMA_STREAMS] = dma_tx_mvb;
         automatic virtual mfb_if #(
             .REGIONS     (test_pkg::REGIONS),
             .REGION_SIZE (test_pkg::MFB_REG_SIZE),
@@ -587,7 +682,7 @@ module testbench;
         automatic virtual mvb_if #(
             .ITEMS      (test_pkg::REGIONS),
             .ITEM_WIDTH (DMA_RX_MVB_WIDTH)
-        )                                                              vir_dma_rx_mvb[test_pkg::DMA_STREAMS] = dma_rx_mvb;
+        ) vir_dma_rx_mvb[test_pkg::DMA_STREAMS] = dma_rx_mvb;
         automatic virtual mfb_if #(
             .REGIONS     (test_pkg::REGIONS),
             .REGION_SIZE (test_pkg::MFB_REG_SIZE),
@@ -630,7 +725,7 @@ module testbench;
             uvm_config_db#(virtual mvb_if #(
                 .ITEMS      (test_pkg::REGIONS),
                 .ITEM_WIDTH (DMA_TX_MVB_WIDTH)
-            )                                                        )::set(null, "", {"DMA_TX_MVB_", it_num}, vir_dma_tx_mvb[it]);
+            ) )::set(null, "", {"DMA_TX_MVB_", it_num}, vir_dma_tx_mvb[it]);
             uvm_config_db#(virtual mfb_if #(
                 .REGIONS     (test_pkg::REGIONS),
                 .REGION_SIZE (test_pkg::MFB_REG_SIZE),
@@ -641,7 +736,7 @@ module testbench;
             uvm_config_db#(virtual mvb_if #(
                 .ITEMS      (test_pkg::REGIONS),
                 .ITEM_WIDTH (DMA_RX_MVB_WIDTH)
-            )                                                        )::set(null, "", {"DMA_RX_MVB_", it_num}, vir_dma_rx_mvb[it]);
+            ) )::set(null, "", {"DMA_RX_MVB_", it_num}, vir_dma_rx_mvb[it]);
             uvm_config_db#(virtual mfb_if #(
                 .REGIONS     (test_pkg::REGIONS),
                 .REGION_SIZE (test_pkg::MFB_REG_SIZE),

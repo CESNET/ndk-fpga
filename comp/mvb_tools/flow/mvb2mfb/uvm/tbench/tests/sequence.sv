@@ -5,8 +5,17 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEMS, MVB_ITEM_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEMS, MVB_ITEM_WIDTH))
+class virt_sequence #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MFB_META_WIDTH,
+    MVB_ITEMS,
+    MVB_ITEM_WIDTH
+) extends uvm_sequence;
+    `uvm_object_param_utils(test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                MFB_META_WIDTH, MVB_ITEMS, MVB_ITEM_WIDTH))
     `uvm_declare_p_sequencer(uvm_mvb2mfb::virt_sequencer #(MVB_ITEM_WIDTH))
 
     function new (string name = "virt_sequence");

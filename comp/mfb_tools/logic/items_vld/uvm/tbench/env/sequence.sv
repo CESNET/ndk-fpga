@@ -5,7 +5,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // This low level sequence define bus functionality
-class byte_array_sequence#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH, MFB_ITEM_WIDTH) extends uvm_sequence#(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
+class byte_array_sequence #(
+    PKT_MTU,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH,
+    MFB_ITEM_WIDTH
+) extends uvm_sequence #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
     `uvm_object_param_utils(uvm_items_valid::byte_array_sequence#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH, MFB_ITEM_WIDTH))
 
     mailbox#(uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)) tr_export;

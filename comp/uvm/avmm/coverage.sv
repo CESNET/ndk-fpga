@@ -22,8 +22,13 @@ class coverage #(
     `uvm_analysis_imp_decl(_master)
 
     typedef coverage #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH) this_type;
+    // verilog_lint: waive line-length
     uvm_analysis_imp_slave  #(sequence_item_response #(DATA_WIDTH), this_type)                            analysis_export_slave;
-    uvm_analysis_imp_master #(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH), this_type) analysis_export_master;
+    uvm_analysis_imp_master #(sequence_item_request #(
+        ADDRESS_WIDTH,
+        DATA_WIDTH,
+        BURST_WIDTH
+    ), this_type) analysis_export_master;
 
     // ----------- //
     // Covergroups //
@@ -47,7 +52,9 @@ class coverage #(
     endgroup
 
     // Master
-    covergroup request_validity_covergroup with function sample(sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH) item);
+    covergroup request_validity_covergroup with function sample (
+        sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH) item
+    );
         validity : coverpoint item.ready {
             bins valid   = {1};
             bins invalid = {0};
@@ -94,7 +101,9 @@ class coverage #(
         string report_message_master;
         super.report_phase(phase);
 
+        // verilog_lint: waive line-length
         report_message_slave  = $sformatf("\n\tREADDATA coverage %0f %%\n\tREADY coverage %0f %%\n", readdata_covergroup.get_inst_coverage(), ready_covergroup.get_inst_coverage());
+        // verilog_lint: waive line-length
         report_message_master = $sformatf("\n\tRequest coverage %0f %%\n", request_validity_covergroup.get_inst_coverage());
 
         `uvm_info(this.get_full_name(), { report_message_slave, "\n", report_message_master } , UVM_LOW);

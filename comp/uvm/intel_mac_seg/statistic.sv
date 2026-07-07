@@ -72,7 +72,9 @@ class statistic#(SEGMENTS) extends uvm_subscriber#(sequence_item #(SEGMENTS));
                 speed_start_time = speed_end_time;
                 speed_end_time   = step_speed_end_time;
                 speed.count(min, max, avg, std_dev);
-                msg = $sformatf("\n\tSpeed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s",
+                msg = $sformatf(
+                    "\n\tSpeed [%0dns:%0dns]\n\t\tAverage : %0.2fGb/s std_dev %0.2fGb/s\n\t\tmin : %0.2fGb/s max  %0.2fGb/s"
+                        ,
                         speed_start_time/1ns, speed_end_time/1ns, avg, std_dev, min, max);
                 `uvm_info(this.get_full_name(), msg, UVM_LOW);
                 speed.reset();

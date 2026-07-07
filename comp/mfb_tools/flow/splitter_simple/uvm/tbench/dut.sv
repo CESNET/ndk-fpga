@@ -44,7 +44,9 @@ module dut (
         end
 
         for (genvar it = 0; it < REGIONS; it++) begin : gen_it
+            // verilog_lint: waive line-length
             assign rx_mfb_meta[(it+1)*META_WIDTH-1 -: META_WIDTH]                             = mfb_rx.META[it*(META_WIDTH +$clog2(SPLITTER_OUTPUTS)) +META_WIDTH -1                           -: META_WIDTH];
+            // verilog_lint: waive line-length
             assign rx_mfb_sel [(it+1)*$clog2(SPLITTER_OUTPUTS)-1 -: $clog2(SPLITTER_OUTPUTS)] = mfb_rx.META[it*(META_WIDTH +$clog2(SPLITTER_OUTPUTS)) +META_WIDTH +$clog2(SPLITTER_OUTPUTS) -1 -: $clog2(SPLITTER_OUTPUTS)];
         end
     endgenerate

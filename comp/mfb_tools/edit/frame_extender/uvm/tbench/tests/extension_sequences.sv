@@ -3,16 +3,24 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-virtual class extension_sequence_base #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_logic_vector::sequence_simple #(RX_MVB_ITEM_WIDTH);
+virtual class extension_sequence_base #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_logic_vector::sequence_simple #(RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_base)
 
     localparam int unsigned MAX_DATA_LENGTH = PKT_MTU;
     localparam int unsigned MIN_DATA_LENGTH = 64;
 
-    localparam int unsigned MAX_EXTENSION_ONLY_LENGTH = MAX_DATA_LENGTH - (MAX_DATA_LENGTH % MFB_BLOCK_SIZE); // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to MAX_DATA_LENGTH
-    localparam int unsigned MAX_EXTENSION_LENGTH      = (MAX_DATA_LENGTH-MIN_DATA_LENGTH) - ((MAX_DATA_LENGTH-MIN_DATA_LENGTH) % MFB_BLOCK_SIZE); // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to (MAX_DATA_LENGTH-MIN_DATA_LENGTH)
-    localparam int unsigned MIN_EXTENSION_LENGTH      = 60 - (60 % MFB_BLOCK_SIZE) + MFB_BLOCK_SIZE; // The closest value divisible by MFB_BLOCK_SIZE and greater than or equal to 60
+    localparam int unsigned MAX_EXTENSION_ONLY_LENGTH = MAX_DATA_LENGTH - (MAX_DATA_LENGTH % MFB_BLOCK_SIZE)
+        ;  // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to MAX_DATA_LENGTH
+    localparam int unsigned MAX_EXTENSION_LENGTH = (MAX_DATA_LENGTH - MIN_DATA_LENGTH) -
+        ((MAX_DATA_LENGTH - MIN_DATA_LENGTH) % MFB_BLOCK_SIZE)
+        ;  // The closest value divisible by MFB_BLOCK_SIZE and less than or equal to (MAX_DATA_LENGTH-MIN_DATA_LENGTH)
+    localparam int unsigned MIN_EXTENSION_LENGTH = 60 - (60 % MFB_BLOCK_SIZE) +
+        MFB_BLOCK_SIZE;  // The closest value divisible by MFB_BLOCK_SIZE and greater than or equal to 60
 
     rand int unsigned transaction_count;
 
@@ -40,7 +48,11 @@ endclass
 // Extending sequences //
 // ------------------- //
 
-class extension_sequence #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence)
 
@@ -88,7 +100,11 @@ class extension_sequence #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, in
 
 endclass
 
-class extension_sequence_min #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence_min #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_min #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_min)
 
@@ -133,7 +149,11 @@ class extension_sequence_min #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU
 
 endclass
 
-class extension_sequence_max #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence_max #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_max #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_max)
 
@@ -178,7 +198,11 @@ class extension_sequence_max #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU
 
 endclass
 
-class extension_sequence_off #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence_off #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_off #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_off)
 
@@ -215,7 +239,11 @@ endclass
 // Generating sequences //
 // -------------------- //
 
-class extension_sequence_only #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence_only #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_only #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_only)
 
@@ -245,7 +273,11 @@ class extension_sequence_only #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MT
 
 endclass
 
-class extension_sequence_only_min #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence_only_min #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_only_min #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_only_min)
 
@@ -273,7 +305,11 @@ class extension_sequence_only_min #(int unsigned MFB_BLOCK_SIZE, int unsigned PK
 
 endclass
 
-class extension_sequence_only_max #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
+class extension_sequence_only_max #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends extension_sequence_base #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::extension_sequence_only_max #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `m_uvm_get_type_name_func(test::extension_sequence_only_max)
 
@@ -305,7 +341,12 @@ endclass
 // Sequence library //
 // ---------------- //
 
-class extension_sequence_library #(int unsigned MFB_BLOCK_SIZE, int unsigned PKT_MTU, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_common::sequence_library #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH));
+class extension_sequence_library #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned PKT_MTU,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_common::sequence_library
+    #(uvm_logic_vector::config_sequence, uvm_logic_vector::sequence_item #(RX_MVB_ITEM_WIDTH));
     `uvm_object_param_utils(test::extension_sequence_library #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
     `uvm_sequence_library_utils(test::extension_sequence_library #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH))
 

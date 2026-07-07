@@ -76,7 +76,9 @@ class scoreboard extends uvm_scoreboard;
             compared++;
             if (($time() - tr_model_packet.time_last()) >= 10us) begin
                 string msg;
-                $sformat(msg, "\n\tDelay %0dns is too long\n\tinput time %0dns output time %0dns\n%s", ($time() - tr_model_packet.time_last())/1ns, tr_model_packet.time_last()/1ns, $time()/1ns, tr_model_packet.convert2string());
+                $sformat(msg, "\n\tDelay %0dns is too long\n\tinput time %0dns output time %0dns\n%s", ($time()
+                         - tr_model_packet.time_last()) / 1ns, tr_model_packet.time_last() / 1ns, $time() / 1ns,
+                         tr_model_packet.convert2string());
                 `uvm_error(this.get_full_name(), msg);
             end
 
@@ -86,7 +88,9 @@ class scoreboard extends uvm_scoreboard;
                 errors++;
                 str = $sformatf( "\n\tError num %0d Packet num %0d", errors, compared);
                 str = {str, $sformatf("\n\tInput time %0dns",  tr_model_packet.time_last()/1ns)};
+                // verilog_lint: waive line-length
                 str = {str, $sformatf("\n\tPACKET FROM DUT\n\t%s\n\tEXPECTED PACKET\n\t%s",  tr_dut_packet.convert2string(), tr_model_packet.convert2string())};
+                // verilog_lint: waive line-length
                 str = {str, $sformatf("\n\tERROR FROM DUT\n\t0b%b\n\tEXPECTED ERROR\n\t0b%b",  tr_dut_error.data, tr_model_error.data)};
                `uvm_error(this.get_full_name(), str);
             end
@@ -97,13 +101,23 @@ class scoreboard extends uvm_scoreboard;
     virtual function void report_phase(uvm_phase phase);
         string str = "";
 
+        // verilog_lint: waive line-length
         str = $sformatf( "\n\tCompared transaction %d\n\tErrors %d\n\tDUT TX fifo %d\n\tModel TX fifo %d", compared, errors, dut_fifo_packet.used(), model_fifo_packet.used());
+        // verilog_lint: waive line-length
         str = {str, $sformatf("\n\tDUT TX fifo error : %d\n\tModel TX fifo error : %d\n",  dut_fifo_error.used(), model_fifo_error.used())};
 
-        if (errors == 0 && dut_fifo_packet.used() == 0 && model_fifo_packet.used() == 0 && dut_fifo_error.used() == 0 && model_fifo_error.used() == 0) begin
-            `uvm_info(get_type_name(), {str, "\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+        if (errors == 0 && dut_fifo_packet.used() == 0 && model_fifo_packet.used() == 0 && dut_fifo_error.used() == 0 &&
+            model_fifo_error.used() == 0) begin
+            `uvm_info(
+                get_type_name(), {
+                str,
+                "\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {str, "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      str,
+                      "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 endclass

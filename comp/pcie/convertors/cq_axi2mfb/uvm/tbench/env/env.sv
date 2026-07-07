@@ -19,7 +19,13 @@ class env #(
     uvm_cq_mfb2axi::sequencer m_sequencer;
 
     protected uvm_pcie_axi::env_rx#(AXI_ITEMS, uvm_pcie_axi::AXI_CQ, DEVICE, STRADDLING) axi_cq;
-    protected uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0) mfb_cq_env;
+    protected uvm_logic_vector_array_mfb::env_tx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        0
+    ) mfb_cq_env;
     protected uvm_reset::agent                                                           m_reset;
 
     protected scoreboard m_scoreboard;
@@ -43,13 +49,24 @@ class env #(
         pcie_cfg.active = UVM_ACTIVE;
         pcie_cfg.interface_name = "vif_rx";
         uvm_config_db #(uvm_pcie::config_item)::set(this, "axi_cq", "m_config", pcie_cfg);
-        axi_cq = uvm_pcie_axi::env_rx #(AXI_ITEMS, uvm_pcie_axi::AXI_CQ, DEVICE, STRADDLING)::type_id::create("axi_cq", this);
+        axi_cq = uvm_pcie_axi::env_rx #(
+            AXI_ITEMS,
+            uvm_pcie_axi::AXI_CQ,
+            DEVICE,
+            STRADDLING
+        )::type_id::create("axi_cq", this);
 
         mfb_cq_cfg = new;
         mfb_cq_cfg.active = UVM_ACTIVE;
         mfb_cq_cfg.interface_name = "vif_tx";
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "mfb_cq_env", "m_config", mfb_cq_cfg);
-        mfb_cq_env = uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create("mfb_cq_env", this);
+        mfb_cq_env = uvm_logic_vector_array_mfb::env_tx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            0
+        )::type_id::create("mfb_cq_env", this);
 
         m_config_reset                = new;
         m_config_reset.active         = UVM_ACTIVE;

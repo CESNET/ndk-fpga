@@ -35,7 +35,21 @@ class env #(
         MI_DATA_WIDTH,
         MI_ADDR_WIDTH
     );
-    `uvm_component_param_utils(uvm_network_mod_cmac_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+    `uvm_component_param_utils(
+        uvm_network_mod_cmac_env::env #(
+            ETH_CORE_ARCH,
+            ETH_PORTS,
+            ETH_PORT_SPEED,
+            ETH_PORT_CHAN,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ))
 
     // BYTE ARRAY LBUS environments
     protected uvm_logic_vector_array_lbus::env_rx m_eth_rx[ETH_PORTS];
@@ -70,17 +84,29 @@ class env #(
         // Overriding the base components/objects //
         // -------------------------------------- //
 
-        uvm_network_mod_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_inst_override(
-            uvm_network_mod_cmac_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(),
+        uvm_network_mod_env::sequencer_port
+            #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0],
+              MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_inst_override(
+            uvm_network_mod_cmac_env::sequencer_port
+                #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0],
+                  MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(),
             "m_sequencer.*",
             this
         );
 
-        uvm_network_mod_env::virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_type_override(
-            uvm_network_mod_cmac_env::virt_sequence_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type()
+        uvm_network_mod_env::virt_sequence_port
+            #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0],
+              MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_type_override(
+            uvm_network_mod_cmac_env::virt_sequence_port
+                #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0],
+                  MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type()
         );
-        uvm_network_mod_env::virt_sequence_simple #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_type_override(
-            uvm_network_mod_cmac_env::virt_sequence_simple #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type()
+        uvm_network_mod_env::virt_sequence_simple
+            #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE,
+              ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_type_override(
+            uvm_network_mod_cmac_env::virt_sequence_simple
+                #(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE,
+                  ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type()
         );
 
         // Build of base environment
@@ -97,15 +123,18 @@ class env #(
             cfg_eth_rx = new();
             cfg_eth_rx.active = UVM_ACTIVE;
             cfg_eth_rx.interface_name = $sformatf("vif_eth_rx_%0d", it);
-            uvm_config_db #(uvm_logic_vector_array_lbus::config_item)::set(this, $sformatf("m_eth_rx_%0d", it), "m_config", cfg_eth_rx);
+            uvm_config_db #(uvm_logic_vector_array_lbus::config_item)::set(this, $sformatf("m_eth_rx_%0d", it),
+                                                                          "m_config", cfg_eth_rx);
             m_eth_rx[it] = uvm_logic_vector_array_lbus::env_rx::type_id::create($sformatf("m_eth_rx_%0d", it), this);
 
             cfg_eth_tx = new();
             cfg_eth_tx.active = UVM_ACTIVE;
             cfg_eth_tx.interface_name = $sformatf("vif_eth_tx_%0d", it);
-            uvm_config_db #(uvm_logic_vector_array_lbus::config_item)::set(this, $sformatf("m_eth_tx_%0d", it), "m_config", cfg_eth_tx);
+            uvm_config_db #(uvm_logic_vector_array_lbus::config_item)::set(this, $sformatf("m_eth_tx_%0d", it),
+                                                                          "m_config", cfg_eth_tx);
             m_eth_tx[it] = uvm_logic_vector_array_lbus::env_tx::type_id::create($sformatf("m_eth_tx_%0d", it), this);
 
+            // verilog_lint: waive line-length
             m_rx_error_expander[it] = tx_error_expander::type_id::create($sformatf("m_rx_error_expander_%0d", it), this);
         end
     endfunction
@@ -133,7 +162,8 @@ class env #(
         end
 
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
-            sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) cast_sequencer_port;
+            sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE,
+                             ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) cast_sequencer_port;
             assert($cast(cast_sequencer_port, m_sequencer.port[it]))
             else begin
                 `uvm_fatal(this.get_full_name(), $sformatf("\n\tCast failed: %s", m_sequencer.port[it].get_full_name()))

@@ -5,9 +5,34 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH, CLK_PERIOD) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH, CLK_PERIOD))
-    `uvm_declare_p_sequencer(uvm_speed_meter::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH))
+class virt_sequence #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    MI_DATA_WIDTH,
+    MI_ADDRESS_WIDTH,
+    CLK_PERIOD
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        test::virt_sequence #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDRESS_WIDTH,
+            CLK_PERIOD
+        ))
+    `uvm_declare_p_sequencer(
+        uvm_speed_meter::virt_sequencer #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDRESS_WIDTH
+        ))
 
     function new (string name = "virt_sequence");
         super.new(name);
@@ -25,8 +50,18 @@ class virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH
         m_reset_sq    = uvm_reset::sequence_start::type_id::create("m_reset_sq");
         m_mfb_data_sq = uvm_speed_meter::sequence_mfb_data#(ITEM_WIDTH)::type_id::create("m_mfb_data_sq");
         // m_mfb_data_sq = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("m_mfb_data_sq");
-        m_mi_sq       = uvm_speed_meter::sequence_mi#(MI_DATA_WIDTH, MI_ADDRESS_WIDTH, CLK_PERIOD)::type_id::create("m_mi_sq");
-        m_mfb_rdy_sq  = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_mfb_rdy_sq");
+        m_mi_sq       = uvm_speed_meter::sequence_mi#(
+            MI_DATA_WIDTH,
+            MI_ADDRESS_WIDTH,
+            CLK_PERIOD
+        )::type_id::create("m_mi_sq");
+        m_mfb_rdy_sq  = uvm_mfb::sequence_lib_tx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            0
+        )::type_id::create("m_mfb_rdy_sq");
 
         // m_mfb_data_sq.init_sequence();
         // m_mfb_data_sq.min_random_count = 50;

@@ -53,7 +53,9 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
         super.build_phase(phase);
 
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            comparer[i] = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(ITEM_WIDTH))::type_id::create($sformatf("comparer_%0d", i), this);
+            // verilog_lint: waive line-length
+            comparer[i] = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(ITEM_WIDTH))::type_id::create(
+                $sformatf("comparer_%0d", i), this);
             comparer[i].model_tr_timeout_set(200us);
         end
 
@@ -88,13 +90,27 @@ class scoreboard #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned IT
         super.report_phase(phase);
 
         if (m_model.in_data.used() > 0 || m_model.in_read_command.used() > 0) begin
-            msg = { msg, $sformatf("\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tPORT NUMBER:%0d", m_model.in_data.used(), m_model.in_read_command.used()) };
+            msg = {
+                msg,
+                $sformatf(
+                    "\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tPORT NUMBER:%0d",
+                    m_model.in_data.used(),
+                    m_model.in_read_command.used()
+                )
+            };
         end
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 

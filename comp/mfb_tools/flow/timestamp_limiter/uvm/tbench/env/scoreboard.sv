@@ -5,8 +5,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class scoreboard #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTAMP_WIDTH, QUEUES, TIMESTAMP_FORMAT) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_timestamp_limiter::scoreboard #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTAMP_WIDTH, QUEUES, TIMESTAMP_FORMAT))
+class scoreboard #(
+    MFB_ITEM_WIDTH,
+    RX_MFB_META_WIDTH,
+    TX_MFB_META_WIDTH,
+    TIMESTAMP_WIDTH,
+    QUEUES,
+    TIMESTAMP_FORMAT
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(uvm_timestamp_limiter::scoreboard #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH,
+                                   TIMESTAMP_WIDTH, QUEUES, TIMESTAMP_FORMAT))
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) out_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(TX_MFB_META_WIDTH))    out_meta;
@@ -46,9 +54,20 @@ class scoreboard #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTA
 
 
     function void build_phase(uvm_phase phase);
-        m_model = model#(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTAMP_WIDTH, QUEUES, TIMESTAMP_FORMAT)::type_id::create("m_model", this);
+        m_model = model#(
+            MFB_ITEM_WIDTH,
+            RX_MFB_META_WIDTH,
+            TX_MFB_META_WIDTH,
+            TIMESTAMP_WIDTH,
+            QUEUES,
+            TIMESTAMP_FORMAT
+        )::type_id::create("m_model", this);
 
-        data_cmp = uvm_timestamp_limiter::delayer_cmp #(MFB_ITEM_WIDTH, TIMESTAMP_WIDTH)::type_id::create("data_cmp", this);
+        data_cmp = uvm_timestamp_limiter::delayer_cmp #(
+            MFB_ITEM_WIDTH,
+            TIMESTAMP_WIDTH
+        )::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_unordered #(uvm_logic_vector::sequence_item#(TX_MFB_META_WIDTH))::type_id::create("meta_cmp", this);
     endfunction
 
@@ -74,9 +93,16 @@ class scoreboard #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, TIMESTA
         // msg = {msg, $sformatf("\n\tMETA info %s",  meta_cmp.info())};
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

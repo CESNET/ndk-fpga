@@ -164,7 +164,9 @@ module testbench;
             .ITEMS (REGIONS),
             .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
         )                                      vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
+        // verilog_lint: waive line-length
         automatic virtual intel_mac_seg_if #(SEGMENTS)                                             vif_eth_rx     [ETH_PORTS] = eth_rx;
+        // verilog_lint: waive line-length
         automatic virtual intel_mac_seg_if #(SEGMENTS)                                             vif_eth_tx     [ETH_PORTS] = eth_tx;
 
         // SET INTERFACE
@@ -194,10 +196,12 @@ module testbench;
             uvm_config_db#(virtual mvb_if #(
                 .ITEMS (REGIONS),
                 .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
-            )                                                                               )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
+            ) )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
 
-            uvm_config_db#(virtual intel_mac_seg_if #(SEGMENTS))::set(null, "", $sformatf("vif_eth_rx_%0d", it) , vif_eth_rx[it]);
-            uvm_config_db#(virtual intel_mac_seg_if #(SEGMENTS))::set(null, "", $sformatf("vif_eth_tx_%0d", it) , vif_eth_tx[it]);
+            uvm_config_db #(virtual intel_mac_seg_if #(SEGMENTS))::set(null, "", $sformatf("vif_eth_rx_%0d", it),
+                                                                      vif_eth_rx[it]);
+            uvm_config_db #(virtual intel_mac_seg_if #(SEGMENTS))::set(null, "", $sformatf("vif_eth_tx_%0d", it),
+                                                                      vif_eth_tx[it]);
         end
         uvm_config_db#(virtual mi_if #(
             .DATA_WIDTH (MI_DATA_WIDTH),

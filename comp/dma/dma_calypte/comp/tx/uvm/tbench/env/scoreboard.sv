@@ -159,7 +159,8 @@ class ptr_upd_data_parser #(
 
                 if (ret == 0) begin
                     `uvm_error(this.get_full_name(),
-                               $sformatf("\nThese fields should be 0: tag8: 0b%b, tag9: 0b%b, ln: 0b%b", tag8, tag9, ln));
+                    $sformatf(
+           "\nThese fields should be 0: tag8: 0b%b, tag9: 0b%b, ln: 0b%b", tag8, tag9, ln));
                 end
 
                 dut_out_tr.data = dut_in_tr_data.data;

@@ -8,7 +8,8 @@
 class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
-    uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS, META_BEHAV) m_env;
+    uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS, META_BEHAV)
+        m_env;
     // ------------------------------------------------------------------------
     // Functions
     function new(string name, uvm_component parent);
@@ -16,7 +17,8 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS, META_BEHAV)::type_id::create("m_env", this);
+        m_env = uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS,
+                                          META_BEHAV)::type_id::create("m_env", this);
     endfunction
 
     virtual task run_reset(uvm_phase phase);

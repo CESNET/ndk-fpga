@@ -11,7 +11,11 @@
 `ifndef LII_SEQUENCE_ITEM_SV
 `define LII_SEQUENCE_ITEM_SV
 // This class represents transaction which contains values of output signals for eth phy
-class sequence_item #(int unsigned DATA_WIDTH, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_common::sequence_item;
+class sequence_item #(
+    int unsigned DATA_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_common::sequence_item;
 
     // registration of object tools
     `ndk_object_param_utils(

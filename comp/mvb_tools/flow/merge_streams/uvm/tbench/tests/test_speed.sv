@@ -3,8 +3,13 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class test_speed #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends test_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS);
-    typedef uvm_component_registry #(test::test_speed #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS), "test::test_speed") type_id;
+class test_speed #(
+    int unsigned MVB_ITEMS,
+    int unsigned MVB_ITEM_WIDTH,
+    int unsigned RX_STREAMS
+) extends test_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS);
+    typedef uvm_component_registry #(test::test_speed #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS), "test::test_speed")
+        type_id;
 
     // Constructor
     function new(string name = "test_speed", uvm_component parent = null);

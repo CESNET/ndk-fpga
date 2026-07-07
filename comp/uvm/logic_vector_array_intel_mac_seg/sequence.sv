@@ -10,7 +10,9 @@
 
 //////////////////////////////////////////////////
 // BASE CLASS CONTAINING COMMON FUNCTIONS
-virtual class sequence_simple_rx_base #(int unsigned SEGMENTS) extends uvm_intel_mac_seg::sequence_simple_rx #(SEGMENTS);
+virtual class sequence_simple_rx_base #(
+    int unsigned SEGMENTS
+) extends uvm_intel_mac_seg::sequence_simple_rx #(SEGMENTS);
    `ndk_object_param_utils(
         uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx_base#(SEGMENTS),
         $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_simple_rx_base#(%0d)",SEGMENTS)
@@ -183,10 +185,22 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends sequence_simple_rx_bas
 
     constraint c_space_size {
         space_size_min <= space_size_max;
-        space_size_min dist { [0*SEGMENTS:1*SEGMENTS] :/ 60,  [1*SEGMENTS:3*SEGMENTS] :/ 10,  [3*SEGMENTS:5*SEGMENTS] :/ 5,
-                              [5*SEGMENTS:90*SEGMENTS] :/ 3,  [90*SEGMENTS:95*SEGMENTS] :/ 7, [95*SEGMENTS:100*SEGMENTS] :/ 15};
-        space_size_max dist { [0*SEGMENTS:1*SEGMENTS] :/ 60,  [1*SEGMENTS:3*SEGMENTS] :/ 10,  [3*SEGMENTS:5*SEGMENTS] :/ 5,
-                              [5*SEGMENTS:90*SEGMENTS] :/ 3,  [90*SEGMENTS:95*SEGMENTS] :/ 7, [95*SEGMENTS:100*SEGMENTS] :/ 15};
+        space_size_min dist {
+            [0*SEGMENTS:1*SEGMENTS] :/ 60,
+            [1*SEGMENTS:3*SEGMENTS] :/ 10,
+            [3*SEGMENTS:5*SEGMENTS] :/ 5,
+            [5*SEGMENTS:90*SEGMENTS] :/ 3,
+            [90*SEGMENTS:95*SEGMENTS] :/ 7,
+            [95*SEGMENTS:100*SEGMENTS] :/ 15
+        };
+        space_size_max dist {
+            [0*SEGMENTS:1*SEGMENTS] :/ 60,
+            [1*SEGMENTS:3*SEGMENTS] :/ 10,
+            [3*SEGMENTS:5*SEGMENTS] :/ 5,
+            [5*SEGMENTS:90*SEGMENTS] :/ 3,
+            [90*SEGMENTS:95*SEGMENTS] :/ 7,
+            [95*SEGMENTS:100*SEGMENTS] :/ 15
+        };
     }
 
     function new (string name = "req");
@@ -248,8 +262,14 @@ class sequence_space_same_rx #(int unsigned SEGMENTS) extends sequence_simple_rx
     local int unsigned space_size;
 
     constraint c_space_size {
-        space_size_same dist { [0*SEGMENTS:1*SEGMENTS] :/ 60,  [1*SEGMENTS:3*SEGMENTS] :/ 10,  [3*SEGMENTS:5*SEGMENTS] :/ 5,
-                              [5*SEGMENTS:90*SEGMENTS] :/ 3,  [90*SEGMENTS:95*SEGMENTS] :/ 7, [95*SEGMENTS:100*SEGMENTS] :/ 15};
+        space_size_same dist {
+            [0*SEGMENTS:1*SEGMENTS] :/ 60,
+            [1*SEGMENTS:3*SEGMENTS] :/ 10,
+            [3*SEGMENTS:5*SEGMENTS] :/ 5,
+            [5*SEGMENTS:90*SEGMENTS] :/ 3,
+            [90*SEGMENTS:95*SEGMENTS] :/ 7,
+            [95*SEGMENTS:100*SEGMENTS] :/ 15
+        };
     }
 
     function new (string name = "req");
@@ -412,7 +432,9 @@ endclass
 ///////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY
 ///////////////////////////////////////////////////////////////
-class sequence_lib_rx #(int unsigned SEGMENTS) extends uvm_sequence_library#(uvm_intel_mac_seg::sequence_item #(SEGMENTS));
+class sequence_lib_rx #(
+    int unsigned SEGMENTS
+) extends uvm_sequence_library #(uvm_intel_mac_seg::sequence_item #(SEGMENTS));
   `ndk_object_param_utils(
         uvm_logic_vector_array_intel_mac_seg::sequence_lib_rx#(SEGMENTS),
         $sformatf("uvm_logic_vector_array_intel_mac_seg::sequence_lib_rx#(%0d)",SEGMENTS)

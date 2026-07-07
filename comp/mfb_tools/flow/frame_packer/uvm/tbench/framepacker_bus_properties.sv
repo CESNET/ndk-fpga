@@ -4,7 +4,15 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-module framepacker_bus_properties #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEMS, MVB_ITEM_WIDTH)
+module framepacker_bus_properties #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MFB_META_WIDTH,
+    MVB_ITEMS,
+    MVB_ITEM_WIDTH
+)
     (
         input RESET,
         mfb_if mfb_wr_vif,

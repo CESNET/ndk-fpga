@@ -10,7 +10,9 @@
 
 
 // Reusable high level sequence. Contains transaction, which has only data part.
-class sequence_simple #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
+class sequence_simple #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_logic_vector_array::sequence_simple#(ITEM_WIDTH),
         $sformatf("uvm_logic_vector_array::sequence_simple#(%0d)",ITEM_WIDTH)
@@ -29,26 +31,42 @@ class sequence_simple #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_ba
         data_size_min <= data_size_max;
         data_size_min dist {
              cfg.array_size_min :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
              cfg.array_size_max :/ 5
         };
 
         data_size_max dist {
              cfg.array_size_min :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
              cfg.array_size_max :/ 5
         };
@@ -85,7 +103,9 @@ endclass
 
 // High level sequence with same size.
 
-class sequence_simple_const #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
+class sequence_simple_const #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_logic_vector_array::sequence_simple_const#(ITEM_WIDTH),
         $sformatf("uvm_logic_vector_array::sequence_simple_const#(%0d)",ITEM_WIDTH)
@@ -101,13 +121,21 @@ class sequence_simple_const #(int unsigned ITEM_WIDTH) extends uvm_common::seque
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
     constraint c2 {data_size dist {
              cfg.array_size_min :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
              cfg.array_size_max :/ 5
         };}
@@ -144,7 +172,9 @@ endclass
 
 // High level sequence with Gaussian distribution.
 
-class sequence_simple_gauss #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
+class sequence_simple_gauss #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_logic_vector_array::sequence_simple_gauss#(ITEM_WIDTH),
         $sformatf("uvm_logic_vector_array::sequence_simple_gauss#(%0d)",ITEM_WIDTH)
@@ -164,13 +194,21 @@ class sequence_simple_gauss #(int unsigned ITEM_WIDTH) extends uvm_common::seque
     constraint c2 {
         mean dist {
              cfg.array_size_min :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
              cfg.array_size_max :/ 5
         };
@@ -223,7 +261,9 @@ endclass
 
 // High level sequence with increment size.
 
-class sequence_simple_inc #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
+class sequence_simple_inc #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_logic_vector_array::sequence_simple_inc#(ITEM_WIDTH),
         $sformatf("uvm_logic_vector_array::sequence_simple_inc#(%0d)",ITEM_WIDTH)
@@ -261,7 +301,8 @@ class sequence_simple_inc #(int unsigned ITEM_WIDTH) extends uvm_common::sequenc
 
         `uvm_info(m_sequencer.get_full_name(), "\n\tsequence_simple_inc is running", UVM_DEBUG)
         it = 0;
-        while (it < transaction_count && data_size <= cfg.array_size_max && data_size <= border && (state == null || state.next()))begin
+        while (it < transaction_count && data_size <= cfg.array_size_max && data_size <= border &&
+               (state == null || state.next())) begin
             // Generate random request, which must be in interval from min length to max length
             `uvm_do_with(req, {data.size == data_size; });
             data_size += step;
@@ -275,7 +316,9 @@ endclass
 
 // High level sequence with decrement size.
 
-class sequence_simple_dec #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, sequence_item#(ITEM_WIDTH));
+class sequence_simple_dec #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_logic_vector_array::sequence_simple_dec#(ITEM_WIDTH),
         $sformatf("uvm_logic_vector_array::sequence_simple_dec#(%0d)",ITEM_WIDTH)
@@ -315,7 +358,8 @@ class sequence_simple_dec #(int unsigned ITEM_WIDTH) extends uvm_common::sequenc
         `uvm_info(m_sequencer.get_full_name(), "\n\tsequence_simple_dec is running", UVM_DEBUG)
 
         it = 0;
-        while (it < transaction_count && data_size >= cfg.array_size_min && data_size >= border && (state == null || state.next()))begin
+        while (it < transaction_count && data_size >= cfg.array_size_min && data_size >= border &&
+               (state == null || state.next())) begin
             // Generate random request, which must be in interval from min length to max length
             `uvm_do_with(req, {data.size == data_size; });
             data_size -= step;
@@ -423,26 +467,42 @@ class sequence_inverted_gauss #(int unsigned ITEM_WIDTH) extends sequence_simple
         data_size_min <= data_size_max;
         data_size_min dist {
              cfg.array_size_min :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
              cfg.array_size_max :/ 5
         };
 
         data_size_max dist {
              cfg.array_size_min :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*0 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1] :/ 20,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*1 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2] :/ 7,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*2 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3] :/ 5,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*3 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4] :/ 3,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*4 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5] :/ 2,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*5 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*6 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7] :/ 1,
+            // verilog_lint: waive line-length
             [cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*7 : cfg.array_size_min + (cfg.array_size_max-cfg.array_size_min)/8*8] :/ 3,
              cfg.array_size_max :/ 5
         };
@@ -506,7 +566,9 @@ endclass
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY
-class sequence_lib #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_library#(config_sequence, sequence_item#(ITEM_WIDTH));
+class sequence_lib #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_library #(config_sequence, sequence_item #(ITEM_WIDTH));
   `ndk_object_param_utils(
         uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH),
         $sformatf("uvm_logic_vector_array::sequence_lib#(%0d)",ITEM_WIDTH)

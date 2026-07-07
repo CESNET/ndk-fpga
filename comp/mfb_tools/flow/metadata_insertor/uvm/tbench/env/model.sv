@@ -38,6 +38,7 @@ class model #(MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_compon
             input_meta.get(tr_input_meta);
             input_mvb.get(tr_input_mvb);
 
+            // verilog_lint: waive line-length
             tr_output_meta = uvm_logic_vector::sequence_item #(MFB_META_WIDTH+MVB_ITEM_WIDTH)::type_id::create("tr_output_meta");
 
             tr_output_meta.data = {tr_input_meta.data, tr_input_mvb.data};

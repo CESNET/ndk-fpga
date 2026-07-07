@@ -3,8 +3,21 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int unsigned PKT_MTU, int unsigned USERMETA_WIDTH, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_mfb_frame_extender::scoreboard #(MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH))
+class scoreboard #(
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned PKT_MTU,
+    int unsigned USERMETA_WIDTH,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(
+        uvm_mfb_frame_extender::scoreboard #(
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            PKT_MTU,
+            USERMETA_WIDTH,
+            RX_MVB_ITEM_WIDTH
+        ))
 
     // RX analysis exports
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) analysis_export_rx_mfb;
@@ -57,17 +70,32 @@ class scoreboard #(int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int
     endfunction
 
     function void build_phase(uvm_phase phase);
+        // verilog_lint: waive line-length
         comparer_mfb_data = model_data_comparer          #(MFB_ITEM_WIDTH)                                   ::type_id::create("comparer_mfb_data", this);
+        // verilog_lint: waive line-length
         comparer_mfb_meta = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(USERMETA_WIDTH))::type_id::create("comparer_mfb_meta", this);
+        // verilog_lint: waive line-length
         comparer_mvb      = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(USERMETA_WIDTH))::type_id::create("comparer_mvb", this);
         comparer_mfb_data.model_tr_timeout_set(2000us);
         comparer_mfb_meta.model_tr_timeout_set(2000us);
         comparer_mvb     .model_tr_timeout_set(2000us);
 
-        m_model         = model         #(MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)::type_id::create("m_model", this);
-        m_meta_splitter = meta_splitter #(USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)                         ::type_id::create("m_meta_splitter", this);
+        m_model         = model         #(
+            MFB_ITEM_WIDTH,
+            PKT_MTU,
+            USERMETA_WIDTH,
+            RX_MVB_ITEM_WIDTH
+        )::type_id::create("m_model", this);
+        m_meta_splitter = meta_splitter #(
+            USERMETA_WIDTH,
+            RX_MVB_ITEM_WIDTH
+        ) ::type_id::create("m_meta_splitter", this);
 
-        m_coverage_model = coverage_model #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH-USERMETA_WIDTH)::type_id::create("m_coverage_model", this);
+        m_coverage_model = coverage_model #(
+            MFB_BLOCK_SIZE,
+            PKT_MTU,
+            RX_MVB_ITEM_WIDTH-USERMETA_WIDTH
+        )::type_id::create("m_coverage_model", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -102,9 +130,16 @@ class scoreboard #(int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int
         super.report_phase(phase);
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                // verilog_lint: waive line-length
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(get_type_name(),
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                          ,
+                      UVM_NONE)
         end
     endfunction
 

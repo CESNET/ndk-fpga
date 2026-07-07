@@ -7,7 +7,10 @@
 `ifndef MVB_SEQUENCER_SV
 `define MVB_SEQUENCER_SV
 
-class sequencer #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_sequencer #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class sequencer #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_sequencer #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze

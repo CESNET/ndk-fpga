@@ -4,7 +4,9 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_library #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_library #(config_sequence, uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
+class sequence_library #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_library #(config_sequence, uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `uvm_object_param_utils(uvm_packet_generators::sequence_library #(ITEM_WIDTH))
     `uvm_sequence_library_utils(uvm_packet_generators::sequence_library #(ITEM_WIDTH))
 

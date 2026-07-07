@@ -70,12 +70,14 @@ class model#(INPUT_CHANNELS, OUTPUT_CHANNELS, RESET_TYPE, OPT_MODE) extends uvm_
                 int ch_diff;
                 ret = channel[input_port].act + m_regmodel.channel[input_port].ch_min.get();
                 ch_diff = (m_regmodel.channel[input_port].ch_max.get() - m_regmodel.channel[input_port].ch_min.get());
+                // verilog_lint: waive line-length
                 channel[input_port].act = (channel[input_port].act + m_regmodel.channel[input_port].incr.get()) & (ch_diff);
             end else begin
                 int ch_next;
                 ret = channel[input_port].act;
                 ch_next = channel[input_port].act + m_regmodel.channel[input_port].incr.get();
-                if ((ch_next <= m_regmodel.channel[input_port].ch_max.get()) && (ch_next < OUTPUT_CHANNELS) && (ch_next >= m_regmodel.channel[input_port].ch_min.get())) begin
+                if ((ch_next <= m_regmodel.channel[input_port].ch_max.get()) && (ch_next < OUTPUT_CHANNELS) &&
+                    (ch_next >= m_regmodel.channel[input_port].ch_min.get())) begin
                     channel[input_port].act = ch_next;
                 end else begin
                     channel[input_port].act = m_regmodel.channel[input_port].ch_min.get();

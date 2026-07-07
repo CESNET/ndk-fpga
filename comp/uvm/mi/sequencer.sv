@@ -8,7 +8,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class sequencer_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_sequencer #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
+class sequencer_slave #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends
+    uvm_sequencer #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
     `ndk_component_param_utils(
         uvm_mi::sequencer_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequencer_slave#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -20,7 +25,12 @@ class sequencer_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int un
 endclass
 
 
-class sequencer_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_sequencer #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH));
+class sequencer_master #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends
+    uvm_sequencer #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH));
     `ndk_component_param_utils(
         uvm_mi::sequencer_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequencer_master#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)

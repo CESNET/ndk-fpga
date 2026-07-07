@@ -45,7 +45,7 @@ module testbench;
 
         $timeformat(-9, 5, " ns",10);
 
-        uvm_config_db #(virtual reset_if)                                        ::set(null, "", "reset_vif"  , reset_vif);
+        uvm_config_db #(virtual reset_if)::set(null, "", "reset_vif", reset_vif);
         uvm_config_db #(virtual mvb_if #(
             .ITEMS      (ITEMS),
             .ITEM_WIDTH (ITEM_WIDTH + $clog2(TX_PORTS))

@@ -9,7 +9,9 @@ class virt_sequencer #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, QUEUES) extends uvm_se
     `uvm_component_param_utils(uvm_timestamp_limiter::virt_sequencer #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, QUEUES))
 
     uvm_reset::sequencer                                                                                  m_reset_sqr;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array::sequencer #(MFB_ITEM_WIDTH)                                                   m_mfb_data_sqr;
+    // verilog_lint: waive line-length
     uvm_logic_vector::sequencer #(RX_MFB_META_WIDTH)                                                      m_mfb_meta_sqr;
     uvm_timestamp_limiter::regmodel #(QUEUES)                                                             m_regmodel;
 

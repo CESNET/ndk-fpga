@@ -5,7 +5,15 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mfb interface.
-interface mfb_if #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) (input logic CLK);
+interface mfb_if #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) (
+    input logic CLK
+);
     initial begin
         VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && BLOCK_SIZE > 0 && ITEM_WIDTH > 0);
     end

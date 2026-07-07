@@ -3,7 +3,11 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class test_speed #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDTH) extends test_base #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH);
+class test_speed #(
+    int unsigned RX_ITEMS,
+    int unsigned TX_ITEMS,
+    int unsigned ITEM_WIDTH
+) extends test_base #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH);
     typedef uvm_component_registry #(test::test_speed #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH), "test::test_speed") type_id;
 
     // Constructor

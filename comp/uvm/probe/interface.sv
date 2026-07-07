@@ -29,7 +29,9 @@ interface probe_inf #(int unsigned DATA_WIDTH) (
         endfunction
 
         task body();
-            uvm_probe::data#(DATA_WIDTH) data = uvm_probe::data#(DATA_WIDTH)::type_id::create({"probe_event_component", PATH}, null);
+            uvm_probe::data #(DATA_WIDTH) data = uvm_probe::data #(DATA_WIDTH)::type_id::create(
+                {"probe_event_component", PATH}, null
+            );
             forever begin
                 @(posedge CLK);
                 if (event_signal == 1'b1) begin

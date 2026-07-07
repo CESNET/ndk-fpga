@@ -18,7 +18,14 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_cq_mfb2axi::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, STRADDLING, DEVICE)::type_id::create("m_env", this);
+        m_env = uvm_cq_mfb2axi::env #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            STRADDLING,
+            DEVICE
+        )::type_id::create(
+            "m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------

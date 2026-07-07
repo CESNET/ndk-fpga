@@ -110,7 +110,8 @@ class sequence_base_cq #(
     endtask
 
     // This taks create axi transaction
-    virtual task create_sequence_item(ref uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ)) gen);
+    virtual task create_sequence_item(ref uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ
+                                      )) gen);
         int unsigned region;
         int unsigned sof_num;
         int unsigned eof_num;
@@ -300,7 +301,8 @@ class sequence_base_cq #(
         assert((STRADDLING == 0 && ITEMS <= 16) ||
                (STRADDLING == 1 && ITEMS == 16)
         ) else begin
-            `uvm_fatal(m_sequencer.get_full_name(), $sformatf("\n\tSTRADDLING IS NOT IMPLEMENTED --\n\tSTRADDLING %0d\n\tITEMS %0d", STRADDLING, ITEMS));
+            `uvm_fatal(m_sequencer.get_full_name(), $sformatf(
+                       "\n\tSTRADDLING IS NOT IMPLEMENTED --\n\tSTRADDLING %0d\n\tITEMS %0d", STRADDLING, ITEMS));
         end
 
         if(!uvm_config_db#(uvm_common::fifo#(uvm_pcie::header))::get(m_sequencer, "" , "in_fifo", in_fifo)) begin
@@ -315,14 +317,19 @@ class sequence_base_cq #(
         // high-level transactions. Low level transaction
         // have to be count in middle of send_frame and get_response.
         // PEELING LOOP - Send first block
-        gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ))::type_id::create("gen", m_sequencer);
+        gen = uvm_axi::sequence_item #(
+            ITEMS,
+            ITEM_WIDTH,
+            tuser_width_get(ITEMS, AXI_CQ)
+        )::type_id::create("gen", m_sequencer);
         create_sequence_item(gen);
         req = gen;
         send_frame();
 
         while(transactions > 0 || data.size() > 0) begin
             // get response and check if tready is asserted
-            gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ))::type_id::create("gen", m_sequencer);
+            gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ))::type_id::create(
+                "gen", m_sequencer);
             create_sequence_item(gen);
 
             get_response(rsp);

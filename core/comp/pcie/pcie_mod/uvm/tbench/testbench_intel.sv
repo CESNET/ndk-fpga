@@ -106,38 +106,47 @@ module testbench;
     //BUGFIX QUESTASIM
     generate
         if (PCIE_ENDPOINTS == 1) begin : gen_PCIE_ENDPOINTS_1
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
         end else if (PCIE_ENDPOINTS == 2) begin : gen_PCIE_ENDPOINTS_2
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[1].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[1].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
         end else if (PCIE_ENDPOINTS == 4) begin : gen_PCIE_ENDPOINTS_4
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[1].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[1].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[2].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[2].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
-            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[3].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
+            bind PCIE_TRANSACTION_CTRL : $root.testbench.DUT_U.VHDL_DUT_U.pcie_ctrl_g[3].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
                                 .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
                                 .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                                 .CLK         (CLK));
         end else begin : gen_PCIE_ENDPOINTS_unsupported
-            $error("\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n");
+            $error(
+                "\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n"
+            );
         end
     endgenerate
 
@@ -227,7 +236,8 @@ module testbench;
 
 
         for (int unsigned pcie_con = 0; pcie_con < PCIE_CONS; pcie_con++) begin
-            uvm_config_db#(virtual reset_if)::set(null, "", $sformatf("vif_pcie_sysrst_n_%0d", pcie_con), v_pcie_sysrst_n[pcie_con]);
+            uvm_config_db #(virtual reset_if)::set(null, "", $sformatf("vif_pcie_sysrst_n_%0d", pcie_con),
+                                                  v_pcie_sysrst_n[pcie_con]);
         end
 
         for (int unsigned pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
@@ -237,7 +247,8 @@ module testbench;
                 .DATA_WIDTH(32),
                 .ADDR_WIDTH(32)
             ))::set(null, "", {"vif_mi_",i_string}, v_mi_config[pcie_e]);
-            uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_",i_string}, v_pcie_user_reset[pcie_e]);
+            uvm_config_db #(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_", i_string},
+                                                  v_pcie_user_reset[pcie_e]);
             uvm_config_db#(virtual avst_if #(
                 .REGIONS(CQ_MFB_REGIONS),
                 .REGION_SIZE(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE),
@@ -367,6 +378,7 @@ module testbench;
             for (genvar reg_it = 0; reg_it < CQ_MFB_REGIONS; reg_it++) begin : avst_down_gen
                 localparam CQ_REGION_SIZE = CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
 
+                // verilog_lint: waive line-length
                 assign avst_down_data[(reg_it+1)*CQ_REGION_SIZE*ITEM_WIDTH-1 -: CQ_REGION_SIZE*ITEM_WIDTH] = avst_down[pcie_e].DATA[reg_it];
                 assign {
                     down_bar_range[(reg_it+1)*BAR_RANGE_WIDTH-1 -: BAR_RANGE_WIDTH],
@@ -374,14 +386,20 @@ module testbench;
                     down_hdr      [(reg_it+1)*HDR_WIDTH      -1 -: HDR_WIDTH]
                 } = avst_down[pcie_e].META[reg_it];
 
+                // verilog_lint: waive line-length
                 assign avst_down_empty[(reg_it+1)*$clog2(CQ_REGION_SIZE)-1 -: $clog2(CQ_REGION_SIZE)] = avst_down[pcie_e].EMPTY[reg_it];
                 //QUESTA BUG: when (CQ_MFB_REGION_SIZE == 0) then simple assigment fail
+                // verilog_lint: waive line-length
                 assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_SOP[reg_it]    = avst_down[pcie_e].SOP[reg_it];
+                // verilog_lint: waive line-length
                 assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_EOP[reg_it]    = avst_down[pcie_e].EOP[reg_it];
+                // verilog_lint: waive line-length
                 assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_VALID[reg_it]  = avst_down[pcie_e].VALID[reg_it];
             end
 
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_EMPTY     = avst_down_empty;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_BAR_RANGE = down_bar_range;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_PREFIX    = down_prefix;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_HDR       = down_hdr;
@@ -389,11 +407,13 @@ module testbench;
             //assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_SOP    = avst_down[pcie_e].SOP;
             //assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_EOP    = avst_down[pcie_e].EOP;
             //assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_VALID  = avst_down[pcie_e].VALID;
+            // verilog_lint: waive line-length
             assign avst_down[pcie_e].READY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_DOWN_READY;
 
 
             for (genvar reg_it = 0; reg_it < CC_MFB_REGIONS; reg_it++) begin : gen_CC_MFB_REGIONS
                 localparam CC_REGION_SIZE = CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE;
+                // verilog_lint: waive line-length
                 assign avst_up[pcie_e].DATA[reg_it]  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_UP_DATA[(reg_it+1)*CC_REGION_SIZE*ITEM_WIDTH-1 -: CC_REGION_SIZE*ITEM_WIDTH];
                 assign avst_up[pcie_e].EMPTY[reg_it] = '0;
 
@@ -403,8 +423,11 @@ module testbench;
                     up_hdr   [(reg_it+1)*HDR_WIDTH      -1 -: HDR_WIDTH]
                 };
             end
+            // verilog_lint: waive line-length
             assign avst_up[pcie_e].SOP   = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_UP_SOP;
+            // verilog_lint: waive line-length
             assign avst_up[pcie_e].EOP   = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_UP_EOP;
+            // verilog_lint: waive line-length
             assign avst_up[pcie_e].VALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_UP_VALID;
             assign up_hdr        = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_UP_HDR;
             assign up_prefix     = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.AVST_UP_PREFIX;

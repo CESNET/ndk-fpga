@@ -42,53 +42,93 @@ module dut (
     logic [PCIE_CONS*PCIE_LANES-1 : 0] pcie_txn;
 
     // RQ BUS
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS*RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*ITEM_WIDTH                            -1 : 0] dma_rq_mfb_data;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH                                                              -1 : 0] dma_rq_mfb_meta;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS                                                                            -1 : 0] dma_rq_mfb_sof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS                                                                            -1 : 0] dma_rq_mfb_eof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*((RQ_MFB_REGION_SIZE != 1) ? RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE) : RQ_MFB_REGIONS*1)-1 : 0] dma_rq_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE)                               -1 : 0] dma_rq_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rq_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rq_mfb_dst_rdy;
 
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS*sv_dma_bus_pack::DMA_UPHDR_WIDTH                                          -1 : 0] dma_rq_mvb_data;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RQ_MFB_REGIONS                                                                            -1 : 0] dma_rq_mvb_vld;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rq_mvb_src_rdy;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rq_mvb_dst_rdy;
 
     // RC BUS
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS*RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*ITEM_WIDTH                            -1 : 0] dma_rc_mfb_data;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RC_META_WIDTH                                                              -1 : 0] dma_rc_mfb_meta;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS                                                                            -1 : 0] dma_rc_mfb_sof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS                                                                            -1 : 0] dma_rc_mfb_eof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*((RC_MFB_REGION_SIZE != 1) ? RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE) : RC_MFB_REGIONS*1)-1 : 0] dma_rc_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE)                               -1 : 0] dma_rc_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rc_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rc_mfb_dst_rdy;
 
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS*sv_dma_bus_pack::DMA_DOWNHDR_WIDTH                                         -1 : 0] dma_rc_mvb_data;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*RC_MFB_REGIONS                                                                            -1 : 0] dma_rc_mvb_vld;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rc_mvb_src_rdy;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_rc_mvb_dst_rdy;
 
     // CC BUS
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CC_MFB_REGIONS*CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE*ITEM_WIDTH                            -1 : 0] dma_cc_mfb_data;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CC_META_WIDTH                                              -1 : 0] dma_cc_mfb_meta;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CC_MFB_REGIONS                                                                            -1 : 0] dma_cc_mfb_sof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CC_MFB_REGIONS                                                                            -1 : 0] dma_cc_mfb_eof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*((CC_MFB_REGION_SIZE != 1) ? CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE) : CC_MFB_REGIONS*1)-1 : 0] dma_cc_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE)                               -1 : 0] dma_cc_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_cc_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_cc_mfb_dst_rdy;
 
     // CQ BUS
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE*ITEM_WIDTH                            -1 : 0] dma_cq_mfb_data;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CQ_META_WIDTH                                       -1 : 0] dma_cq_mfb_meta;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CQ_MFB_REGIONS                                                                            -1 : 0] dma_cq_mfb_sof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CQ_MFB_REGIONS                                                                            -1 : 0] dma_cq_mfb_eof;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*((CQ_MFB_REGION_SIZE != 1) ? CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE) : CQ_MFB_REGIONS*1)-1 : 0] dma_cq_mfb_sof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS*CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE)                               -1 : 0] dma_cq_mfb_eof_pos;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_cq_mfb_src_rdy;
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*DMA_PORTS                                                                                           -1 : 0] dma_cq_mfb_dst_rdy;
 
     for (genvar pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin : gen_pcie_endpoint
@@ -102,54 +142,96 @@ module dut (
                 assign dma_rc_mvb[pcie][dma].VLD[dma_region] = dma_rc_mvb_vld[DMA_IT*RC_MFB_REGIONS + dma_region];
             end
 
+            // verilog_lint: waive line-length
             assign dma_rq_mfb_data[(DMA_IT+1)*RQ_MFB_REGIONS*RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*ITEM_WIDTH-1 -: RQ_MFB_REGIONS*RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*ITEM_WIDTH]       = dma_rq_mfb[pcie][dma].DATA;
             //assign dma_rq_mfb_meta[(dma_it+1)*RQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH                 -1 -: RQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RQ_META_WIDTH]          = dma_rq_mfb[pcie][dma].META;
+            // verilog_lint: waive line-length
             assign dma_rq_mfb_sof[(DMA_IT+1)*RQ_MFB_REGIONS                                                        -1 -: RQ_MFB_REGIONS]                                                = dma_rq_mfb[pcie][dma].SOF;
+            // verilog_lint: waive line-length
             assign dma_rq_mfb_eof[(DMA_IT+1)*RQ_MFB_REGIONS                                                        -1 -: RQ_MFB_REGIONS]                                                = dma_rq_mfb[pcie][dma].EOF;
             if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_rq
-                assign dma_rq_mfb_sof_pos[(DMA_IT+1)*RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE)                     -1 -: RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE)]                     = dma_rq_mfb[pcie][dma].SOF_POS;
+                assign dma_rq_mfb_sof_pos[(DMA_IT+1)*RQ_MFB_REGIONS*$clog2(
+                    RQ_MFB_REGION_SIZE
+                )-1-:RQ_MFB_REGIONS*$clog2(
+                    RQ_MFB_REGION_SIZE
+                )] = dma_rq_mfb[pcie][dma].SOF_POS;
             end
+            // verilog_lint: waive line-length
             assign dma_rq_mfb_eof_pos[(DMA_IT+1)*RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE)       -1 -: RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE)]   = dma_rq_mfb[pcie][dma].EOF_POS;
+            // verilog_lint: waive line-length
             assign dma_rq_mfb_src_rdy[DMA_IT]                                                                                                                                           = dma_rq_mfb[pcie][dma].SRC_RDY;
+            // verilog_lint: waive line-length
             assign dma_rq_mfb[pcie][dma].DST_RDY                                                                                                                                           = dma_rq_mfb_dst_rdy[DMA_IT];
 
+            // verilog_lint: waive line-length
             assign dma_rq_mvb_data[(DMA_IT+1)*RQ_MFB_REGIONS*sv_dma_bus_pack::DMA_UPHDR_WIDTH                      -1 -: RQ_MFB_REGIONS*sv_dma_bus_pack::DMA_UPHDR_WIDTH]               = dma_rq_mvb[pcie][dma].DATA;
+            // verilog_lint: waive line-length
             assign dma_rq_mvb_src_rdy[DMA_IT]                                                                                                                                           = dma_rq_mvb[pcie][dma].SRC_RDY;
+            // verilog_lint: waive line-length
             assign dma_rq_mvb[pcie][dma].DST_RDY                                                                                                                                           = dma_rq_mvb_dst_rdy[DMA_IT];
 
+            // verilog_lint: waive line-length
             assign dma_cc_mfb_data[(DMA_IT+1)*CC_MFB_REGIONS*CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE*ITEM_WIDTH-1 -: CC_MFB_REGIONS*CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE*ITEM_WIDTH] = dma_cc_mfb[pcie][dma].DATA;
+            // verilog_lint: waive line-length
             assign dma_cc_mfb_meta[(DMA_IT+1)*CC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CC_META_WIDTH                  -1 -: CC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CC_META_WIDTH]   = dma_cc_mfb[pcie][dma].META;
+            // verilog_lint: waive line-length
             assign dma_cc_mfb_sof[(DMA_IT+1)*CC_MFB_REGIONS                                                        -1 -: CC_MFB_REGIONS]                                          = dma_cc_mfb[pcie][dma].SOF;
+            // verilog_lint: waive line-length
             assign dma_cc_mfb_eof[(DMA_IT+1)*CC_MFB_REGIONS                                                        -1 -: CC_MFB_REGIONS]                                          = dma_cc_mfb[pcie][dma].EOF;
             if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_cc
-                assign dma_cc_mfb_sof_pos[(DMA_IT+1)*CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE)                         -1 -: CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE)]           = dma_cc_mfb[pcie][dma].SOF_POS;
+                assign dma_cc_mfb_sof_pos[(DMA_IT+1)*CC_MFB_REGIONS*$clog2(
+                    CC_MFB_REGION_SIZE
+                )-1-:CC_MFB_REGIONS*$clog2(
+                    CC_MFB_REGION_SIZE
+                )] = dma_cc_mfb[pcie][dma].SOF_POS;
             end
+            // verilog_lint: waive line-length
             assign dma_cc_mfb_eof_pos[(DMA_IT+1)*CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE)       -1 -: CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE)]           = dma_cc_mfb[pcie][dma].EOF_POS;
+            // verilog_lint: waive line-length
             assign dma_cc_mfb_src_rdy[DMA_IT]                                                                                                                                                   = dma_cc_mfb[pcie][dma].SRC_RDY;
+            // verilog_lint: waive line-length
             assign dma_cc_mfb[pcie][dma].DST_RDY                                                                                                                                                   = dma_cc_mfb_dst_rdy[DMA_IT];
 
+            // verilog_lint: waive line-length
             assign dma_rc_mfb[pcie][dma].DATA    = dma_rc_mfb_data[(DMA_IT+1)*RC_MFB_REGIONS*RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*ITEM_WIDTH-1 -: RC_MFB_REGIONS*RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*ITEM_WIDTH];
             //assign dma_rc_mfb[pcie][dma].META    = dma_rc_mfb_meta[(dma_it+1)*RC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RC_META_WIDTH                 -1 -: RC_MFB_REGIONS*sv_pcie_meta_pack::PCIE_RC_META_WIDTH];
+            // verilog_lint: waive line-length
             assign dma_rc_mfb[pcie][dma].SOF     = dma_rc_mfb_sof[(DMA_IT+1)*RC_MFB_REGIONS                                                        -1 -: RC_MFB_REGIONS];
+            // verilog_lint: waive line-length
             assign dma_rc_mfb[pcie][dma].EOF     = dma_rc_mfb_eof[(DMA_IT+1)*RC_MFB_REGIONS                                                        -1 -: RC_MFB_REGIONS];
             if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_rc
-                assign dma_rc_mfb[pcie][dma].SOF_POS = dma_rc_mfb_sof_pos[(DMA_IT+1)*RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE)                         -1 -: RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE)];
+                assign dma_rc_mfb[pcie][dma].SOF_POS = dma_rc_mfb_sof_pos[(DMA_IT+1)*RC_MFB_REGIONS*$clog2(
+                    RC_MFB_REGION_SIZE
+                )-1-:RC_MFB_REGIONS*$clog2(
+                    RC_MFB_REGION_SIZE
+                )];
             end
+            // verilog_lint: waive line-length
             assign dma_rc_mfb[pcie][dma].EOF_POS = dma_rc_mfb_eof_pos[(DMA_IT+1)*RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE)       -1 -: RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE)];
             assign dma_rc_mfb[pcie][dma].SRC_RDY = dma_rc_mfb_src_rdy[DMA_IT];
             assign dma_rc_mfb_dst_rdy[DMA_IT] = dma_rc_mfb[pcie][dma].DST_RDY;
 
+            // verilog_lint: waive line-length
             assign dma_rc_mvb[pcie][dma].DATA    = dma_rc_mvb_data[(DMA_IT+1)*RC_MFB_REGIONS*sv_dma_bus_pack::DMA_DOWNHDR_WIDTH                    -1 -: RC_MFB_REGIONS*sv_dma_bus_pack::DMA_DOWNHDR_WIDTH];
             assign dma_rc_mvb[pcie][dma].SRC_RDY = dma_rc_mvb_src_rdy[DMA_IT];
             assign dma_rc_mvb_dst_rdy[DMA_IT] = dma_rc_mvb[pcie][dma].DST_RDY;
 
+            // verilog_lint: waive line-length
             assign dma_cq_mfb[pcie][dma].DATA    = dma_cq_mfb_data[(DMA_IT+1)*CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE*ITEM_WIDTH-1 -: CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE*ITEM_WIDTH];
+            // verilog_lint: waive line-length
             assign dma_cq_mfb[pcie][dma].META    = dma_cq_mfb_meta[(DMA_IT+1)*CQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CQ_META_WIDTH                    -1 -: CQ_MFB_REGIONS*sv_pcie_meta_pack::PCIE_CQ_META_WIDTH];
+            // verilog_lint: waive line-length
             assign dma_cq_mfb[pcie][dma].SOF     = dma_cq_mfb_sof[(DMA_IT+1)*CQ_MFB_REGIONS                                                        -1 -: CQ_MFB_REGIONS];
+            // verilog_lint: waive line-length
             assign dma_cq_mfb[pcie][dma].EOF     = dma_cq_mfb_eof[(DMA_IT+1)*CQ_MFB_REGIONS                                                        -1 -: CQ_MFB_REGIONS];
             if (RQ_MFB_REGION_SIZE > 1) begin : gen_mult_RQ_MFB_REGION_SIZE_cq
-                assign dma_cq_mfb[pcie][dma].SOF_POS = dma_cq_mfb_sof_pos[(DMA_IT+1)*CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE)                         -1 -: CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE)];
+                assign dma_cq_mfb[pcie][dma].SOF_POS = dma_cq_mfb_sof_pos[(DMA_IT+1)*CQ_MFB_REGIONS*$clog2(
+                    CQ_MFB_REGION_SIZE
+                )-1-:CQ_MFB_REGIONS*$clog2(
+                    CQ_MFB_REGION_SIZE
+                )];
             end
+            // verilog_lint: waive line-length
             assign dma_cq_mfb[pcie][dma].EOF_POS = dma_cq_mfb_eof_pos[(DMA_IT+1)*CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE)       -1 -: CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE)];
             assign dma_cq_mfb[pcie][dma].SRC_RDY = dma_cq_mfb_src_rdy[DMA_IT];
             assign dma_cq_mfb_dst_rdy[DMA_IT] = dma_cq_mfb[pcie][dma].DST_RDY;

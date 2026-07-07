@@ -89,7 +89,9 @@ module PROPERTY #(
 
         assert property (no_fall_init)
             else begin
-                `uvm_error(module_name, "\n\tAVST DOWN interface broke protocol R_TILE. The READY signal falls down after inintialization");
+                `uvm_error(
+                    module_name,
+                    "\n\tAVST DOWN interface broke protocol R_TILE. The READY signal falls down after inintialization");
             end
     end endgenerate
 endmodule

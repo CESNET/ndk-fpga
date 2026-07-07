@@ -13,8 +13,13 @@ class generator#(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH, MFB_ITEM_WIDTH) extends u
 
     // PORT DECLARATION
     //INPUT
+    // verilog_lint: waive line-length
     uvm_seq_item_pull_port #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH), uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))                                         seq_item_port_byte_array;
-    uvm_seq_item_pull_port #(uvm_meta::sequence_item #(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH), uvm_meta::sequence_item #(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH)) seq_item_port_info;
+    uvm_seq_item_pull_port #(uvm_meta::sequence_item #(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH), uvm_meta::sequence_item #(
+        PKT_MTU,
+        RX_CHANNELS,
+        HDR_META_WIDTH
+    )) seq_item_port_info;
 
     //OUTPUT - FIFO
     mailbox#(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) byte_array_export;
@@ -51,6 +56,7 @@ class generator#(PKT_MTU, RX_CHANNELS, HDR_META_WIDTH, MFB_ITEM_WIDTH) extends u
             seq_item_port_info.get_next_item(info_req);
 
             $cast(byte_array_new, byte_array_req.clone());
+            // verilog_lint: waive line-length
             logic_vector_new      = uvm_logic_vector::sequence_item#($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1))::type_id::create("logic_vector_new");
             packet_size           = byte_array_new.data.size();
             channel               = info_req.channel;

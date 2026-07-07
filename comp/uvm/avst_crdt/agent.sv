@@ -63,7 +63,8 @@ class agent_rx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_agent;
         // Get a virtual interface instance from the database
         assert(uvm_config_db #(virtual avst_crdt_if #(UPDATE_CNT_WIDTH))::get(null, "", m_config.interface_name, vif))
         else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find an interface with name %s, probably not set!", m_config.interface_name));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find an interface with name %s, probably not set!", m_config.interface_name));
         end
 
         // Connect the driver if the agent is active
@@ -158,7 +159,8 @@ class agent_tx #(int unsigned UPDATE_CNT_WIDTH) extends uvm_agent;
         // Get a virtual interface instance from the database
         assert(uvm_config_db #(virtual avst_crdt_if #(UPDATE_CNT_WIDTH))::get(null, "", m_config.interface_name, vif))
         else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find an interface with name %s, probably not set!", m_config.interface_name));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find an interface with name %s, probably not set!", m_config.interface_name));
         end
 
         // Connect the driver if the agent is active

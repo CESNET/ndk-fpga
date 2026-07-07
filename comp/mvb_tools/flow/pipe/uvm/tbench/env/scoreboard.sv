@@ -38,7 +38,8 @@ class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
 
     function void build_phase(uvm_phase phase);
 
-        cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(ITEM_WIDTH))::type_id::create("cmp",  this);
+        // verilog_lint: waive line-length
+        cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(ITEM_WIDTH))::type_id::create("cmp", this);
         cmp.model_tr_timeout_set(200us);
 
         m_model = model #(ITEM_WIDTH)::type_id::create("m_model", this);
@@ -61,9 +62,16 @@ class scoreboard #(ITEM_WIDTH) extends uvm_scoreboard;
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

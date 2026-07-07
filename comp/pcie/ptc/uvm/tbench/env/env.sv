@@ -135,7 +135,8 @@ class env#(
         m_pcie_rc.analysis_port.connect(m_model.pcie_rc.analysis_export);
         m_pcie_rq.analysis_port.connect(m_scoreboard.pcie_rq_cmp.analysis_imp_dut);
         m_pcie_rq.analysis_port.connect(m_pcie_dev.port_pcie);
-        uvm_config_db#(uvm_pcie::pcie_info#(PCIE_TAG_WIDTH))::set(m_pcie_rc.m_sequencer, "", "pcie_info", m_pcie_dev.rx_info);
+        uvm_config_db #(uvm_pcie::pcie_info #(PCIE_TAG_WIDTH))::set(m_pcie_rc.m_sequencer, "", "pcie_info",
+                                                                  m_pcie_dev.rx_info);
         m_model.pcie_rq.connect(m_scoreboard.pcie_rq_cmp.analysis_imp_model);
 
         m_sequencer.m_dma_reset = m_dma_reset.m_sequencer;

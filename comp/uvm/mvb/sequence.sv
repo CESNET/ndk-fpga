@@ -8,7 +8,10 @@
 `define MVB_SEQUENCE_SV
 
 // This low level sequence define bus functionality
-class sequence_simple_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_sequence #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class sequence_simple_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_sequence #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_mvb::sequence_simple_rx#(ITEMS, ITEM_WIDTH),
         $sformatf("uvm_mvb::sequence_simple_rx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
@@ -66,7 +69,10 @@ endclass
 
 //////////////////////////////////////
 // RX LIBRARY
-class sequence_lib_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_sequence_library#(uvm_mvb::sequence_item#(ITEMS, ITEM_WIDTH));
+class sequence_lib_rx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_sequence_library #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
   `ndk_object_param_utils(
         uvm_mvb::sequence_lib_rx#(ITEMS, ITEM_WIDTH),
         $sformatf("uvm_mvb::sequence_lib_rx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
@@ -86,7 +92,10 @@ class sequence_lib_rx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm
 endclass
 
 // This low level sequence define how can data looks like
-class sequence_simple_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class sequence_simple_tx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze
@@ -147,7 +156,10 @@ endclass
 
 
 // This low level sequence that have every tact dst rdy at tx side
-class sequence_full_speed_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class sequence_full_speed_tx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_mvb::sequence_full_speed_tx#(ITEMS, ITEM_WIDTH),
         $sformatf("uvm_mvb::sequence_full_speed_tx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
@@ -193,7 +205,10 @@ class sequence_full_speed_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) exte
 
 endclass
 
-class sequence_stop_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_common::sequence_base#(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class sequence_stop_tx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_mvb::sequence_stop_tx#(ITEMS, ITEM_WIDTH),
         $sformatf("uvm_mvb::sequence_stop_tx#(%0d,%0d)",ITEMS, ITEM_WIDTH)
@@ -246,7 +261,10 @@ endclass
 
 //////////////////////////////////////
 // TX LIBRARY
-class sequence_lib_tx #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_common::sequence_library#(config_sequence, sequence_item#(ITEMS, ITEM_WIDTH));
+class sequence_lib_tx #(
+    int unsigned ITEMS,
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_library #(config_sequence, sequence_item #(ITEMS, ITEM_WIDTH));
   `ndk_object_param_utils(
         uvm_mvb::sequence_lib_tx#(ITEMS, ITEM_WIDTH),
         $sformatf("uvm_mvb::sequence_lib_tx#(%0d,%0d)",ITEMS, ITEM_WIDTH)

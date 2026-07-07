@@ -11,7 +11,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 // SLAVE SEQUENCE
 //////////////////////////////////////////////////////////////////////////////////
-class sequence_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_sequence#(sequence_item_request#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
+class sequence_slave #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends
+    uvm_sequence #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
     `ndk_object_param_utils(
         uvm_mi::sequence_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_slave#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -58,7 +63,11 @@ class sequence_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int uns
     endfunction
 endclass
 
-class sequence_slave_same_addr #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends sequence_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_slave_same_addr #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends sequence_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_mi::sequence_slave_same_addr#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_slave_same_addr#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -92,7 +101,11 @@ class sequence_slave_same_addr #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDT
     endtask
 endclass
 
-class sequence_slave_incr_addr #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends sequence_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_slave_incr_addr #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends sequence_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_mi::sequence_slave_incr_addr#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_slave_incr_addr#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -142,7 +155,11 @@ class sequence_slave_incr_addr #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDT
     endtask
 endclass
 
-class sequence_slave_burst #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends sequence_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_slave_burst #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends sequence_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_mi::sequence_slave_burst#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_slave_burst#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -188,7 +205,11 @@ class sequence_slave_burst #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, i
     endtask
 endclass
 
-class sequence_slave_sim #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends sequence_slave#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_slave_sim #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends sequence_slave #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_mi::sequence_slave_sim#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_slave_sim#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -262,7 +283,12 @@ class sequence_slave_sim #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int
 endclass
 
 
-class sequence_slave_library #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_sequence_library#(sequence_item_request#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
+class sequence_slave_library #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends uvm_sequence_library
+    #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
     `ndk_object_param_utils(
         uvm_mi::sequence_slave_library#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_slave_library#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -288,7 +314,12 @@ endclass
 ////////////////////////////////////////////////////////////////////////////////////
 // Master SEQUENCE
 ////////////////////////////////////////////////////////////////////////////////////
-class sequence_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_sequence#(sequence_item_response #(DATA_WIDTH), sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH));
+class sequence_master #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends
+    uvm_sequence #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH));
     `ndk_object_param_utils(
         uvm_mi::sequence_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_master#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -340,7 +371,11 @@ class sequence_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int un
 endclass
 
 
-class sequence_master_burst #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends sequence_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_master_burst #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends sequence_master #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_mi::sequence_master_burst#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_master_burst#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -376,7 +411,11 @@ class sequence_master_burst #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, 
     endtask
 endclass
 
-class sequence_master_max #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends sequence_master#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
+class sequence_master_max #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends sequence_master #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_mi::sequence_master_max#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_master_max#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)
@@ -408,7 +447,12 @@ class sequence_master_max #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, in
 endclass
 
 
-class sequence_master_library #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_sequence_library#(sequence_item_request#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
+class sequence_master_library #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends uvm_sequence_library
+    #(sequence_item_request #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH), sequence_item_response #(DATA_WIDTH));
     `ndk_object_param_utils(
         uvm_mi::sequence_master_library#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::sequence_master_library#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)

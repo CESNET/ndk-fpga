@@ -4,13 +4,20 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_item;
+class sequence_item #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_common::sequence_item;
 
     // ------------------------------------------------------------------------
     // Registration of object tools
     `ndk_object_param_utils(
         uvm_mfb::sequence_item#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_mfb::sequence_item#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+                            $sformatf("uvm_mfb::sequence_item #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, BLOCK_SIZE,
+                                      ITEM_WIDTH, META_WIDTH)
     )
 
     // ------------------------------------------------------------------------
@@ -93,6 +100,7 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
         );
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
+            // verilog_lint: waive line-length
             ret = {ret, $sformatf("\n\t-- id %0d\n\tEOF 'b%b EOF_POS %0d\n\tSOF 'b%b SOF_POS %0d\n\tMETA 'h%h\n",  it, eof[it], eof_pos[it], sof[it], sof_pos[it], meta[it])};
             ret = {ret, "\tDATA"};
             for (int unsigned jt = 0; jt < REGION_SIZE*BLOCK_SIZE; jt++) begin

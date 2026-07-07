@@ -6,7 +6,12 @@
 
 
 class scoreboard #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_superunpacketer::scoreboard #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY))
+    `uvm_component_param_utils(uvm_superunpacketer::scoreboard #(
+        HEADER_SIZE,
+        MFB_ITEM_WIDTH,
+        MVB_ITEM_WIDTH,
+        VERBOSITY
+    ))
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))               out_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(HEADER_SIZE+MVB_ITEM_WIDTH))         out_meta;
@@ -44,7 +49,9 @@ class scoreboard #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) exten
     endfunction
 
     function void build_phase(uvm_phase phase);
+        // verilog_lint: waive line-length
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(HEADER_SIZE+MVB_ITEM_WIDTH))::type_id::create("meta_cmp", this);
 
         data_cmp.compared_tr_timeout_set(50us);
@@ -71,9 +78,16 @@ class scoreboard #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) exten
     function void report_phase(uvm_phase phase);
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                // verilog_lint: waive line-length
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------", UVM_NONE)
+            `uvm_info(get_type_name(),
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                          ,
+                      UVM_NONE)
         end
 
     endfunction

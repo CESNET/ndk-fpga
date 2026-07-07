@@ -5,7 +5,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-module timestamp_limiter_property #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH)
+module timestamp_limiter_property #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    RX_MFB_META_WIDTH,
+    TX_MFB_META_WIDTH
+)
     (
         input RESET,
         mfb_if tx_mfb_vif,

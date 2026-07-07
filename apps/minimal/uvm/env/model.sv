@@ -8,8 +8,36 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_app_core::model #(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH);
-    `uvm_component_param_utils(uvm_app_core_minimal::model#(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, REGIONS, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+class model #(
+    ETH_STREAMS,
+    ETH_CHANNELS,
+    ETH_RX_HDR_WIDTH,
+    DMA_STREAMS,
+    DMA_RX_CHANNELS,
+    DMA_TX_CHANNELS,
+    DMA_HDR_META_WIDTH,
+    DMA_PKT_MTU,
+    REGIONS,
+    ITEM_WIDTH,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_app_core::model #(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS,
+                                DMA_HDR_META_WIDTH, DMA_PKT_MTU, ITEM_WIDTH);
+    `uvm_component_param_utils(
+        uvm_app_core_minimal::model #(
+            ETH_STREAMS,
+            ETH_CHANNELS,
+            ETH_RX_HDR_WIDTH,
+            DMA_STREAMS,
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_HDR_META_WIDTH,
+            DMA_PKT_MTU,
+            REGIONS,
+            ITEM_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ))
 
     //LOCAL VARIABLES
     localparam APP_RX_CHANNELS = DMA_RX_CHANNELS/(ETH_STREAMS/DMA_STREAMS);
@@ -25,7 +53,8 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
         for (int unsigned it = 0; it < ETH_STREAMS; it++) begin
             string it_num;
             it_num.itoa(it);
-            eth_to_dma[it] = uvm_channel_router::model#(ETH_CHANNELS, APP_RX_CHANNELS, 2, 1)::type_id::create({"eth_to_dma_index_", it_num}, this);
+            eth_to_dma[it] = uvm_channel_router::model #(ETH_CHANNELS, APP_RX_CHANNELS, 2, 1)::type_id::create(
+                {"eth_to_dma_index_", it_num}, this);
         end
     endfunction
 
@@ -63,7 +92,12 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
             //get item
             eth_rx[index].get(item);
 
-            packet = uvm_app_core::packet #(DMA_HDR_META_WIDTH, DMA_RX_CHANNELS, DMA_PKT_MTU, ITEM_WIDTH)::type_id::create("packet", this);
+            packet = uvm_app_core::packet #(
+                DMA_HDR_META_WIDTH,
+                DMA_RX_CHANNELS,
+                DMA_PKT_MTU,
+                ITEM_WIDTH
+            )::type_id::create("packet", this);
             packet.start = item.start;
             packet.data = item.data;
             packet.meta = '0;
@@ -85,7 +119,12 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
 
     task run_dma(uvm_phase phase, int unsigned index);
         int unsigned eth_channel;
-        uvm_app_core_top_agent::sequence_dma_item#(DMA_RX_CHANNELS, $clog2(DMA_PKT_MTU+1), DMA_HDR_META_WIDTH, ITEM_WIDTH) item;
+        uvm_app_core_top_agent::sequence_dma_item#(
+            DMA_RX_CHANNELS,
+            $clog2(DMA_PKT_MTU+1),
+            DMA_HDR_META_WIDTH,
+            ITEM_WIDTH
+        ) item;
 
         uvm_app_core::packet #(0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1, ITEM_WIDTH) packet;
         //uvm_app_core::packet_header #(0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1) packet_hdr;
@@ -95,8 +134,14 @@ class model #(ETH_STREAMS, ETH_CHANNELS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_C
 
             dma_rx[index].get(item);
 
-            packet = uvm_app_core::packet #(0, 2**ETH_TX_CHANNEL_WIDTH, 2**ETH_TX_LENGTH_WIDTH-1, ITEM_WIDTH)::type_id::create("packet", this);
+            packet = uvm_app_core::packet #(
+                0,
+                2**ETH_TX_CHANNEL_WIDTH,
+                2**ETH_TX_LENGTH_WIDTH-1,
+                ITEM_WIDTH
+            )::type_id::create("packet", this);
             packet.start = item.start;
+            // verilog_lint: waive line-length
             eth_channel = ((index * DMA_TX_CHANNELS) + item.channel)/((DMA_STREAMS*DMA_TX_CHANNELS)/(ETH_STREAMS*ETH_CHANNELS));
             packet.channel = eth_channel;
             packet.discard = 1'b0;

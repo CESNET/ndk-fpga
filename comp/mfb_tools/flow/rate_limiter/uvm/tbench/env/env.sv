@@ -4,15 +4,58 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD) extends uvm_env;
-    `uvm_component_param_utils(uvm_rate_limiter::env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD));
+class env #(
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH,
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MFB_META_WIDTH,
+    INTERVAL_COUNT,
+    SHAPING_TYPE,
+    CLK_PERIOD
+) extends uvm_env;
+    `uvm_component_param_utils(
+        uvm_rate_limiter::env #(
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH,
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH,
+            INTERVAL_COUNT,
+            SHAPING_TYPE,
+            CLK_PERIOD
+        ));
 
+    // verilog_lint: waive line-length
     uvm_reset::agent                                                                                                   m_reset;
+    // verilog_lint: waive line-length
     uvm_mi::regmodel                   #(regmodel#(INTERVAL_COUNT), MI_DATA_WIDTH, MI_ADDR_WIDTH)                      m_regmodel;
-    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_rx;
-    uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_tx;
+    uvm_logic_vector_array_mfb::env_rx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH
+    ) m_env_rx;
+    uvm_logic_vector_array_mfb::env_tx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH
+    ) m_env_tx;
     uvm_rate_limiter::virt_sequencer   #(MFB_ITEM_WIDTH, MFB_META_WIDTH) m_sequencer;
-    scoreboard                         #(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD)     sc;
+    scoreboard                         #(
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH,
+        INTERVAL_COUNT,
+        SHAPING_TYPE,
+        CLK_PERIOD
+    ) sc;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -35,6 +78,7 @@ class env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK
         m_mi_config.agent.active         = UVM_ACTIVE;
         m_mi_config.agent.interface_name = "vif_mi";
         uvm_config_db#(uvm_mi::regmodel_config)::set(this, "m_regmodel", "m_config", m_mi_config);
+        // verilog_lint: waive line-length
         m_regmodel = uvm_mi::regmodel#(regmodel#(INTERVAL_COUNT), MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);
 
         m_config_rx                      = new();
@@ -42,18 +86,39 @@ class env#(MI_DATA_WIDTH, MI_ADDR_WIDTH, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK
         m_config_rx.interface_name       = "vif_rx";
         m_config_rx.meta_behav           = uvm_logic_vector_array_mfb::config_item::META_SOF;
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_rx", this);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_env_rx", this);
 
         m_config_tx                      = new();
         m_config_tx.active               = UVM_ACTIVE;
         m_config_tx.interface_name       = "vif_tx";
         m_config_tx.meta_behav           = uvm_logic_vector_array_mfb::config_item::META_SOF;
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_env_tx", this);
 
-        m_sequencer = uvm_rate_limiter::virt_sequencer#(MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_sequencer", this);
+        m_sequencer = uvm_rate_limiter::virt_sequencer#(
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_sequencer", this);
 
-        sc = scoreboard#(MFB_ITEM_WIDTH, MFB_META_WIDTH, INTERVAL_COUNT, SHAPING_TYPE, CLK_PERIOD)::type_id::create("sc", this);
+        sc = scoreboard#(
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH,
+            INTERVAL_COUNT,
+            SHAPING_TYPE,
+            CLK_PERIOD
+        )::type_id::create("sc", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);

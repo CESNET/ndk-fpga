@@ -5,7 +5,14 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-module superunpacketer_property #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, META_WIDTH)
+module superunpacketer_property #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MVB_ITEM_WIDTH,
+    META_WIDTH
+)
     (
         input RESET,
         mfb_if tx_mfb_vif,

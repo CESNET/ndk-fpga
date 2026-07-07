@@ -5,8 +5,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequencer;
-    `uvm_component_param_utils(virt_sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
+class virt_sequencer #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    META_WIDTH,
+    MVB_DATA_WIDTH,
+    PKT_MTU,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH
+) extends uvm_sequencer;
+    `uvm_component_param_utils(virt_sequencer #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH,
+                                   MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
     uvm_header_type::sequencer#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_info;
 

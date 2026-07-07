@@ -4,7 +4,10 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_cxs2_rx_mvb #(RX_MVB_ITEM_W, USERMETA_W) extends uvm_sequence #(uvm_logic_vector::sequence_item #(RX_MVB_ITEM_W));
+class sequence_cxs2_rx_mvb #(
+    RX_MVB_ITEM_W,
+    USERMETA_W
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #(RX_MVB_ITEM_W));
     `uvm_object_param_utils(test::sequence_cxs2_rx_mvb #(RX_MVB_ITEM_W, USERMETA_W))
 
     // Constructor - creates new instance of this class
@@ -32,17 +35,50 @@ class sequence_cxs2_rx_mvb #(RX_MVB_ITEM_W, USERMETA_W) extends uvm_sequence #(u
 
 endclass
 
-class virt_sequence #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
+class virt_sequence #(
+    RX_MFB_REGIONS,
+    RX_MFB_REGION_S,
+    RX_MFB_BLOCK_S,
+    RX_MFB_ITEM_W,
+    TX_MFB_REGIONS,
+    TX_MFB_REGION_S,
+    TX_MFB_BLOCK_S,
+    TX_MFB_ITEM_W,
+    RX_MVB_ITEM_W,
+    USERMETA_W,
+    FRAME_SIZE_MIN,
+    FRAME_SIZE_MAX
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        test::virt_sequence #(
+            RX_MFB_REGIONS,
+            RX_MFB_REGION_S,
+            RX_MFB_BLOCK_S,
+            RX_MFB_ITEM_W,
+            TX_MFB_REGIONS,
+            TX_MFB_REGION_S,
+            TX_MFB_BLOCK_S,
+            TX_MFB_ITEM_W,
+            RX_MVB_ITEM_W,
+            USERMETA_W,
+            FRAME_SIZE_MIN,
+            FRAME_SIZE_MAX
+        ))
     `uvm_declare_p_sequencer(uvm_mfb_crossbarx_stream2::virt_sequencer #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W))
 
     function new (string name = "virt_sequence");
         super.new(name);
     endfunction
 
+    // verilog_lint: waive line-length
     uvm_reset::sequence_start                                                                                       m_reset;
-    test::sequence_cxs2_rx_mvb #(RX_MVB_ITEM_W, USERMETA_W)                                                         m_mvb_data_seq;
+    test::sequence_cxs2_rx_mvb #(
+        RX_MVB_ITEM_W,
+        USERMETA_W
+    ) m_mvb_data_seq;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array::sequence_lib #(RX_MFB_ITEM_W)                                                           m_mfb_data_sq_lib;
+    // verilog_lint: waive line-length
     uvm_logic_vector::sequence_endless #(USERMETA_W)                                                                m_mfb_meta_sq;
 
 
@@ -52,9 +88,13 @@ class virt_sequence #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_IT
 
         m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset");
         m_reset.reset.length_min = 10;
+        // verilog_lint: waive line-length
         m_mfb_data_sq_lib   = uvm_logic_vector_array::sequence_lib #(RX_MFB_ITEM_W)::type_id::create("m_mfb_data_sq_lib");
         m_mfb_meta_sq       = uvm_logic_vector::sequence_endless #(USERMETA_W)::type_id::create("m_mfb_meta_sq");
-        m_mvb_data_seq      = test::sequence_cxs2_rx_mvb #(RX_MVB_ITEM_W, USERMETA_W)::type_id::create("m_mvb_data_seq");
+        m_mvb_data_seq      = test::sequence_cxs2_rx_mvb #(
+            RX_MVB_ITEM_W,
+            USERMETA_W
+        )::type_id::create("m_mvb_data_seq");
 
         m_mfb_data_sq_lib.init_sequence();
         m_mfb_data_sq_lib.cfg = new();
