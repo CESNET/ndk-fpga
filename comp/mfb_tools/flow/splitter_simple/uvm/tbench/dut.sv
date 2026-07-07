@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     reset_if        reset,
     mfb_if.dut_rx   mfb_rx,
@@ -32,7 +32,7 @@ module DUT (
     logic [REGIONS*$clog2(SPLITTER_OUTPUTS) -1:0] rx_mfb_sel;
 
     generate
-        for (genvar i = 0; i< SPLITTER_OUTPUTS; i++) begin
+        for (genvar i = 0; i< SPLITTER_OUTPUTS; i++) begin : gen_i
             assign mfb_tx[i].DATA    = tx_mfb_data[i];
             assign mfb_tx[i].META    = tx_mfb_meta[i];
             assign mfb_tx[i].SOF     = tx_mfb_sof[i];
@@ -43,8 +43,10 @@ module DUT (
             assign tx_mfb_dst_rdy[i] = mfb_tx [i].DST_RDY;
         end
 
-        for (genvar it = 0; it < REGIONS; it++) begin
+        for (genvar it = 0; it < REGIONS; it++) begin : gen_it
+            // verilog_lint: waive line-length
             assign rx_mfb_meta[(it+1)*META_WIDTH-1 -: META_WIDTH]                             = mfb_rx.META[it*(META_WIDTH +$clog2(SPLITTER_OUTPUTS)) +META_WIDTH -1                           -: META_WIDTH];
+            // verilog_lint: waive line-length
             assign rx_mfb_sel [(it+1)*$clog2(SPLITTER_OUTPUTS)-1 -: $clog2(SPLITTER_OUTPUTS)] = mfb_rx.META[it*(META_WIDTH +$clog2(SPLITTER_OUTPUTS)) +META_WIDTH +$clog2(SPLITTER_OUTPUTS) -1 -: $clog2(SPLITTER_OUTPUTS)];
         end
     endgenerate

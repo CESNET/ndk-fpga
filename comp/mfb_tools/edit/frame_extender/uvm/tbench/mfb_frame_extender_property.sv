@@ -3,7 +3,14 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module mfb_frame_extender_property #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) (
+module mfb_frame_extender_property #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    USERMETA_WIDTH,
+    RX_MVB_ITEM_WIDTH
+) (
         input  RESET,
         mfb_if mfb_rx,
         mvb_if mvb_rx,

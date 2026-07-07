@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic CLK,
     input logic RST,
     mvb_if.dut_rx mvb_rx,
@@ -14,7 +14,11 @@ module DUT (
     mvb_if.dut_tx mvb_status
 );
 
-    bind FIFOX : VHDL_DUT_U probe_inf #(2) probe_status((RESET === 1'b0), { wr_en, rd_en }, CLK);
+    bind FIFOX : VHDL_DUT_U probe_inf #(2) probe_status(
+        .event_signal((RESET === 1'b0)),
+        .event_data  ({wr_en, rd_en}    ),
+        .CLK         (CLK               )
+    );
 
     logic wr;
     logic full;

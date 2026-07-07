@@ -41,10 +41,11 @@ class model #(LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH, LUT_DEPTH) extends uv
             model_mvb_in.get(tr_mvb_in);
             for (int unsigned slice = 0; slice<(LUT_WIDTH/SW_WIDTH); slice++) begin
                 // In case of register, there is addres 0 and every slice is on address which is incremented with 2
-                if (LUT_DEPTH == 1)
+                if (LUT_DEPTH == 1) begin
                     value_in = (tr_mvb_in.data/4)+(LUT_DEPTH*slice)*2;
-                else
+                end else begin
                     value_in = (tr_mvb_in.data/4)+(LUT_DEPTH*slice);
+                end
                 m_regmodel.lut.read(status, value_in, value);
                 tr_mvb_out.data[SW_WIDTH*slice +: SW_WIDTH] = value[SW_WIDTH-1 : 0];
             end

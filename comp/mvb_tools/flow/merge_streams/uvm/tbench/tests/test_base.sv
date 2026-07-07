@@ -4,7 +4,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class test_base #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends uvm_test;
-    typedef uvm_component_registry #(test::test_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS), "test::test_base") type_id;
+    typedef uvm_component_registry #(test::test_base #(
+        MVB_ITEMS,
+        MVB_ITEM_WIDTH,
+        RX_STREAMS
+    ), "test::test_base") type_id;
 
     // Verification environment
     uvm_mvb_merge_streams::env #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) m_env;
@@ -25,7 +29,8 @@ class test_base #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsig
         virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) m_virtual_sequence;
 
 
-        m_virtual_sequence = virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_virtual_sequence", this);
+        m_virtual_sequence =
+            virtual_sequence_base #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_virtual_sequence", this);
 
         // Raise objection
         phase.raise_objection(this);

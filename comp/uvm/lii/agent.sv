@@ -12,7 +12,12 @@
 `define LII_AGENT_SV
 
 // This is LII agent, which declares basic components.
-class agent_rx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_agent;
+class agent_rx #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_agent;
 
     // Registration of agent to databaze.
     `ndk_component_param_utils(
@@ -64,7 +69,9 @@ class agent_rx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDT
         virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH) vif;
         super.connect_phase(phase);
 
-        if(!uvm_config_db #(virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             `uvm_fatal(this.get_full_name(), "Cannot find 'lii_interface' inside uvm_config_db, probably not set!")
         end
 
@@ -82,7 +89,12 @@ endclass
 
 
 // This is LII agent, which declares basic components.
-class agent_tx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_agent;
+class agent_tx #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_agent;
 
     // Registration of agent to databaze.
     `ndk_component_param_utils(
@@ -134,7 +146,9 @@ class agent_tx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDT
         virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH) vif;
         super.connect_phase(phase);
 
-        if(!uvm_config_db #(virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             $write("Interface name %s interface %p\n", m_config.interface_name, vif);
             `uvm_fatal("configuration", "Cannot find 'lii_interface' inside uvm_config_db, probably not set!")
         end
@@ -152,7 +166,13 @@ class agent_tx #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDT
 endclass
 
 // This is ETH PHY agent, which declares basic components.
-class agent_rx_eth_phy #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, logic MEAS, int unsigned SOF_WIDTH) extends uvm_agent;
+class agent_rx_eth_phy #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    logic MEAS,
+    int unsigned SOF_WIDTH
+) extends uvm_agent;
 
     // Registration of agent to databaze.
     `ndk_component_param_utils(
@@ -187,7 +207,13 @@ class agent_rx_eth_phy #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned M
 
         if(get_is_active() == UVM_ACTIVE) begin
             m_sequencer = sequencer #(DATA_WIDTH, META_WIDTH, SOF_WIDTH)::type_id::create("m_sequencer", this);
-            m_driver    = driver_rx_eth_phy #(DATA_WIDTH, FAST_SOF, META_WIDTH, MEAS, SOF_WIDTH)::type_id::create("m_driver", this);
+            m_driver    = driver_rx_eth_phy #(
+                DATA_WIDTH,
+                FAST_SOF,
+                META_WIDTH,
+                MEAS,
+                SOF_WIDTH
+            )::type_id::create("m_driver", this);
         end
         m_monitor   = monitor #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH)::type_id::create("m_monitor", this);
     endfunction
@@ -201,7 +227,9 @@ class agent_rx_eth_phy #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned M
         virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH) vif;
         super.connect_phase(phase);
 
-        if(!uvm_config_db #(virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual lii_if #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             $write("Interface name %s interface %p\n", m_config.interface_name, vif);
             `uvm_fatal("configuration", "Cannot find 'lii_interface' inside uvm_config_db, probably not set!")
         end

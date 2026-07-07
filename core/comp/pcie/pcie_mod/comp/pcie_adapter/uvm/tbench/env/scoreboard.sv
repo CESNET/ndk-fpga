@@ -83,7 +83,7 @@ class scoreboard extends uvm_scoreboard;
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        //Sometime DUT can be quicker that model. Allow some delay to model.
+        //Sometime dut can be quicker that model. Allow some delay to model.
         // TODO: FIX in scoreboard. Timeout use time when first part of packet
         // received to monitor.
         m_pcie_cc.model_tr_timeout_set(100ns);
@@ -102,9 +102,18 @@ class scoreboard extends uvm_scoreboard;
         //$swrite(msg, "%s-------------------------------------------------------------------\n", msg);
 
         if (this.used() == 0 && this.errors() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
 
     endfunction

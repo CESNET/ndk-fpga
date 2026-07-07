@@ -5,8 +5,17 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX) extends uvm_sequence;
-    `uvm_object_param_utils (test::virt_sequence          #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
+class virt_sequence #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MFB_META_WIDTH,
+    FRAME_SIZE_MIN,
+    FRAME_SIZE_MAX
+) extends uvm_sequence;
+    `uvm_object_param_utils(test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
     `uvm_declare_p_sequencer(frame_masker::virt_sequencer #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
     function new (string name = "virt_sequence");
@@ -22,9 +31,12 @@ class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WID
 
     virtual function void init(uvm_phase phase);
 
-        m_reset           = uvm_reset::sequence_start                             ::type_id::create("m_reset_seq"      );
+        m_reset           = uvm_reset::sequence_start                             ::type_id::create("m_reset"      );
+        // verilog_lint: waive line-length
         m_mfb_data_sq_lib = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_mfb_data_sq_lib");
+        // verilog_lint: waive line-length
         m_mfb_meta_sq     = uvm_logic_vector::sequence_endless   #(MFB_META_WIDTH)::type_id::create("m_mfb_meta_sq"    );
+        // verilog_lint: waive line-length
         m_mvb_data_seq    = uvm_logic_vector::sequence_endless   #(MFB_REGIONS)   ::type_id::create("m_mvb_data_seq", p_sequencer);
 
         m_mfb_data_sq_lib.init_sequence();

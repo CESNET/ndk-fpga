@@ -28,7 +28,7 @@ module testbench;
     always #(CLK_PERIOD   /2) CLK    = ~CLK;
     always #(MI_CLK_PERIOD/2) MI_CLK = ~MI_CLK;
 
-    DUT DUT_U (
+    dut DUT_U (
         .CLK        (CLK       ),
         .RESET      (RESET     ),
         .MI_CLK     (MI_CLK    ),

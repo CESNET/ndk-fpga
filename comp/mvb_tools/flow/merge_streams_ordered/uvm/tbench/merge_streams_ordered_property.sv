@@ -11,7 +11,7 @@ module merge_streams_ordered_property #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) (
         mvb_if tx_mvb_vif
 );
 
-    for (genvar port = 0; port < RX_STREAMS; port++) begin
+    for (genvar port = 0; port < RX_STREAMS; port++) begin : gen_port
         mvb_property #(
             .ITEMS      (MVB_ITEMS),
             .ITEM_WIDTH (MVB_ITEM_WIDTH)

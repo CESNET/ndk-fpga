@@ -4,8 +4,23 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_items_valid::scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH))
+class scoreboard #(
+    META_WIDTH,
+    MVB_DATA_WIDTH,
+    MVB_ITEMS,
+    MFB_ITEM_WIDTH,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(
+        uvm_items_valid::scoreboard #(
+            META_WIDTH,
+            MVB_DATA_WIDTH,
+            MVB_ITEMS,
+            MFB_ITEM_WIDTH,
+            OFFSET_WIDTH,
+            LENGTH_WIDTH
+        ))
 
     int unsigned compared;
     int unsigned errors;
@@ -52,7 +67,8 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
 
 
     function void build_phase(uvm_phase phase);
-        m_model    = model#(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_model", this);
+        m_model = model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create(
+            "m_model", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -64,7 +80,7 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
         // processed data from the output of the model connected to the analysis fifo
         m_model.out_mvb.connect(model_mvb.analysis_export);
         m_model.out_mvb_end.connect(model_mvb_end.analysis_export);
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_mvb.connect(dut_mvb.analysis_export);
         end_mvb.connect(dut_end_mvb.analysis_export);
 
@@ -88,8 +104,8 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
             msg = "\n";
             msg = {msg, $sformatf("MVB Model %s\n" , tr_model_mvb.convert2string())};
             msg = {msg, $sformatf("END Model %d\n" , tr_model_mvb_end.data)};
-            msg = {msg, $sformatf("MVB DUT %s\n"   , tr_dut_mvb.convert2string())};
-            msg = {msg, $sformatf("END DUT %d\n"   , tr_dut_end_mvb.data)};
+            msg = {msg, $sformatf("MVB dut %s\n"   , tr_dut_mvb.convert2string())};
+            msg = {msg, $sformatf("END dut %d\n"   , tr_dut_end_mvb.data)};
             `uvm_info(this.get_full_name(), msg, UVM_MEDIUM)
 
             compared++;
@@ -99,7 +115,15 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
                 errors++;
 
                 `uvm_info(this.get_full_name(), msg ,UVM_NONE)
-                 msg = { msg, $sformatf("\n\tComparison failed at Item number %d! \n\tModel Item:\n%s\n\tDUT Item:\n%s", compared, tr_model_mvb.convert2string(), tr_dut_mvb.convert2string())};
+                msg = {
+                    msg,
+                    $sformatf(
+                        "\n\tComparison failed at Item number %d! \n\tModel Item:\n%s\n\tDUT Item:\n%s",
+                        compared,
+                        tr_model_mvb.convert2string(),
+                        tr_dut_mvb.convert2string()
+                    )
+                };
                 `uvm_error(this.get_full_name(), msg);
             end
 
@@ -108,7 +132,15 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
                 errors++;
 
                 `uvm_info(this.get_full_name(), msg ,UVM_NONE)
-                msg = {msg, $sformatf("\n\tComparison failed at Item number %d! \n\tModel Item:\n%s\n\tDUT Item:\n%s", compared, tr_model_mvb_end.convert2string(), tr_dut_end_mvb.convert2string())};
+                msg = {
+                    msg,
+                    $sformatf(
+                        "\n\tComparison failed at Item number %d! \n\tModel Item:\n%s\n\tDUT Item:\n%s",
+                        compared,
+                        tr_model_mvb_end.convert2string(),
+                        tr_dut_end_mvb.convert2string()
+                    )
+                };
                 `uvm_error(this.get_full_name(), msg);
             end
 
@@ -127,10 +159,26 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, MFB_ITEM_WIDTH, OFFSET
 
         msg = {msg, $sformatf("\n\tCompared Items: %0d and errors %0d", compared, errors)};
         if (errors == 0 && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            msg = {msg, $sformatf("\n\tFIFO is not empty :\n\t\tDUT MVB(%0d) MVB_END(%0d)\n\t\tMODEL MVB(%0d) MVB_END(%0d)", dut_mvb.used(), dut_end_mvb.used(), model_mvb.used(), model_mvb_end.used())};
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            msg = {
+                msg,
+                $sformatf(
+                    "\n\tFIFO is not empty :\n\t\tDUT MVB(%0d) MVB_END(%0d)\n\t\tMODEL MVB(%0d) MVB_END(%0d)",
+                    dut_mvb.used(),
+                    dut_end_mvb.used(),
+                    model_mvb.used(),
+                    model_mvb_end.used()
+                )
+            };
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

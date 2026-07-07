@@ -6,7 +6,8 @@
 
 
 class scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_rx_mac_lite_buffer::scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH))
+    `uvm_component_param_utils(
+        uvm_rx_mac_lite_buffer::scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH))
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH)) analysis_imp_mfb_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item#(MFB_META_WIDTH))       analysis_imp_mfb_meta;
@@ -47,7 +48,9 @@ class scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extend
     function void build_phase(uvm_phase phase);
         m_model = model#(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH)::type_id::create("m_model", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH))::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(MFB_META_WIDTH))::type_id::create("meta_cmp", this);
     endfunction
 
@@ -60,7 +63,7 @@ class scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extend
         m_model.out_mfb_data.connect(data_cmp.analysis_imp_model);
         m_model.out_mvb_data.connect(meta_cmp.analysis_imp_model);
 
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_mfb_data.connect(data_cmp.analysis_imp_dut);
         out_mvb_data.connect(meta_cmp.analysis_imp_dut);
     endfunction
@@ -72,9 +75,16 @@ class scoreboard #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extend
         msg = {msg, $sformatf("\n\tMETA info %s", meta_cmp.info())};
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 

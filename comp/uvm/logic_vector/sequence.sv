@@ -5,7 +5,9 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Reusable high level sequence. Contains transaction, which has only data part
-class sequence_simple #(int unsigned DATA_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH));
+class sequence_simple #(
+    int unsigned DATA_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH));
 
     `ndk_object_param_utils(
         uvm_logic_vector::sequence_simple#(DATA_WIDTH),
@@ -48,7 +50,9 @@ class sequence_simple #(int unsigned DATA_WIDTH) extends uvm_common::sequence_ba
 
 endclass
 
-class sequence_endless #(int unsigned DATA_WIDTH) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH));
+class sequence_endless #(
+    int unsigned DATA_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(DATA_WIDTH));
     `ndk_object_param_utils(
         uvm_logic_vector::sequence_endless#(DATA_WIDTH),
         $sformatf("uvm_logic_vector::sequence_endless#(%0d)",DATA_WIDTH)

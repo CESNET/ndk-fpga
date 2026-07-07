@@ -231,7 +231,15 @@ function automatic uvm_pcie::header hdr_get(
 
         ret.data = new[length](data);
         assert (length <= data.size() && data.size() <= length + REGION_SIZE) else begin
-            const string msg = $sformatf("\n\tData length is not in required boundaries %0d <= %0d <= %0d\n%s", length, data.size(), length + REGION_SIZE, ret.convert2string());
+            const
+            string
+            msg = $sformatf(
+                "\n\tData length is not in required boundaries %0d <= %0d <= %0d\n%s",
+                length,
+                data.size(),
+                length + REGION_SIZE,
+                ret.convert2string()
+            );
             `uvm_fatal(parent != null ? parent.get_full_name() : "", msg);
         end
     end

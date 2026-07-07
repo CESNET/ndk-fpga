@@ -5,7 +5,10 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-class comparer_tx_hdr #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_base_ordered#(uvm_logic_vector::sequence_item#(ITEM_WIDTH), uvm_logic_vector::sequence_item#(ITEM_WIDTH));
+class comparer_tx_hdr #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::comparer_base_ordered
+    #(uvm_logic_vector::sequence_item #(ITEM_WIDTH), uvm_logic_vector::sequence_item #(ITEM_WIDTH));
     `uvm_component_param_utils(uvm_network_mod_env::comparer_tx_hdr#(ITEM_WIDTH))
 
     function new(string name, uvm_component parent = null);
@@ -44,7 +47,9 @@ class comparer_tx_hdr #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_ba
         logic [1-1:0]  model_timestamp_vld;
         logic [64-1:0] model_timestamp;
 
+        // verilog_lint: waive line-length
         {dut_timestamp, dut_timestamp_vld, dut_mac_hit, dut_mac_hit_vld, dut_multicast, dut_broadcast, dut_error_mac, dut_error_crc, dut_error_max_tu, dut_error_min_tu, dut_error_frame, dut_error, dut_port, dut_length} = tr_dut.data;
+        // verilog_lint: waive line-length
         {model_timestamp, model_timestamp_vld, model_mac_hit, model_mac_hit_vld, model_multicast, model_broadcast, model_error_mac, model_error_crc, model_error_max_tu, model_error_min_tu, model_error_frame, model_error, model_port, model_length} = tr_model.data;
 
         ret &= dut_length === model_length            ;
@@ -80,6 +85,7 @@ class comparer_tx_hdr #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_ba
         logic [1-1:0]  model_timestamp_vld;
         logic [64-1:0] model_timestamp;
 
+        // verilog_lint: waive line-length
         {model_timestamp, model_timestamp_vld, model_mac_hit, model_mac_hit_vld, model_multicast, model_broadcast, model_error_mac, model_error_crc, model_error_max_tu, model_error_min_tu, model_error_frame, model_error, model_port, model_length} = tr.data;
 
         msg = tr.time2string();
@@ -117,6 +123,7 @@ class comparer_tx_hdr #(int unsigned ITEM_WIDTH) extends uvm_common::comparer_ba
         logic [1-1:0]  dut_timestamp_vld;
         logic [64-1:0] dut_timestamp;
 
+        // verilog_lint: waive line-length
         {dut_timestamp, dut_timestamp_vld, dut_mac_hit, dut_mac_hit_vld, dut_multicast, dut_broadcast, dut_error_mac, dut_error_crc, dut_error_max_tu, dut_error_min_tu, dut_error_frame, dut_error, dut_port, dut_length} = tr.data;
 
         msg = tr.time2string();

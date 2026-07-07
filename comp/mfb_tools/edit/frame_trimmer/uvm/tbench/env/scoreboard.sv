@@ -3,11 +3,21 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_mfb_frame_trimmer::scoreboard #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
+class scoreboard #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(
+        uvm_mfb_frame_trimmer::scoreboard #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
 
     // RX analysis exports
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))               analysis_export_rx_mfb_data;
+    // verilog_lint: waive line-length
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(META_WIDTH+1+$clog2(PKT_MTU+1))) analysis_export_rx_mfb_meta;
 
     // TX analysis exports
@@ -51,7 +61,9 @@ class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
     endfunction
 
     function void build_phase(uvm_phase phase);
+        // verilog_lint: waive line-length
         comparer_data = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH))::type_id::create("comparer_data", this);
+        // verilog_lint: waive line-length
         comparer_meta = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(META_WIDTH))      ::type_id::create("comparer_meta", this);
         comparer_data.model_tr_timeout_set(2000us);
         comparer_meta.model_tr_timeout_set(2000us);
@@ -89,13 +101,27 @@ class scoreboard #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
         string msg = "\n";
 
         if (m_model.in_data.used() > 0 || m_model.in_trim.used() > 0) begin
-            msg = { msg, $sformatf("\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tTRIM:%0d", m_model.in_data.used(), m_model.in_trim.used()) };
+            msg = {
+                msg,
+                $sformatf(
+                    "\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tTRIM:%0d",
+                    m_model.in_data.used(),
+                    m_model.in_trim.used()
+                )
+            };
         end
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 

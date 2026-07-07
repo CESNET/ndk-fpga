@@ -6,9 +6,19 @@
 
 // Environment for functional verification of encode.
 // This environment containts two mii agents.
-class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH, SPACE_SIZE_MIN, SPACE_SIZE_MAX) extends uvm_env;
+class env #(
+    ITEMS,
+    LUT_WIDTH,
+    REG_DEPTH,
+    SW_WIDTH,
+    SLICE_WIDTH,
+    LUT_DEPTH,
+    SPACE_SIZE_MIN,
+    SPACE_SIZE_MAX
+) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_lookup_table::env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH, SPACE_SIZE_MIN, SPACE_SIZE_MAX));
+    `uvm_component_param_utils(uvm_lookup_table::env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH,
+                                   SPACE_SIZE_MIN, SPACE_SIZE_MAX));
 
     uvm_logic_vector_mvb::env_rx #(ITEMS, REG_DEPTH-SLICE_WIDTH) m_mvb_rx_env;
     uvm_logic_vector_mvb::config_item                            m_mvb_rx_config;
@@ -66,9 +76,18 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH, SPACE
         uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, "m_mvb_rx_env", "m_config", m_mvb_rx_config);
 
         m_mvb_tx_env = uvm_logic_vector_mvb::env_tx #(ITEMS, LUT_WIDTH)::type_id::create("m_mvb_tx_env", this);
-        m_mvb_rx_env = uvm_logic_vector_mvb::env_rx #(ITEMS, REG_DEPTH-SLICE_WIDTH)::type_id::create("m_mvb_rx_env", this);
+        m_mvb_rx_env = uvm_logic_vector_mvb::env_rx #(
+            ITEMS,
+            REG_DEPTH-SLICE_WIDTH
+        )::type_id::create("m_mvb_rx_env", this);
 
-        vscr   = uvm_lookup_table::virt_sequencer#(ITEMS, LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH)::type_id::create("vscr",this);
+        vscr   = uvm_lookup_table::virt_sequencer#(
+            ITEMS,
+            LUT_WIDTH,
+            REG_DEPTH,
+            SLICE_WIDTH,
+            SW_WIDTH
+        )::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

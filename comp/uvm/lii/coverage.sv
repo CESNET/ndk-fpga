@@ -4,7 +4,11 @@
 //--
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class coverage #(int unsigned DATA_WIDTH, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_subscriber#(sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH));
+class coverage #(
+    int unsigned DATA_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_subscriber #(sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH));
 
     sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH) seq_item;
 
@@ -44,7 +48,8 @@ class coverage #(int unsigned DATA_WIDTH, int unsigned META_WIDTH, int unsigned 
     endfunction
 
     function void display();
-        $write("Ready signals coverage %f %% byte valid signals coverage %f %%\n", m_cov_rdy_sig.get_inst_coverage(), m_cov_bytes_vld_sig.get_inst_coverage());
+        $write("Ready signals coverage %f %% byte valid signals coverage %f %%\n", m_cov_rdy_sig.get_inst_coverage(),
+               m_cov_bytes_vld_sig.get_inst_coverage());
     endfunction
 
 endclass

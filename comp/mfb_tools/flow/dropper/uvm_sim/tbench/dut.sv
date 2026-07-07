@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mfb_if.dut_rx   mfb_rx,
@@ -17,7 +17,7 @@ module DUT (
     logic [REGIONS-1 : 0]            drop;
 
     generate
-        for (genvar r = 0; r < REGIONS; r++) begin
+        for (genvar r = 0; r < REGIONS; r++) begin : gen_r
             assign meta[(r+1)*META_WIDTH-1 : r*META_WIDTH] = mfb_rx.META[(r+1)*META_WIDTH+r-1 : r*META_WIDTH+r];
             assign drop[r]                                 = mfb_rx.META[(r+1)*META_WIDTH+r];
         end

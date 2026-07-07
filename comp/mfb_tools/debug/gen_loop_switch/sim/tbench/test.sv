@@ -62,7 +62,7 @@ program TEST (
     MfbResponder #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) tx_mfb_responder;
     MfbMonitor   #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) tx_mfb_monitor;
 
-    task createGeneratorEnvironment(int packet_size_min, int packet_size_max);
+    task automatic createGeneratorEnvironment(int packet_size_min, int packet_size_max);
         mi_blueprint = new;
 
         rx_mvb_generator = new("RX MVB Generator",0);
@@ -85,7 +85,7 @@ program TEST (
         mi_trans_mbx = new(1);
     endtask
 
-    task createEnvironment();
+    task automatic createEnvironment();
         mi_driver = new("MI32 Module",mi_trans_mbx,MI);
 
         rx_mvb_driver = new("ETH RX MVB Driver",rx_mvb_generator.transMbx,ETH_RX_MVB);
@@ -129,7 +129,7 @@ program TEST (
         //tx_mfb_monitor.setCallbacks(tx_mfb_scoreboard.monitorCbs);
     endtask
 
-    task resetDesign();
+    task automatic resetDesign();
         RESET    = 1;
         MI_RESET = 1;
         #RESET_TIME;
@@ -137,7 +137,7 @@ program TEST (
         MI_RESET = 0;
     endtask
 
-    task enableTestEnvironment();
+    task automatic enableTestEnvironment();
         mi_driver.setEnabled();
 
         rx_mvb_driver.setEnabled();
@@ -156,7 +156,7 @@ program TEST (
         tx_mfb_responder.setEnabled();
     endtask
 
-    task disableTestEnvironment();
+    task automatic disableTestEnvironment();
         //wait(!rx_mvb_driver.busy && !rx_mfb_driver.busy && !tx_mvb_driver.busy && !tx_mfb_driver.busy);
         //do begin
         //    wait(!rx_mvb_monitor.busy && !rx_mfb_monitor.busy && !tx_mvb_monitor.busy && !tx_mfb_monitor.busy);
@@ -185,20 +185,20 @@ program TEST (
     endtask
 
 
-    task test0(int mux_sel);
+    task automatic test0(int mux_sel);
         static Mi32Transaction mi_trans;
         $cast(mi_trans,mi_blueprint.copy());
         mi_trans.be = '1;
         mi_trans.rw = 1;
 
-        $write("\n\n############ TEST CASE %4b ############\n\n",mux_sel);
+        $write("\n\n############ TEST CASE 0b%4b ############\n\n",mux_sel);
 
         ////////
         // Setup MUXes
         for (int i=0;i<4;i++) begin
             mi_trans.address = 4*i;
             mi_trans.data    = mux_sel>>i;
-            $write("addr: %x, data: %x\n",mi_trans.address,mi_trans.data);
+            $write("addr: 0x%x, data: 0x%x\n",mi_trans.address,mi_trans.data);
             mi_trans_mbx.put(mi_trans.copy());
         end
         ////////

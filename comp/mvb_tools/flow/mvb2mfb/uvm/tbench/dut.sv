@@ -4,7 +4,7 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(
+module dut #(
     int unsigned MVB_ITEMS,
     int unsigned MVB_ITEM_WIDTH_RAW,
     int unsigned MFB_REGIONS,
@@ -26,8 +26,10 @@ module DUT #(
     logic [MVB_ITEMS*MVB_ITEM_WIDTH_RAW-1 : 0] mvb_data;
 
     generate
-        for (genvar i = 0; i < MVB_ITEMS; i++) begin
+        for (genvar i = 0; i < MVB_ITEMS; i++) begin : gen_i
+            // verilog_lint: waive line-length
             assign mvb_data[(i+1)*MVB_ITEM_WIDTH_RAW-1 : MVB_ITEM_WIDTH_RAW*i] = mvb_rx.DATA[i*MVB_ITEM_WIDTH +: MVB_ITEM_WIDTH_RAW];
+            // verilog_lint: waive line-length
             assign mvb_meta[(i+1)*MFB_META_WIDTH-1 : MFB_META_WIDTH*i]         = mvb_rx.DATA[i*MVB_ITEM_WIDTH+MVB_ITEM_WIDTH_RAW +: MFB_META_WIDTH];
         end
     endgenerate

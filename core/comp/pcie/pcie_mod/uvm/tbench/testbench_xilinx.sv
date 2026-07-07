@@ -8,6 +8,8 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 import test::*;
 
+
+// verilog_lint: waive module-filename
 module testbench;
 
     localparam ITEM_WIDTH      = 32;
@@ -39,8 +41,11 @@ module testbench;
     logic [CQ_MFB_REGIONS*PREFIX_WIDTH   -1 : 0] down_prefix[PCIE_CONS]   ;
     logic [CQ_MFB_REGIONS*BAR_RANGE_WIDTH-1 : 0] down_bar_range[PCIE_CONS];
 
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*CC_MFB_REGIONS*HDR_WIDTH                                                                 -1: 0] up_hdr[PCIE_CONS];
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*CC_MFB_REGIONS*PREFIX_WIDTH                                                              -1: 0] up_prefix[PCIE_CONS];
+    // verilog_lint: waive line-length
     logic [PCIE_ENDPOINTS*CC_MFB_REGIONS                                                                           -1: 0] up_error[PCIE_CONS];
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -51,48 +56,113 @@ module testbench;
     reset_if  dma_reset(DMA_CLK);
     // For Xilinx (AXI)
     localparam int unsigned AXI_ITEMS = CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
-    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)) cq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)) cc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)) rq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)) rc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
-    // For Intel and Xilinx (MFB)
-    mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0)  dma_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                      dma_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0)  dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                    dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    axi_if #(
+        .ITEMS       (AXI_ITEMS),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ))
+    ) cq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    axi_if #(
+        .ITEMS       (AXI_ITEMS),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC))
+    ) cc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    axi_if #(
+        .ITEMS       (AXI_ITEMS),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
+    ) rq_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+    axi_if #(
+        .ITEMS       (AXI_ITEMS),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC))
+    ) rc_axi[PCIE_ENDPOINTS](PCIE_USER_CLK);
+        // For Intel and Xilinx (MFB)
+    mfb_if #(
+        .REGIONS (RQ_MFB_REGIONS),
+        .REGION_SIZE (RQ_MFB_REGION_SIZE),
+        .BLOCK_SIZE (RQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    )  dma_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mvb_if #(
+        .ITEMS (RQ_MFB_REGIONS),
+        .ITEM_WIDTH (sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+    )                      dma_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(
+        .REGIONS (RC_MFB_REGIONS),
+        .REGION_SIZE (RC_MFB_REGION_SIZE),
+        .BLOCK_SIZE (RC_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    )  dma_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mvb_if #(
+        .ITEMS (RC_MFB_REGIONS),
+        .ITEM_WIDTH (sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+    )                    dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
 
-    mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)  dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH)  dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
-    mi_if  #(32, 32) config_mi[PCIE_ENDPOINTS] (MI_CLK);
+    mfb_if #(
+        .REGIONS (CQ_MFB_REGIONS),
+        .REGION_SIZE (CQ_MFB_REGION_SIZE),
+        .BLOCK_SIZE (CQ_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+    )  dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mfb_if #(
+        .REGIONS (CC_MFB_REGIONS),
+        .REGION_SIZE (CC_MFB_REGION_SIZE),
+        .BLOCK_SIZE (CC_MFB_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+    )  dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS](DMA_CLK);
+    mi_if #(
+        .DATA_WIDTH (32),
+        .ADDR_WIDTH (32)
+    ) config_mi[PCIE_ENDPOINTS] (MI_CLK);
 
     //bind TAG_PROBE : DUT_U.VHDL_DUT_U. pcie_ctrl_g[it].pcie_ctrl_i.ptc_i  probe_inf #(2*REGIONS) probe_drop({tagm_mvb_out_src_rdy & tagm_mvb_out_src_rdy},
     //                                                                                                        {s_rx_eof_orig_reg, s_rx_force_drop_reg}, PCIE_USER_CLK);
     generate
-        if (PCIE_ENDPOINTS == 1) begin
-            bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i probe_inf #(MVB_UP_ITEMS*(1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag(
-                            {tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}, {tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}, CLK);
-        end else begin
-            $error("\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n");
+        if (PCIE_ENDPOINTS == 1) begin : gen_PCIE_ENDPOINTS_1
+            bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
+                            .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
+                            .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
+                            .CLK         (CLK)
+                        );
+        end else begin : gen_line_74
+            $error(
+                "\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n"
+            );
         end
     endgenerate
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_P = ~PCIE_SYSCLK_P;
-    always #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_N = ~PCIE_SYSCLK_N;
-    always #(DMA_CLK_PERIOD) PCIE_USER_CLK         = ~PCIE_USER_CLK;
-    always #(DMA_CLK_PERIOD) DMA_CLK               = ~DMA_CLK;
-    always #(MI_CLK_PERIOD) MI_CLK                 = ~MI_CLK;
+    always begin
+        #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_P = ~PCIE_SYSCLK_P;
+    end
+    always begin
+        #(PCIE_SYSCLK_CLK_PERIOD) PCIE_SYSCLK_N = ~PCIE_SYSCLK_N;
+    end
+    always begin
+        #(DMA_CLK_PERIOD) PCIE_USER_CLK         = ~PCIE_USER_CLK;
+    end
+    always begin
+        #(DMA_CLK_PERIOD) DMA_CLK               = ~DMA_CLK;
+    end
+    always begin
+        #(MI_CLK_PERIOD) MI_CLK                 = ~MI_CLK;
+    end
 
-    for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
+    for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin : gen_pcie_e
         assign pcie_user_reset[pcie_e].RESET = pcie_user_reset_logic[pcie_e];
     end
 
-    for (genvar pcie_clks = 0; pcie_clks < PCIE_CONS*PCIE_CLKS; pcie_clks++) begin
+    for (genvar pcie_clks = 0; pcie_clks < PCIE_CONS*PCIE_CLKS; pcie_clks++) begin : gen_pcie_clks
         assign pcie_sysclk_p_logic[pcie_clks] = PCIE_SYSCLK_P;
         assign pcie_sysclk_n_logic[pcie_clks] = PCIE_SYSCLK_N;
     end
-    for (genvar pcie_c = 0; pcie_c < PCIE_CONS; pcie_c++) begin
+    for (genvar pcie_c = 0; pcie_c < PCIE_CONS; pcie_c++) begin : gen_pcie_c
         assign pcie_sysrst_n_logic[pcie_c] = pcie_sysrst_n[pcie_c].RESET;
         // assign INIT_DONE_N = !pcie_sysrst_n[pcie_c].RESET;
     end
@@ -102,47 +172,148 @@ module testbench;
     initial begin
         uvm_root m_root;
         // DMA
-        automatic virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0) v_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mfb;
-        automatic virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH)                                 v_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mvb;
-        automatic virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0) v_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mfb;
-        automatic virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)                               v_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS (RQ_MFB_REGIONS),
+            .REGION_SIZE (RQ_MFB_REGION_SIZE),
+            .BLOCK_SIZE (RQ_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (0)
+        ) v_rq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS (RQ_MFB_REGIONS),
+            .ITEM_WIDTH (sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+        )                                 v_rq_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rq_mvb;
+        automatic virtual mfb_if #(
+            .REGIONS (RC_MFB_REGIONS),
+            .REGION_SIZE (RC_MFB_REGION_SIZE),
+            .BLOCK_SIZE (RC_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (0)
+        ) v_rc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mfb;
+        automatic virtual mvb_if #(
+            .ITEMS (RC_MFB_REGIONS),
+            .ITEM_WIDTH (sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+        )                               v_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS] = dma_rc_mvb;
 
-        automatic virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH) v_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cq_mfb;
-        automatic virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH) v_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cc_mfb;
+        automatic virtual mfb_if #(
+            .REGIONS (CQ_MFB_REGIONS),
+            .REGION_SIZE (CQ_MFB_REGION_SIZE),
+            .BLOCK_SIZE (CQ_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+        ) v_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cq_mfb;
+        automatic virtual mfb_if #(
+            .REGIONS (CC_MFB_REGIONS),
+            .REGION_SIZE (CC_MFB_REGION_SIZE),
+            .BLOCK_SIZE (CC_MFB_BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+        ) v_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS] = dma_cc_mfb;
 
         // AXI
-        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)) v_cq_axi[PCIE_ENDPOINTS] = cq_axi;
-        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)) v_cc_axi[PCIE_ENDPOINTS] = cc_axi;
-        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)) v_rq_axi[PCIE_ENDPOINTS] = rq_axi;
-        automatic virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)) v_rc_axi[PCIE_ENDPOINTS] = rc_axi;
+        automatic virtual axi_if #(
+            .ITEMS       (AXI_ITEMS),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ))
+        ) v_cq_axi[PCIE_ENDPOINTS] = cq_axi;
+        automatic virtual axi_if #(
+            .ITEMS       (AXI_ITEMS),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC))
+        ) v_cc_axi[PCIE_ENDPOINTS] = cc_axi;
+        automatic virtual axi_if #(
+            .ITEMS       (AXI_ITEMS),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
+        ) v_rq_axi[PCIE_ENDPOINTS] = rq_axi;
+        automatic virtual axi_if #(
+            .ITEMS       (AXI_ITEMS),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC))
+        ) v_rc_axi[PCIE_ENDPOINTS] = rc_axi;
 
-        automatic virtual mi_if #(32, 32)                                                                                   v_mi_config[PCIE_ENDPOINTS]       = config_mi;
+        automatic virtual mi_if #(
+            .DATA_WIDTH (32),
+            .ADDR_WIDTH (32)
+        ) v_mi_config[PCIE_ENDPOINTS]       = config_mi;
+        // verilog_lint: waive line-length
         automatic virtual reset_if                                                                                          v_pcie_user_reset[PCIE_ENDPOINTS] = pcie_user_reset;
+        // verilog_lint: waive line-length
         automatic virtual reset_if                                                                                          v_pcie_sysrst_n[PCIE_CONS]        = pcie_sysrst_n;
 
         for (int unsigned pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
             string i_string;
             i_string.itoa(pcie_e);
-            uvm_config_db#(virtual mi_if #(32, 32))::set(null, "", {"vif_mi_",i_string}, v_mi_config[pcie_e]);
-            uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_",i_string}, v_pcie_user_reset[pcie_e]);
+            uvm_config_db#(virtual mi_if #(
+                .DATA_WIDTH (32),
+                .ADDR_WIDTH (32)
+            ))::set(null, "", {"vif_mi_",i_string}, v_mi_config[pcie_e]);
+            uvm_config_db #(virtual reset_if)::set(null, "", {"vif_pcie_user_reset_", i_string},
+                                                  v_pcie_user_reset[pcie_e]);
             uvm_config_db#(virtual reset_if)::set(null, "", {"vif_pcie_sysrst_n_",i_string}, v_pcie_sysrst_n[pcie_e]);
 
             // AXI
-            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ)))::set(null, "", {"vif_pcie_", i_string, "_cq_axi"}, v_cq_axi[pcie_e]);
-            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC)))::set(null, "", {"vif_pcie_", i_string, "_cc_axi"}, v_cc_axi[pcie_e]);
-            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ)))::set(null, "", {"vif_pcie_", i_string, "_rq_axi"}, v_rq_axi[pcie_e]);
-            uvm_config_db#(virtual axi_if #(AXI_ITEMS, ITEM_WIDTH, uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC)))::set(null, "", {"vif_pcie_", i_string, "_rc_axi"}, v_rc_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(
+                .ITEMS       (AXI_ITEMS),
+                .ITEM_WIDTH  (ITEM_WIDTH),
+                .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ))
+            ))::set(null, "", {"vif_pcie_", i_string, "_cq_axi"}, v_cq_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(
+                .ITEMS       (AXI_ITEMS),
+                .ITEM_WIDTH  (ITEM_WIDTH),
+                .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CC))
+            ))::set(null, "", {"vif_pcie_", i_string, "_cc_axi"}, v_cc_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(
+                .ITEMS       (AXI_ITEMS),
+                .ITEM_WIDTH  (ITEM_WIDTH),
+                .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
+            ))::set(null, "", {"vif_pcie_", i_string, "_rq_axi"}, v_rq_axi[pcie_e]);
+            uvm_config_db#(virtual axi_if #(
+                .ITEMS       (AXI_ITEMS),
+                .ITEM_WIDTH  (ITEM_WIDTH),
+                .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_RC))
+            ))::set(null, "", {"vif_pcie_", i_string, "_rc_axi"}, v_rc_axi[pcie_e]);
 
             for (int dma = 0; dma < DMA_PORTS; dma++) begin
                 string dma_string;
                 dma_string = $sformatf("%0d_%0d", pcie_e, dma);
-                uvm_config_db#(virtual mfb_if #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",dma_string, "_rq_mfb"}, v_rq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mvb_if #(RQ_MFB_REGIONS, sv_dma_bus_pack::DMA_UPHDR_WIDTH))::set(null, "", {"vif_dma_", dma_string, "_rq_mvb"}, v_rq_mvb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", {"vif_dma_",dma_string, "_rc_mfb"}, v_rc_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mvb_if #(RC_MFB_REGIONS, sv_dma_bus_pack::DMA_DOWNHDR_WIDTH))::set(null, "", {"vif_dma_",dma_string, "_rc_mvb"}, v_rc_mvb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS (RQ_MFB_REGIONS),
+                    .REGION_SIZE (RQ_MFB_REGION_SIZE),
+                    .BLOCK_SIZE (RQ_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH (ITEM_WIDTH),
+                    .META_WIDTH (0)
+                ))::set(null, "", {"vif_dma_",dma_string, "_rq_mfb"}, v_rq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mvb_if #(
+                    .ITEMS (RQ_MFB_REGIONS),
+                    .ITEM_WIDTH (sv_dma_bus_pack::DMA_UPHDR_WIDTH)
+                ))::set(null, "", {"vif_dma_", dma_string, "_rq_mvb"}, v_rq_mvb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS (RC_MFB_REGIONS),
+                    .REGION_SIZE (RC_MFB_REGION_SIZE),
+                    .BLOCK_SIZE (RC_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH (ITEM_WIDTH),
+                    .META_WIDTH (0)
+                ))::set(null, "", {"vif_dma_",dma_string, "_rc_mfb"}, v_rc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mvb_if #(
+                    .ITEMS (RC_MFB_REGIONS),
+                    .ITEM_WIDTH (sv_dma_bus_pack::DMA_DOWNHDR_WIDTH)
+                ))::set(null, "", {"vif_dma_",dma_string, "_rc_mvb"}, v_rc_mvb[pcie_e][dma]);
 
-                uvm_config_db#(virtual mfb_if #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CQ_META_WIDTH))::set(null, "", {"vif_dma_cq_",dma_string, "_mfb"}, v_cq_mfb[pcie_e][dma]);
-                uvm_config_db#(virtual mfb_if #(CC_MFB_REGIONS, CC_MFB_REGION_SIZE, CC_MFB_BLOCK_SIZE, ITEM_WIDTH, sv_pcie_meta_pack::PCIE_CC_META_WIDTH))::set(null, "", {"vif_dma_cc_",dma_string, "_mfb"}, v_cc_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS (CQ_MFB_REGIONS),
+                    .REGION_SIZE (CQ_MFB_REGION_SIZE),
+                    .BLOCK_SIZE (CQ_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH (ITEM_WIDTH),
+                    .META_WIDTH (sv_pcie_meta_pack::PCIE_CQ_META_WIDTH)
+                ))::set(null, "", {"vif_dma_cq_",dma_string, "_mfb"}, v_cq_mfb[pcie_e][dma]);
+                uvm_config_db#(virtual mfb_if #(
+                    .REGIONS (CC_MFB_REGIONS),
+                    .REGION_SIZE (CC_MFB_REGION_SIZE),
+                    .BLOCK_SIZE (CC_MFB_BLOCK_SIZE),
+                    .ITEM_WIDTH (ITEM_WIDTH),
+                    .META_WIDTH (sv_pcie_meta_pack::PCIE_CC_META_WIDTH)
+                ))::set(null, "", {"vif_dma_cc_",dma_string, "_mfb"}, v_cc_mfb[pcie_e][dma]);
             end
         end
 
@@ -159,9 +330,9 @@ module testbench;
         //REWRITE PCIE
         uvm_pcie::root::type_id::set_inst_override(
             uvm_pcie_axi::root#(
-                CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE,
-                DEVICE,
-                STRADDLING
+                .AXI_ITEMS  (CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE),
+                .DEVICE     (DEVICE),
+                .STRADDLING (STRADDLING)
             )::get_type(), "uvm_test_top.*"
         );
 
@@ -170,8 +341,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .PCIE_SYSCLK_P   (pcie_sysclk_p_logic),
         .PCIE_SYSCLK_N   (pcie_sysclk_n_logic),
         .PCIE_USER_CLK   (pcie_user_clk_logic),
@@ -194,38 +365,60 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // GRAY BOX CONNECTION
     generate
-        for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
+        for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin : gen_pcie_e_greybox
 
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_hip_clk[pcie_e] = PCIE_USER_CLK;
 
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_phy_link_status[pcie_e][0]  = 1'b1;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_phy_link_status[pcie_e][1]  = 1'b1;
 
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_DATA  = cq_axi[pcie_e].TDATA;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_USER  = cq_axi[pcie_e].TUSER;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_LAST  = cq_axi[pcie_e].TLAST;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_KEEP  = cq_axi[pcie_e].TKEEP;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_VALID = cq_axi[pcie_e].TVALID;
+            // verilog_lint: waive line-length
             assign cq_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_READY;
 
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_DATA  = rc_axi[pcie_e].TDATA;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_USER  = rc_axi[pcie_e].TUSER;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_LAST  = rc_axi[pcie_e].TLAST;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_KEEP  = rc_axi[pcie_e].TKEEP;
+            // verilog_lint: waive line-length
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_VALID = rc_axi[pcie_e].TVALID;
+            // verilog_lint: waive line-length
             assign rc_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_READY;
 
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_DATA;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_USER;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_LAST;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_KEEP;
+            // verilog_lint: waive line-length
             assign cc_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_VALID;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cc_axi_ready[pcie_e][0] = cc_axi[pcie_e].TREADY;
 
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_DATA;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_USER;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_LAST;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_KEEP;
+            // verilog_lint: waive line-length
             assign rq_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_VALID;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_rq_axi_ready[pcie_e][0] = rq_axi[pcie_e].TREADY;
 

@@ -12,8 +12,9 @@ class sequence_rx_pcie_burst #(
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
-        uvm_logic_vector_array_mfb::sequence_rx_pcie_burst#(        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_pcie_burst#(%0d,%0d,%0d,%0d,%0d)",        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        uvm_logic_vector_array_mfb::sequence_rx_pcie_burst #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_pcie_burst #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
     uvm_common::rand_length   rand_burst_size; //burst set to 1
     uvm_common::rand_length   rand_space_size; //burst set to 0
@@ -103,14 +104,16 @@ class sequence_rx_pcie_burst #(
 
                     if (state_packet == state_packet_new) begin
                         // Check SOF and EOF position if we can insert packet into this region
-                        if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                        if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE * BLOCK_SIZE) >=
+                                                 (index * BLOCK_SIZE + data.data.size()))) begin
                             break;
                         end
 
                     // Break when straddling is enable and previous eof is
                     // not set. When straddling is not set then generate sof
                     // only to first region
-                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) || cfg.endpoint_type == config_sequence::PCIE)) begin
+                        if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING)
+                                       || cfg.endpoint_type == config_sequence::PCIE)) begin
                         break;
                     end
 
@@ -123,7 +126,8 @@ class sequence_rx_pcie_burst #(
                     end
 
                     if (state_packet == state_packet_data) begin
-                        int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                        int unsigned loop_end = BLOCK_SIZE < (data.data.size() - data_index) ?
+                            BLOCK_SIZE : (data.data.size() - data_index);
                         gen.src_rdy = 1;
 
                         for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -155,7 +159,9 @@ class sequence_rx_pcie_burst #(
         int unsigned probability_min;
         int unsigned probability_max;
 
+        // verilog_lint: waive line-length
         probability_min = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_min)/100;
+        // verilog_lint: waive line-length
         probability_max = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_max)/100;
 
         rand_burst_size.bound_set(probability_min*coeficient, probability_max*coeficient);
@@ -172,9 +178,10 @@ class sequence_rx_pcie_full_speed #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `ndk_object_param_utils(
-        uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    `ndk_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed
+                                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+                            $sformatf("uvm_logic_vector_array_mfb::sequence_rx_pcie_full_speed #(%0d,%0d,%0d,%0d,%0d)",
+                                      REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     function new (string name = "sequence_rx_pcie_full_speed");
@@ -213,14 +220,16 @@ class sequence_rx_pcie_full_speed #(
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE * BLOCK_SIZE) >=
+                                             (index * BLOCK_SIZE + data.data.size()))) begin
                         break;
                     end
 
                     // Break when straddling is enable and previous eof is
                     // not set. When straddling is not set then generate sof
                     // only to first region
-                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) || cfg.endpoint_type == config_sequence::PCIE)) begin
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) ||
+                                   cfg.endpoint_type == config_sequence::PCIE)) begin
                         break;
                     end
 
@@ -233,7 +242,8 @@ class sequence_rx_pcie_full_speed #(
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    int unsigned loop_end = BLOCK_SIZE < (data.data.size() - data_index) ?
+                        BLOCK_SIZE : (data.data.size() - data_index);
                     gen.src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -268,9 +278,10 @@ class sequence_rx_no_inframe_gap #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
-    `ndk_object_param_utils(
-        uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap#(        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap#(%0d,%0d,%0d,%0d,%0d)",        REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    `ndk_object_param_utils(uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap
+                                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+                            $sformatf("uvm_logic_vector_array_mfb::sequence_rx_no_inframe_gap #(%0d,%0d,%0d,%0d,%0d)",
+                                      REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     uvm_common::rand_length   rdy_length;
@@ -314,14 +325,16 @@ class sequence_rx_no_inframe_gap #(
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if (gen.sof[it] == 1 || (gen.eof[it] == 1'b1 && (REGION_SIZE * BLOCK_SIZE) >=
+                                             (index * BLOCK_SIZE + data.data.size()))) begin
                         break;
                     end
 
                     // Break when straddling is enable and previous eof is
                     // not set. When straddling is not set then generate sof
                     // only to first region
-                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) || cfg.endpoint_type == config_sequence::PCIE)) begin
+                    if (it > 0 && ((gen.eof[it-1] == 1'b0 && cfg.endpoint_type == config_sequence::PCIE_STRADDLING) ||
+                                   cfg.endpoint_type == config_sequence::PCIE)) begin
                         break;
                     end
 
@@ -334,7 +347,8 @@ class sequence_rx_no_inframe_gap #(
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    int unsigned loop_end = BLOCK_SIZE < (data.data.size() - data_index) ?
+                        BLOCK_SIZE : (data.data.size() - data_index);
                     gen.src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin

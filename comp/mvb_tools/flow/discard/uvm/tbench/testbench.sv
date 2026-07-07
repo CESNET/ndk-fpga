@@ -18,12 +18,20 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mvb_if #(ITEMS, ITEM_WIDTH+1) mvb_wr(CLK);
-    mvb_if #(ITEMS, ITEM_WIDTH) mvb_rd(CLK);
+    mvb_if #(
+        .ITEMS      (ITEMS),
+        .ITEM_WIDTH (ITEM_WIDTH+1)
+    ) mvb_wr(CLK);
+    mvb_if #(
+        .ITEMS      (ITEMS),
+        .ITEM_WIDTH (ITEM_WIDTH)
+    ) mvb_rd(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Initial reset
@@ -39,8 +47,14 @@ module testbench;
         uvm_root m_root;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mvb_if #(ITEMS, ITEM_WIDTH+1))::set(null, "", "vif_rx", mvb_wr);
-        uvm_config_db#(virtual mvb_if #(ITEMS, ITEM_WIDTH))::set(null, "", "vif_tx", mvb_rd);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (ITEMS),
+            .ITEM_WIDTH (ITEM_WIDTH+1)
+        ))::set(null, "", "vif_rx", mvb_wr);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (ITEMS),
+            .ITEM_WIDTH (ITEM_WIDTH)
+        ))::set(null, "", "vif_tx", mvb_rd);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -54,8 +68,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK    (CLK),
         .RST    (reset.RESET),
         .mvb_wr (mvb_wr),

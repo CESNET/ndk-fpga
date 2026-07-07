@@ -190,7 +190,8 @@ class env #(
         end
 
         //RESET INTERFACE
-        uvm_config_db#(uvm_reset::env_config_item#(PCIE_CONS))::set(this, "m_pcie_sysrst_n", "m_config", m_pcie_sysrst_n_cfg);
+        uvm_config_db #(uvm_reset::env_config_item #(PCIE_CONS))::set(this, "m_pcie_sysrst_n", "m_config",
+                                                                    m_pcie_sysrst_n_cfg);
         m_pcie_sysrst_n = uvm_reset::env#(PCIE_CONS)::type_id::create("m_pcie_sysrst_n", this);
 
         // DMA Reset

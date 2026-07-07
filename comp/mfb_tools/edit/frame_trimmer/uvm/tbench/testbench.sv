@@ -16,22 +16,50 @@ module testbench;
     logic CLK = 0;
     pullup(reset.RESET);
 
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // ---------- //
     // Interfaces //
     // ---------- //
 
     reset_if                                                                               reset (CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH+1+$clog2(PKT_MTU+1)) mfb_rx(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)                     mfb_tx(CLK);
+   mfb_if #(
+       .REGIONS     (REGIONS),
+       .REGION_SIZE (REGION_SIZE),
+       .BLOCK_SIZE  (BLOCK_SIZE),
+       .ITEM_WIDTH  (ITEM_WIDTH),
+       .META_WIDTH  (META_WIDTH+1+$clog2(PKT_MTU+1))
+   ) mfb_rx(CLK);
+   mfb_if #(
+       .REGIONS     (REGIONS),
+       .REGION_SIZE (REGION_SIZE),
+       .BLOCK_SIZE  (BLOCK_SIZE),
+       .ITEM_WIDTH  (ITEM_WIDTH),
+       .META_WIDTH  (META_WIDTH)
+   )                     mfb_tx(CLK);
 
     // ----- //
     // Tests //
     // ----- //
 
-    typedef test::test_base  #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) test_base;
-    typedef test::test_speed #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU) test_speed;
+    typedef test::test_base #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH),
+        .PKT_MTU     (PKT_MTU)
+    ) test_base;
+    typedef test::test_speed #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH),
+        .PKT_MTU     (PKT_MTU)
+    ) test_speed;
 
     // Start of tests
     initial begin
@@ -41,9 +69,21 @@ module testbench;
         // Database configuration //
         // ---------------------- //
 
-        uvm_config_db #(virtual reset_if)                                                                              ::set(null, "", "vif_reset", reset);
-        uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH+1+$clog2(PKT_MTU+1)))::set(null, "", "vif_rx_mfb", mfb_rx);
-        uvm_config_db #(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))                    ::set(null, "", "vif_tx_mfb", mfb_tx);
+        uvm_config_db #(virtual reset_if)::set(null, "", "vif_reset", reset);
+        uvm_config_db #(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH+1+$clog2(PKT_MTU+1))
+        ))::set(null, "", "vif_rx_mfb", mfb_rx);
+        uvm_config_db #(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ))                    ::set(null, "", "vif_tx_mfb", mfb_tx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -57,10 +97,10 @@ module testbench;
     end
 
     // --- //
-    // DUT //
+    // dut //
     // --- //
 
-    DUT #(
+    dut #(
         .REGIONS     (REGIONS),
         .REGION_SIZE (REGION_SIZE),
         .BLOCK_SIZE  (BLOCK_SIZE),

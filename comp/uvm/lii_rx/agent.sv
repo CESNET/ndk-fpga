@@ -12,7 +12,12 @@
 `define LII_AGENT_SV
 
 // This is LII agent, which declares basic components.
-class agent #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_agent;
+class agent #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_agent;
 
     // Registration of agent to databaze.
     `uvm_component_param_utils(uvm_lii_rx::agent #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))
@@ -55,7 +60,9 @@ class agent #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, 
         virtual lii_if_rx #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH) vif;
         super.connect_phase(phase);
 
-        if(!uvm_config_db #(virtual lii_if_rx #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual lii_if_rx #(DATA_WIDTH, FAST_SOF, META_WIDTH, SOF_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             `uvm_fatal("configuration", "Cannot find 'lii_interface' inside uvm_config_db, probably not set!")
         end
 

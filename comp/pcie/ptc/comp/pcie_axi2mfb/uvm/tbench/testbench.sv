@@ -19,12 +19,23 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) mfb_tx(CLK);
-    axi_if #(DATA_WIDTH, TUSER_WIDTH) axi_rx(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_tx(CLK);
+    axi_if #(
+        .ITEMS      (DATA_WIDTH),
+        .ITEM_WIDTH (TUSER_WIDTH)
+    ) axi_rx(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -33,8 +44,17 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_tx);
-        uvm_config_db#(virtual axi_if #(DATA_WIDTH, TUSER_WIDTH))::set(null, "", "vif_rx", axi_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual axi_if #(
+            .ITEMS      (DATA_WIDTH),
+            .ITEM_WIDTH (TUSER_WIDTH)
+        ))::set(null, "", "vif_rx", axi_rx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -48,8 +68,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK        (CLK),
         .RST        (reset.RESET),
         .mfb_tx     (mfb_tx),

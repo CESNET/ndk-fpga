@@ -77,7 +77,7 @@ class sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE) extends uvm_sequence_item;
         string ret;
 
 
-        ret = $sformatf("\tlength : %h\n\tnext : %h\n\tmeta : %h\n\tsup_meta %h\n",
+        ret = $sformatf("\tlength : 0x%h\n\tnext : 0x%h\n\tmeta : 0x%h\n\tsup_meta 0x%h\n",
                      length, next, meta, sup_meta);
 
         return ret;

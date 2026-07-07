@@ -5,13 +5,56 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Environment for the functional verification.
-class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_env;
-    `uvm_component_param_utils(uvm_mfb_crossbarx_stream2::env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W));
+class env #(
+    RX_MFB_REGIONS,
+    RX_MFB_REGION_S,
+    RX_MFB_BLOCK_S,
+    RX_MFB_ITEM_W,
+    TX_MFB_REGIONS,
+    TX_MFB_REGION_S,
+    TX_MFB_BLOCK_S,
+    TX_MFB_ITEM_W,
+    RX_MVB_ITEM_W,
+    USERMETA_W,
+    MOD_W
+) extends uvm_env;
+    `uvm_component_param_utils(
+        uvm_mfb_crossbarx_stream2::env #(
+            RX_MFB_REGIONS,
+            RX_MFB_REGION_S,
+            RX_MFB_BLOCK_S,
+            RX_MFB_ITEM_W,
+            TX_MFB_REGIONS,
+            TX_MFB_REGION_S,
+            TX_MFB_BLOCK_S,
+            TX_MFB_ITEM_W,
+            RX_MVB_ITEM_W,
+            USERMETA_W,
+            MOD_W
+        ));
 
-    uvm_logic_vector_array_mfb::env_rx #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, USERMETA_W) m_env_rx;
-    uvm_logic_vector_array_mfb::env_tx #(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W) m_env_tx;
-    uvm_logic_vector_mvb::env_rx       #(RX_MFB_REGIONS, RX_MVB_ITEM_W)                                              m_env_rx_mvb;
-    uvm_logic_vector_mvb::env_tx       #(TX_MFB_REGIONS, USERMETA_W)                                                 m_env_tx_mvb;
+    uvm_logic_vector_array_mfb::env_rx #(
+        RX_MFB_REGIONS,
+        RX_MFB_REGION_S,
+        RX_MFB_BLOCK_S,
+        RX_MFB_ITEM_W,
+        USERMETA_W
+    ) m_env_rx;
+    uvm_logic_vector_array_mfb::env_tx #(
+        TX_MFB_REGIONS,
+        TX_MFB_REGION_S,
+        TX_MFB_BLOCK_S,
+        TX_MFB_ITEM_W,
+        USERMETA_W
+    ) m_env_tx;
+    uvm_logic_vector_mvb::env_rx       #(
+        RX_MFB_REGIONS,
+        RX_MVB_ITEM_W
+    ) m_env_rx_mvb;
+    uvm_logic_vector_mvb::env_tx       #(
+        TX_MFB_REGIONS,
+        USERMETA_W
+    ) m_env_tx_mvb;
 
     uvm_mfb_crossbarx_stream2::virt_sequencer #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W) vscr;
 
@@ -37,7 +80,9 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
 
         m_logic_vector_array_agent_cfg        = new();
         m_logic_vector_array_agent_cfg.active = UVM_ACTIVE;
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", m_logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 m_logic_vector_array_agent_cfg);
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent   = uvm_logic_vector_array::agent#(RX_MFB_ITEM_W)::type_id::create("m_logic_vector_array_agent", this);
 
         m_config_reset                = new;
@@ -54,7 +99,13 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
         m_config_rx.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_NONE;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, USERMETA_W)::type_id::create("m_env_rx", this);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(
+            RX_MFB_REGIONS,
+            RX_MFB_REGION_S,
+            RX_MFB_BLOCK_S,
+            RX_MFB_ITEM_W,
+            USERMETA_W
+        )::type_id::create("m_env_rx", this);
 
         m_config_tx                = new;
         m_config_tx.active         = UVM_ACTIVE;
@@ -62,14 +113,23 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
         m_config_tx.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_NONE;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, USERMETA_W)::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(
+            TX_MFB_REGIONS,
+            TX_MFB_REGION_S,
+            TX_MFB_BLOCK_S,
+            TX_MFB_ITEM_W,
+            USERMETA_W
+        )::type_id::create("m_env_tx", this);
 
         m_config_mvb_rx                = new;
         m_config_mvb_rx.active         = UVM_ACTIVE;
         m_config_mvb_rx.interface_name = "vif_mvb_rx";
 
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_rx_mvb", "m_config", m_config_mvb_rx);
-        m_env_rx_mvb = uvm_logic_vector_mvb::env_rx#(RX_MFB_REGIONS, RX_MVB_ITEM_W)::type_id::create("m_env_rx_mvb", this);
+        m_env_rx_mvb = uvm_logic_vector_mvb::env_rx#(
+            RX_MFB_REGIONS,
+            RX_MVB_ITEM_W
+        )::type_id::create("m_env_rx_mvb", this);
 
         m_config_mvb_tx                = new;
         m_config_mvb_tx.active         = UVM_ACTIVE;
@@ -79,7 +139,11 @@ class env #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_M
         m_env_tx_mvb = uvm_logic_vector_mvb::env_tx#(TX_MFB_REGIONS, USERMETA_W)::type_id::create("m_env_tx_mvb", this);
 
         sc   = scoreboard#(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W)::type_id::create("sc", this);
-        vscr = uvm_mfb_crossbarx_stream2::virt_sequencer#(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W)::type_id::create("vscr",this);
+        vscr = uvm_mfb_crossbarx_stream2::virt_sequencer#(
+            RX_MFB_ITEM_W,
+            RX_MVB_ITEM_W,
+            USERMETA_W
+        )::type_id::create("vscr",this);
 
     endfunction
 

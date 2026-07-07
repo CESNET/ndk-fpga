@@ -21,8 +21,16 @@ module app_core_property #(ETH_STREAMS, DMA_STREAMS, REGIONS, MFB_REGION_SIZE, M
     );
 
 
-    localparam DMA_RX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_TX_CHANNELS);
-    localparam DMA_TX_MVB_WIDTH = $clog2(test_pkg::DMA_PKT_MTU+1)+test_pkg::DMA_HDR_META_WIDTH+$clog2(test_pkg::DMA_RX_CHANNELS) + 1;
+    localparam DMA_RX_MVB_WIDTH = $clog2(
+        test_pkg::DMA_PKT_MTU + 1
+    ) + test_pkg::DMA_HDR_META_WIDTH + $clog2(
+        test_pkg::DMA_TX_CHANNELS
+    );
+    localparam DMA_TX_MVB_WIDTH = $clog2(
+        test_pkg::DMA_PKT_MTU + 1
+    ) + test_pkg::DMA_HDR_META_WIDTH + $clog2(
+        test_pkg::DMA_RX_CHANNELS
+    ) + 1;
 
     ////////////////////////////////////////
     // ETH INTERFACE
@@ -45,7 +53,7 @@ module app_core_property #(ETH_STREAMS, DMA_STREAMS, REGIONS, MFB_REGION_SIZE, M
         //    .RESET (RESET),
         //    .vif   (eth_tx_mvb[eth_it])
         //);
-        if (CHECK_RX == 1'b1) begin
+        if (CHECK_RX == 1'b1) begin : gen_CHECK_RX_1_b1
             mfb_property #(
                 .REGIONS      (REGIONS),
                 .REGION_SIZE  (MFB_REGION_SIZE),
@@ -94,7 +102,7 @@ module app_core_property #(ETH_STREAMS, DMA_STREAMS, REGIONS, MFB_REGION_SIZE, M
         );
 
 
-        if (CHECK_RX == 1'b1) begin
+        if (CHECK_RX == 1'b1) begin : gen_CHECK_RX_1_b1
             mfb_property #(
                 .REGIONS      (REGIONS),
                 .REGION_SIZE  (MFB_REGION_SIZE),

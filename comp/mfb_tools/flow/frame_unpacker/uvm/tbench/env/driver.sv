@@ -4,16 +4,47 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, OFF_PIPE_STAGES, ZERO_TS = 0, CHSUM_EN = 0, META_WIDTH = 0) extends uvm_component;
-    `uvm_component_param_utils(uvm_superunpacketer::driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, OFF_PIPE_STAGES, ZERO_TS, CHSUM_EN, META_WIDTH))
+class driver #(
+    HEADER_SIZE,
+    VERBOSITY,
+    PKT_MTU,
+    MIN_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MVB_ITEM_WIDTH,
+    OFF_PIPE_STAGES,
+    ZERO_TS = 0,
+    CHSUM_EN = 0,
+    META_WIDTH = 0
+) extends uvm_component;
+    `uvm_component_param_utils(
+        uvm_superunpacketer::driver #(
+            HEADER_SIZE,
+            VERBOSITY,
+            PKT_MTU,
+            MIN_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MVB_ITEM_WIDTH,
+            OFF_PIPE_STAGES,
+            ZERO_TS,
+            CHSUM_EN,
+            META_WIDTH
+        ))
 
     localparam L2_HDR_WIDTH = 7;
     localparam L3_HDR_WIDTH = 9;
 
+    // verilog_lint: waive line-length
     uvm_seq_item_pull_port #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH), uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))                           seq_item_port_byte_array;
+    // verilog_lint: waive line-length
     uvm_seq_item_pull_port #(uvm_superpacket_header::sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE), uvm_superpacket_header::sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE)) seq_item_port_header;
-    uvm_seq_item_pull_port #(uvm_superpacket_size::sequence_item, uvm_superpacket_size::sequence_item)                                                                   seq_item_port_sp_size;
+    uvm_seq_item_pull_port #(
+        uvm_superpacket_size::sequence_item,
+        uvm_superpacket_size::sequence_item
+    ) seq_item_port_sp_size;
 
+    // verilog_lint: waive line-length
     uvm_seq_item_pull_port #(uvm_logic_vector::sequence_item #(META_WIDTH), uvm_logic_vector::sequence_item #(META_WIDTH)) seq_item_port_chsum_hdr;
 
     mailbox#(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) byte_array_export;
@@ -25,7 +56,8 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
 
     uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)              byte_array_req;
     uvm_superpacket_header::sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE) info_req;
-    uvm_superpacket_size::sequence_item                                  size_of_sp; // Size of superpacket in bytes with headers
+    // Size of superpacket in bytes with headers
+    uvm_superpacket_size::sequence_item                                  size_of_sp;
     uvm_logic_vector::sequence_item #(META_WIDTH)                        chsum_hdr;
     uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)              byte_array_new;
     uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)              byte_array_out;
@@ -54,7 +86,10 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
 
 
 
-    function sp_info fill_header(uvm_superpacket_header::sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE) info, logic first);
+    function sp_info fill_header(uvm_superpacket_header::sequence_item #(
+        MVB_ITEM_WIDTH,
+        HEADER_SIZE
+    ) info, logic first);
         logic[HEADER_SIZE-1 : 0] hdr = '0;
         sp_info ret;
         int unsigned chsum_hdrs_len = 0;
@@ -78,9 +113,13 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
         end
         if (CHSUM_EN) begin
             info.meta                                                            = '0;
+            // verilog_lint: waive line-length
             info.meta[L2_HDR_WIDTH-1                : 0                        ] = chsum_hdr.data[$clog2(PKT_MTU)+L2_HDR_WIDTH               -1 : $clog2(PKT_MTU)                          ];
+            // verilog_lint: waive line-length
             info.meta[L3_HDR_WIDTH+L2_HDR_WIDTH-1   : L2_HDR_WIDTH             ] = chsum_hdr.data[$clog2(PKT_MTU)+L2_HDR_WIDTH+L3_HDR_WIDTH  -1 : $clog2(PKT_MTU)+L2_HDR_WIDTH             ];
+            // verilog_lint: waive line-length
             info.meta[L3_HDR_WIDTH+L2_HDR_WIDTH+3-1 : L3_HDR_WIDTH+L2_HDR_WIDTH] = chsum_hdr.data[$clog2(PKT_MTU)+L2_HDR_WIDTH+L3_HDR_WIDTH+3-1 : $clog2(PKT_MTU)+L2_HDR_WIDTH+L3_HDR_WIDTH];
+            // verilog_lint: waive line-length
             chsum_hdrs_len = info.meta[L2_HDR_WIDTH-1 : 0] + info.meta[L3_HDR_WIDTH+L2_HDR_WIDTH-1: L2_HDR_WIDTH] + info.meta[L3_HDR_WIDTH+L2_HDR_WIDTH+3-1 : L3_HDR_WIDTH+L2_HDR_WIDTH] + 20;
             if ((act_size + HEADER_SIZE/MFB_ITEM_WIDTH + chsum_hdrs_len) >= size_of_sp.sp_size) begin
                 chsum_overflow = 1;
@@ -163,6 +202,7 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
             done = 1'b0;
             chsum_overflow = 0;
             debug_msg = "\n";
+            // verilog_lint: waive line-length
             debug_msg = {debug_msg, $sformatf("\n ================ SUPERPACKET %d IN DRIVER =============== \n",  sp_cnt+1)};
             while (done != 1'b1) begin
                 seq_item_port_byte_array.get_next_item(byte_array_req);
@@ -179,7 +219,9 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
                 if (state == FIRST) begin
                     state          = DATA;
 
+                    // verilog_lint: waive line-length
                     byte_array_out = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("byte_array_out");
+                    // verilog_lint: waive line-length
                     logic_vector_out = uvm_logic_vector::sequence_item #(MVB_ITEM_WIDTH)::type_id::create("logic_vector_out");
 
                     logic_vector_out.data = info_req.meta;
@@ -194,7 +236,7 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
                 debug_msg = {debug_msg, $sformatf("PAYLOAD LEN %d\n",  sp_st.hdr[16      -1 : 0     ])};
                 debug_msg = {debug_msg, $sformatf("L2 LEN %d\n",  sp_st.hdr[16+7    -1 : 16    ])};
                 debug_msg = {debug_msg, $sformatf("L3 LEN %d\n",  sp_st.hdr[16+7+9  -1 : 16+7  ])};
-                debug_msg = {debug_msg, $sformatf("FLAG   %b\n",  sp_st.hdr[16+7+9+3-1 : 16+7+9])};
+                debug_msg = {debug_msg, $sformatf("FLAG   0b%b\n",  sp_st.hdr[16+7+9+3-1 : 16+7+9])};
 
                 len_with_hdr = byte_array_new.size() + HEADER_SIZE/MFB_ITEM_WIDTH;
                 if (VERBOSITY >= 3) begin
@@ -205,12 +247,15 @@ class driver#(HEADER_SIZE, VERBOSITY, PKT_MTU, MIN_SIZE, MFB_BLOCK_SIZE, MFB_ITE
                     msg = {msg, $sformatf("\tHEADER_SIZE/MFB_ITEM_WIDTH %d\n",  HEADER_SIZE/MFB_ITEM_WIDTH)};
                     msg = {msg, $sformatf("\tsize_of_sp.sp_size %d\n",  size_of_sp.sp_size)};
                     msg = {msg, $sformatf("\tALIGN %d\n",  MFB_BLOCK_SIZE-len_with_hdr[3-1 : 0])};
+                    // verilog_lint: waive line-length
                     msg = {msg, $sformatf("\tSOLUTION %d\n",  signed'((size_of_sp.sp_size - (act_size + len_with_hdr + HEADER_SIZE/MFB_ITEM_WIDTH + MIN_DATA_SIZE + (MFB_BLOCK_SIZE - int'(len_with_hdr[3-1 : 0]) )))))};
                     `uvm_info(this.get_full_name(), msg ,UVM_FULL)
                 end
 
                 // Check if there is a place for another packet
-                if (signed'((size_of_sp.sp_size - (act_size + len_with_hdr + HEADER_SIZE/MFB_ITEM_WIDTH + MIN_DATA_SIZE + (MFB_BLOCK_SIZE - int'(len_with_hdr[3-1 : 0]) )))) < 0) begin
+                if (signed'((size_of_sp.sp_size - (act_size + len_with_hdr + HEADER_SIZE / MFB_ITEM_WIDTH +
+                                                   MIN_DATA_SIZE + (MFB_BLOCK_SIZE - int'(len_with_hdr[3-1 : 0]))))) <
+                    0) begin
                     sp_st.next = 1'b0;
                 end
 

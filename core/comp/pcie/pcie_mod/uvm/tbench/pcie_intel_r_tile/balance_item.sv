@@ -80,7 +80,8 @@ class balance_item extends uvm_sequence_item;
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tHEADER:\n\t\tP: %0d\n\t\tNP: %0d\n\t\tCPL: %0d\n\tDATA\n\t\tP: %0d\n\t\tNP: %0d\n\t\tCPL: %0d\n",
+        output_string = $sformatf(
+            "\n\tHEADER:\n\t\tP: %0d\n\t\tNP: %0d\n\t\tCPL: %0d\n\tDATA\n\t\tP: %0d\n\t\tNP: %0d\n\t\tCPL: %0d\n",
             header.p,
             header.np,
             header.cpl,

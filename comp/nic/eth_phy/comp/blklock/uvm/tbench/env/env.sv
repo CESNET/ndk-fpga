@@ -49,7 +49,11 @@ class env #(SH_CNT_MAX, SH_INVALID_CNT_MAX, SLIP_WAIT_TIME) extends uvm_env;
         agent_tx    = uvm_mvb::agent_tx #(1, 2)::type_id::create("agent_tx", this);
         reset_agent = uvm_reset::agent::type_id::create("reset_agent", this);
 
-        m_scoreboard = scoreboard#(SH_CNT_MAX, SH_INVALID_CNT_MAX, SLIP_WAIT_TIME)::type_id::create("m_scoreboard", this);
+        m_scoreboard = scoreboard#(
+            SH_CNT_MAX,
+            SH_INVALID_CNT_MAX,
+            SLIP_WAIT_TIME
+        )::type_id::create("m_scoreboard", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

@@ -81,7 +81,7 @@ module rx_calypte_property #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_M
         assert property (sof_after_eof)
             else begin
                 `uvm_error(module_name, $sformatf({"\n\tIf sof is set on different region that 0 then region before ",
-                                                  "have to be eof set\n\tSOF %b\n\tEOF %b"},
+                                                  "have to be eof set\n\tSOF 0b%b\n\tEOF 0b%b"},
                                                   pcie_rq_mfb.SOF, pcie_rq_mfb.EOF));
             end
 
@@ -95,7 +95,8 @@ module rx_calypte_property #(DEVICE, USR_MFB_REGIONS, USR_MFB_REGION_SIZE, USR_M
         assert property (ptr_upd_sof_after_eof)
             else begin
                 `uvm_error(module_name, $sformatf({"\n\tPointer Update interface: If sof is set on different region ",
-                                                   "that 0 then region befor have to be eof set\n\tSOF %b\n\tEOF %b"},
+               "that 0 then region befor have to be eof set\n\tSOF 0b%b\n\tEOF 0b%b"
+           },
                                                   ptr_upd_mfb.SOF, ptr_upd_mfb.EOF));
             end
     end endgenerate

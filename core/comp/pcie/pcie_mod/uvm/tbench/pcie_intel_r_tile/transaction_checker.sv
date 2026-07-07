@@ -4,8 +4,16 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) extends uvm_component;
-    `uvm_component_param_utils(uvm_pcie_intel_r_tile::transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class transaction_checker #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    META_WIDTH,
+    READY_LATENCY
+) extends uvm_component;
+    `uvm_component_param_utils(uvm_pcie_intel_r_tile::transaction_checker
+                                   #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
     localparam int unsigned HDR_WIDTH    = 128;
     localparam int unsigned PREFIX_WIDTH = 32;
@@ -88,11 +96,13 @@ class transaction_checker #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_W
             if (!total_cost.is_zero()) begin
                 assert(m_balance_counter.is_init_done())
                 else begin
-                    `uvm_error(this.get_full_name(), "\n\tUser can't send the transaction while initializing phase is in progress!")
+                    `uvm_error(this.get_full_name(),
+                               "\n\tUser can't send the transaction while initializing phase is in progress!")
                 end
                 assert(m_balance_counter.try_reduce_balance(total_cost))
                 else begin
-                    `uvm_error(this.get_full_name(), "\n\tUser has insufficient number of credits to send the transaction!")
+                    `uvm_error(this.get_full_name(),
+                               "\n\tUser has insufficient number of credits to send the transaction!")
                 end
             end
 

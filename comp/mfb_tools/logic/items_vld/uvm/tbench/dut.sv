@@ -7,7 +7,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mfb_if.dut_rx   mfb_rx,
@@ -21,19 +21,23 @@ module DUT (
     logic                                  mvb_src_rdy;
 
     generate
-        for (genvar r = 0; r < MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < MFB_REGIONS; r++) begin : gen_r
+            // verilog_lint: waive line-length
             assign offset  [(r+1)*OFFSET_WIDTH-1 : r*OFFSET_WIDTH] = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH-1              : r*META_WIDTH];
+            // verilog_lint: waive line-length
             assign length  [(r+1)*LENGTH_WIDTH-1 : r*LENGTH_WIDTH] = mfb_rx.META[(r*META_WIDTH)+OFFSET_WIDTH+LENGTH_WIDTH-1 : OFFSET_WIDTH+(r*META_WIDTH)];
+            // verilog_lint: waive line-length
             assign rx_en[r]                                        = mfb_rx.META[(r*META_WIDTH)+META_WIDTH-1                : OFFSET_WIDTH+LENGTH_WIDTH+(r*META_WIDTH)];
         end
     endgenerate
 
     logic [((MFB_REGION_SIZE != 1) ? MFB_REGIONS*$clog2(MFB_REGION_SIZE) : MFB_REGIONS)-1 : 0] sof_pos;
     generate
-        if (MFB_REGION_SIZE != 1) begin
+        if (MFB_REGION_SIZE != 1) begin : gen_MFB_REGION_SIZE_1
             assign sof_pos = mfb_rx.SOF_POS;
-        end else
+        end else begin : gen_MFB_REGION_SIZE_eq_1
             assign sof_pos = '0;
+        end
     endgenerate
 
     assign mvb_tx.SRC_RDY  = mvb_src_rdy;

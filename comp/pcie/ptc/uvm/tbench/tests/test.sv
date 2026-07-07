@@ -46,8 +46,14 @@ class ex_test extends uvm_test;
                 )::get_type(), "m_env.*", this);
 
             uvm_pcie::env_rx::type_id::set_inst_override(
-                uvm_pcie_mfb::env_rx #(MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE,
-                                      uvm_pcie_mfb::MFB_RC, uvm_pcie_mfb::MFB_META_SOF, PCIE_STRADDLING, uvm_pcie_mfb::DEV_INTEL
+                uvm_pcie_mfb::env_rx #(
+                    MFB_DOWN_REGIONS,
+                    MFB_DOWN_REG_SIZE,
+                    MFB_DOWN_BLOCK_SIZE,
+                    uvm_pcie_mfb::MFB_RC,
+                    uvm_pcie_mfb::MFB_META_SOF,
+                    PCIE_STRADDLING,
+                    uvm_pcie_mfb::DEV_INTEL
                 )::get_type(), "m_env.*", this);
 
         end else begin
@@ -77,7 +83,7 @@ class ex_test extends uvm_test;
         time_start = $time();
         do begin
             #(600ns);
-        end while((time_start + 10ms) > $time() && m_env.used());
+        end while ((time_start + 10ms) > $time() && m_env.used());
         phase.drop_objection(this);
     endtask
 

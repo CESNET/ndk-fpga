@@ -24,6 +24,7 @@ class status_model #(STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSE
 
         wr_and_rd_en_in = uvm_probe::cbs_simple #(2)::type_id::create("wr_and_rd_en_in", this);
 
+        // verilog_lint: waive line-length
         uvm_probe::pool::get_global_pool().get({ "probe_event_component_", "testbench.DUT_U.VHDL_DUT_U", ".probe_status" }).add_callback(wr_and_rd_en_in);
 
     endfunction
@@ -44,9 +45,12 @@ class status_model #(STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSE
         forever begin
 
             wr_and_rd_en_in.get({ wr_en, rd_en });
-            if (wr_en) status++;
-            if (rd_en) status--;
-
+            if (wr_en) begin
+                status++;
+            end
+            if (rd_en) begin
+                status--;
+            end
             logic_status = status;
             afull  = (status >= ITEMS - ALMOST_FULL_OFFSET) ? 1 : 0;
             aempty = (status <= ALMOST_EMPTY_OFFSET)        ? 1 : 0;

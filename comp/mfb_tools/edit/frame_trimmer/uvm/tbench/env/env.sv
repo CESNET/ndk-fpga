@@ -3,14 +3,28 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class env #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_env;
-    `uvm_component_param_utils(uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
+class env #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends uvm_env;
+    `uvm_component_param_utils(
+        uvm_mfb_frame_trimmer::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
 
     // Reset environment
     uvm_reset::agent m_reset;
 
     // RX environments
-    uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH+1+$clog2(PKT_MTU+1)) m_env_rx_mfb;
+    uvm_logic_vector_array_mfb::env_rx #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH+1+$clog2(PKT_MTU+1)
+    ) m_env_rx_mfb;
 
     // TX environments
     uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) m_env_tx_mfb;
@@ -58,19 +72,44 @@ class env #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_S
         m_config_rx_mfb.active         = UVM_ACTIVE;
         m_config_rx_mfb.interface_name = "vif_rx_mfb";
         m_config_rx_mfb.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
+        // verilog_lint: waive line-length
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx_mfb", "m_config", m_config_rx_mfb);
-        m_env_rx_mfb = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH+1+$clog2(PKT_MTU+1))::type_id::create("m_env_rx_mfb", this);
+        m_env_rx_mfb = uvm_logic_vector_array_mfb::env_rx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH+1+$clog2(PKT_MTU+1)
+        )::type_id::create("m_env_rx_mfb", this);
 
         // TX MFB
         m_config_tx_mfb                = new;
         m_config_tx_mfb.active         = UVM_ACTIVE;
         m_config_tx_mfb.interface_name = "vif_tx_mfb";
         m_config_tx_mfb.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
+        // verilog_lint: waive line-length
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx_mfb", "m_config", m_config_tx_mfb);
-        m_env_tx_mfb = uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_env_tx_mfb", this);
+        m_env_tx_mfb = uvm_logic_vector_array_mfb::env_tx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_env_tx_mfb", this);
 
-        m_scoreboard        = scoreboard        #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_scoreboard", this);
-        m_virtual_sequencer = virtual_sequencer #(ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_virtual_sequencer", this);
+        m_scoreboard        = scoreboard        #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            PKT_MTU
+        )::type_id::create("m_scoreboard", this);
+        m_virtual_sequencer = virtual_sequencer #(
+            ITEM_WIDTH,
+            META_WIDTH,
+            PKT_MTU
+        )::type_id::create("m_virtual_sequencer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -102,10 +141,13 @@ class env #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_S
 
         assert($cast(m_virtual_sequencer.m_rx_mfb_data, m_env_rx_mfb.m_sequencer.m_data))
         else begin
-            `uvm_fatal(get_full_name(), $sformatf("\n\tCast failed: %s", m_env_rx_mfb.m_sequencer.m_data.get_full_name()))
+            `uvm_fatal(get_full_name(), $sformatf("\n\tCast failed: %s", m_env_rx_mfb.m_sequencer.m_data.get_full_name()
+                       ))
         end
 
-        uvm_config_db #(mailbox #(int unsigned))::set(this, "m_env_rx_mfb.m_logic_vector_agent.m_sequencer", "mfb_item_lengths", m_virtual_sequencer.m_rx_mfb_data.mfb_item_lengths);
+        uvm_config_db #(mailbox #(int unsigned))::set(this, "m_env_rx_mfb.m_logic_vector_agent.m_sequencer",
+                                                    "mfb_item_lengths",
+                                                    m_virtual_sequencer.m_rx_mfb_data.mfb_item_lengths);
     endfunction
 
 endclass

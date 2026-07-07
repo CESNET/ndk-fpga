@@ -6,7 +6,10 @@
 
 
 // Reusable high level sequence. Contains transaction, which has only data part.
-class sequence_simple #(MVB_ITEM_WIDTH, HEADER_SIZE) extends uvm_sequence #(uvm_superpacket_header::sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE));
+class sequence_simple #(
+    MVB_ITEM_WIDTH,
+    HEADER_SIZE
+) extends uvm_sequence #(uvm_superpacket_header::sequence_item #(MVB_ITEM_WIDTH, HEADER_SIZE));
     `uvm_object_param_utils(uvm_superpacket_header::sequence_simple #(MVB_ITEM_WIDTH, HEADER_SIZE))
 
     rand int unsigned transaction_count;

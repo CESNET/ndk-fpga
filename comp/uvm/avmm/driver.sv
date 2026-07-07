@@ -84,7 +84,8 @@ class driver_master #(
     int unsigned ADDRESS_WIDTH,
     int unsigned DATA_WIDTH,
     int unsigned BURST_WIDTH
-) extends uvm_driver #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
+) extends
+    uvm_driver #(sequence_item_response #(DATA_WIDTH), sequence_item_request #(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH));
     `ndk_component_param_utils(
         uvm_avmm::driver_master#(ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH),
         $sformatf("uvm_avmm::driver_master#(%0d,%0d,%0d)",ADDRESS_WIDTH, DATA_WIDTH, BURST_WIDTH)

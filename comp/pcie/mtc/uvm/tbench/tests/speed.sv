@@ -23,18 +23,23 @@ class speed extends base;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CQ_MFB_META_WIDTH)::type_id::set_inst_override(
-            uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CQ_MFB_META_WIDTH)::get_type(),
+        uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                                     CQ_MFB_META_WIDTH)::type_id::set_inst_override(
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CQ_MFB_META_WIDTH)::get_type(),
             "m_env.m_env_cq.*", this
         );
 
 
-        uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CC_MFB_META_WIDTH)::type_id::set_inst_override(
-            uvm_mfb::sequence_lib_tx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CC_MFB_META_WIDTH)::get_type(),
+        uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                  CC_MFB_META_WIDTH)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx_speed
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CC_MFB_META_WIDTH)::get_type(),
             "m_env.m_env_cq.*", this
         );
 
-        m_env = uvm_mtc::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_mtc::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE,
+                              MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     function void report_phase(uvm_phase phase);

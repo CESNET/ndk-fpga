@@ -4,7 +4,14 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class mfb_rx_rand#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH);
+class mfb_rx_rand #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    EXTENDED_META_WIDTH
+) extends
+    uvm_logic_vector_array_mfb::sequence_lib_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH);
   `uvm_object_param_utils(test::mfb_rx_rand#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH))
   `uvm_sequence_library_utils(test::mfb_rx_rand#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH))
 
@@ -19,7 +26,9 @@ class mfb_rx_rand#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_W
         end else begin
             this.cfg = param_cfg;
         end
-        this.add_sequence(uvm_logic_vector_array_mfb::sequence_simple_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_mfb::sequence_simple_rx
+                #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::get_type());
     endfunction
 endclass
 
@@ -27,7 +36,18 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     bit timeout;
-    uvm_dropper::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX) m_env;
+    uvm_dropper::env #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH,
+        EXTENDED_META_WIDTH,
+        SPACE_SIZE_MIN_RX,
+        SPACE_SIZE_MAX_RX,
+        SPACE_SIZE_MIN_TX,
+        SPACE_SIZE_MAX_TX
+    ) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -36,9 +56,13 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::type_id::set_inst_override(mfb_rx_rand#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::get_type(),
+        uvm_logic_vector_array_mfb::sequence_lib_rx
+            #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::type_id::set_inst_override(
+            mfb_rx_rand #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::get_type(),
         {this.get_full_name(), ".m_env.rx_env.*"});
-        m_env = uvm_dropper::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX)::type_id::create("m_env", this);
+        m_env = uvm_dropper::env
+            #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH, SPACE_SIZE_MIN_RX,
+              SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX)::type_id::create("m_env", this);
     endfunction
 
     task test_wait_timeout(int unsigned time_length);
@@ -52,7 +76,8 @@ class ex_test extends uvm_test;
 
         phase.raise_objection(this, "Start of rx sequence");
 
-        m_vseq = virt_sequence#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence
+            #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH)::type_id::create("m_vseq");
         m_vseq.init(phase);
         assert(m_vseq.randomize());
         m_vseq.start(m_env.vscr);

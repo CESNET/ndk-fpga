@@ -31,7 +31,7 @@ class sequence_resp extends uvm_sequence #(uvm_pcie::header);
         //$write("TEST AAA%s\n", response.convert2string());
     endfunction
 
-    virtual function void mid_do(uvm_sequence_item 	this_item);
+    virtual function void mid_do(uvm_sequence_item     this_item);
         uvm_pcie::header hdr;
 
         $cast(hdr, this_item);
@@ -77,15 +77,26 @@ class sequence_resp extends uvm_sequence #(uvm_pcie::header);
 
 
             //cc_hdr = hdr.pop_front();
-            cq_num = $urandom_range(0, info.rq_hdr.size()-1); //Cahnge randomize to 0 gauss distribution. when head have the moust generated top transaction
-            rc_hdr = uvm_pcie::completer_header::type_id::create("cc_hdr", m_sequencer);
+            //Cahnge randomize to 0 gauss distribution. when head have the moust generated top transaction
+            cq_num = $urandom_range(0, info.rq_hdr.size()-1);
+            rc_hdr = uvm_pcie::completer_header::type_id::create("rc_hdr", m_sequencer);
 
             //
             start_item(rc_hdr);
             assert(rc_hdr.randomize() with {
                 rc_hdr.data.size() <= 15000;
-                info.rq_hdr[cq_num].rest_length >= MAX_PAYLOAD_SIZE -> rc_hdr.length dist {max_payload :/60,  [6*MAX_PAYLOAD_SIZE/8:MAX_PAYLOAD_SIZE-1] :/ 30,  [MAX_PAYLOAD_SIZE/8:6*MAX_PAYLOAD_SIZE/8-1] :/ 10,  [1:MAX_PAYLOAD_SIZE/8-1] :/ 10};
-                info.rq_hdr[cq_num].rest_length <  MAX_PAYLOAD_SIZE -> rc_hdr.length dist {info.rq_hdr[cq_num].rest_length  :/70,  [1:info.rq_hdr[cq_num].rest_length] :/ 30};
+                info.rq_hdr[cq_num].rest_length >= MAX_PAYLOAD_SIZE ->
+                rc_hdr.length dist {
+                    max_payload :/60,
+                    [6*MAX_PAYLOAD_SIZE/8:MAX_PAYLOAD_SIZE-1] :/ 30,
+                    [MAX_PAYLOAD_SIZE/8:6*MAX_PAYLOAD_SIZE/8-1] :/ 10,
+                    [1:MAX_PAYLOAD_SIZE/8-1] :/ 10
+                };
+                info.rq_hdr[cq_num].rest_length < MAX_PAYLOAD_SIZE ->
+                rc_hdr.length dist {
+                    info.rq_hdr[cq_num].rest_length  :/70,
+                    [1:info.rq_hdr[cq_num].rest_length] :/ 30
+                };
 
                 (rc_hdr.length == 0) -> (rc_hdr.data.size() == 1024);
                 (rc_hdr.length != 0) -> (rc_hdr.data.size() == rc_hdr.length);

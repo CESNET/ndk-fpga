@@ -3,7 +3,10 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class model_data_comparer #(int unsigned MFB_ITEM_WIDTH) extends uvm_common::comparer_base_ordered #(model_data_item #(MFB_ITEM_WIDTH), uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
+class model_data_comparer #(
+    int unsigned MFB_ITEM_WIDTH
+) extends uvm_common::comparer_base_ordered
+    #(model_data_item #(MFB_ITEM_WIDTH), uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
     `uvm_object_param_utils(uvm_mfb_frame_extender::model_data_comparer #(MFB_ITEM_WIDTH))
 
     // Constructor
@@ -11,7 +14,8 @@ class model_data_comparer #(int unsigned MFB_ITEM_WIDTH) extends uvm_common::com
         super.new(name);
     endfunction
 
-    function int unsigned compare(model_data_item #(MFB_ITEM_WIDTH) tr_model, uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_dut);
+    function int unsigned compare(model_data_item #(MFB_ITEM_WIDTH) tr_model,
+                                  uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) tr_dut);
         if (tr_model.size() !== tr_dut.size()) begin
             return 0;
         end

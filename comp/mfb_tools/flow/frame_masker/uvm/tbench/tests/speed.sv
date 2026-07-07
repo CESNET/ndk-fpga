@@ -49,22 +49,27 @@ class speed extends uvm_test;
             this
         );
 
-        uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
-            uvm_mfb::sequence_lib_tx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
+        uvm_mfb::sequence_lib_tx
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx_speed
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
             "m_env.m_env_tx.*",
             this
         );
 
 
         // Initializing the reference to the environment
-        m_env = frame_masker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env", this);
+        m_env = frame_masker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                   MFB_META_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
-        virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX) m_vseq;
-        m_vseq = virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX)::type_id::create("m_vseq");
+        virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, FRAME_SIZE_MIN,
+                        FRAME_SIZE_MAX) m_vseq;
+        m_vseq = virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH,
+                                FRAME_SIZE_MIN, FRAME_SIZE_MAX)::type_id::create("m_vseq");
 
         phase.raise_objection(this);
 
@@ -98,7 +103,9 @@ class speed extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 endclass

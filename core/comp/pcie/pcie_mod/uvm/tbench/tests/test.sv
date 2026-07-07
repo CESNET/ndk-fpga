@@ -54,7 +54,7 @@ class ex_test extends uvm_test;
         m_virt_seq.start(m_env.m_sequencer);
 
         // Wait on all RQ transaction. Some can be stored in
-        // DUT and  Model
+        // dut and  Model
         fork
             begin
                 wait(m_env.m_scoreboard.used() == 0);

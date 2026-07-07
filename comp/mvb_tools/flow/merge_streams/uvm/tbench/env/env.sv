@@ -73,8 +73,10 @@ class env #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX
             m_config_rx_mvb[i].active         = UVM_ACTIVE;
             m_config_rx_mvb[i].interface_name = $sformatf("vif_rx_mvb_%0d", i);
             m_config_rx_mvb[i].coverage = 1;
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_env_rx_mvb_%0d", i), "m_config", m_config_rx_mvb[i]);
-            m_env_rx_mvb[i] = lv_mvb #(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::create($sformatf("m_env_rx_mvb_%0d", i), this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_env_rx_mvb_%0d", i), "m_config",
+                                                                   m_config_rx_mvb[i]);
+            m_env_rx_mvb[i] =
+                lv_mvb #(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::create($sformatf("m_env_rx_mvb_%0d", i), this);
         end
 
         // TX MVB
@@ -89,11 +91,25 @@ class env #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX
         // Coverage model creation //
         // ----------------------- //
 
-        m_hl_coverage_model = hl_coverage_model #(MVB_ITEM_WIDTH, RX_STREAMS)           ::type_id::create("m_hl_coverage_model", this);
-        m_ll_coverage_model = ll_coverage_model #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_ll_coverage_model", this);
+        m_hl_coverage_model = hl_coverage_model #(
+            MVB_ITEM_WIDTH,
+            RX_STREAMS
+        ) ::type_id::create("m_hl_coverage_model", this);
+        m_ll_coverage_model = ll_coverage_model #(
+            MVB_ITEMS,
+            MVB_ITEM_WIDTH,
+            RX_STREAMS
+        )::type_id::create("m_ll_coverage_model", this);
 
-        m_scoreboard        = scoreboard        #(MVB_ITEM_WIDTH, RX_STREAMS)           ::type_id::create("m_scoreboard", this);
-        m_virtual_sequencer = virtual_sequencer #(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)::type_id::create("m_virtual_sequencer", this);
+        m_scoreboard        = scoreboard        #(
+            MVB_ITEM_WIDTH,
+            RX_STREAMS
+        ) ::type_id::create("m_scoreboard", this);
+        m_virtual_sequencer = virtual_sequencer #(
+            MVB_ITEMS,
+            MVB_ITEM_WIDTH,
+            RX_STREAMS
+        )::type_id::create("m_virtual_sequencer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);

@@ -37,19 +37,27 @@ class monitor extends uvm_monitor;
         forever begin
             rq_mvb.get(tr_meta);
 
-            tr_rq = uvm_dma::sequence_item_rq::type_id::create("rq_item.item", this);
+            tr_rq = uvm_dma::sequence_item_rq::type_id::create("tr_rq", this);
             tr_rq.time_array_add(tr_meta.start);
 
             tr_rq.relaxed     = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_W-1 : sv_dma_bus_pack::DMA_REQUEST_RELAXED_O];
             tr_rq.pasidvld    = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_PASIDVLD_O];
             tr_rq.pasid       = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_PASID_O];
+            // verilog_lint: waive line-length
             tr_rq.vfid        = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_PASID_O-1 : sv_dma_bus_pack::DMA_REQUEST_VFID_O];
+            // verilog_lint: waive line-length
             tr_rq.global_id   = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_VFID_O-1 : sv_dma_bus_pack::DMA_REQUEST_GLOBAL_O];
+            // verilog_lint: waive line-length
             tr_rq.unitid      = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_GLOBAL_O-1 : sv_dma_bus_pack::DMA_REQUEST_UNITID_O];
+            // verilog_lint: waive line-length
             tr_rq.tag         = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_UNITID_O-1 : sv_dma_bus_pack::DMA_REQUEST_TAG_O];
+            // verilog_lint: waive line-length
             tr_rq.lastib      = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_TAG_O-1 : sv_dma_bus_pack::DMA_REQUEST_LASTIB_O];
+            // verilog_lint: waive line-length
             tr_rq.firstib     = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_LASTIB_O-1 : sv_dma_bus_pack::DMA_REQUEST_FIRSTIB_O];
+            // verilog_lint: waive line-length
             tr_rq.type_ide    = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_FIRSTIB_O-1 : sv_dma_bus_pack::DMA_REQUEST_TYPE_O];
+            // verilog_lint: waive line-length
             tr_rq.length      = tr_meta.data[sv_dma_bus_pack::DMA_REQUEST_TYPE_O-1 : sv_dma_bus_pack::DMA_REQUEST_LENGTH_O]; // Size in DWORDS
 
             if (tr_rq.type_ide == 1'b1) begin
@@ -60,7 +68,8 @@ class monitor extends uvm_monitor;
 
                 if (tr_rq.data.size() != tr_rq.length) begin
                     string msg;
-                     msg = $sformatf("\n\tDATA SIZE: %d META SIZE: %d (0x%h)", tr_rq.data.size(), tr_rq.length, tr_meta.data);
+                    msg = $sformatf("\n\tDATA SIZE: %d META SIZE: %d (0x%h)", tr_rq.data.size(), tr_rq.length,
+                                    tr_meta.data);
                     `uvm_fatal(this.get_full_name(), msg);
                 end
             end else begin

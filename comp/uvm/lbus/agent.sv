@@ -54,7 +54,7 @@ class agent_rx extends uvm_agent;
         // Create a statistics gatherer
         m_statistics = statistics::type_id::create("m_statistics", this);
         // Create a coverage gatherer
-        m_coverage = coverage::type_id::create("coverage", this);
+        m_coverage = coverage::type_id::create("m_coverage", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -66,7 +66,8 @@ class agent_rx extends uvm_agent;
         // Get a virtual interface instance from the database
         assert(uvm_config_db #(virtual lbus_if)::get(null, "", m_config.interface_name, vif))
         else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find an interface with the name %s, probably not set!", m_config.interface_name));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find an interface with the name %s, probably not set!", m_config.interface_name));
         end
 
         // Connect the driver if the agent is active
@@ -136,7 +137,7 @@ class agent_tx extends uvm_agent;
         // Create a statistics gatherer
         m_statistics = statistics::type_id::create("m_statistics", this);
         // Create a coverage gatherer
-        m_coverage = coverage::type_id::create("coverage", this);
+        m_coverage = coverage::type_id::create("m_coverage", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -148,7 +149,8 @@ class agent_tx extends uvm_agent;
         // Get a virtual interface instance from the database
         assert(uvm_config_db #(virtual lbus_if)::get(null, "", m_config.interface_name, vif))
         else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("Cannot find an interface with the name %s, probably not set!", m_config.interface_name));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "Cannot find an interface with the name %s, probably not set!", m_config.interface_name));
         end
 
         // Connect the driver if the agent is active

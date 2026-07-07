@@ -5,10 +5,17 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mfb environment
-class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_env;
+class env_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends uvm_env;
     `ndk_component_param_utils(
         uvm_logic_vector_array_avst::env_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::env_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+        $sformatf("uvm_logic_vector_array_avst::env_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, ITEM_WIDTH,
+                  META_WIDTH, READY_LATENCY)
     );
 
     // ------------------------------------------------------------------------
@@ -41,7 +48,9 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
         end
 
         if (READY_LATENCY == 0) begin
-            `uvm_warning(get_type_name(), "\n\tYou are using zero ready latency. It is supported only for R_TILE with full_speed_sequence.")
+            `uvm_warning(
+                get_type_name(),
+                "\n\tYou are using zero ready latency. It is supported only for R_TILE with full_speed_sequence.")
         end
 
         logic_vector_array_agent_cfg = new;
@@ -54,16 +63,29 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
         avst_agent_cfg.active = m_config.active;
         avst_agent_cfg.interface_name = m_config.interface_name;
 
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", logic_vector_array_agent_cfg);
-        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config", logic_vector_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config",
+                                                           logic_vector_agent_cfg);
         uvm_config_db #(uvm_avst::config_item)::set(this, "m_avst_agent", "m_config", avst_agent_cfg);
 
-        uvm_logic_vector_array::monitor #(ITEM_WIDTH)::type_id::set_inst_override(monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {this.get_full_name(), ".m_logic_vector_array_agent.*"});
-        uvm_logic_vector::monitor#(META_WIDTH)::type_id::set_inst_override(monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {this.get_full_name(), ".m_logic_vector_agent.*"});
+        uvm_logic_vector_array::monitor #(ITEM_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_array_agent.*"});
+        uvm_logic_vector::monitor #(META_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_agent.*"});
 
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent = uvm_logic_vector_array::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_array_agent", this);
+        // verilog_lint: waive line-length
         m_logic_vector_agent       = uvm_logic_vector::agent#(META_WIDTH)::type_id::create("m_logic_vector_agent", this);
-        m_avst_agent               = uvm_avst::agent_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_avst_agent", this);
+        m_avst_agent               = uvm_avst::agent_rx #(
+            REGIONS,
+            REGION_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_avst_agent", this);
 
         if (m_config.active == UVM_ACTIVE) begin
             m_sequencer = sequencer_rx #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_sequencer", this);
@@ -94,7 +116,8 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
             m_sequencer.m_meta = m_logic_vector_agent.m_sequencer;
             m_sequencer.meta_behav = m_config.meta_behav;
             reset_sync.push_back(m_avst_agent.m_sequencer.reset_sync);
-            uvm_config_db #(sequencer_rx #(ITEM_WIDTH, META_WIDTH))::set(this, "m_avst_agent.m_sequencer", "hl_sqr", m_sequencer);
+            uvm_config_db #(sequencer_rx #(ITEM_WIDTH, META_WIDTH))::set(this, "m_avst_agent.m_sequencer", "hl_sqr",
+                                                                       m_sequencer);
         end
     endfunction
 
@@ -103,9 +126,11 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
             sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) avst_seq;
 
             if (m_config.lib_type == config_item::BASE) begin
-                avst_seq = sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
+                avst_seq = sequence_lib_rx
+                    #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
             end else if (m_config.lib_type == config_item::SPEED) begin
-                avst_seq = sequence_lib_rx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
+                avst_seq = sequence_lib_rx_speed
+                    #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("avst_seq", this);
             end else begin
                 `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
             end
@@ -120,7 +145,9 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
                 verbosity = this.get_report_verbosity_level(UVM_INFO, "avst_seq");
                 m_avst_agent.m_sequencer.set_report_verbosity_level(verbosity >= 300 ? verbosity - 300 : 0);
 
-                if(!avst_seq.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize logic_vector_array_mfb rx_seq");
+                if(!avst_seq.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize logic_vector_array_mfb rx_seq");
+                end
                 avst_seq.start(m_avst_agent.m_sequencer);
             end
         end
@@ -129,10 +156,17 @@ class env_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
 endclass
 
 
-class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_env;
+class env_tx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends uvm_env;
     `ndk_component_param_utils(
         uvm_logic_vector_array_avst::env_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::env_tx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+        $sformatf("uvm_logic_vector_array_avst::env_tx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, ITEM_WIDTH,
+                  META_WIDTH, READY_LATENCY)
     );
 
     //Access component
@@ -174,16 +208,29 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
         avst_agent_cfg.active         = m_config.active;
         avst_agent_cfg.interface_name = m_config.interface_name;
 
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", logic_vector_array_agent_cfg);
-        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config", logic_vector_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config",
+                                                           logic_vector_agent_cfg);
         uvm_config_db #(uvm_avst::config_item)::set(this, "m_avst_agent", "m_config", avst_agent_cfg);
 
-        uvm_logic_vector_array::monitor#(ITEM_WIDTH)::type_id::set_inst_override(monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {this.get_full_name(), ".m_logic_vector_array_agent.*"});
-        uvm_logic_vector::monitor#(META_WIDTH)::type_id::set_inst_override(monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {this.get_full_name(), ".m_logic_vector_agent.*"});
+        uvm_logic_vector_array::monitor #(ITEM_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_array_agent.*"});
+        uvm_logic_vector::monitor #(META_WIDTH)::type_id::set_inst_override(
+            monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type(), {
+            this.get_full_name(), ".m_logic_vector_agent.*"});
 
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent = uvm_logic_vector_array::agent#(ITEM_WIDTH)::type_id::create("m_logic_vector_array_agent", this);
+        // verilog_lint: waive line-length
         m_logic_vector_agent       = uvm_logic_vector::agent#(META_WIDTH)::type_id::create("m_logic_vector_agent", this);
-        m_avst_agent               = uvm_avst::agent_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_avst_agent", this);
+        m_avst_agent               = uvm_avst::agent_tx #(
+            REGIONS,
+            REGION_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_avst_agent", this);
 
         reset_sync = new();
     endfunction
@@ -192,7 +239,13 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
     function void connect_phase(uvm_phase phase);
 
         monitor_logic_vector_array #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY) m_byte_arr_monitor;
-        monitor_logic_vector #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)       m_logic_vector_monitor;
+        monitor_logic_vector #(
+            REGIONS,
+            REGION_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            READY_LATENCY
+        ) m_logic_vector_monitor;
 
         $cast(m_byte_arr_monitor, m_logic_vector_array_agent.m_monitor);
         m_avst_agent.analysis_port.connect(m_byte_arr_monitor.analysis_export);
@@ -211,9 +264,11 @@ class env_tx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM
 
         if (m_config.active == UVM_ACTIVE) begin
             if (m_config.lib_type == config_item::BASE) begin
-                avst_seq = uvm_avst::sequence_lib_tx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+                avst_seq = uvm_avst::sequence_lib_tx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create(
+                    "avst_seq", this);
             end else if (m_config.lib_type == config_item::SPEED) begin
-                avst_seq = uvm_avst::sequence_lib_tx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
+                avst_seq = uvm_avst::sequence_lib_tx_speed
+                    #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("avst_seq", this);
             end else begin
                 `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
             end

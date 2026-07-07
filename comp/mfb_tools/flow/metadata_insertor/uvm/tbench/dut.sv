@@ -7,7 +7,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mfb_if.dut_rx   mfb_rx,
@@ -19,9 +19,11 @@ module DUT (
     logic [MFB_REGIONS*MVB_ITEM_WIDTH-1 : 0] meta_new;
 
     generate
-        for (genvar i = 0; i < MFB_REGIONS; i++) begin
+        for (genvar i = 0; i < MFB_REGIONS; i++) begin : gen_i
+            // verilog_lint: waive line-length
             assign mfb_tx.META[i*(MVB_ITEM_WIDTH + MFB_META_WIDTH)+MVB_ITEM_WIDTH+MFB_META_WIDTH-1 -: MFB_META_WIDTH] = meta[(i+1)*MFB_META_WIDTH-1 : MFB_META_WIDTH*i];
 
+            // verilog_lint: waive line-length
             assign mfb_tx.META[i*(MFB_META_WIDTH + MVB_ITEM_WIDTH)+MVB_ITEM_WIDTH-1 -: MVB_ITEM_WIDTH] = meta_new[(i+1)*MVB_ITEM_WIDTH-1 -: MVB_ITEM_WIDTH];
         end
     endgenerate

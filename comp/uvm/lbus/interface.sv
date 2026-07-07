@@ -10,13 +10,13 @@ interface lbus_if (input logic CLK);
     // Bus structure of LBUS //
     // --------------------- //
 
-    wire logic [4*128-1 : 0] DATA;
-    wire logic [4    -1 : 0] ENA;
-    wire logic [4    -1 : 0] SOP;
-    wire logic [4    -1 : 0] EOP;
-    wire logic [4    -1 : 0] ERR;
-    wire logic [4*4  -1 : 0] MTY;
-    wire logic               RDY;
+    wire [4*128-1 : 0] DATA;
+    wire [4    -1 : 0] ENA;
+    wire [4    -1 : 0] SOP;
+    wire [4    -1 : 0] EOP;
+    wire [4    -1 : 0] ERR;
+    wire [4*4  -1 : 0] MTY;
+    wire               RDY;
 
     // TX driver clocking block
     clocking driver_rx_cb @(posedge CLK);

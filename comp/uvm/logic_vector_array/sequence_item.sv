@@ -75,11 +75,11 @@ class sequence_item #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_item
         $sformat(ret, "%s\n\tByte_array::sequence_item size %0d", super.convert2string(), data.size());
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % (regions*region_width) == 0) begin
-                $sformat(ret, "%s\n\t\t%x", ret, data[it]);
+                $sformat(ret, "%s\n\t\t'h%x", ret, data[it]);
             end else if (it % region_width == 0) begin
-                $sformat(ret, "%s    %x", ret, data[it]);
+                $sformat(ret, "%s    'h%x", ret, data[it]);
             end else begin
-                $sformat(ret, "%s %x", ret, data[it]);
+                $sformat(ret, "%s 'h%x", ret, data[it]);
             end
         end
         return ret;

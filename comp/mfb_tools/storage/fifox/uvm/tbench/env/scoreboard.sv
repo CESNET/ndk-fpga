@@ -54,7 +54,7 @@ class scoreboard#(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
         m_model.out_data.connect(model_data.analysis_export);
         m_model.out_meta.connect(model_meta.analysis_export);
 
-        // connects the data from the DUT to the analysis fifo
+        // connects the data from the dut to the analysis fifo
         out_data.connect(dut_data.analysis_export);
         out_meta.connect(dut_meta.analysis_export);
     endfunction
@@ -77,7 +77,11 @@ class scoreboard#(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
             if (tr_model.compare(tr_dut) == 0) begin
                 string msg;
 
-                msg = $sformatf( "\n\tPacket comparison failed! \n\tModel packet:\n%s\n\tDUT packet:\n%s", tr_model.convert2string(), tr_dut.convert2string());
+                msg = $sformatf(
+                    "\n\tPacket comparison failed! \n\tModel packet:\n%s\n\tDUT packet:\n%s",
+                    tr_model.convert2string(),
+                    tr_dut.convert2string()
+                );
                 `uvm_error(this.get_full_name(), msg);
                 errors++;
             end
@@ -85,7 +89,11 @@ class scoreboard#(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
             if (tr_model_meta.compare(tr_dut_meta) == 0) begin
                 string msg;
 
-                msg = $sformatf( "\n\tMetadata comparison failed! \n\tModel metadata:\n%s\n\tDUT metadata:\n%s", tr_model_meta.convert2string(), tr_dut_meta.convert2string());
+                msg = $sformatf(
+                    "\n\tMetadata comparison failed! \n\tModel metadata:\n%s\n\tDUT metadata:\n%s",
+                    tr_model_meta.convert2string(),
+                    tr_dut_meta.convert2string()
+                );
                 `uvm_error(this.get_full_name(), msg);
                 errors++;
             end
@@ -98,9 +106,16 @@ class scoreboard#(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
 
         str = $sformatf( "\n\tCompared packets: %0d", compared);
         if (errors == 0) begin
-            `uvm_info(get_type_name(), {str, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                str,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {str, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      str,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
 

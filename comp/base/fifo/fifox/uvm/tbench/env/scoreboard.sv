@@ -5,7 +5,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 class scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET) extends uvm_scoreboard;
-    `uvm_component_utils(uvm_fifox::scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET))
+    `uvm_component_utils(
+        uvm_fifox::scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET))
 
     // Analysis components.
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(DATA_WIDTH)) analysis_imp_mvb_rx;
@@ -45,6 +46,7 @@ class scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_E
 
     function void build_phase(uvm_phase phase);
 
+        // verilog_lint: waive line-length
         cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(DATA_WIDTH))::type_id::create("cmp", this);
         cmp.model_tr_timeout_set(200us);
 
@@ -52,7 +54,12 @@ class scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_E
         status_cmp.model_tr_timeout_set(200us);
 
         m_pipe_model = uvm_pipe::model #(DATA_WIDTH)::type_id::create("m_pipe_model", this);
-        m_status_model = status_model #(STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET)::type_id::create("m_status_model", this);
+        m_status_model = status_model #(
+            STATUS_WIDTH,
+            ITEMS,
+            ALMOST_FULL_OFFSET,
+            ALMOST_EMPTY_OFFSET
+        )::type_id::create("m_status_model", this);
 
     endfunction
 
@@ -65,7 +72,7 @@ class scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_E
         m_pipe_model.model_mvb_out.connect(cmp       .analysis_imp_model);
         m_status_model.model_out  .connect(status_cmp.analysis_imp_model);
 
-        // Connects output data of the DUT
+        // Connects output data of the dut
         analysis_imp_mvb_tx    .connect(cmp       .analysis_imp_dut);
         analysis_imp_mvb_status.connect(status_cmp.analysis_imp_dut);
 
@@ -75,9 +82,16 @@ class scoreboard #(DATA_WIDTH, STATUS_WIDTH, ITEMS, ALMOST_FULL_OFFSET, ALMOST_E
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

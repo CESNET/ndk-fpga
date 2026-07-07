@@ -19,27 +19,44 @@ module testbench;
     // ----------------------------e--------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if                                        reset_vif                     (CLK);
-    mvb_if #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS))  rx_mvb_vif                    (CLK);
-    mvb_if #(ITEMS, ITEM_WIDTH)                     tx_mvb_vif [TX_PORTS -1 : 0]  (CLK);
+    mvb_if #(
+        .ITEMS      (ITEMS),
+        .ITEM_WIDTH (ITEM_WIDTH + $clog2(TX_PORTS))
+    )  rx_mvb_vif                    (CLK);
+    mvb_if #(
+        .ITEMS      (ITEMS),
+        .ITEM_WIDTH (ITEM_WIDTH)
+    )                     tx_mvb_vif [TX_PORTS -1 : 0]  (CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
     initial begin
         uvm_root m_root;
-        automatic virtual mvb_if #(ITEMS, ITEM_WIDTH) v_tx_mvb_vif [TX_PORTS -1 : 0] = tx_mvb_vif;
+        automatic virtual mvb_if #(
+            .ITEMS      (ITEMS),
+            .ITEM_WIDTH (ITEM_WIDTH)
+        ) v_tx_mvb_vif [TX_PORTS -1 : 0] = tx_mvb_vif;
 
         $timeformat(-9, 5, " ns",10);
 
-        uvm_config_db #(virtual reset_if)                                        ::set(null, "", "reset_vif"  , reset_vif);
-        uvm_config_db #(virtual mvb_if #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS)))  ::set(null, "", "rx_mvb_vif" , rx_mvb_vif);
+        uvm_config_db #(virtual reset_if)::set(null, "", "reset_vif", reset_vif);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (ITEMS),
+            .ITEM_WIDTH (ITEM_WIDTH + $clog2(TX_PORTS))
+        ))  ::set(null, "", "rx_mvb_vif" , rx_mvb_vif);
 
         // Configuration of database
         for (int i = 0; i < TX_PORTS; i++) begin
-            uvm_config_db #(virtual mvb_if #(ITEMS, ITEM_WIDTH))                 ::set(null, "", $sformatf("tx_mvb_vif_%0d", i), v_tx_mvb_vif[i]);
+            uvm_config_db #(virtual mvb_if #(
+                .ITEMS      (ITEMS),
+                .ITEM_WIDTH (ITEM_WIDTH)
+            ))                 ::set(null, "", $sformatf("tx_mvb_vif_%0d", i), v_tx_mvb_vif[i]);
         end
 
         m_root = uvm_root::get();
@@ -54,8 +71,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK    (CLK),
         .RST    (reset_vif.RESET),
         .rx_mvb (rx_mvb_vif),
@@ -73,8 +90,8 @@ module testbench;
     );
 
     generate
-        if (DEMUX_VERSION != "logic") begin
-            for (genvar i = 0; i < TX_PORTS; i++) begin
+        if (DEMUX_VERSION != "logic") begin : gen_DEMUX_VERSION_logic
+            for (genvar i = 0; i < TX_PORTS; i++) begin : gen_i
                 mvb_property #(
                     .ITEMS      (ITEMS),
                     .ITEM_WIDTH (ITEM_WIDTH)

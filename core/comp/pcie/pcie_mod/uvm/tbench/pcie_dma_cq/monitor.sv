@@ -54,6 +54,7 @@ class monitor#(ITEM_WIDTH, DEVICE) extends uvm_pcie::monitor;
                 item.time_array_add(item_data.start);
 
                 //item = uvm_pcie::request_header::type_id::create("item", this);
+                // verilog_lint: waive line-length
                 hdr = {item_meta.data[32-1:0], item_meta.data[64-1:32], item_meta.data[96-1:64], item_meta.data[128-1:96]};
 
                 item.bar  = item_meta.data[162:160];
@@ -62,11 +63,12 @@ class monitor#(ITEM_WIDTH, DEVICE) extends uvm_pcie::monitor;
                 item.address = 0;
 
                 //prefix = item_meta.data[160-1:128];
+                // verilog_lint: waive line-length
                 {item.fmt, item.pcie_type, r0, item.traffic_class, r1, item.id_based_ordering, r2, item.th, item.td, item.ep, item.relaxed_ordering, item.no_snoop, item.at, item.length} = hdr[32*4-1 -: 32];
                 if (item.fmt[0] == 1'b0) begin
-                    {item.requester_id, item.tag, item.lbe, item.fbe, item.address[32-1:2], item.ph} = hdr[32*3-1 -: 64];
+                    {item.requester_id, item.tag, item.lbe, item.fbe, item.address[32-1:2], item.ph} = hdr[32*3-1-:64];
                 end else begin
-                    {item.requester_id, item.tag, item.lbe, item.fbe, item.address, item.ph}         = hdr[32*3-1 -: 96];
+                    {item.requester_id, item.tag, item.lbe, item.fbe, item.address, item.ph} = hdr[32*3-1-:96];
                 end
 
                 if (item.fmt[3-1:1] == 2'b01) begin
@@ -144,7 +146,8 @@ class monitor#(ITEM_WIDTH, DEVICE) extends uvm_pcie::monitor;
                 item.lbe = lbe;
 
                 if (thp_present !== 1'b0) begin
-                    `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported feature THP_PRESENT(%0d) : %s", thp_present, DEVICE));
+                    `uvm_fatal(this.get_full_name(), $sformatf(
+                               "\n\tUnsupported feature THP_PRESENT(%0d) : %s", thp_present, DEVICE));
                 end
             end else begin
                 `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported device : %s", DEVICE));

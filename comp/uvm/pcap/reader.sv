@@ -10,7 +10,11 @@
 
 import "DPI-C" context function chandle dpi_pcap_read_open(string file);
 import "DPI-C" context function void    dpi_pcap_read_close(chandle ptr);
-import "DPI-C" context function int     dpi_pcap_read_data_get(chandle file_ptr, output chandle data_ptr, output int unsigned size);
+import "DPI-C" context function int dpi_pcap_read_data_get(
+    chandle file_ptr,
+    output chandle data_ptr,
+    output int unsigned size
+);
 import "DPI-C" context function void    dpi_pcap_read_data_extract(chandle in, inout byte unsigned out[]);
 
 

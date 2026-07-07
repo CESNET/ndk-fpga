@@ -52,7 +52,7 @@ program TEST (
   // --------------------------------------------------------------------------
 
   // Create Test Environment
-  task createEnvironment();
+  task automatic createEnvironment();
     // Create generator
     fluGenerator = new("Generator", 0);
       fluBlueprint = new;
@@ -104,14 +104,14 @@ program TEST (
 
   // --------------------------------------------------------------------------
   // Resets design
-  task resetDesign();
+  task automatic resetDesign();
     RESET=1;                       // Init Reset variable
     #RESET_TIME     RESET = 0;     // Deactivate reset after reset_time
   endtask : resetDesign
 
   // --------------------------------------------------------------------------
   // Enable test Environment
-  task enableTestEnvironment();
+  task automatic enableTestEnvironment();
     fluDriver.setEnabled();
     hdrDriver.setEnabled();
     fluMonitor.setEnabled();
@@ -120,7 +120,7 @@ program TEST (
 
   // --------------------------------------------------------------------------
   // Disable test Environment
-  task disableTestEnvironment();
+  task automatic disableTestEnvironment();
     int i;
     #(10*CLK_PERIOD);
     i = 0;
@@ -145,7 +145,7 @@ program TEST (
   //                            Test cases
   // --------------------------------------------------------------------------
   // Basic test
-  task test1();
+  task automatic test1();
     $write("\n\n############ TEST CASE 1 ############\n\n");
     createEnvironment();
     enableTestEnvironment();
@@ -158,7 +158,7 @@ program TEST (
   endtask: test1
 
   // Generate very short packets
-  task test2();
+  task automatic test2();
     $write("\n\n############ TEST CASE 2 ############\n\n");
     createEnvironment();
     // ////////////////////////////////
@@ -177,7 +177,7 @@ program TEST (
   endtask: test2
 
   // Classic length transactions, slow TX and fast RX
-  task test3();
+  task automatic test3();
     $write("\n\n############ TEST CASE 3 ############\n\n");
     createEnvironment();
     // ////////////////////////////////
@@ -201,7 +201,7 @@ program TEST (
 
 
   // Classic length transactions, no TX wait
-  task test4();
+  task automatic test4();
     $write("\n\n############ TEST CASE 4 ############\n\n");
     createEnvironment();
     // ////////////////////////////////
@@ -220,7 +220,7 @@ program TEST (
   endtask: test4
 
   // Very short packets, lot of waiting
-  task test5();
+  task automatic test5();
     $write("\n\n############ TEST CASE 5 ############\n\n");
     createEnvironment();
     // ////////////////////////////////

@@ -40,7 +40,18 @@ class env #(
         MI_ADDR_WIDTH
     ));
 
-    sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequencer;
+    sequencer#(
+        ETH_PORTS,
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH,
+        ITEM_WIDTH,
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ETH_PORT_CHAN,
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) m_sequencer;
 
     //RESETS
     protected uvm_reset::agent m_usr_rst;
@@ -51,9 +62,24 @@ class env #(
     protected uvm_reset::agent m_tsu_rst;
 
     //USR
-    protected uvm_logic_vector_array_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH) m_usr_rx[ETH_PORTS];
-    protected uvm_logic_vector_array_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                m_usr_tx_data[ETH_PORTS];
-    protected uvm_logic_vector_mvb::env_tx      #(REGIONS, ETH_RX_HDR_WIDTH)                                      m_usr_tx_hdr[ETH_PORTS];
+    protected uvm_logic_vector_array_mfb::env_rx#(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        ETH_TX_HDR_WIDTH
+    ) m_usr_rx[ETH_PORTS];
+    protected uvm_logic_vector_array_mfb::env_tx#(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        0
+    ) m_usr_tx_data[ETH_PORTS];
+    protected uvm_logic_vector_mvb::env_tx      #(
+        REGIONS,
+        ETH_RX_HDR_WIDTH
+    ) m_usr_tx_hdr[ETH_PORTS];
 
     //MI
     //protected uvm_mi::agent_slave #(MI_DATA_WIDTH, MI_ADDR_WIDTH) m_mi;
@@ -64,8 +90,20 @@ class env #(
     protected uvm_logic_vector_mvb::env_rx      #(1, 64) m_tsu;
 
     // SCOREBOARD
-    protected scoreboard #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH) m_scoreboard;
-    protected uvm_mi::regmodel#(uvm_network_mod_env::regmodel #(ETH_PORTS, ETH_PORT_CHAN), MI_DATA_WIDTH, MI_ADDR_WIDTH) m_regmodel;
+    protected scoreboard #(
+        ETH_CORE_ARCH,
+        ETH_PORTS,
+        ETH_PORT_SPEED,
+        ETH_PORT_CHAN,
+        REGIONS,
+        ITEM_WIDTH,
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH
+    ) m_scoreboard;
+    protected uvm_mi::regmodel#(uvm_network_mod_env::regmodel #(
+        ETH_PORTS,
+        ETH_PORT_CHAN
+    ), MI_DATA_WIDTH, MI_ADDR_WIDTH) m_regmodel;
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -77,7 +115,8 @@ class env #(
     endfunction
 
     virtual function void eth_full_speed_set();
-        `uvm_fatal(this.get_full_name(), "\n\tIf you want to run full speed test you have to specified full speed sequece for ethernet");
+        `uvm_fatal(this.get_full_name(),
+                   "\n\tIf you want to run full speed test you have to specified full speed sequece for ethernet");
     endfunction
 
     // Create base components of environment.
@@ -139,21 +178,37 @@ class env #(
             cfg_rx.active = UVM_ACTIVE;
             cfg_rx.interface_name = $sformatf("vif_usr_rx_%0d", it);
             cfg_rx.meta_behav = uvm_logic_vector_array_mfb::config_item::META_SOF;
-            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, $sformatf("m_usr_rx_%0d", it), "m_config", cfg_rx);
-            m_usr_rx[it]      = uvm_logic_vector_array_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create($sformatf("m_usr_rx_%0d", it), this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, $sformatf("m_usr_rx_%0d", it),
+                                                                         "m_config", cfg_rx);
+            m_usr_rx[it]      = uvm_logic_vector_array_mfb::env_rx#(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                ITEM_WIDTH,
+                ETH_TX_HDR_WIDTH
+            )::type_id::create($sformatf("m_usr_rx_%0d", it), this);
 
             cfg_tx_data = new();
             cfg_tx_data.active = UVM_ACTIVE;
             cfg_tx_data.interface_name = $sformatf("vif_usr_tx_data_%0d", it);
             cfg_tx_data.meta_behav = uvm_logic_vector_array_mfb::config_item::META_NONE;
-            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, $sformatf("m_usr_tx_data_%0d", it), "m_config", cfg_tx_data);
-            m_usr_tx_data[it] = uvm_logic_vector_array_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create($sformatf("m_usr_tx_data_%0d", it), this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, $sformatf("m_usr_tx_data_%0d", it),
+                                                                         "m_config", cfg_tx_data);
+            m_usr_tx_data[it] = uvm_logic_vector_array_mfb::env_tx#(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                ITEM_WIDTH,
+                0
+            )::type_id::create($sformatf("m_usr_tx_data_%0d", it), this);
 
             cfg_tx_hdr = new();
             cfg_tx_hdr.active = UVM_ACTIVE;
             cfg_tx_hdr.interface_name = $sformatf("vif_usr_tx_hdr_%0d", it);
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_usr_tx_hdr_%0d", it), "m_config", cfg_tx_hdr);
-            m_usr_tx_hdr[it]  = uvm_logic_vector_mvb::env_tx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::create($sformatf("m_usr_tx_hdr_%0d", it), this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_usr_tx_hdr_%0d", it), "m_config",
+                                                                   cfg_tx_hdr);
+            m_usr_tx_hdr[it] = uvm_logic_vector_mvb::env_tx #(REGIONS, ETH_RX_HDR_WIDTH)::type_id::create(
+                $sformatf("m_usr_tx_hdr_%0d", it), this);
         end
 
         cfg_mi  = new();
@@ -161,7 +216,10 @@ class env #(
         cfg_mi.agent.active         = UVM_ACTIVE;
         cfg_mi.agent.interface_name = "vif_mi";
         uvm_config_db#(uvm_mi::regmodel_config)::set(this, "m_regmodel", "m_config", cfg_mi);
-        m_regmodel = uvm_mi::regmodel#(uvm_network_mod_env::regmodel #(ETH_PORTS, ETH_PORT_CHAN), MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);;
+        m_regmodel = uvm_mi::regmodel#(uvm_network_mod_env::regmodel #(
+            ETH_PORTS,
+            ETH_PORT_CHAN
+        ), MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);
 
         cfg_mi_phy  = new();
         cfg_mi_phy.active         = UVM_ACTIVE;
@@ -181,8 +239,28 @@ class env #(
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_tsu", "m_config", cfg_tsu);
         m_tsu  = uvm_logic_vector_mvb::env_rx#(1, 64)::type_id::create("m_tsu", this);
 
-        m_scoreboard = scoreboard#(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, REGIONS, ITEM_WIDTH, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("m_scoreboard", this);
-        m_sequencer  = sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequencer", this);
+        m_scoreboard = scoreboard#(
+            ETH_CORE_ARCH,
+            ETH_PORTS,
+            ETH_PORT_SPEED,
+            ETH_PORT_CHAN,
+            REGIONS,
+            ITEM_WIDTH,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH
+        )::type_id::create("m_scoreboard", this);
+        m_sequencer  = sequencer#(
+            ETH_PORTS,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )::type_id::create("m_sequencer", this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

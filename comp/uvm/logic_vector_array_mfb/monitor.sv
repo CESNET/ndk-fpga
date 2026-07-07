@@ -11,14 +11,22 @@ class monitor_logic_vector_array #(
     int unsigned ITEM_WIDTH,
     int unsigned META_WIDTH
 ) extends uvm_logic_vector_array::monitor #(ITEM_WIDTH);
-    `ndk_component_param_utils(
-        uvm_logic_vector_array_mfb::monitor_logic_vector_array#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::monitor_logic_vector_array#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+    `ndk_component_param_utils(uvm_logic_vector_array_mfb::monitor_logic_vector_array
+                                   #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+                               $sformatf(
+                                   "uvm_logic_vector_array_mfb::monitor_logic_vector_array #(%0d,%0d,%0d,%0d,%0d)",
+                                         REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     // Analysis port
     typedef monitor_logic_vector_array #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) this_type;
-    uvm_analysis_imp #(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
+    uvm_analysis_imp #(uvm_mfb::sequence_item #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH
+    ), this_type) analysis_export;
 
     uvm_reset::sync_terminate reset_sync;
     localparam SOF_POS_WIDTH = $clog2(REGION_SIZE);
@@ -41,7 +49,8 @@ class monitor_logic_vector_array #(
         this.endpoint_type = endpoint_type;
     endfunction
 
-    virtual function void process_eof(int unsigned index, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
+    virtual function void process_eof(
+        int unsigned index, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
         if (hi_tr != null) begin
             hi_tr.data = data;
             items++;
@@ -50,15 +59,22 @@ class monitor_logic_vector_array #(
             analysis_port.write(hi_tr);
             hi_tr = null;
         end else begin
-            `uvm_error(this.get_full_name(), "\n\n\tTwo EOFs without a SOF between them were detected!\nThe frame's SOF is missing or an EOF has been duplicated.\n")
+            `uvm_error(this.get_full_name(),
+                       "\n\n\tTwo EOFs without a SOF between them were detected!\nThe frame's SOF is missing or an EOF has been duplicated.\n"
+                           )
         end
     endfunction
 
-    virtual function void process_sof(int unsigned index, int unsigned end_pos, uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
+    virtual function void process_sof(
+        int unsigned index, int unsigned end_pos,
+        uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) tr);
         int unsigned sof_pos = (SOF_POS_WIDTH != 0 ? BLOCK_SIZE*tr.sof_pos[index] : 0);
 
         if (hi_tr != null) begin
-            `uvm_error(this.get_full_name(), "\n\n\tTwo SOFs without an EOF between them were detected!\nThe frame's EOF is missing or a SOF has been duplicated.\n")
+            `uvm_error(
+                this.get_full_name(),
+                // verilog_lint: waive line-length
+                "\n\n\tTwo SOFs without an EOF between them were detected!\nThe frame's EOF is missing or a SOF has been duplicated.\n")
         end
         hi_tr = uvm_logic_vector_array::sequence_item #(ITEM_WIDTH)::type_id::create("hi_tr", this);
         data.delete();
@@ -81,11 +97,14 @@ class monitor_logic_vector_array #(
                 int unsigned sof_pos = SOF_POS_WIDTH != 0 ? BLOCK_SIZE*tr.sof_pos[it] : 0;
                 // Eop is before next packet start
                 assert(
+                    // verilog_lint: waive line-length
                     ((it == 0 || (it > 0 &&  tr.sof[it] == 0                      )) && endpoint_type == config_sequence::PCIE)            || // PCIE No straddling
-                    ((it == 0 || (it > 0 && (tr.sof[it] == 0 || tr.eof[it-1] == 1))) && endpoint_type == config_sequence::PCIE_STRADDLING) || // PCIE straddling
-                    (1'b1                                                            && endpoint_type == config_sequence::NORMAL)             // Normal sequence
+                ((it == 0 || (it > 0 && (tr.sof[it] == 0 || tr.eof[it-1] == 1))) &&
+                 endpoint_type == config_sequence::PCIE_STRADDLING) ||  // PCIE straddling
+                (1'b1 && endpoint_type == config_sequence::NORMAL)  // Normal sequence
                 ) else begin
-                    `uvm_fatal(this.get_full_name(), $sformatf("\n\tPCIE protocol error %s\n\t%s", endpoint_type, tr.convert2string()));
+                    `uvm_fatal(this.get_full_name(), $sformatf(
+                               "\n\tPCIE protocol error %s\n\t%s", endpoint_type, tr.convert2string()));
                 end
 
                 if (tr.sof[it] && tr.eof[it] && tr.eof_pos[it] < sof_pos) begin
@@ -131,14 +150,21 @@ class monitor_logic_vector #(
 ) extends uvm_logic_vector::monitor#(META_WIDTH);
     `ndk_component_param_utils(
         uvm_logic_vector_array_mfb::monitor_logic_vector#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::monitor_logic_vector#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::monitor_logic_vector #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     //localparam ITEM_WIDTH = 32;
 
     typedef monitor_logic_vector #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) this_type;
     // Analysis por
-    uvm_analysis_imp #(uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH), this_type) analysis_export;
+    uvm_analysis_imp #(uvm_mfb::sequence_item #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH
+    ), this_type) analysis_export;
     uvm_reset::sync_terminate reset_sync;
     config_item::meta_type meta_behav;
 

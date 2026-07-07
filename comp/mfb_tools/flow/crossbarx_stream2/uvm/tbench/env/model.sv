@@ -99,6 +99,7 @@ class model #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_compo
                 mod_sof_trim = mod_sof_size;
             end
 
+            // verilog_lint: waive line-length
             tr_output_data = uvm_logic_vector_array::sequence_item #(RX_MFB_ITEM_W)::type_id::create("tr_output_data", this);
             tr_output_data.data = new[mfb_new_size];
 
@@ -120,11 +121,11 @@ class model #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_compo
 
             transactions++;
             str = $sformatf( "\n======= MODEL: Transaction %0d =======", transactions);
-            str = {str, $sformatf("\nDISCARD: %0b",  mod_discard)};
+            str = {str, $sformatf("\nDISCARD: 0b%0b",  mod_discard)};
             str = {str, $sformatf("\nMOD SOF size: %0d",  mod_sof_size)};
-            str = {str, $sformatf("\nMOD SOF type: %0b",  mod_sof_type)};
+            str = {str, $sformatf("\nMOD SOF type: 0b%0b",  mod_sof_type)};
             str = {str, $sformatf("\nMOD EOF size: %0d",  mod_eof_size)};
-            str = {str, $sformatf("\nMOD EOF type: %0b",  mod_eof_type)};
+            str = {str, $sformatf("\nMOD EOF type: 0b%0b",  mod_eof_type)};
             str = {str, $sformatf("\nORIG size: %0d",  mfb_orig_size)};
             str = {str, $sformatf("\nNEW size: %0d",  mfb_new_size)};
             str = {str, $sformatf("\nsof_extend: %0d",  mod_sof_extend)};

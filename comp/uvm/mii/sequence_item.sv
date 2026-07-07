@@ -69,7 +69,7 @@ class sequence_item #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_com
         string output_string = "";
         string data = "";
 
-        $sformat(output_string, {"%s\n\tDATA: %b\n\tCONTROL: %b\n\t CLK_EN: %b\n"},
+        $sformat(output_string, {"%s\n\tDATA: 'b%b\n\tCONTROL: 'b%b\n\t CLK_EN: 'b%b\n"},
             super.convert2string(),
             this.data,
             this.control,

@@ -24,7 +24,7 @@ module testbench;
     always #(5ns/2) CLK = ~CLK;
 
 
-    DUT DUT_U (
+    dut DUT_U (
         .CLK     (CLK),
         .RESET   (RESET),
         .MI      (MI)

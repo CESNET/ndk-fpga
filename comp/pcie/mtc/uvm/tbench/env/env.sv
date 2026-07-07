@@ -16,10 +16,27 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE
 
     sequencer#(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_sequencer;
 
+    // verilog_lint: waive line-length
     uvm_reset::agent                                                                                                          m_reset;
-    uvm_pcie_cq::env                   #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE) m_env_cq;
-    uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CC_MFB_META_WIDTH)     m_env_cc;
-    uvm_mi::agent_master #(MI_DATA_WIDTH, MI_ADDR_WIDTH)                                                                      m_mi_agent;
+    uvm_pcie_cq::env                   #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        DEVICE,
+        ENDPOINT_TYPE
+    ) m_env_cq;
+    uvm_logic_vector_array_mfb::env_tx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        CC_MFB_META_WIDTH
+    ) m_env_cc;
+    uvm_mi::agent_master #(
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) m_mi_agent;
     uvm_pcie_hdr::sync_tag tag_sync;
     uvm_mtc::tr_planner #(MI_DATA_WIDTH, MI_ADDR_WIDTH) tr_plan;
     monitor #(MI_DATA_WIDTH, MI_ADDR_WIDTH) m_monitor;
@@ -48,14 +65,27 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE
         m_config_cq.active               = UVM_ACTIVE;
         m_config_cq.interface_name       = "vif_cq";
         uvm_config_db #(uvm_pcie_cq::config_item)::set(this, "m_env_cq", "m_config", m_config_cq);
-        m_env_cq   = uvm_pcie_cq::env#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE)::type_id::create("m_env_cq", this);
+        m_env_cq   = uvm_pcie_cq::env#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            DEVICE,
+            ENDPOINT_TYPE
+        )::type_id::create("m_env_cq", this);
 
         m_config_cc                      = new;
         m_config_cc.active               = UVM_ACTIVE;
         m_config_cc.interface_name       = "vif_cc";
         m_config_cc.meta_behav           = uvm_logic_vector_array_mfb::config_item::META_SOF;
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_cc", "m_config", m_config_cc);
-        m_env_cc   = uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CC_MFB_META_WIDTH)::type_id::create("m_env_cc", this);
+        m_env_cc   = uvm_logic_vector_array_mfb::env_tx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            CC_MFB_META_WIDTH
+        )::type_id::create("m_env_cc", this);
 
         m_mi_config                = new();
         m_mi_config.active         = UVM_ACTIVE;
@@ -64,7 +94,9 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE
         m_mi_agent = uvm_mi::agent_master #(MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_mi_agent", this);
 
         //change Select devices
-        set_type_override_by_type(uvm_mtc::model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(), uvm_mtc::model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type());
+        set_type_override_by_type(
+            uvm_mtc::model #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(),
+            uvm_mtc::model_base #(MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type());
         sc          = scoreboard #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("sc", this);
         m_sequencer = sequencer  #(MFB_ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_sequencer", this);
 

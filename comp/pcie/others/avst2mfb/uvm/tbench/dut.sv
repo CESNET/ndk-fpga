@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mfb_if.dut_tx   mfb_rx,
@@ -20,7 +20,7 @@ module DUT (
 
     assign mfb_rx.SOF_POS = '0;
     generate
-        for (genvar it = 0; it < MFB_REGIONS; it++) begin
+        for (genvar it = 0; it < MFB_REGIONS; it++) begin : gen_it
             assign avst_data [(it+1)*AVST_ITEMS*MFB_ITEM_WIDTH -1 -: AVST_ITEMS*MFB_ITEM_WIDTH] = mfb_avst.DATA[it];
             assign avst_meta [(it+1)*META_WIDTH -1                -: META_WIDTH]                = mfb_avst.META[it];
             assign avst_empty[(it+1)*$clog2(AVST_ITEMS) -1         -: $clog2(AVST_ITEMS)]       = mfb_avst.EMPTY[it];

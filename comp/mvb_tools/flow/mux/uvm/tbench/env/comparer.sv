@@ -4,7 +4,10 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class mvb_comparer #(ITEMS, ITEM_WIDTH) extends uvm_common::comparer_ordered #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
+class mvb_comparer #(
+    ITEMS,
+    ITEM_WIDTH
+) extends uvm_common::comparer_ordered #(uvm_mvb::sequence_item #(ITEMS, ITEM_WIDTH));
     `uvm_component_param_utils(uvm_mvb_mux::mvb_comparer #(ITEMS, ITEM_WIDTH))
 
     function new(string name, uvm_component parent = null);

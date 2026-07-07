@@ -6,16 +6,46 @@
 
 // Environment for functional verification of encode.
 // This environment containts two mii agents.
-class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX) extends uvm_env;
+class env #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    MI_DATA_WIDTH,
+    MI_ADDRESS_WIDTH,
+    SPACE_SIZE_MIN_RX,
+    SPACE_SIZE_MAX_RX,
+    SPACE_SIZE_MIN_TX,
+    SPACE_SIZE_MAX_TX
+) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_speed_meter::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX));
+    `uvm_component_param_utils(
+        uvm_speed_meter::env #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDRESS_WIDTH,
+            SPACE_SIZE_MIN_RX,
+            SPACE_SIZE_MAX_RX,
+            SPACE_SIZE_MIN_TX,
+            SPACE_SIZE_MAX_TX
+        ));
 
     uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) m_mfb_rx_env;
     uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0) m_mfb_tx_env;
     uvm_logic_vector_array_mfb::config_item                                               m_mfb_rx_config;
     uvm_logic_vector_array_mfb::config_item                                               m_mfb_tx_config;
 
-    uvm_speed_meter::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH) vscr;
+    uvm_speed_meter::virt_sequencer#(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        MI_DATA_WIDTH,
+        MI_ADDRESS_WIDTH
+    ) vscr;
 
     uvm_reset::agent       m_reset;
     uvm_reset::config_item m_reset_config;
@@ -62,10 +92,29 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_mfb_rx_env", "m_config", m_mfb_rx_config);
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_mfb_tx_env", "m_config", m_mfb_tx_config);
 
-        m_mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_mfb_rx_env", this);
-        m_mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_mfb_tx_env", this);
+        m_mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            0
+        )::type_id::create("m_mfb_rx_env", this);
+        m_mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            0
+        )::type_id::create("m_mfb_tx_env", this);
 
-        vscr   = uvm_speed_meter::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDRESS_WIDTH)::type_id::create("vscr",this);
+        vscr   = uvm_speed_meter::virt_sequencer#(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            MI_DATA_WIDTH,
+            MI_ADDRESS_WIDTH
+        )::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

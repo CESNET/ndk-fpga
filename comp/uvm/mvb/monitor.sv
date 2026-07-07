@@ -46,7 +46,7 @@ class monitor #(int unsigned ITEMS, int unsigned ITEM_WIDTH) extends uvm_monitor
             @(vif.monitor_cb);
 
             // Capture actual data at interface
-	        si = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("si");
+            si = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("si");
             for (int i = 0 ; i < ITEMS ; i++ ) begin
                 si.data[i] = vif.monitor_cb.DATA[(i+1)*ITEM_WIDTH - 1 -: ITEM_WIDTH];
             end

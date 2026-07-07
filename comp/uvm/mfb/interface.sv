@@ -5,8 +5,18 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mfb interface.
-interface mfb_if #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) (input logic CLK);
-    initial VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && BLOCK_SIZE > 0 && ITEM_WIDTH > 0);
+interface mfb_if #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) (
+    input logic CLK
+);
+    initial begin
+        VALID_PARAMETERS : assert(REGIONS > 0 && REGION_SIZE > 0 && BLOCK_SIZE > 0 && ITEM_WIDTH > 0);
+    end
 
     // ------------------------------------------------------------------------
     // Parameters
@@ -17,14 +27,14 @@ interface mfb_if #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned 
 
     // ------------------------------------------------------------------------
     // Bus structure of mfb
-    wire logic [WORD_WIDTH       -1 : 0] DATA;
-    wire logic [META_WORD_WIDTH  -1 : 0] META;
-    wire logic [SOF_POS_WIDTH    -1 : 0] SOF_POS;
-    wire logic [EOF_POS_WIDTH    -1 : 0] EOF_POS;
-    wire logic [REGIONS          -1 : 0] SOF;
-    wire logic [REGIONS          -1 : 0] EOF;
-    wire logic SRC_RDY;
-    wire logic DST_RDY;
+    wire [WORD_WIDTH       -1 : 0] DATA;
+    wire [META_WORD_WIDTH  -1 : 0] META;
+    wire [SOF_POS_WIDTH    -1 : 0] SOF_POS;
+    wire [EOF_POS_WIDTH    -1 : 0] EOF_POS;
+    wire [REGIONS          -1 : 0] SOF;
+    wire [REGIONS          -1 : 0] EOF;
+    wire SRC_RDY;
+    wire DST_RDY;
 
 
     // ------------------------------------------------------------------------

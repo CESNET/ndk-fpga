@@ -77,7 +77,11 @@ class env #(RX0_ITEMS, RX1_ITEMS, RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH)
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_env_tx1", "m_config", m_config_tx1);
         m_env_tx1 = uvm_logic_vector_mvb::env_tx #(RX0_ITEMS, RX1_ITEM_WIDTH)::type_id::create("m_env_tx1", this);
 
-        sc   = scoreboard                  #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH)           ::type_id::create("sc",   this);
+        sc   = scoreboard                  #(
+            RX0_ITEM_WIDTH,
+            RX1_ITEM_WIDTH,
+            TX_ITEM_WIDTH
+        ) ::type_id::create("sc",   this);
         vscr = merge_items::virt_sequencer #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH)::type_id::create("vscr", this);
 
     endfunction

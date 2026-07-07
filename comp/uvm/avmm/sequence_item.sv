@@ -80,7 +80,9 @@ class sequence_item_request #(
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tREQUEST:\n\tREADY: %0b \n\tREAD: %0b \n\tWRITE: %0b \n\tADDRESS: %0h \n\tWRITEDATA: %0h \n\tBURSTCOUNT: %0d \n",
+        output_string = $sformatf(
+            "\n\tREQUEST:\n\tREADY: 'b%0b \n\tREAD: 'b%0b \n\tWRITE: 'b%0b \n\tADDRESS: 'h%0h \n\tWRITEDATA: 'h%0h \n\tBURSTCOUNT: %0d \n"
+                ,
                             ready,
                             read,
                             write,
@@ -153,7 +155,7 @@ class sequence_item_response #(int unsigned DATA_WIDTH) extends uvm_common::sequ
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tRESPONSE:\n\tREADY: %0b \n\tREADDATA %0h \n\tREADDATAVALID %0b \n",
+        output_string = $sformatf("\n\tRESPONSE:\n\tREADY: 'b%0b \n\tREADDATA 'h%0h \n\tREADDATAVALID 'b%0b \n",
                             ready,
                             readdata,
                             readdatavalid

@@ -4,13 +4,20 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_common::sequence_item;
+class sequence_item #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_common::sequence_item;
 
     // ------------------------------------------------------------------------
     // Registration of object tools
     `ndk_object_param_utils(
         uvm_mfb::sequence_item#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_mfb::sequence_item#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+                            $sformatf("uvm_mfb::sequence_item #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE, BLOCK_SIZE,
+                                      ITEM_WIDTH, META_WIDTH)
     )
 
     // ------------------------------------------------------------------------
@@ -87,19 +94,20 @@ class sequence_item #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsign
     function string convert2string();
         string ret = "";
 
-        $sformat(ret, {"\n\tSRC_RDY: %b\n\tDST_RDY: %b\n"},
+        $sformat(ret, {"\n\tSRC_RDY: 'b%b\n\tDST_RDY: 'b%b\n"},
             src_rdy,
             dst_rdy
         );
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
-            ret = {ret, $sformatf("\n\t-- id %0d\n\tEOF %b EOF_POS %0d\n\tSOF %b SOF_POS %0d\n\tMETA %h\n",  it, eof[it], eof_pos[it], sof[it], sof_pos[it], meta[it])};
+            // verilog_lint: waive line-length
+            ret = {ret, $sformatf("\n\t-- id %0d\n\tEOF 'b%b EOF_POS %0d\n\tSOF 'b%b SOF_POS %0d\n\tMETA 'h%h\n",  it, eof[it], eof_pos[it], sof[it], sof_pos[it], meta[it])};
             ret = {ret, "\tDATA"};
             for (int unsigned jt = 0; jt < REGION_SIZE*BLOCK_SIZE; jt++) begin
                 if (jt % 8 == 0) begin
                     ret = {ret, "\n\t"};
                 end
-                ret = {ret, $sformatf("%h  ", data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
+                ret = {ret, $sformatf("'h%h  ", data[it][(jt+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
             end
         end
 

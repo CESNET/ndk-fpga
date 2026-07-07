@@ -24,8 +24,24 @@ module testbench #(
     localparam int unsigned MVB_ITEM_WIDTH = MVB_ITEM_WIDTH_RAW+MFB_META_WIDTH;
 
     //TESTS
-    typedef test::ex_test #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH) ex_test;
-    typedef test::speed #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH) speed;
+    typedef test::ex_test #(
+        .MFB_REGIONS     (MFB_REGIONS),
+        .MVB_ITEMS       (MVB_ITEMS),
+        .MFB_REGION_SIZE (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .MFB_META_WIDTH  (MFB_META_WIDTH),
+        .MVB_ITEM_WIDTH  (MVB_ITEM_WIDTH)
+    ) ex_test;
+    typedef test::speed #(
+        .MFB_REGIONS     (MFB_REGIONS),
+        .MVB_ITEMS       (MVB_ITEMS),
+        .MFB_REGION_SIZE (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .MFB_META_WIDTH  (MFB_META_WIDTH),
+        .MVB_ITEM_WIDTH  (MVB_ITEM_WIDTH)
+    ) speed;
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -36,12 +52,23 @@ module testbench #(
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) mfb_tx(CLK);
-    mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH) mvb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (MFB_REGIONS),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+        .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+        .META_WIDTH  (MFB_META_WIDTH)
+    ) mfb_tx(CLK);
+    mvb_if #(
+       .ITEMS      (MVB_ITEMS),
+       .ITEM_WIDTH (MVB_ITEM_WIDTH)
+   ) mvb_rx(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -50,8 +77,17 @@ module testbench #(
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))::set(null, "", "vif_tx", mfb_tx);
-        uvm_config_db#(virtual mvb_if #(MVB_ITEMS, MVB_ITEM_WIDTH))::set(null, "", "vif_mvb_rx", mvb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (MFB_ITEM_WIDTH),
+            .META_WIDTH  (MFB_META_WIDTH)
+        ))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (MVB_ITEMS),
+            .ITEM_WIDTH (MVB_ITEM_WIDTH)
+        ))::set(null, "", "vif_mvb_rx", mvb_rx);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -65,8 +101,8 @@ module testbench #(
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT #(
+    // dut
+    dut #(
         .MVB_ITEMS          (MVB_ITEMS),
         .MVB_ITEM_WIDTH_RAW (MVB_ITEM_WIDTH_RAW),
         .MFB_REGIONS        (MFB_REGIONS),

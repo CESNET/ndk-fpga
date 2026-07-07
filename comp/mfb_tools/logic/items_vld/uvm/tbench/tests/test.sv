@@ -8,7 +8,18 @@ class ex_test extends uvm_test;
     typedef uvm_component_registry#(test::ex_test, "test::ex_test") type_id;
 
     // declare the Environment reference variable
-    uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_env;
+    uvm_items_valid::env #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        META_WIDTH,
+        MVB_DATA_WIDTH,
+        MVB_ITEMS,
+        PKT_MTU,
+        OFFSET_WIDTH,
+        LENGTH_WIDTH
+    ) m_env;
     uvm_reset::sequence_start                              m_reset;
 
     // ------------------------------------------------------------------------
@@ -30,7 +41,9 @@ class ex_test extends uvm_test;
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
         // Initializing the reference to the environment
-        m_env = uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH,
+                                      MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create(
+            "m_env", this);
     endfunction
 
     virtual task run_reset();
@@ -40,19 +53,30 @@ class ex_test extends uvm_test;
 
     virtual function void init();
 
-        m_reset   = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset   = uvm_reset::sequence_start::type_id::create("m_reset");
     endfunction
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
-        virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_vseq;
+        virt_sequence #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            META_WIDTH,
+            MVB_DATA_WIDTH,
+            PKT_MTU,
+            OFFSET_WIDTH,
+            LENGTH_WIDTH
+        ) m_vseq;
         time time_start;
 
         phase.raise_objection(this);
 
         //RUN MFB RX SEQUENCE
-        m_vseq = virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH,
+                                MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_vseq");
 
         init();
 

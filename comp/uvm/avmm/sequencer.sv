@@ -57,6 +57,7 @@ class sequencer_master #(
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
+        // verilog_lint: waive line-length
         uvm_config_db #(uvm_tlm_analysis_fifo #(response_item #(DATA_WIDTH)))::set(this, "", "response_in", response_in);
     endfunction
 

@@ -102,6 +102,7 @@ class sequence_meta extends uvm_sequence #(uvm_logic_vector::sequence_item#(sv_p
             wait(fifo.size() != 0);
             pcie_tr = fifo.pop_front();
 
+            // verilog_lint: waive line-length
             req = uvm_logic_vector::sequence_item#(sv_pcie_meta_pack::PCIE_CC_META_WIDTH)::type_id::create("req", m_sequencer);
             start_item(req);
 

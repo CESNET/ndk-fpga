@@ -6,7 +6,11 @@
 
 
 // Reusable high level sequence. Contains transaction, which has only data part.
-class sequence_simple #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX) extends uvm_common::sequence_base#(config_sequence, sequence_item);
+class sequence_simple #(
+    IS_XILINX_DEV,
+    PCIE_LEN_MIN,
+    PCIE_LEN_MAX
+) extends uvm_common::sequence_base #(config_sequence, sequence_item);
     `uvm_object_param_utils(uvm_pcie_hdr::sequence_simple #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX))
 
     rand int unsigned      transaction_count;
@@ -86,7 +90,11 @@ endclass
 
 //////////////////////////////////////
 // TX LIBRARY
-class sequence_lib #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX) extends uvm_common::sequence_library#(config_sequence, sequence_item);
+class sequence_lib #(
+    IS_XILINX_DEV,
+    PCIE_LEN_MIN,
+    PCIE_LEN_MAX
+) extends uvm_common::sequence_library #(config_sequence, sequence_item);
   `uvm_object_param_utils(uvm_pcie_hdr::sequence_lib #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX))
   `uvm_sequence_library_utils(uvm_pcie_hdr::sequence_lib #(IS_XILINX_DEV, PCIE_LEN_MIN, PCIE_LEN_MAX))
 

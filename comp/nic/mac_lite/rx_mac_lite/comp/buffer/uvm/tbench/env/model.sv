@@ -78,12 +78,22 @@ class model #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extends uvm
     function string info();
         string msg = "";
 
-        msg = {msg, $sformatf("\n\tProcessed packets %0d/%0d dropped packets %0d/%0d", (pkt_cnt - drop_cnt), pkt_cnt, drop_cnt, pkt_cnt)};
+        msg = {
+            msg,
+            $sformatf(
+                "\n\tProcessed packets %0d/%0d dropped packets %0d/%0d",
+                (pkt_cnt - drop_cnt),
+                pkt_cnt,
+                drop_cnt,
+                pkt_cnt
+            )
+        };
         return msg;
     endfunction
 
 
     function void connect_phase(uvm_phase phase);
+        // verilog_lint: waive line-length
         uvm_probe::pool::get_global_pool().get({"probe_event_component_", DUT_PATH, ".probe_drop"}).add_callback(drop_sync);
     endfunction
 
@@ -102,7 +112,9 @@ class model #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extends uvm
             drop = err | force_drop;
 
             meta_cnt++;
-            `uvm_info(this.get_full_name(), $sformatf("\n\tPacket %0d drop %b error %0d\n%s", meta_cnt, drop, err, tr_input.convert2string()), UVM_HIGH);
+            `uvm_info(this.get_full_name(), $sformatf(
+                      "\n\tPacket %0d drop 0b%b error %0d\n%s", meta_cnt, drop, err, tr_input.convert2string()),
+                      UVM_HIGH);
 
             pkt_drop.push_back(drop);
             if (drop == 0) begin
@@ -124,7 +136,8 @@ class model #(MFB_ITEM_WIDTH, MFB_META_WIDTH, MFB_REGIONS, DUT_PATH) extends uvm
             drop = pkt_drop.pop_front();
 
             pkt_cnt++;
-            `uvm_info(this.get_full_name(), $sformatf("\n\tPacket %0d drop %b\n%s", pkt_cnt, drop, tr_input.convert2string()), UVM_HIGH);
+            `uvm_info(this.get_full_name(), $sformatf(
+                      "\n\tPacket %0d drop 0b%b\n%s", pkt_cnt, drop, tr_input.convert2string()), UVM_HIGH);
             if (drop == 0) begin
                 out_mfb_data.write(tr_input);
             end

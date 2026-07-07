@@ -5,7 +5,12 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // Definition of mfb monitor
-class monitor #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH) extends uvm_monitor;
+class monitor #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH
+) extends uvm_monitor;
 
     // ------------------------------------------------------------------------
     // Registration of agent to databaze

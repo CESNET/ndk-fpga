@@ -67,8 +67,11 @@ class agent_rx #(
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
-            `uvm_fatal(this.get_full_name(), {"\n\tCannot find 'axi_if' with name ", m_config.interface_name, " inside uvm_config_db, probably not set!"})
+        if (!uvm_config_db #(virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
+            `uvm_fatal(this.get_full_name(), {"\n\tCannot find 'axi_if' with name ", m_config.interface_name,
+                                              " inside uvm_config_db, probably not set!"})
         end
 
         // Connect driver if the agent is active
@@ -147,8 +150,11 @@ class agent_tx #(
         super.connect_phase(phase);
 
         // Get interface instance
-        if(!uvm_config_db #(virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
-            `uvm_fatal(this.get_full_name(), {"\n\tCannot find 'axi_if' with name ", m_config.interface_name, " inside uvm_config_db, probably not set!"})
+        if (!uvm_config_db #(virtual axi_if #(ITEMS, ITEM_WIDTH, TUSER_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
+            `uvm_fatal(this.get_full_name(), {"\n\tCannot find 'axi_if' with name ", m_config.interface_name,
+                                              " inside uvm_config_db, probably not set!"})
         end
 
         // Connect driver if the agent is active

@@ -13,6 +13,6 @@ lappend COMPONENTS [ list "SV_RESET"            "$SV_UVM_BASE/reset"            
 # Define modules
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"   \
             "$ENTITY_BASE/tbench/tests/pkg.sv" \
-            "$ENTITY_BASE/tbench/property.sv"  \
+            "$ENTITY_BASE/tbench/mvb_merge_streams_property.sv"  \
             "$ENTITY_BASE/tbench/dut.sv"       \
             "$ENTITY_BASE/tbench/testbench.sv"

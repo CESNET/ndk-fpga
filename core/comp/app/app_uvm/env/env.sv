@@ -49,8 +49,10 @@ class env #(
     localparam DMA_TX_MVB_WIDTH = $clog2(DMA_PKT_MTU+1)+DMA_HDR_META_WIDTH+$clog2(DMA_TX_CHANNELS) + 1;
 
     //META TO ITEM
-    typedef uvm_app_core_top_agent::sequence_eth_item#(2**8, 16, MFB_ITEM_WIDTH)                                                   sequence_item_eth_rx;
-    typedef uvm_app_core_top_agent::sequence_dma_item#(DMA_TX_CHANNELS, $clog2(DMA_PKT_MTU+1), DMA_HDR_META_WIDTH, MFB_ITEM_WIDTH) sequence_item_dma_rx;
+    typedef uvm_app_core_top_agent::sequence_eth_item #(2 ** 8, 16, MFB_ITEM_WIDTH) sequence_item_eth_rx;
+    typedef uvm_app_core_top_agent::sequence_dma_item #(DMA_TX_CHANNELS, $clog2(
+        DMA_PKT_MTU + 1
+    ), DMA_HDR_META_WIDTH, MFB_ITEM_WIDTH) sequence_item_dma_rx;
 
     //TOP Sequencer
     uvm_app_core::sequencer#(DMA_RX_CHANNELS, DMA_PKT_MTU, DMA_HDR_META_WIDTH,DMA_STREAMS,
@@ -58,12 +60,35 @@ class env #(
     ) m_sequencer;
 
     // ETHERNET I/O
-    uvm_app_core_top_agent::agent#(sequence_item_eth_rx, MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)                        m_eth_rx[ETH_STREAMS];
-    uvm_logic_vector_array_mfb::env_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)  m_eth_mfb_tx[ETH_STREAMS];
+    uvm_app_core_top_agent::agent#(
+        sequence_item_eth_rx,
+        MFB_ITEM_WIDTH,
+        ETH_RX_HDR_WIDTH
+    ) m_eth_rx[ETH_STREAMS];
+    uvm_logic_vector_array_mfb::env_tx#(
+        REGIONS,
+        MFB_REG_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        ETH_TX_HDR_WIDTH
+    ) m_eth_mfb_tx[ETH_STREAMS];
     // DMA I/O
-    uvm_app_core_top_agent::agent#(sequence_item_dma_rx, MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)                    m_dma_rx[DMA_STREAMS];
-    uvm_logic_vector_mvb::env_tx#(REGIONS, DMA_TX_MVB_WIDTH)                                                  m_dma_mvb_tx[DMA_STREAMS];
-    uvm_logic_vector_array_mfb::env_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)             m_dma_mfb_tx[DMA_STREAMS];
+    uvm_app_core_top_agent::agent#(
+        sequence_item_dma_rx,
+        MFB_ITEM_WIDTH,
+        DMA_RX_MVB_WIDTH
+    ) m_dma_rx[DMA_STREAMS];
+    uvm_logic_vector_mvb::env_tx#(
+        REGIONS,
+        DMA_TX_MVB_WIDTH
+    ) m_dma_mvb_tx[DMA_STREAMS];
+    uvm_logic_vector_array_mfb::env_tx#(
+        REGIONS,
+        MFB_REG_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        0
+    ) m_dma_mfb_tx[DMA_STREAMS];
     //RESET
     uvm_reset::env#(4)         m_resets_gen;
     uvm_reset::agent           m_resets_mi;
@@ -77,14 +102,42 @@ class env #(
     uvm_mi::regmodel#(uvm_app_core::regmodel, MI_DATA_WIDTH, MI_ADDR_WIDTH) m_regmodel;
 
     //SCOREBOARD
-    protected scoreboard #(ETH_STREAMS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, MFB_ITEM_WIDTH) m_scoreboard;
+    protected scoreboard #(
+        ETH_STREAMS,
+        ETH_RX_HDR_WIDTH,
+        ETH_TX_HDR_WIDTH,
+        DMA_STREAMS,
+        DMA_RX_CHANNELS,
+        DMA_TX_CHANNELS,
+        DMA_HDR_META_WIDTH,
+        DMA_PKT_MTU,
+        MFB_ITEM_WIDTH
+    ) m_scoreboard;
 
     // ETH lower agetns. Convert ETH to ETH_MFB and ETH_MVB
-    protected uvm_logic_vector_mvb::env_rx#(REGIONS, ETH_RX_HDR_WIDTH)                                        m_eth_mvb_rx[ETH_STREAMS];
-    protected uvm_logic_vector_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)   m_eth_mfb_rx[ETH_STREAMS];
+    protected uvm_logic_vector_mvb::env_rx#(
+        REGIONS,
+        ETH_RX_HDR_WIDTH
+    ) m_eth_mvb_rx[ETH_STREAMS];
+    protected uvm_logic_vector_array_mfb::env_rx#(
+        REGIONS,
+        MFB_REG_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        0
+    ) m_eth_mfb_rx[ETH_STREAMS];
     // DMA lower agetns. Convert DMA to DMA_MFB and DMA_MVB
-    protected uvm_logic_vector_mvb::env_rx#(REGIONS, DMA_RX_MVB_WIDTH)                                        m_dma_mvb_rx[DMA_STREAMS];
-    protected uvm_logic_vector_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)   m_dma_mfb_rx[DMA_STREAMS];
+    protected uvm_logic_vector_mvb::env_rx#(
+        REGIONS,
+        DMA_RX_MVB_WIDTH
+    ) m_dma_mvb_rx[DMA_STREAMS];
+    protected uvm_logic_vector_array_mfb::env_rx#(
+        REGIONS,
+        MFB_REG_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        0
+    ) m_dma_mfb_rx[DMA_STREAMS];
     //MEMORY INTERFACE
     protected uvm_avmm::agent_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH) m_memory[MEM_PORTS];
 
@@ -135,29 +188,48 @@ class env #(
             //RX ETH
             m_eth_rx_config = new();
             m_eth_rx_config.active         = UVM_ACTIVE;
-            uvm_config_db#(uvm_app_core_top_agent::config_item)::set(this, {"m_eth_rx_", it_num}, "m_config", m_eth_rx_config);
-            m_eth_rx[it] = uvm_app_core_top_agent::agent#(sequence_item_eth_rx, MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create({"m_eth_rx_", it_num}, this);
+            uvm_config_db #(uvm_app_core_top_agent::config_item)::set(this, {"m_eth_rx_", it_num}, "m_config",
+                                                                     m_eth_rx_config);
+            m_eth_rx[it] = uvm_app_core_top_agent::agent#(
+                sequence_item_eth_rx,
+                MFB_ITEM_WIDTH,
+                ETH_RX_HDR_WIDTH
+            )::type_id::create({"m_eth_rx_", it_num}, this);
 
             // RX MVB
             mvb_rx_config = new();
             mvb_rx_config.active         = UVM_ACTIVE;
             mvb_rx_config.interface_name = {"ETH_RX_MVB_", it_num};
-            uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, {"m_eth_mvb_rx_", it_num}, "m_config", mvb_rx_config);
-            m_eth_mvb_rx[it] = uvm_logic_vector_mvb::env_rx#(REGIONS, ETH_RX_HDR_WIDTH)::type_id::create({"m_eth_mvb_rx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, {"m_eth_mvb_rx_", it_num}, "m_config",
+                                                                   mvb_rx_config);
+            m_eth_mvb_rx[it] = uvm_logic_vector_mvb::env_rx#(
+                REGIONS,
+                ETH_RX_HDR_WIDTH
+            )::type_id::create({"m_eth_mvb_rx_", it_num}, this);
             // RX MFB
             mfb_rx_config = new();
             mfb_rx_config.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_NONE;
             mfb_rx_config.active         = UVM_ACTIVE;
             mfb_rx_config.interface_name = {"ETH_RX_MFB_", it_num};
-            uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_eth_mfb_rx_", it_num}, "m_config", mfb_rx_config);
-            m_eth_mfb_rx[it] = uvm_logic_vector_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create({"m_eth_mfb_rx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_eth_mfb_rx_", it_num}, "m_config",
+                                                                         mfb_rx_config);
+            m_eth_mfb_rx[it] = uvm_logic_vector_array_mfb::env_rx#(
+                REGIONS,
+                MFB_REG_SIZE,
+                MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH,
+                0
+            )::type_id::create({"m_eth_mfb_rx_", it_num}, this);
             // TX MFB
             mfb_tx_config = new();
             mfb_tx_config.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
             mfb_tx_config.active         = UVM_ACTIVE;
             mfb_tx_config.interface_name = {"ETH_TX_MFB_", it_num};
-            uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_eth_mfb_tx_", it_num}, "m_config", mfb_tx_config);
-            m_eth_mfb_tx[it] = uvm_logic_vector_array_mfb::env_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::create({"m_eth_mfb_tx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_eth_mfb_tx_", it_num}, "m_config",
+                                                                         mfb_tx_config);
+            m_eth_mfb_tx[it] =
+                uvm_logic_vector_array_mfb::env_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                                    ETH_TX_HDR_WIDTH)::type_id::create({"m_eth_mfb_tx_", it_num}, this);
         end
 
         ///////////////
@@ -173,33 +245,56 @@ class env #(
             //DMA
             m_dma_rx_config = new();
             m_dma_rx_config.active         = UVM_ACTIVE;
-            uvm_config_db#(uvm_app_core_top_agent::config_item)::set(this, {"m_dma_rx_", it_num}, "m_config", m_dma_rx_config);
-            m_dma_rx[it] = uvm_app_core_top_agent::agent#(sequence_item_dma_rx, MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create({"m_dma_rx_", it_num}, this);
+            uvm_config_db #(uvm_app_core_top_agent::config_item)::set(this, {"m_dma_rx_", it_num}, "m_config",
+                                                                     m_dma_rx_config);
+            m_dma_rx[it] = uvm_app_core_top_agent::agent#(
+                sequence_item_dma_rx,
+                MFB_ITEM_WIDTH,
+                DMA_RX_MVB_WIDTH
+            )::type_id::create({"m_dma_rx_", it_num}, this);
 
             // RX MVB
             mvb_rx_config = new();
             mvb_rx_config.active         = UVM_ACTIVE;
             mvb_rx_config.interface_name = {"DMA_RX_MVB_", it_num};
-            uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, {"m_dma_mvb_rx_", it_num}, "m_config", mvb_rx_config);
-            m_dma_mvb_rx[it] = uvm_logic_vector_mvb::env_rx#(REGIONS, DMA_RX_MVB_WIDTH)::type_id::create({"m_dma_mvb_rx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, {"m_dma_mvb_rx_", it_num}, "m_config",
+                                                                   mvb_rx_config);
+            m_dma_mvb_rx[it] = uvm_logic_vector_mvb::env_rx#(
+                REGIONS,
+                DMA_RX_MVB_WIDTH
+            )::type_id::create({"m_dma_mvb_rx_", it_num}, this);
             // RX MFB
             mfb_rx_config = new();
             mfb_rx_config.active         = UVM_ACTIVE;
             mfb_rx_config.interface_name = {"DMA_RX_MFB_", it_num};
-            uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_dma_mfb_rx_", it_num}, "m_config", mfb_rx_config);
-            m_dma_mfb_rx[it] = uvm_logic_vector_array_mfb::env_rx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create({"m_dma_mfb_rx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_dma_mfb_rx_", it_num}, "m_config",
+                                                                         mfb_rx_config);
+            m_dma_mfb_rx[it] = uvm_logic_vector_array_mfb::env_rx#(
+                REGIONS,
+                MFB_REG_SIZE,
+                MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH,
+                0
+            )::type_id::create({"m_dma_mfb_rx_", it_num}, this);
             // TX MVB
             mvb_tx_config = new();
             mvb_tx_config.active         = UVM_ACTIVE;
             mvb_tx_config.interface_name = {"DMA_TX_MVB_", it_num};
-            uvm_config_db#(uvm_logic_vector_mvb::config_item)::set(this, {"m_dma_mvb_tx_", it_num}, "m_config", mvb_tx_config);
-            m_dma_mvb_tx[it] = uvm_logic_vector_mvb::env_tx#(REGIONS, DMA_TX_MVB_WIDTH)::type_id::create({"m_dma_mvb_tx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, {"m_dma_mvb_tx_", it_num}, "m_config",
+                                                                   mvb_tx_config);
+            m_dma_mvb_tx[it] = uvm_logic_vector_mvb::env_tx#(
+                REGIONS,
+                DMA_TX_MVB_WIDTH
+            )::type_id::create({"m_dma_mvb_tx_", it_num}, this);
             // TX MFB
             mfb_tx_config = new();
             mfb_tx_config.active         = UVM_ACTIVE;
             mfb_tx_config.interface_name = {"DMA_TX_MFB_", it_num};
-            uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_dma_mfb_tx_", it_num}, "m_config", mfb_tx_config);
-            m_dma_mfb_tx[it] = uvm_logic_vector_array_mfb::env_tx#(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::create({"m_dma_mfb_tx_", it_num}, this);
+            uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, {"m_dma_mfb_tx_", it_num}, "m_config",
+                                                                         mfb_tx_config);
+            m_dma_mfb_tx[it] =
+                uvm_logic_vector_array_mfb::env_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                                    0)::type_id::create({"m_dma_mfb_tx_", it_num}, this);
         end
 
         ///////////////
@@ -215,7 +310,7 @@ class env #(
         m_resets_gen_config.interface_name[3] = "RESET_USER_X4";
         m_resets_gen_config.driver_delay      = 40ns;
         uvm_config_db#(uvm_reset::env_config_item#(4))::set(this, "m_reset_gen", "m_config", m_resets_gen_config);
-        m_resets_gen = uvm_reset::env#(4)::type_id::create("m_reset_gen", this);
+        m_resets_gen = uvm_reset::env#(4)::type_id::create("m_resets_gen", this);
 
         m_resets_mi_config = new();
         m_resets_mi_config.active         = UVM_PASSIVE;
@@ -252,9 +347,11 @@ class env #(
             mem_cfg.interface_name = {"MEM_", it_num};
             mem_cfg.generated_memory_file_type = uvm_avmm::config_item::RANDOM;
             uvm_config_db#(uvm_avmm::config_item)::set(this, {"m_memory_", it_num}, "m_config", mem_cfg);
-            m_memory[it] = uvm_avmm::agent_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create( {"m_memory_", it_num}, this);;
+            m_memory[it] = uvm_avmm::agent_master #(MEM_ADDR_WIDTH, MEM_DATA_WIDTH, MEM_BURST_WIDTH)::type_id::create(
+                {"m_memory_", it_num}, this);
         end
-        uvm_config_db#(uvm_reset::env_config_item#(MEM_PORTS))::set(this, "m_resets_mem", "m_config", m_resets_mem_config);
+        uvm_config_db #(uvm_reset::env_config_item #(MEM_PORTS))::set(this, "m_resets_mem", "m_config",
+                                                                    m_resets_mem_config);
         m_resets_mem = uvm_reset::env#(MEM_PORTS)::type_id::create("m_resets_mem", this);
 
 
@@ -271,14 +368,29 @@ class env #(
         m_mi_config.agent.active         = UVM_ACTIVE;
         m_mi_config.agent.interface_name = "MI_INTERFACE";
         uvm_config_db#(uvm_mi::regmodel_config)::set(this, "m_regmodel", "m_config", m_mi_config);
-        m_regmodel = uvm_mi::regmodel#(uvm_app_core::regmodel, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create("m_regmodel", this);
+        m_regmodel = uvm_mi::regmodel#(
+            uvm_app_core::regmodel,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        )::type_id::create("m_regmodel", this);
 
         ///////////////
         // SCOREBOARD
-        m_scoreboard = scoreboard #(ETH_STREAMS, ETH_RX_HDR_WIDTH, ETH_TX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, MFB_ITEM_WIDTH)::type_id::create("m_scoreboard", this);
+        m_scoreboard = scoreboard #(
+            ETH_STREAMS,
+            ETH_RX_HDR_WIDTH,
+            ETH_TX_HDR_WIDTH,
+            DMA_STREAMS,
+            DMA_RX_CHANNELS,
+            DMA_TX_CHANNELS,
+            DMA_HDR_META_WIDTH,
+            DMA_PKT_MTU,
+            MFB_ITEM_WIDTH
+        )::type_id::create("m_scoreboard", this);
     endfunction
 
-    function model#(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH, DMA_PKT_MTU, MFB_ITEM_WIDTH) model_get();
+    function model #(ETH_STREAMS, ETH_RX_HDR_WIDTH, DMA_STREAMS, DMA_RX_CHANNELS, DMA_TX_CHANNELS, DMA_HDR_META_WIDTH,
+                    DMA_PKT_MTU, MFB_ITEM_WIDTH) model_get();
         return m_scoreboard.model_get();
     endfunction
 
@@ -311,8 +423,13 @@ class env #(
             m_eth_mfb_tx[it].analysis_port_data.connect(m_scoreboard.eth_mfb_tx[it]);
             m_eth_mfb_tx[it].analysis_port_meta.connect(m_scoreboard.eth_mvb_tx[it]);
 
-            uvm_config_db#(uvm_common::fifo#(uvm_app_core_top_agent::sequence_item#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)))::set(this, {"m_eth_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}      , "fifo", m_eth_rx[it].fifo_mvb);
-            uvm_config_db#(uvm_common::fifo#(uvm_app_core_top_agent::sequence_item#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)))::set(this, {"m_eth_mfb_rx_", it_num,".m_logic_vector_array_agent.m_sequencer"}, "fifo", m_eth_rx[it].fifo_mfb);
+            uvm_config_db
+                #(uvm_common::fifo #(uvm_app_core_top_agent::sequence_item #(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)))::set(
+                this, {"m_eth_mvb_rx_", it_num, ".m_logic_vector_agent.m_sequencer"}, "fifo", m_eth_rx[it].fifo_mvb);
+            uvm_config_db
+                #(uvm_common::fifo #(uvm_app_core_top_agent::sequence_item #(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)))::set(
+                this, {"m_eth_mfb_rx_", it_num, ".m_logic_vector_array_agent.m_sequencer"}, "fifo",
+                m_eth_rx[it].fifo_mfb);
 
             m_resets_app.sync_connect(m_eth_rx[it].reset_sync);
             m_resets_app.sync_connect(m_eth_mvb_rx[it].reset_sync);
@@ -332,8 +449,13 @@ class env #(
             m_dma_mvb_tx[it].analysis_port.connect(m_scoreboard.dma_mvb_tx[it]);
             m_dma_mfb_tx[it].analysis_port_data.connect(m_scoreboard.dma_mfb_tx[it]);
 
-            uvm_config_db#(uvm_common::fifo#(uvm_app_core_top_agent::sequence_item#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)))::set(this, {"m_dma_mvb_rx_", it_num,".m_logic_vector_agent.m_sequencer"}      , "fifo", m_dma_rx[it].fifo_mvb);
-            uvm_config_db#(uvm_common::fifo#(uvm_app_core_top_agent::sequence_item#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)))::set(this, {"m_dma_mfb_rx_", it_num,".m_logic_vector_array_agent.m_sequencer"}, "fifo", m_dma_rx[it].fifo_mfb);
+            uvm_config_db
+                #(uvm_common::fifo #(uvm_app_core_top_agent::sequence_item #(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)))::set(
+                this, {"m_dma_mvb_rx_", it_num, ".m_logic_vector_agent.m_sequencer"}, "fifo", m_dma_rx[it].fifo_mvb);
+            uvm_config_db
+                #(uvm_common::fifo #(uvm_app_core_top_agent::sequence_item #(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)))::set(
+                this, {"m_dma_mfb_rx_", it_num, ".m_logic_vector_array_agent.m_sequencer"}, "fifo",
+                m_dma_rx[it].fifo_mfb);
 
             m_resets_app.sync_connect(m_dma_rx[it].reset_sync);
             m_resets_app.sync_connect(m_dma_mfb_rx[it].reset_sync);
@@ -352,7 +474,8 @@ class env #(
     task run_eth_meta(uvm_logic_vector::sequencer#(ETH_RX_HDR_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH) meta_seq;
 
-        meta_seq = uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("mvb_seq", this);
+        meta_seq = uvm_app_core_top_agent::logic_vector_sequence #(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create(
+            "meta_seq", this);
 
         forever begin
             //mvb_seq.set_starting_phase(phase);
@@ -363,7 +486,11 @@ class env #(
 
     task run_eth_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH) seq;
-        seq = uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, ETH_RX_HDR_WIDTH)::type_id::create("seq", this);
+        seq =
+            uvm_app_core_top_agent::logic_vector_array #(
+                MFB_ITEM_WIDTH,
+                ETH_RX_HDR_WIDTH
+            )::type_id::create("seq", this);
         forever begin
             seq.randomize();
             seq.start(sqr);
@@ -373,7 +500,8 @@ class env #(
     task run_dma_meta(uvm_logic_vector::sequencer#(DMA_RX_MVB_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH) meta_seq;
 
-        meta_seq = uvm_app_core_top_agent::logic_vector_sequence#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("mvb_seq", this);
+        meta_seq = uvm_app_core_top_agent::logic_vector_sequence #(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create(
+            "meta_seq", this);
 
         forever begin
             //mvb_seq.set_starting_phase(phase);
@@ -384,7 +512,11 @@ class env #(
 
     task run_dma_packet(uvm_logic_vector_array::sequencer#(MFB_ITEM_WIDTH) sqr);
         uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH) seq;
-        seq = uvm_app_core_top_agent::logic_vector_array#(MFB_ITEM_WIDTH, DMA_RX_MVB_WIDTH)::type_id::create("seq", this);
+        seq =
+            uvm_app_core_top_agent::logic_vector_array #(
+                MFB_ITEM_WIDTH,
+                DMA_RX_MVB_WIDTH
+            )::type_id::create("seq", this);
         forever begin
             seq.randomize();
             seq.start(sqr);

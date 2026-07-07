@@ -102,13 +102,25 @@ class root#(
         m_avst_down_cfg.interface_name    = {m_config.interface_name, "_down"};
         m_avst_down_cfg.active    = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_avst_down", "m_config", m_avst_down_cfg);
-        m_avst_down = uvm_pcie_avst::env_rx #(REGIONS, REGIONS_SIZE, AVST_META_DOWN, RDY_LATENCY, STRADDLING)::type_id::create("m_avst_down", this);
+        m_avst_down = uvm_pcie_avst::env_rx #(
+            REGIONS,
+            REGIONS_SIZE,
+            AVST_META_DOWN,
+            RDY_LATENCY,
+            STRADDLING
+        )::type_id::create("m_avst_down", this);
 
         m_avst_up_cfg    = new();
         m_avst_up_cfg.interface_name    = {m_config.interface_name, "_up"};
         m_avst_up_cfg.active    = UVM_ACTIVE;
         uvm_config_db #(uvm_pcie::config_item)::set(this, "m_avst_up", "m_config", m_avst_up_cfg);
-        m_avst_up = uvm_pcie_avst::env_tx #(REGIONS, REGIONS_SIZE, AVST_META_UP, STRADDLING)::type_id::create("m_avst_up", this);
+        m_avst_up =
+            uvm_pcie_avst::env_tx #(
+                REGIONS,
+                REGIONS_SIZE,
+                AVST_META_UP,
+                STRADDLING
+            )::type_id::create("m_avst_up", this);
     endfunction
 
     virtual function void bar_register(uvm_pcie::bar_config cfg);
@@ -140,12 +152,16 @@ class root#(
 
         fork
             forever begin
-                assert(req.randomize()) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                assert(req.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                end
                 req.start(m_avst_down.m_sequencer);
             end
 
             forever begin
-                assert(res.randomize()) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                assert(res.randomize()) else begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize seqeunce");
+                end
                 res.start(m_avst_down.m_sequencer);
             end
         join

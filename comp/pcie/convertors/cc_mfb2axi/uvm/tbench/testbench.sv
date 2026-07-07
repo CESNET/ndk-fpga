@@ -23,12 +23,24 @@ module testbench;
     reset_if  reset(CLK);
     pullup (reset.RESET);
 
-    axi_if #(ITEMS, 32, TUSER_WIDTH) axi_cc(CLK);
-    mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0) mfb_cc(CLK);
+    axi_if #(
+        .ITEMS       (ITEMS),
+        .ITEM_WIDTH  (32),
+        .TUSER_WIDTH (TUSER_WIDTH)
+    ) axi_cc(CLK);
+    mfb_if #(
+        .REGIONS (MFB_REGIONS),
+        .REGION_SIZE (MFB_REGION_SIZE),
+        .BLOCK_SIZE (MFB_BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    ) mfb_cc(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,8 +49,18 @@ module testbench;
         uvm_root m_root;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual axi_if #(ITEMS, 32, TUSER_WIDTH))::set(null, "", "vif_rx_axi", axi_cc);
-        uvm_config_db#(virtual mfb_if #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_cc);
+        uvm_config_db#(virtual axi_if #(
+            .ITEMS       (ITEMS),
+            .ITEM_WIDTH  (32),
+            .TUSER_WIDTH (TUSER_WIDTH)
+        ))::set(null, "", "vif_rx_axi", axi_cc);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (MFB_REGIONS),
+            .REGION_SIZE (MFB_REGION_SIZE),
+            .BLOCK_SIZE  (MFB_BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_tx", mfb_cc);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -52,8 +74,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT #(
+    // dut
+    dut #(
         .STRADDLING (STRADDLING)
     )DUT_U (
         .CLK    (CLK),

@@ -3,8 +3,14 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class model #(int unsigned MFB_ITEM_WIDTH, int unsigned PKT_MTU, int unsigned USERMETA_WIDTH, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_mfb_frame_extender::model #(MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH))
+class model #(
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned PKT_MTU,
+    int unsigned USERMETA_WIDTH,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_component;
+    `uvm_component_param_utils(
+        uvm_mfb_frame_extender::model #(MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH))
 
     // Model inputs
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))                   in_data;
@@ -83,7 +89,12 @@ class model #(int unsigned MFB_ITEM_WIDTH, int unsigned PKT_MTU, int unsigned US
     function void assert_frame_length(int unsigned actual_frame_length, int unsigned extension_provided_frame_length);
         assert(actual_frame_length === extension_provided_frame_length)
         else begin
-            `uvm_fatal(get_full_name(), $sformatf("\n\tThe actual frame length (%0d) differs from the length (%0d) provided through the extension item", actual_frame_length, extension_provided_frame_length))
+            `uvm_fatal(get_full_name(), $sformatf(
+                       "\n\tThe actual frame length (%0d) differs from the length (%0d) provided through the extension item"
+                           ,
+                       actual_frame_length,
+                       extension_provided_frame_length
+                       ))
         end
     endfunction
 
@@ -100,7 +111,12 @@ class model #(int unsigned MFB_ITEM_WIDTH, int unsigned PKT_MTU, int unsigned US
 
         assert(used() == 0)
         else begin
-            `uvm_error(get_full_name(), $sformatf("\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tMETA:%0d\n\tEXTENSION:%0d", in_data.used(), in_meta.used(), in_extension.used()));
+            `uvm_error(get_full_name(), $sformatf(
+                       "\n\tSOME TRANSACTIONS ARE STUCK INSIDE THE MODEL\n\tDATA:%0d\n\tMETA:%0d\n\tEXTENSION:%0d",
+                       in_data.used(),
+                       in_meta.used(),
+                       in_extension.used()
+                       ));
         end
     endfunction
 

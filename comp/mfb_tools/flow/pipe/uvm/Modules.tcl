@@ -13,7 +13,7 @@ lappend COMPONENTS [ list "SV_LOGIC_VECTOR_MFB" "$OFM_PATH/comp/uvm/logic_vector
 
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/tests/pkg.sv"
-lappend MOD "$ENTITY_BASE/tbench/property.sv"
+lappend MOD "$ENTITY_BASE/tbench/mfb_pipe_property.sv"
 lappend MOD "$ENTITY_BASE/tbench/dut.sv"
 lappend MOD "$ENTITY_BASE/tbench/testbench.sv"
 

@@ -40,15 +40,17 @@ class driver#(
             wait(data_fifo.size() < 8 || meta_fifo.size() < 8);
             seq_item_port.get_next_item(req);
 
-            data = uvm_logic_vector_array::sequence_item #(32)           ::type_id::create("mfb_fifo", this);
-            meta = uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))::type_id::create("mfb_fifo", this);
+            data = uvm_logic_vector_array::sequence_item #(32)           ::type_id::create("data", this);
+            meta = uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))::type_id::create("meta", this);
 
             if (DEVICE == DEV_XILINX) begin
                 if (DIR ==  MFB_CC) begin
                     logic [32-1:0] hdr_data[3];
                     uvm_pcie::completer_header hdr_cast;
 
-                    assert($cast(hdr_cast, req)) else `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    assert($cast(hdr_cast, req)) else begin
+                        `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    end
 
                     uvm_pcie_axi::hdr_cc_set(hdr_data, hdr_cast);
                     data.data = {hdr_data, req.data};
@@ -58,7 +60,9 @@ class driver#(
                     logic [8-1:0] target_fce = 0;
                     uvm_pcie::request_header hdr_cast;
 
-                    assert($cast(hdr_cast, req)) else `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    assert($cast(hdr_cast, req)) else begin
+                        `uvm_fatal(this.get_full_name(), $sformatf("NOT COMPLEATER HEADER %s", req.convert2string()));
+                    end
 
                     uvm_pcie_axi::hdr_rq_set(hdr_data, hdr_cast);
                     data.data = {hdr_data, req.data};

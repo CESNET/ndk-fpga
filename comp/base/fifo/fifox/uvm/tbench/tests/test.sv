@@ -28,12 +28,15 @@ class ex_test extends uvm_test;
 
     task test_wait_result(time time_length);
         time start_time = $time();
-        while ($time()-start_time < time_length && m_env.sc.used() !== 0) #(600ns);
+        while ($time()-start_time < time_length && m_env.sc.used() !== 0) begin
+        #(600ns);
+    end
     endtask
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        m_env = uvm_fifox::env #(DATA_WIDTH, STATUS_WIDTH, ITEMS_ACTUAL, ALMOST_FULL_OFFSET, ALMOST_EMPTY_OFFSET)::type_id::create("m_env", this);
+        m_env = uvm_fifox::env #(DATA_WIDTH, STATUS_WIDTH, ITEMS_ACTUAL, ALMOST_FULL_OFFSET,
+                                ALMOST_EMPTY_OFFSET)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------

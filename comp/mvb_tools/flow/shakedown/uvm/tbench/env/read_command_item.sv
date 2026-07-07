@@ -50,7 +50,7 @@ class read_command_item #(int unsigned TX_ITEMS) extends uvm_common::uvm_sequenc
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("%s\n\tread: %0b \n", super.convert2string(), read);
+        output_string = $sformatf("%s\n\tread: 0b%0b \n", super.convert2string(), read);
 
         return output_string;
     endfunction

@@ -4,7 +4,12 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class chsum_calc_cmp #(MVB_DATA_WIDTH, MFB_META_WIDTH) extends uvm_common::comparer_base_ordered#(uvm_checksum_calculator::chsum_calc_item#(MVB_DATA_WIDTH, MFB_META_WIDTH), uvm_logic_vector::sequence_item#(MVB_DATA_WIDTH+1+MFB_META_WIDTH));
+class chsum_calc_cmp #(
+    MVB_DATA_WIDTH,
+    MFB_META_WIDTH
+) extends
+    uvm_common::comparer_base_ordered #(uvm_checksum_calculator::chsum_calc_item #(MVB_DATA_WIDTH, MFB_META_WIDTH),
+                                        uvm_logic_vector::sequence_item #(MVB_DATA_WIDTH + 1 + MFB_META_WIDTH));
     `uvm_component_param_utils(uvm_checksum_calculator::chsum_calc_cmp #(MVB_DATA_WIDTH, MFB_META_WIDTH))
 
     function new(string name, uvm_component parent = null);
@@ -42,9 +47,9 @@ class chsum_calc_cmp #(MVB_DATA_WIDTH, MFB_META_WIDTH) extends uvm_common::compa
 
         {meta, bypass, data} = tr.data;
         msg = tr.time2string();
-        msg = {msg, $sformatf("\n\tbypass %b",  bypass)};
-        msg = {msg, $sformatf("\n\tmeta   %h",  meta)};
-        msg = {msg, $sformatf("\n\tdata   %h",  data)};
+        msg = {msg, $sformatf("\n\tbypass 0b%b",  bypass)};
+        msg = {msg, $sformatf("\n\tmeta   0x%h",  meta)};
+        msg = {msg, $sformatf("\n\tdata   0x%h",  data)};
         return msg;
     endfunction
 

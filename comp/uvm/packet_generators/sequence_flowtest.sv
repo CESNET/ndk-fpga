@@ -4,7 +4,9 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_base #(config_sequence, uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
+class sequence_flowtest #(
+    int unsigned ITEM_WIDTH
+) extends uvm_common::sequence_base #(config_sequence, uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `uvm_object_param_utils(uvm_packet_generators::sequence_flowtest #(ITEM_WIDTH))
     `uvm_declare_p_sequencer(uvm_logic_vector_array::sequencer #(ITEM_WIDTH));
 
@@ -63,8 +65,12 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
     rand int unsigned forward_packet_number;
     rand int unsigned reverse_packet_number;
 
-    constraint c_forward_packet_number { forward_packet_number inside { [forward_packet_number_min : forward_packet_number_max] }; }
-    constraint c_reverse_packet_number { reverse_packet_number inside { [reverse_packet_number_min : reverse_packet_number_max] }; }
+    constraint c_forward_packet_number {
+        forward_packet_number inside {[forward_packet_number_min : forward_packet_number_max]};
+    }
+    constraint c_reverse_packet_number {
+        reverse_packet_number inside {[reverse_packet_number_min : reverse_packet_number_max]};
+    }
 
     // ------------- //
     // IPv4 ADRESSES //
@@ -229,6 +235,7 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string ipv6_address;
 
         foreach (ipv6[i]) begin
+            // verilog_lint: waive numeric-format-string-style
             ipv6_address = $sformatf("%04h:%04h:%04h:%04h:%04h:%04h:%04h:%04h/128",
                             ipv6[i].address[127 : 112],
                             ipv6[i].address[111 : 96],
@@ -255,6 +262,7 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string mac_address;
 
         foreach (mac[i]) begin
+            // verilog_lint: waive numeric-format-string-style
             mac_address = $sformatf("%02h:%02h:%02h:%02h:%02h:%02h/48",
                             mac[i].address[47 : 40],
                             mac[i].address[39 : 32],
@@ -281,9 +289,11 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string ipv6_addresses = get_ipv6_addresses();
         string mac_addresses  = get_mac_addresses();
 
-        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s", // Creating string of the options
+        // Creating string of the options
+        config_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s %s %s %s %s %s",
                                        config_filepath,
                                        seed,
+                                       // verilog_lint: waive line-length
                                        (config_generator_config_filepath != "") ? { "--config \"", config_generator_config_filepath, "\"" } : "",
                                        (ipv4_addresses != "") ? { "--ipv4 \"", ipv4_addresses, "\"" } : "",
                                        (ipv6_addresses != "") ? { "--ipv6 \"", ipv6_addresses, "\"" } : "",
@@ -291,7 +301,8 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
                                        $sformatf("--packet-min-size %0d", packet_size_min),
                                        $sformatf("--packet-max-size %0d", packet_size_max)
                                        );
-        config_generator_execute_command = { CONFIG_GENERATOR_EXECUTE_PATH, " ", config_generator_parameters }; // Creating string of the config generator call command
+        // Creating string of the config generator call command
+        config_generator_execute_command = { CONFIG_GENERATOR_EXECUTE_PATH, " ", config_generator_parameters };
 
         // Try generate config file
         assert ($system(config_generator_execute_command) == 0) else begin // Try execute
@@ -303,13 +314,16 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         string profile_generator_parameters;
         string profile_generator_execute_command;
 
+        // verilog_lint: waive line-length
         profile_generator_parameters = $sformatf("-o \"%s\" --seed %0d %s --forward-packet-number %0d --reverse-packet-number %0d", // Creating string of the options
                                         profile_filepath,
                                         seed,
+                                        // verilog_lint: waive line-length
                                         (profile_generator_config_filepath != "") ? { "--config \"", profile_generator_config_filepath, "\"" } : "",
                                         forward_packet_number,
                                         reverse_packet_number);
-        profile_generator_execute_command = { PROFILE_GENERATOR_EXECUTE_PATH, " ", profile_generator_parameters }; // Creating string of the profile generator call command
+        // Creating string of the profile generator call command
+        profile_generator_execute_command = { PROFILE_GENERATOR_EXECUTE_PATH, " ", profile_generator_parameters };
 
         // Try generate profile file
         assert($system(profile_generator_execute_command) == 0) else begin // Try execute
@@ -346,9 +360,11 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
         reader = new();
         void'(uvm_config_db #(string)::get(p_sequencer, "", "output_filepath", output_filepath));
 
-        `uvm_info(get_full_name(), $sformatf("\n\tsequence_flowtest is running\n\t\tpcap_name%s", output_filepath), UVM_DEBUG);
+        `uvm_info(get_full_name(), $sformatf("\n\tsequence_flowtest is running\n\t\tpcap_name%s", output_filepath),
+                  UVM_DEBUG);
 
-        generator_parameters = $sformatf("-p %s -c %s -o \"%s\" -r %s --seed %0d %s %s", // Creating string of the options
+        // Creating string of the options
+        generator_parameters = $sformatf("-p %s -c %s -o \"%s\" -r %s --seed %0d %s %s",
                                 profile_filepath,
                                 config_filepath,
                                 output_filepath,
@@ -356,7 +372,8 @@ class sequence_flowtest #(int unsigned ITEM_WIDTH) extends uvm_common::sequence_
                                 seed,
                                 (skip_unknown ? "--skip-unknown" : ""),
                                 (no_collision_check ? "--no-collision-check" : ""));
-        generator_execute_command = { GENERATOR_EXECUTE_PATH, " ", generator_parameters }; // Creating string of the generator call command
+        // Creating string of the generator call command
+        generator_execute_command = { GENERATOR_EXECUTE_PATH, " ", generator_parameters };
 
         assert($system(generator_execute_command) == 0) else begin
             `uvm_fatal(p_sequencer.get_full_name(), $sformatf("\n\t Cannot run command %s", generator_execute_command))

@@ -8,7 +8,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class sequence_base #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, type RSP=REQ) extends uvm_sequence#(REQ, RSP);
+class sequence_base #(
+    type CONFIG_TYPE,
+    type REQ=uvm_common::sequence_item,
+    type RSP=REQ
+) extends uvm_sequence #(REQ, RSP);
     `uvm_object_param_utils(uvm_common::sequence_base#(CONFIG_TYPE, REQ, RSP))
 
     CONFIG_TYPE cfg;

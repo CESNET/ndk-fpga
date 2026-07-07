@@ -5,15 +5,58 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 // Environment for the functional verification.
-class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, INSERT_MODE, MFB_META_ALIGNMENT) extends uvm_env;
-    `uvm_component_param_utils(uvm_metadata_insertor::env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, INSERT_MODE, MFB_META_ALIGNMENT));
+class env #(
+    MFB_REGIONS,
+    MVB_ITEMS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MFB_META_WIDTH,
+    MVB_ITEM_WIDTH,
+    INSERT_MODE,
+    MFB_META_ALIGNMENT
+) extends uvm_env;
+    `uvm_component_param_utils(
+        uvm_metadata_insertor::env #(
+            MFB_REGIONS,
+            MVB_ITEMS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH,
+            MVB_ITEM_WIDTH,
+            INSERT_MODE,
+            MFB_META_ALIGNMENT
+        ));
 
-    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)                  m_env_rx;
-    uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, (MFB_META_WIDTH+MVB_ITEM_WIDTH)) m_env_tx;
-    uvm_logic_vector_mvb::env_rx       #(MVB_ITEMS, MVB_ITEM_WIDTH)                                                                     m_env_rx_mvb;
+    uvm_logic_vector_array_mfb::env_rx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH
+    ) m_env_rx;
+    uvm_logic_vector_array_mfb::env_tx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        (MFB_META_WIDTH+MVB_ITEM_WIDTH)
+    ) m_env_tx;
+    uvm_logic_vector_mvb::env_rx       #(
+        MVB_ITEMS,
+        MVB_ITEM_WIDTH
+    ) m_env_rx_mvb;
 
 
-    uvm_metadata_insertor::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH) vscr;
+    uvm_metadata_insertor::virt_sequencer #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH,
+        MVB_ITEM_WIDTH
+    ) vscr;
 
     uvm_reset::agent                               m_reset;
     uvm_logic_vector_array::agent#(MFB_ITEM_WIDTH) m_logic_vector_array_agent;
@@ -36,7 +79,9 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
 
         m_logic_vector_array_agent_cfg        = new();
         m_logic_vector_array_agent_cfg.active = UVM_ACTIVE;
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", m_logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 m_logic_vector_array_agent_cfg);
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent   = uvm_logic_vector_array::agent#(MFB_ITEM_WIDTH)::type_id::create("m_logic_vector_array_agent", this);
 
         m_config_reset                = new;
@@ -50,19 +95,33 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
         m_config_rx                = new;
         m_config_rx.active         = UVM_ACTIVE;
         m_config_rx.interface_name = "vif_rx";
+        // verilog_lint: waive line-length
         m_config_rx.meta_behav     = (MFB_META_ALIGNMENT == 0) ? uvm_logic_vector_array_mfb::config_item::META_SOF : uvm_logic_vector_array_mfb::config_item::META_EOF;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_rx", this);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_env_rx", this);
 
         m_config_tx                = new;
         m_config_tx.active         = UVM_ACTIVE;
         m_config_tx.interface_name = "vif_tx";
+        // verilog_lint: waive line-length
         m_config_tx.meta_behav     = (INSERT_MODE == 0 || INSERT_MODE == 2) ? uvm_logic_vector_array_mfb::config_item::META_SOF : uvm_logic_vector_array_mfb::config_item::META_EOF;
 
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, (MFB_META_WIDTH+MVB_ITEM_WIDTH))::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            (MFB_META_WIDTH+MVB_ITEM_WIDTH)
+        )::type_id::create("m_env_tx", this);
 
         m_config_mvb_rx                = new;
         m_config_mvb_rx.active         = UVM_ACTIVE;
@@ -72,7 +131,14 @@ class env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WI
         m_env_rx_mvb = uvm_logic_vector_mvb::env_rx#(MVB_ITEMS, MVB_ITEM_WIDTH)::type_id::create("m_env_rx_mvb", this);
 
         sc   = scoreboard#(MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("sc", this);
-        vscr = uvm_metadata_insertor::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH)::type_id::create("vscr",this);
+        vscr = uvm_metadata_insertor::virt_sequencer#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH,
+            MVB_ITEM_WIDTH
+        )::type_id::create("vscr",this);
 
     endfunction
 

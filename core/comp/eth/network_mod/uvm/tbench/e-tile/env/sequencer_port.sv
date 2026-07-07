@@ -4,8 +4,21 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, int unsigned ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_network_mod_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH);
-    `uvm_component_param_utils(uvm_network_mod_e_tile_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
+class sequencer_port #(
+    ETH_TX_HDR_WIDTH,
+    ETH_RX_HDR_WIDTH,
+    ITEM_WIDTH,
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    int unsigned ETH_PORT_CHAN,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_network_mod_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE,
+                                                BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH);
+    `uvm_component_param_utils(
+        uvm_network_mod_e_tile_env::sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS,
+            REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     uvm_logic_vector_array::sequencer#(ITEM_WIDTH)  eth_rx_data;
     uvm_logic_vector::sequencer#(6)                 eth_rx_meta;

@@ -75,7 +75,8 @@ class sequence_item extends uvm_sequence_item;
         string output_string;
 
         // Item stringifying
-        output_string = $sformatf("\n\tDATA %0h\n\tENA %0b\n\tSOP %0b\n\tEOP %0b\n\tERR %0b\n\tMTY %0d\n\tRDY %0b\n",
+        output_string = $sformatf(
+            "\n\tDATA 'h%0h\n\tENA 'b%0b\n\tSOP 'b%0b\n\tEOP 'b%0b\n\tERR 'b%0b\n\tMTY %0d\n\tRDY 'b%0b\n",
             data,
             ena,
             sop,

@@ -77,7 +77,9 @@ class sequence_item extends uvm_sequence_item;
     function string convert2string();
         string output_string;
 
-        output_string = $sformatf("\n\tINIT_DONE: %b \n\tUPDATE 0x%h \n\tCNT_PH 0x%h \n\tCNT_NPH 0x%h \n\tCNT_CPLH 0x%h \n\tCNT_PD 0x%h \n\tCNT_NPD 0x%h \n\tCNT_CPLD 0x%h \n",
+        output_string = $sformatf(
+            "\n\tINIT_DONE: 0b%b \n\tUPDATE 0x%h \n\tCNT_PH 0x%h \n\tCNT_NPH 0x%h \n\tCNT_CPLH 0x%h \n\tCNT_PD 0x%h \n\tCNT_NPD 0x%h \n\tCNT_CPLD 0x%h \n"
+                ,
             init_done, update, cnt_ph, cnt_nph, cnt_cplh, cnt_pd, cnt_npd, cnt_cpld
         );
 

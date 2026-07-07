@@ -19,12 +19,26 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_rx(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_tx(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH)
+    ) mfb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH)
+    ) mfb_tx(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -33,8 +47,20 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ))::set(null, "", "vif_tx", mfb_tx);
 
         m_root = uvm_root::get();
         m_root.set_report_id_action_hier("ILLEGALNAME",UVM_NO_ACTION);
@@ -49,8 +75,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK        (CLK),
         .RESET      (reset.RESET),
         .mfb_rx     (mfb_rx),

@@ -4,7 +4,10 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class mi_subscriber #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_subscriber#(uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0));
+class mi_subscriber #(
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_subscriber #(uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0));
     `uvm_component_param_utils(uvm_mtc::mi_subscriber #(MI_DATA_WIDTH, MI_ADDR_WIDTH))
 
     // Analysis port

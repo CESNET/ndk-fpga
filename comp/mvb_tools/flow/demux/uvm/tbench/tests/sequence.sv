@@ -20,6 +20,7 @@ class virt_sequence#(ITEM_WIDTH, TX_PORTS) extends uvm_sequence;
     virtual function void init();
         m_reset_seq        = uvm_reset::sequence_start::type_id::create("m_reset_seq");
 
+        // verilog_lint: waive line-length
         m_logic_vector_seq = uvm_logic_vector::sequence_simple#(ITEM_WIDTH + $clog2(TX_PORTS))::type_id::create("m_logic_vector_seq");
         m_logic_vector_seq.transaction_count_min = 1000;
         m_logic_vector_seq.transaction_count_max = 3000;

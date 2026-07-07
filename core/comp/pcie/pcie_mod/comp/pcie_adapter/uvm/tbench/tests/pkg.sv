@@ -66,7 +66,8 @@ package test;
     // latency for H-Tile is 18 cycles (20 cycles for safe)
     // latency for P-Tile is 27 cycles (30 cycles for safe)
     // latency for R-Tile is 0 cycles  (FIFO_ENABLE is disabled)
-    parameter READY_LATENCY    = (ENDPOINT_TYPE == "H_TILE" || ENDPOINT_TYPE == "DUMMY") ? 20 : ((ENDPOINT_TYPE == "P_TILE") ? 30 : 0);
+    parameter READY_LATENCY = (ENDPOINT_TYPE == "H_TILE" || ENDPOINT_TYPE == "DUMMY") ?
+        20 : ((ENDPOINT_TYPE == "P_TILE") ? 30 : 0);
 
     parameter CLK_PERIOD = 5ns;
 

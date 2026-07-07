@@ -52,7 +52,11 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH) exten
         m_mi_config.agent.active         = UVM_ACTIVE;
         m_mi_config.agent.interface_name = "vif_mi";
         uvm_config_db#(uvm_mi::regmodel_config)::set(this, "m_regmodel", "m_config", m_mi_config);
-        m_regmodel = uvm_mi::regmodel#(regmodel#(REG_DEPTH, SW_WIDTH), SW_WIDTH, REG_DEPTH)::type_id::create("m_regmodel", this);
+        m_regmodel =
+            uvm_mi::regmodel #(regmodel #(
+                REG_DEPTH,
+                SW_WIDTH
+            ), SW_WIDTH, REG_DEPTH)::type_id::create("m_regmodel", this);
 
         uvm_config_db #(uvm_reset::config_item)::set(this, "m_reset_agent", "m_config", m_config_reset);
         m_reset_agent = uvm_reset::agent::type_id::create("m_reset_agent", this);
@@ -64,10 +68,23 @@ class env #(ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH) exten
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_mfb_rx_env", "m_config", m_mfb_rx_config);
 
         m_mfb_tx_env    = uvm_logic_vector_mvb::env_tx #(ITEMS, LUT_WIDTH)::type_id::create("m_mfb_tx_env", this);
-        m_mfb_rx_env    = uvm_logic_vector_mvb::env_rx #(ITEMS, REG_DEPTH-SLICE_WIDTH)::type_id::create("m_mfb_rx_env", this);
+        m_mfb_rx_env    = uvm_logic_vector_mvb::env_rx #(
+            ITEMS,
+            REG_DEPTH-SLICE_WIDTH
+        )::type_id::create("m_mfb_rx_env", this);
 
-        m_scoreboard  = scoreboard #(LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH, LUT_DEPTH)::type_id::create("m_scoreboard", this);
-        vscr          = uvm_lookup_table::virt_sequencer#(REG_DEPTH, SLICE_WIDTH, SW_WIDTH)::type_id::create("vscr",this);
+        m_scoreboard  = scoreboard #(
+            LUT_WIDTH,
+            REG_DEPTH,
+            SLICE_WIDTH,
+            SW_WIDTH,
+            LUT_DEPTH
+        )::type_id::create("m_scoreboard", this);
+        vscr          = uvm_lookup_table::virt_sequencer#(
+            REG_DEPTH,
+            SLICE_WIDTH,
+            SW_WIDTH
+        )::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

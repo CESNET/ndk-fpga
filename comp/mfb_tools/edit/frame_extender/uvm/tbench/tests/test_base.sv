@@ -3,11 +3,22 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class test_base #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int unsigned PKT_MTU, int unsigned USERMETA_WIDTH, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_test;
-    typedef uvm_component_registry #(test::test_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH), "test::test_base") type_id;
+class test_base #(
+    int unsigned MFB_REGIONS,
+    int unsigned MFB_REGION_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned PKT_MTU,
+    int unsigned USERMETA_WIDTH,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_test;
+    typedef uvm_component_registry #(test::test_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                                     PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH), "test::test_base")
+        type_id;
 
     // Verification environment
-    uvm_mfb_frame_extender::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) m_env;
+    uvm_mfb_frame_extender::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH,
+                                  RX_MVB_ITEM_WIDTH) m_env;
 
     // Constructor
     function new(string name = "test_base", uvm_component parent = null);
@@ -17,11 +28,13 @@ class test_base #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int un
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
-        m_env = uvm_mfb_frame_extender::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_mfb_frame_extender::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU,
+                                             USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)::type_id::create("m_env", this);
     endfunction
 
     task run_phase(uvm_phase phase);
         time end_time;
+        // verilog_lint: waive line-length
         virtual_sequence_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH) m_virtual_sequence = virtual_sequence_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH)::type_id::create("m_virtual_sequence", this);
 
         // Raise objection

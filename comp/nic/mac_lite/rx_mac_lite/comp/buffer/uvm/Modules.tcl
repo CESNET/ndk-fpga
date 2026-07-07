@@ -15,7 +15,7 @@ lappend COMPONENTS \
       [ list "SV_LOGIC_VECTOR_MVB_UVM_BASE" "$SV_UVM_BASE/logic_vector_mvb"         "FULL"] \
 
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"      \
-            "$ENTITY_BASE/tbench/property.sv"     \
+            "$ENTITY_BASE/tbench/dut_property.sv"     \
             "$ENTITY_BASE/tbench/dut.sv"          \
             "$ENTITY_BASE/tbench/pkg.sv"          \
             "$ENTITY_BASE/tbench/tests/pkg.sv"    \

@@ -13,7 +13,8 @@ class env_rx #(
 ) extends uvm_pcie::env_rx;
     `ndk_component_param_utils(
         uvm_pcie_avst::env_rx#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING),
-        $sformatf("uvm_pcie_avst::env_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)
+                               $sformatf("uvm_pcie_avst::env_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                                         META_WIDTH, READY_LATENCY, STRADDLING)
     );
 
     localparam DIRECTION = AVST_DOWN;
@@ -47,8 +48,10 @@ class env_rx #(
         uvm_avst::config_item avst_cfg;
 
         //register driver in factory
-        uvm_pcie::monitor::type_id::set_inst_override(monitor #(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIRECTION)::get_type(), "m_monitor", this);
-        uvm_pcie::driver::type_id::set_inst_override(driver#(REGIONS, REGION_SIZE, META_WIDTH)::get_type(), "m_driver", this);
+        uvm_pcie::monitor::type_id::set_inst_override(
+            monitor #(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIRECTION)::get_type(), "m_monitor", this);
+        uvm_pcie::driver::type_id::set_inst_override(driver #(REGIONS, REGION_SIZE, META_WIDTH)::get_type(), "m_driver",
+                                                     this);
 
         super.build_phase(phase);
 
@@ -69,7 +72,8 @@ class env_rx #(
         m_avst.analysis_port.connect(m_monitor_avst.port_avst);
 
         $cast(m_driver_avst, m_driver);
-        uvm_config_db#(uvm_common::fifo#(uvm_pcie::header))::set(m_avst.m_sequencer, "" , "in_fifo", m_driver_avst.fifo);
+        // verilog_lint: waive line-length
+        uvm_config_db #(uvm_common::fifo #(uvm_pcie::header))::set(m_avst.m_sequencer, "", "in_fifo", m_driver_avst.fifo);
     endfunction
 
     task run_phase(uvm_phase phase);
@@ -80,7 +84,13 @@ class env_rx #(
 
         if (get_is_active() == UVM_ACTIVE) begin
             uvm_pcie_avst::config_sequence seq_cfg;
-            seq = uvm_pcie_avst::sequence_lib_down#(REGIONS, REGION_SIZE, META_WIDTH, READY_LATENCY, STRADDLING)::type_id::create("seq", this);
+            seq = uvm_pcie_avst::sequence_lib_down#(
+                REGIONS,
+                REGION_SIZE,
+                META_WIDTH,
+                READY_LATENCY,
+                STRADDLING
+            )::type_id::create("seq", this);
 
             seq.min_random_count = 20;
             seq.max_random_count = 100;
@@ -89,7 +99,9 @@ class env_rx #(
             seq.init_sequence(seq_cfg);
 
             forever begin
-                if(!seq.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                if(!seq.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                end
                 seq.start(m_avst.m_sequencer);
             end
         end
@@ -130,7 +142,8 @@ class env_tx #(
 
         //Override monitor
         //uvm_pcie::monitor::type_id::set_inst_override(monitor#(ITEMS, dir, STRADDLING)::get_type(), "m_monitor", this);
-        uvm_pcie::monitor::type_id::set_inst_override(monitor#(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIRECTION)::get_type(), "m_monitor", this);
+        uvm_pcie::monitor::type_id::set_inst_override(
+            monitor #(REGIONS, REGION_SIZE, META_WIDTH, STRADDLING, DIRECTION)::get_type(), "m_monitor", this);
 
         super.build_phase(phase);
 
@@ -161,7 +174,9 @@ class env_tx #(
             seq.init_sequence();
 
             forever begin
-                if(!seq.randomize()) `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                if(!seq.randomize()) begin
+                    `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_axi sequence");
+                end
                 seq.start(m_avst.m_sequencer);
             end
         end

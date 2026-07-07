@@ -33,7 +33,11 @@ class reg2bus_class  extends uvm_sequence_item;
 endclass
 
 // Monitor convert bus transaction to reg transaction
-class reg2bus_monitor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_monitor;
+class reg2bus_monitor #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends uvm_monitor;
     `ndk_component_param_utils(
         uvm_mi::reg2bus_monitor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH),
         $sformatf("uvm_mi::reg2bus_monitor#(%0d,%0d,%0d)",DATA_WIDTH, ADDR_WIDTH, META_WIDTH)

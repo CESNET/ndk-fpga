@@ -39,7 +39,9 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
     function void build_phase(uvm_phase phase);
         m_model = uvm_pcie_mfb2avst::model #(ITEM_WIDTH, META_WIDTH)::type_id::create("m_model", this);
 
+        // verilog_lint: waive line-length
         data_cmp = uvm_common::comparer_ordered #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH))::type_id::create("data_cmp", this);
+        // verilog_lint: waive line-length
         meta_cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item#(META_WIDTH))::type_id::create("meta_cmp", this);
 
     endfunction
@@ -57,12 +59,30 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH) extends uvm_scoreboard;
 
     virtual function void report_phase(uvm_phase phase);
         string msg = "\n";
-        msg = {msg, $sformatf("\tDATA Compared/errors: %0d/%0d\n\tMETA Compared/errors: %0d/%0d\n",  data_cmp.compared, data_cmp.errors, meta_cmp.compared, meta_cmp.errors)};
+        msg = {
+            msg,
+            $sformatf(
+                "\tDATA Compared/errors: %0d/%0d\n\tMETA Compared/errors: %0d/%0d\n",
+                data_cmp.compared,
+                data_cmp.errors,
+                meta_cmp.compared,
+                meta_cmp.errors
+            )
+        };
 
         if (this.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
 
     endfunction

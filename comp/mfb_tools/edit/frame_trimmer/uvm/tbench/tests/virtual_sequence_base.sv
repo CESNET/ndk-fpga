@@ -3,8 +3,16 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned BLOCK_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned PKT_MTU) extends uvm_sequence;
-    `uvm_object_param_utils(test::virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
+class virtual_sequence_base #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned BLOCK_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned PKT_MTU
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        test::virtual_sequence_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU))
     `uvm_declare_p_sequencer(uvm_mfb_frame_trimmer::virtual_sequencer #(ITEM_WIDTH, META_WIDTH, PKT_MTU))
 
     uvm_reset::sequence_start                                                            m_reset;
@@ -42,7 +50,8 @@ class virtual_sequence_base #(int unsigned REGIONS, int unsigned REGION_SIZE, in
         uvm_config_db #(uvm_common::sequence_cfg)::set(p_sequencer.m_rx_mfb_data, "", "state", m_rx_mfb_data_config);
 
         // Create the RX MFB meta sequence
-        m_rx_mfb_meta = trim_sequence_library #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_rx_mfb_meta");
+        m_rx_mfb_meta =
+            trim_sequence_library #(BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, PKT_MTU)::type_id::create("m_rx_mfb_meta");
         // Configure the RX MFB meta sequence
         m_rx_mfb_meta.init_sequence();
         m_rx_mfb_meta.min_random_count = 15;

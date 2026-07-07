@@ -8,7 +8,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
-class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, type RSP=REQ) extends uvm_sequence_library#(REQ, RSP);
+class sequence_library #(
+    type CONFIG_TYPE,
+    type REQ=uvm_common::sequence_item,
+    type RSP=REQ
+) extends uvm_sequence_library #(REQ, RSP);
     `uvm_object_param_utils(uvm_common::sequence_library#(CONFIG_TYPE, REQ, RSP))
 
     CONFIG_TYPE cfg;
@@ -38,11 +42,15 @@ class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, t
         end
 
         if (sequences.size() == 0) begin
-            `uvm_error(m_seqeuncer_name, "Sequence library does not contain any sequences. Did you forget to call init_sequence_library() in the constructor?");
+            `uvm_error(m_seqeuncer_name,
+                       "Sequence library does not contain any sequences. Did you forget to call init_sequence_library() in the constructor?"
+                           );
             return;
         end
 
-        `uvm_info(m_seqeuncer_name, $sformatf("\nStarting sequence library %s with configuration %s",  get_type_name(), cfg.convert2string()), UVM_DEBUG);
+        `uvm_info(m_seqeuncer_name, $sformatf(
+                  "\nStarting sequence library %s with configuration %s", get_type_name(), cfg.convert2string()),
+                  UVM_DEBUG);
         sequences_executed = 0;
 
         while (sequences_executed < sequence_count && (state == null || !state.stopped())) begin
@@ -67,6 +75,7 @@ class sequence_library #(type CONFIG_TYPE, type REQ=uvm_common::sequence_item, t
         uvm_factory factory=cs.get_factory();
 
         m_sequencer_path = (m_sequencer != null) ? m_sequencer.get_full_name() : "";
+        // verilog_lint: waive line-length
         obj = factory.create_object_by_type(wrap, m_sequencer_path, $sformatf("%s:%0d", wrap.get_type_name(), seqs_distrib[wrap.get_type_name()]));
 
         if (!$cast(cast_sequence, obj)) begin

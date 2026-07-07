@@ -8,7 +8,8 @@
 class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
-    uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS, META_BEHAV) m_env;
+    uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS, META_BEHAV)
+        m_env;
     // ------------------------------------------------------------------------
     // Functions
     function new(string name, uvm_component parent);
@@ -16,15 +17,16 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS, META_BEHAV)::type_id::create("m_env", this);
+        m_env = uvm_splitter_simple::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, SPLITTER_OUTPUTS,
+                                          META_BEHAV)::type_id::create("m_env", this);
     endfunction
 
     virtual task run_reset(uvm_phase phase);
         uvm_reset::sequence_reset reset;
         uvm_reset::sequence_run   run;
 
-        reset = uvm_reset::sequence_reset::type_id::create("reset_reset");
-        run   = uvm_reset::sequence_run::type_id::create("reset_run");
+        reset = uvm_reset::sequence_reset::type_id::create("reset");
+        run   = uvm_reset::sequence_run::type_id::create("run");
         run.length_min = 1000;
         run.length_max = 2000;
 

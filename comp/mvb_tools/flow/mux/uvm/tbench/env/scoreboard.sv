@@ -34,7 +34,7 @@ class scoreboard #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_scoreboard;
     function void build_phase(uvm_phase phase);
         m_model = model #(ITEMS, ITEM_WIDTH, RX_MVB_CNT)::type_id::create("m_model", this);
 
-        comparer                = uvm_mvb_mux::mvb_comparer #(ITEMS, ITEM_WIDTH)::type_id::create("mvb_comparer", this);
+        comparer                = uvm_mvb_mux::mvb_comparer #(ITEMS, ITEM_WIDTH)::type_id::create("comparer", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -51,9 +51,18 @@ class scoreboard #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_scoreboard;
         msg = {msg, $sformatf("Compared/errors: %0d/%0d \n",  comparer.compared, comparer.errors)};
 
         if (comparer.errors == 0 && comparer.used() == 0) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
 
     endfunction

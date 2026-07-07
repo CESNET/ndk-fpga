@@ -36,7 +36,7 @@ set MOD "$MOD $ENTITY_BASE/tbench/dma/pkg.sv"
 
 set MOD "$MOD $ENTITY_BASE/tbench/env/pkg.sv"
 set MOD "$MOD $ENTITY_BASE/tbench/tests/pkg.sv"
-set MOD "$MOD $ENTITY_BASE/tbench/property.sv"
+set MOD "$MOD $ENTITY_BASE/tbench/ptc_property.sv"
 
 set MOD "$MOD $ENTITY_BASE/tbench/dut.sv"
 set MOD "$MOD $ENTITY_BASE/tbench/testbench.sv"

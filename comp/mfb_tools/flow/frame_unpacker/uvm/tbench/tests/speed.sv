@@ -9,7 +9,19 @@ class speed extends uvm_test;
      typedef uvm_component_registry#(test::speed, "test::speed") type_id;
 
     // declare the Environment reference variable
-    uvm_superunpacketer::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH, VERBOSITY, PKT_MTU, MIN_SIZE, META_OUT_MODE, UNPACKING_STAGES) m_env;
+    uvm_superunpacketer::env #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        HEADER_SIZE,
+        MVB_ITEM_WIDTH,
+        VERBOSITY,
+        PKT_MTU,
+        MIN_SIZE,
+        META_OUT_MODE,
+        UNPACKING_STAGES
+    ) m_env;
     int unsigned timeout;
 
     // ------------------------------------------------------------------------
@@ -29,13 +41,17 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
-                uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
+        uvm_logic_vector_array_mfb::sequence_lib_rx
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
                 {this.get_full_name(), ".m_env.m_env_rx.*"}
         );
 
-        uvm_mfb::sequence_lib_tx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::set_inst_override(
-                uvm_mfb::sequence_lib_tx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE+MVB_ITEM_WIDTH)::get_type(),
+        uvm_mfb::sequence_lib_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                  HEADER_SIZE + MVB_ITEM_WIDTH)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                            HEADER_SIZE + MVB_ITEM_WIDTH)::get_type(),
                 {this.get_full_name(), ".m_env.m_env_tx.*"}
         );
 
@@ -45,13 +61,26 @@ class speed extends uvm_test;
         );
 
         // Initializing the reference to the environment
-        m_env = uvm_superunpacketer::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH, VERBOSITY, PKT_MTU, MIN_SIZE, META_OUT_MODE, UNPACKING_STAGES)::type_id::create("m_env", this);
+        m_env = uvm_superunpacketer::env
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH, VERBOSITY,
+              PKT_MTU, MIN_SIZE, META_OUT_MODE, UNPACKING_STAGES)::type_id::create("m_env", this);
     endfunction
 
     virtual task run_phase(uvm_phase phase);
         time time_start;
-        virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH) m_vseq;
-        m_vseq = virt_sequence#(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH)::type_id::create("m_vseq");
+        virt_sequence #(
+            MIN_SIZE,
+            PKT_MTU,
+            DATA_SIZE_MAX,
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            HEADER_SIZE,
+            MVB_ITEM_WIDTH
+        ) m_vseq;
+        m_vseq = virt_sequence #(MIN_SIZE, PKT_MTU, DATA_SIZE_MAX, MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE,
+                                MFB_ITEM_WIDTH, HEADER_SIZE, MVB_ITEM_WIDTH)::type_id::create("m_vseq");
 
         phase.raise_objection(this);
         m_vseq.init(phase);
@@ -72,7 +101,9 @@ class speed extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 endclass

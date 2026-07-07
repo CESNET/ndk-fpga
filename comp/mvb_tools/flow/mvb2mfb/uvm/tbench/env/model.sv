@@ -34,8 +34,8 @@ class model #(MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_compon
         forever begin
             input_mvb.get(tr_input_mvb);
 
-            tr_output_data = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_output_data_item");
-            tr_output_meta = uvm_logic_vector::sequence_item #(MFB_META_WIDTH)::type_id::create("tr_output_data_item");
+            tr_output_data = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_output_data");
+            tr_output_meta = uvm_logic_vector::sequence_item #(MFB_META_WIDTH)::type_id::create("tr_output_meta");
 
             mvb_data = tr_input_mvb.data[MVB_ITEM_WIDTH_RAW-1:0];
             mvb_meta = tr_input_mvb.data[MVB_ITEM_WIDTH-1:MVB_ITEM_WIDTH_RAW];

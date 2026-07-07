@@ -71,12 +71,36 @@ class stats  extends uvm_subscriber#(uvm_pcie::header);
             #(section_time);
             information_stop = $time;
 
+            // verilog_lint: waive line-length
             msg = $sformatf("\nPCIE meter information time [%0dns, %0dns]\n", information_start/1ns, information_stop/1ns);
             msg = {msg, $sformatf("\n\tpacket %0d", packets)};
             data_size.count(min, max, avg, std_dev);
-            msg = {msg, $sformatf("\n\tDATA:\n\t\tMIN : %0.2f (%0.2f b) \n\t\tMAX : %0.2f (%0.2f b)\n\t\tAVG STD_DEV : %0.2f %0.2f (%0.2f b %0.2f b)\n", min, min*KOEF, max, max*KOEF, avg, std_dev, avg*KOEF, std_dev*KOEF)};
+            msg = {
+                msg,
+                $sformatf(
+                    "\n\tDATA:\n\t\tMIN : %0.2f (%0.2f b) \n\t\tMAX : %0.2f (%0.2f b)\n\t\tAVG STD_DEV : %0.2f %0.2f (%0.2f b %0.2f b)\n"
+                        ,
+                    min,
+                    min * KOEF,
+                    max,
+                    max * KOEF,
+                    avg,
+                    std_dev,
+                    avg * KOEF,
+                    std_dev * KOEF
+                )
+            };
             speed.count(min, max, avg, std_dev);
-            msg = {msg, $sformatf("\tSPEED :\n\t\tMIN : %0.2f Gb/s \n\t\tMAX : %0.2f Gb/s\n\t\tAVG STD_DEV : %0.2f Gb/s %0.2f Gb/s\n", min*KOEF, max*KOEF, avg*KOEF, std_dev*KOEF)};
+            msg = {
+                msg,
+                $sformatf(
+                    "\tSPEED :\n\t\tMIN : %0.2f Gb/s \n\t\tMAX : %0.2f Gb/s\n\t\tAVG STD_DEV : %0.2f Gb/s %0.2f Gb/s\n",
+                    min * KOEF,
+                    max * KOEF,
+                    avg * KOEF,
+                    std_dev * KOEF
+                )
+            };
             `uvm_info(this.get_full_name(), msg, UVM_LOW);
         end
     endtask

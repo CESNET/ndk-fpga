@@ -184,9 +184,9 @@ class driver #(
         string ret = $sformatf("\nData size %0d", data.size());
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % 8 == 0) begin
-                ret = {ret, $sformatf("\n\t%h", data[it])};
+                ret = {ret, $sformatf("\n\t0x%h", data[it])};
             end else begin
-                ret = {ret, $sformatf(" %h", data[it])};
+                ret = {ret, $sformatf(" 0x%h", data[it])};
             end
         end
         return ret;
@@ -370,10 +370,10 @@ class driver #(
             debug_msg = {debug_msg, $sformatf("\tPointer for transaction: 0x%h\n", pcie_trans_ptr)};
             debug_msg = {debug_msg, $sformatf("\tPointer mask: 0x%h\n", m_driv_data.data_mask)};
             debug_msg = {debug_msg, $sformatf("\tPCIE Transaction length: %0d DW\n", pcie_len)};
-            debug_msg = {debug_msg, $sformatf("\tLast LBE: %b\n", lbe)};
+            debug_msg = {debug_msg, $sformatf("\tLast LBE: 0b%b\n", lbe)};
 
             fbe = lbe_to_fbe(lbe);
-            debug_msg = {debug_msg, $sformatf("\tDerived next FBE: %b\n", fbe)};
+            debug_msg = {debug_msg, $sformatf("\tDerived next FBE: 0b%b\n", fbe)};
 
             if (packet_len <= (packet_byte_cntr/(MFB_ITEM_WIDTH/8) + pcie_len)) begin
                 pcie_len = packet_len - packet_byte_cntr/(MFB_ITEM_WIDTH/8);
@@ -392,7 +392,7 @@ class driver #(
             end
 
             debug_msg = {debug_msg, $sformatf("\tRemaining transaction length: %0d\n", pcie_len)};
-            debug_msg = {debug_msg, $sformatf("\tCalculated LBE: %b\n", lbe)};
+            debug_msg = {debug_msg, $sformatf("\tCalculated LBE: 0b%b\n", lbe)};
 
             // COPY DATA TO TEMPORARY VARIABLE
             data = new[pcie_len];
@@ -452,7 +452,7 @@ class driver #(
             debug_msg = {debug_msg, $sformatf("\tpcie_addr 0x%h(%0d) - CUTOUT\n", pcie_addr[DATA_POINTER_WIDTH-2-1 : 2],
                                               pcie_addr[DATA_POINTER_WIDTH-2-1 : 2])};
             debug_msg = {debug_msg, $sformatf("\tpcie_len  %0d dwords (%0d B)\n", pcie_len, data_index)};
-            debug_msg = {debug_msg, $sformatf("\tfbe %b lbe %b\n", fbe, lbe)};
+            debug_msg = {debug_msg, $sformatf("\tfbe 0b%b lbe 0b%b\n", fbe, lbe)};
             debug_msg = {debug_msg, print_data(data)};
 
             debug_msg = {debug_msg, "\n"};
@@ -498,7 +498,7 @@ class driver #(
 
             debug_msg = {debug_msg, $sformatf("\tRealigning ptr: 0x%h (free_space: %0d)\n", m_driv_data.data_addr,
                                               m_driv_data.data_free_space)};
-            debug_msg = {debug_msg, $sformatf("\tPtr mask: %h\n", m_driv_data.data_mask)};
+            debug_msg = {debug_msg, $sformatf("\tPtr mask: 0x%h\n", m_driv_data.data_mask)};
             size_to_allign = (alignment_select - (m_driv_data.data_addr % alignment_select));
             debug_msg = {debug_msg, $sformatf("\tRemaining size to align: %0d (0x%h)\n", size_to_allign,
                                               size_to_allign)};
@@ -573,10 +573,10 @@ class driver #(
                                           pcie_addr[DATA_POINTER_WIDTH-1 : 0])};
         debug_msg = {debug_msg, $sformatf("\theader_num  0x%h(%0d)\n", m_driv_data.hdr_addr, m_driv_data.hdr_addr)};
         debug_msg = {debug_msg, $sformatf("\tpcie_len  %0d dwords\n", pcie_len)};
-        debug_msg = {debug_msg, $sformatf("\tfbe %b fbe %b\n", fbe, lbe)};
+        debug_msg = {debug_msg, $sformatf("\tfbe 0b%b fbe 0b%b\n", fbe, lbe)};
         debug_msg = {debug_msg, $sformatf("\tpacket size    %0dB\n", req.m_packet.size())};
         debug_msg = {debug_msg, $sformatf("\tpacket pointer 0x%h (%0d)\n", packet_ptr, packet_ptr)};
-        debug_msg = {debug_msg, $sformatf("\tmeta %h\n", req.m_meta)};
+        debug_msg = {debug_msg, $sformatf("\tmeta 0x%h\n", req.m_meta)};
         `uvm_info(this.get_full_name(), debug_msg, UVM_HIGH);
 
         //SEND DATA

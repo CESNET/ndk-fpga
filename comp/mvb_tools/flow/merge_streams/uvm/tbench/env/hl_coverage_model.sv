@@ -3,7 +3,10 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class hl_coverage_model #(int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(MVB_ITEM_WIDTH));
+class hl_coverage_model #(
+    int unsigned MVB_ITEM_WIDTH,
+    int unsigned RX_STREAMS
+) extends uvm_subscriber #(uvm_logic_vector::sequence_item #(MVB_ITEM_WIDTH));
     `uvm_component_param_utils(uvm_mvb_merge_streams::hl_coverage_model #(MVB_ITEM_WIDTH, RX_STREAMS))
 
     // ----------- //

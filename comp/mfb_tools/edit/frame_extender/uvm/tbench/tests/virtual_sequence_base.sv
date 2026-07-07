@@ -3,13 +3,28 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virtual_sequence_base #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int unsigned PKT_MTU, int unsigned USERMETA_WIDTH, int unsigned RX_MVB_ITEM_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(test::virtual_sequence_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH))
+class virtual_sequence_base #(
+    int unsigned MFB_REGIONS,
+    int unsigned MFB_REGION_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned PKT_MTU,
+    int unsigned USERMETA_WIDTH,
+    int unsigned RX_MVB_ITEM_WIDTH
+) extends uvm_sequence;
+    `uvm_object_param_utils(test::virtual_sequence_base #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                PKT_MTU, USERMETA_WIDTH, RX_MVB_ITEM_WIDTH))
     `uvm_declare_p_sequencer(uvm_mfb_frame_extender::virtual_sequencer #(MFB_ITEM_WIDTH, RX_MVB_ITEM_WIDTH))
 
+    // verilog_lint: waive line-length
     uvm_reset::sequence_start                                                                                            m_reset;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)                                                               m_rx_mfb;
-    extension_sequence_library           #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH)                                   m_rx_mvb;
+    extension_sequence_library           #(
+        MFB_BLOCK_SIZE,
+        PKT_MTU,
+        RX_MVB_ITEM_WIDTH
+    ) m_rx_mvb;
 
     function new(string name = "virtual_sequence_base");
         super.new(name);
@@ -39,7 +54,11 @@ class virtual_sequence_base #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_
         // --------------- //
 
         // Create the RX MVB sequence
-        m_rx_mvb = extension_sequence_library #(MFB_BLOCK_SIZE, PKT_MTU, RX_MVB_ITEM_WIDTH)::type_id::create("m_rx_mvb");
+        m_rx_mvb = extension_sequence_library #(
+            MFB_BLOCK_SIZE,
+            PKT_MTU,
+            RX_MVB_ITEM_WIDTH
+        )::type_id::create("m_rx_mvb");
         // Configure the RX MVB sequence
         m_rx_mvb.init_sequence();
         m_rx_mvb.min_random_count = 150;

@@ -17,7 +17,7 @@ package test_pkg;
    // Include this file if you want to use standard SystemVerilog Scoreboard
    `include "scoreboard.sv"
 
-   // DUT GENERICS
+   // dut GENERICS
    parameter DATA_WIDTH    = 512;        // RX Data width
    parameter SOP_POS_WIDTH = 3;
    parameter HDR_WIDTH    = 128;        // TX Data width

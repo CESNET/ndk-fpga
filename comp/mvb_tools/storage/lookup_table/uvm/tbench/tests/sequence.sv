@@ -21,8 +21,14 @@ class virt_sequence#(ITEMS, LUT_WIDTH, REG_DEPTH, ADDR_WIDTH, SLICE_WIDTH, SW_WI
     virtual function void init(uvm_lookup_table::regmodel#(REG_DEPTH, SW_WIDTH) m_regmodel, uvm_phase phase);
 
         m_reset           = uvm_reset::sequence_start::type_id::create("m_reset");
+        // verilog_lint: waive line-length
         m_logic_vector_sq = uvm_logic_vector::sequence_simple#(REG_DEPTH-SLICE_WIDTH)::type_id::create("m_logic_vector_sq");
-        m_reg             = uvm_lookup_table::reg_sequence#(REG_DEPTH, ADDR_WIDTH, LUT_DEPTH, SW_WIDTH)::type_id::create("m_reg");
+        m_reg             = uvm_lookup_table::reg_sequence#(
+            REG_DEPTH,
+            ADDR_WIDTH,
+            LUT_DEPTH,
+            SW_WIDTH
+        )::type_id::create("m_reg");
         m_reg.m_regmodel  = m_regmodel;
 
         this.phase = phase;

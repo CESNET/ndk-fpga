@@ -33,12 +33,21 @@ class reg_sequence#(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) extends uvm
 
         for (int unsigned it = 0; it < STREAMS; it++) begin
             for (int unsigned jt = 0; jt < CHANNELS; jt++) begin
-                if(!m_regmodel_minimal.stream[it].channel[jt].randomize() with {ch_min.value <= ch_max.value; ch_max.value < APP_RX_CHANNELS; incr.value dist {[0:5] :/ 30, [6:255] :/ 1};
+                if (!m_regmodel_minimal.stream[it].channel[jt].randomize() with {
+                        ch_min.value <= ch_max.value;
+                        ch_max.value < APP_RX_CHANNELS;
+                        incr.value dist {
+                            [0:5] :/ 30,
+                            [6:255] :/ 1
+                        };
                 $countones(ch_max.value-ch_min.value+1) <= 1;}) begin
                     `uvm_fatal(m_regmodel_minimal.get_full_name(), "\n\treg_sequence cannot randomize");
                 end
 
-                $swrite(msg, "%s\n\t\tPORT [%0d] CHANNEL [%0d] :  min %0d max %0d inc %0d", msg, it, jt, m_regmodel_minimal.stream[it].channel[jt].ch_min.value, m_regmodel_minimal.stream[it].channel[jt].ch_max.value, m_regmodel_minimal.stream[it].channel[jt].incr.value);
+                $swrite(msg, "%s\n\t\tPORT [%0d] CHANNEL [%0d] :  min %0d max %0d inc %0d", msg, it, jt,
+                        m_regmodel_minimal.stream[it].channel[jt].ch_min.value,
+                        m_regmodel_minimal.stream[it].channel[jt].ch_max.value,
+                        m_regmodel_minimal.stream[it].channel[jt].incr.value);
             end
         end
         `uvm_info(this.get_full_name(), {msg, "\n"}, UVM_LOW);
@@ -52,9 +61,7 @@ class reg_sequence#(STREAMS, CHANNELS, DMA_STREAMS, DMA_RX_CHANNELS) extends uvm
             regs[it].update(status);
         end
 
-		//just for synchronization
+        //just for synchronization
         m_regmodel_minimal.stream[0].channel[0].read(status, data, .parent(this));
     endtask
 endclass
-
-

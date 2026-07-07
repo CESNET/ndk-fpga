@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mvb_if.dut_rx   mvb_wr [RX_MVB_CNT - 1 : 0],
@@ -19,7 +19,7 @@ module DUT (
     logic [RX_MVB_CNT - 1 : 0]                              rx_mvb_src_rdy;
     logic [RX_MVB_CNT - 1 : 0]                              rx_mvb_dst_rdy;
 
-    for (genvar it = 0; it < RX_MVB_CNT; it++) begin
+    for (genvar it = 0; it < RX_MVB_CNT; it++) begin : gen_it
         assign rx_mvb_data[(it+1) * ITEMS * ITEM_WIDTH - 1 -: ITEMS * ITEM_WIDTH] = mvb_wr[it].DATA;
         assign rx_mvb_vld[(it+1) * ITEMS - 1 -: ITEMS] = mvb_wr[it].VLD;
         assign rx_mvb_src_rdy[it] = mvb_wr[it].SRC_RDY;

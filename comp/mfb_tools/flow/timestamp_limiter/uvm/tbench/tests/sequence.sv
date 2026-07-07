@@ -5,25 +5,69 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-class virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, FRAME_SIZE_MIN, PKT_MTU, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_WIDTH, QUEUES) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, TX_MFB_META_WIDTH, FRAME_SIZE_MIN, PKT_MTU, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_WIDTH, QUEUES))
+class virt_sequence #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    RX_MFB_META_WIDTH,
+    TX_MFB_META_WIDTH,
+    FRAME_SIZE_MIN,
+    PKT_MTU,
+    TIMESTAMP_MIN,
+    TIMESTAMP_MAX,
+    TIMESTAMP_WIDTH,
+    QUEUES
+) extends uvm_sequence;
+    `uvm_object_param_utils(
+        test::virt_sequence #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            RX_MFB_META_WIDTH,
+            TX_MFB_META_WIDTH,
+            FRAME_SIZE_MIN,
+            PKT_MTU,
+            TIMESTAMP_MIN,
+            TIMESTAMP_MAX,
+            TIMESTAMP_WIDTH,
+            QUEUES
+        ))
     `uvm_declare_p_sequencer(uvm_timestamp_limiter::virt_sequencer #(MFB_ITEM_WIDTH, RX_MFB_META_WIDTH, QUEUES))
 
     function new (string name = "virt_sequence");
         super.new(name);
     endfunction
 
+    // verilog_lint: waive line-length
     uvm_reset::sequence_start                                                                                                         m_reset;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)                                                                            m_mfb_data_sq_lib;
-    uvm_timestamp_limiter::sequence_meta#(RX_MFB_META_WIDTH, TIMESTAMP_WIDTH, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_FORMAT, QUEUES) m_mfb_meta_sq;
+    uvm_timestamp_limiter::sequence_meta#(
+        RX_MFB_META_WIDTH,
+        TIMESTAMP_WIDTH,
+        TIMESTAMP_MIN,
+        TIMESTAMP_MAX,
+        TIMESTAMP_FORMAT,
+        QUEUES
+    ) m_mfb_meta_sq;
 
     uvm_phase phase;
 
     virtual function void init(uvm_timestamp_limiter::regmodel #(QUEUES) m_regmodel, uvm_phase phase);
 
-        m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset                  = uvm_reset::sequence_start::type_id::create("m_reset");
+        // verilog_lint: waive line-length
         m_mfb_data_sq_lib        = uvm_logic_vector_array::sequence_lib #(MFB_ITEM_WIDTH)::type_id::create("m_mfb_data_sq_lib");
-        m_mfb_meta_sq            = uvm_timestamp_limiter::sequence_meta#(RX_MFB_META_WIDTH, TIMESTAMP_WIDTH, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_FORMAT, QUEUES)::type_id::create("m_mfb_meta_sq");
+        m_mfb_meta_sq            = uvm_timestamp_limiter::sequence_meta#(
+            RX_MFB_META_WIDTH,
+            TIMESTAMP_WIDTH,
+            TIMESTAMP_MIN,
+            TIMESTAMP_MAX,
+            TIMESTAMP_FORMAT,
+            QUEUES
+        )::type_id::create("m_mfb_meta_sq");
         m_mfb_meta_sq.m_regmodel = m_regmodel;
 
         m_mfb_data_sq_lib.init_sequence();

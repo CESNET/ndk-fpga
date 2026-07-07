@@ -18,11 +18,16 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mi_if #(MI_DATA_WIDTH, MI_ADDRESS_WIDTH) mi_config(CLK);
+    mi_if #(
+        .DATA_WIDTH (MI_DATA_WIDTH),
+        .ADDR_WIDTH (MI_ADDRESS_WIDTH)
+    ) mi_config(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Initial reset
@@ -39,7 +44,10 @@ module testbench;
         uvm_root m_root;
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDRESS_WIDTH))::set(null, "", "vif_mi", mi_config);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (MI_DATA_WIDTH),
+            .ADDR_WIDTH (MI_ADDRESS_WIDTH)
+        ))::set(null, "", "vif_mi", mi_config);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -53,8 +61,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK       (CLK),
         .RST       (reset.RESET),
         .config_mi (mi_config)

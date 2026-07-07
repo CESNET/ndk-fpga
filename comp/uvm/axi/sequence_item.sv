@@ -85,11 +85,11 @@ class sequence_item #(
                 ret = {ret, "\n\t"};
             end
 
-            ret = {ret, $sformatf("%0h  ", tdata[(it+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
+            ret = {ret, $sformatf("'h%0h  ", tdata[(it+1)*ITEM_WIDTH-1 -: ITEM_WIDTH])};
         end
 
 
-        ret = {ret, $sformatf({"\n\tTUSER: %h\n\tTKEEP: %b\n\tTLAST: %b\n\tTVALID: %b\n\tTREADY: %b\n"},
+        ret = {ret, $sformatf({"\n\tTUSER: 'h%h\n\tTKEEP: 'b%b\n\tTLAST: 'b%b\n\tTVALID: 'b%b\n\tTREADY: 'b%b\n"},
             tuser,
             tkeep,
             tlast,

@@ -6,14 +6,14 @@
 
 virtual class monitor#(
     int unsigned ITEMS,
-    direction_t dir
+    direction_t DIR
 ) extends uvm_pcie::monitor;
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices
-    localparam TUSER_WIDTH = tuser_width_get(ITEMS, dir);
+    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR);
 
-    typedef monitor#(ITEMS, dir) this_type;
+    typedef monitor#(ITEMS, DIR) this_type;
     uvm_analysis_imp#(uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH), this_type) port_axi;
 
     // protected variable
@@ -35,9 +35,9 @@ virtual class monitor#(
     function void send_req(logic [4-1:0] fbe, logic [4-1:0] lbe);
         uvm_pcie::request_header hdr;
 
-        if (dir == AXI_RQ) begin
+        if (DIR == AXI_RQ) begin
             hdr = hdr_rq_get(data, fbe, lbe);
-        end else if (dir == AXI_CQ) begin
+        end else if (DIR == AXI_CQ) begin
             hdr = hdr_cq_get(data, fbe, lbe, bar_cfg);
         end else begin
             `uvm_fatal(this.get_full_name(), "\nUnknown request header");
@@ -52,9 +52,9 @@ virtual class monitor#(
     function void send_comp();
         uvm_pcie::completer_header hdr;
 
-        if (dir == AXI_RC) begin
+        if (DIR == AXI_RC) begin
             hdr = hdr_rc_get(data);
-        end else if (dir == AXI_CC) begin
+        end else if (DIR == AXI_CC) begin
             hdr = hdr_cc_get(data);
         end else begin
             `uvm_fatal(this.get_full_name(), "\nUnknown request header");
@@ -96,7 +96,8 @@ class monitor_CC #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -147,7 +148,8 @@ class monitor_CC #(
             end
 
             assert(!(data.size() > 0 && sof_vld[0] == 1 && sof[0] != 0)) else begin
-                `uvm_fatal(this.get_full_name(), "\nPacket can start in REGION only if previous region packet stop or it is first region!!!")
+                `uvm_fatal(this.get_full_name(),
+                           "\nPacket can start in REGION only if previous region packet stop or it is first region!!!")
             end
         end else begin
             sof_vld = 1'b1;
@@ -160,7 +162,8 @@ class monitor_CC #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
            end
         end
 
@@ -208,7 +211,8 @@ class monitor_CQ #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -278,7 +282,10 @@ class monitor_CQ #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set\n%s", t.convert2string()));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set\n%s",
+                           t.convert2string()
+                           ));
            end
         end
 
@@ -331,7 +338,8 @@ class monitor_RQ #(
         super.new(name, parent);
         // STRADDLING is supported only when ITES is 16
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -405,7 +413,8 @@ class monitor_RQ #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep have to be all ones if tlast is not set"));
            end
         end
 
@@ -454,7 +463,8 @@ class monitor_RC #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         assert(STRADDLING == 0 || ITEMS == 16) else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS*32, STRADDLING));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
     endfunction
 
@@ -522,7 +532,12 @@ class monitor_RC #(
             end
 
             assert(t.tlast == 1'b1 || t.tkeep[ITEMS-1] == 1'b1) else begin
-                `uvm_error(this.get_full_name(), $sformatf("\n\tBroken protocol axi protocol !!!\n\tTkeep (%b) have to be all ones if tlast(%b) is not set", t.tkeep, t.tlast));
+                `uvm_error(this.get_full_name(), $sformatf(
+                           "\n\tBroken protocol axi protocol !!!\n\tTkeep ('b%b) have to be all ones if tlast('b%b) is not set"
+                               ,
+                           t.tkeep,
+                           t.tlast
+                           ));
             end
         end
 
@@ -552,12 +567,12 @@ class monitor_RC #(
 endclass
 
 
-class monitor_register #(int unsigned ITEMS, direction_t dir, logic STRADDLING);
+class monitor_register #(int unsigned ITEMS, direction_t DIR, logic STRADDLING);
     static function uvm_object_wrapper get();
         automatic uvm_object_wrapper ret = null;
 
         if (ITEMS == 2 || ITEMS == 4 || ITEMS == 8 || ITEMS == 16) begin
-            unique case (dir)
+            unique case (DIR)
                 AXI_RQ: ret = monitor_RQ#(ITEMS, STRADDLING)::get_type();
                 AXI_RC: ret = monitor_RC#(ITEMS, STRADDLING)::get_type();
                 AXI_CQ: ret = monitor_CQ#(ITEMS, STRADDLING)::get_type();

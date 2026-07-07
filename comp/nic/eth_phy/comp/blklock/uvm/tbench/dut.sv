@@ -1,7 +1,7 @@
 /*
  * file       : dut.sv
  * Copyright (C) 2022 CESNET z. s. p. o.
- * description: DUT - Block Lock
+ * description: dut - Block Lock
  * date       : 2022
  * author     : Oliver Gurka <xgurka00@stud.fit.vutbr.cz>
  *
@@ -10,7 +10,7 @@
 
 import test::*;
 
-module DUT
+module dut
     (
         input logic CLK,
         reset_if.dut rst_if,

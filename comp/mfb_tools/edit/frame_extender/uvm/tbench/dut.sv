@@ -3,7 +3,7 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(
+module dut #(
     int unsigned MFB_REGIONS,
     int unsigned MFB_REGION_SIZE,
     int unsigned MFB_BLOCK_SIZE,
@@ -77,14 +77,19 @@ module DUT #(
     );
 
     generate;
-        for (genvar i = 0; i < MFB_REGIONS; i++) begin
+        for (genvar i = 0; i < MFB_REGIONS; i++) begin : gen_i
             logic [RX_MVB_ITEM_WIDTH-1 : 0] rx_mvb_slice;
             assign rx_mvb_slice = mvb_rx.DATA[RX_MVB_ITEM_WIDTH*(i+1)-1 -: RX_MVB_ITEM_WIDTH];
 
+            // verilog_lint: waive line-length
             assign rx_mvb_ext_en      [i]                                              = rx_mvb_slice[1                                      -1 -: 1];
+            // verilog_lint: waive line-length
             assign rx_mvb_ext_only    [i]                                              = rx_mvb_slice[1+1                                    -1 -: 1];
+            // verilog_lint: waive line-length
             assign rx_mvb_ext_size    [$clog2(PKT_MTU+1)*(i+1)-1 -: $clog2(PKT_MTU+1)] = rx_mvb_slice[$clog2(PKT_MTU+1)+1+1                  -1 -: $clog2(PKT_MTU+1)];
+            // verilog_lint: waive line-length
             assign rx_mvb_frame_length[$clog2(PKT_MTU+1)*(i+1)-1 -: $clog2(PKT_MTU+1)] = rx_mvb_slice[$clog2(PKT_MTU+1)+$clog2(PKT_MTU+1)+1+1-1 -: $clog2(PKT_MTU+1)];
+            // verilog_lint: waive line-length
             assign rx_mvb_usermeta    [USERMETA_WIDTH   *(i+1)-1 -: USERMETA_WIDTH   ] = rx_mvb_slice[RX_MVB_ITEM_WIDTH                      -1 -: USERMETA_WIDTH];
         end
     endgenerate

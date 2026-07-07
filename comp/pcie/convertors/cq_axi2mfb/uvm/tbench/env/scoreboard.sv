@@ -4,7 +4,8 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class compare_data extends uvm_common::comparer_base_ordered#(uvm_pcie::header, uvm_logic_vector_array::sequence_item#(32));
+class compare_data
+    extends uvm_common::comparer_base_ordered #(uvm_pcie::header, uvm_logic_vector_array::sequence_item #(32));
     `uvm_component_utils(uvm_cq_mfb2axi::compare_data)
 
     function new(string name, uvm_component parent = null);
@@ -22,7 +23,8 @@ class compare_data extends uvm_common::comparer_base_ordered#(uvm_pcie::header, 
             cmp_data = {hdr_data, tr_model.data};
             ret &= (cmp_data === tr_dut.data);
         end else begin
-            `uvm_fatal(this.get_full_name(), $sformatf("\n\tWrong type of header expecting request header\n\t%s", tr_model.convert2string()));
+            `uvm_fatal(this.get_full_name(), $sformatf(
+                       "\n\tWrong type of header expecting request header\n\t%s", tr_model.convert2string()));
             ret = 0;
         end
         return ret;
@@ -83,9 +85,18 @@ class scoreboard extends uvm_scoreboard;
         msg = {msg, $sformatf("\tCompared/errors: %0d/%0d\n",  cmp_data.compared, cmp_data.errors)};
 
         if (this.used() == 0 && this.success() == 1) begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(
+                get_type_name(),
+                $sformatf(
+                    // verilog_lint: waive line-length
+                    "%s\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------",
+                    msg), UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), $sformatf("%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------", msg), UVM_NONE)
+            `uvm_info(get_type_name(), $sformatf(
+                      "%s\n\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                          ,
+                      msg
+                      ), UVM_NONE)
         end
 
     endfunction

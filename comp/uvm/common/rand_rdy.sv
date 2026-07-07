@@ -246,7 +246,9 @@ class rand_rdy_rand extends rand_rdy;
             void'(rand_bounds_active[index].randomize());
             //m_bounds = rand_bounds_active[index];
             void'(std::randomize(mode) with {mode dist {BASE :/ 1, BURST :/ 10};});
+            // verilog_lint: waive line-length
             ones_count  = rand_bounds_active[index].one  * real'(rand_count)/(real'(rand_bounds_active[index].one + rand_bounds_active[index].zero));
+            // verilog_lint: waive line-length
             zeros_count = rand_bounds_active[index].zero * real'(rand_count)/(real'(rand_bounds_active[index].one + rand_bounds_active[index].zero));
         end else begin
             rand_count--;

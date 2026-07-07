@@ -6,13 +6,50 @@
 
 // Environment for functional verification of encode.
 // This environment containts two mii agents.
-class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX) extends uvm_env;
+class env #(
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    ITEM_WIDTH,
+    META_WIDTH,
+    EXTENDED_META_WIDTH,
+    SPACE_SIZE_MIN_RX,
+    SPACE_SIZE_MAX_RX,
+    SPACE_SIZE_MIN_TX,
+    SPACE_SIZE_MAX_TX
+) extends uvm_env;
 
-    `uvm_component_param_utils(uvm_dropper::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH, SPACE_SIZE_MIN_RX, SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX));
+    `uvm_component_param_utils(
+        uvm_dropper::env #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            EXTENDED_META_WIDTH,
+            SPACE_SIZE_MIN_RX,
+            SPACE_SIZE_MAX_RX,
+            SPACE_SIZE_MIN_TX,
+            SPACE_SIZE_MAX_TX
+        ));
 
-    uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH) m_mfb_rx_env;
-    uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)          m_mfb_tx_env;
+    uvm_logic_vector_array_mfb::env_rx #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        EXTENDED_META_WIDTH
+    ) m_mfb_rx_env;
+    uvm_logic_vector_array_mfb::env_tx #(
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH
+    ) m_mfb_tx_env;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array_mfb::config_item                                                                 m_mfb_rx_config;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array_mfb::config_item                                                                 m_mfb_tx_config;
 
     uvm_dropper::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH) vscr;
@@ -52,10 +89,29 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_M
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_mfb_rx_env", "m_config", m_mfb_rx_config);
         uvm_config_db#(uvm_logic_vector_array_mfb::config_item)::set(this, "m_mfb_tx_env", "m_config", m_mfb_tx_config);
 
-        m_mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, EXTENDED_META_WIDTH)::type_id::create("m_mfb_rx_env", this);
-        m_mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb_tx_env", this);
+        m_mfb_rx_env = uvm_logic_vector_array_mfb::env_rx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            EXTENDED_META_WIDTH
+        )::type_id::create("m_mfb_rx_env", this);
+        m_mfb_tx_env = uvm_logic_vector_array_mfb::env_tx #(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_mfb_tx_env", this);
 
-        vscr   = uvm_dropper::virt_sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, EXTENDED_META_WIDTH)::type_id::create("vscr",this);
+        vscr   = uvm_dropper::virt_sequencer#(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            EXTENDED_META_WIDTH
+        )::type_id::create("vscr",this);
     endfunction
 
     // Connect agent's ports with ports from scoreboard.

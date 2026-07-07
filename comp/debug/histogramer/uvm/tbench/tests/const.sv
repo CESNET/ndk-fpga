@@ -7,7 +7,7 @@
 `ifndef CONST
 `define CONST
 /*
-    // DUT constants
+    // dut constants
     parameter INPUT_WIDTH           = 8;
     parameter BOX_WIDTH             = 32;
     parameter BOX_CNT               = 32;

@@ -8,7 +8,14 @@ class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
     bit timeout;
-    uvm_pcie_mfb2avst::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY) m_env;
+    uvm_pcie_mfb2avst::env #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        META_WIDTH,
+        READY_LATENCY
+    ) m_env;
 
     // ------------------------------------------------------------------------
     // Functions
@@ -17,7 +24,8 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_pcie_mfb2avst::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, READY_LATENCY)::type_id::create("m_env", this);
+        m_env = uvm_pcie_mfb2avst::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH,
+                                        READY_LATENCY)::type_id::create("m_env", this);
     endfunction
 
     task test_wait_timeout(int unsigned time_length);
@@ -38,7 +46,8 @@ class ex_test extends uvm_test;
 
         phase.raise_objection(this, "Start of rx sequence");
 
-        m_vseq = virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::create("m_vseq");
         assert(m_vseq.randomize());
         m_vseq.start(m_env.vscr);
 
@@ -58,7 +67,9 @@ class ex_test extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 endclass

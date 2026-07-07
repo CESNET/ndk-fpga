@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic CLK,
     input logic RST,
     // For Intel
@@ -30,10 +30,18 @@ module DUT (
     localparam AXI_ITEMS     = CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE;
     localparam IS_INTEL_DEV  = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
 
-    localparam RC_SOF_POS_WIDTH   = (RC_MFB_REGION_SIZE == 1) ? RC_MFB_REGIONS : (RC_MFB_REGIONS*$clog2(RC_MFB_REGION_SIZE));
-    localparam CC_SOF_POS_WIDTH   = (CC_MFB_REGION_SIZE == 1) ? CC_MFB_REGIONS : (CC_MFB_REGIONS*$clog2(CC_MFB_REGION_SIZE));
-    localparam RQ_SOF_POS_WIDTH   = (RQ_MFB_REGION_SIZE == 1) ? RQ_MFB_REGIONS : (RQ_MFB_REGIONS*$clog2(RQ_MFB_REGION_SIZE));
-    localparam CQ_SOF_POS_WIDTH   = (CQ_MFB_REGION_SIZE == 1) ? CQ_MFB_REGIONS : (CQ_MFB_REGIONS*$clog2(CQ_MFB_REGION_SIZE));
+    localparam RC_SOF_POS_WIDTH = (RC_MFB_REGION_SIZE == 1) ? RC_MFB_REGIONS : (RC_MFB_REGIONS * $clog2(
+        RC_MFB_REGION_SIZE
+    ));
+    localparam CC_SOF_POS_WIDTH = (CC_MFB_REGION_SIZE == 1) ? CC_MFB_REGIONS : (CC_MFB_REGIONS * $clog2(
+        CC_MFB_REGION_SIZE
+    ));
+    localparam RQ_SOF_POS_WIDTH = (RQ_MFB_REGION_SIZE == 1) ? RQ_MFB_REGIONS : (RQ_MFB_REGIONS * $clog2(
+        RQ_MFB_REGION_SIZE
+    ));
+    localparam CQ_SOF_POS_WIDTH = (CQ_MFB_REGION_SIZE == 1) ? CQ_MFB_REGIONS : (CQ_MFB_REGIONS * $clog2(
+        CQ_MFB_REGION_SIZE
+    ));
     localparam HDR_WIDTH       = 128;
     localparam PREFIX_WIDTH    = 32;
     localparam BAR_RANGE_WIDTH = 3;
@@ -58,14 +66,18 @@ module DUT (
     logic down_ready;
 
 
-    initial assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 && CC_MFB_ITEM_WIDTH == 32) else begin
-        $error("SUPPORT ONLY 32 ITEM_WIDTH\n");
-        $stop();
+    initial begin
+        assert (RQ_MFB_ITEM_WIDTH == 32 && RC_MFB_ITEM_WIDTH == 32 && CQ_MFB_ITEM_WIDTH == 32 &&
+                CC_MFB_ITEM_WIDTH == 32)
+        else begin
+            $error("SUPPORT ONLY 32 ITEM_WIDTH\n");
+            $stop();
+        end
     end
 
     assign avst_down.READY = down_ready;
     generate
-        for (genvar r = 0; r < CQ_MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < CQ_MFB_REGIONS; r++) begin : gen_cq_regions
             assign {down_bar_range [(r+1)*BAR_RANGE_WIDTH-1 -: BAR_RANGE_WIDTH],
                     down_prefix    [(r+1)*PREFIX_WIDTH-1    -: PREFIX_WIDTH],
                     down_hdr       [(r+1)*HDR_WIDTH-1       -: HDR_WIDTH]
@@ -74,14 +86,14 @@ module DUT (
             assign down_data[(r+1)*256-1 -: 256] = avst_down.DATA[r] ;
             assign down_empty[(r+1)*3-1 -: 3]    = avst_down.EMPTY[r];
 
-            if (ENDPOINT_TYPE == "R_TILE") begin
+            if (ENDPOINT_TYPE == "R_TILE") begin : gen_ENDPOINT_TYPE_R_TILE
                 assign down_valid[r] = avst_down.VALID[r] & down_ready;
-            end else begin
+            end else begin : gen_ENDPOINT_TYPE_not_R_TILE
                 assign down_valid[r] = avst_down.VALID[r];
             end
         end
 
-        for (genvar r = 0; r < CC_MFB_REGIONS; r++) begin
+        for (genvar r = 0; r < CC_MFB_REGIONS; r++) begin : gen_cc_regions
             assign avst_up.META[r] = {
                     up_error  [r],
                     up_prefix [(r+1)*PREFIX_WIDTH-1    : r*PREFIX_WIDTH],

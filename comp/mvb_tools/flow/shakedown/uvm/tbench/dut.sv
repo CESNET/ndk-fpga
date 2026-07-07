@@ -3,7 +3,14 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDTH, int unsigned SHAKE_PORTS, bit USE_MUX_IMPL, string DEVICE)
+module dut #(
+    int unsigned RX_ITEMS,
+    int unsigned TX_ITEMS,
+    int unsigned ITEM_WIDTH,
+    int unsigned SHAKE_PORTS,
+    bit USE_MUX_IMPL,
+    string DEVICE
+)
 (
     input logic CLK,
     input logic RST,
@@ -37,7 +44,7 @@ module DUT #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WID
     );
 
     generate;
-        for (genvar i = 0; i < TX_ITEMS; i++) begin
+        for (genvar i = 0; i < TX_ITEMS; i++) begin : gen_i
             assign mvb_tx[i].DATA    = tx_mvb_data[ITEM_WIDTH*(i+1)-1 -: ITEM_WIDTH];
             assign mvb_tx[i].VLD     = tx_mvb_vld[i];
             assign mvb_tx[i].SRC_RDY = 1'b1;

@@ -3,7 +3,10 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-class data_sequence #(int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) extends uvm_logic_vector::sequence_simple #(MVB_ITEM_WIDTH);
+class data_sequence #(
+    int unsigned MVB_ITEM_WIDTH,
+    int unsigned RX_STREAMS
+) extends uvm_logic_vector::sequence_simple #(MVB_ITEM_WIDTH);
     `uvm_object_param_utils(test::data_sequence #(MVB_ITEM_WIDTH, RX_STREAMS))
     `m_uvm_get_type_name_func(test::data_sequence)
 
@@ -16,7 +19,13 @@ class data_sequence #(int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS) exte
 
         assert(MVB_ITEM_WIDTH >= $clog2(RX_STREAMS))
         else begin
-            `uvm_fatal(get_full_name(), $sformatf("\n\tMVB_ITEM_WIDTH (%0d) cannot be smaller than log2(RX_STREAMS) (%0d)\n", MVB_ITEM_WIDTH, $clog2(RX_STREAMS)))
+            `uvm_fatal(get_full_name(), $sformatf(
+                       "\n\tMVB_ITEM_WIDTH (%0d) cannot be smaller than log2(RX_STREAMS) (%0d)\n",
+                       MVB_ITEM_WIDTH,
+                       $clog2(
+                           RX_STREAMS
+                       )
+                       ))
         end
     endfunction
 

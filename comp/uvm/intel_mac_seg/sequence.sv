@@ -44,7 +44,7 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends uvm_sequence #(sequenc
         req.randomize();
         finish_item(req);
         get_response(rsp);
-	endtask
+    endtask
 
 
     // ------------------------------------------------------------------------
@@ -68,7 +68,9 @@ class sequence_simple_rx #(int unsigned SEGMENTS) extends uvm_sequence #(sequenc
 endclass
 
 
-class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_base #(config_sequence, sequence_item #(SEGMENTS));
+class sequence_simple_tx #(
+    int unsigned SEGMENTS
+) extends uvm_common::sequence_base #(config_sequence, sequence_item #(SEGMENTS));
     `ndk_object_param_utils(
         uvm_intel_mac_seg::sequence_simple_tx#(SEGMENTS),
         $sformatf("uvm_intel_mac_seg::sequence_simple_tx#(%0d)",SEGMENTS)
@@ -97,7 +99,7 @@ class sequence_simple_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_b
         void'(req.randomize() with {ready == rdy.m_value;});
         finish_item(req);
         get_response(rsp);
-	endtask
+    endtask
 
 
     // ------------------------------------------------------------------------
@@ -123,7 +125,9 @@ endclass
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
-class sequence_lib_tx #(int unsigned SEGMENTS) extends uvm_common::sequence_library#(config_sequence, sequence_item #(SEGMENTS));
+class sequence_lib_tx #(
+    int unsigned SEGMENTS
+) extends uvm_common::sequence_library #(config_sequence, sequence_item #(SEGMENTS));
   `ndk_object_param_utils(
         uvm_intel_mac_seg::sequence_lib_tx#(SEGMENTS),
         $sformatf("uvm_intel_mac_seg::sequence_lib_tx#(%0d)",SEGMENTS)

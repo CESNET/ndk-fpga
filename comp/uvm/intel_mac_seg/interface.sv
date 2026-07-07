@@ -9,14 +9,14 @@ interface intel_mac_seg_if #(int unsigned SEGMENTS) (input logic CLK);
 
     // ------------------------------------------------------------------------
     // Bus structure of mvb
-    wire logic [SEGMENTS*64-1:0] DATA;
-    wire logic                   VALID;
-    wire logic [SEGMENTS-1:0]    INFRAME;
-    wire logic [SEGMENTS*3-1:0]  EOP_EMPTY;
-    wire logic [SEGMENTS-1:0]    FCS_ERROR;
-    wire logic [SEGMENTS*2-1:0]  ERROR;
-    wire logic [SEGMENTS*3-1:0]  STATUS_DATA;
-    wire logic                   READY;
+    wire [SEGMENTS*64-1:0] DATA;
+    wire                   VALID;
+    wire [SEGMENTS-1:0]    INFRAME;
+    wire [SEGMENTS*3-1:0]  EOP_EMPTY;
+    wire [SEGMENTS-1:0]    FCS_ERROR;
+    wire [SEGMENTS*2-1:0]  ERROR;
+    wire [SEGMENTS*3-1:0]  STATUS_DATA;
+    wire                   READY;
 
     // ------------------------------------------------------------------------
     // Driver clocking block

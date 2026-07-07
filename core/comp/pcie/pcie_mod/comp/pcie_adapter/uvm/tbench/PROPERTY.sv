@@ -80,15 +80,18 @@ module PROPERTY #(
         .vif   (cq_mfb)
     );
 
-    generate if (ENDPOINT_TYPE == "R_TILE") begin
+    generate if (ENDPOINT_TYPE == "R_TILE") begin : gen_ENDPOINT_TYPE_R_TILE
         property no_fall_init;
             @(posedge avst_down.CLK) disable iff(RST)
+            // verilog_lint: waive explicit-begin
             $rose(avst_down.READY) |=> always avst_down.READY;
         endproperty
 
         assert property (no_fall_init)
             else begin
-                `uvm_error(module_name, "\n\tAVST DOWN interface broke protocol R_TILE. The READY signal falls down after inintialization");
+                `uvm_error(
+                    module_name,
+                    "\n\tAVST DOWN interface broke protocol R_TILE. The READY signal falls down after inintialization");
             end
     end endgenerate
 endmodule

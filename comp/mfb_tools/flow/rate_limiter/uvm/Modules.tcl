@@ -14,6 +14,6 @@ lappend COMPONENTS [ list "SV_LOGIC_VECTOR_ARRAY_MFB" "$SV_UVM_BASE/logic_vector
 
 lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/tests/pkg.sv"
-lappend MOD "$ENTITY_BASE/tbench/property.sv"
+lappend MOD "$ENTITY_BASE/tbench/rate_limiter_property.sv"
 lappend MOD "$ENTITY_BASE/tbench/dut.sv"
 lappend MOD "$ENTITY_BASE/tbench/testbench.sv"

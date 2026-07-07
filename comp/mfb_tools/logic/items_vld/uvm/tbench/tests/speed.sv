@@ -28,7 +28,19 @@ class speed extends uvm_test;
      typedef uvm_component_registry#(test::speed, "test::speed") type_id;
 
     // declare the Environment reference variable
-    uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_env;
+    uvm_items_valid::env #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        META_WIDTH,
+        MVB_DATA_WIDTH,
+        MVB_ITEMS,
+        PKT_MTU,
+        OFFSET_WIDTH,
+        LENGTH_WIDTH
+    ) m_env;
+    // verilog_lint: waive line-length
     uvm_reset::sequence_start                                                                                                                                                   m_reset;
 
     // ------------------------------------------------------------------------
@@ -48,8 +60,10 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::set_inst_override(
-                uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::get_type(),
+        uvm_logic_vector_array_mfb::sequence_lib_rx
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::type_id::set_inst_override(
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH)::get_type(),
                 {this.get_full_name(), ".m_env.m_env_rx.*"}
         );
 
@@ -59,7 +73,9 @@ class speed extends uvm_test;
         );
 
         // Initializing the reference to the environment
-        m_env = uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_env", this);
+        m_env = uvm_items_valid::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH,
+                                      MVB_DATA_WIDTH, MVB_ITEMS, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create(
+            "m_env", this);
     endfunction
 
     virtual task run_reset();
@@ -68,19 +84,30 @@ class speed extends uvm_test;
     endtask
 
     virtual function void init();
-        m_reset      = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset      = uvm_reset::sequence_start::type_id::create("m_reset");
     endfunction
 
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
-        virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) m_vseq;
+        virt_sequence#(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            META_WIDTH,
+            MVB_DATA_WIDTH,
+            PKT_MTU,
+            OFFSET_WIDTH,
+            LENGTH_WIDTH
+        ) m_vseq;
         time time_start;
 
         phase.raise_objection(this);
 
-        m_vseq = virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH,
+                                MVB_DATA_WIDTH, PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::type_id::create("m_vseq");
 
         init();
 

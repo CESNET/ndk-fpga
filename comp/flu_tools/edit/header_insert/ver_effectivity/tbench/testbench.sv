@@ -32,7 +32,7 @@ module testbench;
 
 
   //-- Design Under Test ------------------------------------------------------
-  DUT DUT_U   (.CLK     (CLK),
+  dut DUT_U   (.CLK     (CLK),
                .RESET   (RESET),
                .RX      (RX),
                .TX      (TX),

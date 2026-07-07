@@ -10,12 +10,14 @@ class env_rx #(
     int unsigned BLOCK_SIZE,
     direction_t  DIR,
     meta_position_t META_TYPE,
-    logic STRADDLING, // TODO: REMOVE STRADDLING it if you want to switch off straddling you shoudld use comb 1, X, REGIONS*y, 32
+    // TODO: REMOVE STRADDLING it if you want to switch off straddling you shoudld use comb 1, X, REGIONS*y, 32
+    logic STRADDLING,
     device_t DEVICE
 ) extends uvm_pcie::env_rx;
     `ndk_component_param_utils(
         uvm_pcie_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE),
-        $sformatf("uvm_pcie_mfb::env_rx#(%0d,%0d,%0d,%s,%s,%0d,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE)
+        $sformatf("uvm_pcie_mfb::env_rx #(%0d,%0d,%0d,%s,%s,%0d,%s)", REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE,
+                  STRADDLING, DEVICE)
     );
 
     // LOCAL PARAMETERS
@@ -48,8 +50,9 @@ class env_rx #(
         uvm_logic_vector_array_mfb::config_item  m_lva_cfg;
 
         //register driver in factory
-        uvm_pcie::monitor::type_id::set_inst_override(monitor_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)::get_type(), "m_monitor", this);
-        uvm_pcie::driver::type_id::set_inst_override (driver #(DIR, META_TYPE, DEVICE)                                     ::get_type(), "m_driver", this);
+        uvm_pcie::monitor::type_id::set_inst_override(
+            monitor_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)::get_type(), "m_monitor", this);
+        uvm_pcie::driver::type_id::set_inst_override(driver #(DIR, META_TYPE, DEVICE)::get_type(), "m_driver", this);
 
 
         super.build_phase(phase);
@@ -61,7 +64,8 @@ class env_rx #(
         m_lva_cfg.seq_cfg  = new();
         m_lva_cfg.set_pcie(STRADDLING);
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_lva", "m_config", m_lva_cfg);
-        m_lva = uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_lva", this);
+        m_lva = uvm_logic_vector_array_mfb::env_rx
+            #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_lva", this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -77,8 +81,10 @@ class env_rx #(
         end
 
         $cast(m_driver_cast, m_driver);
-        uvm_config_db#(uvm_common::fifo#(uvm_logic_vector_array::sequence_item #(32))           )::set(m_lva.m_sequencer.m_data, "" , "in_fifo", m_driver_cast.data_fifo);
+        uvm_config_db #(uvm_common::fifo #(uvm_logic_vector_array::sequence_item #(32)))::set(
+            m_lva.m_sequencer.m_data, "", "in_fifo", m_driver_cast.data_fifo);
         if (META_TYPE != MFB_META_NONE) begin
+            // verilog_lint: waive line-length
             uvm_config_db#(uvm_common::fifo#(uvm_logic_vector::sequence_item #(meta_width_get(DIR, DEVICE))))::set(m_lva.m_sequencer.m_meta, "" , "in_fifo", m_driver_cast.meta_fifo);
         end
     endfunction
@@ -112,12 +118,14 @@ class env_mvb_rx #(
     int unsigned BLOCK_SIZE,
     direction_t  DIR,
     meta_position_t META_TYPE,
-    logic STRADDLING, // TODO: REMOVE STRADDLING it if you want to switch off straddling you shoudld use comb 1, X, REGIONS*y, 32
+    // TODO: REMOVE STRADDLING it if you want to switch off straddling you shoudld use comb 1, X, REGIONS*y, 32
+    logic STRADDLING,
     device_t DEVICE
 ) extends env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, MFB_META_NONE, STRADDLING, DEVICE);
     `ndk_component_param_utils(
         uvm_pcie_mfb::env_mvb_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE),
-        $sformatf("uvm_pcie_mfb::env_mvb_rx#(%0d,%0d,%0d,%s,%s,%0d,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, STRADDLING, DEVICE)
+        $sformatf("uvm_pcie_mfb::env_mvb_rx #(%0d,%0d,%0d,%s,%s,%0d,%s)", REGIONS, REGION_SIZE, BLOCK_SIZE, DIR,
+                  META_TYPE, STRADDLING, DEVICE)
     );
     // LOCAL PARAMETERS
     localparam MVB_META_WIDTH = meta_width_get(DIR, DEVICE);
@@ -155,7 +163,8 @@ class env_tx #(
 ) extends uvm_pcie::env_tx;
     `ndk_component_param_utils(
         uvm_pcie_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE),
-        $sformatf("uvm_pcie_mfb::env_tx#(%0d,%0d,%0d,%s,%s,%s)",REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)
+                               $sformatf("uvm_pcie_mfb::env_tx #(%0d,%0d,%0d,%s,%s,%s)", REGIONS, REGION_SIZE,
+                                         BLOCK_SIZE, DIR, META_TYPE, DEVICE)
     );
 
     // LOCAL PARAMETERS
@@ -185,7 +194,8 @@ class env_tx #(
         uvm_mfb::config_item mfb_cfg;
 
         //register driver in factory
-        uvm_pcie::monitor::type_id::set_inst_override(monitor#(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)::get_type(), "m_monitor", this);
+        uvm_pcie::monitor::type_id::set_inst_override(
+            monitor #(REGIONS, REGION_SIZE, BLOCK_SIZE, DIR, META_TYPE, DEVICE)::get_type(), "m_monitor", this);
 
         super.build_phase(phase);
 
@@ -193,7 +203,8 @@ class env_tx #(
         mfb_cfg.interface_name = {m_config.interface_name, "_mfb"};
         mfb_cfg.active         = m_config.active;
         uvm_config_db #(uvm_mfb::config_item)::set(this, "m_mfb", "m_config", mfb_cfg);
-        m_mfb = uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb", this);
+        m_mfb = uvm_mfb::agent_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_mfb",
+                                                                                                              this);
     endfunction
 
     function void connect_phase(uvm_phase phase);
@@ -210,14 +221,23 @@ class env_tx #(
 
         if (get_is_active() == UVM_ACTIVE) begin
             //GENERATE RDY SIGNLA
-            seq_mfb = uvm_mfb::sequence_lib_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, 32, META_WIDTH)::type_id::create("seq_mfb", this);
+            seq_mfb = uvm_mfb::sequence_lib_tx #(
+                REGIONS,
+                REGION_SIZE,
+                BLOCK_SIZE,
+                32,
+                META_WIDTH
+            )::type_id::create("seq_mfb", this);
             seq_mfb.min_random_count = 20;
             seq_mfb.max_random_count = 100;
             seq_mfb.init_sequence();
 
             fork
                 forever begin
-                    assert(seq_mfb.randomize()) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_mfb sequence");
+                    assert(seq_mfb.randomize())
+                    else begin
+                        `uvm_fatal(this.get_full_name(), "\n\tCannot randomize pcie_mfb sequence");
+                    end
                     seq_mfb.start(m_mfb.m_sequencer);
                 end
             join
@@ -274,5 +294,3 @@ class env_mvb_tx #(
         m_mvb.analysis_port.connect(m_monitor_cast.port_mvb);
     endfunction
 endclass
-
-

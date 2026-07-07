@@ -22,7 +22,7 @@ package uvm_pcie_hdr;
     `include "agent.sv"
 
     typedef enum {TYPE_READ, TYPE_WRITE, TYPE_MSG, TYPE_MSGD, TYPE_ERR} msg_type;
-    function msg_type encode_type(logic [8-1 : 0] req_type, logic intel);
+    function automatic msg_type encode_type(logic [8-1 : 0] req_type, logic intel);
         msg_type ret;
         if (intel) begin
             case (req_type)

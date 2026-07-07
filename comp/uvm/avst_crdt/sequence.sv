@@ -8,7 +8,9 @@
 // RX side //
 // ======= //
 
-virtual class sequence_rx_base #(int unsigned UPDATE_CNT_WIDTH) extends uvm_sequence #(sequence_item #(UPDATE_CNT_WIDTH));
+virtual class sequence_rx_base #(
+    int unsigned UPDATE_CNT_WIDTH
+) extends uvm_sequence #(sequence_item #(UPDATE_CNT_WIDTH));
     `ndk_object_param_utils(
         uvm_avst_crdt::sequence_rx_base #(UPDATE_CNT_WIDTH),
         $sformatf("uvm_avst_crdt::sequence_rx_base#(%0d)", UPDATE_CNT_WIDTH)

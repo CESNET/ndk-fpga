@@ -87,7 +87,9 @@ class scoreboard extends uvm_scoreboard;
                 string str = "";
                 errors++;
                 str = {str, $sformatf("\n\terrors %0d packet %0d",  errors, compared)};
+                // verilog_lint: waive line-length
                 str = {str, $sformatf("\n\tPACKET FROM DUT\n\t%s\n\tEXPECTED PACKET\n\t%s",  tr_dut_packet.convert2string(), tr_model_packet.convert2string())};
+                // verilog_lint: waive line-length
                 str = {str, $sformatf("\n\tERROR FROM DUT\n\t%s\n\tEXPECTED ERROR\n\t%s",  tr_dut_error.convert2string(), tr_model_error.convert2string())};
                `uvm_error(this.get_full_name(), str);
             end
@@ -101,13 +103,23 @@ class scoreboard extends uvm_scoreboard;
     virtual function void report_phase(uvm_phase phase);
         string str = "";
 
+        // verilog_lint: waive line-length
         str = $sformatf( "\n\tCompared transaction %d\n\tErrors %d\n\tDUT TX fifo %d\n\tModel TX fifo %d", compared, errors, dut_fifo_packet.used(), model_fifo_packet.used());
+        // verilog_lint: waive line-length
         str = {str, $sformatf("\n\tDUT TX fifo error : %d\n\tModel TX fifo error : %d\n",  dut_fifo_error.used(), model_fifo_error.used())};
 
-        if (errors == 0 && dut_fifo_packet.used() == 0 && model_fifo_packet.used() == 0 && dut_fifo_error.used() == 0 && model_fifo_error.used() == 0) begin
-            `uvm_info(get_type_name(), {str, "\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+        if (errors == 0 && dut_fifo_packet.used() == 0 && model_fifo_packet.used() == 0 && dut_fifo_error.used() == 0 &&
+            model_fifo_error.used() == 0) begin
+            `uvm_info(
+                get_type_name(), {
+                str,
+                "\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {str, "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      str,
+                      "\n\t---------------------------------------\n\t----     VERIFICATION FAIL      ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 endclass

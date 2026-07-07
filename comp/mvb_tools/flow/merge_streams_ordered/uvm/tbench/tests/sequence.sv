@@ -21,6 +21,7 @@ class virt_sequence#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_sequence
         m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
 
         for (int port = 0; port < RX_STREAMS; port++) begin
+            // verilog_lint: waive line-length
             m_rx_mvb_seq[port] = uvm_logic_vector::sequence_simple#(MVB_ITEM_WIDTH)::type_id::create($sformatf("m_rx_mvb_seq_%0d", port));
             m_rx_mvb_seq[port].transaction_count_min = MIN_TRANSACTION_COUNT;
             m_rx_mvb_seq[port].transaction_count_max = MAX_TRANSACTION_COUNT;

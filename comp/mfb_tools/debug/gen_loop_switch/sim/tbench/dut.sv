@@ -9,7 +9,7 @@
 import test_pkg::*;
 import math_pkg::*;
 
-module DUT (
+module dut (
     input logic MI_CLK,
     input logic MI_RESET,
     input logic CLK,
@@ -169,7 +169,7 @@ module DUT (
         assign DMA_RX_MVB.DATA           = {>>{arr_DMA_RX_MVB_DATA}};
         assign {>>{arr_DMA_TX_MVB_DATA}} = DMA_TX_MVB.DATA;
 
-        for(genvar i = 0; i<REGIONS; i++) begin
+        for(genvar i = 0; i<REGIONS; i++) begin : gen_i
 
             assign {>>{arr_ETH_RX_MVB_LEN[i], arr_ETH_RX_MVB_CHANNEL[i], arr_ETH_RX_MVB_HDR_META[i], arr_ETH_RX_MVB_DISCARD[i]}} = arr_ETH_RX_MVB_DATA[i];
             assign arr_ETH_TX_MVB_DATA[i] = {>>{arr_ETH_TX_MVB_LEN[i], arr_ETH_TX_MVB_CHANNEL[i], arr_ETH_TX_MVB_HDR_META[i]}};

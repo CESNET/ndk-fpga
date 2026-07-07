@@ -6,19 +6,36 @@
 
 // Environment for the functional verification.
 class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) extends uvm_env;
-    `uvm_component_param_utils(frame_masker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH));
+    `uvm_component_param_utils(
+        frame_masker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH));
 
     uvm_reset::agent m_reset;
 
-    uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_rx;
-    uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_env_tx;
-    uvm_logic_vector_mvb::env_rx       #(1, MFB_REGIONS)                                                               m_env_rx_mvb;
+    uvm_logic_vector_array_mfb::env_rx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH
+    ) m_env_rx;
+    uvm_logic_vector_array_mfb::env_tx #(
+        MFB_REGIONS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH
+    ) m_env_tx;
+    uvm_logic_vector_mvb::env_rx       #(
+        1,
+        MFB_REGIONS
+    ) m_env_rx_mvb;
 
     frame_masker::virt_sequencer #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) vscr;
 
     scoreboard #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH) sc;
 
-    protected uvm_logic_vector_array_mfb::config_item m_config_rx; // why is it protected and why is it declared here instead of the Build Phase ?
+    // why is it protected and why is it declared here instead of the Build Phase ?
+    protected uvm_logic_vector_array_mfb::config_item m_config_rx;
 
     coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH) m_coverage_model;
 
@@ -46,14 +63,26 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
         m_config_rx.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
         m_config_rx.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_logic_vector_array_mfb::env_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_rx", this);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_env_rx", this);
 
         m_config_tx                = new;
         m_config_tx.active         = UVM_ACTIVE;
         m_config_tx.interface_name = "vif_tx";
         m_config_tx.meta_behav     = uvm_logic_vector_array_mfb::config_item::META_SOF;
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_logic_vector_array_mfb::env_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_env_tx", this);
 
         m_config_mvb_rx                = new;
         m_config_mvb_rx.active         = UVM_ACTIVE;
@@ -62,9 +91,19 @@ class env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_ME
         m_env_rx_mvb = uvm_logic_vector_mvb::env_rx #(1, MFB_REGIONS)::type_id::create("m_env_rx_mvb", this);
 
         sc   = scoreboard                   #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("sc", this);
-        vscr = frame_masker::virt_sequencer #(MFB_REGIONS, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("vscr",this);
+        vscr = frame_masker::virt_sequencer #(
+            MFB_REGIONS,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("vscr",this);
 
-        m_coverage_model = coverage_model #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::create("m_coverage_model", this);
+        m_coverage_model = coverage_model #(
+            MFB_REGIONS,
+            MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("m_coverage_model", this);
 
     endfunction
 

@@ -4,9 +4,21 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class virt_seq_full_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX) extends virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX);
-    `uvm_object_param_utils(test::virt_seq_full_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
-    `uvm_declare_p_sequencer(uvm_metadata_insertor::virt_sequencer#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH))
+class virt_seq_full_speed #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    MFB_META_WIDTH,
+    MVB_ITEM_WIDTH,
+    FRAME_SIZE_MIN,
+    FRAME_SIZE_MAX
+) extends virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH,
+                          FRAME_SIZE_MIN, FRAME_SIZE_MAX);
+    `uvm_object_param_utils(test::virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                MFB_META_WIDTH, MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX))
+    `uvm_declare_p_sequencer(uvm_metadata_insertor::virt_sequencer #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE,
+                                 MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH))
 
     function new (string name = "virt_seq_full_speed");
         super.new(name);
@@ -14,7 +26,9 @@ class virt_seq_full_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITE
 
     virtual function void init(uvm_phase phase);
         super.init(phase);
-        m_mfb_rdy_seq = uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, (MFB_META_WIDTH+MVB_ITEM_WIDTH))::type_id::create("m_mfb_rdy_seq");
+        m_mfb_rdy_seq =
+            uvm_mfb::sequence_full_speed_tx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH,
+                                             (MFB_META_WIDTH + MVB_ITEM_WIDTH))::type_id::create("m_mfb_rdy_seq");
     endfunction
 endclass
 
@@ -22,7 +36,17 @@ class speed extends uvm_test;
      typedef uvm_component_registry#(test::speed, "test::speed") type_id;
 
     // declare the Environment reference variable
-    uvm_metadata_insertor::env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, INSERT_MODE, MFB_META_ALIGNMENT) m_env;
+    uvm_metadata_insertor::env #(
+        MFB_REGIONS,
+        MVB_ITEMS,
+        MFB_REGION_SIZE,
+        MFB_BLOCK_SIZE,
+        MFB_ITEM_WIDTH,
+        MFB_META_WIDTH,
+        MVB_ITEM_WIDTH,
+        INSERT_MODE,
+        MFB_META_ALIGNMENT
+    ) m_env;
     int unsigned timeout;
 
     // ------------------------------------------------------------------------
@@ -42,20 +66,26 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
-        uvm_logic_vector_array_mfb::sequence_lib_rx#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
-            uvm_logic_vector_array_mfb::sequence_lib_rx_speed#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
+        uvm_logic_vector_array_mfb::sequence_lib_rx
+            #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::type_id::set_inst_override(
+            uvm_logic_vector_array_mfb::sequence_lib_rx_speed
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type(),
             {this.get_full_name(), ".m_env.m_env_rx.*"}
         );
 
         // Initializing the reference to the environment
-        m_env = uvm_metadata_insertor::env #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, INSERT_MODE, MFB_META_ALIGNMENT)::type_id::create("m_env", this);
+        m_env = uvm_metadata_insertor::env
+            #(MFB_REGIONS, MVB_ITEMS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH,
+              INSERT_MODE, MFB_META_ALIGNMENT)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
     // Create environment and Run sequences on their sequencers
     virtual task run_phase(uvm_phase phase);
-        virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX) m_vseq;
-        m_vseq = virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH, MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX)::type_id::create("m_vseq");
+        virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH,
+                              MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX) m_vseq;
+        m_vseq = virt_seq_full_speed #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH,
+                                      MVB_ITEM_WIDTH, FRAME_SIZE_MIN, FRAME_SIZE_MAX)::type_id::create("m_vseq");
 
         phase.raise_objection(this);
 
@@ -89,7 +119,9 @@ class speed extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 endclass

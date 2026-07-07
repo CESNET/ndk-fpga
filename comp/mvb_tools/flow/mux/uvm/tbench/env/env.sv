@@ -74,7 +74,8 @@ class env #(ITEMS, ITEM_WIDTH, RX_MVB_CNT) extends uvm_env;
             cfg_rx.seq_cfg        = new();
             cfg_rx.seq_cfg.space_size_set(0, 5);
             cfg_rx.coverage       = 1;
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("rx_env_%0d", port), "m_config", cfg_rx);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("rx_env_%0d", port), "m_config",
+                                                                   cfg_rx);
             rx_env[port] = lv_mvb #(ITEMS, ITEM_WIDTH)::type_id::create($sformatf("rx_env_%0d", port), this);
         end
 

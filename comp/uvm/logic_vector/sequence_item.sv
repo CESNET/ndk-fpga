@@ -62,7 +62,7 @@ class sequence_item #(int unsigned DATA_WIDTH)extends uvm_common::sequence_item;
         string s;
         $sformat(s, {
             "%s\n",
-            "data         = h%0h"},
+            "data         = 'h%0h"},
             super.convert2string(), data);
         return s;
     endfunction

@@ -92,9 +92,9 @@ class ptr_updater_model #(
 
                 msg = "\n\t PTR_UPD_MODEL -> Runtime pointer update:\n";
                 msg = {msg, $sformatf("\tChannel:      %0d\n", chan_idx)};
-                msg = {msg, $sformatf("\tHHP:          %0d (%0x)\n", hhp_int, hhp_int)};
-                msg = {msg, $sformatf("\tHDP:          %0d (%0x)\n", hdp_int, hdp_int)};
-                msg = {msg, $sformatf("\tInternal HDP: %0d (%0x)\n", m_chan_info[chan_idx].hdp,
+                msg = {msg, $sformatf("\tHHP:          %0d (0x%0x)\n", hhp_int, hhp_int)};
+                msg = {msg, $sformatf("\tHDP:          %0d (0x%0x)\n", hdp_int, hdp_int)};
+                msg = {msg, $sformatf("\tInternal HDP: %0d (0x%0x)\n", m_chan_info[chan_idx].hdp,
                                       m_chan_info[chan_idx].hdp)};
 
                 ptr_distance = hdp_int - m_chan_info[chan_idx].hdp;
@@ -108,8 +108,8 @@ class ptr_updater_model #(
                     upd_buff_addr_int = m_regmodel_top.m_regmodel_channel[chan_idx].update_base_reg.get();
                     p2p_en_int        = m_regmodel_top.m_regmodel_channel[chan_idx].exper_reg.get();
 
-                    msg = {msg, $sformatf("\tP2P_EN: %x\n", p2p_en_int)};
-                    msg = {msg, $sformatf("\tUPD_BUFF_ADDR: %x\n", upd_buff_addr_int)};
+                    msg = {msg, $sformatf("\tP2P_EN: 0x%x\n", p2p_en_int)};
+                    msg = {msg, $sformatf("\tUPD_BUFF_ADDR: 0x%x\n", upd_buff_addr_int)};
 
                     out_tr = uvm_pcie::request_header::type_id::create(this.get_full_name);
 
@@ -159,10 +159,10 @@ class ptr_updater_model #(
                 {hhp_int, hdp_int, p2p_en_int, upd_buff_addr_int} = upd_stop_req_tr.data;
 
                 msg = "\n\t PTR_UPD_MODEL -> Channel stop pointer update:\n";
-                msg = {msg, $sformatf("\tHHP: %0d (%0x)\n", hhp_int, hhp_int)};
-                msg = {msg, $sformatf("\tHDP: %0d (%0x)\n", hdp_int, hdp_int)};
-                msg = {msg, $sformatf("\tP2P_EN: %x\n", p2p_en_int)};
-                msg = {msg, $sformatf("\tUPD_BUFF_ADDR: %x\n", upd_buff_addr_int)};
+                msg = {msg, $sformatf("\tHHP: %0d (0x%0x)\n", hhp_int, hhp_int)};
+                msg = {msg, $sformatf("\tHDP: %0d (0x%0x)\n", hdp_int, hdp_int)};
+                msg = {msg, $sformatf("\tP2P_EN: 0x%x\n", p2p_en_int)};
+                msg = {msg, $sformatf("\tUPD_BUFF_ADDR: 0x%x\n", upd_buff_addr_int)};
                 `uvm_info(this.get_full_name(), msg,  UVM_MEDIUM);
 
                 out_tr = uvm_pcie::request_header::type_id::create(this.get_full_name);

@@ -4,8 +4,17 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH) extends uvm_scoreboard;
-    `uvm_component_param_utils(uvm_checksum_calculator::scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH))
+class scoreboard #(
+    META_WIDTH,
+    MVB_DATA_WIDTH,
+    MFB_ITEM_WIDTH,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH,
+    VERBOSITY,
+    MFB_META_WIDTH
+) extends uvm_scoreboard;
+    `uvm_component_param_utils(uvm_checksum_calculator::scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH,
+                                   OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH))
 
     uvm_analysis_export #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH))         input_data;
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(META_WIDTH))                   input_meta;
@@ -38,9 +47,20 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LEN
 
 
     function void build_phase(uvm_phase phase);
-        m_model    = model#(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH)::type_id::create("m_model", this);
+        m_model    = model#(
+            META_WIDTH,
+            MVB_DATA_WIDTH,
+            MFB_ITEM_WIDTH,
+            OFFSET_WIDTH,
+            LENGTH_WIDTH,
+            VERBOSITY,
+            MFB_META_WIDTH
+        )::type_id::create("m_model", this);
 
-        data_cmp = uvm_checksum_calculator::chsum_calc_cmp #(MVB_DATA_WIDTH, MFB_META_WIDTH)::type_id::create("data_cmp", this);
+        data_cmp = uvm_checksum_calculator::chsum_calc_cmp #(
+            MVB_DATA_WIDTH,
+            MFB_META_WIDTH
+        )::type_id::create("data_cmp", this);
         data_cmp.model_tr_timeout_set(1ms);
 
     endfunction
@@ -58,9 +78,16 @@ class scoreboard #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LEN
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
 
     endfunction

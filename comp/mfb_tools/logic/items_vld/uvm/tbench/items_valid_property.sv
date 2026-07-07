@@ -5,7 +5,15 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 
-module items_valid_property #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH, MVB_DATA_WIDTH, MVB_ITEMS)
+module items_valid_property #(
+    MFB_REGIONS,
+    MFB_REGION_SIZE,
+    MFB_BLOCK_SIZE,
+    MFB_ITEM_WIDTH,
+    META_WIDTH,
+    MVB_DATA_WIDTH,
+    MVB_ITEMS
+)
     (
         input RESET,
         mfb_if rx_mfb_vif,

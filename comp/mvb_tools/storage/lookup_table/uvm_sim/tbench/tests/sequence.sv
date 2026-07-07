@@ -6,7 +6,8 @@
 
 
 class virt_sequence#(ITEMS, LUT_WIDTH, REG_DEPTH, ADDR_WIDTH, SLICE_WIDTH, SW_WIDTH, CLK_PERIOD) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence#(ITEMS, LUT_WIDTH, REG_DEPTH, ADDR_WIDTH, SLICE_WIDTH, SW_WIDTH, CLK_PERIOD))
+    `uvm_object_param_utils(
+        test::virt_sequence #(ITEMS, LUT_WIDTH, REG_DEPTH, ADDR_WIDTH, SLICE_WIDTH, SW_WIDTH, CLK_PERIOD))
     `uvm_declare_p_sequencer(uvm_lookup_table::virt_sequencer#(ITEMS, LUT_WIDTH, REG_DEPTH, SLICE_WIDTH, SW_WIDTH))
 
     function new (string name = "virt_sequence");

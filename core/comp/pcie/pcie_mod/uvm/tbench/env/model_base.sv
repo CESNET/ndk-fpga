@@ -158,7 +158,11 @@ class model #(REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE) ex
     endtask
 
     task run_phase(uvm_phase phase);
-        assert(DMA_BAR_ENABLE == 0 || DMA_PORTS == 1) else begin `uvm_fatal(this.get_full_name(), "\n\t Unsupported combination when DMA_BAR_ENABLE is set then DMA_PORTS have to be one"); end
+        assert (DMA_BAR_ENABLE == 0 || DMA_PORTS == 1)
+        else begin
+            `uvm_fatal(this.get_full_name(),
+                       "\n\t Unsupported combination when DMA_BAR_ENABLE is set then DMA_PORTS have to be one");
+        end
         for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
             fork
                 automatic int unsigned pcie_index = it;

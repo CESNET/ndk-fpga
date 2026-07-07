@@ -71,4 +71,4 @@ veriblelint:
   before_script:
     - sh tests/verible/install.sh
   script:
-    - python3 tests/verible/gitlab_runner.py
+    - python3 tests/verible/verible_runner.py

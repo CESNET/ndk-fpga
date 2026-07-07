@@ -63,17 +63,18 @@ class model #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_component;
             //save it for data
             headers.push_back(tr_in);
             //Create output header
-            tr_out = uvm_logic_vector::sequence_item #(META_WIDTH)::type_id::create("tr_output_meta", this);
+            tr_out = uvm_logic_vector::sequence_item #(META_WIDTH)::type_id::create("tr_out", this);
             tr_out.start = tr_in.start;
             tr_out.data  = tr_in.data[META_WIDTH-1:0];
             channel      = tr_in.data[SEL_WIDTH + META_WIDTH-1 : META_WIDTH];
 
             if (channel >= CHANNELS) begin
                 string msg;
-                msg = $sformatf( "\n\tWrong channel num %0d Channel range is 0-%0d", channel, CHANNELS-1);
+                msg = $sformatf( "\n\tWrong channel num %0d Channel range is 0 - %0d", channel, CHANNELS-1);
                 `uvm_fatal(this.get_full_name(), msg);
             end else begin
-                `uvm_info(this.get_full_name(), $sformatf("\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
                 out_meta[channel].write(tr_out);
             end
         end
@@ -104,10 +105,11 @@ class model #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_component;
 
             if (channel >= CHANNELS) begin
                 string msg;
-                msg = $sformatf( "\n\tWrong channel num %0d Channel range is 0-%0d", channel, CHANNELS-1);
+                msg = $sformatf( "\n\tWrong channel num %0d Channel range is 0 - %0d", channel, CHANNELS-1);
                 `uvm_fatal(this.get_full_name(), msg);
             end else begin
-                `uvm_info(this.get_full_name(), $sformatf("\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
+                `uvm_info(this.get_full_name(), $sformatf(
+                          "\nINPUT\n\t%s\nOUTPUT : \n%s\n\n", msg, tr_out.convert2string()), UVM_HIGH);
                 out_data[channel].write(tr_out);
             end
         end

@@ -6,7 +6,8 @@
 
 // Environment for the functional verification.
 class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, DATA_WIDTH, TUSER_WIDTH, STRADDLING) extends uvm_env;
-    `uvm_component_param_utils(uvm_ptc_mfb2pcie_axi::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, DATA_WIDTH, TUSER_WIDTH, STRADDLING));
+    `uvm_component_param_utils(
+        uvm_ptc_mfb2pcie_axi::env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, DATA_WIDTH, TUSER_WIDTH, STRADDLING));
 
     uvm_logic_vector_array_mfb::env_rx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                      m_env_rx;
     uvm_logic_vector_array_axi::env_tx #(DATA_WIDTH, TUSER_WIDTH, ITEM_WIDTH, REGIONS, BLOCK_SIZE, STRADDLING) m_env_tx;
@@ -41,14 +42,27 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, DATA_WIDTH, TUSER_WIDT
         m_config_rx.interface_name   = "vif_rx";
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)::type_id::create("m_env_rx", this);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            0
+        )::type_id::create("m_env_rx", this);
 
         m_config_tx                  = new;
         m_config_tx.active           = UVM_ACTIVE;
         m_config_tx.interface_name   = "vif_tx";
 
         uvm_config_db #(uvm_logic_vector_array_axi::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_logic_vector_array_axi::env_tx#(DATA_WIDTH, TUSER_WIDTH, ITEM_WIDTH, REGIONS, BLOCK_SIZE, STRADDLING)::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_axi::env_tx#(
+            DATA_WIDTH,
+            TUSER_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            BLOCK_SIZE,
+            STRADDLING
+        )::type_id::create("m_env_tx", this);
 
         sc     = scoreboard#(ITEM_WIDTH)::type_id::create("sc", this);
 

@@ -30,7 +30,8 @@ class sequencer#(
     //DMA CQ
     //uvm_mfb::sequencer #(CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE, ITEM_WIDTH, CQ_MFB_META_W) m_dma_cq[PCIE_ENDPOINTS][DMA_PORTS];
     //DMA CC
-    uvm_pcie::sequencer m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS]; //its very simular to pcie but only support pcie response transactions.
+    //its very simular to pcie but only support pcie response transactions.
+    uvm_pcie::sequencer m_dma_cc[PCIE_ENDPOINTS][DMA_PORTS];
 
     //MI Interface (CQ+CC)
     uvm_mi::sequencer_master#(32, 32)                     m_mi_sqr[PCIE_ENDPOINTS];

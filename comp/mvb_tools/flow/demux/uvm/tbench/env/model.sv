@@ -12,6 +12,7 @@ class model #(ITEM_WIDTH, TX_PORTS) extends uvm_component;
     // Model input
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(ITEM_WIDTH + $clog2(TX_PORTS)))  rx_mvb_analysis_fifo;
     // Model output
+    // verilog_lint: waive line-length
     uvm_analysis_port     #(uvm_logic_vector::sequence_item #(ITEM_WIDTH))                     tx_mvb_analysis_imp [TX_PORTS - 1 : 0];
 
     function new(string name = "model", uvm_component parent = null);
@@ -36,7 +37,7 @@ class model #(ITEM_WIDTH, TX_PORTS) extends uvm_component;
             port                = rx_mvb_tr.data[ITEM_WIDTH + $clog2(TX_PORTS) - 1 : ITEM_WIDTH];
 
             // Create output transaction on a specific port
-            tx_mvb_tr      = uvm_logic_vector::sequence_item #(ITEM_WIDTH)::type_id::create("tx_mvb_tr_seq_it");
+            tx_mvb_tr      = uvm_logic_vector::sequence_item #(ITEM_WIDTH)::type_id::create("tx_mvb_tr");
             tx_mvb_tr.data = rx_mvb_tr.data[ITEM_WIDTH - 1 : 0];
             tx_mvb_tr.time_array_add(rx_mvb_tr.start);
 

@@ -20,16 +20,26 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
-    mvb_if #(1, ITEM_WIDTH) mvb_wr(RX_CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (ITEM_WIDTH)
+    ) mvb_wr(RX_CLK);
     reset_if                reset_wr(RX_CLK);
 
-    mvb_if #(1, ITEM_WIDTH) mvb_rd(TX_CLK);
+    mvb_if #(
+        .ITEMS      (1),
+        .ITEM_WIDTH (ITEM_WIDTH)
+    ) mvb_rd(TX_CLK);
     reset_if                reset_rd(TX_CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(RX_CLK_PERIOD) RX_CLK = ~RX_CLK;
-    always #(TX_CLK_PERIOD) TX_CLK = ~TX_CLK;
+    always begin
+        #(RX_CLK_PERIOD) RX_CLK = ~RX_CLK;
+    end
+    always begin
+        #(TX_CLK_PERIOD) TX_CLK = ~TX_CLK;
+    end
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -37,9 +47,15 @@ module testbench;
     initial begin
         uvm_root m_root;
         // Configuration of database
-        uvm_config_db#(virtual mvb_if #(1, ITEM_WIDTH))::set(null, "", "vif_rx", mvb_wr);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (ITEM_WIDTH)
+        ))::set(null, "", "vif_rx", mvb_wr);
         uvm_config_db#(virtual reset_if)::set(null, "", "reset_if_rx", reset_wr);
-        uvm_config_db#(virtual mvb_if #(1, ITEM_WIDTH))::set(null, "", "vif_tx", mvb_rd);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (ITEM_WIDTH)
+        ))::set(null, "", "vif_tx", mvb_rd);
         uvm_config_db#(virtual reset_if)::set(null, "", "reset_if_tx", reset_rd);
 
         m_root = uvm_root::get();
@@ -54,8 +70,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .RX_CLK     (RX_CLK),
         .RX_RST     (reset_wr.RESET),
         .TX_CLK     (TX_CLK),

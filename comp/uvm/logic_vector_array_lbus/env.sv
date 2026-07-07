@@ -63,7 +63,8 @@ class env_rx extends uvm_env;
         // Configuration
         m_logic_vector_array_agent_cfg = new();
         m_logic_vector_array_agent_cfg.active = m_config.active;
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", m_logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 m_logic_vector_array_agent_cfg);
         // Monitor instance override
         uvm_logic_vector_array::monitor #(8)::type_id::set_inst_override(
             monitor_logic_vector_array::get_type(),
@@ -71,6 +72,7 @@ class env_rx extends uvm_env;
             this
         );
         // Build
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent = uvm_logic_vector_array::agent #(8)::type_id::create("m_logic_vector_array_agent", this);
 
         // ------------------ //
@@ -80,7 +82,8 @@ class env_rx extends uvm_env;
         // Configuration
         m_logic_vector_agent_cfg = new();
         m_logic_vector_agent_cfg.active = m_config.active;
-        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config", m_logic_vector_agent_cfg);
+        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config",
+                                                           m_logic_vector_agent_cfg);
         // Monitor instance override
         uvm_logic_vector::monitor #(1)::type_id::set_inst_override(
             monitor_logic_vector::get_type(),
@@ -148,9 +151,11 @@ class env_rx extends uvm_env;
             uvm_logic_vector_array_lbus::sequence_library_rx lbus_sequence_library;
 
             if (m_config.lib_type == config_item::BASE) begin
-                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx::type_id::create("lbus_sequence_library", this);
+                lbus_sequence_library =
+                    uvm_logic_vector_array_lbus::sequence_library_rx::type_id::create("lbus_sequence_library", this);
             end else if (m_config.lib_type == config_item::SPEED) begin
-                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx_speed::type_id::create("lbus_sequence_library", this);
+                lbus_sequence_library = uvm_logic_vector_array_lbus::sequence_library_rx_speed::type_id::create(
+                    "lbus_sequence_library", this);
             end else begin
                 `uvm_fatal(this.get_full_name(), "\n\tUnexisted name of sequence library type");
             end
@@ -227,7 +232,8 @@ class env_tx extends uvm_env;
         // Configuration
         m_logic_vector_array_agent_cfg = new();
         m_logic_vector_array_agent_cfg.active = m_config.active;
-        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config", m_logic_vector_array_agent_cfg);
+        uvm_config_db #(uvm_logic_vector_array::config_item)::set(this, "m_logic_vector_array_agent", "m_config",
+                                                                 m_logic_vector_array_agent_cfg);
         // Monitor instance override
         uvm_logic_vector_array::monitor #(8)::type_id::set_inst_override(
             monitor_logic_vector_array::get_type(),
@@ -235,6 +241,7 @@ class env_tx extends uvm_env;
             this
         );
         // Build
+        // verilog_lint: waive line-length
         m_logic_vector_array_agent = uvm_logic_vector_array::agent #(8)::type_id::create("m_logic_vector_array_agent", this);
 
         // ------------------ //
@@ -244,7 +251,8 @@ class env_tx extends uvm_env;
         // Configuration
         m_logic_vector_agent_cfg = new();
         m_logic_vector_agent_cfg.active = m_config.active;
-        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config", m_logic_vector_agent_cfg);
+        uvm_config_db #(uvm_logic_vector::config_item)::set(this, "m_logic_vector_agent", "m_config",
+                                                           m_logic_vector_agent_cfg);
         // Monitor instance override
         uvm_logic_vector::monitor #(1)::type_id::set_inst_override(
             monitor_logic_vector::get_type(),

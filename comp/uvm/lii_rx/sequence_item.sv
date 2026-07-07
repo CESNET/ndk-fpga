@@ -11,7 +11,11 @@
 `ifndef LII_SEQUENCE_ITEM_SV
 `define LII_SEQUENCE_ITEM_SV
 // This class represents transaction which contains values of output signals for eth phy
-class sequence_item #(int unsigned DATA_WIDTH, int unsigned META_WIDTH, int unsigned SOF_WIDTH) extends uvm_common::sequence_item;
+class sequence_item #(
+    int unsigned DATA_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) extends uvm_common::sequence_item;
 
     // registration of object tools
     `uvm_object_param_utils(uvm_lii_rx::sequence_item #(DATA_WIDTH, META_WIDTH, SOF_WIDTH))
@@ -94,17 +98,17 @@ class sequence_item #(int unsigned DATA_WIDTH, int unsigned META_WIDTH, int unsi
 
         $sformat(s, {
             "%s\n",
-            "data: h%0h\n",
-            "bytes_vld: h%0h\n",
-            "sof:  b%0b\n",
-            "eof:  b%0b\n",
-            "rdy:  b%0b\n",
-            "eeof: b%0b\n",
-            "edb:  h%0h\n",
-            "link_status:  b%0b\n",
-            "err: b%0b\n",
-            "crc_ok: b%0b\n",
-            "crc_vld: b%0b\n"},
+            "data:       'h%0h\n",
+            "bytes_vld:  'h%0h\n",
+            "sof:        'b%0b\n",
+            "eof:        'b%0b\n",
+            "rdy:        'b%0b\n",
+            "eeof:       'b%0b\n",
+            "edb:        'h%0h\n",
+            "link_status:'b%0b\n",
+            "err:        'b%0b\n",
+            "crc_ok:     'b%0b\n",
+            "crc_vld:    'b%0b\n"},
             super.convert2string(),
             data,
             bytes_vld,

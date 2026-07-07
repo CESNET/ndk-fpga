@@ -167,8 +167,37 @@ class read_rx_counters#(RX_MAC_COUNT) extends uvm_sequence;
     endfunction
 
     virtual function string convert2string();
-        string format = "BASE\n\ttrfc %0d cfc %0d dfc %0d bodfc %0d oroc %0d\n\tRFC\n\tcrc_err %0d over_mtu %0d below_min %0d bcast_frames %0d mcast_frames %0d fragment_frames %0d jabber_frames %0d trans_octets %0d\n\tHIST\n\tframes_undersize %0d frames_64 %0d frames_65_127 %0d frames_128_255 %0d frames_256_511 %0d frames_512_1023 %0d frames_1024_1518 %0d frames_over_1518 %0d frames_1519_2047 %0d frames_2048_4095 %0d frames_4096_8191 %0d frames_over_8191 %0d";
-        return $sformatf(format, trfc, cfc, dfc, bodfc, oroc, crc_err, over_mtu, below_min, bcast_frames, mcast_frames, fragment_frames, jabber_frames, trans_octets, frames_undersize, frames_64, frames_65_127, frames_128_255, frames_256_511, frames_512_1023, frames_1024_1518, frames_over_1518, frames_1519_2047, frames_2048_4095, frames_4096_8191, frames_over_8191);
+        string format =
+            "BASE\n\ttrfc %0d cfc %0d dfc %0d bodfc %0d oroc %0d\n\tRFC\n\tcrc_err %0d over_mtu %0d below_min %0d bcast_frames %0d mcast_frames %0d fragment_frames %0d jabber_frames %0d trans_octets %0d\n\tHIST\n\tframes_undersize %0d frames_64 %0d frames_65_127 %0d frames_128_255 %0d frames_256_511 %0d frames_512_1023 %0d frames_1024_1518 %0d frames_over_1518 %0d frames_1519_2047 %0d frames_2048_4095 %0d frames_4096_8191 %0d frames_over_8191 %0d"
+            ;
+        return $sformatf(
+            format,
+            trfc,
+            cfc,
+            dfc,
+            bodfc,
+            oroc,
+            crc_err,
+            over_mtu,
+            below_min,
+            bcast_frames,
+            mcast_frames,
+            fragment_frames,
+            jabber_frames,
+            trans_octets,
+            frames_undersize,
+            frames_64,
+            frames_65_127,
+            frames_128_255,
+            frames_256_511,
+            frames_512_1023,
+            frames_1024_1518,
+            frames_over_1518,
+            frames_1519_2047,
+            frames_2048_4095,
+            frames_4096_8191,
+            frames_over_8191
+        );
     endfunction
 
 endclass

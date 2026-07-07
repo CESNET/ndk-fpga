@@ -15,22 +15,30 @@ module testbench;
 
     logic CLK = 0;
 
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // ---------- //
     // Interfaces //
     // ---------- //
 
     reset_if                       reset           (CLK);
-    mvb_if #(RX_ITEMS, ITEM_WIDTH) mvb_rx          (CLK);
-    mvb_if #(1, ITEM_WIDTH)        mvb_tx[TX_ITEMS](CLK);
+   mvb_if #(
+       .ITEMS      (RX_ITEMS),
+       .ITEM_WIDTH (ITEM_WIDTH)
+   ) mvb_rx          (CLK);
+   mvb_if #(
+       .ITEMS      (1),
+       .ITEM_WIDTH (ITEM_WIDTH)
+   )        mvb_tx[TX_ITEMS](CLK);
 
     // ----- //
     // Tests //
     // ----- //
 
-    typedef test::test_base  #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH) test_base;
-    typedef test::test_speed #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH) test_speed;
+    typedef test::test_base  #(.RX_ITEMS(RX_ITEMS), .TX_ITEMS(TX_ITEMS), .ITEM_WIDTH(ITEM_WIDTH)) test_base;
+    typedef test::test_speed #(.RX_ITEMS(RX_ITEMS), .TX_ITEMS(TX_ITEMS), .ITEM_WIDTH(ITEM_WIDTH)) test_speed;
 
     // Start of tests
     initial begin
@@ -40,12 +48,21 @@ module testbench;
         // Database configuration //
         // ---------------------- //
 
-        automatic virtual mvb_if #(1, ITEM_WIDTH) v_mvb_tx[TX_ITEMS] = mvb_tx;
+        automatic virtual mvb_if #(
+            .ITEMS      (1),
+            .ITEM_WIDTH (ITEM_WIDTH)
+        ) v_mvb_tx[TX_ITEMS] = mvb_tx;
 
         uvm_config_db #(virtual reset_if)                      ::set(null, "", "vif_reset",  reset);
-        uvm_config_db #(virtual mvb_if #(RX_ITEMS, ITEM_WIDTH))::set(null, "", "vif_rx_mvb", mvb_rx);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (RX_ITEMS),
+            .ITEM_WIDTH (ITEM_WIDTH)
+        ))::set(null, "", "vif_rx_mvb", mvb_rx);
         for (int unsigned i = 0; i < TX_ITEMS; i++) begin
-            uvm_config_db #(virtual mvb_if #(1, ITEM_WIDTH))::set(null, "", $sformatf("vif_tx_mvb_%0d", i), v_mvb_tx[i]);
+            uvm_config_db #(virtual mvb_if #(
+                .ITEMS      (1),
+                .ITEM_WIDTH (ITEM_WIDTH)
+            ))::set(null, "", $sformatf("vif_tx_mvb_%0d", i), v_mvb_tx[i]);
         end
 
         m_root = uvm_root::get();
@@ -60,10 +77,10 @@ module testbench;
     end
 
     // --- //
-    // DUT //
+    // dut //
     // --- //
 
-    DUT #(
+    dut #(
         .RX_ITEMS     (RX_ITEMS),
         .TX_ITEMS     (TX_ITEMS),
         .ITEM_WIDTH   (ITEM_WIDTH),

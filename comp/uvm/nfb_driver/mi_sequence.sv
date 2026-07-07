@@ -45,7 +45,9 @@ class mi_sequence extends controler;
         int dtb_ptr;
 
         dts = $fopen({name, ".dts"}, "w");
-        if(dts == 0) return 0;
+        if(dts == 0) begin
+            return 0;
+        end
         $fwrite(dts, "/dts-v1/;\n\n");
         $fwrite(dts, "/ {\n\n");
         $fwrite(dts, "  firmware {\n");
@@ -64,7 +66,9 @@ class mi_sequence extends controler;
         $fwrite(dts, "\n    };\n  };\n};\n");
         $fclose(dts);
 
-        if($system({"dtc -I dts -O dtb -o ", name, ".dtb ", name, ".dts"}) != 0) return 0;
+        if($system({"dtc -I dts -O dtb -o ", name, ".dtb ", name, ".dts"}) != 0) begin
+            return 0;
+        end
         return 1;
     endfunction
 

@@ -16,11 +16,25 @@ module testbench;
 
     //Interfaces
     reset_if reset(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_wr(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) mfb_rd(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH)
+    ) mfb_wr(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH)
+    ) mfb_rd(CLK);
 
     //Clock
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     //Start of tests
     initial begin
@@ -28,8 +42,20 @@ module testbench;
 
         //Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_rx", mfb_wr);
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::set(null, "", "vif_tx", mfb_rd);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ))::set(null, "", "vif_rx", mfb_wr);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ))::set(null, "", "vif_tx", mfb_rd);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -42,8 +68,8 @@ module testbench;
         $stop(2);
     end
 
-    //DUT mapping
-    DUT DUT_U(
+    //dut mapping
+    dut DUT_U(
         .CLK        (CLK),
         .RST        (reset.RESET),
         .mfb_wr     (mfb_wr),

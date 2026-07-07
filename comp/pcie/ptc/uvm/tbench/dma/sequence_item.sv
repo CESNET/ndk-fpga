@@ -77,11 +77,9 @@ class sequence_item_rq  extends uvm_common::sequence_item;
         string msg = $sformatf("\n\tDMA RC DATA : size(%0d) ", data.size());
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % 8 == 0) begin
-                // verilog_lint: waive numeric-format-string-style
-                msg = {msg, $sformatf("\n\t\t%h", data[it])};
+                msg = {msg, $sformatf("\n\t\t0x%h", data[it])};
             end else begin
-                // verilog_lint: waive numeric-format-string-style
-                msg = {msg, $sformatf("  %h", data[it])};
+                msg = {msg, $sformatf("  0x%h", data[it])};
             end
         end
         return msg;
@@ -91,11 +89,10 @@ class sequence_item_rq  extends uvm_common::sequence_item;
         string msg = "";
 
         msg = this.time2string();
-        msg = {msg, $sformatf({"\tLength : %0d\n\tType : %0d\n\tFirstIB : %0d\n\tlastIB : %0d\n",
-                                 "\ttag : %0d(0x%h)\n\tunitid : 0x%h\n\tglobal : 0x%h\n\tvfid : 0x%h\n",
-                                 "\tpasid : 0x%h\n\tpasidvld : %0d\n\trelaxed : %0d\n"},
-                                 length != 0 ? length : 1024, type_ide, firstib, lastib, tag, tag,
-                                 unitid, global_id, vfid, pasid, pasidvld, relaxed)};
+        // verilog_lint: waive line-length
+        msg = {msg, $sformatf("\tLength : %d\n\tType : 0b%b\n\tFirstIB : %0d\n\tlastIB : %0d\n\ttag : %0d(0x%h)\n\tunitid : 0x%h\n\tglobal : 0x%h\n\tvfid : 0x%h\n\tpasid : 0x%h\n\tpasidvld : 0b%b\n\trelaxed : 0b%b\n",
+                     // verilog_lint: waive line-length
+                     length != 0 ? length : 1024, type_ide, firstib, lastib, tag, tag, unitid, global_id, vfid, pasid, pasidvld, relaxed)};
         msg = {msg, convert2string_data()};
         return msg;
     endfunction
@@ -165,11 +162,9 @@ class sequence_item_rc  extends uvm_common::sequence_item;
         string msg = $sformatf("\n\tDMA RC DATA : size(%0d) ", data.size());
         for (int unsigned it = 0; it < data.size(); it++) begin
             if (it % 8 == 0) begin
-                // verilog_lint: waive numeric-format-string-style
-                msg = {msg, $sformatf("\n\t\t%h", data[it])};
+                msg = {msg, $sformatf("\n\t\t0x%h", data[it])};
             end else begin
-                // verilog_lint: waive numeric-format-string-style
-                msg = {msg, $sformatf("  %h", data[it])};
+                msg = {msg, $sformatf("  0x%h", data[it])};
             end
         end
         return msg;

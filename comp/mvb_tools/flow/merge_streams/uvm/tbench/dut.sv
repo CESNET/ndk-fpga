@@ -3,7 +3,14 @@
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned RX_STREAMS, bit RX_SHAKEDOWN_EN, int unsigned SW_TIMEOUT_W, string DEVICE)
+module dut #(
+    int unsigned MVB_ITEMS,
+    int unsigned MVB_ITEM_WIDTH,
+    int unsigned RX_STREAMS,
+    bit RX_SHAKEDOWN_EN,
+    int unsigned SW_TIMEOUT_W,
+    string DEVICE
+)
 (
     input logic CLK,
     input logic RST,
@@ -39,7 +46,7 @@ module DUT #(int unsigned MVB_ITEMS, int unsigned MVB_ITEM_WIDTH, int unsigned R
     );
 
     generate;
-        for (genvar i = 0; i < RX_STREAMS; i++) begin
+        for (genvar i = 0; i < RX_STREAMS; i++) begin : gen_i
             assign rx_mvb_data[MVB_ITEMS*MVB_ITEM_WIDTH*(i+1)-1 -: MVB_ITEMS*MVB_ITEM_WIDTH] = mvb_rx[i].DATA;
             assign rx_mvb_vld [MVB_ITEMS               *(i+1)-1 -: MVB_ITEMS]                = mvb_rx[i].VLD;
             assign rx_mvb_src_rdy[i] = mvb_rx[i].SRC_RDY;

@@ -87,7 +87,11 @@ class driver#(ITEM_WIDTH, META_WIDTH) extends uvm_driver #(sequence_item#(ITEM_W
                 const int unsigned diff_step = (m_config.diff_max - m_config.diff_min)/10;
                 assert(std::randomize(diff_type, diff, diff_count) with
                     {
-                        diff_type  dist { STORE_MVB := m_config.weigth_mfb_first, 1'b1, STORE_MFB := m_config.weigth_mvb_first};
+                    diff_type dist {
+                        STORE_MVB := m_config.weigth_mfb_first,
+                        1'b1,
+                        STORE_MFB := m_config.weigth_mvb_first
+                    };
                         diff       dist { [m_config.diff_min              : m_config.diff_min + diff_step] :/ 95,
                                           [m_config.diff_min+ diff_step   : m_config.diff_min + diff_step*9] :/ 1,
                                           [m_config.diff_min+ diff_step*9 : m_config.diff_max] :/ 5};
@@ -130,11 +134,17 @@ class driver#(ITEM_WIDTH, META_WIDTH) extends uvm_driver #(sequence_item#(ITEM_W
     endtask
 
     task run_phase(uvm_phase phase);
-        assert (uvm_config_db#(uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)))::get(this, "", "fifo_mvb", fifo_mvb)) else begin
+        assert (uvm_config_db #(uvm_common::fifo #(sequence_item #(ITEM_WIDTH, META_WIDTH)))::get(
+            this, "", "fifo_mvb", fifo_mvb
+        ))
+        else begin
             `uvm_fatal(this.get_full_name(), "\n\tCannot get mvb fifo");
         end
 
-        assert (uvm_config_db#(uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)))::get(this, "", "fifo_mfb", fifo_mfb)) else begin
+        assert (uvm_config_db #(uvm_common::fifo #(sequence_item #(ITEM_WIDTH, META_WIDTH)))::get(
+            this, "", "fifo_mfb", fifo_mfb
+        ))
+        else begin
             `uvm_fatal(this.get_full_name(), "\n\tCannot get mfb fifo");
         end
 

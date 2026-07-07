@@ -18,7 +18,8 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = uvm_lookup_table::env #(MVB_ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH)::type_id::create("m_env", this);
+        m_env = uvm_lookup_table::env
+            #(MVB_ITEMS, LUT_WIDTH, REG_DEPTH, SW_WIDTH, SLICE_WIDTH, LUT_DEPTH)::type_id::create("m_env", this);
     endfunction
 
     task test_wait_timeout(int unsigned time_length);
@@ -39,7 +40,8 @@ class ex_test extends uvm_test;
 
         phase.raise_objection(this, "Start of rx sequence");
 
-        m_vseq = virt_sequence#(MVB_ITEMS, LUT_WIDTH, REG_DEPTH, ADDR_WIDTH, SLICE_WIDTH, SW_WIDTH)::type_id::create("m_vseq");
+        m_vseq = virt_sequence #(MVB_ITEMS, LUT_WIDTH, REG_DEPTH, ADDR_WIDTH, SLICE_WIDTH, SW_WIDTH)::type_id::create(
+            "m_vseq");
         m_vseq.init(m_env.m_regmodel.m_regmodel, phase);
         assert(m_vseq.randomize());
         m_vseq.start(m_env.vscr);
@@ -62,7 +64,9 @@ class ex_test extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 endclass

@@ -44,7 +44,13 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uv
         m_config_rx.meta_behav       = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_rx", "m_config", m_config_rx);
-        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_env_rx", this);
+        m_env_rx = uvm_logic_vector_array_mfb::env_rx#(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_env_rx", this);
 
         m_config_tx                  = new;
         m_config_tx.active           = UVM_ACTIVE;
@@ -52,7 +58,13 @@ class env #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) extends uv
         m_config_tx.meta_behav       = uvm_logic_vector_array_mfb::config_item::META_SOF;
 
         uvm_config_db #(uvm_logic_vector_array_mfb::config_item)::set(this, "m_env_tx", "m_config", m_config_tx);
-        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("m_env_tx", this);
+        m_env_tx = uvm_logic_vector_array_mfb::env_tx#(
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH
+        )::type_id::create("m_env_tx", this);
 
         sc     = scoreboard#(ITEM_WIDTH, META_WIDTH)::type_id::create("sc", this);
         vscr   = uvm_mfb_fifox::virt_sequencer#(ITEM_WIDTH, META_WIDTH)::type_id::create("vscr",this);

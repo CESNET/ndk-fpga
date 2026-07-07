@@ -10,24 +10,32 @@
 */
 
 // Definition of LII interface.
-interface lii_if #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WIDTH, int unsigned SOF_WIDTH) (input logic CLK, RESET);
+interface lii_if #(
+    int unsigned DATA_WIDTH,
+    logic FAST_SOF,
+    int unsigned META_WIDTH,
+    int unsigned SOF_WIDTH
+) (
+    input logic CLK,
+    RESET
+);
 
     // Variables
     localparam BYTES_VLD_LENGTH = $clog2(DATA_WIDTH/8)+1;
 
     // Bus structure of LII.
-    wire logic [DATA_WIDTH-1 : 0]       DATA; // Data
-    wire logic [BYTES_VLD_LENGTH-1 : 0] BYTES_VLD; // Byte valid
-    wire logic [BYTES_VLD_LENGTH-1 : 0] EDB; // Byte valid, valid on EEOF cycle only.
-    wire logic [SOF_WIDTH-1 : 0]        SOF;
-    wire logic                          EOF; // End of frame
-    wire logic                          RDY; // Clock enable
-    wire logic                          EEOF; // Early EOF, when EEOF = 1 then next cycle EOF must be 1;
-    wire logic                          LINK_STATUS; // Signalize state of ethernet link
-    wire logic [META_WIDTH-1 : 0]       META; // Metadata
-    wire logic                          RXDECERR; // Decode error signalization
-    wire logic                          RXSEQERR; // Sequence error signalization
-    wire logic                          CRCERR; // CRC error injection
+    wire [DATA_WIDTH-1 : 0]       DATA; // Data
+    wire [BYTES_VLD_LENGTH-1 : 0] BYTES_VLD; // Byte valid
+    wire [BYTES_VLD_LENGTH-1 : 0] EDB; // Byte valid, valid on EEOF cycle only.
+    wire [SOF_WIDTH-1 : 0]        SOF;
+    wire                          EOF; // End of frame
+    wire                          RDY; // Clock enable
+    wire                          EEOF; // Early EOF, when EEOF = 1 then next cycle EOF must be 1;
+    wire                          LINK_STATUS; // Signalize state of ethernet link
+    wire [META_WIDTH-1 : 0]       META; // Metadata
+    wire                          RXDECERR; // Decode error signalization
+    wire                          RXSEQERR; // Sequence error signalization
+    wire                          CRCERR; // CRC error injection
 
     // Driver clocking block.
     clocking driver_tx_cb @(posedge CLK);
@@ -54,9 +62,18 @@ interface lii_if #(int unsigned DATA_WIDTH, logic FAST_SOF, int unsigned META_WI
     endclocking
 
     // Connection to DUT.
-    modport dut_tx(output DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR, input RDY);
-    modport dut_rx_eth_phy(input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, META, CRCERR, output RDY, LINK_STATUS, RXDECERR, RXSEQERR);
-    modport dut_rx(input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR, output RDY);
+    modport dut_tx(
+        output DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR,
+        input RDY
+    );
+    modport dut_rx_eth_phy(
+        input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, META, CRCERR,
+        output RDY, LINK_STATUS, RXDECERR, RXSEQERR
+    );
+    modport dut_rx(
+        input DATA, BYTES_VLD, SOF, EOF, EEOF, EDB, LINK_STATUS, META, RXDECERR, RXSEQERR, CRCERR,
+        output RDY
+    );
 
     // Specify wires and direction used for each connection for driver and monitor.
     modport driver_tx(clocking driver_tx_cb);

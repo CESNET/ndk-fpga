@@ -9,8 +9,10 @@ class sequence_one_frame #(
     int unsigned MFB_BLOCK_SIZE,
     int unsigned MFB_ITEM_WIDTH,
     int unsigned MFB_META_WIDTH
-) extends uvm_logic_vector_array_mfb::sequence_rx_simple #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH);
-    `uvm_object_param_utils(test::sequence_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
+) extends uvm_logic_vector_array_mfb::sequence_rx_simple
+    #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH);
+    `uvm_object_param_utils(
+        test::sequence_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
     function new (string name = "sequence_one_frame");
         super.new(name);
@@ -34,7 +36,7 @@ class sequence_one_frame #(
         for (int unsigned region = 0; region < REGIONS; region++) begin
             for (int unsigned index = 0; index < REGION_SIZE; index++) begin
                 if (state_packet == state_packet_space_new) begin
-                    space_size = $urandom_range(space_size_min, space_size_max);;
+                    space_size = $urandom_range(space_size_min, space_size_max);
                     state_packet = state_packet_space;
                 end
 
@@ -53,7 +55,10 @@ class sequence_one_frame #(
 
                 if (state_packet == state_packet_new) begin
                     // Check SOF and EOF position if we can insert packet into this region
-                    if ($countones(gen.sof) > 0 || (gen.eof[region] == 1'b1 && (REGION_SIZE*BLOCK_SIZE) >= (index*BLOCK_SIZE + data.data.size()))) begin
+                    if ($countones(
+                            gen.sof
+                        ) > 0 || (gen.eof[region] == 1'b1 &&
+                                  (REGION_SIZE * BLOCK_SIZE) >= (index * BLOCK_SIZE + data.data.size()))) begin
                         break;
                     end
 
@@ -66,7 +71,8 @@ class sequence_one_frame #(
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end  = BLOCK_SIZE < (data.data.size() - data_index) ? BLOCK_SIZE : (data.data.size() - data_index);
+                    int unsigned loop_end = BLOCK_SIZE < (data.data.size() - data_index) ?
+                        BLOCK_SIZE : (data.data.size() - data_index);
                     gen.src_rdy = 1;
 
                     for (int unsigned jt = index*BLOCK_SIZE; jt < (index*BLOCK_SIZE + loop_end); jt++) begin
@@ -76,7 +82,8 @@ class sequence_one_frame #(
 
                     // End of packet
                     if (data.data.size() <= data_index) begin
-                        if (hl_sqr.meta_behav == uvm_logic_vector_array_mfb::config_item::META_EOF && META_WIDTH != 0) begin
+                        if (hl_sqr.meta_behav == uvm_logic_vector_array_mfb::config_item::META_EOF &&
+                            META_WIDTH != 0) begin
                             gen.meta[region] = meta.data;
                         end
                         gen.eof[region]     = 1'b1;
@@ -91,9 +98,18 @@ class sequence_one_frame #(
 
 endclass
 
-class sequence_lib_one_frame #(int unsigned MFB_REGIONS, int unsigned MFB_REGION_SIZE, int unsigned MFB_BLOCK_SIZE, int unsigned MFB_ITEM_WIDTH, int unsigned MFB_META_WIDTH) extends uvm_logic_vector_array_mfb::sequence_lib_rx #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH);
-    `uvm_object_param_utils(test::sequence_lib_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
-    `uvm_sequence_library_utils(test::sequence_lib_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
+class sequence_lib_one_frame #(
+    int unsigned MFB_REGIONS,
+    int unsigned MFB_REGION_SIZE,
+    int unsigned MFB_BLOCK_SIZE,
+    int unsigned MFB_ITEM_WIDTH,
+    int unsigned MFB_META_WIDTH
+) extends uvm_logic_vector_array_mfb::sequence_lib_rx
+    #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH);
+    `uvm_object_param_utils(
+        test::sequence_lib_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
+    `uvm_sequence_library_utils(
+        test::sequence_lib_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH))
 
     function new(string name = "sequence_lib_one_frame");
         super.new(name);
@@ -103,7 +119,9 @@ class sequence_lib_one_frame #(int unsigned MFB_REGIONS, int unsigned MFB_REGION
     virtual function void init_sequence(uvm_logic_vector_array_mfb::config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
 
-        add_sequence(test::sequence_one_frame #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type());
+        add_sequence(
+            test::sequence_one_frame
+                #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, MFB_META_WIDTH)::get_type());
     endfunction
 
 endclass

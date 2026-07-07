@@ -26,8 +26,10 @@ class test_base extends uvm_test;
 
     function void build_phase(uvm_phase phase);
         if (ENDPOINT_TYPE == "R_TILE") begin
-            uvm_mfb::sequence_lib_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, 32, sv_pcie_meta_pack::PCIE_RC_META_WIDTH)::type_id::set_inst_override(
-                uvm_mfb::sequence_lib_tx_speed#(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, 32, sv_pcie_meta_pack::PCIE_RC_META_WIDTH)::get_type(),
+            uvm_mfb::sequence_lib_tx #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, 32,
+                                      sv_pcie_meta_pack::PCIE_RC_META_WIDTH)::type_id::set_inst_override(
+                uvm_mfb::sequence_lib_tx_speed #(RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE, 32,
+                                                sv_pcie_meta_pack::PCIE_RC_META_WIDTH)::get_type(),
                 "m_env.m_mfb_rc_env.seq_mfb", this
             );
         end

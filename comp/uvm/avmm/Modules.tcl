@@ -7,5 +7,5 @@
 lappend COMPONENTS [list "RESET" "$OFM_PATH/comp/uvm/reset" "FULL"]
 
 lappend MOD "$ENTITY_BASE/interface.sv"
-lappend MOD "$ENTITY_BASE/property.sv"
+lappend MOD "$ENTITY_BASE/avmm_property.sv"
 lappend MOD "$ENTITY_BASE/pkg.sv"

@@ -17,5 +17,5 @@ lappend MOD "$ENTITY_BASE/tbench/env/pkg.sv"
 lappend MOD "$ENTITY_BASE/tbench/tests/pkg.sv"
 
 lappend MOD "$ENTITY_BASE/tbench/dut.sv"
-lappend MOD "$ENTITY_BASE/tbench/property.sv"
+lappend MOD "$ENTITY_BASE/tbench/reg_fifo_property.sv"
 lappend MOD "$ENTITY_BASE/tbench/testbench.sv"

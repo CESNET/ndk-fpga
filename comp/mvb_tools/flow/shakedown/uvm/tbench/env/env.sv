@@ -83,7 +83,8 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
             m_config_tx_mvb[i].active         = UVM_ACTIVE;
             m_config_tx_mvb[i].interface_name = $sformatf("vif_tx_mvb_%0d", i);
             m_config_rx_mvb.coverage          = 1;
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_env_tx_mvb_%0d", i), "m_config", m_config_tx_mvb[i]);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_env_tx_mvb_%0d", i), "m_config",
+                                                                   m_config_tx_mvb[i]);
             m_env_tx_mvb[i] = lv_mvb #(1, ITEM_WIDTH)::type_id::create($sformatf("m_env_tx_mvb_%0d", i), this);
         end
 
@@ -93,8 +94,15 @@ class env #(int unsigned RX_ITEMS, int unsigned TX_ITEMS, int unsigned ITEM_WIDT
 
         m_coverage_model = ll_coverage_model #(TX_ITEMS, ITEM_WIDTH)::type_id::create("m_coverage_model", this);
 
-        m_scoreboard        = scoreboard        #(RX_ITEMS, TX_ITEMS, ITEM_WIDTH)::type_id::create("m_scoreboard", this);
-        m_virtual_sequencer = virtual_sequencer #(TX_ITEMS, ITEM_WIDTH)          ::type_id::create("m_virtual_sequencer", this);
+        m_scoreboard        = scoreboard        #(
+            RX_ITEMS,
+            TX_ITEMS,
+            ITEM_WIDTH
+        )::type_id::create("m_scoreboard", this);
+        m_virtual_sequencer = virtual_sequencer #(
+            TX_ITEMS,
+            ITEM_WIDTH
+        ) ::type_id::create("m_virtual_sequencer", this);
 
         m_activity_detector = activity_detector #(TX_ITEMS, ITEM_WIDTH)::type_id::create("m_activity_detector", this);
     endfunction

@@ -5,10 +5,18 @@
 //-- SPDX-License-Identifier: BSD-3-Clause
 
 // This low level sequence define bus functionality
-virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_common::sequence_base#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
-    `ndk_object_param_utils(
-        uvm_logic_vector_array_avst::sequence_simple_rx_base#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx_base#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+virtual class sequence_simple_rx_base #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends uvm_common::sequence_base
+    #(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+    `ndk_object_param_utils(uvm_logic_vector_array_avst::sequence_simple_rx_base
+                                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+                            $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx_base #(%0d,%0d,%0d,%0d,%0d)",
+                                      REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
     `uvm_declare_p_sequencer(uvm_avst::sequencer#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
 
@@ -24,7 +32,13 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
 
     sequencer_rx #(ITEM_WIDTH, META_WIDTH)                                              hl_sqr;
 
-    typedef enum {state_packet_none, state_packet_new, state_packet_data, state_packet_space, state_packet_space_new} state_packet_t;
+    typedef enum {
+        state_packet_none,
+        state_packet_new,
+        state_packet_data,
+        state_packet_space,
+        state_packet_space_new
+    } state_packet_t;
     state_packet_t state_packet;
 
     rand int unsigned hl_transactions;
@@ -111,7 +125,7 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
                             send_empty_frame();
                         end
                         get_response(rsp);
-                    end while(rsp.ready != 1);
+                    end while (rsp.ready != 1);
                     //assert(std::randomize(simple_reg.latency_cnt) with {simple_reg.latency_cnt inside {[0 : (READY_LATENCY - 1)]}; }) else `uvm_fatal(this.get_full_name(), "\n\tCannot randomize latency");
                     //for (int unsigned it = 0; it < simple_reg.latency_cnt; it++) begin
                     //    send_empty_frame();
@@ -136,7 +150,9 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
             `uvm_fatal(p_sequencer.get_full_name(), "\n\tsequence sequence_simple_rx cannot get hl_sqr");
         end
 
-        if(!uvm_config_db #(uvm_logic_vector_array_avst::data_reg)::get(p_sequencer, "", "simple_reg", simple_reg)) begin
+        if (!uvm_config_db #(uvm_logic_vector_array_avst::data_reg)::get(
+                p_sequencer, "", "simple_reg", simple_reg
+            )) begin
             simple_reg = new();
             uvm_config_db #(uvm_logic_vector_array_avst::data_reg)::set(p_sequencer, "", "simple_reg", simple_reg);
         end
@@ -147,7 +163,7 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
         state_packet = state_packet_space_new;
 
         req = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("req");
-        gen = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("reg");
+        gen = uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH)::type_id::create("gen");
 
         //send empty frame to get first response
         send_empty_frame();
@@ -163,10 +179,17 @@ virtual class sequence_simple_rx_base #(int unsigned REGIONS, int unsigned REGIO
     endtask
 endclass
 
-class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+class sequence_simple_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     `ndk_object_param_utils(
         uvm_logic_vector_array_avst::sequence_simple_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+        $sformatf("uvm_logic_vector_array_avst::sequence_simple_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
     uvm_common::rand_length   rand_space_size; //burst set to 0
 
@@ -217,13 +240,13 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
         rdy_probability != 0;
         rdy_probability dist
                 {
-                    [cfg.rdy_probability_min                         :cfg.rdy_probability_min+rdy_probability_dist/4*1] :/ 5,
-                    [cfg.rdy_probability_min+rdy_probability_dist/8*1:cfg.rdy_probability_min+rdy_probability_dist/8*2] :/ 2,
-                    [cfg.rdy_probability_min+rdy_probability_dist/8*2:cfg.rdy_probability_min+rdy_probability_dist/8*3] :/ 1,
-                    [cfg.rdy_probability_min+rdy_probability_dist/8*3:cfg.rdy_probability_min+rdy_probability_dist/8*4] :/ 1,
-                    [cfg.rdy_probability_min+rdy_probability_dist/8*4:cfg.rdy_probability_min+rdy_probability_dist/8*5] :/ 2,
-                    [cfg.rdy_probability_min+rdy_probability_dist/8*5:cfg.rdy_probability_min+rdy_probability_dist/8*6] :/ 5,
-                    [cfg.rdy_probability_min+rdy_probability_dist/8*6:cfg.rdy_probability_min+rdy_probability_dist/8*7] :/ 15,
+            [cfg.rdy_probability_min                         :cfg.rdy_probability_min+rdy_probability_dist/4*1] :/ 5,
+            [cfg.rdy_probability_min+rdy_probability_dist/8*1:cfg.rdy_probability_min+rdy_probability_dist/8*2] :/ 2,
+            [cfg.rdy_probability_min+rdy_probability_dist/8*2:cfg.rdy_probability_min+rdy_probability_dist/8*3] :/ 1,
+            [cfg.rdy_probability_min+rdy_probability_dist/8*3:cfg.rdy_probability_min+rdy_probability_dist/8*4] :/ 1,
+            [cfg.rdy_probability_min+rdy_probability_dist/8*4:cfg.rdy_probability_min+rdy_probability_dist/8*5] :/ 2,
+            [cfg.rdy_probability_min+rdy_probability_dist/8*5:cfg.rdy_probability_min+rdy_probability_dist/8*6] :/ 5,
+            [cfg.rdy_probability_min+rdy_probability_dist/8*6:cfg.rdy_probability_min+rdy_probability_dist/8*7] :/ 15,
                     [cfg.rdy_probability_min+rdy_probability_dist/8*7:cfg.rdy_probability_max] :/ 25,
                      cfg.rdy_probability_max :/ 10
                 };
@@ -311,7 +334,8 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 
 
              if (state_packet == state_packet_data) begin
-                 int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
+                int unsigned loop_end = REGION_SIZE < (data.data.size() - data_index) ?
+                    REGION_SIZE : (data.data.size() - data_index);
                  gen.valid[it] = 1;
 
                  for (int unsigned jt = 0; jt < loop_end; jt++) begin
@@ -341,10 +365,17 @@ class sequence_simple_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int u
 endclass
 
 
-class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `ndk_object_param_utils(
-        uvm_logic_vector_array_avst::sequence_burst_pcie_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::sequence_burst_pcie_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+class sequence_burst_pcie_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `ndk_object_param_utils(uvm_logic_vector_array_avst::sequence_burst_pcie_rx
+                                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+                            $sformatf("uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(%0d,%0d,%0d,%0d,%0d)",
+                                      REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
     uvm_common::rand_length   rand_burst_size; //burst set to 1
     uvm_common::rand_length   rand_space_size; //burst set to 0
@@ -451,7 +482,8 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
                 end
 
                 if (state_packet == state_packet_data) begin
-                    int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
+                    int unsigned loop_end = REGION_SIZE < (data.data.size() - data_index) ?
+                        REGION_SIZE : (data.data.size() - data_index);
                     gen.valid[it] = 1;
 
                     for (int unsigned jt = 0; jt < loop_end; jt++) begin
@@ -479,7 +511,9 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
         int unsigned probability_min;
         int unsigned probability_max;
 
+        // verilog_lint: waive line-length
         probability_min = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_min)/100;
+        // verilog_lint: waive line-length
         probability_max = cfg.rdy_probability_min + ((cfg.rdy_probability_max - cfg.rdy_probability_min)*rdy_probability_max)/100;
 
         rand_burst_size.bound_set(probability_min*coeficient, probability_max*coeficient);
@@ -489,10 +523,17 @@ class sequence_burst_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endtask
 endclass
 
-class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `ndk_object_param_utils(
-        uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+class sequence_full_speed_pcie_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `ndk_object_param_utils(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx
+                                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+                            $sformatf("uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(%0d,%0d,%0d,%0d,%0d)",
+                                      REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
 
     function new (string name = "sequence_full_speed_pcie_rx");
@@ -547,7 +588,8 @@ class sequence_full_speed_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SI
             end
 
             if (state_packet == state_packet_data) begin
-                int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
+                int unsigned loop_end = REGION_SIZE < (data.data.size() - data_index) ?
+                    REGION_SIZE : (data.data.size() - data_index);
                 gen.valid[it] = 1;
 
                 for (int unsigned jt = 0; jt < (loop_end); jt++) begin
@@ -573,10 +615,17 @@ endclass
 
 // This is only a slight modification of the sequence_full_speed_rx class where no gaps inside frame are inserted.
 // But there are abitrary long gaps getween frames.
-class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-    `ndk_object_param_utils(
-        uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+class seqv_no_inframe_gap_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `ndk_object_param_utils(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx
+                                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
+                            $sformatf("uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(%0d,%0d,%0d,%0d,%0d)",
+                                      REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
 
     uvm_common::rand_length   rdy_length;
@@ -635,7 +684,8 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
             end
 
             if (state_packet == state_packet_data) begin
-                int unsigned loop_end   = REGION_SIZE < (data.data.size() - data_index) ? REGION_SIZE : (data.data.size() - data_index);
+                int unsigned loop_end = REGION_SIZE < (data.data.size() - data_index) ?
+                    REGION_SIZE : (data.data.size() - data_index);
                 gen.valid[it] = 1;
 
                 for (int unsigned jt = 0; jt < (loop_end); jt++) begin
@@ -665,17 +715,30 @@ class seqv_no_inframe_gap_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, i
     endtask
 endclass
 
-class sequence_stop_pcie_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+class sequence_stop_pcie_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends sequence_simple_rx_base #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
     `ndk_object_param_utils(
-        uvm_logic_vector_array_avst::sequence_stop_pcie_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::sequence_stop_pcie_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+        uvm_logic_vector_array_avst::sequence_stop_pcie_rx#(
+            REGIONS,
+            REGION_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            READY_LATENCY
+        ),
+        $sformatf("uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
 
     int unsigned hl_transactions_step;
 
     constraint c_hl_transations_stop {
         hl_transactions dist {[hl_transactions_min:(hl_transactions_min + hl_transactions_step)] :/ 60,
-                              [(hl_transactions_min+hl_transactions_step)  :(hl_transactions_max - hl_transactions_step)] :/ 30,
+            [(hl_transactions_min+hl_transactions_step)  :(hl_transactions_max - hl_transactions_step)] :/ 30,
                               [(hl_transactions_max - hl_transactions_step):hl_transactions_max] :/10};
     }
 
@@ -707,12 +770,21 @@ endclass
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY RX
 
-class sequence_lib_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends uvm_common::sequence_library#(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
+class sequence_lib_rx #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends uvm_common::sequence_library
+    #(config_sequence, uvm_avst::sequence_item #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH));
   `ndk_object_param_utils(
         uvm_logic_vector_array_avst::sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY),
-        $sformatf("uvm_logic_vector_array_avst::sequence_lib_rx#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)
+        $sformatf("uvm_logic_vector_array_avst::sequence_lib_rx #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  ITEM_WIDTH, META_WIDTH, READY_LATENCY)
     )
-  `uvm_sequence_library_utils(uvm_logic_vector_array_avst::sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+    `uvm_sequence_library_utils(
+        uvm_logic_vector_array_avst::sequence_lib_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -723,17 +795,47 @@ class sequence_lib_rx #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsi
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_simple_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_stop_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_burst_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_avst::sequence_simple_rx
+                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx
+                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_avst::seqv_no_inframe_gap_rx
+                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_avst::sequence_stop_pcie_rx
+                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_avst::sequence_burst_pcie_rx
+                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
     endfunction
 endclass
 
-class sequence_lib_rx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, int unsigned ITEM_WIDTH, int unsigned META_WIDTH, int unsigned READY_LATENCY) extends sequence_lib_rx#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
-  `uvm_object_param_utils(    uvm_logic_vector_array_avst::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
-  `uvm_sequence_library_utils(uvm_logic_vector_array_avst::sequence_lib_rx_speed#(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY))
+class sequence_lib_rx_speed #(
+    int unsigned REGIONS,
+    int unsigned REGION_SIZE,
+    int unsigned ITEM_WIDTH,
+    int unsigned META_WIDTH,
+    int unsigned READY_LATENCY
+) extends sequence_lib_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY);
+    `uvm_object_param_utils(
+        uvm_logic_vector_array_avst::sequence_lib_rx_speed #(
+            REGIONS,
+            REGION_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            READY_LATENCY
+        ))
+    `uvm_sequence_library_utils(
+        uvm_logic_vector_array_avst::sequence_lib_rx_speed #(
+            REGIONS,
+            REGION_SIZE,
+            ITEM_WIDTH,
+            META_WIDTH,
+            READY_LATENCY
+        ))
 
   function new(string name = "sequence_lib_rx_speed");
     super.new(name);
@@ -744,9 +846,8 @@ class sequence_lib_rx_speed #(int unsigned REGIONS, int unsigned REGION_SIZE, in
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
+        this.add_sequence(
+            uvm_logic_vector_array_avst::sequence_full_speed_pcie_rx
+                #(REGIONS, REGION_SIZE, ITEM_WIDTH, META_WIDTH, READY_LATENCY)::get_type());
     endfunction
 endclass
-
-
-

@@ -4,8 +4,16 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequence_meta#(META_WIDTH, TIMESTAMP_WIDTH, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_FORMAT, QUEUES) extends uvm_sequence #(uvm_logic_vector::sequence_item#(META_WIDTH));
-    `uvm_object_param_utils(uvm_timestamp_limiter::sequence_meta#(META_WIDTH, TIMESTAMP_WIDTH, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_FORMAT, QUEUES))
+class sequence_meta #(
+    META_WIDTH,
+    TIMESTAMP_WIDTH,
+    TIMESTAMP_MIN,
+    TIMESTAMP_MAX,
+    TIMESTAMP_FORMAT,
+    QUEUES
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #(META_WIDTH));
+    `uvm_object_param_utils(uvm_timestamp_limiter::sequence_meta
+                                #(META_WIDTH, TIMESTAMP_WIDTH, TIMESTAMP_MIN, TIMESTAMP_MAX, TIMESTAMP_FORMAT, QUEUES))
 
     regmodel#(QUEUES) m_regmodel;
 

@@ -19,26 +19,58 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if                                                                                      reset(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, $clog2(SPLITTER_OUTPUTS) + META_WIDTH) mfb_rx(CLK);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)                            mfb_tx[SPLITTER_OUTPUTS](CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  ($clog2(SPLITTER_OUTPUTS) + META_WIDTH)
+    ) mfb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE  (BLOCK_SIZE),
+        .ITEM_WIDTH  (ITEM_WIDTH),
+        .META_WIDTH  (META_WIDTH)
+    )                            mfb_tx[SPLITTER_OUTPUTS](CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
     initial begin
         uvm_root m_root;
-        automatic virtual mfb_if#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) v_mfb_tx[SPLITTER_OUTPUTS] = mfb_tx;
+        automatic virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  (META_WIDTH)
+        ) v_mfb_tx[SPLITTER_OUTPUTS] = mfb_tx;
 
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
         // Configuration of database
-        uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, $clog2(SPLITTER_OUTPUTS) +META_WIDTH))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE  (BLOCK_SIZE),
+            .ITEM_WIDTH  (ITEM_WIDTH),
+            .META_WIDTH  ($clog2(SPLITTER_OUTPUTS) +META_WIDTH)
+        ))::set(null, "", "vif_rx", mfb_rx);
         for (int i = 0; i < SPLITTER_OUTPUTS; i++ ) begin
             string i_string;
             i_string.itoa(i);
-            uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH))::set(null, "", {"vif_tx_",i_string}, v_mfb_tx[i]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS     (REGIONS),
+                .REGION_SIZE (REGION_SIZE),
+                .BLOCK_SIZE  (BLOCK_SIZE),
+                .ITEM_WIDTH  (ITEM_WIDTH),
+                .META_WIDTH  (META_WIDTH)
+            ))::set(null, "", {"vif_tx_",i_string}, v_mfb_tx[i]);
         end
 
         m_root = uvm_root::get();
@@ -53,8 +85,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK        (CLK),
         .reset      (reset),
         .mfb_rx     (mfb_rx),

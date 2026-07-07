@@ -152,8 +152,10 @@ class sequence_mfb_lib_tx_fifo #(
     // can be useful in specific tests
     virtual function void init_sequence(uvm_mfb::config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
-        this.add_sequence(uvm_mfb::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_mfb::sequence_full_speed_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
+        this.add_sequence(
+            uvm_mfb::sequence_stop_tx #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)::get_type());
     endfunction
 endclass
 
@@ -291,8 +293,10 @@ class fifo #(
                 this
             );
 
-            uvm_mfb::sequence_lib_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::set_inst_override(
-                sequence_mfb_lib_tx_fifo #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::get_type(),
+            uvm_mfb::sequence_lib_tx
+                #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::set_inst_override(
+                sequence_mfb_lib_tx_fifo
+                    #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::get_type(),
                 {".m_env.m_eth_mfb_tx_", it_num, ".*"},
                 this
             );
@@ -326,7 +330,8 @@ class fifo #(
                 this
             );
 
-            uvm_mfb::sequence_lib_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx
+                #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
                 sequence_mfb_lib_tx_fifo #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
                 {"m_env.m_dma_mfb_tx_", it_num, ".*"},
                 this

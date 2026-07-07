@@ -15,8 +15,34 @@ module testbench;
     // Test type definitions //
     // --------------------- //
 
-    typedef test::base  #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) base;
-    typedef test::speed #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH) speed;
+    typedef test::base  #(
+        .ETH_CORE_ARCH    (ETH_CORE_ARCH    ),
+        .ETH_PORTS        (ETH_PORTS        ),
+        .ETH_PORT_SPEED   (ETH_PORT_SPEED   ),
+        .ETH_PORT_CHAN    (ETH_PORT_CHAN    ),
+        .ETH_TX_HDR_WIDTH (ETH_TX_HDR_WIDTH ),
+        .ETH_RX_HDR_WIDTH (ETH_RX_HDR_WIDTH ),
+        .REGIONS          (REGIONS          ),
+        .REGION_SIZE      (REGION_SIZE      ),
+        .BLOCK_SIZE       (BLOCK_SIZE       ),
+        .ITEM_WIDTH       (ITEM_WIDTH       ),
+        .MI_DATA_WIDTH    (MI_DATA_WIDTH    ),
+        .MI_ADDR_WIDTH    (MI_ADDR_WIDTH    )
+    ) base;
+    typedef test::speed #(
+        .ETH_CORE_ARCH    (ETH_CORE_ARCH    ),
+        .ETH_PORTS        (ETH_PORTS        ),
+        .ETH_PORT_SPEED   (ETH_PORT_SPEED   ),
+        .ETH_PORT_CHAN    (ETH_PORT_CHAN    ),
+        .ETH_TX_HDR_WIDTH (ETH_TX_HDR_WIDTH ),
+        .ETH_RX_HDR_WIDTH (ETH_RX_HDR_WIDTH ),
+        .REGIONS          (REGIONS          ),
+        .REGION_SIZE      (REGION_SIZE      ),
+        .BLOCK_SIZE       (BLOCK_SIZE       ),
+        .ITEM_WIDTH       (ITEM_WIDTH       ),
+        .MI_DATA_WIDTH    (MI_DATA_WIDTH    ),
+        .MI_ADDR_WIDTH    (MI_ADDR_WIDTH    )
+    ) speed;
 
     // ------ //
     // Clocks //
@@ -55,15 +81,42 @@ module testbench;
     lbus_if eth_tx[ETH_PORTS](CLK_ETH);
     lbus_if eth_rx[ETH_PORTS](CLK_ETH);
 
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH) usr_rx     [ETH_PORTS](CLK_USR);
-    mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                usr_tx_data[ETH_PORTS](CLK_USR);
-    mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                      usr_tx_hdr [ETH_PORTS](CLK_USR);
+    mfb_if #(
+        .REGIONS (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE (BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (ETH_TX_HDR_WIDTH)
+    ) usr_rx     [ETH_PORTS](CLK_USR);
+    mfb_if #(
+        .REGIONS (REGIONS),
+        .REGION_SIZE (REGION_SIZE),
+        .BLOCK_SIZE (BLOCK_SIZE),
+        .ITEM_WIDTH (ITEM_WIDTH),
+        .META_WIDTH (0)
+    )                usr_tx_data[ETH_PORTS](CLK_USR);
+    mvb_if #(
+        .ITEMS (REGIONS),
+        .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
+    )                                      usr_tx_hdr [ETH_PORTS](CLK_USR);
 
-    mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH) mi    (CLK_MI);
-    mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH) mi_phy(CLK_MI_PHY);
-    mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH) mi_pmd(CLK_MI_PMD);
+    mi_if #(
+        .DATA_WIDTH (MI_DATA_WIDTH),
+        .ADDR_WIDTH (MI_ADDR_WIDTH)
+    ) mi    (CLK_MI);
+    mi_if #(
+        .DATA_WIDTH (MI_DATA_WIDTH),
+        .ADDR_WIDTH (MI_ADDR_WIDTH)
+    ) mi_phy(CLK_MI_PHY);
+    mi_if #(
+        .DATA_WIDTH (MI_DATA_WIDTH),
+        .ADDR_WIDTH (MI_ADDR_WIDTH)
+    ) mi_pmd(CLK_MI_PMD);
 
-    mvb_if #(1, 64) tsu(CLK_TSU);
+    mvb_if #(
+        .ITEMS (1),
+        .ITEM_WIDTH (64)
+    ) tsu(CLK_TSU);
 
     // Fix bind
     fix_bind #(
@@ -75,11 +128,21 @@ module testbench;
     // Clock ticking definitions //
     // ------------------------- //
 
-    always #(CLK_USR_PERIOD/2) CLK_USR = ~CLK_USR;
-    always #(CLK_MI_PERIOD/2)     CLK_MI     = ~CLK_MI    ;
-    always #(CLK_MI_PHY_PERIOD/2) CLK_MI_PHY = ~CLK_MI_PHY;
-    always #(CLK_MI_PMD_PERIOD/2) CLK_MI_PMD = ~CLK_MI_PMD;
-    always #(CLK_TSU_PERIOD/2)    CLK_TSU    = ~CLK_TSU   ;
+    always begin
+        #(CLK_USR_PERIOD/2) CLK_USR = ~CLK_USR;
+    end
+    always begin
+        #(CLK_MI_PERIOD/2) CLK_MI     = ~CLK_MI    ;
+    end
+    always begin
+        #(CLK_MI_PHY_PERIOD/2) CLK_MI_PHY = ~CLK_MI_PHY;
+    end
+    always begin
+        #(CLK_MI_PMD_PERIOD/2) CLK_MI_PMD = ~CLK_MI_PMD;
+    end
+    always begin
+        #(CLK_TSU_PERIOD/2) CLK_TSU    = ~CLK_TSU   ;
+    end
 
     initial begin
         // --------- //
@@ -89,10 +152,27 @@ module testbench;
         automatic uvm_root m_root;
 
         automatic virtual reset_if vif_rst_eth[ETH_PORTS] = rst_eth;
-        automatic virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH) vif_usr_rx     [ETH_PORTS] = usr_rx;
-        automatic virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                vif_usr_tx_data[ETH_PORTS] = usr_tx_data;
-        automatic virtual mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                      vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
+        automatic virtual mfb_if #(
+            .REGIONS (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE (BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (ETH_TX_HDR_WIDTH)
+        ) vif_usr_rx     [ETH_PORTS] = usr_rx;
+        automatic virtual mfb_if #(
+            .REGIONS (REGIONS),
+            .REGION_SIZE (REGION_SIZE),
+            .BLOCK_SIZE (BLOCK_SIZE),
+            .ITEM_WIDTH (ITEM_WIDTH),
+            .META_WIDTH (0)
+        )                vif_usr_tx_data[ETH_PORTS] = usr_tx_data;
+        automatic virtual mvb_if #(
+            .ITEMS (REGIONS),
+            .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
+        )                                      vif_usr_tx_hdr [ETH_PORTS] = usr_tx_hdr;
+        // verilog_lint: waive line-length
         automatic virtual lbus_if                                                                  vif_eth_tx     [ETH_PORTS] = eth_tx;
+        // verilog_lint: waive line-length
         automatic virtual lbus_if                                                                  vif_eth_rx     [ETH_PORTS] = eth_rx;
 
         // ------------- //
@@ -109,17 +189,44 @@ module testbench;
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_rst_mi_pmd", rst_mi_pmd);
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_rst_tsu", rst_tsu);
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
-            uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, ETH_TX_HDR_WIDTH))::set(null, "", $sformatf("vif_usr_rx_%0d", it)     , vif_usr_rx[it]);
-            uvm_config_db#(virtual mfb_if #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, 0)                             )::set(null, "", $sformatf("vif_usr_tx_data_%0d", it), vif_usr_tx_data[it]);
-            uvm_config_db#(virtual mvb_if #(REGIONS, ETH_RX_HDR_WIDTH)                                                                               )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS (REGIONS),
+                .REGION_SIZE (REGION_SIZE),
+                .BLOCK_SIZE (BLOCK_SIZE),
+                .ITEM_WIDTH (ITEM_WIDTH),
+                .META_WIDTH (ETH_TX_HDR_WIDTH)
+            ))::set(null, "", $sformatf("vif_usr_rx_%0d", it)     , vif_usr_rx[it]);
+            uvm_config_db#(virtual mfb_if #(
+                .REGIONS (REGIONS),
+                .REGION_SIZE (REGION_SIZE),
+                .BLOCK_SIZE (BLOCK_SIZE),
+                .ITEM_WIDTH (ITEM_WIDTH),
+                .META_WIDTH (0)
+            )                             )::set(null, "", $sformatf("vif_usr_tx_data_%0d", it), vif_usr_tx_data[it]);
+            uvm_config_db#(virtual mvb_if #(
+                .ITEMS (REGIONS),
+                .ITEM_WIDTH (ETH_RX_HDR_WIDTH)
+            ) )::set(null, "", $sformatf("vif_usr_tx_hdr_%0d", it) , vif_usr_tx_hdr[it]);
 
             uvm_config_db#(virtual lbus_if)::set(null, "", $sformatf("vif_eth_tx_%0d", it) , vif_eth_tx[it]);
             uvm_config_db#(virtual lbus_if)::set(null, "", $sformatf("vif_eth_rx_%0d", it) , vif_eth_rx[it]);
         end
-        uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi"    , mi);
-        uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi_phy", mi_phy);
-        uvm_config_db#(virtual mi_if #(MI_DATA_WIDTH, MI_ADDR_WIDTH))::set(null, "", "vif_mi_pmd", mi_pmd);
-        uvm_config_db#(virtual mvb_if #(1, 64))::set(null, "", "vif_tsu", tsu);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (MI_DATA_WIDTH),
+            .ADDR_WIDTH (MI_ADDR_WIDTH)
+        ))::set(null, "", "vif_mi"    , mi);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (MI_DATA_WIDTH),
+            .ADDR_WIDTH (MI_ADDR_WIDTH)
+        ))::set(null, "", "vif_mi_phy", mi_phy);
+        uvm_config_db#(virtual mi_if #(
+            .DATA_WIDTH (MI_DATA_WIDTH),
+            .ADDR_WIDTH (MI_ADDR_WIDTH)
+        ))::set(null, "", "vif_mi_pmd", mi_pmd);
+        uvm_config_db#(virtual mvb_if #(
+            .ITEMS (1),
+            .ITEM_WIDTH (64)
+        ))::set(null, "", "vif_tsu", tsu);
 
         // Configuration of the database
         m_root = uvm_root::get();
@@ -130,8 +237,34 @@ module testbench;
         uvm_config_db#(uvm_bitstream_t)::set(null, "", "recording_detail", 0);
 
         // Instance override
-        uvm_network_mod_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::set_inst_override(
-            uvm_network_mod_cmac_env::env #(ETH_CORE_ARCH, ETH_PORTS, ETH_PORT_SPEED, ETH_PORT_CHAN, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, MI_DATA_WIDTH, MI_ADDR_WIDTH)::get_type(),
+        uvm_network_mod_env::env #(
+            .ETH_CORE_ARCH    (ETH_CORE_ARCH    ),
+            .ETH_PORTS        (ETH_PORTS        ),
+            .ETH_PORT_SPEED   (ETH_PORT_SPEED   ),
+            .ETH_PORT_CHAN    (ETH_PORT_CHAN    ),
+            .ETH_TX_HDR_WIDTH (ETH_TX_HDR_WIDTH ),
+            .ETH_RX_HDR_WIDTH (ETH_RX_HDR_WIDTH ),
+            .REGIONS          (REGIONS          ),
+            .REGION_SIZE      (REGION_SIZE      ),
+            .BLOCK_SIZE       (BLOCK_SIZE       ),
+            .ITEM_WIDTH       (ITEM_WIDTH       ),
+            .MI_DATA_WIDTH    (MI_DATA_WIDTH    ),
+            .MI_ADDR_WIDTH    (MI_ADDR_WIDTH    )
+        )::type_id::set_inst_override(
+            uvm_network_mod_cmac_env::env #(
+                .ETH_CORE_ARCH    (ETH_CORE_ARCH    ),
+                .ETH_PORTS        (ETH_PORTS        ),
+                .ETH_PORT_SPEED   (ETH_PORT_SPEED   ),
+                .ETH_PORT_CHAN    (ETH_PORT_CHAN    ),
+                .ETH_TX_HDR_WIDTH (ETH_TX_HDR_WIDTH ),
+                .ETH_RX_HDR_WIDTH (ETH_RX_HDR_WIDTH ),
+                .REGIONS          (REGIONS          ),
+                .REGION_SIZE      (REGION_SIZE      ),
+                .BLOCK_SIZE       (BLOCK_SIZE       ),
+                .ITEM_WIDTH       (ITEM_WIDTH       ),
+                .MI_DATA_WIDTH    (MI_DATA_WIDTH    ),
+                .MI_ADDR_WIDTH    (MI_ADDR_WIDTH    )
+            )::get_type(),
             "uvm_test_top.m_env"
         );
 

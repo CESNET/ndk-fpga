@@ -36,7 +36,8 @@ class regmodel #(ETH_STREAMS, CHANNELS, DMA_STREAMS, OUTPUT_CHANNELS) extends uv
             string it_num;
             it_num.itoa(it);
             //CREATE
-            stream[it] = uvm_channel_router::regmodel#(CHANNELS, APP_RX_CHANNELS, 2)::type_id::create({"status_", it_num}, , get_full_name());
+            stream[it] = uvm_channel_router::regmodel #(CHANNELS, APP_RX_CHANNELS, 2)::type_id::create(
+                {"status_", it_num},, get_full_name());
             //BUILD and CONFIGURE register
             stream[it].build('h0, bus_width);
             stream[it].configure(this, {"status_", it_num});

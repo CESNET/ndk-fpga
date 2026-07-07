@@ -59,7 +59,8 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
         return ret;
     endfunction
 
-    function uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0) gen_mi_read(input logic[32-1 : 0] addr, input logic[(32/8)-1 : 0] be);
+    function uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0) gen_mi_read(input logic [32-1 : 0] addr,
+                                                                                         input logic [(32/8)-1 : 0] be);
         uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0) mi_tr;
 
         mi_tr = uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0)::type_id::create("mi_tr");
@@ -73,7 +74,8 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
         return mi_tr;
     endfunction
 
-    function uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0) gen_mi_write(input logic[32-1 : 0] addr, input logic[32-1 : 0] data, input logic[(MI_DATA_WIDTH/8)-1 : 0] be);
+    function uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0) gen_mi_write(
+        input logic [32-1 : 0] addr, input logic [32-1 : 0] data, input logic [(MI_DATA_WIDTH/8)-1 : 0] be);
         uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0) mi_tr;
 
         mi_tr = uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0)::type_id::create("mi_tr");
@@ -110,7 +112,8 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
             pcie_cq.get(info);
             pcie_cq_cnt++;
-            `uvm_info(this.get_full_name(), $sformatf("\nMI Request %0d%s\n", pcie_cq_cnt, info.convert2string()), UVM_MEDIUM);
+            `uvm_info(this.get_full_name(), $sformatf("\nMI Request %0d%s\n", pcie_cq_cnt, info.convert2string()),
+                      UVM_MEDIUM);
 
             tlp_addr_mask = 0;
             for (int unsigned it = 0; it < 26; it++) begin
@@ -141,7 +144,11 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
                 for (int unsigned it = 0; it < info.length_get(); it++) begin
                     logic read;
-                    mi_tr      = uvm_mi::sequence_item_request #(MI_DATA_WIDTH, MI_ADDR_WIDTH, 0)::type_id::create("mi_tr");
+                    mi_tr      = uvm_mi::sequence_item_request #(
+                        MI_DATA_WIDTH,
+                        MI_ADDR_WIDTH,
+                        0
+                    )::type_id::create("mi_tr");
                     mi_tr.start = info.start;
 
                     if (it == 0) begin
@@ -230,7 +237,8 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
                     if (length == 1 && fbe == 0 && lbe == 0) begin
                         rsp.byte_count =  1;
                     end else begin
-                        rsp.byte_count =  unsigned'(length * 4) - unsigned'(uvm_pcie::encode_fbe(fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(lbe)));
+                        rsp.byte_count = unsigned'(length * 4) - unsigned'(uvm_pcie::encode_fbe(fbe)) -
+                            (4 - unsigned'(uvm_pcie::encode_lbe(lbe)));
                     end
                     rsp.requester_id      = info.requester_id;
                     rsp.tag               = info.tag;
@@ -266,6 +274,7 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
                 rsp.data              = {}; //data_fifo;
                 rsp.completer_id      = 0;
                 rsp.bcm               = 0;
+                // verilog_lint: waive line-length
                 rsp.byte_count        = unsigned'(length * 4) - unsigned'(uvm_pcie::encode_fbe(info.fbe)) - (4-unsigned'(uvm_pcie::encode_lbe(lbe)));
                 rsp.requester_id      = info.requester_id;
                 rsp.tag               = info.tag;
@@ -288,7 +297,12 @@ class model_mtc #(MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_component;
 
     function void check_phase(uvm_phase phase);
         if (this.success() == 0 || this.used()) begin
-            `uvm_error(this.get_full_name(), $sformatf("\n\tSuccess %0d Transaction in\n\t\tPcie CQ : %0d\n\t\tRsp : %0d", this.success(), pcie_cq.used(), mi_rsp.used()));
+            `uvm_error(this.get_full_name(), $sformatf(
+                       "\n\tSuccess %0d Transaction in\n\t\tPcie CQ : %0d\n\t\tRsp : %0d",
+                       this.success(),
+                       pcie_cq.used(),
+                       mi_rsp.used()
+                       ));
         end
     endfunction
 endclass

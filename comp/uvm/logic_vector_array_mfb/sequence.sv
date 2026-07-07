@@ -17,8 +17,9 @@ class sequence_rx_base #(
                     REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
           ));
     `ndk_object_param_utils(
-        uvm_logic_vector_array_mfb::sequence_rx_base#(                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_base#(%0d,%0d,%0d,%0d,%0d)",                    REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        uvm_logic_vector_array_mfb::sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_base #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
     `uvm_declare_p_sequencer(uvm_mfb::sequencer#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH));
 
@@ -203,7 +204,8 @@ class sequence_rx_simple #(
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_rx_simple#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_simple#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_simple #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     rand int unsigned space_size_min;
@@ -389,7 +391,8 @@ class sequence_rx_burst #(
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_rx_burst#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_burst#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_burst #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     rand int unsigned rdy_probability_min;
@@ -581,7 +584,8 @@ class sequence_rx_position #(
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_rx_position#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_position#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_position #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     rand logic [REGION_SIZE-1:0] sof_pos;
@@ -764,7 +768,8 @@ class sequence_rx_full_speed #(
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_rx_full_speed#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_full_speed#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_full_speed #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     function new (string name = "sequence_rx_full_speed");
@@ -863,7 +868,8 @@ class sequence_rx_stop #(
 ) extends sequence_rx_base #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH);
     `ndk_object_param_utils(
         uvm_logic_vector_array_mfb::sequence_rx_stop#(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH),
-        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_stop#(%0d,%0d,%0d,%0d,%0d)",REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
+        $sformatf("uvm_logic_vector_array_mfb::sequence_rx_stop #(%0d,%0d,%0d,%0d,%0d)", REGIONS, REGION_SIZE,
+                  BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)
     )
 
     function new (string name = "sequence_rx_stop");

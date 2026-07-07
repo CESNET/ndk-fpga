@@ -8,13 +8,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
 */
 
+// verilog_lint: waive interface-name-style
 interface probe_inf #(int unsigned DATA_WIDTH) (
-    input wire logic event_signal,
-    input wire logic [DATA_WIDTH-1:0] event_data,
-    input wire logic CLK);
+    input wire event_signal,
+    input wire [DATA_WIDTH-1:0] event_data,
+    input wire CLK);
 
     import uvm_pkg::*;
-    localparam string PATH = $psprintf("%m");
+    localparam string PATH = $sformatf("%m");
 
     class probe_event_component;
         uvm_event probe_event;
@@ -28,7 +29,9 @@ interface probe_inf #(int unsigned DATA_WIDTH) (
         endfunction
 
         task body();
-            uvm_probe::data#(DATA_WIDTH) data = uvm_probe::data#(DATA_WIDTH)::type_id::create({"probe_event_component", PATH}, null);
+            uvm_probe::data #(DATA_WIDTH) data = uvm_probe::data #(DATA_WIDTH)::type_id::create(
+                {"probe_event_component", PATH}, null
+            );
             forever begin
                 @(posedge CLK);
                 if (event_signal == 1'b1) begin

@@ -6,7 +6,11 @@
 
 
 // Reusable high level sequence. Contains transaction, which has only data part.
-class sequence_simple #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence #(uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
+class sequence_simple #(
+    PKT_MTU,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH
+) extends uvm_sequence #(uvm_header_type::sequence_item #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
     `uvm_object_param_utils(uvm_header_type::sequence_simple#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
     rand int unsigned transaction_count;
@@ -42,14 +46,19 @@ class sequence_simple #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequenc
                 }
             })
             if (req.length+req.offset > req.payload_size) begin
-                `uvm_fatal(get_type_name(), $sformatf("LENGTH (%d) + OFFSET (%d) is bigger than PAYLOAD SIZE %d", req.length, req.offset, req.payload_size))
+                `uvm_fatal(get_type_name(), $sformatf("LENGTH (%d) + OFFSET (%d) is bigger than PAYLOAD SIZE %d",
+                                                      req.length, req.offset, req.payload_size))
             end
         end
     endtask
 
 endclass
 
-class sequence_two_bytes #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence #(uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
+class sequence_two_bytes #(
+    PKT_MTU,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH
+) extends uvm_sequence #(uvm_header_type::sequence_item #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
     `uvm_object_param_utils(uvm_header_type::sequence_two_bytes #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
     rand int unsigned transaction_count;
@@ -80,14 +89,19 @@ class sequence_two_bytes #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequ
                 }
             })
             if (req.length+req.offset > req.payload_size) begin
-                `uvm_fatal(get_type_name(), $sformatf("LENGTH (%d) + OFFSET (%d) is bigger than PAYLOAD SIZE %d", req.length, req.offset, req.payload_size))
+                `uvm_fatal(get_type_name(), $sformatf("LENGTH (%d) + OFFSET (%d) is bigger than PAYLOAD SIZE %d",
+                                                      req.length, req.offset, req.payload_size))
             end
         end
     endtask
 
 endclass
 
-class sequence_whole_frame_chsum #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence #(uvm_header_type::sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
+class sequence_whole_frame_chsum #(
+    PKT_MTU,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH
+) extends uvm_sequence #(uvm_header_type::sequence_item #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
     `uvm_object_param_utils(uvm_header_type::sequence_whole_frame_chsum#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
     rand int unsigned transaction_count;
@@ -114,7 +128,8 @@ class sequence_whole_frame_chsum #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends 
                 length == payload_size;
             })
             if (req.length+req.offset > req.payload_size) begin
-                `uvm_fatal(get_type_name(), $sformatf("LENGTH (%d) + OFFSET (%d) is bigger than PAYLOAD SIZE %d", req.length, req.offset, req.payload_size))
+                `uvm_fatal(get_type_name(), $sformatf("LENGTH (%d) + OFFSET (%d) is bigger than PAYLOAD SIZE %d",
+                                                      req.length, req.offset, req.payload_size))
             end
         end
     endtask
@@ -123,7 +138,11 @@ endclass
 
 /////////////////////////////////////////////////////////////////////////
 // SEQUENCE LIBRARY
-class sequence_lib #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence_library#(sequence_item#(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
+class sequence_lib #(
+    PKT_MTU,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH
+) extends uvm_sequence_library #(sequence_item #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH));
   `uvm_object_param_utils(uvm_header_type::sequence_lib #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
   `uvm_sequence_library_utils(uvm_header_type::sequence_lib #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH))
 
@@ -138,7 +157,8 @@ class sequence_lib #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH) extends uvm_sequence_l
         this.add_sequence(uvm_header_type::sequence_simple #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::get_type());
         this.add_sequence(uvm_header_type::sequence_two_bytes #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::get_type());
         if (LENGTH_WIDTH == $clog2(PKT_MTU)) begin
-            this.add_sequence(uvm_header_type::sequence_whole_frame_chsum #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::get_type());
+            this.add_sequence(
+                uvm_header_type::sequence_whole_frame_chsum #(PKT_MTU, OFFSET_WIDTH, LENGTH_WIDTH)::get_type());
         end
     endfunction
 endclass

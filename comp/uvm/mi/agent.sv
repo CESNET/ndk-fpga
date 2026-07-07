@@ -48,7 +48,9 @@ class agent_slave #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsign
     function void connect_phase(uvm_phase phase);
         virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH) vif;
 
-        if(!uvm_config_db #(virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             `uvm_fatal(this.get_full_name(), "Cannot find 'mi_interface' inside uvm_config_db, probably not set!")
         end
 
@@ -115,7 +117,9 @@ class agent_master #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsig
     function void connect_phase(uvm_phase phase);
         virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH) vif;
 
-        if(!uvm_config_db #(virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))::get(null, "", m_config.interface_name, vif)) begin
+        if (!uvm_config_db #(virtual mi_if #(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))::get(
+                null, "", m_config.interface_name, vif
+            )) begin
             `uvm_fatal(this.get_full_name(), "Cannot find 'mi_interface' inside uvm_config_db, probably not set!")
         end
 

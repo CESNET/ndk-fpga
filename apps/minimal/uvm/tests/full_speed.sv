@@ -124,8 +124,10 @@ class full_speed #(
                 this
             );
 
-            uvm_mfb::sequence_lib_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::set_inst_override(
-                uvm_mfb::sequence_lib_tx_speed #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::get_type(),
+            uvm_mfb::sequence_lib_tx
+                #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::type_id::set_inst_override(
+                uvm_mfb::sequence_lib_tx_speed
+                    #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, ETH_TX_HDR_WIDTH)::get_type(),
                 {".m_env.m_eth_mfb_tx_", it_num, ".*"},
                 this
             );
@@ -164,7 +166,8 @@ class full_speed #(
             );
 
 
-            uvm_mfb::sequence_lib_tx #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
+            uvm_mfb::sequence_lib_tx
+                #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
                 uvm_mfb::sequence_lib_tx_speed #(REGIONS, MFB_REG_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::get_type(),
                 {"m_env.m_dma_mfb_tx_", it_num, ".*"},
                 this

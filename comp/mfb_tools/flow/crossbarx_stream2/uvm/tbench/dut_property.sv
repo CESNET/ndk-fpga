@@ -1,11 +1,22 @@
-// property.sv: Properties for DUT
+// property.sv: Properties for dut
 // Copyright (C) 2023 CESNET z. s. p. o.
 // Author(s): Jakub Cabal <cabal@cesnet.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 
 
-module dut_property #(RX_MFB_REGIONS, RX_MFB_REGION_S, RX_MFB_BLOCK_S, RX_MFB_ITEM_W, TX_MFB_REGIONS, TX_MFB_REGION_S, TX_MFB_BLOCK_S, TX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W)
+module dut_property #(
+    RX_MFB_REGIONS,
+    RX_MFB_REGION_S,
+    RX_MFB_BLOCK_S,
+    RX_MFB_ITEM_W,
+    TX_MFB_REGIONS,
+    TX_MFB_REGION_S,
+    TX_MFB_BLOCK_S,
+    TX_MFB_ITEM_W,
+    RX_MVB_ITEM_W,
+    USERMETA_W
+)
     (
         input RESET,
         mfb_if rx_mfb_vif,

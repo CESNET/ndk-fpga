@@ -1,10 +1,10 @@
-// dut.sv: Intel E-Tile DUT
+// dut.sv: Intel E-Tile dut
 // Copyright (C) 2024 CESNET z. s. p. o.
 // Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>
 
 // SPDX-License-Identifier: BSD-3-Clause
 
-module DUT #(
+module dut #(
     string       ETH_CORE_ARCH,
     int unsigned ETH_PORTS,
     int unsigned ETH_PORT_SPEED[ETH_PORTS-1 : 0],
@@ -136,9 +136,12 @@ module DUT #(
             logic [ETH_PORT_CHAN[eth_it]*$clog2(AVST_ITEMS)-1 : 0]    avst_tx_empty;
             logic CLK_ETH_GEN = 1'b0;
 
-            always #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH_GEN = ~CLK_ETH_GEN;
+            always begin
+                #(CLK_ETH_PERIOD[eth_it]/2) CLK_ETH_GEN = ~CLK_ETH_GEN;
+            end
             // RX
-            assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_data  = { <<ITEM_WIDTH { {>>{ eth_rx[eth_it].DATA}} }};
+            assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_data =
+                {<<ITEM_WIDTH{{>>{eth_rx[eth_it].DATA}}}};
 
 
             always_ff @(posedge CLK_ETH[eth_it]) begin
@@ -160,6 +163,7 @@ module DUT #(
                 end
             end
 
+            // verilog_lint: waive line-length
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_empty = { >> {eth_rx[eth_it].EMPTY}};
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_error = { >> {avst_rx_meta}};
             assign DUT_BASE_U.VHDL_DUT_U.eth_core_g[eth_it].network_mod_core_i.rx_avst_sop   = eth_rx[eth_it].SOP;
@@ -168,9 +172,11 @@ module DUT #(
             assign eth_rx[eth_it].READY = 1'b1; // it have to be allways ready
 
             // TX
-            for (genvar reg_it = 0; reg_it < ETH_PORT_CHAN[eth_it]; reg_it++) begin
+            for (genvar reg_it = 0; reg_it < ETH_PORT_CHAN[eth_it]; reg_it++) begin : gen_reg_it
+                // verilog_lint: waive line-length
                 assign eth_tx[eth_it].DATA[reg_it]   = { << ITEM_WIDTH {avst_tx_data[(ETH_PORT_CHAN[eth_it] - reg_it)*AVST_ITEMS*ITEM_WIDTH-1 -: AVST_ITEMS*ITEM_WIDTH]}};
                 assign eth_tx[eth_it].META[reg_it]   = avst_tx_meta[(reg_it+1)*1-1 -: 1];
+                // verilog_lint: waive line-length
                 assign eth_tx[eth_it].EMPTY[reg_it]  = avst_tx_empty[(reg_it+1)*$clog2(AVST_ITEMS)-1 -: $clog2(AVST_ITEMS)];
             end
 

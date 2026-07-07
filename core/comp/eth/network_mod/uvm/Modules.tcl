@@ -23,7 +23,7 @@ lappend COMPONENTS [ list "TX_MAC_LITE_SV" "$OFM_PATH/comp/nic/mac_lite/tx_mac_l
 
 lappend MOD "$ENTITY_BASE/tbench/fix_bind.sv"      \
             "$ENTITY_BASE/tbench/base/dut.sv"      \
-            "$ENTITY_BASE/tbench/base/property.sv" \
+            "$ENTITY_BASE/tbench/base/PROPERTY.sv" \
             "$ENTITY_BASE/tbench/base/env/pkg.sv"  \
             "$ENTITY_BASE/tbench/tests/pkg.sv"
 
@@ -39,6 +39,6 @@ if {$ARCHGRP == "E_TILE"} {
     lappend COMPONENTS [ list "SV_LOGIC_VECTOR_ARRAY_LBUS"          "$SV_UVM_BASE/logic_vector_array_lbus"          "FULL"]
     lappend MOD "$ENTITY_BASE/tbench/cmac/env/pkg.sv"   \
                 "$ENTITY_BASE/tbench/cmac/dut.sv"       \
-                "$ENTITY_BASE/tbench/cmac/property.sv"  \
+                "$ENTITY_BASE/tbench/cmac/PROPERTY_CMAC.sv"  \
                 "$ENTITY_BASE/tbench/cmac/testbench.sv"
 }

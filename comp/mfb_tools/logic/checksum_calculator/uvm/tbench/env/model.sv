@@ -14,17 +14,26 @@ class chsum_calc_item#(MVB_DATA_WIDTH, MFB_META_WIDTH) extends uvm_common::seque
         string msg;
 
         msg = super.convert2string();
-        msg = {msg, $sformatf("\n\tbypass %b",  bypass)};
-        msg = {msg, $sformatf("\n\tmeta   %h",  meta)};
-        msg = {msg, $sformatf("\n\tdata   %h",  data)};
+        msg = {msg, $sformatf("\n\tbypass 0b%b",  bypass)};
+        msg = {msg, $sformatf("\n\tmeta   0x%h",  meta)};
+        msg = {msg, $sformatf("\n\tdata   0x%h",  data)};
         return msg;
     endfunction
 
 endclass
 
 
-class model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH) extends uvm_component;
-    `uvm_component_param_utils(uvm_checksum_calculator::model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH))
+class model #(
+    META_WIDTH,
+    MVB_DATA_WIDTH,
+    MFB_ITEM_WIDTH,
+    OFFSET_WIDTH,
+    LENGTH_WIDTH,
+    VERBOSITY,
+    MFB_META_WIDTH
+) extends uvm_component;
+    `uvm_component_param_utils(uvm_checksum_calculator::model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH,
+                                   OFFSET_WIDTH, LENGTH_WIDTH, VERBOSITY, MFB_META_WIDTH))
 
     uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)) input_data;
     uvm_tlm_analysis_fifo #(uvm_logic_vector::sequence_item #(META_WIDTH))           input_meta;
@@ -41,7 +50,8 @@ class model #(META_WIDTH, MVB_DATA_WIDTH, MFB_ITEM_WIDTH, OFFSET_WIDTH, LENGTH_W
         pkt_cnt = 0;
     endfunction
 
-    function logic[16-1 : 0] checksum_calc(logic [MFB_ITEM_WIDTH-1:0] frame[], logic [OFFSET_WIDTH-1 : 0] offset, logic [LENGTH_WIDTH-1 : 0] length);
+    function logic [16-1 : 0] checksum_calc(logic [MFB_ITEM_WIDTH-1:0] frame[], logic [OFFSET_WIDTH-1 : 0] offset,
+                                            logic [LENGTH_WIDTH-1 : 0] length);
         const logic [16-1 : 0] CHCKS_MAX = '1;
         logic [16-1 : 0] ret;
         int unsigned     data_index = 0;

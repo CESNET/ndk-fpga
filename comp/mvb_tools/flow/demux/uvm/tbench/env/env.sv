@@ -37,15 +37,18 @@ class env #(ITEMS, ITEM_WIDTH, TX_PORTS) extends uvm_env;
         m_rx_mvb_config.interface_name = "rx_mvb_vif";
         m_rx_mvb_config.coverage       = 1;
         uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, "m_rx_mvb_env", "m_config", m_rx_mvb_config);
-        m_rx_mvb_env = uvm_logic_vector_mvb::env_rx #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS))::type_id::create("m_rx_mvb_env", this);
+        m_rx_mvb_env =
+            uvm_logic_vector_mvb::env_rx #(ITEMS, ITEM_WIDTH + $clog2(TX_PORTS))::type_id::create("m_rx_mvb_env", this);
 
         for (int i = 0; i < TX_PORTS; i++) begin
             m_tx_mvb_config[i]                = new;
             m_tx_mvb_config[i].active         = UVM_ACTIVE;
             m_tx_mvb_config[i].interface_name = $sformatf("tx_mvb_vif_%0d", i);
             m_tx_mvb_config[i].coverage       = 1;
-            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_tx_mvb_env_%0d", i), "m_config" , m_tx_mvb_config[i]);
-            m_tx_mvb_env[i] = uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH)::type_id::create($sformatf("m_tx_mvb_env_%0d", i), this);
+            uvm_config_db #(uvm_logic_vector_mvb::config_item)::set(this, $sformatf("m_tx_mvb_env_%0d", i), "m_config",
+                                                                   m_tx_mvb_config[i]);
+            m_tx_mvb_env[i] = uvm_logic_vector_mvb::env_tx #(ITEMS, ITEM_WIDTH)::type_id::create(
+                $sformatf("m_tx_mvb_env_%0d", i), this);
         end
 
         m_virt_sqcr = uvm_mvb_demux::virt_sequencer#(ITEM_WIDTH, TX_PORTS)::type_id::create("m_virt_sqcr",this);

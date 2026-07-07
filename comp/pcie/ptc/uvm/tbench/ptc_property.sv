@@ -41,7 +41,7 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
         START = 1'b0;
     end
 
-    for (genvar dma_port = 0; dma_port < DMA_PORTS; dma_port++) begin
+    for (genvar dma_port = 0; dma_port < DMA_PORTS; dma_port++) begin : gen_dma_port
         mfb_property #(
             .REGIONS      (DMA_MFB_UP_REGIONS),
             .REGION_SIZE  (MFB_UP_REG_SIZE),
@@ -87,7 +87,7 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
 
 
     generate
-        if (DEVICE == "AGILEX" || DEVICE == "STRATIX10") begin
+        if (DEVICE == "AGILEX" || DEVICE == "STRATIX10") begin : gen_DEVICE_AGILEX_DEVICE_STRATIX10
             mvb_property #(
                 .ITEMS      (MFB_UP_REGIONS),
                 .ITEM_WIDTH (PCIE_UP_META_WIDTH)
@@ -120,19 +120,19 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
                 .RESET (RESET),
                 .vif   (rq_mfb_vif)
             );
-        end else begin
+        end else begin : gen_line_123
             axi_property #(
-                RQ_AXI_ITEMS,
-                32,
-                uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)
+                .ITEMS      (RQ_AXI_ITEMS),
+                .ITEM_WIDTH (32),
+                .TUSER_WIDTH(uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ))
             ) AXI_RQ (
                 .RESET (RESET),
                 .vif   (rq_axi_vif)
             );
             axi_property  #(
-                RC_AXI_ITEMS,
-                32,
-                uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)
+                .ITEMS      (RC_AXI_ITEMS),
+                .ITEM_WIDTH (32),
+                .TUSER_WIDTH(uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC))
             ) AXI_RC (
                 .RESET (RESET_DMA),
                 .vif   (rc_axi_vif)
@@ -147,7 +147,7 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
         $rose(rq_mfb_vif.SOF[region]) |-> (rq_mfb_vif.SOF[region] == rq_mvb_vif.VLD[region]);
     endproperty
 
-    for(genvar it = 0; it < MFB_UP_REGIONS; it++) begin
+    for(genvar it = 0; it < MFB_UP_REGIONS; it++) begin : gen_it
         assert property (sof_with_vld(it))
             else begin
                 `uvm_error(module_name, "\n\tMVB interface: MFB SOF is not same as MVB VLD.");

@@ -6,7 +6,8 @@
 
 
 class virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH) extends uvm_sequence;
-    `uvm_object_param_utils(test::virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH))
+    `uvm_object_param_utils(
+        test::virt_sequence #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, META_WIDTH))
     `uvm_declare_p_sequencer(uvm_pcie_avst2mfb::virt_sequencer#(MFB_ITEM_WIDTH, META_WIDTH))
 
     function new (string name = "virt_sequence");
@@ -14,14 +15,16 @@ class virt_sequence#(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDT
     endfunction
 
     uvm_reset::sequence_start                                                                           m_reset;
+    // verilog_lint: waive line-length
     uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)                                               m_logic_vector_array_sq_lib;
     uvm_logic_vector::sequence_endless#(META_WIDTH)                                        m_meta_sq;
 
     virtual function void init();
 
-        m_reset                     = uvm_reset::sequence_start::type_id::create("m_reset_seq");
+        m_reset                     = uvm_reset::sequence_start::type_id::create("m_reset");
+        // verilog_lint: waive line-length
         m_logic_vector_array_sq_lib = uvm_logic_vector_array::sequence_lib#(MFB_ITEM_WIDTH)::type_id::create("m_logic_vector_array_sq_lib");
-        m_meta_sq                   = uvm_logic_vector::sequence_endless#(META_WIDTH)::type_id::create("m_mfb_meta_sq");
+        m_meta_sq                   = uvm_logic_vector::sequence_endless#(META_WIDTH)::type_id::create("m_meta_sq");
 
         m_logic_vector_array_sq_lib.init_sequence();
         m_logic_vector_array_sq_lib.min_random_count = 50;

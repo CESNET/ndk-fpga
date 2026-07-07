@@ -6,7 +6,9 @@
 
 // Definition of mvb interface.
 interface mvb_if #(int unsigned ITEMS, int unsigned ITEM_WIDTH) (input logic CLK);
-    initial VALID_PARAMETERS : assert(ITEMS > 0 && ITEM_WIDTH > 0);
+    initial begin
+        VALID_PARAMETERS : assert(ITEMS > 0 && ITEM_WIDTH > 0);
+    end
 
     // ------------------------------------------------------------------------
     // Parameters
@@ -14,10 +16,10 @@ interface mvb_if #(int unsigned ITEMS, int unsigned ITEM_WIDTH) (input logic CLK
 
     // ------------------------------------------------------------------------
     // Bus structure of mvb
-    wire logic [WORD_WIDTH-1 : 0] DATA;
-    wire logic [ITEMS-1 : 0] VLD;
-    wire logic SRC_RDY;
-    wire logic DST_RDY;
+    wire [WORD_WIDTH-1 : 0] DATA;
+    wire [ITEMS-1 : 0] VLD;
+    wire SRC_RDY;
+    wire DST_RDY;
 
     // ------------------------------------------------------------------------
     // Driver clocking block

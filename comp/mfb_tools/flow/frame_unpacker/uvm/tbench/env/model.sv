@@ -25,7 +25,8 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
 
     endfunction
 
-    function logic[HEADER_SIZE-1 : 0] extract_header(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) packet, int index);
+    function logic [HEADER_SIZE-1 : 0] extract_header(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) packet,
+                                                      int index);
         logic[HEADER_SIZE-1 : 0] ret = '0;
         for (int i = 0; i < (HEADER_SIZE/MFB_ITEM_WIDTH); i++) begin
             ret[(i*MFB_ITEM_WIDTH) +: MFB_ITEM_WIDTH] = packet.data[index + i];
@@ -33,7 +34,8 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
         return ret;
     endfunction
 
-    function data_queue extract_data(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) packet, int index, int size);
+    function data_queue extract_data(uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH) packet, int index,
+                                     int size);
         logic [MFB_ITEM_WIDTH-1 : 0] ret[$];
         for (int i = 0; i < size; i++) begin
             ret.push_back(packet.data[index + i]);
@@ -78,11 +80,14 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
 
             while(offset != size_of_sp) begin
 
-                tr_output_packet = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_output_packet_item");
-                tr_output_meta   = uvm_logic_vector::sequence_item #(HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("tr_output_packet_item");
+                // verilog_lint: waive line-length
+                tr_output_packet = uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH)::type_id::create("tr_output_packet");
+                // verilog_lint: waive line-length
+                tr_output_meta   = uvm_logic_vector::sequence_item #(HEADER_SIZE+MVB_ITEM_WIDTH)::type_id::create("tr_output_meta");
 
                 header                     = extract_header(tr_input_packet, offset);
                 size_of_pkt                = header[16-1 : 0];
+                // verilog_lint: waive line-length
                 align                      = ((size_of_pkt % MFB_ITEM_WIDTH == 0) || (offset + size_of_pkt + HEADER_SIZE/MFB_ITEM_WIDTH) == size_of_sp) ? 0 : (MFB_ITEM_WIDTH - (size_of_pkt % MFB_ITEM_WIDTH));
                 offset                    += (size_of_pkt + HEADER_SIZE/MFB_ITEM_WIDTH + align);
                 tr_output_packet.data = extract_data(tr_input_packet, data_offset, size_of_pkt);
@@ -96,7 +101,7 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
                 tr_output_meta.time_array_add(tr_input_mvb.start);
 
                 if (this.get_report_verbosity_level() == 200) begin
-                    msg = {msg, $sformatf("\tHEADER %h\n",  header)};
+                    msg = {msg, $sformatf("\tHEADER 0x%h\n",  header)};
                 end
                 if (this.get_report_verbosity_level() == 300) begin
                     msg = {msg, $sformatf("\tPACKET NUMBER: %d SIZE OF PACKET %d\n",  pkt_cnt, size_of_pkt)};
@@ -113,9 +118,10 @@ class model #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) extends uv
                 if (offset > size_of_sp) begin
                     msg = "";
                     msg = {msg, $sformatf("\n ================ OFFSET FATAL =============== \n")};
-                    msg = {msg, $sformatf("\tDATA HEADER %h\n",  header)};
+                    msg = {msg, $sformatf("\tDATA HEADER 0x%h\n",  header)};
                     msg = {msg, $sformatf("\n\tSUPERPACKET NUMBER: %d\n",  sp_cnt)};
                     msg = {msg, $sformatf("\tPACKET NUMBER: %d SIZE OF PACKET %d\n",  pkt_cnt, size_of_pkt)};
+                    // verilog_lint: waive line-length
                     msg = {msg, $sformatf("\tData length of incoming transaction is wrong or there is a problem with parsing in model.")};
                     `uvm_fatal(this.get_full_name(), msg);
                 end

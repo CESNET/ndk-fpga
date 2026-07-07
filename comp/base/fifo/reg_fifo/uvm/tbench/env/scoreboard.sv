@@ -38,6 +38,7 @@ class scoreboard #(DATA_WIDTH, ITEMS) extends uvm_scoreboard;
     endfunction
 
     function void build_phase(uvm_phase phase);
+        // verilog_lint: waive line-length
         cmp = uvm_common::comparer_ordered #(uvm_logic_vector::sequence_item #(DATA_WIDTH))::type_id::create("cmp", this);
         cmp.model_tr_timeout_set(200us);
 
@@ -49,7 +50,7 @@ class scoreboard #(DATA_WIDTH, ITEMS) extends uvm_scoreboard;
         analysis_imp_mvb_rx       .connect(m_pipe_model.model_mvb_in.analysis_export);
         // Connects output data of the models
         m_pipe_model.model_mvb_out.connect(cmp.analysis_imp_model);
-        // Connects output data of the DUT
+        // Connects output data of the dut
         analysis_imp_mvb_tx       .connect(cmp.analysis_imp_dut);
     endfunction
 
@@ -57,9 +58,16 @@ class scoreboard #(DATA_WIDTH, ITEMS) extends uvm_scoreboard;
         string msg = "\n";
 
         if (this.success() && this.used() == 0) begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(
+                get_type_name(), {
+                msg,
+                "\n\n\t---------------------------------------\n\t----     VERIFICATION SUCCESS      ----\n\t---------------------------------------"
+                }, UVM_NONE)
         end else begin
-            `uvm_info(get_type_name(), {msg, "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"}, UVM_NONE)
+            `uvm_info(get_type_name(), {
+                      msg,
+                      "\n\n\t---------------------------------------\n\t----     VERIFICATION FAILED       ----\n\t---------------------------------------"
+                      }, UVM_NONE)
         end
     endfunction
 endclass

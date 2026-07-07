@@ -60,7 +60,8 @@ class sequencer_rx extends uvm_sequencer;
         end
     endtask
 
-    function void prepare_requests(uvm_logic_vector_array::sequence_item #(8) packet_item, uvm_logic_vector::sequence_item #(1) error_item);
+    function void prepare_requests(uvm_logic_vector_array::sequence_item #(8) packet_item,
+                                   uvm_logic_vector::sequence_item #(1) error_item);
         uvm_lbus::sequence_item request;
         int unsigned active_segment;
         int unsigned segment_offset = 0;
@@ -122,7 +123,8 @@ class sequencer_rx extends uvm_sequencer;
         request_queue.push_back(request);
     endfunction
 
-    function void try_to_fit_into_previous_request(output uvm_lbus::sequence_item request, output int unsigned active_segment);
+    function void try_to_fit_into_previous_request(output uvm_lbus::sequence_item request,
+                                                   output int unsigned active_segment);
         uvm_lbus::sequence_item temp_request;
         bit has_sop;
         int unsigned eop_segment;

@@ -11,7 +11,10 @@
 `ifndef MII_SEQUENCER_SV
 `define MII_SEQUENCER_SV
 
-class sequencer #(int unsigned CHANNELS, int unsigned WIDTH) extends uvm_sequencer #(uvm_mii::sequence_item #(CHANNELS, WIDTH));
+class sequencer #(
+    int unsigned CHANNELS,
+    int unsigned WIDTH
+) extends uvm_sequencer #(uvm_mii::sequence_item #(CHANNELS, WIDTH));
 
     // ------------------------------------------------------------------------
     // Registration of sequencer to databaze

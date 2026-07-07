@@ -19,12 +19,26 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if  reset(CLK);
-    mfb_if #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, RX_ITEM_WIDTH, 0) mfb_rx(CLK);
-    mfb_if #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0) mfb_tx(CLK);
+    mfb_if #(
+        .REGIONS     (RX_REGIONS),
+        .REGION_SIZE (RX_REGION_SIZE),
+        .BLOCK_SIZE  (RX_BLOCK_SIZE),
+        .ITEM_WIDTH  (RX_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_rx(CLK);
+    mfb_if #(
+        .REGIONS     (TX_REGIONS),
+        .REGION_SIZE (TX_REGION_SIZE),
+        .BLOCK_SIZE  (TX_BLOCK_SIZE),
+        .ITEM_WIDTH  (TX_ITEM_WIDTH),
+        .META_WIDTH  (0)
+    ) mfb_tx(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock ticking
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -33,8 +47,20 @@ module testbench;
 
         // Configuration of database
         uvm_config_db#(virtual reset_if)::set(null, "", "vif_reset", reset);
-        uvm_config_db#(virtual mfb_if #(RX_REGIONS, RX_REGION_SIZE, RX_BLOCK_SIZE, RX_ITEM_WIDTH, 0))::set(null, "", "vif_rx", mfb_rx);
-        uvm_config_db#(virtual mfb_if #(TX_REGIONS, TX_REGION_SIZE, TX_BLOCK_SIZE, TX_ITEM_WIDTH, 0))::set(null, "", "vif_tx", mfb_tx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (RX_REGIONS),
+            .REGION_SIZE (RX_REGION_SIZE),
+            .BLOCK_SIZE  (RX_BLOCK_SIZE),
+            .ITEM_WIDTH  (RX_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_rx", mfb_rx);
+        uvm_config_db#(virtual mfb_if #(
+            .REGIONS     (TX_REGIONS),
+            .REGION_SIZE (TX_REGION_SIZE),
+            .BLOCK_SIZE  (TX_BLOCK_SIZE),
+            .ITEM_WIDTH  (TX_ITEM_WIDTH),
+            .META_WIDTH  (0)
+        ))::set(null, "", "vif_tx", mfb_tx);
 
         m_root = uvm_root::get();
         m_root.set_report_id_action_hier("ILLEGALNAME",UVM_NO_ACTION);
@@ -48,8 +74,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK        (CLK),
         .RST        (reset.RESET),
         .mfb_rx     (mfb_rx),
@@ -112,6 +138,7 @@ module testbench;
 
     property sof_follows_eof;
         @(posedge mfb_tx.CLK) disable iff(reset.RESET || START)
+        // verilog_lint: waive line-length
         (mfb_tx.SRC_RDY && (mfb_tx.SOF != 0) && (mfb_tx.EOF != 0) && (mfb_tx.SOF_POS > mfb_tx.EOF_POS[5:4])) |-> (mfb_tx.SOF_POS == mfb_tx.EOF_POS[5:4] + 1);
     endproperty
 
@@ -122,12 +149,16 @@ module testbench;
 
     assert property (sof_always_at_begin)
         else begin
-            `uvm_error(module_name, "\n\tMFB_TO_LBUS_RECONF/UVM: When only SOF is present, it needs to be on the beginning of the word!");
+        `uvm_error(
+            module_name,
+            "\n\tMFB_TO_LBUS_RECONF/UVM: When only SOF is present, it needs to be on the beginning of the word!");
         end
 
     assert property (sof_follows_eof)
         else begin
-            `uvm_error(module_name, "\n\tMFB_TO_LBUS_RECONF/UVM: When SOF follows the EOF (e.g. two packets are in the word), the SOF needs to follow immediately after the EOF, no empty blocks shall be between them.");
+        `uvm_error(module_name,
+                   "\n\tMFB_TO_LBUS_RECONF/UVM: When SOF follows the EOF (e.g. two packets are in the word), the SOF needs to follow immediately after the EOF, no empty blocks shall be between them."
+                       );
         end
 
 endmodule

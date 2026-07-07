@@ -92,7 +92,8 @@ package test;
     // latency for H-Tile is 18 cycles (20 cycles for safe)
     // latency for P-Tile is 27 cycles (30 cycles for safe)
     // latency for R-Tile is 0 cycles  (FIFO_ENABLE is disabled)
-    parameter READY_LATENCY    = (PCIE_ENDPOINT_TYPE == "H_TILE" || PCIE_ENDPOINT_TYPE == "DUMMY") ? 20 : ((PCIE_ENDPOINT_TYPE == "P_TILE") ? 30 : 0);
+    parameter READY_LATENCY = (PCIE_ENDPOINT_TYPE == "H_TILE" || PCIE_ENDPOINT_TYPE == "DUMMY") ?
+        20 : ((PCIE_ENDPOINT_TYPE == "P_TILE") ? 30 : 0);
 
     parameter PCIE_LEN_MAX      = 128;
     parameter BYTES_LEN_MAX     = PCIE_LEN_MAX*4;

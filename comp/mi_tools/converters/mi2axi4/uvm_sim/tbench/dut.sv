@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT (
+module dut (
     input logic     CLK,
     input logic     RST,
     mi_if.dut_slave config_mi
@@ -69,14 +69,16 @@ module DUT (
 
     always @(posedge CLK)
     begin
-        if (axi_rready)
+        if (axi_rready) begin
             axi_rvalid <= axi_arvalid;
+        end
     end
 
     always @(posedge CLK)
     begin
-        if (axi_bready)
+        if (axi_bready) begin
             axi_bvalid <= axi_wvalid;
+        end
     end
 
 endmodule

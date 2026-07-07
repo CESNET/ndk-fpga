@@ -39,7 +39,7 @@ virtual class base_reg_frontdoor  extends uvm_reg_frontdoor;
         super.new(name);
     endfunction
 
-    virtual function void do_copy (	uvm_object 	rhs	);
+    virtual function void do_copy(uvm_object rhs);
         base_reg_frontdoor c_rhs;
         super.do_copy(rhs);
         $cast(c_rhs, rhs);
@@ -53,7 +53,11 @@ virtual class base_reg_frontdoor  extends uvm_reg_frontdoor;
     pure virtual task indirect_switch(int unsigned addr, int unsigned data);
 endclass
 
-class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends base_reg_frontdoor;
+class reg2bus_frontdoor #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends base_reg_frontdoor;
     `uvm_object_param_utils(uvm_mi::reg2bus_frontdoor#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
 
     localparam DATA_BYTES_WIDTH = (DATA_WIDTH+8-1)/8;
@@ -71,7 +75,7 @@ class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int 
         sem = null;
     endfunction
 
-    virtual function void do_copy (	uvm_object 	rhs	);
+    virtual function void do_copy(uvm_object rhs);
         super.do_copy(rhs);
     endfunction
 
@@ -93,7 +97,7 @@ class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int 
             request.wr   = 0;
             request.rd   = 1'b1;
             finish_item(request);
-        end while(request.ardy != 1'b1);
+        end while (request.ardy != 1'b1);
         sem.put();
     endtask
 
@@ -120,7 +124,7 @@ class reg2bus_frontdoor #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int 
             request.wr   = 1'b1;
             request.rd   = 1'b0;
             finish_item(request);
-        end while(request.ardy != 1'b1);
+        end while (request.ardy != 1'b1);
         sem.put();
     endtask
 
@@ -254,7 +258,11 @@ endclass
 
 
 
-class reg2bus_adapter #(int unsigned DATA_WIDTH, int unsigned ADDR_WIDTH, int unsigned META_WIDTH = 0) extends uvm_reg_adapter;
+class reg2bus_adapter #(
+    int unsigned DATA_WIDTH,
+    int unsigned ADDR_WIDTH,
+    int unsigned META_WIDTH = 0
+) extends uvm_reg_adapter;
     `uvm_object_param_utils(uvm_mi::reg2bus_adapter#(DATA_WIDTH, ADDR_WIDTH, META_WIDTH))
 
     function new(string name = "reg2mi_adapter");

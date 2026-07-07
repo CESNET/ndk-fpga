@@ -8,7 +8,9 @@
 class virt_sequencer #(MVB_ITEM_WIDTH) extends uvm_sequencer;
     `uvm_component_param_utils(virt_sequencer #(MVB_ITEM_WIDTH))
 
+    // verilog_lint: waive line-length
     uvm_reset::sequencer                                                                                                m_reset_sqr;
+    // verilog_lint: waive line-length
     uvm_logic_vector::sequencer #(MVB_ITEM_WIDTH)                                                                       m_mvb_data_sqr;
 
     function new(string name = "virt_sequencer", uvm_component parent);

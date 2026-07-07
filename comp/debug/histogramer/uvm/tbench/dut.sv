@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT #(
+module dut #(
     int unsigned    INPUT_WIDTH,
     int unsigned    BOX_WIDTH,
     int unsigned    BOX_CNT,

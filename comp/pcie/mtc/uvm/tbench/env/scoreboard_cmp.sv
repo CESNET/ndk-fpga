@@ -37,7 +37,8 @@ class mi_cmp_rq #(MI_DATA_WIDTH, type CLASS_TYPE) extends uvm_common::comparer_o
 
     virtual function string info(logic data = 0);
         string msg ="";
-        msg = $sformatf("\n\tErrors %0d Compared %0d Compared write tr %0d Compared read tr %0d Wait for tramsaction DUT(%0d) MODEL(%0d)", errors, compared, compared_write, compared_read, dut_items.size(), model_items.size());
+        // verilog_lint: waive line-length
+        msg = $sformatf("\n\tErrors %0d Compared %0d Compared write tr %0d Compared read tr %0d Wait for tramsaction dut(%0d) MODEL(%0d)", errors, compared, compared_write, compared_read, dut_items.size(), model_items.size());
         msg = {msg, super.info()};
         return msg;
     endfunction
@@ -51,7 +52,10 @@ class mi_cmp_rq #(MI_DATA_WIDTH, type CLASS_TYPE) extends uvm_common::comparer_o
 
 endclass
 
-class mi_cmp_rs #(MFB_ITEM_WIDTH) extends uvm_common::comparer_base_ordered#(uvm_mtc::cc_mtc_item#(MFB_ITEM_WIDTH), uvm_logic_vector_array::sequence_item#(MFB_ITEM_WIDTH));
+class mi_cmp_rs #(
+    MFB_ITEM_WIDTH
+) extends uvm_common::comparer_base_ordered
+    #(uvm_mtc::cc_mtc_item #(MFB_ITEM_WIDTH), uvm_logic_vector_array::sequence_item #(MFB_ITEM_WIDTH));
     `uvm_component_param_utils(uvm_mtc::mi_cmp_rs #(MFB_ITEM_WIDTH))
 
     uvm_pcie_hdr::sync_tag tag_sync;

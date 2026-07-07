@@ -52,7 +52,10 @@ endclass
 
 
 
-class logic_vector_array#(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_logic_vector_array::sequence_item#(ITEM_WIDTH));
+class logic_vector_array #(
+    ITEM_WIDTH,
+    META_WIDTH
+) extends uvm_sequence #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
     `ndk_object_param_utils(
         uvm_app_core_top_agent::logic_vector_array#(ITEM_WIDTH, META_WIDTH),
         $sformatf("uvm_app_core_top_agent::logic_vector_array#(%0d,%0d)", ITEM_WIDTH, META_WIDTH)
@@ -71,7 +74,9 @@ class logic_vector_array#(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_log
     // -----------------------
     task body;
         req = uvm_logic_vector_array::sequence_item#(ITEM_WIDTH)::type_id::create("req", m_sequencer);
-        if(!uvm_config_db#(uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)))::get(m_sequencer, "", "fifo", fifo)) begin
+        if (!uvm_config_db #(uvm_common::fifo #(sequence_item #(ITEM_WIDTH, META_WIDTH)))::get(
+                m_sequencer, "", "fifo", fifo
+            )) begin
             `uvm_fatal(m_sequencer.get_full_name(), "\n\tFailed to get packet msg box");
         end
 
@@ -90,7 +95,10 @@ class logic_vector_array#(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_log
 endclass
 
 
-class logic_vector_sequence #(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm_logic_vector::sequence_item #(META_WIDTH));
+class logic_vector_sequence #(
+    ITEM_WIDTH,
+    META_WIDTH
+) extends uvm_sequence #(uvm_logic_vector::sequence_item #(META_WIDTH));
     `ndk_object_param_utils(
         uvm_app_core_top_agent::logic_vector_sequence#(ITEM_WIDTH, META_WIDTH),
         $sformatf("uvm_app_core_top_agent::logic_vector_sequence#(%0d,%0d)", ITEM_WIDTH, META_WIDTH)
@@ -115,7 +123,9 @@ class logic_vector_sequence #(ITEM_WIDTH, META_WIDTH) extends uvm_sequence #(uvm
     task body;
 
         req = uvm_logic_vector::sequence_item#(META_WIDTH)::type_id::create("req", m_sequencer);
-        if(!uvm_config_db#(uvm_common::fifo#(sequence_item#(ITEM_WIDTH, META_WIDTH)))::get(m_sequencer, "", "fifo", fifo)) begin
+        if (!uvm_config_db #(uvm_common::fifo #(sequence_item #(ITEM_WIDTH, META_WIDTH)))::get(
+                m_sequencer, "", "fifo", fifo
+            )) begin
             `uvm_fatal(m_sequencer.get_full_name(), "\n\tFailed to get packet msg box");
         end
 

@@ -4,8 +4,29 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
-class sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, int unsigned ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sequencer;
-    `uvm_component_param_utils(uvm_network_mod_env::sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
+class sequencer_port #(
+    ETH_TX_HDR_WIDTH,
+    ETH_RX_HDR_WIDTH,
+    ITEM_WIDTH,
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    int unsigned ETH_PORT_CHAN,
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_sequencer;
+    `uvm_component_param_utils(
+        uvm_network_mod_env::sequencer_port #(
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ));
 
     uvm_reset::sequencer eth_rst;
 
@@ -23,8 +44,31 @@ class sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, R
     endfunction
 endclass
 
-class sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, int unsigned ETH_PORT_CHAN[ETH_PORTS-1:0], MI_DATA_WIDTH, MI_ADDR_WIDTH) extends uvm_sequencer;
-    `uvm_component_param_utils(uvm_network_mod_env::sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN, MI_DATA_WIDTH, MI_ADDR_WIDTH));
+class sequencer #(
+    ETH_PORTS,
+    ETH_TX_HDR_WIDTH,
+    ETH_RX_HDR_WIDTH,
+    ITEM_WIDTH,
+    REGIONS,
+    REGION_SIZE,
+    BLOCK_SIZE,
+    int unsigned ETH_PORT_CHAN[ETH_PORTS-1:0],
+    MI_DATA_WIDTH,
+    MI_ADDR_WIDTH
+) extends uvm_sequencer;
+    `uvm_component_param_utils(
+        uvm_network_mod_env::sequencer #(
+            ETH_PORTS,
+            ETH_TX_HDR_WIDTH,
+            ETH_RX_HDR_WIDTH,
+            ITEM_WIDTH,
+            REGIONS,
+            REGION_SIZE,
+            BLOCK_SIZE,
+            ETH_PORT_CHAN,
+            MI_DATA_WIDTH,
+            MI_ADDR_WIDTH
+        ));
 
     uvm_reset::sequencer usr_rst;
     uvm_reset::sequencer mi_rst;
@@ -32,7 +76,17 @@ class sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGI
     uvm_reset::sequencer mi_pmd_rst;
     uvm_network_mod_env::regmodel #(ETH_PORTS, ETH_PORT_CHAN) regmodel;
 
-    sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH) port[ETH_PORTS];
+    sequencer_port#(
+        ETH_TX_HDR_WIDTH,
+        ETH_RX_HDR_WIDTH,
+        ITEM_WIDTH,
+        REGIONS,
+        REGION_SIZE,
+        BLOCK_SIZE,
+        ETH_PORT_CHAN[0],
+        MI_DATA_WIDTH,
+        MI_ADDR_WIDTH
+    ) port[ETH_PORTS];
     // MI PHY
 
     // TSU
@@ -44,7 +98,9 @@ class sequencer#(ETH_PORTS, ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGI
 
     function void build_phase(uvm_phase phase);
         for (int unsigned it = 0; it < ETH_PORTS; it++) begin
-            port[it] = sequencer_port#(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE, BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create($sformatf("port_%0d", it), this);
+            port[it] = sequencer_port #(ETH_TX_HDR_WIDTH, ETH_RX_HDR_WIDTH, ITEM_WIDTH, REGIONS, REGION_SIZE,
+                                       BLOCK_SIZE, ETH_PORT_CHAN[0], MI_DATA_WIDTH, MI_ADDR_WIDTH)::type_id::create(
+                $sformatf("port_%0d", it), this);
         end
     endfunction
 

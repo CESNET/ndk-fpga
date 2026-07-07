@@ -47,7 +47,11 @@ class model #(int unsigned ITEM_WIDTH, int unsigned PKT_MTU) extends uvm_compone
             if (trim_en === 1'b1) begin
                 assert(trim_len <= in_data_item.size())
                 else begin
-                    `uvm_fatal(get_full_name(), $sformatf("\n\tThe TRIM length (%0d) is bigger than the data frame length (%0d)\n", trim_len, in_data_item.size()))
+                    `uvm_fatal(get_full_name(), $sformatf(
+                               "\n\tThe TRIM length (%0d) is bigger than the data frame length (%0d)\n",
+                               trim_len,
+                               in_data_item.size()
+                               ))
                 end
 
                 // Trim input data

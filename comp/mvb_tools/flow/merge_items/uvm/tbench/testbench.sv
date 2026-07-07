@@ -17,15 +17,32 @@ module testbench;
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Interfaces
     reset_if                            reset  (CLK);
-    mvb_if #(RX0_ITEMS, RX0_ITEM_WIDTH) mvb_rx0(CLK);
-    mvb_if #(RX1_ITEMS, RX1_ITEM_WIDTH) mvb_rx1(CLK);
-    mvb_if #(RX0_ITEMS, TX_ITEM_WIDTH)  mvb_tx (CLK);
-    mvb_if #(RX0_ITEMS, RX0_ITEM_WIDTH) mvb_tx0(CLK);
-    mvb_if #(RX0_ITEMS, RX1_ITEM_WIDTH) mvb_tx1(CLK);
+    mvb_if #(
+        .ITEMS      (RX0_ITEMS),
+        .ITEM_WIDTH (RX0_ITEM_WIDTH)
+    ) mvb_rx0(CLK);
+    mvb_if #(
+        .ITEMS      (RX1_ITEMS),
+        .ITEM_WIDTH (RX1_ITEM_WIDTH)
+    ) mvb_rx1(CLK);
+    mvb_if #(
+        .ITEMS      (RX0_ITEMS),
+        .ITEM_WIDTH (TX_ITEM_WIDTH)
+    )  mvb_tx (CLK);
+    mvb_if #(
+        .ITEMS      (RX0_ITEMS),
+        .ITEM_WIDTH (RX0_ITEM_WIDTH)
+    ) mvb_tx0(CLK);
+    mvb_if #(
+        .ITEMS      (RX0_ITEMS),
+        .ITEM_WIDTH (RX1_ITEM_WIDTH)
+    ) mvb_tx1(CLK);
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Define clock period
-    always #(CLK_PERIOD) CLK = ~CLK;
+    always begin
+        #(CLK_PERIOD) CLK = ~CLK;
+    end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Start of tests
@@ -34,11 +51,26 @@ module testbench;
 
         // Configuration of database
         uvm_config_db #(virtual reset_if)                           ::set(null, "", "vif_reset", reset);
-        uvm_config_db #(virtual mvb_if #(RX0_ITEMS, RX0_ITEM_WIDTH))::set(null, "", "vif_rx0",   mvb_rx0);
-        uvm_config_db #(virtual mvb_if #(RX1_ITEMS, RX1_ITEM_WIDTH))::set(null, "", "vif_rx1",   mvb_rx1);
-        uvm_config_db #(virtual mvb_if #(RX0_ITEMS, TX_ITEM_WIDTH)) ::set(null, "", "vif_tx",    mvb_tx );
-        uvm_config_db #(virtual mvb_if #(RX0_ITEMS, RX0_ITEM_WIDTH))::set(null, "", "vif_tx0",   mvb_tx0);
-        uvm_config_db #(virtual mvb_if #(RX0_ITEMS, RX1_ITEM_WIDTH))::set(null, "", "vif_tx1",   mvb_tx1);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (RX0_ITEMS),
+            .ITEM_WIDTH (RX0_ITEM_WIDTH)
+        ))::set(null, "", "vif_rx0",   mvb_rx0);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (RX1_ITEMS),
+            .ITEM_WIDTH (RX1_ITEM_WIDTH)
+        ))::set(null, "", "vif_rx1",   mvb_rx1);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (RX0_ITEMS),
+            .ITEM_WIDTH (TX_ITEM_WIDTH)
+        )) ::set(null, "", "vif_tx",    mvb_tx );
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (RX0_ITEMS),
+            .ITEM_WIDTH (RX0_ITEM_WIDTH)
+        ))::set(null, "", "vif_tx0",   mvb_tx0);
+        uvm_config_db #(virtual mvb_if #(
+            .ITEMS      (RX0_ITEMS),
+            .ITEM_WIDTH (RX1_ITEM_WIDTH)
+        ))::set(null, "", "vif_tx1",   mvb_tx1);
 
         m_root = uvm_root::get();
         m_root.finish_on_completion = 0;
@@ -52,8 +84,8 @@ module testbench;
     end
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // DUT
-    DUT DUT_U (
+    // dut
+    dut DUT_U (
         .CLK     (CLK        ),
         .RST     (reset.RESET),
         .mvb_rx0 (mvb_rx0    ),

@@ -8,7 +8,18 @@
 class ex_test extends uvm_test;
     `uvm_component_utils(test::ex_test);
 
-    net_mod_logic_env::env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USER_MVB_WIDTH, ETH_CHANNELS, RX_MAC_LITE_REGIONS) m_env;
+    net_mod_logic_env::env_base #(
+        USER_REGIONS,
+        USER_REGION_SIZE,
+        CORE_REGIONS,
+        CORE_REGION_SIZE,
+        BLOCK_SIZE,
+        ITEM_WIDTH,
+        META_WIDTH,
+        USER_MVB_WIDTH,
+        ETH_CHANNELS,
+        RX_MAC_LITE_REGIONS
+    ) m_env;
     int unsigned timeout;
     logic [ETH_CHANNELS-1:0] core_rx_wait;
 
@@ -19,7 +30,9 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
-        m_env = net_mod_logic_env::env_base #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH, USER_MVB_WIDTH, ETH_CHANNELS, RX_MAC_LITE_REGIONS)::type_id::create("m_env", this);
+        m_env = net_mod_logic_env::env_base
+            #(USER_REGIONS, USER_REGION_SIZE, CORE_REGIONS, CORE_REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH,
+              USER_MVB_WIDTH, ETH_CHANNELS, RX_MAC_LITE_REGIONS)::type_id::create("m_env", this);
     endfunction
 
     // ------------------------------------------------------------------------
@@ -28,7 +41,7 @@ class ex_test extends uvm_test;
     virtual task core_rx_seq(uvm_phase phase, int unsigned index);
         uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH) m_byte_array_seq;
 
-        m_byte_array_seq = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("core_rx_seq");
+        m_byte_array_seq = uvm_logic_vector_array::sequence_lib#(ITEM_WIDTH)::type_id::create("m_byte_array_seq");
         m_byte_array_seq.init_sequence();
         m_byte_array_seq.min_random_count = 5*4;
         m_byte_array_seq.max_random_count = 10*4;
@@ -47,7 +60,7 @@ class ex_test extends uvm_test;
         virt_seq #(ITEM_WIDTH, META_WIDTH, ETH_CHANNELS) m_vseq;
         net_mod_logic_env::sequence_simple#(ETH_CHANNELS) seq_mi;
 
-        seq_mi = net_mod_logic_env::sequence_simple#(ETH_CHANNELS)::type_id::create("seq", this);
+        seq_mi = net_mod_logic_env::sequence_simple#(ETH_CHANNELS)::type_id::create("seq_mi", this);
         seq_mi.regmodel = m_env.m_regmodel.m_regmodel;
 
         phase.raise_objection(this);
@@ -99,7 +112,9 @@ class ex_test extends uvm_test;
     function void report_phase(uvm_phase phase);
         `uvm_info(this.get_full_name(), {"\n\tTEST : ", this.get_type_name(), " END\n"}, UVM_NONE);
         if (timeout) begin
-            `uvm_error(this.get_full_name(), "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n");
+            `uvm_error(this.get_full_name(),
+                       "\n\t===================================================\n\tTIMEOUT SOME PACKET STUCK IN DESIGN\n\t===================================================\n\n"
+                           );
         end
     endfunction
 

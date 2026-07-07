@@ -6,7 +6,7 @@
 
 import test::*;
 
-module DUT #(
+module dut #(
     logic        STRADDLING
 )
 (

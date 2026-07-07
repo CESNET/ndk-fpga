@@ -74,7 +74,13 @@ class sequence_item #(
     function string convert2string();
         string ret;
 
-        ret = $sformatf("\tPacket_size : %h\n\tMeta : %h\n\tChannel : %0d\n\tDiscard : %b\n", packet_size, meta, channel, discard);
+        ret = $sformatf(
+            "\tPacket_size : 0x%h\n\tMeta : 0x%h\n\tChannel : %0d\n\tDiscard : 0b%b\n",
+            packet_size,
+            meta,
+            channel,
+            discard
+        );
 
         return ret;
     endfunction
