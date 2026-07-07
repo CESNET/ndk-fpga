@@ -252,7 +252,8 @@ class sequence_flowtest_eth #(
         string sep = "";
 
         foreach (ipv6[i]) begin
-            const string ipv6_address = $sformatf("0x%04h:0x%04h:0x%04h:0x%04h:0x%04h:0x%04h:0x%04h:0x%04h/%0d",
+            // verilog_lint: waive numeric-format-string-style
+            const string ipv6_address = $sformatf("%04h:%04h:%04h:%04h:%04h:%04h:%04h:%04h/%0d",
                             ipv6[i].address[127 : 112],
                             ipv6[i].address[111 : 96],
                             ipv6[i].address[95 : 80],
@@ -269,7 +270,8 @@ class sequence_flowtest_eth #(
         end
 
         foreach (cfg.ipv6_addresses[i]) begin
-            const string ipv6_address = $sformatf("0x%04h:0x%04h:0x%04h:0x%04h:0x%04h:0x%04h:0x%04h:0x%04h/%0d",
+            // verilog_lint: waive numeric-format-string-style
+            const string ipv6_address = $sformatf("%04h:%04h:%04h:%04h:%04h:%04h:%04h:%04h/%0d",
                             cfg.ipv6_addresses[i][127 : 112],
                             cfg.ipv6_addresses[i][111 : 96],
                             cfg.ipv6_addresses[i][95 : 80],
@@ -293,7 +295,8 @@ class sequence_flowtest_eth #(
         string mac_address;
 
         foreach (mac[i]) begin
-            mac_address = $sformatf("0x%02h:0x%02h:0x%02h:0x%02h:0x%02h:0x%02h/48",
+            // verilog_lint: waive numeric-format-string-style
+            mac_address = $sformatf("%02h:%02h:%02h:%02h:%02h:%02h/48",
                             mac[i].address[47 : 40],
                             mac[i].address[39 : 32],
                             mac[i].address[31 : 24],
