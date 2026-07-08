@@ -1,8 +1,6 @@
-# throughput_probe.py: Universal probe for measuring throughput and efficiency
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
-#
 # SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
 from cocotb.triggers import RisingEdge
@@ -69,7 +67,7 @@ class Probe(ABC):
         if callback is not None:
             self.add_callback(callback)
 
-        self._thread = cocotb.scheduler.add(self._start_probe())
+        self._thread = cocotb.start_soon(self._start_probe())
 
     @abstractmethod
     async def _start_probe(self) -> None:
