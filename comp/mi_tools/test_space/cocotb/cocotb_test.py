@@ -1,6 +1,6 @@
 # cocotb_test.py:
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -40,7 +40,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, pkt_count=5000, item_width_min=1, item_width_max=32):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
     tb = testbench(dut)
     await tb.reset()
 
