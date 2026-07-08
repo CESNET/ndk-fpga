@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
+#            Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 
+import cocotb
 import cocotb.utils
 import cocotb_bus.drivers as cbd
-
 from cocotb.triggers import RisingEdge
 
 from .bus_fixup import do_fix
@@ -34,7 +35,18 @@ class BusDriver(cbd.BusDriver):
         self._idle_gen = IdleGenerator()
         self._idle_tr = IdleTransaction()
 
-        super().__init__(entity, name, clock, array_idx=array_idx)
+        # cocotb 2.0-only defines
+        if cocotb.__version__ >= "2.0.0":
+            from .bus_fixup import BusProxy
+
+            # initiate without using array idx, which causes problems in cocotb 2.0
+            super().__init__(entity, name, clock, array_idx=None)
+
+            # replace bus with bus proxy
+            self.bus = BusProxy(self.bus, array_idx)
+
+        else:
+            super().__init__(entity, name, clock, array_idx=array_idx)
 
         self._cfg_update()
 
