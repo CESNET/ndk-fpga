@@ -3,6 +3,10 @@ stages:
   - test
   - deploy
 
+default:
+  tags:
+    - docker-ci-image
+
 variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: recursive
