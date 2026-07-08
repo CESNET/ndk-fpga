@@ -1,14 +1,14 @@
 # drivers.py: MI Drivers
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 from cocotbext.ofm.base.drivers import BusDriver
 from cocotbext.ofm.utils.math import ceildiv
 from cocotbext.ofm.utils.signals import await_signal_sync, align_write_request, align_read_request
-from cocotb.binary import BinaryValue
 from cocotbext.ofm.mi.transaction import MiTransactionType
+from cocotb.types import LogicArray, Range
 from typing import Optional
 
 
@@ -44,7 +44,6 @@ class MIRequestDriver(BusDriver):
 
     def _propagate_control_signals(self) -> None:
         """Sends value of control signals to the MI bus."""
-
         self.bus.addr.value = self.__addr
         self.bus.dwr.value = int.from_bytes(self.__dwr, 'little')
         self.bus.be.value = self.__be
@@ -100,11 +99,11 @@ class MIRequestDriver(BusDriver):
         self.__addr = addr
 
         if byte_enable is None:
-            byte_enable = BinaryValue(2**self.__data_width - 1)
+            byte_enable = LogicArray("1" * self.__data_width)
         else:
-            byte_enable = BinaryValue(byte_enable, n_bits=4, bigEndian=False)
+            byte_enable = LogicArray(byte_enable, Range(4-1, "downto", 0))
 
-        self.__be = BinaryValue(byte_enable.binstr[::-1]).integer
+        self.__be = LogicArray(byte_enable.binstr[::-1]).integer
 
         self._propagate_control_signals()
 
@@ -115,13 +114,11 @@ class MIRequestDriver(BusDriver):
 
         await await_signal_sync(self._clk_re, self.bus.drdy)
 
-        rd_data = self.bus.drd.value
-        rd_data.big_endian = False
-        drd = rd_data.buff
+        drd = self.bus.drd.value.buff[::-1]
 
         self.log.debug(f"Read {drd.hex()} from {addr.to_bytes(self.__addr_width, 'little').hex()}")
 
-        return bytes(drd)
+        return drd
 
     async def write(self, addr: int, dwr: bytes, *, byte_enable: Optional[int] = None) -> None:
         """writes variable-lenght transaction to the write signals of the MI bus.
@@ -137,7 +134,7 @@ class MIRequestDriver(BusDriver):
         """
         assert addr >= 0
 
-        byte_enable = BinaryValue(2**len(dwr) - 1 if byte_enable is None else byte_enable, n_bits=len(dwr), bigEndian=False)
+        byte_enable = LogicArray("1" * len(dwr) if byte_enable is None else byte_enable, Range(len(dwr)-1, "downto", 0))
         _, _, addr, dwr, byte_enable = align_write_request(self.__data_width, addr, dwr, byte_enable=byte_enable)
 
         cycles = ceildiv(self.__data_width, len(dwr))
@@ -145,7 +142,7 @@ class MIRequestDriver(BusDriver):
         for i in range(cycles):
             be_slice = byte_enable.binstr[i*self.__data_width : (i+1)*self.__data_width]
             be_slice_inv = be_slice[::-1]
-            be = BinaryValue(be_slice_inv).integer
+            be = LogicArray(be_slice_inv).integer
             await self._write_word(addr + i*self.__data_width, dwr[i*self.__data_width : (i+1)*self.__data_width], be)
 
     async def read(self, addr: int, byte_count: int, byte_enable: Optional[int] = None) -> bytes:
@@ -164,7 +161,7 @@ class MIRequestDriver(BusDriver):
         """
         assert addr >= 0
 
-        byte_enable = BinaryValue(2**byte_count - 1 if byte_enable is None else byte_enable, n_bits=byte_count, bigEndian=False)
+        byte_enable = LogicArray(2**byte_count-1 if byte_enable is None else byte_enable, Range(byte_count-1, "downto", 0))
         start_offset, end_offset, addr, byte_count, byte_enable = align_read_request(self.__data_width, addr, byte_count, byte_enable=byte_enable)
 
         drd = bytearray(byte_count)
@@ -172,7 +169,7 @@ class MIRequestDriver(BusDriver):
         cycles = ceildiv(self.__data_width, byte_count)
 
         for i in range(cycles):
-            be = BinaryValue(byte_enable.binstr[i*self.__data_width : (i+1)*self.__data_width]).integer
+            be = LogicArray(byte_enable.binstr[i*self.__data_width : (i+1)*self.__data_width]).integer
             drd[i*self.__data_width: (i+1)*self.__data_width] = await self._read_word(addr + i*self.__data_width, be)
 
         return bytes(drd[start_offset: byte_count-end_offset])
