@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import itertools
@@ -58,7 +58,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, min_size=4, max_size=512, pkt_count=10000):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = testbench(dut, debug=False)
 

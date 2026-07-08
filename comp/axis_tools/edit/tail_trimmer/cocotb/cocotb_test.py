@@ -27,7 +27,7 @@ async def _run_test(
 ):
     """Run test with specified packet count and configuration."""
     cocotb.log.debug(f"Starting AXIS_TAIL_TRIMMER {test_name} test")
-    clock = Clock(dut.CLK, 5, units="ns")
+    clock = Clock(dut.CLK, 5, unit="ns")
     cocotb.start_soon(clock.start())
 
     tb = Testbench(dut, debug=False)
@@ -77,7 +77,7 @@ async def _run_test(
         timeout += 1
 
     if tx_task:
-        tx_task.kill()
+        tx_task.cancel()
 
     cocotb.log.info(f"Test completed: {tb.tx_monitor.frame_cnt}/{pkt_count} packets")
 

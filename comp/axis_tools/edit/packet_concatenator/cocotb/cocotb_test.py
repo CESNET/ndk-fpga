@@ -23,7 +23,7 @@ async def run_base_test(dut, min_size=40, max_size=200, pkt_count=10000):
     cocotb.log.info("Starting AXIS_PACKET_CONCATENATOR base test")
 
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = Testbench(dut, debug=False)
 
@@ -76,7 +76,7 @@ async def run_full_speed_test(dut, min_size=40, max_size=500, pkt_count=10000):
     cocotb.log.info("Starting AXIS_PACKET_CONCATENATOR full speed test")
 
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = Testbench(dut, debug=False)
 

@@ -50,7 +50,7 @@ async def _run_test(
         max_idles: Maximum number of idle cycles between words.
     """
     cocotb.log.info(f"Starting AXIS_PACKET_LEN {test_name} test")
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = Testbench(dut, debug=False)
     await tb.reset()
@@ -85,7 +85,7 @@ async def _run_test(
         timeout += 1
 
     if tx_task:
-        tx_task.kill()
+        tx_task.cancel()
 
     cocotb.log.info(f"Test completed: {tb.tx_monitor.frame_cnt}/{pkt_count} packets")
 

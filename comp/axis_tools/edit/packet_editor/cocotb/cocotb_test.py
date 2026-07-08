@@ -32,7 +32,7 @@ async def _run_test(
 ):
     """Run randomized packet editing test."""
     cocotb.log.info(f"Starting AXIS_PACKET_EDITOR {test_name} test")
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = Testbench(dut, debug=False)
     await tb.reset()
@@ -78,7 +78,7 @@ async def _run_test(
         timeout += 1
 
     if tx_task:
-        tx_task.kill()
+        tx_task.cancel()
 
     cocotb.log.info(f"Test completed: {tb.tx_monitor.frame_cnt}/{pkt_count} packets")
 
@@ -116,7 +116,7 @@ async def run_test_aggressive_backpressure(dut, pkt_count=2000):
 async def run_test_cross_packet_safety(dut):
     """Verify edit never leaks into following packet."""
     cocotb.log.info("Starting AXIS_PACKET_EDITOR cross_packet_safety test")
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = Testbench(dut, debug=False)
     await tb.reset()

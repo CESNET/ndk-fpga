@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from cocotb_bus.scoreboard import Scoreboard as BaseScoreboard
-from cocotb.result import TestFailure
 from cocotb_bus.monitors import Monitor
 import logging
 
@@ -17,12 +16,11 @@ class Scoreboard(BaseScoreboard):
 
     def compare(self, got, exp, log, strict_type=True):
         if strict_type:
-            if type(exp[0]) is not type(got):
-                raise TestFailure("Received transaction of different type then expected.")
+            assert type(exp[0]) is type(got), "Received transaction of different type then expected."
 
         if got not in exp:
             log.error(f"Expected one of: {exp}\n\nGot: {got}")
-            raise TestFailure("Received unexpected transaction.")
+            assert False, "Received unexpected transaction."
 
         else:
             exp.remove(got)
@@ -52,9 +50,9 @@ class Scoreboard(BaseScoreboard):
                 log.error("Received a transaction but wasn't expecting "
                           "anything")
                 log.info("Got: %s", transaction)
-                if self._imm:
-                    raise TestFailure("Received a transaction but wasn't "
-                                      "expecting anything")
+
+                assert not self._imm, "Received a transaction but wasn't expecting anything"
+
                 return
 
             self.compare(transaction, expected_output, log, strict_type=strict_type)
