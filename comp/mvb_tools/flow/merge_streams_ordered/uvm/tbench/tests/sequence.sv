@@ -76,3 +76,66 @@ class virt_sequence#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS) extends uvm_sequence
         run_mvb_select();
     endtask // body
 endclass
+
+// This sequence is necessary to achieve possibility of full speed in simple version
+class sequence_select_speed #(int unsigned DATA_WIDTH) extends uvm_logic_vector::sequence_simple#(DATA_WIDTH);
+    `uvm_object_param_utils(test::sequence_select_speed#(DATA_WIDTH))
+
+    int unsigned max_val = (1 << DATA_WIDTH) - 1;
+
+    function new(string name = "sequence_select_speed");
+        super.new(name);
+    endfunction
+
+    task body;
+        int unsigned it;
+        uvm_common::sequence_cfg state;
+
+        if (!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
+            state = null;
+        end
+
+        it = 0;
+
+        while (it < transaction_count && (state == null || state.next())) begin
+            `uvm_create(req)
+
+            req.data = it % (max_val + 1);
+
+            `uvm_send(req)
+
+            it++;
+        end
+    endtask
+
+endclass
+
+class virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS)
+    extends virt_sequence#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS);
+    `uvm_object_param_utils(test::virt_sequence_speed#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS))
+    `uvm_declare_p_sequencer(uvm_mvb_merge_streams_ordered::virt_sequencer#(MVB_ITEMS, MVB_ITEM_WIDTH, RX_STREAMS))
+
+    function new (string name = "virt_sequence");
+        super.new(name);
+    endfunction
+
+    virtual function void init();
+        m_reset = uvm_reset::sequence_start::type_id::create("m_reset");
+
+        for (int port = 0; port < RX_STREAMS; port++) begin
+            m_rx_mvb_seq[port] = uvm_logic_vector::sequence_simple#(MVB_ITEM_WIDTH)
+                ::type_id::create($sformatf("m_rx_mvb_seq_%0d", port));
+            m_rx_mvb_seq[port].transaction_count_min = MIN_TRANSACTION_COUNT;
+            m_rx_mvb_seq[port].transaction_count_max = MAX_TRANSACTION_COUNT;
+        end
+
+        if (ARCH == "SIMPLE") begin
+            m_rx_sel_mvb_seq = test::sequence_select_speed#($clog2(RX_STREAMS))::type_id::create("m_rx_sel_mvb_seq");
+        end else begin
+            m_rx_sel_mvb_seq = uvm_logic_vector::sequence_simple#($clog2(RX_STREAMS))
+                ::type_id::create("m_rx_sel_mvb_seq");
+        end
+        m_rx_sel_mvb_seq.transaction_count_min = MIN_TRANSACTION_COUNT;
+        m_rx_sel_mvb_seq.transaction_count_max = MAX_TRANSACTION_COUNT;
+    endfunction
+endclass

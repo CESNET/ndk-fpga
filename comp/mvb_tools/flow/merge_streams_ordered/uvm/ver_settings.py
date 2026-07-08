@@ -14,6 +14,8 @@ SETTINGS = {
         "DEVICE"                : "\\\"AGILEX\\\"",
         "MIN_TRANSACTION_COUNT" : "1000",
         "MAX_TRANSACTION_COUNT" : "2000",
+        "ARCH"                  : "\\\"FIFOX\\\"",
+        "__core_params__"       : {"UVM_TEST" : "test::ex_test"},
     },
 
     "rx_comb1" : {
@@ -27,18 +29,28 @@ SETTINGS = {
     },
 
     "eff_comb0": {
-        "USE_FIFOX_MULTI"   : "1",
+        "ARCH"              : "\\\"FIFOX\\\"",
         "SEL_SHAKEDOWN_EN"  : "0",
     },
 
     "eff_comb1": {
-        "USE_FIFOX_MULTI"   : "0",
+        "ARCH"              : "\\\"SHAKEDOWN\\\"",
         "SEL_SHAKEDOWN_EN"  : "1",
     },
 
     "eff_comb2": {
-        "USE_FIFOX_MULTI"   : "1",
+        "ARCH"              : "\\\"FIFOX\\\"",
         "SEL_SHAKEDOWN_EN"  : "1",
+    },
+
+    "eff_simple": {
+        "MVB_ITEMS"         : "1",
+        "ARCH"              : "\\\"SIMPLE\\\"",
+        "SEL_SHAKEDOWN_EN"  : "0",
+    },
+
+    "speed": {
+        "__core_params__"   : {"UVM_TEST" : "test::speed_test"},
     },
 
     "_combinations_" : (
@@ -47,11 +59,17 @@ SETTINGS = {
         (),
         ("rx_comb1", "eff_comb0"),
         ("rx_comb2", "eff_comb0"),
+        ("rx_comb1", "eff_comb0", "speed"),
 
         ("rx_comb1", "eff_comb1"),
         ("rx_comb2", "eff_comb1"),
+        ("rx_comb1", "eff_comb1", "speed"),
 
         ("rx_comb1", "eff_comb2"),
         ("rx_comb2", "eff_comb2"),
+
+        ("eff_simple",),
+        ("eff_simple", "speed"),
+
     ),
 }

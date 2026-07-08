@@ -13,12 +13,14 @@ lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 
 set SHAKEDOWN_BASE      "$OFM_PATH/comp/mvb_tools/flow/merge_n_to_m"
 set MVB_SHAKEDOWN_BASE  "$OFM_PATH/comp/mvb_tools/flow/shakedown"
+set MVB_FIFOX_BASE      "$OFM_PATH/comp/mvb_tools/storage/fifox"
 set FIFOX_MULTI_BASE    "$OFM_PATH/comp/base/fifo/fifox_multi"
 
 # Components
 lappend COMPONENTS [list "SHAKEDOWN"        $SHAKEDOWN_BASE     "FULL"]
 lappend COMPONENTS [list "FIFOX_MULTI"      $FIFOX_MULTI_BASE   "FULL"]
 lappend COMPONENTS [list "MVB_SHAKEDOWN"    $MVB_SHAKEDOWN_BASE "FULL"]
+lappend COMPONENTS [list "MVB_FIFOX"        $MVB_FIFOX_BASE     "FULL"]
 
 # Files
 lappend MOD "$ENTITY_BASE/merge_streams_ordered.vhd"

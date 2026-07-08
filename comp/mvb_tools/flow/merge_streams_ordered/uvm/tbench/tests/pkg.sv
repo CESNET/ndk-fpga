@@ -15,10 +15,11 @@ package test;
     // dut settings
     parameter MVB_ITEMS         = 1;
     parameter MVB_ITEM_WIDTH    = 32;
-    parameter RX_STREAMS        = 32;
+    parameter RX_STREAMS        = 4;
     parameter USE_FIFOX_MULTI   = 1;
     parameter FIFOX_ITEMS_MULT  = 4;
     parameter SEL_SHAKEDOWN_EN  = 0;
+    parameter ARCH              = "SIMPLE";
     parameter DEVICE            = "AGILEX";
 
     // Verification settings

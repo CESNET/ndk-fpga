@@ -33,6 +33,7 @@ module dut (
         .USE_FIFOX_MULTI    (USE_FIFOX_MULTI),
         .FIFOX_ITEMS_MULT   (FIFOX_ITEMS_MULT),
         .SEL_SHAKEDOWN_EN   (SEL_SHAKEDOWN_EN),
+        .ARCH               (ARCH),
         .DEVICE             (DEVICE)
     ) VHDL_DUT_U (
         .CLK            (CLK),
