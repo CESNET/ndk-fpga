@@ -166,6 +166,40 @@ TX interface will contain word from RX interface 2 at position 1
 and word from RX interface 3 at position 2.
 There are no constraints on RX_SEL interface - all selects can
 be from same RX interface.</p>
+<dl class="vhdl enum">
+<dt class="sig sig-object vhdl" id="vhdl-enum-arch">
+<span class="k"><span class="pre">TYPE</span> </span><span class="sig-name descname"><span class="pre">ARCH</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-enum-arch" title="Link to this definition"></a></dt>
+<dd><p>There are multiple implementations of this component, each has its
+pros and cons:</p>
+<dl class="vhdl enumval">
+<dt class="sig sig-object vhdl">
+<span class="sig-name descname"><span class="pre">FIFOX</span></span></dt>
+<dd><p>Under the hood, it uses FIFOX_MULTI as word storage and supports
+full throughput even from one RX interface. Resource usage is high,
+but some resources are transferred to BRAMs.</p>
+</dd></dl>
+
+<dl class="vhdl enumval">
+<dt class="sig sig-object vhdl">
+<span class="sig-name descname"><span class="pre">SHAKEDOWN</span></span></dt>
+<dd><p>Instead of FIFOX_MULTI, this implementation uses MVB_SHAKEDOWN.
+It may have little less throughput than FIFOX implementation, but
+it does not use any BRAMs.</p>
+</dd></dl>
+
+<dl class="vhdl enumval">
+<dt class="sig sig-object vhdl">
+<span class="sig-name descname"><span class="pre">SIMPLE</span></span></dt>
+<dd><p>This implementation does NOT support reading multiple items from
+one RX port in a clock cycle. However, it is useful, when traffic
+is evenly distributed between RX ports and simillarly, selects are
+distrbuted evenly too. The biggest advantage is massive resource
+savings compared to FIFOX and SHAKEDOWN implementation. You can expect
+5x to 6x resource savings.</p>
+</dd></dl>
+
+</dd></dl>
+
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -194,7 +228,8 @@ be from same RX interface.</p>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
 <td><p>Use FIFOX multi instead of shakedown to improve
-on efficiency and buffering. Costs more resources.</p></td>
+on efficiency and buffering. Costs more resources.
+Deprecated option, use ARCH parameter!</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams_ordered-fifox_items_mult"><td><p>FIFOX_ITEMS_MULT</p></td>
 <td><p>natural</p></td>
@@ -202,7 +237,8 @@ on efficiency and buffering. Costs more resources.</p></td>
 <td><p>Fifox multi items multiplier, should be power of 2.
 Defines total capacity of FIFOX MULTI by expression:
 <cite>MVB_ITEMS * RX_STREAMS * FIFOX_ITEMS_MULT</cite>.
-Ignored when USE_FIFOX_MULTI is false.</p></td>
+Ignored when USE_FIFOX_MULTI is false. This value
+is also used for fifo depths in SIMPLE implementation.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_merge_streams_ordered-sel_shakedown_en"><td><p>SEL_SHAKEDOWN_EN</p></td>
 <td><p>boolean</p></td>
@@ -211,7 +247,12 @@ Ignored when USE_FIFOX_MULTI is false.</p></td>
 Can improve throughput by accumulating sparse selects
 to dense ones. More effective with FIFOX MULTI enabled.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams_ordered-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams_ordered-arch"><td><p>ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“FIFOX”</p></td>
+<td><p>Available options are: “SIMPLE”, “FIFOX” and “SHAKEDOWN”</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_merge_streams_ordered-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td><p>FPGA device string</p></td>
