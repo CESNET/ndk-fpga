@@ -406,7 +406,7 @@ module testbench;
 
     for (genvar dma_it = 0; dma_it < test_pkg::DMA_STREAMS; dma_it++) begin : gen_dma_it
         //DMA RX
-        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_dma_region
+        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_rx_dma_region
             // verilog_lint: waive line-length
             assign dma_rx_mvb_len[(dma_it*test_pkg::REGIONS + dma_region + 1)*$clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)]         = dma_rx_mvb[dma_it].DATA[dma_region*DMA_RX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)];
             // verilog_lint: waive line-length
@@ -433,7 +433,7 @@ module testbench;
         assign dma_rx_mfb[dma_it].DST_RDY = dma_rx_mfb_dst_rdy[dma_it];
 
         //DMA TX
-        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_dma_region
+        for (genvar dma_region = 0; dma_region < test_pkg::REGIONS; dma_region++) begin : gen_tx_dma_region
             // verilog_lint: waive line-length
             assign dma_tx_mvb[dma_it].DATA[dma_region*DMA_TX_MVB_WIDTH + $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)]                                                                  = dma_tx_mvb_len[(dma_it*test_pkg::REGIONS + dma_region + 1) * $clog2(test_pkg::DMA_PKT_MTU+1)-1 -: $clog2(test_pkg::DMA_PKT_MTU+1)];
             // verilog_lint: waive line-length

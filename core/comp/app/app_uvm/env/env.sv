@@ -309,7 +309,7 @@ class env #(
         m_resets_gen_config.active[3]         = UVM_ACTIVE;
         m_resets_gen_config.interface_name[3] = "RESET_USER_X4";
         m_resets_gen_config.driver_delay      = 40ns;
-        uvm_config_db#(uvm_reset::env_config_item#(4))::set(this, "m_reset_gen", "m_config", m_resets_gen_config);
+        uvm_config_db#(uvm_reset::env_config_item#(4))::set(this, "m_resets_gen", "m_config", m_resets_gen_config);
         m_resets_gen = uvm_reset::env#(4)::type_id::create("m_resets_gen", this);
 
         m_resets_mi_config = new();
@@ -545,4 +545,3 @@ class env #(
     endtask
 
 endclass
-
