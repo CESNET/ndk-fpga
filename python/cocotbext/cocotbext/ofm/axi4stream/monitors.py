@@ -1,14 +1,20 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
-from cocotb_bus.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamBaseTransaction
 from dataclasses import asdict
-from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask, get_signal_value_in_bytes
+from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
+
+
+# import the correct BusMonitor based on the cocotb version
+if cocotb.__version__ >= "2.0.0":
+    from cocotbext.ofm.base.monitors import BusMonitor
+else:
+    from cocotb_bus.monitors import BusMonitor
 
 
 class Axi4Stream(BusMonitor):
@@ -34,7 +40,6 @@ class Axi4Stream(BusMonitor):
 
         self.frame_cnt = 0
 
-    @cocotb.coroutine
     async def _monitor_recv(self):
         re = RisingEdge(self.clock)
 
@@ -44,9 +49,7 @@ class Axi4Stream(BusMonitor):
             if self.bus.TVALID.value and self.bus.TREADY.value:
                 # returns a whole frame as Axi4StreamTransaction
                 if issubclass(self.__trans_type, Axi4StreamBaseTransaction):
-                    word = {k: get_signal_value_in_bytes(getattr(self.bus, s)) for k, s in self.__recv_signals.items()}
-
-                    #self.log.info(f"WORD: {word}")
+                    word = {k: getattr(self.bus, s).value.buff[::-1] for k, s in self.__recv_signals.items()}
 
                     for name, value in asdict(self.__transaction).items():
                         if not hasattr(self.bus, name):
@@ -83,5 +86,6 @@ class Axi4Stream(BusMonitor):
                 # returns only one word as a dictionary, for backwards compatibility
                 else:
                     word = {k: getattr(self.bus, s).value.buff for k, s in self.__recv_signals.items()}
+
                     self._recv(word)
                     self.frame_cnt += 1
