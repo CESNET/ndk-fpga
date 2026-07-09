@@ -19,8 +19,9 @@ entity PPW_DMA_UPHDR_GEN is
         -- Number of MVB Items in a word, can't handle more than 1.
         MVB_ITEMS       : natural := 1;
         -- Maximum packet size in bytes
-        PKT_MTU         : integer := 2**12;
-        ADDRESS_WIDTH   : natural := 64
+        PKT_MTU         : natural := 2**12;
+        ADDRESS_WIDTH   : natural := 64;
+        META_WIDTH      : natural := 1
     );
     port (
         CLK   : in std_logic;
@@ -32,6 +33,7 @@ entity PPW_DMA_UPHDR_GEN is
 
         RX_MVB_ADDRESS : in  std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
         RX_MVB_LENGTH  : in  std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
+        RX_MVB_META    : in  std_logic_vector(MVB_ITEMS*META_WIDTH-1 downto 0);
         RX_MVB_VALID   : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY : in  std_logic;
         RX_MVB_DST_RDY : out std_logic;
@@ -42,6 +44,7 @@ entity PPW_DMA_UPHDR_GEN is
 
         -- Contains DMA Upstream header
         TX_MVB_DATA    : out std_logic_vector(MVB_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
+        TX_MVB_META    : out std_logic_vector(MVB_ITEMS*META_WIDTH-1 downto 0);
         TX_MVB_VLD     : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_SRC_RDY : out std_logic;
         TX_MVB_DST_RDY : in  std_logic
@@ -112,6 +115,7 @@ begin
         if (rising_edge(CLK)) then
             if (TX_MVB_DST_RDY = '1') then
                 TX_MVB_DATA    <= dma_uphdr_data;
+                TX_MVB_META    <= RX_MVB_META;
                 TX_MVB_VLD     <= RX_MVB_VALID;
                 TX_MVB_SRC_RDY <= RX_MVB_SRC_RDY;
             end if;

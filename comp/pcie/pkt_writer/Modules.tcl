@@ -7,7 +7,9 @@
 # Set paths
 set PKG_BASE            "$OFM_PATH/comp/base/pkg"
 set MFB_STORAGE_BASE    "$OFM_PATH/comp/mfb_tools/storage"
+set MVB_STORAGE_BASE    "$OFM_PATH/comp/mvb_tools/storage"
 set AXIS_STORAGE_BASE   "$OFM_PATH/comp/axis_tools/storage"
+set AXIS_EDIT_BASE      "$OFM_PATH/comp/axis_tools/edit"
 
 # Packages
 lappend PACKAGES "$PKG_BASE/math_pack.vhd"
@@ -16,7 +18,9 @@ lappend PACKAGES "$PKG_BASE/type_pack.vhd"
 # Components
 lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
 lappend COMPONENTS [ list "MFB_FIFOX"           "$MFB_STORAGE_BASE/fifox"          "FULL" ]
+lappend COMPONENTS [ list "MVB_FIFOX"           "$MVB_STORAGE_BASE/fifox"          "FULL" ]
 lappend COMPONENTS [ list "AXIS_FIFO"           "$AXIS_STORAGE_BASE/fifo"          "FULL" ]
+lappend COMPONENTS [ list "PACKET_EXTENDER"     "$AXIS_EDIT_BASE/packet_extender"  "FULL" ]
 lappend COMPONENTS [ list "PPW_INSTR_GEN"       "$ENTITY_BASE/comp/instr_gen"      "FULL" ]
 lappend COMPONENTS [ list "PPW_PKT_BREAKER"     "$ENTITY_BASE/comp/pkt_breaker"    "FULL" ]
 lappend COMPONENTS [ list "PPW_DMA_UPHDR_GEN"   "$ENTITY_BASE/comp/dma_uphdr_gen"  "FULL" ]
