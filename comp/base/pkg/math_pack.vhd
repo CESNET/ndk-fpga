@@ -58,6 +58,13 @@ package math_pack is
     --! \brief Return the count of '1' values in std_logic_vector
     function count_ones (slv : std_logic_vector) return natural;
 
+    --! \brief Counts how many consecutive '1' bits appear in vector v starting at position pos.
+    --! \details Stops at the first '0' or at the end of the vector.
+    --! @param v Given vector.
+    --! @param pos Given position where to start.
+    --! @return Amount of consecutive '1' bits.
+    function count_consec_ones (v : std_logic_vector; pos : natural) return natural;
+
     --! \brief Ternary conditional assignment operator (like ?: in C).
     --! \details Select one of two given values based on condition evaluation.
     --! @param cond Boolean selection condition.
@@ -199,6 +206,22 @@ package body math_pack is
             end if;
         end loop;
         return n_ones;
+    end function;
+
+    function count_consec_ones (v : std_logic_vector; pos : natural) return natural is
+        variable cnt : natural := 0;
+    begin
+        for i in 0 to v'length - 1 loop
+            if ((pos + i) > v'length - 1) then
+                return cnt;
+            end if;
+            if (v(pos + i) = '1') then
+                cnt := cnt + 1;
+            else
+                return cnt;
+            end if;
+        end loop;
+        return cnt;
     end function;
 
     --! \brief Ternary conditional assignment operator (like ?: in C).
