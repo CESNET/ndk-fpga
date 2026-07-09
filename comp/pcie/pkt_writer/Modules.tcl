@@ -6,6 +6,7 @@
 
 # Set paths
 set PKG_BASE            "$OFM_PATH/comp/base/pkg"
+set MFB_FLOW_BASE       "$OFM_PATH/comp/mfb_tools/flow"
 set MFB_STORAGE_BASE    "$OFM_PATH/comp/mfb_tools/storage"
 set MVB_STORAGE_BASE    "$OFM_PATH/comp/mvb_tools/storage"
 set AXIS_STORAGE_BASE   "$OFM_PATH/comp/axis_tools/storage"
@@ -23,6 +24,7 @@ lappend COMPONENTS [ list "AXIS_FIFO"           "$AXIS_STORAGE_BASE/fifo"       
 lappend COMPONENTS [ list "PACKET_EXTENDER"     "$AXIS_EDIT_BASE/packet_extender"  "FULL" ]
 lappend COMPONENTS [ list "PPW_INSTR_GEN"       "$ENTITY_BASE/comp/instr_gen"      "FULL" ]
 lappend COMPONENTS [ list "PPW_PKT_BREAKER"     "$ENTITY_BASE/comp/pkt_breaker"    "FULL" ]
+lappend COMPONENTS [ list "MFB_RECONFIGURATOR"  "$MFB_FLOW_BASE/reconfigurator"    "FULL" ]
 lappend COMPONENTS [ list "PPW_DMA_UPHDR_GEN"   "$ENTITY_BASE/comp/dma_uphdr_gen"  "FULL" ]
 
 # Modules
