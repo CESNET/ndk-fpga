@@ -57,6 +57,9 @@ if cocotb.__version__ >= "2.0.0":
         _instances = {}
 
         def __new__(cls, handle, array_idx=None):
+            if handle is None:
+                return None
+
             key = (id(handle), array_idx)
             if key not in cls._instances:
                 cls._instances[key] = super().__new__(cls)
@@ -68,6 +71,9 @@ if cocotb.__version__ >= "2.0.0":
 
         def __len__(self):
             return len(self.value)
+
+        def __getitem__(self, index: int):
+            return SignalProxy(self._handle, index)
 
         @property
         def value(self):
@@ -107,6 +113,9 @@ if cocotb.__version__ >= "2.0.0":
             handle = getattr(self._bus, name)
 
             if isinstance(handle, ArrayObject):
-                return handle[self._array_idx]
+                if self._array_idx is not None:
+                    return handle[self._array_idx]
+                else:
+                    return handle
 
             return SignalProxy(handle, self._array_idx)
