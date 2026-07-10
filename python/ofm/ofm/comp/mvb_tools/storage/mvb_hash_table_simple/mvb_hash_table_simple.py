@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 """
@@ -223,7 +223,7 @@ class MvbHashTableSimple(nfb.BaseComp):
         """Main interface of the interactive mode used to input commands. Runs until the 'exit' or 'quit' commands.
         All the command line commands are prefixed with 'comm'."""
 
-        print(f"{colorama.Fore.BLUE + colorama.Style.BRIGHT}MVB HASH TABLE SIMPLE TOOLKIT, version 0.1\nCopyright (C) 2024 CESNET z. s. p. o.\nInput command 'help' for more info.\n{colorama.Style.RESET_ALL}")
+        print(f"{colorama.Fore.BLUE + colorama.Style.BRIGHT}MVB HASH TABLE SIMPLE TOOLKIT, version 0.1\nCopyright (C) 2024-2026 CESNET z. s. p. o.\nInput command 'help' for more info.\n{colorama.Style.RESET_ALL}")
 
         while True:
             arguments = input(f"{colorama.Fore.BLUE + colorama.Style.BRIGHT}>>> {colorama.Style.RESET_ALL}").split(" ")
@@ -804,7 +804,7 @@ def toeplitz_hash(mvb_key: int, params: dict) -> int:
 
         hash_bits = hash_bits ^ key_hash
 
-    return hash_bits.integer
+    return hash_bits.to_unsigned()
 
 
 def simple_xor_hash(mvb_key: int, params: dict) -> int:
@@ -829,7 +829,7 @@ def simple_xor_hash(mvb_key: int, params: dict) -> int:
 
     hash_bits = mvb_key_bits[hash_width-1 : 0] ^ hash_key_bits[hash_width-1 : 0]
 
-    return hash_bits.integer
+    return hash_bits.to_unsigned()
 
 
 def main() -> None:

@@ -1,8 +1,8 @@
 [project]
-name = "cocotb-hash-table-simple-test"
+name = "cocotb-mvb_fifox"
 version = "0.1.0"
 dependencies = [
-    "cocotb == 1.9.2",
+    "cocotb >= 2.0.0",
     "cocotbext-ofm @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
     "setuptools",
 ]
