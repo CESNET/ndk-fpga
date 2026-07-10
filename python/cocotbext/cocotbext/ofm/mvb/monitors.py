@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
 
-from cocotb.handle import ModifiableObject
-from cocotb_bus.monitors import BusMonitor
+from cocotb.handle import ArrayObject
+from cocotb.types import LogicArray
+from cocotbext.ofm.base.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
 
 from .transaction import MvbTransaction, MvbTrClassic
@@ -34,7 +35,7 @@ class MVBMonitor(BusMonitor):
         self.__os = [s for s in self._optional_signals if hasattr(self.bus, s)]
         self.__item_cnt = 0
         self.__items = len(self.bus.vld)
-        self.__bus_isarray = not isinstance(getattr(self.bus, self.__os[0]), ModifiableObject)
+        self.__bus_isarray = isinstance(getattr(self.bus, self.__os[0]), ArrayObject)
         self.__item_widths = self._get_item_widths()
         self.__item_width = sum(self.__item_widths.values())
         self.__tr_type = tr_type
@@ -97,9 +98,8 @@ class MVBMonitor(BusMonitor):
             return (signal_src_rdy.value == 1) and (signal_dst_rdy.value == 1)
 
     def recv_bytes(self, vld):
-        data_val = getattr(self.bus, self.__os[0]).value
-        data_val.big_endian = False
-        data_bytes = data_val.buff
+        data_bytes = getattr(self.bus, self.__os[0]).value.to_bytes(byteorder="little")
+
         # Number of bytes in each Item (= length of each data slice)
         item_bytes = next(iter(self.__item_widths.values())) // 8
         for i in range(self.__items):
@@ -118,15 +118,15 @@ class MVBMonitor(BusMonitor):
         for s in self.__os:
             if self.__bus_isarray:
                 data_dict_word[s] = getattr(self.bus, s)
-                data_dict_items[s] = [data_dict_word[s][i].value.integer for i in range(len(data_dict_word[s]))]
+                data_dict_items[s] = [data_dict_word[s][i].value.to_unsigned() for i in range(len(data_dict_word[s]))]
 
             else: # Splitting the word into a list of items by masking and shifting
                 data_dict_word[s] = getattr(self.bus, s).value
                 data_mask = 2**self.__item_widths[s] - 1
                 data_dict_items[s] = []
                 for i in range(self.__items):
-                    data_dict_items[s].append(data_dict_word[s] & data_mask)
-                    data_dict_word[s] >>= self.__item_widths[s]
+                    data_dict_items[s].append(data_dict_word[s].to_unsigned() & data_mask)
+                    data_dict_word[s] = LogicArray(data_dict_word[s].to_unsigned() >> self.__item_widths[s], len(data_dict_word[s]))
 
         for i in range(self.__items):
             if (vld & 1):
@@ -152,8 +152,6 @@ class MVBMonitor(BusMonitor):
                 continue
 
             if self._is_valid_word(self.bus.src_rdy, self.bus.dst_rdy):
-                vld = self.bus.vld.value.integer
-                self.__item_cnt += self.bus.vld.value.binstr.count("1") # Python 3.9 and below
-                # self.__item_cnt += vld.bit_count # from Python 3.10
-
+                vld = self.bus.vld.value.to_unsigned()
+                self.__item_cnt += self.bus.vld.value.count("1")
                 self._recv_method(vld)
