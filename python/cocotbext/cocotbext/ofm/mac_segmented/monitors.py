@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
-from cocotb_bus.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
+from cocotbext.ofm.base.monitors import BusMonitor
 from cocotbext.ofm.utils.binary import Binary, BinaryVector
 
 
