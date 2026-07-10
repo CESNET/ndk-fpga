@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from pyuvm import uvm_monitor, uvm_analysis_port
@@ -11,7 +11,7 @@ class HashUVMMonitor(uvm_monitor):
     def build_phase(self):
         self.ap = uvm_analysis_port("ap", self)
         self._recv_queue = Queue()
-        self._pending = Event(name="Monitor._pending")
+        self._pending = Event()
 
     def start_of_simulation_phase(self):
         self.parent.dut.monitor.add_callback(self._monitor_callback)

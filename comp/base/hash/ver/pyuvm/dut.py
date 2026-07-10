@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from pyuvm import uvm_component
@@ -57,7 +57,7 @@ class HashDUT(uvm_component):
         self.hash = hash_func
 
     def start_of_simulation_phase(self):
-        cocotb.start_soon(Clock(self.clock, 5, units="ns").start())
+        cocotb.start_soon(Clock(self.clock, 5, unit="ns").start())
 
     @property
     def key_width(self):
@@ -126,11 +126,11 @@ class HashMonitor(BusMonitor):
 
             transaction = dict()
 
-            if self.bus.valid.value.integer == 1:
+            if self.bus.valid.value == 1:
                 for name in self._signals:
                     if hasattr(self.bus, name) and name != "valid":
                         sig = getattr(self.bus, name)
-                        transaction[name] = sig.value.integer
+                        transaction[name] = sig.value.to_unsigned()
 
                 self.log.debug(f"received {transaction=}")
 
