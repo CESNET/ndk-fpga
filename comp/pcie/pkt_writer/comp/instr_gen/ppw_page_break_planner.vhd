@@ -96,7 +96,7 @@ architecture FULL of PPW_PAGE_BREAK_PLANNER is
 
 begin
 
-    RX_MVB_DST_RDY <= TX_MVB_DST_RDY and not (breaking and RX_MVB_SRC_RDY);
+    RX_MVB_DST_RDY <= TX_MVB_DST_RDY and not breaking;
 
     meta_reg_p : process (CLK)
     begin
