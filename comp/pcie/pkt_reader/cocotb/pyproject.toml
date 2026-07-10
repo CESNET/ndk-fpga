@@ -2,7 +2,7 @@
 name = "cocotb-pcie_pkt_reader"
 version = "0.1.0"
 dependencies = [
-    "cocotb == 1.9.2",
+    "cocotb >= 2.0.0",
     "cocotbext-ofm[nfb] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
     "setuptools",
 ]

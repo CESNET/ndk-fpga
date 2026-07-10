@@ -10,6 +10,7 @@ from math import log2, ceil
 from collections import deque
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotb_bus.drivers import BitDriver
@@ -58,15 +59,15 @@ class testbench():
         self.scoreboard.add_interface(self.tagmem_mon, self.tagmem_exp_output)
 
         if debug:
-            self.rx_mvb_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.tx_mvb_mon.log.setLevel(cocotb.logging.DEBUG)
-            self.idmem_mon.log.setLevel(cocotb.logging.DEBUG)
-            self.tagmem_mon.log.setLevel(cocotb.logging.DEBUG)
+            self.rx_mvb_drv.log.setLevel(logging.DEBUG)
+            self.tx_mvb_mon.log.setLevel(logging.DEBUG)
+            self.idmem_mon.log.setLevel(logging.DEBUG)
+            self.tagmem_mon.log.setLevel(logging.DEBUG)
 
     async def model(self, instr: PprInstr):
         """Model of the DUT"""
         req_id, req_addr, length_full = instr.id, instr.address, instr.length
-        pcie_mrrs = self.dut.PCIE_MRRS.value.integer
+        pcie_mrrs = self.dut.PCIE_MRRS.value.to_unsigned()
         page_size = self.dut.PAGE_SIZE.value
         memory_size = self.dut.MEMORY_ITEMS.value
         bytes_per_word = self.dut.MEMORY_ITEM_WIDTH.value // 8
@@ -196,7 +197,7 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     assert pcie_mrrs in [128, 256, 512, 1024, 2048, 4096, 8192, 16384], "PCIE_MRRS must be one of the standard values."
 
     dut.RESET.value = 1
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut, debug=False)
     # Change MVB driver's IdleGenerator to ItemRateLimiter

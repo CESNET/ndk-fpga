@@ -1,5 +1,5 @@
 # cocotb_test.py:
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,6 +10,7 @@ from math import log2, ceil
 from typing import Tuple
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotb_bus.drivers import BitDriver
@@ -70,12 +71,12 @@ class testbench():
 
         if debug:
             if self.mfb_rx_drv is not None:
-                self.mfb_rx_drv.log.setLevel(cocotb.logging.DEBUG)
+                self.mfb_rx_drv.log.setLevel(logging.DEBUG)
             if self.axis_rx_drv is not None:
-                self.axis_rx_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.mvb_rx_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.mfb_tx_mon.log.setLevel(cocotb.logging.DEBUG)
-            self.mvb_tx_mon.log.setLevel(cocotb.logging.DEBUG)
+                self.axis_rx_drv.log.setLevel(logging.DEBUG)
+            self.mvb_rx_drv.log.setLevel(logging.DEBUG)
+            self.mfb_tx_mon.log.setLevel(logging.DEBUG)
+            self.mvb_tx_mon.log.setLevel(logging.DEBUG)
 
     def model(self, instr: MvbTrAddressAndLength, meta: Tuple[int, int], packet: bytes):
         """Model of the DUT"""
@@ -154,7 +155,7 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256
     assert pcie_mps in [128, 256, 512, 1024, 2048, 4096, 8192, 16384], "PCIE_MPS must be one of the standard values."
 
     dut.RESET.value = 1
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut)
     # Change MVB driver's IdleGenerator to ItemRateLimiter

@@ -7,6 +7,7 @@
 import itertools
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotb_bus.drivers import BitDriver
@@ -166,10 +167,10 @@ class Testbench():
         self.scoreboard.add_interface(self.user_resp_mon, self.exp_output, compare_fn=compare_wrapper)
 
         if debug:
-            self.user_req_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.pcie_up_mon.log.setLevel(cocotb.logging.DEBUG)
-            self.pcie_down_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.user_resp_mon.log.setLevel(cocotb.logging.DEBUG)
+            self.user_req_drv.log.setLevel(logging.DEBUG)
+            self.pcie_up_mon.log.setLevel(logging.DEBUG)
+            self.pcie_down_drv.log.setLevel(logging.DEBUG)
+            self.user_resp_mon.log.setLevel(logging.DEBUG)
 
     def model(self, instr: PprInstr, mfb_pkt: bytes):
         """Model of the DUT"""
@@ -203,7 +204,7 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     assert pcie_rcb in [64, 128], "PCIE_RCB must be one of the standard values."
 
     dut.RESET.value = 1
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = Testbench(dut, debug=False, pkts_exp=frame_count, mps=pcie_mps, rcb=pcie_rcb)
     # Change MVB driver's IdleGenerator to ItemRateLimiter

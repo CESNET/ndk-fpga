@@ -64,7 +64,7 @@ class BaseMemMonitor(BusMonitor):
         data_dict_items = {}
         for s in self.__os:
             # Splitting the word into a list of items by masking and shifting
-            data_dict_word[s] = getattr(self.bus, s).value
+            data_dict_word[s] = getattr(self.bus, s).value.to_unsigned()
             data_mask = 2**self.__item_widths[s] - 1
             data_dict_items[s] = []
             for i in range(self.__items):
@@ -92,8 +92,8 @@ class BaseMemMonitor(BusMonitor):
             if self.in_reset:
                 continue
 
-            if vld := self.bus.vld.value.integer > 0:
-                self.__item_cnt += self.bus.vld.value.binstr.count("1")
+            if vld := self.bus.vld.value.to_unsigned() > 0:
+                self.__item_cnt += self.bus.vld.value.count("1")
                 self.recv_tr(vld)
 
 
