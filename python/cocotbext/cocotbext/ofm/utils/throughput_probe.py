@@ -1,5 +1,5 @@
 # throughput_probe.py: Universal probe for measuring throughput and efficiency
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -225,7 +225,7 @@ class ThroughputProbe(Probe):
                 if period == 0:
                     return
 
-                time_diff = round(get_sim_time(units=gst_time_units) - self._start_of_period, 4)
+                time_diff = round(get_sim_time(unit=gst_time_units) - self._start_of_period, 4)
 
                 if time_diff >= period:
                     throughput_base_units = (self._interface.item_cnt-self._vld_item_cnt_at_start_of_period) / convert_units(period, time_units.strip("s"), "")[0]
@@ -233,9 +233,9 @@ class ThroughputProbe(Probe):
 
                     efficiency = self._get_immediate_efficiency()*100
 
-                    self.log.info(f"Immediate throughput at {get_sim_time(units=gst_time_units)} {time_units}: {round(throughput, 4):,} {throughput_units}/s, Immediate efficiency: {round(efficiency, 4)}%")
+                    self.log.info(f"Immediate throughput at {get_sim_time(unit=gst_time_units)} {time_units}: {round(throughput, 4):,} {throughput_units}/s, Immediate efficiency: {round(efficiency, 4)}%")
 
-                    self._start_of_period = get_sim_time(units=gst_time_units)
+                    self._start_of_period = get_sim_time(unit=gst_time_units)
                     self._total_item_cnt_at_start_of_period = self._total_item_cnt
                     self._vld_item_cnt_at_start_of_period = self._interface.item_cnt
 
@@ -264,7 +264,7 @@ class ThroughputProbe(Probe):
         Returns:
             average throughput in base units (either Items/s, b/s or B/s depending on which units are set).
         """
-        return self._interface.item_cnt/get_sim_time(units="sec")
+        return self._interface.item_cnt/get_sim_time(unit="sec")
 
     def _get_max_throughput(self) -> float:
         """
@@ -276,7 +276,7 @@ class ThroughputProbe(Probe):
             all the transactions have been already received but the simulation hasn't ended yet. The best accuracy can be
             achieved in the middle of the simulation.
         """
-        return self._total_item_cnt/get_sim_time(units="sec")
+        return self._total_item_cnt/get_sim_time(unit="sec")
 
     def _get_average_efficiency(self) -> float:
         """
