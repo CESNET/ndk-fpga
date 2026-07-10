@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.base.drivers import BusDriver
@@ -56,11 +57,11 @@ class HashMonitor(BusMonitor):
 
             transaction = dict()
 
-            if self.bus.VALID.value.integer == 1:
+            if self.bus.VALID.value == 1:
                 for name in self._signals:
                     if hasattr(self.bus, name) and name != "VALID":
                         sig = getattr(self.bus, name)
-                        transaction[name] = sig.value.integer
+                        transaction[name] = sig.value.to_unsigned()
 
                 self.log.debug(f"received {transaction=}")
 
@@ -76,8 +77,8 @@ class testbench():
         self.stream_out : HashMonitor = HashMonitor(dut, "OUT", dut.CLK)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.stream_out.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
+            self.stream_out.log.setLevel(logging.DEBUG)
 
         # Create a scoreboard on the stream_out bus
         self.pkts_sent = 0
@@ -99,7 +100,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, trans_cnt=10000):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = testbench(dut, debug=False)
 
