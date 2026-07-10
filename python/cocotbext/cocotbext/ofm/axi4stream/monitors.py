@@ -49,7 +49,7 @@ class Axi4Stream(BusMonitor):
             if self.bus.TVALID.value and self.bus.TREADY.value:
                 # returns a whole frame as Axi4StreamTransaction
                 if issubclass(self.__trans_type, Axi4StreamBaseTransaction):
-                    word = {k: getattr(self.bus, s).value.buff[::-1] for k, s in self.__recv_signals.items()}
+                    word = {k: getattr(self.bus, s).value.to_bytes(byteorder="little") for k, s in self.__recv_signals.items()}
 
                     for name, value in asdict(self.__transaction).items():
                         if not hasattr(self.bus, name):

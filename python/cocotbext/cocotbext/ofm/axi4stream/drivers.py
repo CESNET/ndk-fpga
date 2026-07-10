@@ -12,7 +12,7 @@ from cocotbext.ofm.utils.math import ceildiv, bitmask
 from dataclasses import asdict
 from cocotb.queue import Queue
 from cocotb.types import LogicArray
-#from cocotb.handle import Immediate
+from cocotb.handle import Immediate
 from typing import Any
 
 
@@ -31,8 +31,7 @@ class Axi4StreamMaster(BusDriver):
                 length = len(signal.value)
                 value = 2 ** length - 1 if s in ["TSTRB", "TKEEP"] else 0
 
-                #signal.set(Immediate(value))
-                signal.setimmediatevalue(value)
+                signal.set(Immediate(value))
 
     def _clear_control_signals(self):
         for name in self.all_signals:
@@ -159,5 +158,4 @@ class Axi4StreamSlave(BusDriver):
     def __init__(self, entity, name, clock, array_idx=None):
         super().__init__(entity, name, clock, array_idx=array_idx)
 
-        #self.bus.TREADY.set(Immediate(1))
-        self.bus.TREADY.setimmediatevalue(1)
+        self.bus.TREADY.set(Immediate(1))
