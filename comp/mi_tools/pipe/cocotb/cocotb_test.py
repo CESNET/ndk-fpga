@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
+from cocotb.types import LogicArray
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mi.drivers import MIRequestDriverAgent, MIResponseDriverAgent
@@ -14,7 +15,6 @@ from cocotbext.ofm.utils.math import ceildiv
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.mi.transaction import MiRequestTransaction, MiResponseTransaction, MiTransaction, MiTransactionType
-from cocotb.binary import BinaryValue
 from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
 
 from random import choice, randint
@@ -59,7 +59,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_width_max: int = 32):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
     tb = testbench(dut, debug=False)
     await tb.reset()
 
@@ -75,13 +75,13 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
 
         addr = start_addr
         offset_transaction = transaction
-        byte_enable = BinaryValue(2**len(transaction) - 1)
+        byte_enable = LogicArray("1" * len(transaction))
 
         start_offset = addr % tb.request_stream_in.data_width
         end_offset = -(addr + len(offset_transaction)) % tb.request_stream_in.data_width
 
         offset_transaction = bytes(start_offset) + offset_transaction + bytes(end_offset)
-        byte_enable = BinaryValue(("0" * start_offset) + byte_enable.binstr + ("0" * end_offset))
+        byte_enable = LogicArray(("0" * start_offset) + str(byte_enable) + ("0" * end_offset))
         addr = addr - start_offset
 
         cycles = ceildiv(bus_width=tb.request_stream_in.data_width, transaction_len=len(offset_transaction))
@@ -89,7 +89,7 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
         for i in range(cycles):
             data = offset_transaction[i*tb.request_stream_in.data_width:(i+1)*tb.request_stream_in.data_width]
 
-            be_slice = BinaryValue(byte_enable.binstr[i*tb.request_stream_in.data_width:(i+1)*tb.request_stream_in.data_width][::-1], bigEndian=False).integer
+            be_slice = LogicArray(str(byte_enable)[i*tb.request_stream_in.data_width:(i+1)*tb.request_stream_in.data_width][::-1]).to_unsigned()
             enabled_data = filter_bytes_by_bitmask(data, be_slice)
 
             if len(enabled_data) == 0:
@@ -112,7 +112,7 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
         response_trans = MiResponseTransaction()
         response_trans.trans_type = request_type
         response_trans.data = offset_transaction
-        response_trans.be = byte_enable.integer
+        response_trans.be = byte_enable.to_unsigned()
 
         cocotb.log.debug(f"generated transaction: {transaction.hex()}")
         tb.request_stream_in.append(request_trans)

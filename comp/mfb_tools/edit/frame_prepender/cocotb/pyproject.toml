@@ -2,6 +2,7 @@
 name = "cocotb-mfb_mvb_prepander"
 version = "0.1.0"
 dependencies = [
+    "cocotb == 1.9.2",
     "cocotbext-ofm[nfb] @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
     "setuptools",
 ]

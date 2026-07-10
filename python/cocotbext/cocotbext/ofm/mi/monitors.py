@@ -1,12 +1,11 @@
 # monitors.py: MIMonitor
-# Copyright (C) 2024 CESNET z. s. p. o.
-# Author(s): Ondřej Schwarz <Ondrej.Schwarz@cesnet.cz>
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
+# Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from cocotb_bus.monitors import BusMonitor
+from cocotbext.ofm.base.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
-from cocotbext.ofm.utils.signals import get_signal_value_in_bytes
 from cocotbext.ofm.mi.transaction import MiTransaction, MiTransactionType
 from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
 
@@ -53,10 +52,9 @@ class MIMonitor(BusMonitor):
                 continue
 
             if self.bus.rd.value == 1 and self.bus.ardy.value == 1:
-                addr_bytes = get_signal_value_in_bytes(self.bus.addr)
+                addr_bytes = self.bus.addr.value.to_bytes(byteorder="little")
                 be = self.bus.be.value
-                be.big_endian = False
-                be_int = int.from_bytes(be.buff, 'little')
+                be_int = be.to_unsigned()
 
                 recv_trans = MiTransaction()
                 recv_trans.trans_type = MiTransactionType.Request
@@ -69,7 +67,7 @@ class MIMonitor(BusMonitor):
                 if len(self.read_transactions) == 0:
                     raise RuntimeError("Received reponse without request.")
 
-                drd_bytes = get_signal_value_in_bytes(self.bus.drd)
+                drd_bytes = self.bus.drd.value.to_bytes(byteorder="little")
 
                 recv_trans = self.read_transactions.pop(0)
 
@@ -83,18 +81,11 @@ class MIMonitor(BusMonitor):
                 self._item_cnt += 1
 
             if self.bus.wr.value == 1 and self.bus.ardy.value == 1:
-                dwr_bytes = get_signal_value_in_bytes(self.bus.dwr)
-                addr_bytes = get_signal_value_in_bytes(self.bus.addr)
+                dwr_bytes = self.bus.dwr.value.to_bytes(byteorder="little")
+                addr_bytes = self.bus.addr.value.to_bytes(byteorder="little")
 
                 be = self.bus.be.value
-                be.big_endian = False
-                be_int = int.from_bytes(be.buff, 'little')
-
-                dwr_recv = b''
-                be_list = [*be]
-                first_be = be_list.index(1)
-                last_be = (be_list+[0]).index(0, first_be)  # ensures there is at least one zero
-                dwr_recv = dwr_bytes[first_be:last_be]
+                be_int = be.to_unsigned()
 
                 self.log.debug(f"ITEM {self._item_cnt}")
                 self.log.debug(f"ADDR {addr_bytes.hex()}")
@@ -104,7 +95,7 @@ class MIMonitor(BusMonitor):
                 recv_trans = MiTransaction()
                 recv_trans.trans_type = MiTransactionType.Response
                 recv_trans.addr = int.from_bytes(addr_bytes, 'little')
-                recv_trans.data = dwr_recv
+                recv_trans.data = filter_bytes_by_bitmask(dwr_bytes, be_int)
                 recv_trans.be = be_int
 
                 self._recv(recv_trans)

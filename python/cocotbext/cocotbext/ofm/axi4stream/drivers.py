@@ -1,18 +1,18 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import copy
 
-import cocotb
 from cocotbext.ofm.base.drivers import BusDriver
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamBaseTransaction
 from cocotbext.ofm.base.transaction import IdleTransaction
 from cocotbext.ofm.utils.math import ceildiv, bitmask
 from dataclasses import asdict
 from cocotb.queue import Queue
-from cocotb.binary import BinaryValue
+from cocotb.types import LogicArray
+#from cocotb.handle import Immediate
 from typing import Any
 
 
@@ -27,17 +27,22 @@ class Axi4StreamMaster(BusDriver):
         self.all_signals = ms | os if isinstance(ms, dict) else ms + os
         for s in self.all_signals:
             if hasattr(self.bus, s) and s not in ["TREADY"]:
-                val = 2 ** getattr(self.bus, s).value.n_bits - 1 if s in ["TSTRB", "TKEEP"] else 0
-                getattr(self.bus, s).setimmediatevalue(val)
+                signal = getattr(self.bus, s)
+                length = len(signal.value)
+                value = 2 ** length - 1 if s in ["TSTRB", "TKEEP"] else 0
+
+                #signal.set(Immediate(value))
+                signal.setimmediatevalue(value)
 
     def _clear_control_signals(self):
         for name in self.all_signals:
             if hasattr(self.bus, name) and name != "TREADY":
                 signal = getattr(self.bus, name)
+
                 if name == "TVALID":
                     signal.value = 0
                 else:
-                    signal.value = BinaryValue("X" * len(signal))
+                    signal.value = LogicArray("X" * len(signal))
 
     def _split_frame(self, transaction: Axi4StreamBaseTransaction) -> Queue:
         """
@@ -78,7 +83,6 @@ class Axi4StreamMaster(BusDriver):
 
         return split_frame_queue
 
-    @cocotb.coroutine
     async def write(self, data: dict[str, int], sync=True):
         """
         Writes valid transaction represented as a dictionary of intetegers to the bus.
@@ -153,6 +157,7 @@ class Axi4StreamSlave(BusDriver):
     _signals = ["TVALID", "TREADY"]
 
     def __init__(self, entity, name, clock, array_idx=None):
-        BusDriver.__init__(self, entity, name, clock, array_idx=array_idx)
+        super().__init__(entity, name, clock, array_idx=array_idx)
 
+        #self.bus.TREADY.set(Immediate(1))
         self.bus.TREADY.setimmediatevalue(1)

@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
-import cocotb
 from cocotb_bus.drivers import BitDriver
 from cocotb.triggers import RisingEdge
 from typing import Callable
@@ -49,8 +48,7 @@ class MultiBitDriver(BitDriver):
         self.__pattern_args = pattern_args
         super().__init__(signal, clk, generator)
 
-    @cocotb.coroutine
-    def _cr_twiddler(self, generator=None):
+    async def _cr_twiddler(self, generator=None):
         if generator is None and self._generator is None:
             raise Exception("No generator provided!")
         if generator is not None:
@@ -68,4 +66,4 @@ class MultiBitDriver(BitDriver):
                 self._signal.value = int(val, 2)
 
                 for _ in range((off if e else on)):
-                    yield edge
+                    await edge

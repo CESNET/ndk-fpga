@@ -41,9 +41,18 @@ set SIM_MODULE $SYNTH_FLAGS(MODULE)
 
 # Cocotb environment variables
 set env(MODULE) $env(COCOTB_MODULE)
+
+if {![info exists env(COCOTB_TEST_MODULES)]} {
+    set env(COCOTB_TEST_MODULES) $env(COCOTB_MODULE)
+}
+
 set env(TOPLEVEL) work.[string tolower $SYNTH_FLAGS(MODULE)]
 set env(TOPLEVEL_LANG) vhdl
 set env(COCOTB_RESOLVE_X) "ZEROS"
+set env(PYGPI_PYTHON_BIN) [exec which python]
+#set env(COCOTB_ATTACH) 1
+#set env(COCOTB_LOG_LEVEL) DEBUG
+
 
 proc sim_pre_run {} {
     global env

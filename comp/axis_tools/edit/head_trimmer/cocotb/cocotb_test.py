@@ -1,7 +1,6 @@
+# SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2026 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
-#
-# SPDX-License-Identifier: BSD-3-Clause
 
 """Cocotb tests for AXIS_HEAD_TRIMMER component."""
 
@@ -29,7 +28,7 @@ async def _run_test(
 ):
     """Run test with specified packet count and configuration."""
     cocotb.log.info(f"Starting AXIS_HEAD_TRIMMER {test_name} test")
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = Testbench(dut, debug=False)
     await tb.reset()
@@ -78,7 +77,7 @@ async def _run_test(
         timeout += 1
 
     if tx_task:
-        tx_task.kill()
+        tx_task.cancel()
 
     cocotb.log.info(f"Test completed: {tb.tx_monitor.frame_cnt}/{pkt_count} packets")
 

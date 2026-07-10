@@ -1,5 +1,5 @@
 # cocotb_test.py:
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -96,7 +96,7 @@ def gen_fracture(weight: float, maximum: int) -> Tuple[int, int]:
 @cocotb.test()
 async def run_test(dut, frame_count=5000, frame_size_min=60, frame_size_max=1500, fracture_weight=0.3):
     dut.RESET.value = 1
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut)
     rl = EthernetRateLimiter(bitrate=500_000)
