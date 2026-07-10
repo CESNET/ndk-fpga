@@ -10,6 +10,7 @@ from cocotbext.ofm.mac_segmented.monitors import MAC_Segmented_TX_Monitor
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
+import logging
 #from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 
 
@@ -31,8 +32,8 @@ class testbench():
         self.scoreboard.add_interface(self.stream_out, self.expected_output)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.stream_out.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
+            self.stream_out.log.setLevel(logging.DEBUG)
 
     def model(self, transaction):
         """Model the DUT based on the input transaction"""
@@ -49,8 +50,8 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=2048):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 2482, units="ps").start())
-    tb = testbench(dut, debug=True)
+    cocotb.start_soon(Clock(dut.CLK, 2482, unit="ps").start())
+    tb = testbench(dut, debug=False)
     dut.IN_MFB_ERROR.value = 0
     dut.OUT_MAC_READY.value = 1
     await tb.reset()
