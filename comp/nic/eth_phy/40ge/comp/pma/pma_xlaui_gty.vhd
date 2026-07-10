@@ -284,7 +284,7 @@ begin
 
     gen_clkbuf: if (not CLK_SLAVE) generate
 
-        -- Reference clock (161.135 MHz) global buffer
+        -- Reference clock (161.135 MHz) global buffer
         -- Output clock is stable, free-running, not affected by resets
         refclk_bufg_gt : component bufg_gt
         port map (
@@ -309,7 +309,7 @@ begin
             IB    => REFCLK_N_IN,
             CEB   => '0',
             O     => gtrefclk,    -- 322.27 MHz
-            ODIV2 => gtrefclk_div -- 161,135 Mhz
+            ODIV2 => gtrefclk_div -- 161,135 Mhz
         );
 
     end generate;

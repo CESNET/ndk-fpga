@@ -43,7 +43,7 @@
      * stream. The individual instances of the output stream are copied
      * from this instance, after randomization, using the
      * Transaction::copy() method. stream_id property of this instance is
-     * set to the generator’s stream identifier before each randomization.
+     * set to the generatorâ€™s stream identifier before each randomization.
      * The Transaction::data_id property of this instance is also set
      * before each randomization. It will be reset to 0 when the generator
      * is reset and after the specified maximum number of instances has
