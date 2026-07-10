@@ -5,6 +5,7 @@
 
 import ipaddress
 import cocotb
+import logging
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mvb.drivers import MVBDriver
@@ -141,9 +142,9 @@ class Testbench:
 
         # Setting up logging level
         if debug:
-            self.mfb_driver.log.setLevel(cocotb.logging.DEBUG)
-            self.mvb_driver.log.setLevel(cocotb.logging.DEBUG)
-            self.mvb_tx_monitor.log.setLevel(cocotb.logging.DEBUG)
+            self.mfb_driver.log.setLevel(logging.DEBUG)
+            self.mvb_driver.log.setLevel(logging.DEBUG)
+            self.mvb_tx_monitor.log.setLevel(logging.DEBUG)
 
     def _process_tx_transaction(self, transaction):
         """Process TX transaction: zero out csum values and ok flags when en is zero.

@@ -1,5 +1,5 @@
 # cocotb_test.py:
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): David Beneš <xbenes52@vutbr.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -59,7 +59,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
     tb = testbench(dut)
     await tb.reset()
     #That's not really a random number, is it?

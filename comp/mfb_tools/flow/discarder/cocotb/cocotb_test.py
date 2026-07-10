@@ -1,10 +1,11 @@
 # cocotb_test.py:
-# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Copyright (C) 2025-2026 DynaNIC Semiconductors, Ltd.
 # Author(s): Jan Privara <privara@dyna-nic.com>
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mvb.drivers import MVBDriver
@@ -74,10 +75,10 @@ class testbench():
 
         # setting up logging level
         if debug:
-            self.mvb_stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.mfb_stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.mvb_stream_out.log.setLevel(cocotb.logging.DEBUG)
-            self.mfb_stream_out.log.setLevel(cocotb.logging.DEBUG)
+            self.mvb_stream_in.log.setLevel(logging.DEBUG)
+            self.mfb_stream_in.log.setLevel(logging.DEBUG)
+            self.mvb_stream_out.log.setLevel(logging.DEBUG)
+            self.mfb_stream_out.log.setLevel(logging.DEBUG)
 
     # method for adding transactions to expected output
     def model(self, mvb_transaction, mfb_transaction):
@@ -98,7 +99,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     # initialization of the test bench
     tb = testbench(dut, debug=False)
