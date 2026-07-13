@@ -5,6 +5,7 @@
 
 import cocotb
 import warnings
+import logging
 import cocotb_bus.drivers as cbd
 import cocotb_bus.monitors as cbm
 from cocotb_bus.bus import Bus
@@ -25,6 +26,10 @@ class Driver:
         self.busy_event = Event()
         self.busy = False
 
+        # Sub-classes may already set up logging
+        if not hasattr(self, "log"):
+            self.log = logging.getLogger("cocotb.driver.%s" % (type(self).__qualname__))
+
         # Create an independent coroutine which can send stuff
         self._thread = cocotb.start_soon(self._send_thread())
 
@@ -39,6 +44,10 @@ class Monitor:
 
         if callback is not None:
             self.add_callback(callback)
+
+        # Sub-classes may already set up logging
+        if not hasattr(self, "log"):
+            self.log = logging.getLogger("cocotb.monitor.%s" % (type(self).__qualname__))
 
         # Create an independent coroutine which can receive stuff
         self._thread = cocotb.start_soon(self._monitor_recv())
