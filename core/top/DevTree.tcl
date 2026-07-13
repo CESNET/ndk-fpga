@@ -22,11 +22,11 @@ namespace eval NdkCore {
 proc dts_ndk_core_info {DTS} {
     upvar 1 $DTS ret
 
-    global CARD_NAME DT_PROJECT_TEXT PROJECT_VARIANT PROJECT_VERSION
+    global CARD_NAME PROJECT_NAME PROJECT_VARIANT PROJECT_VERSION
 
     dts_appendprop_string ret "card-name" "$CARD_NAME"
-    if {[info exists DT_PROJECT_TEXT]} {
-        dts_appendprop_string ret "project-name" "$DT_PROJECT_TEXT"
+    if {[info exists PROJECT_NAME]} {
+        dts_appendprop_string ret "project-name" "$PROJECT_NAME"
     }
     if {[info exists PROJECT_VARIANT]} {
         dts_appendprop_string ret "project-variant" "$PROJECT_VARIANT"
