@@ -205,6 +205,8 @@ architecture FULL of PCIE_PKT_READER is
     signal tagmem_wr1_upd_fib       : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_FIRSTIB_W-1 downto 0);
     signal tagmem_wr1_data_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(TAGMEM_DATA_W-1 downto 0);
 
+    signal tagmem_addr_collision    : std_logic;
+
     signal idmem_addr_arr           : slv_array_t(MFB_REGIONS-1 downto 0)(MM_RD_ADDR_W+1-1 downto 0);
     signal idmem_words_arr          : slv_array_t(MFB_REGIONS-1 downto 0)(MAX_WORDS_W-1 downto 0);
     signal idmem_eof_pos_arr        : slv_array_t(MFB_REGIONS-1 downto 0)(log2(WORD_ITEMS)-1 downto 0);
@@ -224,6 +226,8 @@ architecture FULL of PCIE_PKT_READER is
     signal idmem_wr1_tagcnt         : u_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr1_new_tag_cnt    : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_TAG_W-1 downto 0);
     signal idmem_wr1_data_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(IDMEM_DATA_W-1 downto 0);
+
+    signal idmem_addr_collision     : std_logic;
 
     signal pcie_down_mvb_data_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_DOWNHDR_WIDTH-1 downto 0);
     signal pcie_resp_len            : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_COMPLETION_LENGTH_W-1 downto 0);
@@ -452,12 +456,14 @@ begin
     process (CLK)
     begin
         if rising_edge(CLK) then
-            tagmem_rd_reg_addr <= tagmem_rd_addr;
-            tagmem_rd_reg_data <= tagmem_rd_data;
+            if (PCIE_DOWN_MVB_DST_RDY = '1') then
+                tagmem_rd_reg_addr <= tagmem_rd_addr;
+                tagmem_rd_reg_data <= tagmem_wr1_data_arr when (tagmem_addr_collision = '1') else tagmem_rd_data;
 
-            tagmem_rd_reg_len  <= slv_arr_to_u_arr(pcie_resp_len);
-            tagmem_rd_reg_cmpl <= pcie_resp_cmlp;
-            tagmem_rd_reg_vld  <= pcie_resp_vld;
+                tagmem_rd_reg_len  <= slv_arr_to_u_arr(pcie_resp_len);
+                tagmem_rd_reg_cmpl <= pcie_resp_cmlp;
+                tagmem_rd_reg_vld  <= pcie_resp_vld;
+            end if;
         end if;
     end process;
 
@@ -478,6 +484,10 @@ begin
     tagmem_wr_addr(2*MFB_REGIONS-1 downto MFB_REGIONS) <= tagmem_rd_reg_addr;
     tagmem_wr_data(2*MFB_REGIONS-1 downto MFB_REGIONS) <= tagmem_wr1_data_arr;
     tagmem_wr_en  (2*MFB_REGIONS-1 downto MFB_REGIONS) <= tagmem_rd_reg_vld;
+
+    -- Detect colliding addresses for requests in consecutive clock cycles due to registering read data (before modification and write-back).
+    -- A very simple implementation for MFB Regions = 1.
+    tagmem_addr_collision <= tagmem_rd_reg_vld(0) and pcie_resp_vld(0) when (unsigned(tagmem_rd_reg_addr(0)) = unsigned(tagmem_rd_addr(0))) else '0';
 
     -- --------------------------------------------------------
     --  Memory for ID records
@@ -539,7 +549,7 @@ begin
     begin
         if rising_edge(CLK) then
             idmem_rd_reg_addr <= idmem_rd_addr;
-            idmem_rd_reg_data <= idmem_rd_data;
+            idmem_rd_reg_data <= idmem_wr1_data_arr when (idmem_addr_collision = '1') else idmem_rd_data;
 
             idmem_rd_reg_cmpl <= tag_completed;
         end if;
@@ -564,6 +574,10 @@ begin
     idmem_wr_data(2*MFB_REGIONS-1 downto MFB_REGIONS) <= idmem_wr1_data_arr;
     idmem_wr_en  (2*MFB_REGIONS-1 downto MFB_REGIONS) <= idmem_rd_reg_cmpl;
 
+    -- Detect colliding addresses for Tag completions in consecutive clock cycles due to registering read data (before modification and write-back).
+    -- A very simple implementation for MFB Regions = 1.
+    idmem_addr_collision <= idmem_rd_reg_cmpl(0) and tag_completed(0) when (unsigned(idmem_rd_reg_addr(0)) = unsigned(idmem_rd_addr(0))) else '0';
+
     -- ========================================================
     --  Process responses and sends them to the Main Memory
     -- ========================================================
@@ -583,7 +597,7 @@ begin
         pcie_resp_tag (r) <= pcie_down_mvb_data_arr(r)(DMA_COMPLETION_TAG);
     end generate;
 
-    pcie_resp_vld <= PCIE_DOWN_MVB_VLD and PCIE_DOWN_MVB_SRC_RDY and PCIE_DOWN_MVB_DST_RDY;
+    pcie_resp_vld <= PCIE_DOWN_MVB_VLD and PCIE_DOWN_MVB_SRC_RDY;
 
     wr_instr_fifo_di_g : for r in 0 to MFB_REGIONS-1 generate
         wr_instr_fifo_di_arr(r) <= tagmem_rd_reg_cmpl (r) & -- Tag completed
