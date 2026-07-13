@@ -18,6 +18,8 @@ def common_card_test_run(CARD_NAME, failed) {
     // Track failed tests based on actual test results
     if (testResult.failCount > 0) {
         echo "Tests failed for $CARD_NAME (${testResult.failCount} failures), build marked as UNSTABLE"
+        currentBuild.result = 'UNSTABLE'
+        currentStage.result = 'UNSTABLE'
         failed.add("$CARD_NAME")
     }
 }
@@ -25,6 +27,8 @@ def common_card_test_run(CARD_NAME, failed) {
 def CARDS = ["alveo-u200", "alveo-u55c", "vcu118", "ia-420f", "n6010", "fb2cghh", "fb4cgg3", "fb2cdg1", "nfb-200g2ql", "dk-dev-1sdx-p", "g35p", "nt200a02", "agi-fh400g", "a2700", "ia-440i"]
 
 node("preklad") {
+    currentBuild.result = 'SUCCESS'
+
     cleanWs()
     checkout scm
 
@@ -62,14 +66,14 @@ node("preklad") {
     sh "rm -rf venv-fpga"
 
     // send out emails if failure is detected (FAILURE or UNSTABLE)
-    if(currentBuild.result != "SUCCESS") {
+    if(currentBuild.result == "FAILURE" || currentBuild.result == "UNSTABLE") {
         println "FAILED on cards: ${failed}."
         emailext \
             recipientProviders: [culprits(), developers()],
             to: 'cabal@cesnet.cz, spinler@cesnet.cz, isa@cesnet.cz, kondys@cesnet.cz, friedl@cesnet.cz',
-            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
+            subject: "[Jenkins] ${currentBuild.result} ${env.JOB_NAME} #${currentBuild.number}",
             body: """\
-                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on cards: ${failed}. You can find build log in the attachments.
+                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.result} on cards: ${failed}. You can find build log in the attachments.
 
                 For more details see ${env.BUILD_URL}.
 
