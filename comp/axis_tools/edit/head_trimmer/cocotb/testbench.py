@@ -11,6 +11,7 @@ signals are ignored.
 """
 
 import cocotb
+import logging
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
@@ -110,8 +111,8 @@ class Testbench:
         self.scoreboard.add_interface(self.tx_monitor, self.expected_output, compare_fn=compare_wrapper)
 
         if debug:
-            self.rx_driver.log.setLevel(cocotb.logging.DEBUG)
-            self.tx_monitor.log.setLevel(cocotb.logging.DEBUG)
+            self.rx_driver.log.setLevel(logging.DEBUG)
+            self.tx_monitor.log.setLevel(logging.DEBUG)
 
     async def reset(self):
         self.dut.RESET.value = 1

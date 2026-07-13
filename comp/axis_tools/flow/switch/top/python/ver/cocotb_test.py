@@ -1,5 +1,5 @@
 # cocotb_test.py: Switch verification environment
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Tomas Hak <hak@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,6 +9,7 @@ from switch import Switch
 from random import randbytes, randint
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles, with_timeout
 
@@ -55,7 +56,7 @@ class testbench:
         self.tx_frames  = [[] for _ in range(self.num_ports)]
 
         # set DEBUG log level
-        loglevel = cocotb.logging.DEBUG if debug else cocotb.logging.WARNING
+        loglevel = logging.DEBUG if debug else logging.WARNING
         self.mi_driver.log.setLevel(loglevel)
         for p in range(self.num_ports):
             self.rx_axi_drivers[p].log.setLevel(loglevel)

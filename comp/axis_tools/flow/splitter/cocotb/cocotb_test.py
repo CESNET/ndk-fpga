@@ -6,6 +6,7 @@ import itertools
 from random import randint
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
@@ -26,7 +27,7 @@ class testbench():
         self.backpressure = MultiBitDriver(dut.TX_AXIS_TREADY, dut.CLK, pattern=Patterns.random)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
 
         # Create a scoreboard on the stream_out bus
         self.pkts_sent = 0
@@ -41,8 +42,8 @@ class testbench():
             self.scoreboard.add_interface(self.stream_out[i], self.expected_output[i])
 
             if debug:
-                self.monitor.log.setLevel(cocotb.logging.DEBUG)
-                self.stream_out.log.setLevel(cocotb.logging.DEBUG)
+                self.monitor.log.setLevel(logging.DEBUG)
+                self.stream_out.log.setLevel(logging.DEBUG)
 
     def model(self, transaction: Axi4StreamTransaction, index: int):
         """Model the DUT based on the input transaction"""

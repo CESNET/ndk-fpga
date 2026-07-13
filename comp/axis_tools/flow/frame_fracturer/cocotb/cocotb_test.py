@@ -10,6 +10,7 @@ from math import log2, ceil
 from typing import Tuple
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotb_bus.drivers import BitDriver
@@ -36,8 +37,8 @@ class testbench():
         self.scoreboard.add_interface(self.axi_tx_mon, self.expected_output)
 
         if debug:
-            self.axi_rx_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.axi_tx_mon.log.setLevel(cocotb.logging.DEBUG)
+            self.axi_rx_drv.log.setLevel(logging.DEBUG)
+            self.axi_tx_mon.log.setLevel(logging.DEBUG)
 
     def model(self, tr: Axi4StreamTransaction, word_bytes: int):
         """Model of the DUT"""
