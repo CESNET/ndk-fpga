@@ -29,7 +29,7 @@ class PcieDriver(BusDriver):
         hdr, data = transaction
         if self.mfb_drv.frame_cnt == 0:
             await ClockCycles(self.clock, 5)
-        await ClockCycles(self.clock, randint(5, 10))
+        await ClockCycles(self.clock, randint(0, 10))
         # TODO: Idle generators
         self.mfb_drv.append(MfbTransaction(data=data))
         self.mvb_drv.append(hdr)
