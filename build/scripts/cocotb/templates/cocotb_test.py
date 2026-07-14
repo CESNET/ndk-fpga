@@ -3,6 +3,7 @@
 # Author(s): %s <%s>
 
 import itertools
+import logging
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
@@ -49,8 +50,8 @@ class testbench():
 
         # setting up the logging level
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.stream_out.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
+            self.stream_out.log.setLevel(logging.DEBUG)
 
     # method for adding transactions to the expected output
     def model(self, transaction):

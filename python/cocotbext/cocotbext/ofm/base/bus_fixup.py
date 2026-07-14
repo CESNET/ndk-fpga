@@ -5,6 +5,7 @@
 
 import cocotb
 import warnings
+import logging
 import cocotb_bus.drivers as cbd
 import cocotb_bus.monitors as cbm
 from cocotb_bus.bus import Bus
@@ -25,6 +26,10 @@ class Driver:
         self.busy_event = Event()
         self.busy = False
 
+        # Sub-classes may already set up logging
+        if not hasattr(self, "log"):
+            self.log = logging.getLogger("cocotb.driver.%s" % (type(self).__qualname__))
+
         # Create an independent coroutine which can send stuff
         self._thread = cocotb.start_soon(self._send_thread())
 
@@ -39,6 +44,10 @@ class Monitor:
 
         if callback is not None:
             self.add_callback(callback)
+
+        # Sub-classes may already set up logging
+        if not hasattr(self, "log"):
+            self.log = logging.getLogger("cocotb.monitor.%s" % (type(self).__qualname__))
 
         # Create an independent coroutine which can receive stuff
         self._thread = cocotb.start_soon(self._monitor_recv())
@@ -57,6 +66,9 @@ if cocotb.__version__ >= "2.0.0":
         _instances = {}
 
         def __new__(cls, handle, array_idx=None):
+            if handle is None:
+                return None
+
             key = (id(handle), array_idx)
             if key not in cls._instances:
                 cls._instances[key] = super().__new__(cls)
@@ -68,6 +80,9 @@ if cocotb.__version__ >= "2.0.0":
 
         def __len__(self):
             return len(self.value)
+
+        def __getitem__(self, index: int):
+            return SignalProxy(self._handle, index)
 
         @property
         def value(self):
@@ -107,6 +122,9 @@ if cocotb.__version__ >= "2.0.0":
             handle = getattr(self._bus, name)
 
             if isinstance(handle, ArrayObject):
-                return handle[self._array_idx]
+                if self._array_idx is not None:
+                    return handle[self._array_idx]
+                else:
+                    return handle
 
             return SignalProxy(handle, self._array_idx)

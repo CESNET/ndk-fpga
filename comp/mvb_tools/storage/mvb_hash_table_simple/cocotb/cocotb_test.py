@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 
 """
@@ -12,6 +12,7 @@ argument.
 
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mi.drivers import MIRequestDriver as MIDriver
@@ -68,9 +69,9 @@ class testbench():
         self.scoreboard.add_interface(self.stream_out, self.expected_output)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.stream_out.log.setLevel(cocotb.logging.DEBUG)
-            self.mi_interface.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
+            self.stream_out.log.setLevel(logging.DEBUG)
+            self.mi_interface.log.setLevel(logging.DEBUG)
 
     def load_file(self, path: str, params: dict) -> (dict, list, list, dict):
         """function for loading data from configuration files.
@@ -146,7 +147,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
     #                    or via configuration script to which is the file passed ('script').
     #     pkt_count: how many random packets are to be generated.
 
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
     tb = testbench(dut, debug=False)
     await tb.reset()
 
@@ -221,9 +222,9 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
             compatible_str="cesnet,ndk,mvb_hash_table_simple")
 
         servicer = Servicer(device=tb.mi_interface, dtb=dtb)
-        dev = await cocotb.external(nfb.open)(servicer.path())
+        dev = await cocotb.task.bridge(nfb.open)(servicer.path())
 
-        await cocotb.external(MvbHashTableSimple)(mod_path=config_file, dev=dev)
+        await cocotb.task.bridge(MvbHashTableSimple)(mod_path=config_file, dev=dev)
 
     else:
         raise RuntimeError("Invalid configuration setting.")

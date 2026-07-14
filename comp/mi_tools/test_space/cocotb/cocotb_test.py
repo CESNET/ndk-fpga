@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mi.drivers import MIRequestDriver as MIDriver
@@ -23,7 +24,7 @@ class testbench():
         self.scoreboard = Scoreboard(dut)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
 
     def model(self, transaction):
         """Model the DUT based on the input transaction"""

@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mp_bram.controller import MP_BRAM_Controller
 from cocotbext.ofm.utils.ram import VWWRAM
 from cocotbext.ofm.ver.generators import random_packets
-from cocotb.result import TestFailure, TestSuccess
 from random import randint
 
 
@@ -23,7 +23,7 @@ class testbench():
                               block_width=dut.BLOCK_WIDTH.value if dut.BLOCK_ENABLE.value else None)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
 
     async def reset(self):
         self.dut.RESET.value = 1
@@ -34,7 +34,7 @@ class testbench():
 
 async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=16, parallel_write=False, parallel_read=False):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units='ns').start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
     tb = testbench(dut)
     await tb.reset()
     await tb.stream_in.clear_memory()
@@ -42,7 +42,7 @@ async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=
     addr_width = len(tb.stream_in.bus.WR_ADDR[0])
 
     for i, transaction in enumerate(random_packets(item_width_min, item_width_max, pkt_count)):
-        #cocotb.log.info(f"generated transaction: {transaction.hex()}")
+        cocotb.log.debug(f"generated transaction: {transaction.hex()}")
 
         address = randint(0, (2**addr_width-1)-(len(transaction)*8))
 
@@ -51,10 +51,9 @@ async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=
         tb.ref_ram.write(address, transaction) # writting transaction to reference RAM
 
         output = await tb.stream_in.read(address, len(transaction), parallel=parallel_read)
-        #cocotb.log.info(f"received transaction:  {output.hex()}")
+        cocotb.log.debug(f"received transaction:  {output.hex()}")
 
-        if output != transaction:
-            raise TestFailure(f"Expected {transaction.hex()}, got {output.hex()}")
+        assert output == transaction, f"Expected {transaction.hex()}, got {output.hex()}"
 
         if i % 100 == 0:
             cocotb.log.info(f"Processed requests {i}/{pkt_count}.")
@@ -65,10 +64,7 @@ async def write_read_test(dut, pkt_count=1000, item_width_min=1, item_width_max=
         ref_word = tb.ref_ram.read_word(i)
         sim_word = await tb.stream_in.read_word(i, 0)
 
-        if ref_word != sim_word:
-            raise TestFailure(f"On address {i} reference RAM has {ref_word}, but simulated RAM has {sim_word}.")
-
-    raise TestSuccess()
+        assert ref_word == sim_word, f"On address {i} reference RAM has {ref_word}, but simulated RAM has {sim_word}."
 
 
 @cocotb.test()

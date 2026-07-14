@@ -14,6 +14,7 @@ AXI-Stream data through unchanged.
 """
 
 import cocotb
+import logging
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
@@ -70,8 +71,8 @@ class Testbench:
         self._len_monitor_task = cocotb.start_soon(self._monitor_packet_len())
 
         if debug:
-            self.rx_driver.log.setLevel(cocotb.logging.DEBUG)
-            self.tx_monitor.log.setLevel(cocotb.logging.DEBUG)
+            self.rx_driver.log.setLevel(logging.DEBUG)
+            self.tx_monitor.log.setLevel(logging.DEBUG)
 
     async def reset(self):
         """Perform a hardware reset sequence.

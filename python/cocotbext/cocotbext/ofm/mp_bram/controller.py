@@ -89,7 +89,7 @@ class MP_BRAM_Controller(BusDriver):
 
         await await_signal_sync(self._clk_re, self.bus.RD_DATA_VLD[0])
 
-        data = self.bus.RD_DATA[0].value.integer
+        data = self.bus.RD_DATA[0].value.to_unsigned()
 
         self.log.debug(f"read {hex(data)} from {address} at {port=}.")
 
@@ -174,7 +174,7 @@ class MP_BRAM_Controller(BusDriver):
 
                     if self.bus.RD_DATA_VLD[port].value:
                         offset = port + port_offset[port] * self._read_ports
-                        data_bin[offset * width : (offset + 1) * width] = self.bus.RD_DATA[port].value.integer # pozor na endian!
+                        data_bin[offset * width : (offset + 1) * width] = self.bus.RD_DATA[port].value.to_unsigned() # pozor na endian!
 
                         self.log.debug(f"read {hex(data_bin[offset * width : (offset + 1) * width].int)} from {address + offset} at {port=}")
 
@@ -202,7 +202,7 @@ class MP_BRAM_Controller(BusDriver):
 
                 await await_signal_sync(self._clk_re, self.bus.RD_DATA_VLD[0])
 
-                data_bin[i * width : (i + 1) * width] = self.bus.RD_DATA[0].value.integer
+                data_bin[i * width : (i + 1) * width] = self.bus.RD_DATA[0].value.to_unsigned()
 
                 self.log.debug(f"read {hex(data_bin[i * width : (i + 1) * width].int)} from {self._rd_addr} at port {port=}.")
 

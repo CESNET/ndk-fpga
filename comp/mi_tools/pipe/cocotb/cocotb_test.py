@@ -3,6 +3,7 @@
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import cocotb
+import logging
 from cocotb.types import LogicArray
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
@@ -40,8 +41,8 @@ class testbench():
         self.scoreboard.add_interface(self.request_proxy, self.expected_output)
 
         if debug:
-            self.request_stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.response_stream_out.log.setLevel(cocotb.logging.DEBUG)
+            self.request_stream_in.log.setLevel(logging.DEBUG)
+            self.response_stream_out.log.setLevel(logging.DEBUG)
 
     def model(self, test_trans: MiTransaction):
         """Model the DUT based on the input transaction"""

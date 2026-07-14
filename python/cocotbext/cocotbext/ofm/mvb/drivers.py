@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
 
-from cocotb.handle import ModifiableObject
+from cocotb.handle import ArrayObject
 
 from cocotbext.ofm.base.drivers import BusDriver
 
@@ -36,7 +36,7 @@ class MVBDriver(BusDriver):
         self.__os = [s for s in self._optional_signals if hasattr(self.bus, s)]
         self.__item_cnt = 0
         self.__items = len(self.bus.vld)
-        self.__bus_isarray = not isinstance(getattr(self.bus, self.__os[0]), ModifiableObject)
+        self.__bus_isarray = isinstance(getattr(self.bus, self.__os[0]), ArrayObject)
         self.__item_widths = self._get_item_widths()
         self.__data = self._init_data()
 
@@ -106,7 +106,7 @@ class MVBDriver(BusDriver):
         for sig, val in self.__data.items():
             sig_obj = getattr(self.bus, sig)
 
-            if isinstance(sig_obj, ModifiableObject):
+            if not isinstance(sig_obj, ArrayObject):
                 sig_obj.value = val
             else:
                 for i in range(len(sig_obj)):

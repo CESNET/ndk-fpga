@@ -18,6 +18,7 @@ import random
 from typing import List
 
 import cocotb
+import logging
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster, Axi4StreamSlave
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
@@ -112,7 +113,7 @@ class Testbench:
 
         # Setting up logging level
         if debug:
-            self.rx_driver.log.setLevel(cocotb.logging.DEBUG)
+            self.rx_driver.log.setLevel(logging.DEBUG)
 
     async def reset(self):
         """Perform a hardware reset sequence.

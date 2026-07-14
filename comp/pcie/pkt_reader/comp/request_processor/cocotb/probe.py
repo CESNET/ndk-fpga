@@ -63,8 +63,8 @@ class PprProbe(Probe):
 
             if self._interface._agent._is_valid_word(self._bus.src_rdy, self._bus.dst_rdy):
                 for i in range(self._interface.items):
-                    if self._bus.vld.value.binstr[i] == '1':
-                        bus_val = self._bus.data.value
+                    if self._bus.vld.value[i] == '1':
+                        bus_val = self._bus.data.value.to_unsigned()
                         item_data = bus_val & self._item_mask
                         self._tag_q.append(DmaUphdr.deserialize(item_data).dma_request_tag)
                         bus_val >>= self._interface.item_width

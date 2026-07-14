@@ -24,7 +24,7 @@ async def run_test_base(dut, pkt_count=4000, truncate_chance=0):
     cocotb.log.info("Starting MFB_CHECKSUM_L3L4 base test")
 
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     # Initialize testbench
     tb = Testbench(dut, debug=False)
@@ -81,7 +81,7 @@ async def run_test_corrupted_extreme(dut, pkt_count=5000, truncate_chance=0.9, l
     cocotb.log.info("Starting MFB_CHECKSUM_L3L4 extreme corrupted packets test")
 
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 5, units="ns").start())
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     # Initialize testbench with disabled comparison logging
     tb = Testbench(dut, debug=False, log_comparisons=log_comparisons)

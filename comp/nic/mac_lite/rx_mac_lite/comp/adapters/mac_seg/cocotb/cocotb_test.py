@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 
 import cocotb
+import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mac_segmented.drivers import MAC_Segmented_RX_Driver
@@ -14,7 +15,7 @@ from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProb
 
 
 class testbench():
-    def __init__(self, dut, debug=True):
+    def __init__(self, dut, debug=False):
         self.dut = dut
         self.stream_in = MAC_Segmented_RX_Driver(dut, "IN_MAC", dut.CLK)
         self.stream_out = MFBMonitor(dut, "OUT_MFB", dut.CLK)
@@ -30,8 +31,8 @@ class testbench():
         self.scoreboard.add_interface(self.stream_out, self.expected_output)
 
         if debug:
-            self.stream_in.log.setLevel(cocotb.logging.DEBUG)
-            self.stream_out.log.setLevel(cocotb.logging.DEBUG)
+            self.stream_in.log.setLevel(logging.DEBUG)
+            self.stream_out.log.setLevel(logging.DEBUG)
 
     def model(self, transaction):
         """Model the DUT based on the input transaction"""
@@ -48,7 +49,7 @@ class testbench():
 @cocotb.test()
 async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=2048):
     # Start clock generator
-    cocotb.start_soon(Clock(dut.CLK, 2482, units="ps").start())
+    cocotb.start_soon(Clock(dut.CLK, 2482, unit="ps").start())
     tb = testbench(dut, debug=False)
     await tb.reset()
 

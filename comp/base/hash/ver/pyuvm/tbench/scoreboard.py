@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
+import cocotb
 from pyuvm import uvm_scoreboard, uvm_tlm_analysis_fifo, uvm_get_port
-from cocotb.result import TestSuccess, TestFailure
 from cocotbext.ofm.utils.math import ceildiv, bitmask
 
 
@@ -57,7 +57,5 @@ class Scoreboard(uvm_scoreboard):
         self.logger.info(f"All {self.trans_cnt} transactions processed.")
 
     def final_phase(self):
-        if self.errors:
-            raise TestFailure(f"{self.errors} errors found, test failed.")
-        else:
-            raise TestSuccess()
+        assert self.errors == 0, f"{self.errors} errors found, test failed."
+        cocotb.pass_test()

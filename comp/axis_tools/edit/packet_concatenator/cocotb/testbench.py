@@ -6,6 +6,7 @@
 """Testbench for AXIS_PACKET_CONCATENATOR component."""
 
 import cocotb
+import logging
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
@@ -130,9 +131,9 @@ class Testbench:
         self.scoreboard.add_interface(self.tx_mon, self.expected_output, compare_fn=compare_wrapper)
 
         if debug:
-            self.rx0_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.rx1_drv.log.setLevel(cocotb.logging.DEBUG)
-            self.tx_mon.log.setLevel(cocotb.logging.DEBUG)
+            self.rx0_drv.log.setLevel(logging.DEBUG)
+            self.rx1_drv.log.setLevel(logging.DEBUG)
+            self.tx_mon.log.setLevel(logging.DEBUG)
 
     def model(self, rx0_tr: Axi4StreamTransaction, rx1_tr: Axi4StreamTransaction):
         """Model of the DUT - concatenates two packets"""
