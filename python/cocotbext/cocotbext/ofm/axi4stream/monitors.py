@@ -85,7 +85,7 @@ class Axi4Stream(BusMonitor):
 
                 # returns only one word as a dictionary, for backwards compatibility
                 else:
-                    word = {k: getattr(self.bus, s).value.buff for k, s in self.__recv_signals.items()}
+                    word = {k: getattr(self.bus, s).value.to_bytes(byteorder="big") for k, s in self.__recv_signals.items()}
 
                     self._recv(word)
                     self.frame_cnt += 1
