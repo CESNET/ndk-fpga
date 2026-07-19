@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. states. p. o.
-# Author(states): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
+# Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from cocotbext.ofm.base.drivers import BusDriver
 from cocotbext.ofm.utils.binary import Binary, BinaryVector
@@ -122,7 +122,7 @@ class AvstCreditorTX(BusDriver):
         self.bus.update_cnt.value = self._update_cnt.int
 
     def _read_control_signals(self):
-        self._init_ack.value = self.bus.init_ack.value.integer
+        self._init_ack.value = self.bus.init_ack.value.to_unsigned()
 
     def _set_update_cnt(self, segment: int, next_state: AvstCreditorStatesTX):
         """
@@ -240,9 +240,9 @@ class AvstCreditorRX(BusDriver):
         self.bus.init_ack.value = self._init_ack.int
 
     def _read_control_signals(self):
-        self._init.value       = self.bus.init.value.integer
-        self._update.value     = self.bus.update.value.integer
-        self._update_cnt.value = self.bus.update_cnt.value.integer
+        self._init.value       = self.bus.init.value.to_unsigned()
+        self._update.value     = self.bus.update.value.to_unsigned()
+        self._update_cnt.value = self.bus.update_cnt.value.to_unsigned()
 
     async def _send_thread(self):
         """

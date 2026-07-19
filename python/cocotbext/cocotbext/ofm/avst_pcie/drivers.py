@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Radek Isa <isa@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 #            Martin Spinler <spinler@cesnet.cz>
@@ -11,6 +11,7 @@ import cocotb
 from cocotb.triggers import RisingEdge
 from cocotbext.ofm.base.drivers import BusDriver
 from cocotb.queue import Queue
+from cocotb.handle import Immediate
 
 from cocotbext.ofm.pcie.AvstRequester import CompletionHeaderEmpty as RcHdrEmpty
 from cocotbext.ofm.pcie.AvstCompleter import RequestHeaderEmpty as CqHdrEmpty
@@ -23,10 +24,11 @@ class AvstPcieDriverMaster(BusDriver):
     _optional_signals = ["PREFIX", "BAR_RANGE"]
 
     def __init__(self, entity, name, clock, array_idx=None):
-        BusDriver.__init__(self, entity, name, clock, array_idx=array_idx)
+        super().__init__(entity, name, clock, array_idx=array_idx)
         self._cq_q = Queue()
         self._rc_q = Queue()
         self._re = RisingEdge(self.clock)
+
         self._ready_latency = 27
         self.current_ready_latency = 0
 
@@ -41,7 +43,7 @@ class AvstPcieDriverMaster(BusDriver):
         self._segs = len(self.bus.VALID)
         for s in signals:
             if hasattr(self.bus, s) and s not in ["READY"]:
-                getattr(self.bus, s).setimmediatevalue(0)
+                getattr(self.bus, s).set(Immediate(0))
                 self._word[s] = 0
 
         self._empty_width = len(self.bus.EMPTY) // self._segs
@@ -207,6 +209,6 @@ class AvstPcieDriverSlave(BusDriver):
     _signals = ["VALID", "READY"]
 
     def __init__(self, entity, name, clock, array_idx=None):
-        BusDriver.__init__(self, entity, name, clock, array_idx=array_idx)
+        super().__init__(entity, name, clock, array_idx=array_idx)
 
-        self.bus.READY.setimmediatevalue(1)
+        self.bus.READY.set(Immediate(1))
