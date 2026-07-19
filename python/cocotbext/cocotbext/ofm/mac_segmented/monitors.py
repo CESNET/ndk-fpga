@@ -29,11 +29,11 @@ class MAC_Segmented_TX_Monitor(BusMonitor):
         self.item_cnt  = 0
 
     def _read_control_signals(self):
-        self._data.value      = self.bus.data.value.integer
-        self._eop_empty.value = self.bus.eop_empty.value.integer
-        self._inframe.value   = self.bus.inframe.value.integer
-        self._error.value     = self.bus.error.value.integer
-        self._valid.value     = self.bus.valid.value.integer
+        self._data.value      = self.bus.data.value.to_unsigned()
+        self._eop_empty.value = self.bus.eop_empty.value.to_unsigned()
+        self._inframe.value   = self.bus.inframe.value.to_unsigned()
+        self._error.value     = self.bus.error.value.to_unsigned()
+        self._valid.value     = self.bus.valid.value.to_unsigned()
 
     async def _monitor_recv(self):
         clk_re = RisingEdge(self.clock)
