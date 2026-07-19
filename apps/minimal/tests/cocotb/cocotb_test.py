@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2025 CESNET z. s. p. o.
+# Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
@@ -17,6 +17,8 @@ from cocotbext.ofm.utils.sim.bus import MfbBus, MiBus, DmaUpMvbBus, DmaDownMvbBu
 
 from ofm.comp.base.misc.frequency_meter import FrequencyMeter, tabulate_data
 
+from cocotbext.ofm.base.bus_fixup import SignalProxy
+
 
 logger = logging.getLogger(__name__)
 #logger.setLevel(logging.DEBUG)
@@ -25,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 # Shortcuts
-e = cocotb.external
+e = cocotb.task.bridge
 st = cocotb.utils.get_sim_time
 
 
@@ -48,6 +50,7 @@ async def test_mi_access_unaligned(dut):
             data = bytes([(j % 256) for j in range(i)])
             await e(c.write)(x, data)
             rdata = await e(c.read)(x, len(data))
+
             assert data == rdata, f"{list(data)}, {list(rdata)}"
 
 
@@ -61,7 +64,7 @@ async def test_enable_rxmac_and_check_status(dut):
     await e(nfb.ndp.rx[0].read_stats)()
 
 
-@cocotb.test(skip=False, timeout_time=100, timeout_unit='us')
+@cocotb.test(timeout_time=100, timeout_unit='us', skip=False)
 async def test_frequency_meter(dut):
     dev, nfb = await get_dev(dut)
     fm = await e(FrequencyMeter)(dev=nfb)
@@ -76,7 +79,7 @@ async def test_frequency_meter(dut):
     await e(make_a_measurement)()
 
 
-@cocotb.test(timeout_time=200, timeout_unit='us')
+@cocotb.test(timeout_time=200, timeout_unit='us', skip=False)
 async def test_ndp_recvmsg(dut):
     dev, nfb = await get_dev(dut)
 
@@ -85,19 +88,19 @@ async def test_ndp_recvmsg(dut):
 
     await e(nfb.ndp.rx[0].start)()
     await dev.dma.rx[0]._push_desc()
-    await Timer(2, units='us')
+    await Timer(2, unit='us')
 
     #pkt = bytes(raw(Ether()/IP(dst="127.0.0.1")/TCP()/"GET /index.html HTTP/1.0 \n\n"))
     pkt = bytes([i for i in range(72)])
 
     dev._eth_rx_driver[0].append(pkt)
-    await Timer(105, units='us')
+    await Timer(105, unit='us')
 
     recv = await e(nfb.ndp.rx[0].recv)()
 
     # FIXME: try again for slower cards
     #if [pkt] != recv:
-    #    await Timer(85, units='us')
+    #    await Timer(85, unit='us')
     #    recv = await e(nfb.ndp.rx[0].recv)()
 
     assert [pkt] == recv
@@ -127,7 +130,7 @@ async def _test_ndp_sendmsg(dut, dev=None, nfb=None):
         pkt = bytes([(i % 256) for i in range(72 + i)])
         await e(nfb.ndp.tx[0].sendmsg)([(pkt, bytes(), 0)])
 
-    await Timer(20, units='us')
+    await Timer(20, unit='us')
     stats = await e(nfb.eth[0].txmac.read_stats)()
     assert stats['passed'] == count, f"Packet count mismatch: {stats['passed']}, expected {count}"
 
@@ -150,7 +153,7 @@ async def _test_ndp_sendmsg_burst(dut, dev=None, nfb=None):
         pkt = bytes([(i % 256) for i in range(72 + i)])
         await e(nfb.ndp.tx[0].sendmsg)([(pkt, bytes(), 0)])
 
-    await Timer(15, units='us')
+    await Timer(15, unit='us')
     stats = await e(nfb.eth[0].txmac.read_stats)()
     assert stats['passed'] == len(pkts), f"{stats['passed']}"
 
@@ -196,7 +199,9 @@ for i in range(DMA_ENDPOINTS):
     DmaDownMvbBus(core.dma_i, 'PCIE_RC_MVB', i).add_wave(groups=["DMA2PCIe", "RC MVB", i], expand=[2, 3])
     MfbBus(core.dma_i, 'PCIE_RQ_MFB', i).add_wave(groups=["DMA2PCIe", "RC MFB", i], expand=[2])
 
-ms.add_wave(core.app_i.CLK_ETH[0])
+clk_eth = SignalProxy(core.app_i.CLK_ETH, 0)
+
+ms.add_wave(clk_eth)
 for i in range(ETH_STREAMS):
     MfbBus(core.app_i, 'ETH_RX_MFB', i, label=f"ETH_RX_MFB{i}").add_wave()
     MfbBus(core.app_i, 'ETH_TX_MFB', i, label=f"ETH_TX_MFB{i}").add_wave()
