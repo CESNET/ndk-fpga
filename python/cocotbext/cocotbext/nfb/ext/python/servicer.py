@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2023 CESNET z. s. p. o.
+# Copyright (C) 2023-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
 import re
@@ -15,13 +15,13 @@ class Servicer(ext.AbstractNfb):
             self._burst_temp = []
             self._q = q
 
-        @cocotb.function
-        def start(self):
-            yield self._q.start()
+        @cocotb.task.resume
+        async def start(self):
+            await self._q.start()
 
-        @cocotb.function
-        def stop(self):
-            yield self._q.stop()
+        @cocotb.task.resume
+        async def stop(self):
+            await self._q.stop()
 
     class NdpQueueRx(NdpQueue, ext.AbstractNdpQueueRx):
         def burst_get(self, count):
@@ -36,21 +36,21 @@ class Servicer(ext.AbstractNfb):
             self._burst_temp.clear()
 
     class NdpQueueTx(NdpQueue, ext.AbstractNdpQueueTx):
-        @cocotb.function
-        def burst_get(self, pkts):
+        @cocotb.task.resume
+        async def burst_get(self, pkts):
             p = [(bytes(pkts[i][0]), bytes(pkts[i][1]), pkts[i][2]) for i in range(len(pkts))]
-            n = yield self._q.wait_sendable(p)
+            n = await self._q.wait_sendable(p)
             if n != len(p):
                 return []
 
             self._burst_temp.extend(p)
             return p
 
-        @cocotb.function
-        def burst_put(self):
+        @cocotb.task.resume
+        async def burst_put(self):
             last_index = len(self._burst_temp) - 1
             for i, pkt in enumerate(self._burst_temp):
-                yield self._q.sendmsg(pkt, i == last_index)
+                await self._q.sendmsg(pkt, i == last_index)
             self._burst_temp.clear()
 
     def __init__(self, device, dtb, *args, **kwargs):
@@ -69,18 +69,18 @@ class Servicer(ext.AbstractNfb):
         mi = self._device.mi[pci]
         return (mi, node.get_property("reg")[0])
 
-    @cocotb.function
-    def read(self, bus_node, node, offset, nbyte):
+    @cocotb.task.resume
+    async def read(self, bus_node, node, offset, nbyte):
         mi, base = self.get_node_base(bus_node, node)
-        data = yield mi.read(offset, nbyte)
+        data = await mi.read(offset, nbyte)
         if data is None:
             data = bytes()
         self._log.debug(f"MI read : size: {nbyte:>2}, offset: {offset:04x}, path: {node.path}/{node.name}, data: {data.hex()}")
         return data
 
-    @cocotb.function
-    def write(self, bus_node, node, offset, data):
+    @cocotb.task.resume
+    async def write(self, bus_node, node, offset, data):
         mi, base = self.get_node_base(bus_node, node)
         nbyte = len(data)
         self._log.debug(f"MI write: size: {nbyte:>2}, offset: {offset:04x}, path: {node.path}/{node.name}, data: {data.hex()}")
-        yield mi.write(offset, data)
+        await mi.write(offset, data)

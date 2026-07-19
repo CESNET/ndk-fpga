@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2023 CESNET z. s. p. o.
+# Copyright (C) 2023-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
 import cocotb
@@ -8,7 +8,7 @@ from cocotb.triggers import Timer
 import nfb.libnetcope
 import nfb.libnfb
 
-e = cocotb.external
+e = cocotb.task.bridge
 
 
 class QueueManager:
@@ -43,7 +43,7 @@ class QueueManager:
 
 class QueueNdp:
     def __init__(self, dev, node, buf_index):
-        self._wait_timer = Timer(10, units="ns")
+        self._wait_timer = Timer(10, unit="ns")
         self._ctrl = nfb.libnetcope.DmaCtrlNdp(dev.nfb, node)
         self._ram = dev.ram
         self._state = 0

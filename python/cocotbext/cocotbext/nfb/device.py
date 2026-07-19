@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2023 CESNET z. s. p. o.
+# Copyright (C) 2023-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
 import os
@@ -16,7 +16,7 @@ from .ext.python import Servicer as NfbPythonServicer
 
 import cocotb
 
-e = cocotb.external
+e = cocotb.task.bridge
 
 
 class NfbDevice:
