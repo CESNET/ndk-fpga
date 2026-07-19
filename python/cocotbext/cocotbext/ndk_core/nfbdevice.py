@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
 #            Martin Spinler <spinler@cesnet.cz>
 
@@ -10,6 +10,8 @@ from cocotb.utils import get_sim_steps
 from cocotb.handle import Force
 
 from cocotb import simulator
+
+from cocotbext.ofm.base.bus_fixup import SignalProxy
 
 from cocotbext.ofm.axi4s_pcie.drivers import Axi4sPcieDriverMaster, Axi4sPcieDriverSlave
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
@@ -53,90 +55,92 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
     async def _init_clks(self):
         self._core = NFBDevice.core_instance_from_top(self._dut)
         if self._card_name == "FB2CGHH":
-            await cocotb.start(Clock(self._dut.REFCLK, 20, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.REFCLK, 20, 'ns').start())
         elif self._card_name in ["FB2CDG1", "FB2CDG1-VAR0", "FB2CDG1-VAR1"]:
-            await cocotb.start(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
         elif self._card_name in ["FB2CGG3", "FB4CGG3"]:
-            await cocotb.start(Clock(self._dut.REFCLK, 20, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_N, 6.206, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.REFCLK, 20, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_N, 6.206, 'ns').start(start_high=False))
         elif self._card_name == "NFB-200G2QL":
-            await cocotb.start(Clock(self._dut.SYSCLK_P, 8, 'ns').start())
-            await cocotb.start(Clock(self._dut.SYSCLK_N, 8, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.SYSCLK_P, 8, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK_N, 8, 'ns').start(start_high=False))
         elif self._card_name in ["AGI-FH400G", "AGI-FH400G-REV0", "AGI-FH400G-REV1", "AGI-FH400G-REV2"]:
-            await cocotb.start(Clock(self._dut.AG_SYSCLK0_P, 8, 'ns').start())
-            await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.AG_SYSCLK0_P, 8, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.AG_SYSCLK1_P, 10, 'ns').start())
         elif self._card_name in ["IA-440I", "IA-440I-VAR0", "IA-440I-VAR1"]:
-            await cocotb.start(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
         elif "IA-860M" in self._card_name:
-            await cocotb.start(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK_100_P, 10, 'ns').start())
         elif "A2700" in self._card_name:
-            await cocotb.start(Clock(self._dut.AG_SYSCLK1_P, 20, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.AG_SYSCLK1_P, 20, 'ns').start())
         elif self._card_name in ["N6010", "N5014"]:
-            await cocotb.start(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYS_CLK_100M, 10, 'ns').start())
             self._core.clk_gen_i.LOCKED.value = 1
             self._core.clk_gen_i.INIT_DONE_N.value = 0
         elif self._card_name == "VCU118":
-            await cocotb.start(Clock(self._dut.REFCLK_P, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
-            await cocotb.start(Clock(self._dut.REFCLK_N, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.REFCLK_P, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
+            cocotb.start_soon(Clock(self._dut.REFCLK_N, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start(start_high=False))
 
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_P, 6.4, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_N, 6.4, 'ns').start(start_high=False))
-            await cocotb.start(Clock(self._dut.QSFP1_REFCLK_P, 6.4, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP1_REFCLK_N, 6.4, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_P, 6.4, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_N, 6.4, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.QSFP1_REFCLK_P, 6.4, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP1_REFCLK_N, 6.4, 'ns').start(start_high=False))
         elif self._card_name == "IA-420F":
-            await cocotb.start(Clock(self._dut.USR_CLK_33M, get_sim_steps(1000/33 / 2, 'ns', round_mode='round')*2).start())
-            await cocotb.start(Clock(self._dut.QSFP_REFCLK_156M, 6.4, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.USR_CLK_33M, get_sim_steps(1000/33 / 2, 'ns', round_mode='round')*2).start())
+            cocotb.start_soon(Clock(self._dut.QSFP_REFCLK_156M, 6.4, 'ns').start())
         elif self._card_name == "DK-DEV-1SDX-P":
-            await cocotb.start(Clock(self._dut.FPGA_SYSCLK0_100M_P, 10, 'ns').start())
-            await cocotb.start(Clock(self._dut.CLK_156P25M_QSFP1_P, 6.4, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.FPGA_SYSCLK0_100M_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.CLK_156P25M_QSFP1_P, 6.4, 'ns').start())
         elif self._card_name == "DK-DEV-AGI027RES":
-            await cocotb.start(Clock(self._dut.REFCLK_PCIE_14C_CH0_P, 10, 'ns').start())
-            await cocotb.start(Clock(self._dut.REFCLK_CXL_15C_CH0_P, 10, 'ns').start())
-            await cocotb.start(Clock(self._dut.REFCLK_FGT12ACH4_P, 6.4, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.REFCLK_PCIE_14C_CH0_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.REFCLK_CXL_15C_CH0_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.REFCLK_FGT12ACH4_P, 6.4, 'ns').start())
             raise NotImplementedError("This card doesn't run")
         elif self._card_name == "ALVEO_U200":
-            await cocotb.start(Clock(self._dut.SYSCLK_P, 6.4, 'ns').start())
-            await cocotb.start(Clock(self._dut.SYSCLK_N, 6.4, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.SYSCLK_P, 6.4, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK_N, 6.4, 'ns').start(start_high=False))
 
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_N, 6.206, 'ns').start(start_high=False))
-            await cocotb.start(Clock(self._dut.QSFP1_REFCLK_P, 6.206, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP1_REFCLK_N, 6.206, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_N, 6.206, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.QSFP1_REFCLK_P, 6.206, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP1_REFCLK_N, 6.206, 'ns').start(start_high=False))
         elif self._card_name == "ALVEO_U55C":
-            await cocotb.start(Clock(self._dut.SYSCLK2_P, 10, 'ns').start())
-            await cocotb.start(Clock(self._dut.SYSCLK2_N, 10, 'ns').start(start_high=False))
-            await cocotb.start(Clock(self._dut.SYSCLK3_P, 10, 'ns').start())
-            await cocotb.start(Clock(self._dut.SYSCLK3_N, 10, 'ns').start(start_high=False))
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
-            await cocotb.start(Clock(self._dut.QSFP0_REFCLK_N, 6.206, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.SYSCLK2_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK2_N, 10, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.SYSCLK3_P, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK3_N, 10, 'ns').start(start_high=False))
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_P, 6.206, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.QSFP0_REFCLK_N, 6.206, 'ns').start(start_high=False))
         else:
             # No card: fpga_common
-            await cocotb.start(Clock(self._dut.SYSCLK, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._dut.SYSCLK, 10, 'ns').start())
 
         # Workaround for all Intel PLL/CLOCKGEN
         if any([(name in self._card_name) for name in ["IA-420F", "N6010", "N5014", "DK-DEV-1SDX-P", "AGI-FH400G", "IA-440I", "IA-860M", "A2700", "FB2CDG1"]]):
-            await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_0, 2.5, 'ns').start())
-            await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_1, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
-            await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_2, 5, 'ns').start())
-            await cocotb.start(Clock(self._core.clk_gen_i.OUTCLK_3, 10, 'ns').start())
+            cocotb.start_soon(Clock(self._core.clk_gen_i.OUTCLK_0, 2.5, 'ns').start())
+            cocotb.start_soon(Clock(self._core.clk_gen_i.OUTCLK_1, get_sim_steps(10/3 / 2, 'ns', round_mode='round')*2).start())
+            cocotb.start_soon(Clock(self._core.clk_gen_i.OUTCLK_2, 5, 'ns').start())
+            cocotb.start_soon(Clock(self._core.clk_gen_i.OUTCLK_3, 10, 'ns').start())
 
-        for pcie_clk in self._core.pcie_i.pcie_core_i.pcie_hip_clk:
+        pcie_clks = SignalProxy(self._core.pcie_i.pcie_core_i.pcie_hip_clk)
+
+        for i in range(len(pcie_clks)):
             if self._core.pcie_i.pcie_core_i.ENDPOINT_TYPE.value.decode() == "P_TILE":
                 # This is default value in IP core for g4_pld_clkfreq_user_hwctl
                 period = 2.5
             else:
                 period = 4
 
-            await cocotb.start(Clock(pcie_clk, period, 'ns').start())
+            cocotb.start_soon(Clock(pcie_clks[i], period, 'ns', impl="py").start())
 
         for eth_core in self._core.network_mod_i.eth_core_g if hasattr(self._core.network_mod_i, 'eth_core_g') else []:
             if hasattr(eth_core.network_mod_core_i, 'cmac_clk_322m'):
-                await cocotb.start(Clock(eth_core.network_mod_core_i.cmac_clk_322m, 3106, 'ps').start())
+                cocotb.start_soon(Clock(eth_core.network_mod_core_i.cmac_clk_322m, 3106, 'ps').start())
             if hasattr(eth_core.network_mod_core_i, 'etile_clk_out'):
-                await cocotb.start(Clock(eth_core.network_mod_core_i.etile_clk_out, 2482, 'ps').start())
+                cocotb.start_soon(Clock(eth_core.network_mod_core_i.etile_clk_out, 2482, 'ps').start())
             if hasattr(eth_core.network_mod_core_i, 'ftile_clk_out'):
-                await cocotb.start(Clock(eth_core.network_mod_core_i.ftile_clk_out, 2482, 'ps').start())
+                cocotb.start_soon(Clock(eth_core.network_mod_core_i.ftile_clk_out, 2482, 'ps').start())
 
     def _init_pcie(self):
         try:
@@ -157,9 +161,11 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
         self.mi = []
         self.pcie_req = []
 
-        for i, clk in enumerate(pcie_i.pcie_clk):
-            clk = pcie_i.pcie_clk[i]
-            #rst = pcie_i.pcie_hip_rst[i]
+        pcie_clk = SignalProxy(pcie_i.pcie_clk)
+
+        for i in range(len(pcie_clk)):
+            clk = pcie_clk[i]
+
             if hasattr(pcie_i, "pcie_cq_axi_data"):
                 cq  = Axi4sPcieDriverMaster(pcie_i, "pcie_cq_axi", clk, array_idx=i)
                 cc  = Axi4sPcieDriverSlave(pcie_i, "pcie_cc_axi", clk, array_idx=i)
@@ -238,31 +244,35 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
     async def _reset(self, time=40, units="ns"):
         t = Timer(time, units)
         pcie_i = self._core.pcie_i.pcie_core_i
+
         if hasattr(pcie_i, 'pcie_hip_rst'):
-            for rst in pcie_i.pcie_hip_rst:
-                rst.value = 1
+            rsts = pcie_i.pcie_hip_rst
+            rsts.value = "1" * len(rsts)
             await t
-            for rst in pcie_i.pcie_hip_rst:
-                rst.value = 0
+            rsts.value = "0" * len(rsts)
 
             # FIXME: some strange loopback on ALVEO_U200
             if self._core.USE_PCIE_CLK.value == 1:
                 await FallingEdge(self._core.global_reset)
+
         elif hasattr(pcie_i, 'pcie_reset_status_n'):
-            for rst in pcie_i.pcie_reset_status_n:
-                rst.value = 0
+            rsts = pcie_i.pcie_reset_status_n
+            pcie_i.pcie_reset_status_n.value = "0" * len(rsts)
             await t
-            for rst in pcie_i.pcie_reset_status_n:
-                rst.value = 1
+            pcie_i.pcie_reset_status_n.value = "1" * len(rsts)
+
         else:
             raise NotImplementedError("Unknown signals for PCI/device reset")
 
-        if self._core.rst_pci[0].value == 1:
-            await FallingEdge(self._core.rst_pci[0])
+        rst_pci = SignalProxy(self._core.rst_pci)
+        i = len(rst_pci) - 1
+
+        if rst_pci[i].value == 1:
+            await FallingEdge(rst_pci[i])
 
     async def _pcie_cfg_ext_reg_access(self, addr, index=0, fn=0, sync=True, data=None):
         pcie_i = self._core.pcie_i.pcie_core_i
-        clk = pcie_i.pcie_hip_clk[index]
+        clk = SignalProxy(pcie_i.pcie_hip_clk, index)
 
         if sync:
             await RisingEdge(clk)
