@@ -5,6 +5,7 @@
 import copy
 from typing import Any
 
+from cocotb.handle import Immediate
 from cocotbext.ofm.base.drivers import BusDriver
 from cocotbext.ofm.base.transaction import IdleTransaction
 from cocotbext.ofm.utils import concat, byte_deserialize
@@ -35,7 +36,7 @@ class Axi4sPcieDriverMaster(BusDriver):
 
         for sig in self._signals:
             if sig != "READY":
-                getattr(self.bus, sig).setimmediatevalue(0)
+                getattr(self.bus, sig).set(Immediate(0))
 
     def _clear_control_signals(self):
         """Clear control signals when sending idle."""
@@ -228,6 +229,6 @@ class Axi4sPcieDriverSlave(BusDriver):
     _signals = ["VALID", "READY"]
 
     def __init__(self, entity, name, clock, array_idx=None):
-        BusDriver.__init__(self, entity, name, clock, array_idx=array_idx)
+        super().__init__(entity, name, clock, array_idx=array_idx)
 
-        self.bus.READY.setimmediatevalue(1)
+        self.bus.READY.set(Immediate(1))
