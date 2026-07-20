@@ -25,6 +25,24 @@ The seed value is logged at the start of each simulation run. When a test fails,
 
 .. note:: Using a fixed seed makes tests deterministic, which is useful for debugging but may hide timing-related issues that only occur with certain random patterns.
 
+Code Coverage
+=============
+
+To run simulation and generate html code coverage report, set enviroment variable ``CODE_COVERAGE``:
+
+.. code-block:: bash
+
+    export CODE_COVERAGE=1
+    make
+
+or do it inline:
+
+.. code-block:: bash
+
+    CODE_COVERAGE=1 make
+
+HTML code coverage report will be in subfolder ``cov_html/``.
+
 Debug Logging
 =============
 
