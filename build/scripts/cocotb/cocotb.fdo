@@ -11,6 +11,13 @@ if {[info exists env(GENERICS)]} {
     set GENERICS ""
 }
 
+if {[info exists env(CODE_COVERAGE)] \
+        && [string is true -strict $env(CODE_COVERAGE)]} {
+    set SIM_FLAGS(CODE_COVERAGE) true
+} else {
+    set SIM_FLAGS(CODE_COVERAGE) false
+}
+
 # Workaround
 if {[info exists env(FIRMWARE_BASE)]} {
     set FIRMWARE_BASE $env(FIRMWARE_BASE)
@@ -105,3 +112,9 @@ if {[file exists $env(COCOTB_MODULE).fdo]} {
 source "$OFM_PATH/build/Modelsim.inc.fdo"
 
 rst
+
+if {$SIM_FLAGS(CODE_COVERAGE)} {
+    coverage save -instance "/$env(TOPLEVEL)" -directive -cvg -code bcefst -verbose actual.ucdb
+    vcover merge final.ucdb final.ucdb actual.ucdb
+    vcover report -html -output cov_html -annotate -details -assert -directive -cvg -code bcefst -verbose -threshL 50 -threshH 90 final.ucdb
+}
