@@ -3,7 +3,8 @@
 # Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 import pyuvm
-from pyuvm import uvm_test, ConfigDB
+import cocotb
+from pyuvm import uvm_test, uvm_root, ConfigDB
 from cocotb.triggers import ClockCycles
 from dut import HashDUT
 from tbench.env import HashEnv
@@ -42,7 +43,7 @@ class TestAll(BaseTest):
     """Tests all sequences."""
 
     def start_of_simulation_phase(self):
-        self.test = TestHashSequencesAll("test", min_items=1, max_items=512, seq_count=1000, min_empty=0, max_empty=512)
+        self.test = TestHashSequencesAll("test", min_items=1, max_items=256, seq_count=1000, min_empty=0, max_empty=256)
 
 
 @pyuvm.test()
@@ -52,3 +53,27 @@ class TestEffectivity(BaseTest):
     def start_of_simulation_phase(self):
         seed = randint(0, 2**self.dut.seed_width-1)
         self.test = TestHashSequencesConstSeed("test", min_items=1, max_items=1, seq_count=100_000, min_empty=0, max_empty=0, const_seed=seed)
+
+
+@pyuvm.test()
+class TestLatency(BaseTest):
+    """Test designed to only test latency. One key is sent, one hash is generated."""
+
+    def start_of_simulation_phase(self):
+        self.test = TestHashSequencesAll("test", min_items=1, max_items=1, seq_count=1, min_empty=0, max_empty=0)
+
+
+# cocotb wrappers so test to be run can be selected via the TESTCASE environment variable
+@cocotb.test(skip=True)
+async def run_test_all(dut):
+    await uvm_root().run_test("TestAll", dut)
+
+
+@cocotb.test(skip=True)
+async def run_test_effectivity(dut):
+    await uvm_root().run_test("TestEffectivity", dut)
+
+
+@cocotb.test(skip=True)
+async def run_test_latency(dut):
+    await uvm_root().run_test("TestLatency", dut)

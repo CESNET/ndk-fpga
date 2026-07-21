@@ -8,6 +8,7 @@ from .monitors import HashUVMMonitor
 from .scoreboard import Scoreboard
 from .coverage import Coverage
 from .effectivity import Effectivity
+from .latency import Latency
 
 
 class HashEnv(uvm_env):
@@ -19,6 +20,7 @@ class HashEnv(uvm_env):
         self.scoreboard  = Scoreboard("scoreboard", self)
         self.coverage    = Coverage("coverage", self)
         self.effectivity = Effectivity("effectivity", self)
+        self.latency     = Latency("latency", self)
 
         ConfigDB().set(None, "*", "SEQR", self.sequencer)
 
@@ -27,5 +29,7 @@ class HashEnv(uvm_env):
         self.driver.ap.connect(self.scoreboard.expected_export)
         self.driver.ap.connect(self.coverage.analysis_export)
         self.driver.ap.connect(self.effectivity.key_export)
+        self.driver.ap.connect(self.latency.key_export)
         self.monitor.ap.connect(self.scoreboard.result_export)
         self.monitor.ap.connect(self.effectivity.hash_export)
+        self.monitor.ap.connect(self.latency.hash_export)

@@ -13,6 +13,7 @@ from tbench.sequences import HashSeqBaseItem, HashSeqEmptyItem
 import spookyhash
 from siphash import siphash_64, siphash_128, half_siphash_32, half_siphash_64
 from ofm.comp.base.hash.chaskey.chaskey import Chaskey
+from ofm.comp.base.hash.pcasd.pcasd import PCASD
 
 
 class HashDUT(uvm_component):
@@ -22,37 +23,50 @@ class HashDUT(uvm_component):
         self.driver  = HashDriver(self.dut, "IN", self.clock)
         self.monitor = HashMonitor(self.dut, "OUT", self.clock)
 
-        match (hash_func_name := self.dut.HASH_FUNCTION.value.decode("utf-8")):
-            case "SPOOKYHASH":
-                def hash_func(key: bytes, seed: bytes):
-                    return spookyhash.hash128(key, int.from_bytes(seed[0:8], "little"), int.from_bytes(seed[8:16], "little"))
+        hash_func_name = self.dut.HASH_FUNCTION.value.decode("utf-8")
 
-            case "SIPHASH_2_4" | "SIPHASH_4_8" | "HALFSIPHASH_2_4" | "HALFSIPHASH_4_8":
-                def hash_func(key: bytes, seed: bytes):
-                    compression_rounds  : int = self.dut.hash_function_g.siphash_i.COMPRESSION_ROUDS.value
-                    finalization_rounds : int = self.dut.hash_function_g.siphash_i.FINALIZATION_ROUNDS.value
-                    word_width          : int = self.dut.hash_function_g.siphash_i.WORD_WIDTH.value
+        if hash_func_name == "SPOOKYHASH":
+            def hash_func(key: bytes, seed: bytes):
+                return spookyhash.hash128(key, int.from_bytes(seed[0:8], "little"), int.from_bytes(seed[8:16], "little"))
 
-                    match word_width:
-                        case 32:
-                            if self.dut.HASH_WIDTH.value > 32:
-                                return int.from_bytes(half_siphash_64(seed[0:8], key, compression_rounds, finalization_rounds), "little")
-                            else:
-                                return int.from_bytes(half_siphash_32(seed[0:8], key, compression_rounds, finalization_rounds), "little")
-                        case 64:
-                            if self.dut.HASH_WIDTH.value > 64:
-                                return int.from_bytes(siphash_128(seed, key, compression_rounds, finalization_rounds), "little")
-                            else:
-                                return int.from_bytes(siphash_64(seed, key, compression_rounds, finalization_rounds), "little")
-                        case _:
-                            raise ValueError(f"Unsupported word width {word_width}. Supported word widths are 32 and 64.")
-            case "CHASKEY" | "CHASKEY_LTS":
-                def hash_func(key: bytes, seed: bytes):
-                    rounds: int = self.dut.hash_function_g.chaskey_i.ROUNDS.value
-                    return int.from_bytes(Chaskey.Hash128(key, seed, rounds), "little")
+        elif "SIPHASH" in hash_func_name:
+            def hash_func(key: bytes, seed: bytes):
+                compression_rounds  : int = self.dut.hash_function_g.siphash_i.COMPRESSION_ROUNDS.value
+                finalization_rounds : int = self.dut.hash_function_g.siphash_i.FINALIZATION_ROUNDS.value
+                word_width          : int = self.dut.hash_function_g.siphash_i.WORD_WIDTH.value
 
-            case _:
-                raise NotImplementedError(f"Unsupported hash function '{hash_func_name}'.")
+                match word_width:
+                    case 32:
+                        if self.dut.HASH_WIDTH.value > 32:
+                            return int.from_bytes(half_siphash_64(seed[0:8], key, compression_rounds, finalization_rounds), "little")
+                        else:
+                            return int.from_bytes(half_siphash_32(seed[0:8], key, compression_rounds, finalization_rounds), "little")
+                    case 64:
+                        if self.dut.HASH_WIDTH.value > 64:
+                            return int.from_bytes(siphash_128(seed, key, compression_rounds, finalization_rounds), "little")
+                        else:
+                            return int.from_bytes(siphash_64(seed, key, compression_rounds, finalization_rounds), "little")
+                    case _:
+                        raise ValueError(f"Unsupported word width {word_width}. Supported word widths are 32 and 64.")
+
+        elif "CHASKEY" in hash_func_name:
+            def hash_func(key: bytes, seed: bytes):
+                rounds: int = self.dut.hash_function_g.chaskey_i.ROUNDS.value
+                return int.from_bytes(Chaskey.Hash128(key, seed, rounds), "little")
+
+        elif "PCASD" in hash_func_name or "PCARX" in hash_func_name:
+            def hash_func(key: bytes, seed: bytes):
+                ca_rounds   : int = self.dut.hash_function_g.pcasd_i.CA_ROUNDS.value
+                rd_rounds   : int = self.dut.hash_function_g.pcasd_i.MIX_ROUNDS.value
+                block_width : int = self.dut.hash_function_g.pcasd_i.BLOCK_WIDTH.value // 8
+                mix_func    : str = self.dut.hash_function_g.pcasd_i.MIX_FUNCTION.value.decode()
+
+                pcasd: PCASD = PCASD(seed, ca_rounds, rd_rounds, block_width, mix_function=mix_func, multithreaded=False)
+
+                return int.from_bytes(pcasd.hash(key), "little")
+
+        else:
+            raise NotImplementedError(f"Unsupported hash function '{hash_func_name}'.")
 
         self.hash = hash_func
 
