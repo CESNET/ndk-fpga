@@ -26,52 +26,52 @@ use work.type_pack.all;
 --     v1 ^= v2;
 --     v2 = ROTL(v2, 32);
 --
--- In the case of halfsiphash, different constants in the rotations are used.
+-- In the case of HalfSipHash, different constants in the rotations are used.
 entity SIPROUND is
     generic (
-        -- width of the whole key
+        -- width of the whole key.
         KEY_WIDTH   : natural := 312;
-        -- width of the passthrough metadata
+        -- width of the passthrough metadata.
         META_WIDTH  : natural := 32;
-        -- width of the words and internal state variables. Use 64 for full siphash and
-        -- 32 for halfsiphash.
+        -- width of the words and internal state variables. Use 64 for full SipHash and
+        -- 32 for HalfSipHash.
         WORD_WIDTH  : natural := 64;
-        -- setup of the registers of this component
+        -- setup of the registers of this component.
         REG_SETUP   : std_logic_vector(4-1 downto 0) := "1111"
     );
     port (
         -- main clock
         CLK       : in  std_logic;
-        -- synchronious reset
+        -- synchronious reset.
         RESET     : in  std_logic;
-        -- key passthrough input
+        -- key passthrough input.
         IN_KEY    : in  unsigned(KEY_WIDTH-1 downto 0);
-        -- internal state variables input
+        -- internal state variables input.
         IN_V0     : in  unsigned(WORD_WIDTH-1 downto 0);
         IN_V1     : in  unsigned(WORD_WIDTH-1 downto 0);
         IN_V2     : in  unsigned(WORD_WIDTH-1 downto 0);
         IN_V3     : in  unsigned(WORD_WIDTH-1 downto 0);
-        -- metadata input
+        -- metadata input.
         IN_META   : in  std_logic_vector(META_WIDTH-1 downto 0);
-        -- validity of input
+        -- validity of input.
         IN_VALID  : in  std_logic;
 
-        -- key passthrough output
+        -- key passthrough output.
         OUT_KEY   : out unsigned(KEY_WIDTH-1 downto 0);
-        -- internal state variables output
+        -- internal state variables output.
         OUT_V0    : out unsigned(WORD_WIDTH-1 downto 0);
         OUT_V1    : out unsigned(WORD_WIDTH-1 downto 0);
         OUT_V2    : out unsigned(WORD_WIDTH-1 downto 0);
         OUT_V3    : out unsigned(WORD_WIDTH-1 downto 0);
-        -- metadata output
+        -- metadata output.
         OUT_META  : out std_logic_vector(META_WIDTH-1 downto 0);
-        -- valid passthrough
+        -- valid passthrough.
         OUT_VALID : out std_logic
     );
 end entity;
 
 architecture FULL of SIPROUND is
-    -- returns rotations constants, different for siphash and halfsiphash
+    -- returns rotations constants, different for SipHash and HalfSipHash.
     function f_get_rotation_constants (word_width: natural) return n_array_t is
         variable rotation_const : n_array_t(0 to 5);
     begin
