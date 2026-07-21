@@ -8,6 +8,7 @@ set COMP_BASE "$ENTITY_BASE/.."
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/hash_pack.vhd"
 
 # Components
 lappend COMPONENTS [list "ROUND"  "$COMP_BASE/round"  "FULL"]

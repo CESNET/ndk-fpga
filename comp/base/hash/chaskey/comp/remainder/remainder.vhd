@@ -10,7 +10,7 @@ use work.type_pack.all;
 
 -- Firmware implementation of remainder processing component of the CHASKEY hash function.
 --
--- Combines last 128-bit block or remainder alligned to 128-bit with padding of the key
+-- Combines last 128-bit block or remainder aligned to 128-bits with padding of the key
 -- and shifted seed with state variables and mixes them with last [ROUNDS] rounds of permutations.
 --
 -- The CHASKEY_REMAINDER entity includes the CHASKEY_ROUND component. The individual parts are
@@ -29,16 +29,14 @@ use work.type_pack.all;
 --
 entity CHASKEY_REMAINDER is
     generic (
-        -- width of the passthrough metadata
+        -- width of the passthrough metadata.
         META_WIDTH      : natural := 32;
-        -- number of sipround rounds generate
+        -- number of sipround rounds generate.
         ROUNDS          : natural := 8;
-        -- number of remaining bytes
+        -- number of remaining bytes.
         REMAIN          : natural := 0;
-        -- setup of the registers of CHASKEY_ROUND components
-        ROUND_REG_SETUP : std_logic_vector(4-1 downto 0) := "1111";
-        -- setup of the registers of this components
-        REG_SETUP       : std_logic_vector(4-1 downto 0) := "1111"
+        -- setup of the registers of this components.
+        REG_SETUP       : std_logic_vector
     );
     port (
         -- main clock
@@ -82,8 +80,10 @@ architecture FULL of CHASKEY_REMAINDER is
         end if;
     end function;
 
-    -- length of the pipeline of this component
-    constant PIPE_LENGTH : natural := ROUNDS + f_get_pipe_length(REMAIN);
+    -- length of the pipeline of this component.
+    constant PIPE_LENGTH         : natural := ROUNDS + f_get_pipe_length(REMAIN);
+    -- register setup of the operation within this component.
+    constant REG_SETUP_REMAINDER : std_logic_vector(4-1 downto 0) := REG_SETUP(REG_SETUP'high downto REG_SETUP'high - 2) & REG_SETUP(0);
 
     -- logic
     signal seed     : u_array_t(PIPE_LENGTH-1 downto 0)(128-1 downto 0);
@@ -162,7 +162,7 @@ begin
         generic map (
             KEY_WIDTH  => 1,
             META_WIDTH => META_WIDTH,
-            REG_SETUP  => ROUND_REG_SETUP
+            REG_SETUP  => REG_SETUP(g * 4 downto (g - 1) * 4 + 1)
         ) port map (
             CLK        => CLK,
             RESET      => RESET,
@@ -195,7 +195,7 @@ begin
     -- ================================================
     -- generating registers between combinations and components.
     pipeline_g: for g in f_get_pipe_length(REMAIN)-1 downto 1 generate
-        reg_g: if REG_SETUP(g) = '1' generate
+        reg_g: if REG_SETUP_REMAINDER(g) = '1' generate
             process (CLK)
             begin
                 if rising_edge(CLK) then
@@ -226,7 +226,7 @@ begin
     -- ================================================
     --                     OUTPUT
     -- ================================================
-    out_reg_g: if REG_SETUP(0) = '1' generate
+    out_reg_g: if REG_SETUP_REMAINDER(0) = '1' generate
         process (CLK)
         begin
             if rising_edge(CLK) then
