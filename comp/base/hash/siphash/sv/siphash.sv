@@ -62,50 +62,50 @@ package siphash_pkg;
 
         // most used, good balance between security and speed, 64-bit output
         static function logic[64-1 : 0] Hash_2_4(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed // 128-bit seed (secret key in SipHash terminology)
         );
             return SipHash::Hash_c_d(key, seed, 2, 4);
         endfunction
 
         // better security than the 2-4 variant, 64-bit output
         static function logic[64-1 : 0] Hash_4_8(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed // 128-bit seed (secret key in SipHash terminology)
         );
             return SipHash::Hash_c_d(key, seed, 4, 8);
         endfunction
 
         // extended version of the regular 2-4 variant, 128-bit output
         static function logic[128-1 : 0] Hash_2_4_128(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed // 128-bit seed (secret key in SipHash terminology)
         );
             return SipHash::Hash_c_d_128(key, seed, 2, 4);
         endfunction
 
         // extended version of the regular 4-8 variant, 128-bit output
         static function logic[128-1 : 0] Hash_4_8_128(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed // 128-bit seed (secret key in SipHash terminology)
         );
             return SipHash::Hash_c_d_128(key, seed, 4, 8);
         endfunction
 
-        // regular siphash with configurable compression and finalization rounds, 64-bit output
+        // regular SipHash with configurable compression and finalization rounds, 64-bit output
         static function logic[64-1 : 0] Hash_c_d(
-            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed,     // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed,     // 128-bit seed (secret key in SipHash terminology)
             byte unsigned          c_rounds, // number of compression rounds
             byte unsigned          d_rounds  // number of finalization rounds
         );
             return SipHash::Hash(key, seed, c_rounds, d_rounds, 8)[64-1 : 0];
         endfunction
 
-        // extended siphash with configurable conpression and finalization rounds, 128-bit output
+        // extended SipHash with configurable compression and finalization rounds, 128-bit output
         static function logic[128-1 : 0] Hash_c_d_128(
-            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed,     // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed,     // 128-bit seed (secret key in SipHash terminology)
             byte unsigned          c_rounds, // number of compression rounds
             byte unsigned          d_rounds  // number of finalization rounds
         );
@@ -114,8 +114,8 @@ package siphash_pkg;
 
     // private
         local static function logic[128-1 : 0] Hash(
-            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in siphash terminology)
-            logic[128-1 : 0]       seed,     // 128-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in SipHash terminology)
+            logic[128-1 : 0]       seed,     // 128-bit seed (secret key in SipHash terminology)
             byte unsigned          c_rounds, // number of compression rounds
             byte unsigned          d_rounds, // number of finalization rounds
             byte unsigned          outlen    // length of the output in bytes, must be 8 or 16
@@ -236,40 +236,40 @@ package siphash_pkg;
 
         // most used, good balance between security and speed, 32-bit output
         static function logic[32-1 : 0] Hash_2_4(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed // 64-bit seed (secret key in SipHash terminology)
         );
             return HalfSipHash::Hash_c_d(key, seed, 2, 4);
         endfunction
 
         // better security than the 2-4 variant, 32-bit output
         static function logic[32-1 : 0] Hash_4_8(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed // 64-bit seed (secret key in SipHash terminology)
         );
             return HalfSipHash::Hash_c_d(key, seed, 4, 8);
         endfunction
 
         // extended version of the regular 2-4 variant, 64-bit output
         static function logic[64-1 : 0] Hash_2_4_64(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed // 64-bit seed (secret key in SipHash terminology)
         );
             return HalfSipHash::Hash_c_d_64(key, seed, 2, 4);
         endfunction
 
         // extended version of the regular 4-8 variant, 64-bit output
         static function logic[64-1 : 0] Hash_4_8_64(
-            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key, // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed // 64-bit seed (secret key in SipHash terminology)
         );
             return HalfSipHash::Hash_c_d_64(key, seed, 4, 8);
         endfunction
 
         // regular siphash with configurable compression and finalization rounds, 32-bit output
         static function logic[32-1 : 0] Hash_c_d(
-            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed,     // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed,     // 64-bit seed (secret key in SipHash terminology)
             byte unsigned          c_rounds, // number of compression rounds
             byte unsigned          d_rounds  // number of finalization rounds
         );
@@ -278,8 +278,8 @@ package siphash_pkg;
 
         // extended siphash with configurable conpression and finalization rounds, 64-bit output
         static function logic[64-1 : 0] Hash_c_d_64(
-            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed,     // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed,     // 64-bit seed (secret key in SipHash terminology)
             byte unsigned          c_rounds, // number of compression rounds
             byte unsigned          d_rounds  // number of finalization rounds
         );
@@ -288,8 +288,8 @@ package siphash_pkg;
 
     // private
         local static function logic[64-1 : 0] Hash(
-            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in siphash terminology)
-            logic[64-1 : 0]        seed,     // 64-bit seed (key in siphash terminology)
+            logic[KEY_WIDTH-1 : 0] key,      // key to be hashed (message in SipHash terminology)
+            logic[64-1 : 0]        seed,     // 64-bit seed (secret key in SipHash terminology)
             byte unsigned          c_rounds, // number of compression rounds
             byte unsigned          d_rounds, // number of finalization rounds
             byte unsigned          outlen    // length of the output in bytes, must be 4 or 8
