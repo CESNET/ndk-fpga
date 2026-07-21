@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #            Martin Spinler <spinler@cesnet.cz>
 
-from cocotb_bus.monitors import BusMonitor
+from cocotbext.ofm.base.monitors import BusMonitor
 from cocotb.triggers import RisingEdge
 
 
@@ -46,7 +46,7 @@ class AvstPcieMonitor(BusMonitor):
                     segment = {}
                     for k, s in self._recv_signals.items():
                         if s not in ["READY"]:
-                            signal = getattr(self.bus, s).value.buff
+                            signal = getattr(self.bus, s).value.to_bytes(byteorder="big")
                             # TODO: try to use slicing instead of shifting (at least for data and headers)
                             signal = int.from_bytes(signal, byteorder="big")
                             signal = signal >> i * max(len(getattr(self.bus, s)) // self._segments, 1)

@@ -12,10 +12,9 @@ from cocotb_bus.bus import Bus
 from cocotb_bus.monitors import MonitorStatistics
 
 from collections import deque
-from typing import Optional
+from typing import Optional, Callable
+from functools import cached_property
 from cocotb.triggers import Event
-
-from cocotb.types import LogicArray
 
 
 class Driver:
@@ -60,7 +59,148 @@ def do_fix():
 
 # cocotb 2.0-only defines
 if cocotb.__version__ >= "2.0.0":
-    from cocotb.handle import ArrayObject, Immediate
+    from cocotb.types import Logic, LogicArray
+    from cocotb.handle import LogicObject, ArrayObject, Immediate, Deposit
+    from cocotb.triggers import GPITrigger
+    from cocotb._gpi_triggers import _EdgeBase
+    from cocotb.simulator import register_value_change_callback, VALUE_CHANGE, RISING, FALLING
+
+    class _EdgeProxyBase(_EdgeBase):
+        _instances = {}
+        _cbhdls = {}
+
+        def _is_edge_event(self, last_value, current_value) -> bool:
+            return last_value != current_value
+
+        @property
+        def _path(self):
+            return self.signal._path
+
+        @classmethod
+        def _make(cls, signal):
+            self = GPITrigger.__new__(cls)
+            GPITrigger.__init__(self)
+
+            self.signal = signal
+            self._last_val = int(self.signal.value)
+
+            if self._path not in cls._instances.keys():
+                cls._instances[self._path] = list()
+
+            cls._instances[self._path].append(self)
+
+            if self._path not in cls._cbhdls.keys():
+                cls._cbhdls[self._path] = None
+
+            return self
+
+        def _prime(self, callback) -> None:
+            cls = type(self)
+
+            self._last_val = int(self.signal.value)
+
+            if cls._cbhdls[self._path] is None:
+                cls._cbhdls[self._path] = register_value_change_callback(
+                    self.signal._handle, lambda trigger: cls._distribute_callback(trigger, callback), VALUE_CHANGE, self
+                )
+                if cls._cbhdls[self._path] is None:
+                    raise RuntimeError(f"Unable set up {self!s} Trigger")
+
+        @classmethod
+        def _distribute_callback(cls, trigger: "_EdgeProxyBase", callback: Callable):
+            is_primed = False
+            path = trigger._path
+            instances = cls._instances[path]
+
+            cls._cbhdls[path] = None
+
+            for instance in instances:
+                is_primed |= instance._do_callback(callback)
+
+            if not is_primed:
+                trigger._prime(callback)
+
+        def _do_callback(self, callback) -> bool:
+            did_callback = False
+            current = int(self.signal.value)
+
+            if self._is_edge_event(self._last_val, current):
+                callback(self)
+                did_callback = True
+
+            self._last_val = current
+            return did_callback
+
+    class RisingEdgeProxy(_EdgeProxyBase):
+        _edge_type = RISING
+
+        def __new__(cls, signal: cocotb.handle.LogicObject) -> "RisingEdgeProxy":
+            if not isinstance(
+                signal, (cocotb.handle.LogicObject, cocotb.handle.LogicArrayObject)
+            ):
+                raise TypeError(
+                    f"{cls.__qualname__} requires a scalar LogicObject or a 1-bit LogicArrayObject. Got {signal!r} of type {type(signal).__qualname__}"
+                )
+            return signal.rising_edge
+
+        def _is_edge_event(self, last_value, current_value) -> bool:
+            return last_value == 0 and current_value == 1
+
+    class FallingEdgeProxy(_EdgeProxyBase):
+        _edge_type = FALLING
+
+        def __new__(cls, signal: cocotb.handle.LogicObject) -> "FallingEdgeProxy":
+            if not isinstance(
+                signal, (cocotb.handle.LogicObject, cocotb.handle.LogicArrayObject)
+            ):
+                raise TypeError(
+                    f"{cls.__qualname__} requires a scalar LogicObject or a 1-bit LogicArrayObject. Got {signal!r} of type {type(signal).__qualname__}"
+                )
+            return signal.falling_edge
+
+        def _is_edge_event(self, last_value, current_value) -> bool:
+            return last_value == 1 and current_value == 0
+
+    class LogicProxy(LogicObject):
+        _instances = {}
+
+        def __new__(cls, handle, array_idx):
+            if handle is None:
+                return None
+
+            key = (id(handle), array_idx)
+            if key not in cls._instances:
+                cls._instances[key] = super().__new__(cls)
+            return cls._instances[key]
+
+        def __init__(self, handle, array_idx):
+            super().__init__(handle._handle, handle._path)
+            self._lao_handle = handle
+            self._array_idx = array_idx
+
+        @property
+        def value(self):
+            return Logic(str(self._lao_handle.value[self._array_idx]))
+
+        @value.setter
+        def value(self, value):
+            self.set(value)
+
+        def set(self, value):
+            if isinstance(value, Deposit) or isinstance(value, Immediate):
+                value  = value.value
+
+            full_val = self._lao_handle.value
+            full_val[self._array_idx] = value
+            self._lao_handle.set(Immediate(full_val))
+
+        @cached_property
+        def rising_edge(self):
+            return RisingEdgeProxy._make(self)
+
+        @cached_property
+        def falling_edge(self):
+            return FallingEdgeProxy._make(self)
 
     class SignalProxy:
         _instances = {}
@@ -82,7 +222,13 @@ if cocotb.__version__ >= "2.0.0":
             return len(self.value)
 
         def __getitem__(self, index: int):
-            return SignalProxy(self._handle, index)
+            if isinstance(self._handle, ArrayObject):
+                return SignalProxy(self._handle, index)
+            return LogicProxy(self._handle, index)
+
+        @property
+        def _path(self):
+            return self._handle._path
 
         @property
         def value(self):

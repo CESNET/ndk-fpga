@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2023-2026 CESNET z. s. p. o.
+# Author(s): Martin Spinler <spinler@cesnet.cz>
+#            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
+
 from typing import Optional, Union
 import cocotb
 import cocotb.triggers
@@ -6,6 +11,7 @@ import cocotb.utils
 from .. import modelsim as ms
 
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.base.bus_fixup import SignalProxy
 
 
 st = cocotb.utils.get_sim_time
@@ -40,7 +46,11 @@ class Bus():
                 sl = (self._index * w, (self._index + 1) * w)
 
             else:
-                o = o[self._index]
+                o = SignalProxy(o, self._index)
+
+        else:
+            o = SignalProxy(o, self._index)
+
         return o, sl
 
     def _get_handle(self, name):

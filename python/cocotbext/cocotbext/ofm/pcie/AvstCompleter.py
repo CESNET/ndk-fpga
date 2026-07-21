@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2024 CESNET z. s. p. o.
+# Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #            Martin Spinler <spinler@cesnet.cz>
 #            Radek Isa <isa@cesnet.cz>
@@ -49,6 +49,8 @@ class AvstCompleter():
         self._tag_queue = cocotb.queue.PriorityQueue()
         [self._tag_queue.put_nowait(i) for i in range(2**5)]
 
+        self._req_data = None
+
         cc_monitor.add_callback(self._handle_cc_transaction)
         cocotb.start_soon(self._cq_loop())
 
@@ -77,7 +79,8 @@ class AvstCompleter():
                 trigger, item, req_data = self._read_requests[tag]
                 del self._read_requests[tag]
                 self._tag_queue.put_nowait(tag)
-                trigger.set(req_data)
+                self._req_data = req_data
+                trigger.set()
             return
 
         if req_type == 1:
@@ -127,7 +130,8 @@ class AvstCompleter():
 
             if is_last:
                 del self._read_requests[tag]
-                trigger.set(req_data)
+                self._req_data = req_data
+                trigger.set()
                 self._tag_queue.put_nowait(tag)
 
     async def read(self, addr, byte_count) -> bytes:
@@ -135,7 +139,7 @@ class AvstCompleter():
         e = Event()
         await self._queue_send.put(((addr, byte_count, 0, []), e))
         await e.wait()
-        return bytes(e.data)
+        return bytes(self._req_data)
 
     async def write(self, addr, data: bytes):
         # TODO: split big writes to more transactions

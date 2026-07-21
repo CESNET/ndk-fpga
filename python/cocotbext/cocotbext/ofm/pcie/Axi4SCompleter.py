@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (C) 2023 CESNET z. s. p. o.
+# Copyright (C) 2023-2026 CESNET z. s. p. o.
 # Author(s): Martin Spinler <spinler@cesnet.cz>
 
 import cocotb
@@ -27,6 +27,8 @@ class Axi4SCompleter:
         self._read_requests = {}
         self._tag_queue = cocotb.queue.PriorityQueue()
         [self._tag_queue.put_nowait(i) for i in range(2**5)]
+
+        self._req_data = None
 
         cc_monitor.add_callback(self._handle_cc_transaction)
         cocotb.start_soon(self._cq_loop())
@@ -85,7 +87,8 @@ class Axi4SCompleter:
             self._cc_inframe = None
             if is_last:
                 del self._read_requests[hdr.tag]
-                trigger.set(req_data)
+                self._req_data = req_data
+                trigger.set()
                 self._tag_queue.put_nowait(hdr.tag)
 
     async def _cq_req(self, addr, byte_count, req_type=0, data=[], tag=None, sync=True):
@@ -95,7 +98,8 @@ class Axi4SCompleter:
                 trigger, item, req_data = self._read_requests[tag]
                 del self._read_requests[tag]
                 self._tag_queue.put_nowait(tag)
-                trigger.set(req_data)
+                self._req_data = req_data
+                trigger.set()
             return
 
         header = CQHeader()
@@ -128,10 +132,11 @@ class Axi4SCompleter:
 
     async def read(self, addr: int, byte_count: int) -> bytes:
         # TODO: split big reads to more transactions
+
         e = Event()
         await self._queue_send.put(((addr, byte_count, 0, []), e))
         await e.wait()
-        return bytes(e.data)
+        return bytes(self._req_data)
 
     async def write(self, addr: int, data: bytes):
         # TODO: split big writes to more transactions

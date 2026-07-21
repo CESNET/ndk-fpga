@@ -56,21 +56,21 @@ class LogicArray2D(Array):
     def serialize(self) -> LogicArray:
         """Concatenate all inner ``LogicArray`` items into a single large ``LogicArray``."""
         direction = self.range.direction
+        item_width = len(self._item_range)
 
         if direction == "downto":
-            la_range = Range(self.range * self.item_range - 1, "downto", 0)
+            la_range = Range(len(self.range) * item_width - 1, "downto", 0)
         else:
-            la_range = Range(0, "to", self.range * self.item_range - 1)
+            la_range = Range(0, "to", len(self.range) * item_width - 1)
 
         logic_array = LogicArray(0, la_range)
 
         if direction == "downto":
             for i in range(len(self)):
-                logic_array[(i + 1) * self.item_range - 1 : i * self.item_range] = self[i]
-
+                logic_array[(i + 1) * item_width - 1 : i * item_width] = self[i]
         else:
             for i in range(len(self)):
-                logic_array[i * self.item_range : (i + 1) * self.item_range - 1] = self[i]
+                logic_array[i * item_width : (i + 1) * item_width - 1] = self[i]
 
         return logic_array
 
