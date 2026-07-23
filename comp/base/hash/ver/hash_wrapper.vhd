@@ -1,5 +1,5 @@
 -- SPDX-License-Identifier: BSD-3-Clause
--- Copyright (C) 2025 CESNET z. s. p. o
+-- Copyright (C) 2026 CESNET z. s. p. o
 -- Author(s): Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 library IEEE;
@@ -10,7 +10,7 @@ use work.type_pack.all;
 
 entity HASH_WRAPPER is
     generic (
-        -- width of the input key, should not exceed 191B.
+        -- width of the input key.
         -- If not aligned to whole bytes, the rest is
         -- extended by zeros
         KEY_WIDTH     : natural := 296;
@@ -20,6 +20,8 @@ entity HASH_WRAPPER is
         META_WIDTH    : natural := 32;
         -- adds a register to the output
         OUT_REG       : boolean := true;
+        -- general register setup of the pipeline
+        REG_SETUP     : std_logic_vector := "1";
         -- name of the hash function to be wrapped
         HASH_FUNCTION : string := "SPOOKYHASH"
     );
@@ -55,6 +57,7 @@ begin
             KEY_WIDTH  => KEY_WIDTH,
             HASH_WIDTH => HASH_WIDTH,
             META_WIDTH => META_WIDTH,
+            REG_SETUP  => REG_SETUP,
             OUT_REG    => OUT_REG
         ) port map (
             CLK        => CLK,
@@ -73,20 +76,21 @@ begin
             KEY_WIDTH           => KEY_WIDTH,
             HASH_WIDTH          => HASH_WIDTH,
             META_WIDTH          => META_WIDTH,
-            COMPRESSION_ROUDS   => 2,
+            COMPRESSION_ROUNDS  => 2,
             FINALIZATION_ROUNDS => 4,
             WORD_WIDTH          => 64,
+            REG_SETUP           => REG_SETUP,
             OUT_REG             => OUT_REG
         ) port map (
-            CLK        => CLK,
-            RESET      => RESET,
-            IN_KEY     => IN_KEY,
-            IN_SEED    => IN_SEED,
-            IN_META    => IN_META,
-            IN_VALID   => IN_VALID,
-            OUT_HASH   => OUT_HASH,
-            OUT_META   => OUT_META,
-            OUT_VALID  => OUT_VALID
+            CLK                 => CLK,
+            RESET               => RESET,
+            IN_KEY              => IN_KEY,
+            IN_SEED             => IN_SEED,
+            IN_META             => IN_META,
+            IN_VALID            => IN_VALID,
+            OUT_HASH            => OUT_HASH,
+            OUT_META            => OUT_META,
+            OUT_VALID           => OUT_VALID
         );
     elsif HASH_FUNCTION = "SIPHASH_4_8" generate
         siphash_i: entity work.SIPHASH
@@ -94,20 +98,21 @@ begin
             KEY_WIDTH           => KEY_WIDTH,
             HASH_WIDTH          => HASH_WIDTH,
             META_WIDTH          => META_WIDTH,
-            COMPRESSION_ROUDS   => 4,
+            COMPRESSION_ROUNDS  => 4,
             FINALIZATION_ROUNDS => 8,
             WORD_WIDTH          => 64,
+            REG_SETUP           => REG_SETUP,
             OUT_REG             => OUT_REG
         ) port map (
-            CLK        => CLK,
-            RESET      => RESET,
-            IN_KEY     => IN_KEY,
-            IN_SEED    => IN_SEED,
-            IN_META    => IN_META,
-            IN_VALID   => IN_VALID,
-            OUT_HASH   => OUT_HASH,
-            OUT_META   => OUT_META,
-            OUT_VALID  => OUT_VALID
+            CLK                 => CLK,
+            RESET               => RESET,
+            IN_KEY              => IN_KEY,
+            IN_SEED             => IN_SEED,
+            IN_META             => IN_META,
+            IN_VALID            => IN_VALID,
+            OUT_HASH            => OUT_HASH,
+            OUT_META            => OUT_META,
+            OUT_VALID           => OUT_VALID
         );
     elsif HASH_FUNCTION = "HALFSIPHASH_2_4" generate
         siphash_i: entity work.SIPHASH
@@ -115,20 +120,21 @@ begin
             KEY_WIDTH           => KEY_WIDTH,
             HASH_WIDTH          => HASH_WIDTH,
             META_WIDTH          => META_WIDTH,
-            COMPRESSION_ROUDS   => 2,
+            COMPRESSION_ROUNDS  => 2,
             FINALIZATION_ROUNDS => 4,
             WORD_WIDTH          => 32,
+            REG_SETUP           => REG_SETUP,
             OUT_REG             => OUT_REG
         ) port map (
-            CLK        => CLK,
-            RESET      => RESET,
-            IN_KEY     => IN_KEY,
-            IN_SEED    => IN_SEED,
-            IN_META    => IN_META,
-            IN_VALID   => IN_VALID,
-            OUT_HASH   => OUT_HASH,
-            OUT_META   => OUT_META,
-            OUT_VALID  => OUT_VALID
+            CLK                 => CLK,
+            RESET               => RESET,
+            IN_KEY              => IN_KEY,
+            IN_SEED             => IN_SEED,
+            IN_META             => IN_META,
+            IN_VALID            => IN_VALID,
+            OUT_HASH            => OUT_HASH,
+            OUT_META            => OUT_META,
+            OUT_VALID           => OUT_VALID
         );
     elsif HASH_FUNCTION = "HALFSIPHASH_4_8" generate
         siphash_i: entity work.SIPHASH
@@ -136,20 +142,21 @@ begin
             KEY_WIDTH           => KEY_WIDTH,
             HASH_WIDTH          => HASH_WIDTH,
             META_WIDTH          => META_WIDTH,
-            COMPRESSION_ROUDS   => 4,
+            COMPRESSION_ROUNDS  => 4,
             FINALIZATION_ROUNDS => 8,
             WORD_WIDTH          => 32,
+            REG_SETUP           => REG_SETUP,
             OUT_REG             => OUT_REG
         ) port map (
-            CLK        => CLK,
-            RESET      => RESET,
-            IN_KEY     => IN_KEY,
-            IN_SEED    => IN_SEED,
-            IN_META    => IN_META,
-            IN_VALID   => IN_VALID,
-            OUT_HASH   => OUT_HASH,
-            OUT_META   => OUT_META,
-            OUT_VALID  => OUT_VALID
+            CLK                 => CLK,
+            RESET               => RESET,
+            IN_KEY              => IN_KEY,
+            IN_SEED             => IN_SEED,
+            IN_META             => IN_META,
+            IN_VALID            => IN_VALID,
+            OUT_HASH            => OUT_HASH,
+            OUT_META            => OUT_META,
+            OUT_VALID           => OUT_VALID
         );
     elsif HASH_FUNCTION = "CHASKEY" generate
         chaskey_i: entity work.CHASKEY
@@ -158,6 +165,7 @@ begin
             HASH_WIDTH => HASH_WIDTH,
             META_WIDTH => META_WIDTH,
             ROUNDS     => 8,
+            REG_SETUP  => REG_SETUP,
             OUT_REG    => OUT_REG
         ) port map (
             CLK        => CLK,
@@ -176,7 +184,8 @@ begin
             KEY_WIDTH  => KEY_WIDTH,
             HASH_WIDTH => HASH_WIDTH,
             META_WIDTH => META_WIDTH,
-            ROUNDS     => 12,
+            ROUNDS     => 16,
+            REG_SETUP  => REG_SETUP,
             OUT_REG    => OUT_REG
         ) port map (
             CLK        => CLK,
@@ -188,6 +197,98 @@ begin
             OUT_HASH   => OUT_HASH,
             OUT_META   => OUT_META,
             OUT_VALID  => OUT_VALID
+        );
+    elsif HASH_FUNCTION = "PCASD_4_16" generate
+        pcasd_i: entity work.PCASD
+        generic map (
+            KEY_WIDTH    => KEY_WIDTH,
+            HASH_WIDTH   => HASH_WIDTH,
+            META_WIDTH   => META_WIDTH,
+            BLOCK_WIDTH  => 256,
+            CA_ROUNDS    => 4,
+            MIX_ROUNDS   => 16,
+            MIX_FUNCTION => "RD_ROUND",
+            REG_SETUP    => REG_SETUP,
+            OUT_REG      => OUT_REG
+        ) port map (
+            CLK          => CLK,
+            RESET        => RESET,
+            IN_KEY       => IN_KEY,
+            IN_SEED      => IN_SEED,
+            IN_META      => IN_META,
+            IN_VALID     => IN_VALID,
+            OUT_HASH     => OUT_HASH,
+            OUT_META     => OUT_META,
+            OUT_VALID    => OUT_VALID
+        );
+    elsif HASH_FUNCTION = "PCASD_8_32" generate
+        pcasd_i: entity work.PCASD
+        generic map (
+            KEY_WIDTH    => KEY_WIDTH,
+            HASH_WIDTH   => HASH_WIDTH,
+            META_WIDTH   => META_WIDTH,
+            BLOCK_WIDTH  => 256,
+            CA_ROUNDS    => 8,
+            MIX_ROUNDS   => 32,
+            MIX_FUNCTION => "RD_ROUND",
+            REG_SETUP    => REG_SETUP,
+            OUT_REG      => OUT_REG
+        ) port map (
+            CLK          => CLK,
+            RESET        => RESET,
+            IN_KEY       => IN_KEY,
+            IN_SEED      => IN_SEED,
+            IN_META      => IN_META,
+            IN_VALID     => IN_VALID,
+            OUT_HASH     => OUT_HASH,
+            OUT_META     => OUT_META,
+            OUT_VALID    => OUT_VALID
+        );
+    elsif HASH_FUNCTION = "PCARX_4_4" generate
+        pcasd_i: entity work.PCASD
+        generic map (
+            KEY_WIDTH    => KEY_WIDTH,
+            HASH_WIDTH   => HASH_WIDTH,
+            META_WIDTH   => META_WIDTH,
+            BLOCK_WIDTH  => 256,
+            CA_ROUNDS    => 4,
+            MIX_ROUNDS   => 4,
+            MIX_FUNCTION => "SIPROUND",
+            REG_SETUP    => REG_SETUP,
+            OUT_REG      => OUT_REG
+        ) port map (
+            CLK          => CLK,
+            RESET        => RESET,
+            IN_KEY       => IN_KEY,
+            IN_SEED      => IN_SEED,
+            IN_META      => IN_META,
+            IN_VALID     => IN_VALID,
+            OUT_HASH     => OUT_HASH,
+            OUT_META     => OUT_META,
+            OUT_VALID    => OUT_VALID
+        );
+    elsif HASH_FUNCTION = "PCARX_8_8" generate
+        pcasd_i: entity work.PCASD
+        generic map (
+            KEY_WIDTH    => KEY_WIDTH,
+            HASH_WIDTH   => HASH_WIDTH,
+            META_WIDTH   => META_WIDTH,
+            BLOCK_WIDTH  => 256,
+            CA_ROUNDS    => 8,
+            MIX_ROUNDS   => 8,
+            MIX_FUNCTION => "SIPROUND",
+            REG_SETUP    => REG_SETUP,
+            OUT_REG      => OUT_REG
+        ) port map (
+            CLK          => CLK,
+            RESET        => RESET,
+            IN_KEY       => IN_KEY,
+            IN_SEED      => IN_SEED,
+            IN_META      => IN_META,
+            IN_VALID     => IN_VALID,
+            OUT_HASH     => OUT_HASH,
+            OUT_META     => OUT_META,
+            OUT_VALID    => OUT_VALID
         );
     else generate
         assert false

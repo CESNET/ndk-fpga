@@ -7,20 +7,21 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
+use work.hash_pack.all;
 
 -- Firmware implementation of chaskey cryptographic hash function
 -- using variable pipeline intended for use in high speed networking
 -- applications.
 --
 -- Chaskey is a light-weigth cryptographic hash function based on
--- AXR (Addition, Xor, Rotations) operations. The four state variables
+-- ARX (Addition, Rotations, XOR) operations. The four state variables
 -- are 32-bit and generated hash is 128-bits in length.
 --
 -- The strength of the hash function in terms of security
 -- can be configured by setting the ROUNDS generic, which
--- indicates how many AXR permutations per block of the
--- key will be generated. Typical settings are 8 and 12,
--- the version with 12 rounds is also refered to as Chaskey-LTS.
+-- indicates how many ARX permutations per block of the
+-- key will be generated. Typical settings are 8 and 16,
+-- the version with 16 rounds is also refered to as Chaskey-LTS.
 --
 -- The CHASKEY entity consists of two components - CHASKEY_PROCESS_BLOCK
 -- and CHASKEY_REMAINDER. Pipelines of both of these components can be
@@ -44,16 +45,16 @@ entity CHASKEY is
     generic (
         -- width of the input key.
         -- If not aligned to whole bytes, the rest is extended by zeros.
-        KEY_WIDTH               : natural := 312;
+        KEY_WIDTH                 : natural := 312;
         -- width of the generated hash, max 128 bits.
-        HASH_WIDTH              : natural := 128;
+        HASH_WIDTH                : natural := 128;
         -- width of the passthrough metadata.
-        META_WIDTH              : natural := 32;
-        -- number of permutation rounds. Typical settings are 8 and 12 (Chaskey-LTS).
+        META_WIDTH                : natural := 32;
+        -- number of permutation rounds. Typical settings are 8 and 16 (Chaskey-LTS).
         -- More rounds results in better security.
-        ROUNDS                  : natural := 8;
+        ROUNDS                    : natural := 8;
         -- adds a register to the output.
-        OUT_REG                 : boolean := true;
+        OUT_REG                   : boolean := true;
 
         -- Configuration of the pipeline. A value of '1' at a given index inserts a
         -- register, thus segmenting the logic path. Index 0 always represents the
@@ -62,14 +63,21 @@ entity CHASKEY is
         -- (Fmax), but they also consume more resources and increase the initial latency.
         -- The synthesis tool may perform register re-timing.
 
-        -- setup of the registers of CHASKEY_ROUND components
-        ROUND_REG_SETUP         : std_logic_vector(4-1 downto 0) := "1111";
-        -- adds a register to the start of the CHASKEY_PROCESS_BLOCK component
-        PROCESS_BLOCK_START_REG : boolean                        := true;
+        -- general register setup. The registers in the whole pipeline will be generated
+        -- according to this repeating patern.
+        REG_SETUP                 : std_logic_vector                := "1";
+
+        -- flag that general setting REG_SETUP should be overrided with specific
+        -- component setting bellow.
+        REG_SETUP_MANUAL_OVERRIDE : boolean                         := false;
+        -- setup of the registers of CHASKEY_ROUND components.
+        ROUND_REG_SETUP           : std_logic_vector(4-1 downto 0)  := "1111";
+        -- adds a register to the start of the CHASKEY_PROCESS_BLOCK component.
+        PROCESS_BLOCK_START_REG   : std_logic_vector(1-1 downto 0)  := "1";
         -- setup of the registers of the CHASKEY_REMAINDER component. The
-        -- bit at index 3 is used only when the key is not alligned
+        -- bit at index 3 is used only when the key is not aligned
         -- (is not a multiple of 128).
-        REMAINDER_REG_SETUP     : std_logic_vector(4-1 downto 0) := "1111"
+        REMAINDER_REG_SETUP       : std_logic_vector(4-1 downto 0)  := "1111"
     );
     port (
         -- main clock
@@ -96,20 +104,29 @@ entity CHASKEY is
 end entity;
 
 architecture FULL of CHASKEY is
-    -- width of the key aligned to whole bytes
-    constant KEY_WIDTH_BYTE_ALIGNED  : natural := div_roundup(KEY_WIDTH, 8) * 8;
-    -- width of the words and state variables
-    constant WORD_WIDTH              : natural := 32;
-    -- width of a block of a key
-    constant BLOCK_WIDTH             : natural := WORD_WIDTH * 4;
-    -- width of the key aligned to whole words and extended by a extra word
-    constant KEY_WIDTH_BLOCK_ALIGNED : natural := div_roundup(KEY_WIDTH, BLOCK_WIDTH) * BLOCK_WIDTH;
-    -- number of components processing key blocks to be generated
-    constant PROCESS_BLOCK_COUNT     : natural := (KEY_WIDTH_BLOCK_ALIGNED / BLOCK_WIDTH) - 1;
-    -- number of remaining bytes
-    constant REMAIN                  : natural := (KEY_WIDTH_BYTE_ALIGNED / 8) mod (BLOCK_WIDTH / 8);
-    -- length of the pipeline of this component
-    constant PIPE_LENGTH             : natural := PROCESS_BLOCK_COUNT + 2;
+    -- width of the key aligned to whole bytes.
+    constant KEY_WIDTH_BYTE_ALIGNED     : natural := div_roundup(KEY_WIDTH, 8) * 8;
+    -- width of the words and state variables.
+    constant WORD_WIDTH                 : natural := 32;
+    -- width of a block of a key.
+    constant BLOCK_WIDTH                : natural := WORD_WIDTH * 4;
+    -- width of the key aligned to whole words and extended by a extra word.
+    constant KEY_WIDTH_BLOCK_ALIGNED    : natural := div_roundup(KEY_WIDTH, BLOCK_WIDTH) * BLOCK_WIDTH;
+    -- number of components processing key blocks to be generated.
+    constant PROCESS_BLOCK_COUNT        : natural := (KEY_WIDTH_BLOCK_ALIGNED / BLOCK_WIDTH) - 1;
+    -- number of remaining bytes.
+    constant REMAIN                     : natural := (KEY_WIDTH_BYTE_ALIGNED / 8) mod (BLOCK_WIDTH / 8);
+    -- length of the pipeline of this component.
+    constant PIPE_LENGTH                : natural := PROCESS_BLOCK_COUNT + 2;
+    -- joined setup of the registers of the CHASKEY_COMPRESS_BLOCK component
+    constant COMPRESS_BLOCK_REG_SETUP   : std_logic_vector(ROUND_REG_SETUP'length * ROUNDS downto 0) := PROCESS_BLOCK_START_REG & f_duplicate_std_logic_vector(ROUND_REG_SETUP, ROUNDS);
+    -- joined setup of the registers of the CHASKEY_REMAINDER component
+    constant REMAINDER_JOINED_REG_SETUP : std_logic_vector((ROUND_REG_SETUP'length * ROUNDS) + REMAINDER_REG_SETUP'length - 1 downto 0) := REMAINDER_REG_SETUP(4-1 downto 1) & f_duplicate_std_logic_vector(ROUND_REG_SETUP, ROUNDS) & REMAINDER_REG_SETUP(0);
+    -- actual setup of the pipeline of the individual CHASKEY_PROCESS_BLOCK components.
+    constant REG_SETUP_COMPRESSION      : slv_array_t(PROCESS_BLOCK_COUNT-1 downto 0)(COMPRESS_BLOCK_REG_SETUP'length-1 downto 0) := f_get_reg_setup(PROCESS_BLOCK_COUNT, COMPRESS_BLOCK_REG_SETUP'length, 0, REG_SETUP, REG_SETUP_MANUAL_OVERRIDE, COMPRESS_BLOCK_REG_SETUP);
+    -- actual setup of the pipeline of the CHASKEY_REMAINDER component
+    constant REG_SETUP_REMAINDER        : std_logic_vector(REMAINDER_JOINED_REG_SETUP'length-1 downto 0) := slv_array_ser(f_get_reg_setup(1, REMAINDER_JOINED_REG_SETUP'length, PROCESS_BLOCK_COUNT * COMPRESS_BLOCK_REG_SETUP'length, REG_SETUP, REG_SETUP_MANUAL_OVERRIDE, REMAINDER_JOINED_REG_SETUP));
+
 
     signal key  : u_array_t(PIPE_LENGTH-1 downto 0)(KEY_WIDTH_BLOCK_ALIGNED-1 downto 0);
     signal seed : u_array_t(PIPE_LENGTH-1 downto 0)(128-1 downto 0);
@@ -158,8 +175,7 @@ begin
             KEY_WIDTH       => KEY_WIDTH_BLOCK_ALIGNED,
             META_WIDTH      => META_WIDTH,
             ROUNDS          => ROUNDS,
-            ROUND_REG_SETUP => ROUND_REG_SETUP,
-            START_REG       => PROCESS_BLOCK_START_REG
+            REG_SETUP       => REG_SETUP_COMPRESSION(PIPE_LENGTH - g - 1)
         ) port map (
             CLK             => CLK,
             RESET           => RESET,
@@ -188,8 +204,7 @@ begin
         META_WIDTH      => META_WIDTH,
         ROUNDS          => ROUNDS,
         REMAIN          => REMAIN,
-        ROUND_REG_SETUP => ROUND_REG_SETUP,
-        REG_SETUP       => REMAINDER_REG_SETUP
+        REG_SETUP       => REG_SETUP_REMAINDER
     ) port map (
         CLK             => CLK,
         RESET           => RESET,

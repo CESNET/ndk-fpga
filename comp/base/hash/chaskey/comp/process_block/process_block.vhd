@@ -23,18 +23,16 @@ use work.type_pack.all;
 --
 entity CHASKEY_PROCESS_BLOCK is
     generic (
-        -- which 128-bit word of the key shall be processed
+        -- which 128-bit word of the key shall be processed.
         KEY_OFFSET      : natural := 0;
-        -- width of the whole key
+        -- width of the whole key.
         KEY_WIDTH       : natural := 312;
-        -- width of the passthrough metadata
+        -- width of the passthrough metadata.
         META_WIDTH      : natural := 32;
-        -- number of sipround rounds generate
+        -- number of sipround rounds generate.
         ROUNDS          : natural := 8;
-        -- setup of the registers of CHASKEY_ROUND components
-        ROUND_REG_SETUP : std_logic_vector(4-1 downto 0) := "1111";
-        -- setup of the registers of this components
-        START_REG       : boolean := true
+        -- setup of the registers of this components.
+        REG_SETUP       : std_logic_vector
     );
     port (
         -- main clock
@@ -112,7 +110,7 @@ begin
         generic map (
             KEY_WIDTH  => KEY_WIDTH,
             META_WIDTH => META_WIDTH,
-            REG_SETUP  => ROUND_REG_SETUP
+            REG_SETUP  => REG_SETUP(g * 4 - 1 downto (g - 1) * 4)
         ) port map (
             CLK        => CLK,
             RESET      => RESET,
@@ -140,8 +138,8 @@ begin
     -- ================================================
 
     -- generating the a register between INPUT and PERMUTATIONS
-    -- if START REG is set tu true.
-    end_reg_g: if START_REG generate
+    -- if START REG is set to true.
+    end_reg_g: if REG_SETUP(REG_SETUP'high) generate
         process (CLK)
         begin
             if rising_edge(CLK) then

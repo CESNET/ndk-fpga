@@ -13,6 +13,7 @@ lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend COMPONENTS [list "SPOOKYHASH"  "$COMP_BASE/spookyhash"  "FULL"]
 lappend COMPONENTS [list "SIPHASH"     "$COMP_BASE/siphash"     "FULL"]
 lappend COMPONENTS [list "CHASKEY"     "$COMP_BASE/chaskey"     "FULL"]
+lappend COMPONENTS [list "PCASD"       "$COMP_BASE/pcasd"       "FULL"]
 
 
 # Files

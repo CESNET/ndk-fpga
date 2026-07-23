@@ -7,25 +7,26 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
+use work.hash_pack.all;
 
--- Firmware implementation of siphash cryptographic hash function
+-- Firmware implementation of SipHash cryptographic hash function
 -- using variable pipeline intended for use in high speed networking
 -- applications.
 --
--- Includes siphash and halfsiphash variants, use the WORD_WIDTH
--- generics to switch between these two. Siphash offers better
--- cryptographic strength but consumes more resources, halfsiphash
--- is cryptographically weeker but consumes less resources.
+-- Includes SipHash and HalfSipHash variants, use the WORD_WIDTH
+-- generics to switch between these two. SipHash offers better
+-- cryptographic strength but consumes more resources, HalfSipHash
+-- is cryptographically weaker but consumes less resources.
 --
 -- Also includes standard and extended versions. Normal versions
--- generate hash up to 64b for siphash and 32b for halfsiphash,
--- extended versions up to 128b for siphash and 64b for halfsiphash.
+-- generate hash up to 64b for SipHash and 32b for HalfSipHash,
+-- extended versions up to 128b for SipHash and 64b for HalfSipHash.
 -- Since more finalization rounds are generated, extended versions
 -- consume higher resources.
 --
 -- Number of comperession and finalization rounds can be configured.
--- Standard versions are Siphash2-4, which offers balance between
--- cryptographic strength and consumed resources, and Siphash4-8,
+-- Standard versions are SipHash-2-4, which offers balance between
+-- cryptographic strength and consumed resources, and SipHash-4-8,
 -- which offers higher cryptographic strength for the price of higher
 -- resource consumption.
 --
@@ -33,7 +34,7 @@ use work.type_pack.all;
 -- subcomponents. Pipelines of both of these components can be
 -- configured using their coresponding generics.
 --
--- The components are connected in this matter for normal version of siphash:
+-- The components are connected in this manner for normal version of siphash:
 --
 --             INPUT                     COMPRESSION                          FINALIZATION                      HASH
 --                            +--------------------------------+   +--------------------------------+
@@ -47,7 +48,7 @@ use work.type_pack.all;
 -- FINALIZATION ---[V1 XOR 0xDD]---| SIPROUND * finalization_rounds |--- HASH
 --                                 +--------------------------------+
 --
--- In the case of halfsiphash, the HASH changes to [v1 ^ v3].
+-- In the case of HalfSipHash, the HASH changes to [v1 ^ v3].
 --
 -- For specification, reference C and Python implementation, see:
 --     Specification : https://cr.yp.to/siphash/siphash-20120918.pdf
@@ -63,11 +64,11 @@ entity SIPHASH is
         -- width of the passthrough metadata.
         META_WIDTH          : natural := 32;
         -- number of compression rounds.
-        COMPRESSION_ROUDS   : natural := 2;
+        COMPRESSION_ROUNDS  : natural := 2;
         -- number of finalization rounds.
         FINALIZATION_ROUNDS : natural := 4;
-        -- width of the words and internal state variables. Use 64 for full siphash and
-        -- 32 for halfsiphash
+        -- width of the words and internal state variables. Use 64 for full SipHash and
+        -- 32 for HalfSipHash
         WORD_WIDTH          : natural := 64;
         -- adds a register to the output.
         OUT_REG             : boolean := true;
@@ -78,11 +79,21 @@ entity SIPHASH is
         -- Shorter paths between registers increase the maximum operating frequency
         -- (Fmax), but they also consume more resources and increase the initial latency.
         -- The synthesis tool may perform register re-timing.
+
+        -- general register setup. The registers in the whole pipeline will be generated
+        -- according to this repeating pattern.
+        REG_SETUP   : std_logic_vector                              := "1";
+
+        -- flag that general setting REG_SETUP should be overrided with specific
+        -- component setting bellow.
+        REG_SETUP_MANUAL_OVERRIDE   : boolean                          := false;
+        -- manual setting of the pipeline of the SIPROUND component.
         SIPROUND_REG_SETUP          : std_logic_vector(4-1 downto 0) := "1111";
+        -- manual setting of the SIP_COMPRESS_WORD component.
         SIP_COMPRESS_WORD_REG_SETUP : std_logic_vector(2-1 downto 0) := "11";
         -- if 128 bit variant of the algorithm is used, adds a register to the
         -- start of the second finalization round.
-        HASH_EXTENSION_START_REG    : boolean                        := true
+        HASH_EXTENSION_START_REG    : std_logic_vector(1-1 downto 0) := "1"
     );
     port (
         -- main clock
@@ -109,7 +120,7 @@ entity SIPHASH is
 end entity;
 
 architecture FULL of SIPHASH is
-    -- the length of the array of the hash signal is different for the normal and extended versions
+    -- the length of the array of the hash signal is different for the normal and extended versions.
     function f_get_hash_pipe_length (hash_width: natural; word_width: natural; fin_rounds: natural) return natural is
     begin
         if (hash_width > word_width) then
@@ -119,7 +130,7 @@ architecture FULL of SIPHASH is
         end if;
     end function;
 
-    -- the constant xored with the remainder of the key is different for the normal and extended versions
+    -- the constant xored with the remainder of the key is different for the normal and extended versions.
     function f_get_final_const (hash_width: natural; word_width: natural) return natural is
     begin
         if (hash_width > word_width) then
@@ -130,7 +141,7 @@ architecture FULL of SIPHASH is
     end function;
 
     -- the constants xored with the seed are different for 32 bit and 64 bit versions and
-    -- normal and extended versions
+    -- normal and extended versions.
     function f_get_v_constants (hash_width: natural; word_width: natural) return u_array_t is
         variable v_const : u_array_t(4-1 downto 0)(word_width-1 downto 0);
     begin
@@ -164,42 +175,54 @@ architecture FULL of SIPHASH is
     end function;
 
     -- width of the key aligned to whole bytes
-    constant KEY_WIDTH_BYTE_ALIGNED : natural := div_roundup(KEY_WIDTH, 8) * 8;
+    constant KEY_WIDTH_BYTE_ALIGNED  : natural := div_roundup(KEY_WIDTH, 8) * 8;
     -- word width in bytes
-    constant WORD_WIDTH_BYTES       : natural := WORD_WIDTH / 8;
+    constant WORD_WIDTH_BYTES        : natural := WORD_WIDTH / 8;
     -- number of words
-    constant WORD_COUNT             : natural := KEY_WIDTH_BYTE_ALIGNED / WORD_WIDTH;
+    constant WORD_COUNT              : natural := KEY_WIDTH_BYTE_ALIGNED / WORD_WIDTH;
     -- width of the key aligned to whole words and extended by a extra word
-    constant KEY_WIDTH_WORD_ALIGNED : natural := (WORD_COUNT * WORD_WIDTH) + WORD_WIDTH;
+    constant KEY_WIDTH_WORD_ALIGNED  : natural := (WORD_COUNT * WORD_WIDTH) + WORD_WIDTH;
     -- number of remaining bytes
-    constant REMAINDER_BYTES        : natural := (KEY_WIDTH_BYTE_ALIGNED / 8) - (WORD_COUNT * WORD_WIDTH_BYTES);
+    constant REMAINDER_BYTES         : natural := (KEY_WIDTH_BYTE_ALIGNED / 8) - (WORD_COUNT * WORD_WIDTH_BYTES);
     -- padding of remaining bytes
-    constant PADDING                : unsigned(WORD_WIDTH-1 downto 0) := shift_left(to_unsigned(WORD_COUNT * WORD_WIDTH_BYTES + REMAINDER_BYTES, WORD_WIDTH) and to_unsigned(255, WORD_WIDTH), WORD_WIDTH-8);
+    constant PADDING                 : unsigned(WORD_WIDTH-1 downto 0) := shift_left(to_unsigned(WORD_COUNT * WORD_WIDTH_BYTES + REMAINDER_BYTES, WORD_WIDTH) and to_unsigned(255, WORD_WIDTH), WORD_WIDTH-8);
     -- the constants xored with the seed generating v0, v1, v2 and v3
-    constant V_CONST                : u_array_t(4-1 downto 0)(WORD_WIDTH-1 downto 0) := f_get_v_constants(HASH_WIDTH, WORD_WIDTH);
+    constant V_CONST                 : u_array_t(4-1 downto 0)(WORD_WIDTH-1 downto 0) := f_get_v_constants(HASH_WIDTH, WORD_WIDTH);
     -- length of the hash array
-    constant HASH_PIPE_LENGTH       : natural := f_get_hash_pipe_length(HASH_WIDTH, WORD_WIDTH, FINALIZATION_ROUNDS);
+    constant HASH_PIPE_LENGTH        : natural := f_get_hash_pipe_length(HASH_WIDTH, WORD_WIDTH, FINALIZATION_ROUNDS);
     -- length of the pipeline of this component
-    constant PIPE_LENGTH            : natural := WORD_COUNT + FINALIZATION_ROUNDS + HASH_PIPE_LENGTH + 1;
+    constant PIPE_LENGTH             : natural := WORD_COUNT + FINALIZATION_ROUNDS + HASH_PIPE_LENGTH + 1;
+    -- = sip compress pipeline length
+    constant SCPL                    : natural := (SIPROUND_REG_SETUP'length * COMPRESSION_ROUNDS) + SIP_COMPRESS_WORD_REG_SETUP'length;
+    -- joins reg setup of sipround and operation with message before and after sipround.
+    constant SIP_COMPRESS_JOINED_RS  : std_logic_vector(SCPL-1 downto 0) := SIP_COMPRESS_WORD_REG_SETUP(1) & f_duplicate_std_logic_vector(SIPROUND_REG_SETUP, COMPRESSION_ROUNDS) & SIP_COMPRESS_WORD_REG_SETUP(0);
+    -- actual setup of the pipeline of the individual SIP_COMPRESS_WORD components.
+    constant REG_SETUP_SIP_COMPRESS  : slv_array_t(WORD_COUNT downto 0)(SCPL-1 downto 0) := f_get_reg_setup(WORD_COUNT + 1, SCPL, 0, REG_SETUP, REG_SETUP_MANUAL_OVERRIDE, SIP_COMPRESS_JOINED_RS);
+    -- actual setup of the pipeline of the individual SIPROUND components in the finalization.
+    constant REG_SETUP_FINALIZATION  : slv_array_t(FINALIZATION_ROUNDS-1 downto 0)(SIPROUND_REG_SETUP'high downto 0) := f_get_reg_setup(FINALIZATION_ROUNDS, SIPROUND_REG_SETUP'length, WORD_COUNT * SCPL, REG_SETUP, REG_SETUP_MANUAL_OVERRIDE, SIPROUND_REG_SETUP);
+    -- if register will be added after the generation of lower half of the hash in case of extended components.
+    constant REG_SETUP_EXT_START_REG : std_logic := slv_array_ser(f_get_reg_setup(1, 1, (WORD_COUNT * SCPL) + (FINALIZATION_ROUNDS * SIPROUND_REG_SETUP'length), REG_SETUP, REG_SETUP_MANUAL_OVERRIDE, HASH_EXTENSION_START_REG))(0);
+    -- actual setup of the pipeline of the extended finalization.
+    constant REG_SETUP_EXT_FINAL     : slv_array_t(FINALIZATION_ROUNDS-1 downto 0)(SIPROUND_REG_SETUP'high downto 0) := f_get_reg_setup(FINALIZATION_ROUNDS, SIPROUND_REG_SETUP'length, (WORD_COUNT * SCPL) + (FINALIZATION_ROUNDS * SIPROUND_REG_SETUP'length) + 1, REG_SETUP, REG_SETUP_MANUAL_OVERRIDE, SIPROUND_REG_SETUP);
 
     -- logic
-    signal key                      : u_array_t(PIPE_LENGTH-1 downto PIPE_LENGTH - WORD_COUNT - 2)(KEY_WIDTH_WORD_ALIGNED-1 downto 0);
-    signal v0                       : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
-    signal v1                       : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
-    signal v2                       : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
-    signal v3                       : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
-    signal meta                     : slv_array_t(PIPE_LENGTH-1 downto 0)(META_WIDTH-1 downto 0);
-    signal vld                      : std_logic_vector(PIPE_LENGTH-1 downto 0);
-    signal hash                     : u_array_t(HASH_PIPE_LENGTH-1 downto 0)((WORD_WIDTH*2)-1 downto 0);
+    signal key                       : u_array_t(PIPE_LENGTH-1 downto PIPE_LENGTH - WORD_COUNT - 2)(KEY_WIDTH_WORD_ALIGNED-1 downto 0);
+    signal v0                        : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
+    signal v1                        : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
+    signal v2                        : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
+    signal v3                        : u_array_t(PIPE_LENGTH-1 downto 0)(WORD_WIDTH-1 downto 0);
+    signal meta                      : slv_array_t(PIPE_LENGTH-1 downto 0)(META_WIDTH-1 downto 0);
+    signal vld                       : std_logic_vector(PIPE_LENGTH-1 downto 0);
+    signal hash                      : u_array_t(HASH_PIPE_LENGTH-1 downto 0)((WORD_WIDTH*2)-1 downto 0);
 
     -- registers
-    signal v0_hesr                  : unsigned(WORD_WIDTH-1 downto 0);
-    signal v1_hesr                  : unsigned(WORD_WIDTH-1 downto 0);
-    signal v2_hesr                  : unsigned(WORD_WIDTH-1 downto 0);
-    signal v3_hesr                  : unsigned(WORD_WIDTH-1 downto 0);
-    signal meta_hesr                : std_logic_vector(META_WIDTH-1 downto 0);
-    signal vld_hesr                 : std_logic;
-    signal hash_hesr                : unsigned(WORD_WIDTH-1 downto 0);
+    signal v0_hesr                   : unsigned(WORD_WIDTH-1 downto 0);
+    signal v1_hesr                   : unsigned(WORD_WIDTH-1 downto 0);
+    signal v2_hesr                   : unsigned(WORD_WIDTH-1 downto 0);
+    signal v3_hesr                   : unsigned(WORD_WIDTH-1 downto 0);
+    signal meta_hesr                 : std_logic_vector(META_WIDTH-1 downto 0);
+    signal vld_hesr                  : std_logic;
+    signal hash_hesr                 : unsigned(WORD_WIDTH-1 downto 0);
 
 begin
     assert WORD_WIDTH = 32 or WORD_WIDTH = 64
@@ -234,12 +257,11 @@ begin
             KEY_OFFSET         => PIPE_LENGTH - g - 1,
             KEY_WIDTH          => KEY_WIDTH_WORD_ALIGNED,
             META_WIDTH         => META_WIDTH,
-            ROUNDS             => COMPRESSION_ROUDS,
+            ROUNDS             => COMPRESSION_ROUNDS,
             WORD_WIDTH         => WORD_WIDTH,
             FINAL_WORD         => PIPE_LENGTH - g - 1 = WORD_COUNT,
             FINAL_CONST        => f_get_final_const(HASH_WIDTH, WORD_WIDTH),
-            SIPROUND_REG_SETUP => SIPROUND_REG_SETUP,
-            REG_SETUP          => SIP_COMPRESS_WORD_REG_SETUP
+            REG_SETUP          => REG_SETUP_SIP_COMPRESS(PIPE_LENGTH - g - 1)
         ) port map (
             CLK        => CLK,
             RESET      => RESET,
@@ -267,7 +289,7 @@ begin
             KEY_WIDTH  => KEY_WIDTH_WORD_ALIGNED,
             META_WIDTH => META_WIDTH,
             WORD_WIDTH => WORD_WIDTH,
-            REG_SETUP  => SIPROUND_REG_SETUP
+            REG_SETUP  => REG_SETUP_FINALIZATION(FINALIZATION_ROUNDS + HASH_PIPE_LENGTH - g - 1)
         ) port map (
             CLK        => CLK,
             RESET      => RESET,
@@ -287,17 +309,17 @@ begin
         );
     end generate;
 
-    -- generating more finalization rounds for the extended version of the algorithm
+    -- generating more finalization rounds for the extended version of the algorithm.
     hash_extension_g: if HASH_WIDTH > WORD_WIDTH generate
 
-        -- generating hash differently for siphash and halfsiphash
+        -- generating hash differently for SipHash and HalfSipHash.
         lower_hash_g: if WORD_WIDTH = 64 generate
             hash(HASH_PIPE_LENGTH-1)(WORD_WIDTH-1 downto 0) <= v0(HASH_PIPE_LENGTH-1) xor v1(HASH_PIPE_LENGTH-1) xor v2(HASH_PIPE_LENGTH-1) xor v3(HASH_PIPE_LENGTH-1);
         else generate
             hash(HASH_PIPE_LENGTH-1)(WORD_WIDTH-1 downto 0) <= v1(HASH_PIPE_LENGTH-1) xor v3(HASH_PIPE_LENGTH-1);
         end generate;
 
-        -- xoring v1 with 0xdd constant
+        -- xoring v1 with 0xDD constant.
         v0(HASH_PIPE_LENGTH-2)                          <= v0_hesr;
         v1(HASH_PIPE_LENGTH-2)                          <= v1_hesr xor to_unsigned(221, WORD_WIDTH);
         v2(HASH_PIPE_LENGTH-2)                          <= v2_hesr;
@@ -306,14 +328,14 @@ begin
         vld(HASH_PIPE_LENGTH-2)                         <= vld_hesr;
         hash(HASH_PIPE_LENGTH-2)(WORD_WIDTH-1 downto 0) <= hash_hesr;
 
-        -- generating more finalization rounds
+        -- generating more finalization rounds.
         hash_extension_rounds_g: for g in HASH_PIPE_LENGTH-2 downto 1 generate
             hash_extension_sipround_i: entity work.SIPROUND
             generic map (
                 KEY_WIDTH  => WORD_WIDTH,
                 META_WIDTH => META_WIDTH,
                 WORD_WIDTH => WORD_WIDTH,
-                REG_SETUP  => SIPROUND_REG_SETUP
+                REG_SETUP  => REG_SETUP_EXT_FINAL(HASH_PIPE_LENGTH - g - 2)
             ) port map (
                 CLK        => CLK,
                 RESET      => RESET,
@@ -334,7 +356,7 @@ begin
             );
         end generate;
 
-        -- generating hash differently for siphash and halfsiphash
+        -- generating hash differently for SipHash and HalfSipHash
         upper_hash_g: if WORD_WIDTH = 64 generate
             hash(0)((WORD_WIDTH*2)-1 downto WORD_WIDTH) <= v0(0) xor v1(0) xor v2(0) xor v3(0);
         else generate
@@ -345,7 +367,7 @@ begin
         -- ================================================
         --                     REGISTER
         -- ================================================
-        hash_ext_reg_g: if HASH_EXTENSION_START_REG generate
+        hash_ext_reg_g: if REG_SETUP_EXT_START_REG = '1' generate
             process (CLK)
             begin
                 if rising_edge(CLK) then
@@ -374,7 +396,7 @@ begin
     -- ================================================
 
     else generate
-        -- generating hash differently for siphash and halfsiphash
+        -- generating hash differently for SipHash and HalfSipHash.
         hash_g: if WORD_WIDTH = 64 generate
             hash(0)(WORD_WIDTH-1 downto 0)              <= v0(0) xor v1(0) xor v2(0) xor v3(0);
             hash(0)((WORD_WIDTH*2)-1 downto WORD_WIDTH) <= (others => '0');

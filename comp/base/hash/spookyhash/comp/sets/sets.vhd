@@ -8,10 +8,10 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
--- Processes 32B chunks of key in the spookyhash algoritmhs.
+-- Processes 32B chunks of key in the SpookyHash algoritmhs.
 entity SPOOKY_SETS is
     generic (
-        -- true for sets32, false for sets16
+        -- true for Sets32, false for Sets16
         SETS_TYPE  : boolean := true;
         -- width of the whole key
         KEY_WIDTH  : natural := 256;

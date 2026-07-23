@@ -8,6 +8,7 @@ set COMP_BASE "$ENTITY_BASE/comp"
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
+lappend PACKAGES "$OFM_PATH/comp/base/pkg/hash_pack.vhd"
 
 # Components
 lappend COMPONENTS [list "SPOOKY_SHORTEND"  "$COMP_BASE/shortend"  "FULL"]
