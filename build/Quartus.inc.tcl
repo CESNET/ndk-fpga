@@ -170,6 +170,21 @@ proc SetupDesign {synth_flags} {
     # Create and open a new project with name specified by variable OUTPUT
     project_new $SYNTH_FLAGS(OUTPUT) -overwrite -part $SYNTH_FLAGS(FPGA)
 
+    # Use a user-defined SEED if provided, otherwise generate a random one.
+    # rand() returns a floating-point value in [0.0, 1.0). Multiplying by
+    # 2147483647 (the maximum value allowed by Quartus for SEED), taking the
+    # integer part and adding 1 produces a valid integer seed in the range
+    # [1, 2147483647].
+    if {[info exist SYNTH_FLAGS(SEED)]} {
+        set random_seed $SYNTH_FLAGS(SEED)
+        puts "Using user-defined fitter SEED: $random_seed"
+    } else {
+        expr {srand([clock clicks])}
+        set random_seed [expr {int(rand() * 2147483647) + 1}]
+        puts "Using random fitter SEED: $random_seed"
+    }
+    set_global_assignment -name SEED $random_seed
+
     # Define VHDL-2008 as default dialect for VHDL input files
     set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
 
