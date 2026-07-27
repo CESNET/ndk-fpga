@@ -108,13 +108,16 @@ package dma_bus_pack is
     pure function dma_route_junction (parent : dma_route_path_t; child_count : natural) return dma_route_junction_t;
     pure function dma_route_path (junc : dma_route_junction_t; child_index : natural) return dma_route_path_t;
 
-    -- Modify routing metadata in request header for specific child of a junction
-    pure function dma_route_req_apply_path (path : dma_route_path_t; dma_hdr : std_logic_vector) return std_logic_vector;
-    -- Obtain routing value/vector of the current junction for response header
-    pure function dma_route_res_extract_switch (junc : dma_route_junction_t; dma_hdr : std_logic_vector) return std_logic_vector;
-
     type dma_route_path_array_t is array (natural range <>) of dma_route_path_t;
     type dma_route_junction_array_t is array (natural range <>) of dma_route_junction_t;
+
+    -- Modify routing metadata in request header for specific child of a junction
+    pure function dma_route_req_apply_path (path : dma_route_path_t; dma_hdr : std_logic_vector) return std_logic_vector;
+    -- Switch vector for a junction owned by this block (local ports are children 0..N-1)
+    pure function dma_route_res_extract_switch (junc : dma_route_junction_t; dma_hdr : std_logic_vector) return std_logic_vector;
+    -- Switch vector when DMA_ROUTE is a consecutive subset of a parent junction
+    pure function dma_route_res_extract_switch (paths : dma_route_path_array_t; dma_hdr : std_logic_vector) return std_logic_vector;
+
 
     pure function dma_route_path_array_default (size : NATURAL) return dma_route_path_array_t;
 
@@ -208,6 +211,43 @@ package body dma_bus_pack is
 
         ret := unitid(high_idx downto low_idx);
         return ret;
+    end function;
+
+    pure function dma_route_res_extract_switch (paths : dma_route_path_array_t; dma_hdr : std_logic_vector)
+            return std_logic_vector is
+        constant PARENT_JUNC : dma_route_junction_t := (
+            routing_bit => paths(0).routing_bit,
+            child_count => paths(0).siblings_count
+        );
+        constant LOCAL_BITS  : natural := log2(paths'length);
+        variable extracted   : std_logic_vector(log2(PARENT_JUNC.child_count)-1 downto 0);
+        variable local_val   : natural;
+    begin
+        if (LOCAL_BITS = 0) then
+            return (0 downto 1 => '0');
+        end if;
+
+        extracted := dma_route_res_extract_switch(PARENT_JUNC, dma_hdr);
+
+        -- Sanitize unexpected values
+        if (to_integer(unsigned(extracted)) >= paths(0).child_index) then
+            local_val := to_integer(unsigned(extracted)) - paths(0).child_index;
+        else
+            local_val := 0;
+        end if;
+
+        if (local_val >= paths'length) then
+            assert false
+                report "dma_route_res_extract_switch(paths): routing value "
+                       & integer'image(to_integer(unsigned(extracted)))
+                       & " is outside local port range "
+                       & integer'image(paths(0).child_index) & ".."
+                       & integer'image(paths(0).child_index + paths'length - 1)
+                severity warning;
+            local_val := paths'length - 1;
+        end if;
+
+        return std_logic_vector(to_unsigned(local_val, LOCAL_BITS));
     end function;
 
     pure function dma_route_req_apply_path (path : dma_route_path_t; dma_hdr : std_logic_vector)
