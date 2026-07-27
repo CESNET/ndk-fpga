@@ -67,8 +67,6 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     constant DBG_PROBE_STR         : string := "PUMFPUMVPURQPDMFPDMVPDRC";
     constant RST_WIDTH             : natural := 5;
 
-    constant PTC_DMA_ROUTE_JUNC     : dma_route_junction_t := priv_ptc_get_dma_junc(DMA_PORTS);
-
     ---------------------------------------------------------------------------
 
     ---------------------------------------------------------------------------
@@ -509,7 +507,7 @@ begin
             process (all)
             begin
                 for rr in 0 to MVB_UP_ITEMS-1 loop
-                    -- INFO: DMA_ROUTE should be validated to match nodes created from the PTC_DMA_ROUTE_JUNC
+                    -- INFO: DMA_ROUTE must match downstream response routing (see down_mvb_split).
                     up_mvb_trans_out_data_2df(ii)(rr) <= dma_route_req_apply_path(DMA_ROUTE(ii), up_mvb_trans_out_data_2d(ii)(rr));
                 end loop;
             end process;
@@ -1204,8 +1202,10 @@ begin
     ---------------------------------------------------------------------------
 
     down_mvb_split_in_data_arr <= slv_array_deser(down_mvb_split_in_data,MVB_DOWN_ITEMS);
+    -- INFO: DMA_ROUTE must match request routing on upstream; when it describes a subset
+    -- of a larger parent junction (siblings_count > DMA_PORTS), use local switch extract.
     down_mvb_split_in_switch_g : for i in 0 to MVB_DOWN_ITEMS-1 generate
-        down_mvb_split_in_switch_arr(i) <= dma_route_res_extract_switch(PTC_DMA_ROUTE_JUNC, down_mvb_split_in_data_arr(i));
+        down_mvb_split_in_switch_arr(i) <= dma_route_res_extract_switch(DMA_ROUTE, down_mvb_split_in_data_arr(i));
     end generate;
     down_mvb_split_in_switch <= slv_array_ser(down_mvb_split_in_switch_arr);
 
