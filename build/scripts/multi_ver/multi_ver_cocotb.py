@@ -42,7 +42,7 @@ def find_venv() -> str | None:
     return None
 
 
-def run_modelsim(settings: dict, venv: str | None = None, gui=False):
+def run_modelsim(settings: dict, venv: str | None = None, gui=False, cocotb_testcase: str | None = None):
     command = ""
 
     if venv is not None:
@@ -54,6 +54,9 @@ def run_modelsim(settings: dict, venv: str | None = None, gui=False):
         sim_flags = ""
 
     command += f"make TARGET=cocotb {sim_flags}"
+
+    if cocotb_testcase is not None:
+        command += f" COCOTB_TESTCASE='{cocotb_testcase}'"
 
     if len(settings) > 0:
         command += " GENERICS=\""
@@ -84,6 +87,7 @@ parser.add_argument("-c", "--command-line", action="store_true", help="(Used tog
 parser.add_argument("-r", "--run-percantage", action="store", help="(Used without '-s') Randomly reduces number of performed combination to the given percantage ('100' for running all combinations)")
 parser.add_argument("-n", "--test-name", action="store", help="(Used with '-s') select name of test. Some file will be saved with this suffix")
 parser.add_argument("-p", "--prefix-name", action="store", help="this create prefix for test_name to prevent rewrite older files", default="")
+parser.add_argument("-t", "--cocotb-testcase", action="store", help="Name of a cocotb testcase to run (passed as COCOTB_TESTCASE)")
 
 args = parser.parse_args()
 
@@ -164,7 +168,7 @@ if args.setting is None and args.test_name is None:
         print(f"Running combination: {key} ({comb_name})")
         if (not args.dry_run):
             vsim_time_start = time.time()
-            result = run_modelsim(SETTING, venv=venv)
+            result = run_modelsim(SETTING, venv=venv, cocotb_testcase=args.cocotb_testcase)
             vsim_time_stop = time.time()
             time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
             if result: # detect failure
@@ -194,7 +198,7 @@ else:
 
     print("Running combination: " + " ".join(test_setings))
     if (not args.dry_run):
-        result = run_modelsim(SETTING, venv=venv, gui=(not args.command_line))
+        result = run_modelsim(SETTING, venv=venv, gui=(not args.command_line), cocotb_testcase=args.cocotb_testcase)
         if result: # detect failure
             print("Run SUCCEEDED (" + " ".join(test_setings) + ")")
         else:
