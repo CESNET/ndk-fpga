@@ -181,8 +181,8 @@ class driver #(
         seq_item_port_sp_size    = new("seq_item_port_sp_size", this);
         seq_item_port_chsum_hdr  = new("seq_item_port_chsum_hdr", this);
 
-        byte_array_export        = new();
-        logic_vector_export      = new();
+        byte_array_export        = new(10);
+        logic_vector_export      = new(10);
     endfunction
 
     // ------------------------------------------------------------------------
@@ -192,13 +192,8 @@ class driver #(
         logic[16-1 : 0] len_with_hdr = 0;
         string msg = "";
         sp_info sp_st;
-        int unsigned wait_period;
 
         forever begin
-
-            wait_period = $urandom_range(0, 500);
-
-            #(wait_period*1ns);
             done = 1'b0;
             chsum_overflow = 0;
             debug_msg = "\n";
