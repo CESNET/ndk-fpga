@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Jan Kubalek <xkubal11@stud.fit.vutbr.cz>

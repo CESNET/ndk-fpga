@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # recorder.py : Basic class for packet reading from the frame recorder component.
 #
 # Copyright (C) 2017 CESNET z. s. p. o.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # cut_packet.py: Cut(extract) one part from FL_SIM(FL_BFM) file

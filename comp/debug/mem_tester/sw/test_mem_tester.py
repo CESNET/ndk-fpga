@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright (C) 2022 CESNET z. s. p. o.
 # Author(s): Lukas Nevrkla <xnevrk03@stud.fit.vutbr.cz>
 

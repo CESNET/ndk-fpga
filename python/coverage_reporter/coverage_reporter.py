@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # coverage_reporter.py: Generates a Nested Data Reporting compatible JSON coverage report (see https://plugins.jenkins.io/nested-data-reporting/) based on a UCDB coverage input file
 # Copyright (C) 2025 CESNET z. s. p. o.
 # Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>

@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python3
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2022 CESNET z. s. p. o.
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
