@@ -193,8 +193,8 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
                     dcrdt_rx = AvstCreditorRX(pcie_i, "pcie_dcrdt_dw", clk, array_idx=i)
                     cq_rc_drv = AvstCreditRequester(cq_rc_drv, hcrdt_rx, dcrdt_rx)
 
-                    hcrdt_tx = AvstCreditorTX(pcie_i, "pcie_hcrdt_up", clk, array_idx=i, credits=[0, 32, 32])
-                    dcrdt_tx = AvstCreditorTX(pcie_i, "pcie_dcrdt_up", clk, array_idx=i, credits=[0, 1024, 1024])
+                    hcrdt_tx = AvstCreditorTX(pcie_i, "pcie_hcrdt_up", clk, array_idx=i, credits=[32, 32, 0])
+                    dcrdt_tx = AvstCreditorTX(pcie_i, "pcie_dcrdt_up", clk, array_idx=i, credits=[1024, 1024, 0])
                     cc_mon = AvstCreditReceiver(cc_mon, hcrdt_tx, dcrdt_tx)
                     rq_mon = AvstCreditReceiver(rq_mon, hcrdt_tx, dcrdt_tx)
 
