@@ -903,7 +903,7 @@ begin
     -- --------------------------------------------------------
     mfb2axi_i : entity work.MFB2AXI
     generic map (
-        USE_IN_PIPE    => False,
+        USE_IN_PIPE    => True,
         USE_OUT_PIPE   => True,
         REGIONS        => PCIE_DOWN_REGIONS_RESIZED,
         REGION_SIZE    => PCIE_DOWN_REGION_SIZE,
