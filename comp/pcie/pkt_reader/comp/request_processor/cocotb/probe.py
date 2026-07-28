@@ -5,27 +5,24 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 from collections import deque
-
-from cocotbext.ofm.utils.header import SerializableHeader
+from cocotbext.ofm.mvb.transaction import MvbTrClassicSerializable, hdrfield, serializableheader
 from cocotbext.ofm.base.probe import Probe, ProbeInterface
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 
 
 # A copy from the dma_bus_pack.vhd
-class DmaUphdr(SerializableHeader):
-    items = [
-        ('dma_request_length', 11),
-        ('dma_request_type', 1),
-        ('dma_request_firstib', 2),
-        ('dma_request_lastib', 2),
-        ('dma_request_tag', 8),
-        ('dma_request_unitid', 8),
-        ('dma_request_global', 64),
-        ('dma_request_vfid', 8),
-        ('dma_request_pasid', 0),
-        ('dma_request_pasidvld', 0),
-        ('dma_request_relaxed', 1),
-    ]
+@serializableheader()
+class DmaUphdr(MvbTrClassicSerializable):
+    dma_request_length:  int = hdrfield(11)
+    dma_request_type:    int = hdrfield(1)
+    dma_request_firstib: int = hdrfield(2)
+    dma_request_lastib:  int = hdrfield(2)
+    dma_request_tag:     int = hdrfield(8)
+    dma_request_unitid:  int = hdrfield(8)
+    dma_request_global:  int = hdrfield(64)
+    dma_request_vfid:    int = hdrfield(8)
+    # pasid/pasidvld: width 0, carry no bits — OMIT
+    dma_request_relaxed: int = hdrfield(1)
 
 
 class PprProbeInterface(ProbeInterface):

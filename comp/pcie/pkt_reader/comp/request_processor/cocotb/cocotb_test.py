@@ -8,6 +8,7 @@ import itertools
 from random import randint
 from math import log2, ceil
 from collections import deque
+from dataclasses import fields
 
 import cocotb
 import logging
@@ -17,7 +18,6 @@ from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 
 from cocotbext.ofm.mvb.monitors import MVBMonitor
-from cocotbext.ofm.mvb.transaction import MvbTrClassic
 from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 
@@ -32,7 +32,7 @@ class testbench():
         self.dut = dut
         self.rx_mvb_drv = PprDriver(dut, "RX_MVB", dut.CLK)
         self.tx_mvb_drv = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
-        self.tx_mvb_mon = MVBMonitor(dut, "TX_MVB", dut.CLK)
+        self.tx_mvb_mon = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=DmaUphdr)
         self.idmem_mon = IdMemMonitor(dut, "IDMEM", dut.CLK)
         self.tagmem_mon = TagMemMonitor(dut, "TAGMEM", dut.CLK)
 
@@ -45,13 +45,12 @@ class testbench():
         # Needs to be initialized only once.
         self._mem_base_addr = 0
         # Create a queue for Tags and initialize it with all possible Tags specified by the bitwidth in the DmaUphdr.
-        tag_bitwidth = dict(DmaUphdr.items)['dma_request_tag']
-        self.tag_q = deque(range(2**tag_bitwidth))
+        self.tag_bitwidth = next(f.metadata['width'] for f in fields(DmaUphdr) if f.name == 'dma_request_tag')
+        self.tag_q = deque(range(2**self.tag_bitwidth))
         # Queue of used tags to be recycled, filled by the PprProbe
         self.used_tags_q = deque()
-
-        # Setting up the probe to monitor received tags put them into the used_tags_q to recycle them.
-        self.mfb_throughput_probe = PprProbe(self.used_tags_q, PprProbeInterface(self.tx_mvb_mon))
+        # Setting up the probe to monitor received tags, then put them into the used_tags_q to recycle them.
+        self.tx_mvb_probe = PprProbe(self.used_tags_q, PprProbeInterface(self.tx_mvb_mon))
 
         self.scoreboard = Scoreboard(dut)
         self.scoreboard.add_interface(self.tx_mvb_mon, self.tx_mvb_exp_output)
@@ -84,7 +83,7 @@ class testbench():
         page_addr = req_addr >> log2_page_size
         # Packet goes over at least one page (comparing the top bits indicating the number of the page)
         if ((req_addr + req_len) >> log2_page_size) != (page_addr):
-            len_reminder = page_size - (req_addr & 2**log2_page_size-1)
+            len_reminder = page_size - (req_addr & (2**log2_page_size - 1))
             req_len -= len_reminder
             pb_parts.append((req_addr, len_reminder))
             while req_len > page_size:
@@ -101,10 +100,14 @@ class testbench():
         all_parts = []
         for p in pb_parts:
             req_addr, req_len = p
-            while req_len > pcie_mrrs:
-                all_parts.append((req_addr, pcie_mrrs))
-                req_addr += pcie_mrrs
-                req_len -= pcie_mrrs
+            addr_offset = req_addr % 4
+            # Unaligned start reduces usable space in the first chunk
+            while req_len + addr_offset > pcie_mrrs:
+                chunk_len = pcie_mrrs - addr_offset
+                all_parts.append((req_addr, chunk_len))
+                req_addr += chunk_len
+                req_len -= chunk_len
+                addr_offset = 0  # subsequent chunks are dword-aligned
             all_parts.append((req_addr, req_len))
 
         # Need a clone of the base addres for TagMem transactions; necessary when addressing transactions wrapping around the Main Memory's end.
@@ -112,27 +115,23 @@ class testbench():
         # Create DMA headers and split packets accordingly to the instructions (all_parts)
         for p in all_parts:
             req_addr, req_len = p
+            addr_offset = req_addr % 4
+            # Total bytes is length + byte offset (lower 2 bits of address)
+            total_bytes = req_len + addr_offset
 
             # Create DMA upstream header transaction
-            hdr = DmaUphdr()
-            # Total bytes is length + byte offset (lower 2 bits of address)
-            total_bytes = req_len + (req_addr % 4)
-            hdr.dma_request_length = (total_bytes + 3) // 4 # Round up to dwords (ceildiv)
-            hdr.dma_request_type = 0  # 0=Read
-            hdr.dma_request_firstib = req_addr % 4 # Invalid bytes at start = address offset
-            hdr.dma_request_lastib = (-total_bytes) % 4
-            hdr.dma_request_tag = self.model_sent
-            hdr.dma_request_unitid = 0
-            hdr.dma_request_global = req_addr & ~3 # Dword-aligned address
-            hdr.dma_request_vfid = 0
-            hdr.dma_request_pasid = 0
-            hdr.dma_request_pasidvld = 0
-            hdr.dma_request_relaxed = 0
-            # Convert to MVB transaction
-            mvb_instr_model = MvbTrClassic()
-            mvb_instr_model.data = hdr.serialize()
+            hdr = DmaUphdr(
+                dma_request_length=(total_bytes + 3) // 4, # Round up to dwords (ceildiv)
+                dma_request_type=0, # 0=Read
+                dma_request_firstib=addr_offset, # Invalid bytes at start = address offset
+                dma_request_lastib=(-total_bytes) % 4,
+                dma_request_tag=self.model_sent & (2**self.tag_bitwidth - 1),
+                dma_request_unitid=0,
+                dma_request_global=req_addr & ~3, # Dword-aligned address
+                dma_request_vfid=0,
+                dma_request_relaxed=0)
             # Connect to Scoreboard expected output
-            self.tx_mvb_exp_output.append(mvb_instr_model)
+            self.tx_mvb_exp_output.append(hdr)
             self.model_sent += 1
 
             # Create TagMem transaction
@@ -150,7 +149,7 @@ class testbench():
                 mem_word_addr = addr_extended & (bytes_per_word - 1)
             tagmem_tr.addr = addr_extended
             tagmem_tr.id = req_id
-            tagmem_tr.firstib = req_addr % 4  # Invalid bytes at start = address offset
+            tagmem_tr.firstib = addr_offset  # Invalid bytes at start = address offset
             # Connect to Scoreboard expected output
             self.tagmem_exp_output.append(tagmem_tr)
             # Update the word address (can accumulate over multiple words)
@@ -215,7 +214,7 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     id = 0
     id_width = tb.dut.ID_WIDTH.value
     # Get address width from DmaUphdr class (dma_request_global field)
-    addr_width = dict(DmaUphdr.items)['dma_request_global']
+    addr_width = next(f.metadata['width'] for f in fields(DmaUphdr) if f.name == 'dma_request_global')
     # No need to generate packets, but it will be simpler to reuse it in the test for the whole PPR component
     for mfb_pkt in random_packets(frame_size_min, frame_size_max, frame_count):
         addr = randint(0, 2**addr_width - 1)

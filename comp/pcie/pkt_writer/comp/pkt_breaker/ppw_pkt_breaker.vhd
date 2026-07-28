@@ -32,6 +32,8 @@ entity PPW_PKT_BREAKER is
 
         -- Uses the RX_AXI input interface when true, RX_MFB when false.
         AXI_RX_DIRECT   : boolean := true;
+        -- Uses the TX_AXI input interface when true, TX_MFB when false.
+        AXI_TX_DIRECT   : boolean := true;
         AXI_TDATA_WIDTH : natural := 512;
 
         -- ========================================================
@@ -40,7 +42,6 @@ entity PPW_PKT_BREAKER is
 
         -- Maximum packet size (in bytes).
         PKT_MTU        : integer := 2**12;
-        ADDRESS_WIDTH  : natural := 64;
         DEVICE         : string := "AGILEX"
     );
     port (
@@ -74,7 +75,6 @@ entity PPW_PKT_BREAKER is
         -- RX MVB Instructions Interface
         -- ========================================================
 
-        RX_MVB_ADDRESS : in  std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
         RX_MVB_LENGTH  : in  std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
         RX_MVB_LAST    : in  std_logic_vector(MFB_REGIONS-1 downto 0);
         RX_MVB_VALID   : in  std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -94,14 +94,14 @@ entity PPW_PKT_BREAKER is
         TX_MFB_DST_RDY : in  std_logic;
 
         -- ========================================================
-        -- TX MVB Interface
+        -- TX AXI-Stream Interface
         -- ========================================================
 
-        TX_MVB_ADDRESS : out std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
-        TX_MVB_LENGTH  : out std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
-        TX_MVB_VALID   : out std_logic_vector(MFB_REGIONS-1 downto 0);
-        TX_MVB_SRC_RDY : out std_logic;
-        TX_MVB_DST_RDY : in  std_logic
+        TX_AXI_TDATA   : out std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
+        TX_AXI_TKEEP   : out std_logic_vector(AXI_TDATA_WIDTH/8-1 downto 0);
+        TX_AXI_TLAST   : out std_logic;
+        TX_AXI_TVALID  : out std_logic;
+        TX_AXI_TREADY  : in  std_logic
     );
 end entity;
 
@@ -117,8 +117,6 @@ architecture FULL of PPW_PKT_BREAKER is
     constant WORD_WIDTH    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH, MFB_REGIONS*REGION_ITEMS*MFB_ITEM_WIDTH);
     constant WORD_ITEMS    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, MFB_REGIONS*REGION_ITEMS);
 
-    -- MVB instruction combined:          last + address       + length
-    constant MVB_INSTR_WIDTH : natural := 1    + ADDRESS_WIDTH + log2(PKT_MTU+1);
     -- Maximum amount of Words a single packet can stretch over.
     constant PKT_MAX_WORDS   : natural := div_roundup(PKT_MTU, WORD_ITEMS) + 1;
     -- Maximum offset we can bee looking for to break a packet.
@@ -128,17 +126,6 @@ architecture FULL of PPW_PKT_BREAKER is
     --                                 SIGNALS
     -- =====================================================================
 
-    signal rx_mvb_address_arr             : slv_array_t(MFB_REGIONS-1 downto 0)(ADDRESS_WIDTH-1 downto 0);
-    signal rx_mvb_length_arr              : slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    signal rx_mvb_data                    : slv_array_t(MFB_REGIONS-1 downto 0)(MVB_INSTR_WIDTH-1 downto 0);
-
-    signal instr_data                     : std_logic_vector(MFB_REGIONS*MVB_INSTR_WIDTH-1 downto 0);
-    signal instr_address                  : std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
-    signal instr_length                   : std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
-    signal instr_last                     : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal instr_valid                    : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal instr_src_rdy                  : std_logic;
-    signal instr_dst_rdy                  : std_logic;
     signal valid_instr_ready              : std_logic;
     signal comps_ready                    : std_logic;
     signal last_meets_last                : std_logic;
@@ -175,60 +162,19 @@ architecture FULL of PPW_PKT_BREAKER is
 begin
 
     -- =====================================================================
-    --  Store MVB Instructions
+    --  Accepting MVB Instructions
     -- =====================================================================
 
-    rx_mvb_address_arr <= slv_array_deser(RX_MVB_ADDRESS, MFB_REGIONS);
-    rx_mvb_length_arr  <= slv_array_deser(RX_MVB_LENGTH, MFB_REGIONS);
-    rx_mvb_data_g : for r in 0 to MFB_REGIONS-1 generate
-        rx_mvb_data(r) <= RX_MVB_LAST(r) & rx_mvb_address_arr(r) & rx_mvb_length_arr(r);
-    end generate;
+    valid_instr_ready <= RX_MVB_SRC_RDY and RX_MVB_VALID(0);
 
-    mvb_fifox_i : entity work.MVB_FIFOX
-    generic map (
-        ITEMS               => MFB_REGIONS,
-        ITEM_WIDTH          => MVB_INSTR_WIDTH,
-        FIFO_DEPTH          => 512,
-        RAM_TYPE            => "AUTO",
-        DEVICE              => DEVICE,
-        ALMOST_FULL_OFFSET  => 0,
-        ALMOST_EMPTY_OFFSET => 0,
-        FAKE_FIFO           => False
-    )
-    port map (
-        CLK        => CLK,
-        RESET      => RESET,
-
-        RX_DATA    => slv_array_ser(rx_mvb_data),
-        RX_VLD     => RX_MVB_VALID,
-        RX_SRC_RDY => RX_MVB_SRC_RDY,
-        RX_DST_RDY => RX_MVB_DST_RDY,
-
-        TX_DATA    => instr_data,
-        TX_VLD     => instr_valid,
-        TX_SRC_RDY => instr_src_rdy,
-        TX_DST_RDY => instr_dst_rdy,
-
-        STATUS     => open,
-        AFULL      => open,
-        AEMPTY     => open
-    );
-
-    valid_instr_ready <= instr_src_rdy and instr_valid(0);
-
-    (instr_last, instr_address, instr_length) <= instr_data;
-
-    -- ---------------------------------------------------------------------
-    -- Prep MVB FIFOX read signal
-    -- ---------------------------------------------------------------------
     -- Components (source and destinations) are ready.
-    comps_ready     <= TX_MVB_DST_RDY and conv_tx_axi_tvalid and br_rx_axi_tready;
+    comps_ready     <= conv_tx_axi_tvalid and br_rx_axi_tready;
     -- When Last word on the AXIS bus arrives at the same time as the Last instruction (=> the Last word does not need breaking).
     -- If this does not occur and the Last word does need breaking, last_instr_holdup is applied.
-    last_meets_last <= (instr_last(0) and valid_instr_ready) and (conv_tx_axi_tvalid and conv_tx_axi_tlast);
+    last_meets_last <= (RX_MVB_LAST(0) and valid_instr_ready) and (conv_tx_axi_tvalid and conv_tx_axi_tlast);
     -- Hold transaction until the breakpoint is reached except it it is the "Last" instr.
     logic_ready     <= breakpoint_reached(0) or last_meets_last or last_instr_holdup;
-    instr_dst_rdy   <= comps_ready and logic_ready;
+    RX_MVB_DST_RDY  <= comps_ready and logic_ready;
 
     -- Deassert when Last has already passed on the AXIS bus but the Last MVB instruction has not yet been processed.
     -- Example scenario: There is a break in the Last word -> need to read the Last instr and pause the AXIS bus.
@@ -238,7 +184,7 @@ begin
             if ((br_rx_axi_tvalid = '1') and (br_rx_axi_tready = '1')) then
                 last_instr_holdup <= br_rx_axi_tlast and br_rx_fracture_en;
             end if;
-            if ((RESET = '1') or (((instr_last(0) = '1') and (valid_instr_ready = '1')) and (comps_ready = '1'))) then
+            if ((RESET = '1') or (((RX_MVB_LAST(0) = '1') and (valid_instr_ready = '1')) and (comps_ready = '1'))) then
                 last_instr_holdup <= '0';
             end if;
         end if;
@@ -294,8 +240,8 @@ begin
     -- ---------------------------------------------------------------------
     -- Find the next breakpoint
     -- ---------------------------------------------------------------------
-    break_offset    (0) <= unsigned(instr_length) - 1 + offset_reg;
-    break_offset_vld(0) <= valid_instr_ready and not instr_last(0);
+    break_offset    (0) <= unsigned(RX_MVB_LENGTH) - 1 + offset_reg;
+    break_offset_vld(0) <= valid_instr_ready and not RX_MVB_LAST(0);
     offset_reached_g : for r in 0 to MFB_REGIONS-1 generate
         offset_reached_i : entity work.OFFSET_REACHED
         generic map (
@@ -359,7 +305,7 @@ begin
         RX_MFB_DST_RDY     <= '0';
     end generate;
 
-    conv_tx_axi_tready <= TX_MVB_DST_RDY and br_rx_axi_tready and valid_instr_ready and not last_instr_holdup;
+    conv_tx_axi_tready <= br_rx_axi_tready and valid_instr_ready and not last_instr_holdup;
 
     -- =====================================================================
     --  Breaking packets
@@ -368,7 +314,7 @@ begin
     br_rx_axi_tdata  <= conv_tx_axi_tdata;
     br_rx_axi_tkeep  <= conv_tx_axi_tkeep;
     br_rx_axi_tlast  <= conv_tx_axi_tlast;
-    br_rx_axi_tvalid <= TX_MVB_DST_RDY and conv_tx_axi_tvalid and valid_instr_ready and not last_instr_holdup;
+    br_rx_axi_tvalid <= conv_tx_axi_tvalid and valid_instr_ready and not last_instr_holdup;
 
     br_rx_fracture_en     <= breakpoint_reached(0);
     br_rx_fracture_offset <= std_logic_vector(break_offset(0)(EOF_POS_WIDTH-1 downto 0));
@@ -401,49 +347,56 @@ begin
     --  Bus conversion back to MFB
     -- =====================================================================
 
-    axis2mfb_i : entity work.AXI2MFB
-    generic map (
-        USE_IN_PIPE       => False,
-        USE_OUT_PIPE      => True,
-        REGIONS           => MFB_REGIONS,
-        REGION_SIZE       => MFB_REGION_SIZE,
-        BLOCK_SIZE        => MFB_BLOCK_SIZE,
-        ITEM_WIDTH        => MFB_ITEM_WIDTH,
-        AXI_DATA_WIDTH    => WORD_WIDTH,
-        AXI_USER_WIDTH    => 0,
-        META_WIDTH        => 0,
-        MFB_META_WITH_SOF => True,
-        PIPE_TYPE         => "SHREG",
-        DEVICE            => DEVICE
-    )
-    port map (
-        CLK            => CLK,
-        RST            => RESET,
+    axis2mfb_g : if not AXI_TX_DIRECT generate
 
-        RX_AXI_TDATA   => br_tx_axi_tdata,
-        RX_AXI_TUSER   => (others => '0'),
-        RX_AXI_TKEEP   => br_tx_axi_tkeep,
-        RX_AXI_TLAST   => br_tx_axi_tlast,
-        RX_AXI_TVALID  => br_tx_axi_tvalid,
-        RX_AXI_TREADY  => br_tx_axi_tready,
+        axis2mfb_i : entity work.AXI2MFB
+        generic map (
+            USE_IN_PIPE       => False,
+            USE_OUT_PIPE      => True,
+            REGIONS           => MFB_REGIONS,
+            REGION_SIZE       => MFB_REGION_SIZE,
+            BLOCK_SIZE        => MFB_BLOCK_SIZE,
+            ITEM_WIDTH        => MFB_ITEM_WIDTH,
+            AXI_DATA_WIDTH    => WORD_WIDTH,
+            AXI_USER_WIDTH    => 0,
+            META_WIDTH        => 0,
+            MFB_META_WITH_SOF => True,
+            PIPE_TYPE         => "SHREG",
+            DEVICE            => DEVICE
+        )
+        port map (
+            CLK            => CLK,
+            RST            => RESET,
 
-        TX_MFB_DATA    => TX_MFB_DATA,
-        TX_MFB_META    => open,
-        TX_MFB_SOF_POS => TX_MFB_SOF_POS,
-        TX_MFB_EOF_POS => TX_MFB_EOF_POS,
-        TX_MFB_SOF     => TX_MFB_SOF,
-        TX_MFB_EOF     => TX_MFB_EOF,
-        TX_MFB_SRC_RDY => TX_MFB_SRC_RDY,
-        TX_MFB_DST_RDY => TX_MFB_DST_RDY
-    );
+            RX_AXI_TDATA   => br_tx_axi_tdata,
+            RX_AXI_TUSER   => (others => '0'),
+            RX_AXI_TKEEP   => br_tx_axi_tkeep,
+            RX_AXI_TLAST   => br_tx_axi_tlast,
+            RX_AXI_TVALID  => br_tx_axi_tvalid,
+            RX_AXI_TREADY  => br_tx_axi_tready,
 
-    -- =====================================================================
-    --  TX MVB interface assignments
-    -- =====================================================================
+            TX_MFB_DATA    => TX_MFB_DATA,
+            TX_MFB_META    => open,
+            TX_MFB_SOF_POS => TX_MFB_SOF_POS,
+            TX_MFB_EOF_POS => TX_MFB_EOF_POS,
+            TX_MFB_SOF     => TX_MFB_SOF,
+            TX_MFB_EOF     => TX_MFB_EOF,
+            TX_MFB_SRC_RDY => TX_MFB_SRC_RDY,
+            TX_MFB_DST_RDY => TX_MFB_DST_RDY
+        );
 
-    TX_MVB_ADDRESS <= instr_address;
-    TX_MVB_LENGTH  <= instr_length;
-    TX_MVB_VALID   <= instr_valid;
-    TX_MVB_SRC_RDY <= instr_src_rdy and instr_dst_rdy;
+        TX_AXI_TVALID <= '0';
+
+    else generate
+
+        TX_AXI_TDATA     <= br_tx_axi_tdata;
+        TX_AXI_TKEEP     <= br_tx_axi_tkeep;
+        TX_AXI_TLAST     <= br_tx_axi_tlast;
+        TX_AXI_TVALID    <= br_tx_axi_tvalid;
+        br_tx_axi_tready <= TX_AXI_TREADY;
+
+        TX_MFB_SRC_RDY <= '0';
+
+    end generate;
 
 end architecture;

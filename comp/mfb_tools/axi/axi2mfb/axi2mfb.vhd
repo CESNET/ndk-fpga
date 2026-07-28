@@ -35,7 +35,7 @@ entity AXI2MFB is
         -- regions: any positive number
         -- regison_size: power of 2
         -- block_size: power of 2
-        -- item_width: 8
+        -- item_width: multiple of 8
         -- =========================================================================
         REGIONS             : natural := 1;
         REGION_SIZE         : natural := 1;
@@ -109,6 +109,7 @@ architecture BEHAVIORAL of AXI2MFB is
     constant MFB_SOF_POS_WIDTH : natural := REGIONS*max(1,log2(REGION_SIZE));
     constant MFB_EOF_POS_WIDTH : natural := REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE));
     constant TKEEP_SPLIT_WIDTH : natural := (AXI_DATA_WIDTH/8) / REGIONS;
+    constant BYTES_PER_ITEM    : natural := ITEM_WIDTH/8;
     constant REG_EOF_POS_WIDTH : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
 
     -- function
@@ -144,9 +145,9 @@ begin
     -----------------------------------------------------------------------------
     -- valid parameters checks
     -----------------------------------------------------------------------------
-    -- 1. MFB ITEM needs to be byte - EOF is item aligned & AXI stream use TKEEP by byte
-    assert (ITEM_WIDTH = 8)
-        report "AXI2MFB: ITEM_WIDTH != 8"
+    -- 1. MFB ITEM needs to be N*byte to be able to convert TKEEP to EOF(POS)
+    assert (ITEM_WIDTH mod 8 = 0)
+        report "AXI2MFB: ITEM_WIDTH must be a multiple of 8!"
         severity FAILURE;
 
     -- 2. MFB REGIONS_SIZE is expected to be 2^n
@@ -262,8 +263,8 @@ begin
             variable ms_one_index : std_logic_vector(REG_EOF_POS_WIDTH-1 downto 0);
         begin
             ms_one_index := (others => '0');
-            one_l : for index in TKEEP_SPLIT_WIDTH - 1 downto 1 loop
-                if (tkeep_split(r)(index) = '1') then
+            one_l : for index in TKEEP_SPLIT_WIDTH/BYTES_PER_ITEM - 1 downto 1 loop
+                if (tkeep_split(r)(index*BYTES_PER_ITEM) = '1') then
                     ms_one_index := std_logic_vector(to_unsigned(index, REG_EOF_POS_WIDTH));
                     exit one_l;
                 end if;

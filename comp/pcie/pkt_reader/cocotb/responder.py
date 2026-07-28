@@ -45,8 +45,8 @@ class PprRequester(PcieRequester):
         mvb_hdr = transaction
         dma_uphdr = DmaUpHdr.deserialize(mvb_hdr.data)
 
-        addr = dma_uphdr.dma_request_global + dma_uphdr.dma_request_firstib
-        length = dma_uphdr.dma_request_length * 4 - dma_uphdr.dma_request_firstib - dma_uphdr.dma_request_lastib
+        addr = dma_uphdr.dma_request_global
+        length = dma_uphdr.dma_request_length * 4
 
         # Process only if it is a Read request
         if dma_uphdr.dma_request_type == 0:

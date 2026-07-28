@@ -17,13 +17,44 @@ class ScoreboardDriverCbs extends DriverCbs;
         sc_table = st;
     endfunction
 
+    // Convert a packet's AXI byte stream into MFB ITEM_WIDTH-bit items.
+    //
+    // Inputs:
+    //   bytes[]     - dynamic array of 8-bit bytes; one AXI packet's full payload.
+    // Outputs:
+    //   item_data[] - dynamic array of ITEM_WIDTH-bit words; the same packet
+    //                 repacked into MFB items.
+    // Assumption: ITEM_WIDTH is a multiple of 8.
+    function automatic void data_bytes_to_items(input bit [7:0] bytes[],
+                                                output bit [ITEM_WIDTH-1:0] item_data[]);
+        int byte_count = bytes.size();
+        int bytes_per_item = ITEM_WIDTH / 8;
+        int item_count;
+
+        // Number of MFB items needed = ceiling(byte_count / bytes_per_item).
+        item_count = (byte_count + bytes_per_item - 1) / bytes_per_item;
+        item_data = new[item_count];
+
+        for (int item = 0; item < item_count; item++) begin
+            item_data[item] = '0;
+            for (int byte_in_item = 0; byte_in_item < bytes_per_item; byte_in_item++) begin
+                int byte_idx = item * bytes_per_item + byte_in_item;
+                if (byte_idx < byte_count) begin
+                    // Place byte number byte_idx of the packet into bits
+                    // [byte_in_item*8+7 : byte_in_item*8] of the MFB item.
+                    item_data[item][byte_in_item*8 +: 8] = bytes[byte_idx];
+                end
+            end
+        end
+    endfunction
+
     virtual task pre_tx(ref Transaction transaction, string inst);
-        AxiTransaction #(ITEM_WIDTH, AXI_USER_WIDTH) t_axi;
+        AxiTransaction #(8, AXI_USER_WIDTH) t_axi;
         MfbTransaction #(ITEM_WIDTH, META_WIDTH) t_mfb;
         t_mfb = new;
 
         $cast(t_axi, transaction);
-        t_mfb.data = t_axi.data;
+        data_bytes_to_items(t_axi.data, t_mfb.data);
         t_mfb.meta = t_axi.user;
         // Enable Meta Signal Comparison
         t_mfb.check_meta = 1'b1;

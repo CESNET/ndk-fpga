@@ -11,7 +11,7 @@ from cocotbext.ofm.base.drivers import BusDriver
 from typing import Any
 
 from ..base.transaction import IdleTransaction
-from .transaction import MvbTrClassic
+from .transaction import MvbTrClassic, MvbTrClassicSerializable
 
 
 class MVBDriver(BusDriver):
@@ -154,6 +154,8 @@ class MVBDriver(BusDriver):
         else:
             if isinstance(transaction, bytes):
                 mvb_tr = MvbTrClassic.from_bytes(transaction)
+            elif isinstance(transaction, MvbTrClassicSerializable):
+                mvb_tr = MvbTrClassic(transaction.serialize())
             else:
                 mvb_tr = transaction
             mvb_tr = {s: getattr(mvb_tr, s) for s in self.__os}

@@ -49,9 +49,7 @@ entity MFB2AXI is
         -- MFB parameters
         --
         -- Frame size restrictions:
-        -- regions: 1
-        -- regison_size & block_size: power of 2
-        -- item_width: 8
+        -- REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH = AXI_DATA_WIDTH
         -- =========================================================================
 
         -- any possitive value
