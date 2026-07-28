@@ -145,6 +145,11 @@ architecture FULL of PCIE_PKT_READER is
     constant SOF_POS_WIDTH  : natural := max(1,log2(REGION_SIZE));
     constant EOF_POS_WIDTH  : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
 
+    -- Internal number of Regions on the PCIe down MFB bus.
+    -- Equal to PCIE_DOWN_REGIONS when USER and PCIE_DOWN MFB buses have the same width.
+    -- When they do not, it contains the amount of Regions that will make the word widths equal.
+    constant PCIE_DOWN_REGIONS_RESIZED : natural := WORD_WIDTH/(PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE*PCIE_DOWN_ITEM_WIDTH);
+
     -- Main Memory read address (specifies a word within the memory).
     constant MM_RD_ADDR_W   : natural := log2(MEMORY_SIZE);
     -- Main Memory write address (specifies a word and a byte within the memory).
@@ -291,11 +296,11 @@ architecture FULL of PCIE_PKT_READER is
     signal pcie_mfb_fifo_src_rdy    : std_logic;
     signal pcie_mfb_fifo_dst_rdy    : std_logic;
 
-    signal pcie_mfb_reconf_data     : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    signal pcie_mfb_reconf_sof_pos  : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-    signal pcie_mfb_reconf_eof_pos  : std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    signal pcie_mfb_reconf_sof      : std_logic_vector(REGIONS-1 downto 0);
-    signal pcie_mfb_reconf_eof      : std_logic_vector(REGIONS-1 downto 0);
+    signal pcie_mfb_reconf_data     : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE*PCIE_DOWN_ITEM_WIDTH-1 downto 0);
+    signal pcie_mfb_reconf_sof_pos  : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*max(1,log2(PCIE_DOWN_REGION_SIZE))-1 downto 0);
+    signal pcie_mfb_reconf_eof_pos  : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*max(1,log2(PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE))-1 downto 0);
+    signal pcie_mfb_reconf_sof      : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED-1 downto 0);
+    signal pcie_mfb_reconf_eof      : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED-1 downto 0);
     signal pcie_mfb_reconf_src_rdy  : std_logic;
     signal pcie_mfb_reconf_dst_rdy  : std_logic;
 
@@ -851,10 +856,7 @@ begin
     );
 
     -- --------------------------------------------------------
-    --  Convert PCIe MFB config to user MFB MFB config
-    --
-    --   - Hopefully, this is just a workaround until MFB2AXI
-    --     is fixed for PCIe configurations.
+    --  Eventually resize PCIe MFB bus to be the same width as USER MFB.
     -- --------------------------------------------------------
     pcie_mfb_reconfigurator_i : entity work.MFB_RECONFIGURATOR
     generic map (
@@ -862,10 +864,10 @@ begin
         RX_REGION_SIZE        => PCIE_DOWN_REGION_SIZE,
         RX_BLOCK_SIZE         => PCIE_DOWN_BLOCK_SIZE,
         RX_ITEM_WIDTH         => PCIE_DOWN_ITEM_WIDTH,
-        TX_REGIONS            => REGIONS,
-        TX_REGION_SIZE        => REGION_SIZE,
-        TX_BLOCK_SIZE         => BLOCK_SIZE,
-        TX_ITEM_WIDTH         => ITEM_WIDTH,
+        TX_REGIONS            => PCIE_DOWN_REGIONS_RESIZED,
+        TX_REGION_SIZE        => PCIE_DOWN_REGION_SIZE,
+        TX_BLOCK_SIZE         => PCIE_DOWN_BLOCK_SIZE,
+        TX_ITEM_WIDTH         => PCIE_DOWN_ITEM_WIDTH,
         META_WIDTH            => 0,
         META_MODE             => 0,
         FIFO_SIZE             => 32,
@@ -903,10 +905,10 @@ begin
     generic map (
         USE_IN_PIPE    => False,
         USE_OUT_PIPE   => True,
-        REGIONS        => REGIONS,
-        REGION_SIZE    => REGION_SIZE,
-        BLOCK_SIZE     => BLOCK_SIZE,
-        ITEM_WIDTH     => ITEM_WIDTH,
+        REGIONS        => PCIE_DOWN_REGIONS_RESIZED,
+        REGION_SIZE    => PCIE_DOWN_REGION_SIZE,
+        BLOCK_SIZE     => PCIE_DOWN_BLOCK_SIZE,
+        ITEM_WIDTH     => PCIE_DOWN_ITEM_WIDTH,
         AXI_DATA_WIDTH => REGION_WIDTH,
         PIPE_TYPE      => "SHREG",
         DEVICE         => DEVICE
