@@ -897,8 +897,7 @@ begin
     );
 
     -- --------------------------------------------------------
-    --  Use MFB2AXI and AXI2MFB to convert bus to one
-    --  MFB Region and only one packet per word.
+    --  Use MFB2AXI to get only one packet per word.
     -- --------------------------------------------------------
     mfb2axi_i : entity work.MFB2AXI
     generic map (
