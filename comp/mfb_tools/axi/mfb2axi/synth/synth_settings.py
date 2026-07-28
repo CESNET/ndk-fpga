@@ -37,6 +37,20 @@ SETTINGS = {
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "2048",
     },
+    "mfb_2_1_8_32" : {
+        "REGIONS"            : "2",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "8",
+        "ITEM_WIDTH"         : "32",
+        "AXI_DATA_WIDTH"     : "512",
+    },
+    "mfb_2_1_1_32" : {
+        "REGIONS"            : "2",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "1",
+        "ITEM_WIDTH"         : "32",
+        "AXI_DATA_WIDTH"     : "64",
+    },
     "use_pipe" : {
         "USE_IN_PIPE"        : "true",
         "USE_OUT_PIPE"       : "true",
@@ -54,6 +68,10 @@ SETTINGS = {
     ("mfb_1_8_32_8","use_pipe",),
     ("mfb_4_8_8_8",),
     ("mfb_4_8_8_8","use_pipe",),
+    ("mfb_2_1_8_32",),
+    ("mfb_2_1_8_32","use_pipe",),
+    ("mfb_2_1_1_32",),
+    ("mfb_2_1_1_32","use_pipe",),
     ),
 
 }

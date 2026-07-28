@@ -14,97 +14,103 @@ SETTINGS = {
         "USE_IN_PIPE"        : "0",
         "USE_OUT_PIPE"       : "0",
     },
-    "region_comb_1" : {
+    "mfb_1_1_8_8" : {
         "REGIONS"            : "1",
         "REGION_SIZE"        : "1",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "64",
     },
-    "region_comb_1_i16" : {
+    "mfb_1_1_8_16" : {
         "REGIONS"            : "1",
         "REGION_SIZE"        : "1",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "16",
         "AXI_DATA_WIDTH"     : "128",
     },
-    "region_comb_1_i24" : {
+    "mfb_1_1_8_24" : {
         "REGIONS"            : "1",
         "REGION_SIZE"        : "1",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "24",
         "AXI_DATA_WIDTH"     : "192",
     },
-    "region_comb_2" : {
+    "mfb_1_8_8_8" : {
         "REGIONS"            : "1",
         "REGION_SIZE"        : "8",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "512",
     },
-    "region_comb_3" : {
+    "mfb_1_8_32_8" : {
         "REGIONS"            : "1",
         "REGION_SIZE"        : "8",
         "BLOCK_SIZE"         : "32",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "2048",
     },
-
-    "region_comb_4" : {
+    "mfb_1_2_4_8" : {
         "REGIONS"            : "1",
         "REGION_SIZE"        : "2",
         "BLOCK_SIZE"         : "4",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "64",
     },
-    "region_comb_4_i16" : {
-        "REGIONS"            : "1",
-        "REGION_SIZE"        : "2",
-        "BLOCK_SIZE"         : "4",
-        "ITEM_WIDTH"         : "16",
-        "AXI_DATA_WIDTH"     : "128",
-    },
-    "region_comb_5" : {
+    "mfb_2_8_8_8" : {
         "REGIONS"            : "2",
         "REGION_SIZE"        : "8",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "1024",
     },
-    "region_comb_6" : {
+    "mfb_4_4_8_8" : {
         "REGIONS"            : "4",
         "REGION_SIZE"        : "4",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "1024",
     },
-    "region_comb_6_i16" : {
+    "mfb_4_4_8_16" : {
         "REGIONS"            : "4",
         "REGION_SIZE"        : "4",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "16",
         "AXI_DATA_WIDTH"     : "2048",
     },
-    "region_comb_7" : {
+    "mfb_3_4_8_8" : {
         "REGIONS"            : "3",
         "REGION_SIZE"        : "4",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "768",
     },
-    "region_comb_7_i16" : {
+    "mfb_3_4_8_16" : {
         "REGIONS"            : "3",
         "REGION_SIZE"        : "4",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "16",
         "AXI_DATA_WIDTH"     : "1536",
     },
-    "region_comb_8" : {
+    "mfb_4_8_8_8" : {
         "REGIONS"            : "4",
         "REGION_SIZE"        : "8",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
         "AXI_DATA_WIDTH"     : "2048",
+    },
+    "mfb_2_1_8_32" : {
+        "REGIONS"            : "2",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "8",
+        "ITEM_WIDTH"         : "32",
+        "AXI_DATA_WIDTH"     : "512",
+    },
+    "mfb_2_1_1_32" : {
+        "REGIONS"            : "2",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "1",
+        "ITEM_WIDTH"         : "32",
+        "AXI_DATA_WIDTH"     : "64",
     },
     "pipe_in" : {
         "USE_IN_PIPE"        : "1",
@@ -117,18 +123,21 @@ SETTINGS = {
     ("pipe_in",),
     ("pipe_out",),
     ("pipe_in","pipe_out",),
-    ("region_comb_1",),
-    ("region_comb_1_i16",),
-    ("region_comb_1_i24",),
-    ("region_comb_2",),
-    ("region_comb_3",),
-    ("region_comb_4",),
-    ("region_comb_5",),
-    ("region_comb_6",),
-    ("region_comb_6_i16",),
-    ("region_comb_7",),
-    ("region_comb_7_i16",),
-    ("region_comb_8",),
-    ("region_comb_8","pipe_in","pipe_out",),
+    ("mfb_1_1_8_8",),
+    ("mfb_1_1_8_16",),
+    ("mfb_1_1_8_24",),
+    ("mfb_1_8_8_8",),
+    ("mfb_1_8_32_8",),
+    ("mfb_1_2_4_8",),
+    ("mfb_2_8_8_8",),
+    ("mfb_4_4_8_8",),
+    ("mfb_4_4_8_16",),
+    ("mfb_3_4_8_8",),
+    ("mfb_3_4_8_16",),
+    ("mfb_4_8_8_8",),
+    ("mfb_4_8_8_8","pipe_in","pipe_out",),
+    ("mfb_2_1_8_32",),
+    ("mfb_2_1_8_32","pipe_in","pipe_out",),
+    ("mfb_2_1_1_32",),
     ),
 }

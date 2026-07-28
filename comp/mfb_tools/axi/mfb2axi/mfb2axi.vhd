@@ -381,10 +381,25 @@ begin
                 end loop;
             end process;
 
-            -- adapt POSs so it is pointing in complete data
-            sof_pos_first <= global_sof_array(to_integer(sof_first));
-            sof_pos_last  <= global_sof_array(to_integer(sof_last));
-            eof_pos_first <= global_eof_array(to_integer(eof_first));
+            -- adapt SOF_POSs so it is pointing in complete data
+            sof_pos_1_block_g: if (REGION_SIZE = 1) generate
+                -- in configuration with REGION_SIZE = 1, it is based only on SOF, SOF_POS is ignored.
+                sof_pos_first <= sof_first;
+                sof_pos_last  <= sof_last;
+            else generate
+                -- other configurations considers both SOF and SOF_POS
+                sof_pos_first <= global_sof_array(to_integer(sof_first));
+                sof_pos_last  <= global_sof_array(to_integer(sof_last));
+            end generate;
+
+            -- adapt EOf_POS so it is pointing in complete data
+            eof_pos_1_block_1_item_g: if (REGION_SIZE = 1 and BLOCK_SIZE = 1) generate
+                -- in configuration with REGION_SIZE = 1 &&  BLOCK_SIZE = 1, it is based only on EOF, EOF_POS is ignored.
+                eof_pos_first <= eof_first;
+            else generate
+                -- other configurations considers both EOF and EOF_POS
+                eof_pos_first <= global_eof_array(to_integer(eof_first));
+            end generate;
 
             -- pre-process seq. logic
             pp_seq_p : process (CLK)

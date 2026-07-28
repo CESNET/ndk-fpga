@@ -71,6 +71,7 @@ def COMPONENTS_MULTIVER = [\
     ['MFB_FRAME_TRIMMER'                  , 'comp/mfb_tools/edit/frame_trimmer/uvm'                                           , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['MFB_FRAME_EXTENDER'                 , 'comp/mfb_tools/edit/frame_extender/uvm'                                          , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['GET_LAST_ITEMS'                     , 'comp/mfb_tools/logic/get_last_items/ver'                                         , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'    ],\
+    ['MFB2AXI'                            , 'comp/mfb_tools/axi/mfb2axi/ver'                                                  , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'    ],\
 ]
 // /////////////////////////////////////////////////////////////////////////////
 
