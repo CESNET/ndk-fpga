@@ -179,7 +179,8 @@ Its output interface is compatible with the PTC module.</p>
 <tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_writer-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td><p>Number of MFB Regions in a word, cannot handle more than 1.</p></td>
+<td><p>For RX (user) interface.
+Number of MFB Regions in a word, cannot handle more than 1.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
 <td><p>natural</p></td>
@@ -194,6 +195,26 @@ Its output interface is compatible with the PTC module.</p>
 <tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_writer-pcie_mfb_regions"><td><p>PCIE_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>For TX (PCIe) interface.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-pcie_mfb_region_size"><td><p>PCIE_MFB_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_writer-pcie_mfb_block_size"><td><p>PCIE_MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-pcie_mfb_item_width"><td><p>PCIE_MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
@@ -242,7 +263,12 @@ Its output interface is compatible with the PTC module.</p>
 <td><p>Size of a RAM page (in bytes).
 Must be a power of two.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_writer-instr_fifo_size"><td><p>INSTR_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_writer-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td></td>
@@ -380,12 +406,12 @@ PCIe specification allows at least 128.</p></td>
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Contains DMA Upstream header</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
@@ -400,27 +426,27 @@ PCIe specification allows at least 128.</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS*PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_writer-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1,log2(PCIE_MFB_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_writer-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_MFB_REGIONS*max(1,log2(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
