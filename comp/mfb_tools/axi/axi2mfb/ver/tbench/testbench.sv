@@ -12,7 +12,7 @@ module testbench;
     logic CLK = 0;
     logic RESET;
     iMfbTx #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,META_WIDTH) TX (CLK, RESET);
-    iAxi4SRx #(AXI_DATA_WIDTH, AXI_USER_WIDTH, ITEM_WIDTH) RX (CLK, RESET);
+    iAxi4SRx #(AXI_DATA_WIDTH, AXI_USER_WIDTH, 8) RX (CLK, RESET);
 
     always #(CLK_PERIOD/2) CLK = ~CLK;
 

@@ -18,9 +18,9 @@ program TEST (
     iMfbTx.monitor MONITOR
 );
 
-    AxiTransaction #(ITEM_WIDTH, AXI_USER_WIDTH) blueprint;
+    AxiTransaction #(8, AXI_USER_WIDTH) blueprint;
     Generator generator;
-    Axi4SDriver  #(AXI_DATA_WIDTH, AXI_USER_WIDTH, ITEM_WIDTH) driver;
+    Axi4SDriver  #(AXI_DATA_WIDTH, AXI_USER_WIDTH, 8) driver;
     MfbResponder #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,META_WIDTH) responder;
     MfbMonitor   #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH,META_WIDTH,META_ALIGNMENT) monitor;
     Scoreboard scoreboard;

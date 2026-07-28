@@ -24,11 +24,11 @@ SETTINGS = {
         "AXI_DATA_WIDTH"     : "512",
     },
     "region_comb_2" : {
-        "REGIONS"            : "2",
+        "REGIONS"            : "4",
         "REGION_SIZE"        : "8",
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
-        "AXI_DATA_WIDTH"     : "1024",
+        "AXI_DATA_WIDTH"     : "2048",
     },
     "region_comb_3" : {
         "REGIONS"            : "1",
@@ -38,17 +38,17 @@ SETTINGS = {
         "AXI_DATA_WIDTH"     : "64",
     },
     "region_comb_4" : {
-        "REGIONS"            : "1",
-        "REGION_SIZE"        : "2",
-        "BLOCK_SIZE"         : "4",
-        "ITEM_WIDTH"         : "8",
-        "AXI_DATA_WIDTH"     : "64",
+        "REGIONS"            : "2",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "8",
+        "ITEM_WIDTH"         : "32",
+        "AXI_DATA_WIDTH"     : "512",
     },
     "region_comb_5" : {
         "REGIONS"            : "4",
-        "REGION_SIZE"        : "4",
+        "REGION_SIZE"        : "1",
         "BLOCK_SIZE"         : "8",
-        "ITEM_WIDTH"         : "8",
+        "ITEM_WIDTH"         : "32",
         "AXI_DATA_WIDTH"     : "1024",
     },
     "pipe_in" : {
