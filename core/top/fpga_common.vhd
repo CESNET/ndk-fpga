@@ -288,7 +288,7 @@ architecture FULL of FPGA_COMMON is
         variable ret : dma_route_junction_array_t(0 to DMA_ENDPOINTS-1);
     begin
         for i in 0 to DMA_ENDPOINTS-1 loop
-            ret(i) := dma_route_junction(dma_route_pcie(i), 2);
+            ret(i) := dma_route_junction(DMA_ROUTE_PCIE(i), 2);
         end loop;
         return ret;
     end function;
