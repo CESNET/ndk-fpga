@@ -88,6 +88,12 @@ proc EvalFile {FNAME OPT} {
             # QSF file
             puts "INFO: Importing file to the project: $FNAME"
             source $FNAME
+        } elseif { $FEXT == ".stp" } {
+            # SignalTap File (on-chip logic analyzer)
+            set_global_assignment -name SIGNALTAP_FILE $FNAME
+            set_global_assignment -name USE_SIGNALTAP_FILE $FNAME
+            set_global_assignment -name ENABLE_SIGNALTAP ON
+            puts "INFO: SignalTap file added: $FNAME"
         } else {
             # Not yet supported file type
             puts "WARNING: Adding $FEXT files to the project is not yet supported."
@@ -222,6 +228,14 @@ proc AddInputFiles {synth_flags hierarchy {eval_mod_proc "EvalFile"} {eval_comp_
     # Add constraints
     PrintLabel "Constraints compilation"
     ApplyToMods $SYNTH_FLAGS(CONSTR) $eval_mod_proc FILES
+
+    # Add optional custom SignalTap (STP) debug file.
+    # Set its path via the STP_FILE variable in app_conf.tcl (application
+    # build directory) to enable SignalTap in the compiled design.
+    if {[info exists ::STP_FILE] && $::STP_FILE ne ""} {
+        PrintLabel "SignalTap file compilation"
+        ApplyToMods [list $::STP_FILE] $eval_mod_proc FILES
+    }
 
     return $FILES
 }
