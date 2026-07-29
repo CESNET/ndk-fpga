@@ -81,7 +81,7 @@ entity FRAME_UNPACKER is
         RESET          : in  std_logic;
 
         -- =====================================================================
-        --  TX MVB Headers (per each SuperPacket)
+        --  RX MVB Headers (per each SuperPacket)
         -- =====================================================================
 
         RX_MVB_DATA    : in  std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
