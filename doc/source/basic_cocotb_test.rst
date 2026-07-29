@@ -22,7 +22,7 @@ For beginners, the easiest way to get started is:
    - Update the model function to compute expected outputs for your component
 4. **Run the test** using the Makefile
 
-.. note:: For automatic generation of a test template, use the ``generate_test_template`` script in ``ndk-fpga/build/scripts/cocotb``. This creates a basic test structure that you can customize.
+.. note:: For automatic generation of a test template, use the ``generate_test_template.py`` script in ``ndk-fpga/build/scripts/cocotb``. This creates a basic test structure that you can customize.
 
 
 Test Structure
