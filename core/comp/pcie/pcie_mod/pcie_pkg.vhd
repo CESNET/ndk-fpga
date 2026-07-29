@@ -23,9 +23,9 @@ end package;
 package body core_pcie_pkg is
 
     pure function core_pcie_get_dma_route (DMA_PORTS, PCIE_ENDPOINTS: natural) return dma_route_path_array_t is
-        constant PTC_ROUTE          : dma_route_path_array_t := ptc_get_dma_route(DMA_PORTS);
-        constant DMA_PORTS_PER_EP   : natural := PTC_ROUTE'length;
-        variable cfg                : dma_route_path_array_t(0 to PCIE_ENDPOINTS*DMA_PORTS_PER_EP-1);
+        constant DMA_PORTS_PER_EP   : natural := DMA_PORTS / PCIE_ENDPOINTS;
+        constant PTC_ROUTE          : dma_route_path_array_t := ptc_get_dma_route(DMA_PORTS_PER_EP);
+        variable cfg                : dma_route_path_array_t(0 to DMA_PORTS-1);
     begin
 
         for i in 0 to PCIE_ENDPOINTS-1 loop
@@ -33,6 +33,7 @@ package body core_pcie_pkg is
                 cfg(i*DMA_PORTS_PER_EP+j) := PTC_ROUTE(j);
             end loop;
         end loop;
+
         return cfg;
     end function;
 
