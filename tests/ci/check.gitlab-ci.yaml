@@ -16,6 +16,15 @@ editorconfig:
   image: mstruebing/editorconfig-checker
   script: [ec]
 
+shebang:
+  stage: check
+  needs: []
+  image: alpine:3.19
+  before_script:
+    - apk add --no-cache git
+  script:
+    - sh tests/ci/shebang_check.sh
+
 pycodestyle:
   stage: check
   needs: []
