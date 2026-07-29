@@ -1208,6 +1208,7 @@ begin
 
             INSERT_MODE     => META_OUT_MODE,
             MVB_FIFO_SIZE   => 32,
+            MVB_FIFOX_MULTI => True,
             DEVICE          => DEVICE
         )
         port map (
