@@ -622,7 +622,7 @@ begin
                                    or (rx_mfb_eof_pos_u >= 80 and rx_mfb_eof_pos_u < 112)
                                    or (rx_mfb_eof_pos_u >= 112 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1')
                                ) then
-                                high_shift_val_nst <= INIT_SHIFT;
+                                high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
                                 TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & data_pcie_hdr_corr;
                                 TX_MFB_SOF(0)      <= '1';
                                 TX_MFB_SRC_RDY     <= '1';
