@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 #############################################################################
 # jtag_op_mgmt.py: script for management of JTAG-over-protocol communication

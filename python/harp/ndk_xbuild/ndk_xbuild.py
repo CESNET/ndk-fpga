@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # File: ndk_xbuild.py
 # Author(s): Oliver Gurka <oliver.gurka@cesnet.cz>
 # Copyright: (C) 2024 CESNET, z.s.p.o.

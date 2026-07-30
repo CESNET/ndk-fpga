@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # pcap2sim.py: Convert PCAP file to FL_SIM(FL_BFM) file

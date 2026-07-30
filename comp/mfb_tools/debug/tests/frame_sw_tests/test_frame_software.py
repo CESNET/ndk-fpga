@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # test_frame_software.py : Script for testing of frame_player and
 #                          frame_recorder software.
 #

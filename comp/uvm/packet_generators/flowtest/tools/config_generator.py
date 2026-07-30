@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 # config_generator.py: Generator for FlowTest ft-generator (https://github.com/CESNET/FlowTest/tree/main/tools/ft-generator) config
 # Copyright (C) 2024 CESNET z. s. p. o.

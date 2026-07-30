@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 # max_words_num_transcript_check.py: Check protocol integrity
 # Copyright (C) 2018 CESNET z. s. p. o.

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Profile_swap.py: Script for profile swap in Multirate IP cores
 # Copyright (C) 2021 CESNET z. s. p. o.
 # Author(s): Jakub Záhora <xzahor06@vutbr.cz>

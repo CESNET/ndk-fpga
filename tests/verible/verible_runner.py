@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # verible_runner.py: Verible linter runner script. To waive linter violations, see this: https://github.com/chipsalliance/verible/tree/master/verible/verilog/tools/lint#waiving-lint-violations-lint-waiver
 # Copyright (C) 2025-2026 CESNET z. s. p. o.
 # Author(s): Yaroslav Marushchenko <xmarus09@stud.fit.vutbr.cz>

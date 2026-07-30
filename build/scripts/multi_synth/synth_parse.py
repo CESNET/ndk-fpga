@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # synth_parse.py
 # Copyright (C) 2020 CESNET z. s. p. o.
 # Author(s): Jan Kubalek <kubalek@cesnet.cz>

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2025 CESNET z. s. p. o.
@@ -12,9 +12,15 @@ import argparse
 from datetime import datetime
 
 
-def generate_test_template(path: str = os.getcwd(), entity: str | None = None, ndk_fpga_path: str | None = None,
-                  name: str | None = None, email: str | None = None, company: str = "CESNET z. s. p. o.",
-                  license: str = "BSD-3-Clause"):
+def generate_test_template(
+    path: str = os.getcwd(),
+    entity: str | None = None,
+    ndk_fpga_path: str | None = None,
+    name: str | None = None,
+    email: str | None = None,
+    company: str = "CESNET z. s. p. o.",
+    license: str = "BSD-3-Clause",
+):
     """
     Generates a generic cocotb test template.
 
@@ -69,7 +75,7 @@ def generate_test_template(path: str = os.getcwd(), entity: str | None = None, n
                 try:
                     entity = entities[int(input(entity_enum))]
                     break
-                except:
+                except (ValueError, IndexError):
                     print("An error occured. Choose again.")
 
     if name is None:
@@ -133,9 +139,12 @@ def generate_test_template(path: str = os.getcwd(), entity: str | None = None, n
 
     print("Test template successfully generated.")
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="Cocotb Test Template Generator",
-                    description="Generates cocotb test template for a VHDL entity.")
+    parser = argparse.ArgumentParser(
+        prog="Cocotb Test Template Generator",
+        description="Generates cocotb test template for a VHDL entity.",
+    )
 
     parser.add_argument("-p", "--path", default=os.getcwd(), help="The location where the test folder will be generated. If not specified, the current working directory is chosen.")
     parser.add_argument("-e", "--entity", default=None, help="The name of the VHDL entity for which the test will be generated. If not specified, the entity is found automatically")
