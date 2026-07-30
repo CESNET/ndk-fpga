@@ -77,7 +77,7 @@ ghdl-sim: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
 	ghdl -i --workdir=$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) --std=08 -frelaxed --ieee=synopsys $(filter %.vhd,$(MOD))
 	ghdl -m --workdir=$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) --std=08 -frelaxed --ieee=synopsys --warn-no-hide $(TOP_LEVEL_ENT_LC)
-	MODULE=$(COCOTB_MODULE) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
+	MODULE=$(COCOTB_MODULE) COCOTB_TEST_MODULES=$(COCOTB_MODULE) PYGPI_PYTHON_BIN=$(shell cocotb-config --python-bin) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
 	ghdl -r -v --workdir=$(GHDL_WORK_DIR) -P$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) $(TOP_LEVEL_ENT_LC) --vpi=$(shell cocotb-config --lib-name-path vpi ghdl) --asserts=disable --vcd=$(OUTPUT_NAME).vcd
 
 NVC_LOAD ?=
@@ -88,7 +88,7 @@ nvc: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
 	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
 	@nvc --work=nvcwork -H 1G -M 4G -e --no-collapse $(TOP_LEVEL_ENT_LC)
-	@MODULE=$(COCOTB_MODULE) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
+	@MODULE=$(COCOTB_MODULE) COCOTB_TEST_MODULES=$(COCOTB_MODULE) PYGPI_PYTHON_BIN=$(shell cocotb-config --python-bin) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
 	nvc --work=nvcwork -H 1G -M 4G -rw $(TOP_LEVEL_ENT_LC) --dump-arrays -g --ieee-warnings=off $(NVC_LOAD)
 
 else
