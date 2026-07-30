@@ -11,6 +11,16 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
+-- Distributed/LUT-RAM-backed implementation of ``MVB_LOOKUP_TABLE``.
+-- Instantiates one multi-port ``GEN_LUTRAM`` per byte of LUT_WIDTH,
+-- each with 1+MVB_ITEMS independent, zero-latency read ports (one for the
+-- SW_* interface, one per MVB item); resource usage therefore grows with
+-- both LUT_DEPTH and MVB_ITEMS. RX-to-TX latency is 0 CLK cycles when
+-- OUTPUT_REG = false, or 1 CLK cycle when OUTPUT_REG = true. Not intended to
+-- be instantiated directly - use ``MVB_LOOKUP_TABLE`` with LUT_ARCH = "LUT"
+-- (or "AUTO") instead, which selects this implementation automatically for
+-- a shallow table.
+--
 entity MVB_LOOKUP_TABLE_LUTRAM is
     generic (
         MVB_ITEMS  : natural := 4;
@@ -25,11 +35,19 @@ entity MVB_LOOKUP_TABLE_LUTRAM is
         CLK             : in  std_logic;
         RESET           : in  std_logic;
 
+        -- =====================================================================
+        -- RX MVB INTERFACE
+        -- =====================================================================
+
         RX_MVB_LUT_ADDR : in  slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
         RX_MVB_METADATA : in  slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
         RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY  : in  std_logic;
         RX_MVB_DST_RDY  : out std_logic;
+
+        -- =====================================================================
+        -- TX MVB INTERFACE
+        -- =====================================================================
 
         TX_MVB_LUT_DATA : out slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0);
         TX_MVB_LUT_ADDR : out slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
@@ -37,6 +55,10 @@ entity MVB_LOOKUP_TABLE_LUTRAM is
         TX_MVB_VLD      : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_SRC_RDY  : out std_logic;
         TX_MVB_DST_RDY  : in  std_logic;
+
+        -- =====================================================================
+        -- SW CONFIGURATION INTERFACE
+        -- =====================================================================
 
         SW_ADDR         : in  std_logic_vector(log2(LUT_DEPTH)-1 downto 0);
         SW_SLICE        : in  std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0);
