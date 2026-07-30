@@ -73,7 +73,7 @@ class AvstCompleter():
 
             await self._cq_req(*item, tag=tag)
 
-    async def _cq_req(self, addr, byte_count, req_type=0, data=[], tag=None):
+    async def _cq_req(self, addr, byte_count, req_type=0, data=[], bus_opts=None, tag=None):
         if byte_count == 0:
             if tag is not None:
                 trigger, item, req_data = self._read_requests[tag]
@@ -82,6 +82,12 @@ class AvstCompleter():
                 self._req_data = req_data
                 trigger.set()
             return
+
+        # AVST conveys the target BAR via a driver-bus meta signal (PCIE_CQ_META_BAR),
+        # which isn't wired up on this driver yet - fail loudly rather than silently
+        # routing a non-BAR0 access to BAR0.
+        if (bus_opts or {}).get('bar', 0) != 0:
+            raise NotImplementedError("AvstCompleter does not yet support targeting a BAR other than 0")
 
         if req_type == 1:
             assert len(data) == byte_count
@@ -114,7 +120,7 @@ class AvstCompleter():
             tag = concat([(hdr.tag_l, 8), (hdr.tag_m, 1), (hdr.tag_h, 1)])
 
             trigger, item, req_data = self._read_requests[tag]
-            addr, byte_count, req_type, orig_data = item
+            addr, byte_count, req_type, orig_data, bus_opts = item
 
             is_first = len(req_data) == 0
             offset = addr % 4 if is_first else 0
@@ -134,30 +140,30 @@ class AvstCompleter():
                 trigger.set()
                 self._tag_queue.put_nowait(tag)
 
-    async def read(self, addr, byte_count) -> bytes:
+    async def read(self, addr, byte_count, bus_opts: dict = None) -> bytes:
         # TODO: split big reads to more transactions
         e = Event()
-        await self._queue_send.put(((addr, byte_count, 0, []), e))
+        await self._queue_send.put(((addr, byte_count, 0, [], bus_opts), e))
         await e.wait()
         return bytes(self._req_data)
 
-    async def write(self, addr, data: bytes):
+    async def write(self, addr, data: bytes, bus_opts: dict = None):
         # TODO: split big writes to more transactions
         e = Event()
         data = list(data)
-        await self._queue_send.put(((addr, len(data), 1, data), e))
+        await self._queue_send.put(((addr, len(data), 1, data, bus_opts), e))
         data = await e.wait()
 
-    async def read64(self, addr):
-        rawdata = await self.read(addr, 8)
+    async def read64(self, addr, bus_opts: dict = None):
+        rawdata = await self.read(addr, 8, bus_opts=bus_opts)
         return int.from_bytes(bytes(rawdata), byteorder="little")
 
-    async def read32(self, addr):
-        rawdata = await self.read(addr, 4)
+    async def read32(self, addr, bus_opts: dict = None):
+        rawdata = await self.read(addr, 4, bus_opts=bus_opts)
         return int.from_bytes(bytes(rawdata), byteorder="little")
 
-    async def write32(self, addr, val):
-        await self.write(addr, list(val.to_bytes(4, byteorder="little")))
+    async def write32(self, addr, val, bus_opts: dict = None):
+        await self.write(addr, list(val.to_bytes(4, byteorder="little")), bus_opts=bus_opts)
 
-    async def write64(self, addr, val):
-        await self.write(addr, list(val.to_bytes(8, byteorder="little")))
+    async def write64(self, addr, val, bus_opts: dict = None):
+        await self.write(addr, list(val.to_bytes(8, byteorder="little")), bus_opts=bus_opts)

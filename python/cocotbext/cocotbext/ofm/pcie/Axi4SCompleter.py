@@ -71,7 +71,7 @@ class Axi4SCompleter:
         hdr = self._cc_inframe
 
         trigger, item, req_data = self._read_requests[hdr.tag]
-        addr, byte_count, req_type, orig_data = item
+        addr, byte_count, req_type, orig_data, bus_opts = item
 
         # Splitted completion for request
         is_first = len(req_data) == 0
@@ -91,7 +91,7 @@ class Axi4SCompleter:
                 trigger.set()
                 self._tag_queue.put_nowait(hdr.tag)
 
-    async def _cq_req(self, addr, byte_count, req_type=0, data=[], tag=None, sync=True):
+    async def _cq_req(self, addr, byte_count, req_type=0, data=[], bus_opts=None, tag=None, sync=True):
         """Send CQ request using unified driver."""
         if byte_count == 0:
             if tag is not None:
@@ -123,6 +123,7 @@ class Axi4SCompleter:
         # Fill header
         if tag is not None:
             header.tag = tag
+        header.bar_id = (bus_opts or {}).get('bar', 0)
         header.bar_apper = 26
         header.addr = addr >> 2
         header.dword_count = dwords
@@ -130,31 +131,31 @@ class Axi4SCompleter:
 
         self._cq.append((header, data, user))
 
-    async def read(self, addr: int, byte_count: int) -> bytes:
+    async def read(self, addr: int, byte_count: int, bus_opts: dict = None) -> bytes:
         # TODO: split big reads to more transactions
 
         e = Event()
-        await self._queue_send.put(((addr, byte_count, 0, []), e))
+        await self._queue_send.put(((addr, byte_count, 0, [], bus_opts), e))
         await e.wait()
         return bytes(self._req_data)
 
-    async def write(self, addr: int, data: bytes):
+    async def write(self, addr: int, data: bytes, bus_opts: dict = None):
         # TODO: split big writes to more transactions
         e = Event()
         data = list(data)
-        await self._queue_send.put(((addr, len(data), 1, data), e))
+        await self._queue_send.put(((addr, len(data), 1, data, bus_opts), e))
         data = await e.wait()
 
-    async def read64(self, addr):
-        rawdata = await self.read(addr, 8)
+    async def read64(self, addr, bus_opts: dict = None):
+        rawdata = await self.read(addr, 8, bus_opts=bus_opts)
         return int.from_bytes(bytes(rawdata), byteorder="little")
 
-    async def read32(self, addr):
-        rawdata = await self.read(addr, 4)
+    async def read32(self, addr, bus_opts: dict = None):
+        rawdata = await self.read(addr, 4, bus_opts=bus_opts)
         return int.from_bytes(bytes(rawdata), byteorder="little")
 
-    async def write32(self, addr, val):
-        await self.write(addr, list(val.to_bytes(4, byteorder="little")))
+    async def write32(self, addr, val, bus_opts: dict = None):
+        await self.write(addr, list(val.to_bytes(4, byteorder="little")), bus_opts=bus_opts)
 
-    async def write64(self, addr, val):
-        await self.write(addr, list(val.to_bytes(8, byteorder="little")))
+    async def write64(self, addr, val, bus_opts: dict = None):
+        await self.write(addr, list(val.to_bytes(8, byteorder="little")), bus_opts=bus_opts)
