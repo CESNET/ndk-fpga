@@ -372,8 +372,10 @@ proc ImplementDesignRun {synth_flags} {
     PrintLabel "Report Timing"
     execute_module -tool sta
 
-    PrintLabel "Report Power"
-    execute_module -tool pow
+    if {$SYNTH_FLAGS(POWER_ANALYSIS_EN)} {
+        PrintLabel "Report Power"
+        execute_module -tool pow
+    }
 }
 
 # -----------------------------------------------------------------------------
@@ -636,6 +638,9 @@ proc nb_sanitize_vars {synth_flags hierarchy} {
     }
     if {![info exist SYNTH_FLAGS(ASSERT_OFF)]} {
         set SYNTH_FLAGS(ASSERT_OFF) false
+    }
+    if {![info exists SYNTH_FLAGS(POWER_ANALYSIS_EN)]} {
+        set SYNTH_FLAGS(POWER_ANALYSIS_EN) true
     }
 
     if {[info exist SYNTH_FLAGS(QIP_ENABLE)]} {
