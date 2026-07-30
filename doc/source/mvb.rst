@@ -24,3 +24,8 @@ Components using the MFB bus are typically located in the ``comp/mvb_tools/`` di
    comp/mvb_tools/flow/gate/readme
    comp/mvb_tools/storage/lookup_table/readme
    comp/mvb_tools/storage/fifox/readme
+   comp/mvb_tools/storage/asfifox/readme
+   comp/mvb_tools/storage/asfifo_bram_xilinx/readme
+   comp/mvb_tools/storage/fifo/readme
+   comp/mvb_tools/storage/mvb_hash_table_simple/readme
+   comp/mvb_tools/storage/tcam/readme
