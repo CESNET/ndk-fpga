@@ -504,3 +504,29 @@ What can I do with the `app_conf.tcl` file
 * You can add a parameter to the VHDL package, which is used in the
   `application_core.vhd` component (the same package as in the `card_const.tcl`
   and `core_const.tcl`).
+
+I need to load a custom SignalTap (STP) file when compiling with Quartus
+------------------------------------------------------------------------
+1. Create/edit a SignalTap II Logic Analyzer File (``.stp``) for your design,
+   e.g. using the Quartus GUI (*File > New > SignalTap II Logic Analyzer File*),
+   and place it anywhere in your application directory
+   (e.g. ``apps/<app_name>/build/<card_name>/debug.stp``).
+2. Set its path in the ``STP_FILE`` variable in the ``app_conf.tcl`` file of the
+   card you are building for:
+
+.. code-block:: tcl
+
+    set STP_FILE "$OFM_PATH/apps/<app_name>/build/<card_name>/debug.stp"
+
+3. Run ``make`` as usual. When ``STP_FILE`` is set and non-empty, the build
+   system adds the file to the Quartus project and sets
+   ``ENABLE_SIGNALTAP ON``, so SignalTap logic is instantiated into the design
+   during the Fitter stage. When ``STP_FILE`` is left unset, SignalTap stays
+   disabled and nothing changes in the build.
+
+.. NOTE::
+   The node names referenced in the ``.stp`` file must match hierarchical
+   signal names that exist in the synthesized design. Since these can change
+   between design revisions, the ``.stp`` file usually needs to be re-created
+   or updated (via *SignalTap > Auto Insert Node* or similar) whenever the
+   design's internal hierarchy changes.

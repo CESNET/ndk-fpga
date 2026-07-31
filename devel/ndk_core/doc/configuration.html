@@ -96,6 +96,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-card-conf-tcl-file">What can I do with the <cite>card_conf.tcl</cite> file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-card-const-tcl-file">What can I do with the <cite>card_const.tcl</cite> file</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-the-app-conf-tcl-file">What can I do with the <cite>app_conf.tcl</cite> file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-need-to-load-a-custom-signaltap-stp-file-when-compiling-with-quartus">I need to load a custom SignalTap (STP) file when compiling with Quartus</a></li>
 </ul>
 </li>
 </ul>
@@ -694,6 +695,35 @@ files with respect to the application.</p></li>
 <cite>application_core.vhd</cite> component (the same package as in the <cite>card_const.tcl</cite>
 and <cite>core_const.tcl</cite>).</p></li>
 </ul>
+</section>
+<section id="i-need-to-load-a-custom-signaltap-stp-file-when-compiling-with-quartus">
+<h3>I need to load a custom SignalTap (STP) file when compiling with Quartus<a class="headerlink" href="#i-need-to-load-a-custom-signaltap-stp-file-when-compiling-with-quartus" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Create/edit a SignalTap II Logic Analyzer File (<code class="docutils literal notranslate"><span class="pre">.stp</span></code>) for your design,
+e.g. using the Quartus GUI (<em>File &gt; New &gt; SignalTap II Logic Analyzer File</em>),
+and place it anywhere in your application directory
+(e.g. <code class="docutils literal notranslate"><span class="pre">apps/&lt;app_name&gt;/build/&lt;card_name&gt;/debug.stp</span></code>).</p></li>
+<li><p>Set its path in the <code class="docutils literal notranslate"><span class="pre">STP_FILE</span></code> variable in the <code class="docutils literal notranslate"><span class="pre">app_conf.tcl</span></code> file of the
+card you are building for:</p></li>
+</ol>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="k">set</span><span class="w"> </span>STP_FILE<span class="w"> </span><span class="s2">&quot;$OFM_PATH/apps/&lt;app_name&gt;/build/&lt;card_name&gt;/debug.stp&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">make</span></code> as usual. When <code class="docutils literal notranslate"><span class="pre">STP_FILE</span></code> is set and non-empty, the build
+system adds the file to the Quartus project and sets
+<code class="docutils literal notranslate"><span class="pre">ENABLE_SIGNALTAP</span> <span class="pre">ON</span></code>, so SignalTap logic is instantiated into the design
+during the Fitter stage. When <code class="docutils literal notranslate"><span class="pre">STP_FILE</span></code> is left unset, SignalTap stays
+disabled and nothing changes in the build.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The node names referenced in the <code class="docutils literal notranslate"><span class="pre">.stp</span></code> file must match hierarchical
+signal names that exist in the synthesized design. Since these can change
+between design revisions, the <code class="docutils literal notranslate"><span class="pre">.stp</span></code> file usually needs to be re-created
+or updated (via <em>SignalTap &gt; Auto Insert Node</em> or similar) whenever the
+design’s internal hierarchy changes.</p>
+</div>
 </section>
 </section>
 </section>
