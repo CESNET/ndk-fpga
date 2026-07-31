@@ -497,8 +497,10 @@ proc ImplementDesignRun {synth_flags RUN_NAME} {
     PrintLabel "Report Utilization"
     report_utilization -file $SYNTH_FLAGS(OUTPUT)_par.util
 
-    PrintLabel "Report Power"
-    report_power -file $SYNTH_FLAGS(OUTPUT)_par.pow
+    if {$SYNTH_FLAGS(POWER_ANALYSIS_EN)} {
+        PrintLabel "Report Power"
+        report_power -file $SYNTH_FLAGS(OUTPUT)_par.pow
+    }
 
     # Load user DRC
     global OFM_PATH
@@ -783,6 +785,9 @@ proc nb_sanitize_vars {synth_flags hierarchy} {
     }
     if {![info exist SYNTH_FLAGS(SOPT_VERBOSE)] } {
         set SYNTH_FLAGS(SOPT_VERBOSE) false
+    }
+    if {![info exists SYNTH_FLAGS(POWER_ANALYSIS_EN)]} {
+        set SYNTH_FLAGS(POWER_ANALYSIS_EN) true
     }
 }
 

@@ -379,6 +379,7 @@ The (incomplete) list of SYNTH_FLAGS array items
 - PROJ_ONLY *{false, true}*: Only the project file will be created. Neither synthesis nor implementation will be run.
 - SYNTH_ONLY *{false, true}*: Only the synthesis will be run, the implementation will be skipped.
 - PHASE_SAVE *{true, false}*: Do not generate programming files and archives after implementation.
+- POWER_ANALYSIS_EN *{true, false}*: Run power analysis (``report_power`` in Vivado / PowerPlay Power Analyzer in Quartus) after implementation. Disabling it can speed up the build.
 - DEVICE *{ULTRASCALE, VIRTEX7, STRATIX10, AGILEX}*: Sets the FPGA family. In the `comp target`_ is mapped to specific FPGA.
 - FPGA *{xcvu7p-flvb2104-2-i, 1SD280PT2F55E1VG, ...}*: Sets the FPGA part directly.
 - SETUP_FLAGS: List of specific flags for entire project:
