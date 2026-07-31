@@ -150,9 +150,9 @@ class NFBDevice(cocotbext.nfb.NfbDevice):
             self._core = self._dut
 
         try:
-            handle = simulator.get_root_handle("combo_user_const")
-            combo_user_const = cocotb.handle.SimHandle(handle)
-            self._card_name = combo_user_const.CARD_NAME.value.decode()
+            handle = simulator.get_root_handle("ndk_fpga_top_pkg")
+            ndk_fpga_top_pkg = cocotb.handle.SimHandle(handle)
+            self._card_name = ndk_fpga_top_pkg.CARD_NAME.value.decode()
         except Exception:
             # Workardound for nvc
             self._card_name = self._core.BOARD.value.decode()
