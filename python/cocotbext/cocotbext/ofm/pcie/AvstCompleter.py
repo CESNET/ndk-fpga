@@ -83,11 +83,10 @@ class AvstCompleter():
                 trigger.set()
             return
 
-        # AVST conveys the target BAR via a driver-bus meta signal (PCIE_CQ_META_BAR),
-        # which isn't wired up on this driver yet - fail loudly rather than silently
-        # routing a non-BAR0 access to BAR0.
-        if (bus_opts or {}).get('bar', 0) != 0:
-            raise NotImplementedError("AvstCompleter does not yet support targeting a BAR other than 0")
+        # AVST conveys the target BAR via the driver-bus BAR_RANGE meta signal
+        # (matching real Avalon-ST PCIe hard IP's rx_st_bar_range), not the TLP
+        # header itself - see AvstPcieDriverMaster.prep_words().
+        bar = (bus_opts or {}).get('bar', 0)
 
         if req_type == 1:
             assert len(data) == byte_count
@@ -107,7 +106,7 @@ class AvstCompleter():
             header.tag_l, header.tag_m, header.tag_h = deconcat([tag, 8, 1, 1])
         header.req_t = req_type << 6
         header.length = dwords
-        self._cq.append((header, data, self._avst_tr_type))
+        self._cq.append((header, data, self._avst_tr_type, bar))
 
     def _handle_cc_transaction(self, transaction):
         header_bytes, data_bytes = transaction
