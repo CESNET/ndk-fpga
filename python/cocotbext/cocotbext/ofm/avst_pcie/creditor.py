@@ -306,7 +306,8 @@ class AvstCreditRequester(BusDriver):
         for credit-gated sending.
         """
         try:
-            hdr, data, tr_type = transaction
+            # bar (4th element) is optional - only AvstCompleter's CQ transactions carry it.
+            hdr, data, tr_type, *_ = transaction
         except (ValueError, TypeError) as e:
             self.log.error(f"_driver_send: Failed to unpack transaction {transaction!r}: {e}")
             raise
@@ -349,7 +350,7 @@ class AvstCreditRequester(BusDriver):
                     dcrdt = self._data_creditor.get_credits(trans_type.value)
 
                     if (hcrdt > self._min_hcrdt) and (dcrdt > self._min_dcrdt):
-                        hdr, data, tr_type = transaction
+                        hdr, data, tr_type, *_ = transaction
 
                         self._header_creditor.update_credits(trans_type.value, 1)
 
