@@ -35,7 +35,7 @@ class speed extends base;
                                   CC_MFB_META_WIDTH)::type_id::set_inst_override(
             uvm_mfb::sequence_lib_tx_speed
                 #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, CC_MFB_META_WIDTH)::get_type(),
-            "m_env.m_env_cq.*", this
+            "m_env.m_env_cc.*", this
         );
 
         m_env = uvm_mtc::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, DEVICE, ENDPOINT_TYPE,
