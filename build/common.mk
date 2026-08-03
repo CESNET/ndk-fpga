@@ -81,15 +81,29 @@ ghdl-sim: $(MOD)
 	ghdl -r -v --workdir=$(GHDL_WORK_DIR) -P$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) $(TOP_LEVEL_ENT_LC) --vpi=$(shell cocotb-config --lib-name-path vpi ghdl) --asserts=disable --vcd=$(OUTPUT_NAME).vcd
 
 NVC_LOAD ?=
+# Wave dumping (FST + gtkw + arrays); enable with WAVES=1.
+NVC_WAVE_FLAGS ?=
+ifeq ($(WAVES),1)
+NVC_WAVE_FLAGS := -w --dump-arrays -g
+# Keep hierarchical signals visible in gtkwave (also better for some small
+# cocotb-heavy designs, but ~4x slower on large toplevel sims).
+NVC_NO_COLLAPSE ?= 1
+endif
+# Default: allow signal collapse + -O3 (much faster on large designs).
+# Set NVC_NO_COLLAPSE=1 for wave debug or if a small TB regresses.
+NVC_ELAB_FLAGS ?= -O3
+ifeq ($(NVC_NO_COLLAPSE),1)
+NVC_ELAB_FLAGS += --no-collapse
+endif
 nvc-sim: NVC_LOAD=--load $(shell cocotb-config --lib-name-path vhpi nvc)
 nvc-sim: nvc
 
 nvc: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
 	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
-	@nvc --work=nvcwork -H 1G -M 4G -e --no-collapse $(TOP_LEVEL_ENT_LC)
+	@nvc --work=nvcwork -H 1G -M 4G -e $(NVC_ELAB_FLAGS) $(TOP_LEVEL_ENT_LC)
 	@MODULE=$(COCOTB_MODULE) COCOTB_TEST_MODULES=$(COCOTB_MODULE) PYGPI_PYTHON_BIN=$(shell cocotb-config --python-bin) TOPLEVEL=$(TOP_LEVEL_ENT_LC) TOPLEVEL_LANG=vhdl $(NETCOPE_ENV) COCOTB_RESOLVE_X=ZEROS \
-	nvc --work=nvcwork -H 1G -M 4G -rw $(TOP_LEVEL_ENT_LC) --dump-arrays -g --ieee-warnings=off $(NVC_LOAD)
+	nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
 
 else
 .PHONY: $(GEN_MK_NAME)
