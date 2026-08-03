@@ -1,14 +1,27 @@
-def common_card_test_run(CARD_NAME, failed) {
+def combo_label(CARD_NAME, DMA_TYPE, PCIE_CONF) {
+    def parts = []
+    if (DMA_TYPE)  parts.add("DMA_TYPE=$DMA_TYPE")
+    if (PCIE_CONF) parts.add("PCIE_CONF=$PCIE_CONF")
+    return parts ? "${CARD_NAME} (${parts.join(', ')})" : CARD_NAME
+}
+
+def common_card_test_run(CARD_NAME, failed, DMA_TYPE = null, PCIE_CONF = null, label = null) {
+    label = label ?: combo_label(CARD_NAME, DMA_TYPE, PCIE_CONF)
+    def extraArgs = []
+    if (DMA_TYPE)  extraArgs.add("DMA_TYPE=$DMA_TYPE")
+    if (PCIE_CONF) extraArgs.add("PCIE_CONF=$PCIE_CONF")
+    def makeArgs = extraArgs.join(" ")
+
     try {
         sh """
         source venv-fpga/bin/activate
-        make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\" BMC_ENABLE=0
+        make -C apps/minimal/tests/cocotb CARD=$CARD_NAME SIM_FLAGS=\"-c -do quit\" BMC_ENABLE=0 $makeArgs
         """
     } catch (err) {
-        echo "Error detected, firmware build failed for $CARD_NAME!"
+        echo "Error detected, firmware build failed for $label!"
         currentBuild.result = 'FAILURE'
         currentStage.result = 'FAILURE'
-        failed.add("$CARD_NAME")
+        failed.add("$label")
         return
     }
 
@@ -17,14 +30,20 @@ def common_card_test_run(CARD_NAME, failed) {
 
     // Track failed tests based on actual test results
     if (testResult.failCount > 0) {
-        echo "Tests failed for $CARD_NAME (${testResult.failCount} failures), build marked as UNSTABLE"
+        echo "Tests failed for $label (${testResult.failCount} failures), build marked as UNSTABLE"
         currentBuild.result = 'UNSTABLE'
         currentStage.result = 'UNSTABLE'
-        failed.add("$CARD_NAME")
+        failed.add("$label")
     }
 }
 
 def CARDS = ["alveo-u200", "alveo-u55c", "vcu118", "ia-420f", "n6010", "fb2cghh", "fb4cgg3", "fb2cdg1", "nfb-200g2ql", "dk-dev-1sdx-p", "g35p", "nt200a02", "agi-fh400g", "a2700", "ia-440i"]
+
+// Additional (card, DMA_TYPE, PCIE_CONF) combinations to test on top of each card's defaults
+def EXTRA_COMBINATIONS = [
+    [card: "fb2cghh", dmaType: "4"],
+    [card: "ia-440i", pcieConf: "1xGen5x16"],
+]
 
 node("preklad") {
     currentBuild.result = 'SUCCESS'
@@ -60,6 +79,22 @@ node("preklad") {
             echo "Error detected, test stage failed for $card_name!"
             currentBuild.result = 'FAILURE'
             failed.add("$card_name")
+        }
+    }
+
+    for (combo in EXTRA_COMBINATIONS) {
+        def card_name = combo.card
+        def label = combo_label(card_name, combo.dmaType, combo.pcieConf)
+        try {
+            timeout(time: 1, unit: 'HOURS') {
+                stage("Run test: $label") {
+                    common_card_test_run(card_name, failed, combo.dmaType, combo.pcieConf, label)
+                }
+            }
+        } catch(err) {
+            echo "Error detected, test stage failed for $label!"
+            currentBuild.result = 'FAILURE'
+            failed.add("$label")
         }
     }
 

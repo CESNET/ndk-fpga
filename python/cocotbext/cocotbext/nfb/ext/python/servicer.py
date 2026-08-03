@@ -65,14 +65,15 @@ class Servicer(ext.AbstractNfb):
 
     def get_node_base(self, bus_node, node):
         m = re.search(r'PCI(?P<pci>\d+),BAR(?P<bar>\d+)', bus_node.get_property("resource").value)
-        pci, _ = int(m.group('pci')), int(m.group('bar'))
+        pci, bar = int(m.group('pci')), int(m.group('bar'))
         mi = self._device.mi[pci]
-        return (mi, node.get_property("reg")[0])
+        bus_opts = {'bar': bar}
+        return (mi, node.get_property("reg")[0], bus_opts)
 
     @cocotb.task.resume
     async def read(self, bus_node, node, offset, nbyte):
-        mi, base = self.get_node_base(bus_node, node)
-        data = await mi.read(offset, nbyte)
+        mi, base, bus_opts = self.get_node_base(bus_node, node)
+        data = await mi.read(offset, nbyte, bus_opts=bus_opts)
         if data is None:
             data = bytes()
         self._log.debug(f"MI read : size: {nbyte:>2}, offset: {offset:04x}, path: {node.path}/{node.name}, data: {data.hex()}")
@@ -80,7 +81,7 @@ class Servicer(ext.AbstractNfb):
 
     @cocotb.task.resume
     async def write(self, bus_node, node, offset, data):
-        mi, base = self.get_node_base(bus_node, node)
+        mi, base, bus_opts = self.get_node_base(bus_node, node)
         nbyte = len(data)
         self._log.debug(f"MI write: size: {nbyte:>2}, offset: {offset:04x}, path: {node.path}/{node.name}, data: {data.hex()}")
-        await mi.write(offset, data)
+        await mi.write(offset, data, bus_opts=bus_opts)

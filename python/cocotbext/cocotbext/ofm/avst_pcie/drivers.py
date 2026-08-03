@@ -49,6 +49,8 @@ class AvstPcieDriverMaster(BusDriver):
         self._empty_width = len(self.bus.EMPTY) // self._segs
         self._hdr_width = len(self.bus.HDR) // self._segs
         self._avst_width = (len(self.bus.DATA) // 8) // self._segs
+        # BAR_RANGE is optional (absent on some AVST variants).
+        self._bar_range_width = (len(self.bus.BAR_RANGE) // self._segs) if hasattr(self.bus, "BAR_RANGE") else 0
         self._seg_current = 0
 
         cocotb.start_soon(self.send_transaction())
@@ -58,7 +60,7 @@ class AvstPcieDriverMaster(BusDriver):
             setattr(self.bus, sig, 0)
 
     def prep_words(self, tr, send):
-        data, hdr, hdr_empty = tr
+        data, hdr, hdr_empty, bar = tr
         tr_words = []
         orig_data_len = len(data)
         end = False
@@ -72,6 +74,8 @@ class AvstPcieDriverMaster(BusDriver):
             self._word["HDR"] |= (hdr.serialize() if begin else hdr_empty.serialize()) << (self._seg_current * self._hdr_width)
             self._word["SOP"] |= (1 if begin else 0) << self._seg_current
             self._word["EOP"] |= (1 if end else 0) << self._seg_current
+            if "BAR_RANGE" in self._word:
+                self._word["BAR_RANGE"] |= (bar if begin else 0) << (self._seg_current * self._bar_range_width)
 
             self._seg_current += 1
             data = data[length:]
@@ -174,17 +178,20 @@ class AvstPcieDriverMaster(BusDriver):
         # handle valid transaction
         else:
             try:
-                hdr, data, tr_type = transaction
+                # bar is optional (defaults to 0, i.e. BAR0): RC transactions don't
+                # target a BAR and never provide it; CQ transactions may.
+                hdr, data, tr_type, *rest = transaction
+                bar = rest[0] if rest else 0
             except (ValueError, TypeError) as e:
-                raise ValueError("Transaction must be an iterable with exactly 3 items: (hdr, data, tr_type)") from e
+                raise ValueError("Transaction must be an iterable with 3 or 4 items: (hdr, data, tr_type[, bar])") from e
 
             match tr_type:
                 case 0:  # CQ transaction
                     hdr_empty = CqHdrEmpty()
-                    self._cq_q.put_nowait((data, hdr, hdr_empty))
+                    self._cq_q.put_nowait((data, hdr, hdr_empty, bar))
                 case 1:  # RC transaction
                     hdr_empty = RcHdrEmpty()
-                    self._rc_q.put_nowait((data, hdr, hdr_empty))
+                    self._rc_q.put_nowait((data, hdr, hdr_empty, bar))
                 case _:
                     raise NotImplementedError(f"Unknown transaction type: {tr_type}")
 
