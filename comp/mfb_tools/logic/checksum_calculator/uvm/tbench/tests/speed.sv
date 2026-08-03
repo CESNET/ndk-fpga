@@ -50,9 +50,12 @@ class speed extends uvm_test;
             this
         );
 
-        uvm_mvb::sequence_lib_tx#(MFB_REGIONS, MVB_DATA_WIDTH)::type_id::set_inst_override(
-                uvm_mvb::sequence_lib_tx_speed#(MFB_REGIONS, MVB_DATA_WIDTH)::get_type(),
-                {this.get_full_name(), ".m_env.m_env_rx.*"}
+        `ndk_override_params(
+            uvm_mvb::sequence_lib_tx,
+            uvm_mvb::sequence_lib_tx_speed,
+            #(MFB_REGIONS, MVB_DATA_WIDTH+1+MFB_META_WIDTH),
+            "m_env.m_env_tx_mvb.*",
+            this
         );
 
         // Initializing the reference to the environment

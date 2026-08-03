@@ -81,7 +81,7 @@ entity FRAME_UNPACKER is
         RESET          : in  std_logic;
 
         -- =====================================================================
-        --  TX MVB Headers (per each SuperPacket)
+        --  RX MVB Headers (per each SuperPacket)
         -- =====================================================================
 
         RX_MVB_DATA    : in  std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
@@ -699,8 +699,8 @@ begin
             DEVICE          => DEVICE
         )
         port map (
-            CLK   => CLK,
-            RESET => RESET,
+            CLK         => CLK,
+            RESET       => RESET,
 
             RX_DATA     => rx_op_data    (s),
             RX_META     => rx_op_meta    (s),
@@ -769,8 +769,8 @@ begin
                 DEVICE          => DEVICE
             )
             port map (
-                CLK   => CLK,
-                RESET => RESET,
+                CLK         => CLK,
+                RESET       => RESET,
 
                 RX_DATA     => rx_sc_data    (s)(r),
                 RX_META     => rx_sc_meta    (s)(r),
@@ -854,8 +854,8 @@ begin
         INTERNAL_REG   => true
     )
     port map (
-        CLK   => CLK,
-        RESET => RESET,
+        CLK             => CLK,
+        RESET           => RESET,
 
         RX_DATA         => slv_array_ser(u_arr_to_slv_arr(last_op_updated_offset)),
         RX_VLD          => last_op_updated_sof,
@@ -1040,8 +1040,8 @@ begin
         EXTRACTED_OFFSET => 0
     )
     port map (
-        CLK   => CLK,
-        RESET => RESET,
+        CLK        => CLK,
+        RESET      => RESET,
 
         RX_DATA    => indv_pkt_data,
         RX_META    => indv_pkt_last_eof,
@@ -1113,8 +1113,8 @@ begin
         DEVICE         => DEVICE
     )
     port map (
-        CLK   => CLK,
-        RESET => RESET,
+        CLK         => CLK,
+        RESET       => RESET,
 
         RX0_DATA    => getit_indv_hdr_data,
         RX0_VLD     => getit_indv_hdr_vld,
@@ -1148,11 +1148,11 @@ begin
         -- ------------------
         mfb_fifox_i2 : entity work.MFB_FIFOX
         generic map (
-            REGIONS     => MFB_REGIONS,
-            REGION_SIZE => MFB_REGION_SIZE,
-            BLOCK_SIZE  => MFB_BLOCK_SIZE,
-            ITEM_WIDTH  => MFB_ITEM_WIDTH,
-            META_WIDTH  => 0,
+            REGIONS             => MFB_REGIONS,
+            REGION_SIZE         => MFB_REGION_SIZE,
+            BLOCK_SIZE          => MFB_BLOCK_SIZE,
+            ITEM_WIDTH          => MFB_ITEM_WIDTH,
+            META_WIDTH          => 0,
 
             FIFO_DEPTH          => 512,
             RAM_TYPE            => "AUTO",
@@ -1161,8 +1161,8 @@ begin
             ALMOST_EMPTY_OFFSET => 0
         )
         port map (
-            CLK => CLK,
-            RST => RESET,
+            CLK        => CLK,
+            RST        => RESET,
 
             RX_DATA    => getit_indv_pkt_data,
             RX_META    => (others => '0'),
@@ -1173,14 +1173,14 @@ begin
             RX_SRC_RDY => getit_indv_pkt_src_rdy2,
             RX_DST_RDY => getit_indv_pkt_dst_rdy,
 
-            TX_DATA     => fifox_indv_pkt_data,
-            TX_META     => open,
-            TX_SOF_POS  => fifox_indv_pkt_sof_pos,
-            TX_EOF_POS  => fifox_indv_pkt_eof_pos,
-            TX_SOF      => fifox_indv_pkt_sof,
-            TX_EOF      => fifox_indv_pkt_eof,
-            TX_SRC_RDY  => fifox_indv_pkt_src_rdy,
-            TX_DST_RDY  => fifox_indv_pkt_dst_rdy
+            TX_DATA    => fifox_indv_pkt_data,
+            TX_META    => open,
+            TX_SOF_POS => fifox_indv_pkt_sof_pos,
+            TX_EOF_POS => fifox_indv_pkt_eof_pos,
+            TX_SOF     => fifox_indv_pkt_sof,
+            TX_EOF     => fifox_indv_pkt_eof,
+            TX_SRC_RDY => fifox_indv_pkt_src_rdy,
+            TX_DST_RDY => fifox_indv_pkt_dst_rdy
         );
 
         -- -------------
@@ -1197,36 +1197,37 @@ begin
         -- ---------------
         metadata_insertor_i : entity work.METADATA_INSERTOR
         generic map (
-            MVB_ITEMS            => MFB_REGIONS,
-            MVB_ITEM_WIDTH       => MERGED_ITEMS_WIDTH,
+            MVB_ITEMS       => MFB_REGIONS,
+            MVB_ITEM_WIDTH  => MERGED_ITEMS_WIDTH,
 
-            MFB_REGIONS          => MFB_REGIONS,
-            MFB_REGION_SIZE      => MFB_REGION_SIZE,
-            MFB_BLOCK_SIZE       => MFB_BLOCK_SIZE,
-            MFB_ITEM_WIDTH       => MFB_ITEM_WIDTH,
-            MFB_META_WIDTH       => 0,
+            MFB_REGIONS     => MFB_REGIONS,
+            MFB_REGION_SIZE => MFB_REGION_SIZE,
+            MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
+            MFB_META_WIDTH  => 0,
 
-            INSERT_MODE   => META_OUT_MODE,
-            MVB_FIFO_SIZE => 32,
-            DEVICE        => DEVICE
+            INSERT_MODE     => META_OUT_MODE,
+            MVB_FIFO_SIZE   => 32,
+            MVB_FIFOX_MULTI => True,
+            DEVICE          => DEVICE
         )
         port map (
-            CLK   => CLK,
-            RESET => RESET,
+            CLK             => CLK,
+            RESET           => RESET,
 
-            RX_MVB_DATA    => fifox_indv_hdr_data,
-            RX_MVB_VLD     => fifox_indv_hdr_vld,
-            RX_MVB_SRC_RDY => fifox_indv_hdr_src_rdy,
-            RX_MVB_DST_RDY => fifox_indv_hdr_dst_rdy,
+            RX_MVB_DATA     => fifox_indv_hdr_data,
+            RX_MVB_VLD      => fifox_indv_hdr_vld,
+            RX_MVB_SRC_RDY  => fifox_indv_hdr_src_rdy,
+            RX_MVB_DST_RDY  => fifox_indv_hdr_dst_rdy,
 
-            RX_MFB_DATA    => fifox_indv_pkt_data,
-            RX_MFB_META    => (others => '0'),
-            RX_MFB_SOF_POS => fifox_indv_pkt_sof_pos,
-            RX_MFB_EOF_POS => fifox_indv_pkt_eof_pos,
-            RX_MFB_SOF     => fifox_indv_pkt_sof,
-            RX_MFB_EOF     => fifox_indv_pkt_eof,
-            RX_MFB_SRC_RDY => fifox_indv_pkt_src_rdy,
-            RX_MFB_DST_RDY => fifox_indv_pkt_dst_rdy,
+            RX_MFB_DATA     => fifox_indv_pkt_data,
+            RX_MFB_META     => (others => '0'),
+            RX_MFB_SOF_POS  => fifox_indv_pkt_sof_pos,
+            RX_MFB_EOF_POS  => fifox_indv_pkt_eof_pos,
+            RX_MFB_SOF      => fifox_indv_pkt_sof,
+            RX_MFB_EOF      => fifox_indv_pkt_eof,
+            RX_MFB_SRC_RDY  => fifox_indv_pkt_src_rdy,
+            RX_MFB_DST_RDY  => fifox_indv_pkt_dst_rdy,
 
             TX_MFB_DATA     => metains_indv_pkt_data,
             TX_MFB_META     => open,
@@ -1291,8 +1292,8 @@ begin
         CUTTED_ITEMS   => HEADER_LENGTH
     )
     port map (
-        CLK   => CLK,
-        RESET => RESET,
+        CLK        => CLK,
+        RESET      => RESET,
 
         RX_DATA    => metains_indv_pkt_data,
         RX_META    => metains_indv_pkt_hdr,

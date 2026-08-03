@@ -41,6 +41,13 @@ class speed extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
+        uvm_logic_vector_mvb::sequence_lib_rx
+            #(MFB_REGIONS, MVB_ITEM_WIDTH)::type_id::set_inst_override(
+            uvm_logic_vector_mvb::sequence_lib_rx_speed
+                #(MFB_REGIONS, MVB_ITEM_WIDTH)::get_type(),
+            {this.get_full_name(), ".m_env.m_env_rx_mvb.*"}
+        );
+
         uvm_logic_vector_array_mfb::sequence_lib_rx
             #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, 0)::type_id::set_inst_override(
             uvm_logic_vector_array_mfb::sequence_lib_rx_speed
