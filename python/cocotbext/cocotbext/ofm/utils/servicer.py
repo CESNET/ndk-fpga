@@ -7,11 +7,16 @@ import logging
 import cocotb
 import nfb.ext.python as ext
 
+from cocotbext.nfb.ext.python.exception_bridge import bridge, install_exception_bridge
+
+__all__ = ["Servicer", "bridge"]
+
 
 class Servicer(ext.AbstractNfb):
     def __init__(self, device, dtb, *args, **kwargs):
         self._log = logging.getLogger(__name__)
         self._device = device
+        install_exception_bridge()
         super().__init__(dtb)
 
     def get_node_base(self, bus_node, node):
