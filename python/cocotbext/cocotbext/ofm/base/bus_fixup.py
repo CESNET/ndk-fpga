@@ -256,11 +256,21 @@ if cocotb.__version__ >= "2.0.0":
                 self._handle.set(Immediate(val))
 
         def set(self, value):
-            self._handle.set(value)
+            if self._array_idx is None:
+                self._handle.set(value)
+                return
+
+            # Update only this slice
+            full_val = self._handle.value
+            if isinstance(value, (Deposit, Immediate)):
+                full_val[self._array_idx] = value.value
+            else:
+                full_val[self._array_idx] = value
+            self._handle.set(Immediate(full_val))
 
         def setimmediatevalue(self, value):
             warnings.warn("Method setimmediatevalue(value) is deprecated in cocotb 2.0, use set(Immediate(value)) instead.", DeprecationWarning)
-            self._handle.set(Immediate(value))
+            self.set(Immediate(value))
 
     class BusProxy:
         def __init__(self, bus: Bus, array_idx: Optional[int] = None):
