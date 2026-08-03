@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-CARD = fb2cghh
+CARD ?= fb2cghh
 TARGET = cocotb
 TOP_LEVEL_ENT=fpga
 
