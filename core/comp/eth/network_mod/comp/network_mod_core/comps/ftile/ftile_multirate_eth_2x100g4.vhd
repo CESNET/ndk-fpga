@@ -410,7 +410,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_2X100G4 is
     signal ftile_tx_mac_error      : std_logic_vector(MAC_ERROR_TX_WIDTH  -1 downto 0);
 
     -- For QuestaSim
-    signal ftile_tx_mac_ready_dummy : std_logic_vector(4-1 downto 0);
+    signal ftile_tx_mac_ready_dummy : std_logic_vector(3-1 downto 0);
 
     -- signals from mac output of IP core to Component Out
     signal ftile_rx_mac_data       : std_logic_vector(MAC_DATA_WIDTH      -1 downto 0);
@@ -422,7 +422,7 @@ architecture FULL of FTILE_MULTIRATE_ETH_2X100G4 is
     signal ftile_rx_mac_status     : std_logic_vector(MAC_STATUS_WIDTH    -1 downto 0);
 
     -- For QuestaSim
-    signal ftile_rx_mac_valid_dummy : std_logic_vector(4-1 downto 0);
+    signal ftile_rx_mac_valid_dummy : std_logic_vector(3-1 downto 0);
 
     signal mgmt_pcs_reset   : std_logic; -- not used
     signal mgmt_pma_reset   : std_logic;

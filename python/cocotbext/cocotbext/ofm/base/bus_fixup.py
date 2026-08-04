@@ -174,7 +174,8 @@ if cocotb.__version__ >= "2.0.0":
             return cls._instances[key]
 
         def __init__(self, handle, array_idx):
-            super().__init__(handle._handle, handle._path)
+            # Indexed path so cocotb2path / edge-trigger keys resolve the bit, not the parent vector
+            super().__init__(handle._handle, f"{handle._path}[{array_idx}]")
             self._lao_handle = handle
             self._array_idx = array_idx
 
@@ -228,6 +229,8 @@ if cocotb.__version__ >= "2.0.0":
 
         @property
         def _path(self):
+            if self._array_idx is not None:
+                return f"{self._handle._path}[{self._array_idx}]"
             return self._handle._path
 
         @property
@@ -253,11 +256,21 @@ if cocotb.__version__ >= "2.0.0":
                 self._handle.set(Immediate(val))
 
         def set(self, value):
-            self._handle.set(value)
+            if self._array_idx is None:
+                self._handle.set(value)
+                return
+
+            # Update only this slice
+            full_val = self._handle.value
+            if isinstance(value, (Deposit, Immediate)):
+                full_val[self._array_idx] = value.value
+            else:
+                full_val[self._array_idx] = value
+            self._handle.set(Immediate(full_val))
 
         def setimmediatevalue(self, value):
             warnings.warn("Method setimmediatevalue(value) is deprecated in cocotb 2.0, use set(Immediate(value)) instead.", DeprecationWarning)
-            self._handle.set(Immediate(value))
+            self.set(Immediate(value))
 
     class BusProxy:
         def __init__(self, bus: Bus, array_idx: Optional[int] = None):

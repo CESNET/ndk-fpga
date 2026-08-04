@@ -197,7 +197,7 @@ for i in range(DMA_ENDPOINTS):
     DmaUpMvbBus(core.dma_i, 'PCIE_RQ_MVB', i).add_wave(groups=["DMA2PCIe", "RQ MVB", i], expand=[2, 3])
     MfbBus(core.dma_i, 'PCIE_RQ_MFB', i).add_wave(groups=["DMA2PCIe", "RQ MFB", i], expand=[2])
     DmaDownMvbBus(core.dma_i, 'PCIE_RC_MVB', i).add_wave(groups=["DMA2PCIe", "RC MVB", i], expand=[2, 3])
-    MfbBus(core.dma_i, 'PCIE_RQ_MFB', i).add_wave(groups=["DMA2PCIe", "RC MFB", i], expand=[2])
+    MfbBus(core.dma_i, 'PCIE_RC_MFB', i).add_wave(groups=["DMA2PCIe", "RC MFB", i], expand=[2])
 
 clk_eth = SignalProxy(core.app_i.CLK_ETH, 0)
 
