@@ -194,6 +194,51 @@ receiver to accept incoming data.
           no frames inside. Whether this is the case or the word is empty, is
           indicated by the `SRC_RDY` signal.
 
+.. _mfb-design-considerations:
+
+Design considerations
+---------------------
+When designing a module with MFB interfaces, some handshaking schemes can
+create combinational loops or deadlock the transmission. Others can cause
+data loss or duplication. The following rules ensure that such problems don't
+occur.
+
+1. A handshake (data transfer between transmitter and receiver) occurs on a
+   clock's rising edge when `SRC_RDY` and `DST_RDY` are both high. The receiver must
+   accept the data on this clock cycle. The transmitter must provide new data
+   the following clock cycle, or deassert `SRC_RDY`.
+
+2. When the offered data are valid (`SRC_RDY=1`), they must remain unchanged until
+   received by the receiver driving `DST_RDY` high. Before that happens, `SRC_RDY`
+   also must not change value (drop low).
+
+3. The transmitter is not allowed to wait for `DST_RDY=1` before driving
+   `SRC_RDY` high. It must provide valid data as soon as it can after the
+   previous data were accepted by the receiver. In other words, both
+   combinatorial and sequential dependencies of `SRC_RDY` on `DST_RDY` are
+   forbidden.
+
+4. There are no limitations on how the receiver may set `DST_RDY`. It can even
+   be dependent on `SRC_RDY`; however, this situation must be documented.
+
+5. The above rules apply mainly to a component's input and output MFB
+   interfaces. A component may internally deviate from these rules in a
+   sensible and justifiable manner, as long as it does not affect its behavior
+   to the outside.
+
+6. Any deviations from the rules above must be documented. This also applies to
+   any sort of unexpected behavior. Place it either in the description above
+   the component or inside its readme.
+
+.. note:: The behavior described in Rule#3 can be achieved in a couple of ways.
+          Some examples are: a register at the output enabled by
+          `DST_RDY=1 or SRC_RDY=0`, an :ref:`(MFB) PIPE <mfb_pipe>` with generic
+          `USE_DST_RDY=True`, an :ref:`(MFB) FIFO <mfb_fifox>`, etc. However, it
+          would be useful for optimization purposes if there were an option to
+          use just a simple, DST_RDY-enabled output register. The usage of such
+          goes against this rule but a wise user can utilize it for better
+          performance (meeting the timing constraints). Due to this reason, it
+          should be disabled by default.
 
 Timing diagrams
 ---------------
