@@ -207,6 +207,39 @@ make SIM_FLAGS=-c  # CLI mode (no GUI)
 
 ### 8. Debug Patterns
 
+#### Probing Internal DUT Signals (No Waveform GUI)
+
+Agents don't have access to a waveform viewer, so the idiomatic human debugging path (`cocotb_test_sig.fdo` +
+Questa/GTKWave, see [`doc/source/basic_cocotb_test.rst`](doc/source/basic_cocotb_test.rst)) isn't usable. Instead,
+for low-level RTL debugging (e.g. finding which FSM state or handshake signal is stuck), read internal hierarchy
+signals directly for a few clock cycles and log them — faster than adding new driver/monitor wiring, and it doesn't
+require a display. The `dut` handle passed into every `@cocotb.test()` exposes the whole design hierarchy by
+attribute access, and VHDL `for`/`generate` blocks are indexed (e.g. `some_g[0]`).
+
+How far you have to walk down from `dut` to reach the signal depends on which kind of simulation you're in:
+
+- **Component-level test** (`comp/**/cocotb/`): `dut` *is* the component under test (`TOP_LEVEL_ENT` in the
+  `Makefile`), so internal signals are reached directly, e.g. `dut.some_instance_i.some_signal.value`.
+- **Top-level simulation** (`apps/minimal/tests/cocotb/`, see
+  [`doc/source/top_level_simulation.rst`](doc/source/top_level_simulation.rst)): `dut` is the *entire card's*
+  top-level entity, so there's an extra card-specific wrapper level to cross first.
+  `NFBDevice.core_instance_from_top(dut)` resolves it and is a convenient, card-portable starting point; from there,
+  instance names follow the VHDL source exactly, same as above.
+
+```python
+from cocotb.triggers import RisingEdge
+
+for _ in range(60):
+    await RisingEdge(dut.CLK)
+    logger.info("%s", dut.some_instance_i.some_signal.value)
+```
+
+Grep the relevant `.vhd` file for the instance/signal name first (the same instance names also appear in the
+simulator transcript, e.g. in region/process warnings — a quick way to confirm a path). This only works with
+simulators exposing full hierarchy access (Questa/FLI, NVC); signals inside heavily optimized/synthesized paths may
+not be visible. To iterate quickly while doing this, restrict the run to one test with `COCOTB_TEST_FILTER` (see
+[`doc/source/cocotb_tips_and_tricks.rst`](doc/source/cocotb_tips_and_tricks.rst)).
+
 #### Comments Guidelines
 
 **Write only comments that explain WHY, not WHAT.** Good code should be mostly self-explanatory.
@@ -319,7 +352,8 @@ def parse_mvb_meta(tr: MvbTrClassic) -> MvbMetadata:
 
 ### 11. Additional Documentation
 
-- **Cocotb basics**: [`doc/source/basic_cocotb_test.rst`](doc/source/basic_cocotb_test.rst)
+- **Cocotb basics (component-level)**: [`doc/source/basic_cocotb_test.rst`](doc/source/basic_cocotb_test.rst)
+- **Whole-firmware / top-level simulation**: [`doc/source/top_level_simulation.rst`](doc/source/top_level_simulation.rst) — different setup (`NFBDevice`, `CARD`/`DMA_TYPE`/`PCIE_CONF`); this skill is otherwise component-level-focused
 - **Cocotbext-NDK detailed**: [`doc/source/cocotbext.rst`](doc/source/cocotbext.rst)
 - **Tips & Tricks**: [`doc/source/cocotb_tips_and_tricks.rst`](doc/source/cocotb_tips_and_tricks.rst)
 - **Bus documentation**: [`doc/source/mi.rst`](doc/source/mi.rst), [`doc/source/mfb.rst`](doc/source/mfb.rst), [`doc/source/mvb.rst`](doc/source/mvb.rst), [`doc/source/axi.rst`](doc/source/axi.rst)
