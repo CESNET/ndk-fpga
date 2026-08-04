@@ -54,14 +54,15 @@ async def test_mi_access_unaligned(dut):
             assert data == rdata, f"{list(data)}, {list(rdata)}"
 
 
-@cocotb.test(timeout_time=50, timeout_unit='us', skip=False)
+@cocotb.test(timeout_time=100, timeout_unit='us', skip=False)
 async def test_enable_rxmac_and_check_status(dut):
     dev, nfb = await get_dev(dut)
 
     mac = nfb.eth[0].rxmac
     await e(mac.enable)()
     await e(mac.is_enabled)()
-    await e(nfb.ndp.rx[0].read_stats)()
+    for rx in nfb.ndp.rx:
+        await e(rx.read_stats)()
 
 
 @cocotb.test(timeout_time=100, timeout_unit='us', skip=False)
@@ -158,6 +159,36 @@ async def _test_ndp_sendmsg_burst(dut, dev=None, nfb=None):
     assert stats['passed'] == len(pkts), f"{stats['passed']}"
 
 
+async def _test_ndp_sendmsg_all_channels(dut, dev=None, nfb=None):
+    """Sends one packet on every TX DMA channel present in the design."""
+    if dev is None:
+        dev, nfb = await get_dev(dut)
+
+    for eth in nfb.eth:
+        await e(eth.txmac.reset_stats)()
+        await e(eth.txmac.enable)()
+
+    for i, tx in enumerate(dev._eth_tx_monitor):
+        def eth_tx_monitor_cb(i, p):
+            logger.debug(f"tx_eth{i} packet transmitted: len={len(p)}, data={bytes(p).hex()}")
+        tx.add_callback(partial(eth_tx_monitor_cb, i))
+
+    count = 1
+    total_dma = 0
+    for i in range(count):
+        pkt = bytes([(i % 256) for i in range(72 + i)])
+        for tx in nfb.ndp.tx:
+            await e(tx.sendmsg)([(pkt, bytes(), 0)])
+            total_dma += 1
+
+    await Timer(20, unit='us')
+    total_txmac = 0
+    for eth in nfb.eth:
+        stats = await e(eth.txmac.read_stats)()
+        total_txmac += stats['passed']
+    assert total_txmac == total_dma, f"Packet count mismatch: {total_txmac}, expected {total_dma}"
+
+
 @cocotb.test(timeout_time=400, timeout_unit='us', skip=False)
 async def test_ndp_send_msgs(dut):
     dev, nfb = await get_dev(dut)
@@ -165,6 +196,7 @@ async def test_ndp_send_msgs(dut):
     # FIXME: tests doesn't shuts DMA
     await _test_ndp_sendmsg(dut, dev, nfb)
     await _test_ndp_sendmsg(dut, dev, nfb)
+    await _test_ndp_sendmsg_all_channels(dut, dev, nfb)
     await _test_ndp_sendmsg_burst(dut, dev, nfb)
 
 
