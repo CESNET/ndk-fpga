@@ -20,19 +20,19 @@ entity TCAM2 is
         DATA_WIDTH         : integer := 36;
 
         -- TCAM2 storage capacity
-        --     for XILINX (7SERIES, ULTRASCALE) optimal is a multiple of 2*L*(2^RS), where L is number of LUTRAMs in each SLICEM
-        --     for INTEL (ARRIA10, STRATIX10) optimal is a multiple of 16*(2^RS), if memory fragmentation is not enabled, otherwise a multiple of 32*(2^RS)
+        --     for XILINX (7SERIES, ULTRASCALE, VERSAL) optimal is a multiple of 2*L*(2^RS), where L is number of LUTRAMs in each SLICEM
+        --     for INTEL (ARRIA10, STRATIX10, AGILEX) optimal is a multiple of 16*(2^RS), if memory fragmentation is not enabled, otherwise a multiple of 32*(2^RS)
         ITEMS              : integer := 16;
 
         -- TCAM2 resources saving
         --     higher level of resources saving means fewer FPGA resources involved and faster item write but slower matching
-        --     item write speed is 2^(6-RS) cycles for XILINX and 2^(5-RS)+1 cycles for INTEL FPGAs
-        --     maximum level of resources saving is 6 for XILINX and 5 for INTEL FPGAs
+        --     possible values range from 0 to 4
+        --     item write speed is 2^(5-RS)+1 cycles for all devices
         --     matching speed corresponds to 2^RS cycles
         RESOURCES_SAVING   : integer := 0;
 
         -- set as true if item write should have higher priority when requested in the same cycle as match
-        -- TCAM2 read has lower priority than write
+        -- TCAM2 read has lower priority than write (read does not interfere with match)
         WRITE_BEFORE_MATCH : boolean := true;
 
         -- set as true to enable read from TCAM2 by adding extra WRITE_DATA and WRITE_MASK storage
@@ -60,7 +60,7 @@ entity TCAM2 is
         IS_XILINX          : boolean := (DEVICE = "7SERIES" or DEVICE = "ULTRASCALE" or DEVICE = "VERSAL");
         IS_INTEL           : boolean := (DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX");
 
-        -- Optimal parameters by FPGA device
+        -- Optimal parameters by FPGA device (do not touch)
         INTEL_DATA_WIDTH   : integer := tsel(USE_FRAGMENTED_MEM, 20, 16);
         XILINX_DATA_WIDTH  : integer := tsel(DEVICE = "ULTRASCALE" or DEVICE = "VERSAL", tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4));
         MEMORY_ADDR_WIDTH  : integer := 5;
@@ -247,6 +247,48 @@ begin
     -- --------------------------------------------------------------------------
     --  Memory element
     -- --------------------------------------------------------------------------
+    --  Example (simplyfied):
+    --   DATA_WIDTH        = 10
+    --   ITEMS             = 8
+    --   MEMORY_ADDR_WIDTH = 5 (LUTRAM ADDR_WIDTH)
+    --   MEMORY_DATA_WIDTH = 4 (LUTRAM DATA_WIDTH)
+    --   CW (CELL_WIDTH)   = MEMORY_ADDR_WIDTH - RS
+    --   CH (CELL_HEIGHT)  = MEMORY_DATA_WIDTH * (2^RS)
+    --
+    --
+    --   CW                             CW
+    -- *-----*                        *----*
+    -- *-----*-----*  *   *      *    *----*----*----*  *
+    -- |     |     |  |   | ITEM |    |    |    |    |  |
+    -- *  C  *-----*  |   *      *    *    *----*----*  |
+    -- |  E  |     |  |               |    |    |    |  |
+    -- *  L  *-----*  | CH            *    *----*----*  |
+    -- |  L  |     |  |               |    |    |    |  |
+    -- *  0  *-----*  |        \\     * C  *----*----*  |
+    -- |     |     |  |   \\\\\\\\    | E  |    |    |  |
+    -- *-----*-----*  *   ////////    * L  *----*----*  | CH
+    -- |     |     |           //     | L  |    |    |  |
+    -- *-----*-----*                  * 1  *----*----*  |
+    -- |     |     |  RS=0  ->  RS=1  |    |    |    |  |
+    -- *-----*-----*                  *    *----*----*  |
+    -- |     |     |   4x        3x   |    |    |    |  |
+    -- *-----*-----*                  *    *----*----*  |
+    -- |     |     |                  |    |    |    |  |
+    -- *-----*-----*                  *----*----*----*  *
+    --
+    -- Principle:
+    --  Single memory element (CELL/LUTRAM) stores precomputed (masked wr_cnt) match
+    --  results for multi-ITEM fragments (1 bit per ITEM). With a fixed-depth LUTRAM (2^5 = 32 results):
+    --   ROWS    = ITEMS       / CELL_HEIGHT (RS=0 -> CH=MEMORY_DATA_WIDTH)
+    --   COLUMNS = DATA_WIDTH  / CELL_WIDTH  (RS=0 -> CW=MEMORY_ADDR_WIDTH)
+    --   CELLS   = ROWS * COLUMNS
+    --
+    -- RESOURCES_SAVING for the given CELL in the above example turns (ITEMS/2 * 2^5) to
+    -- (ITEMS * 2^4). The underlying LUTRAMs write only half of their available slots reducing overall
+    -- write latency while preserving the same match semantics in total. Write utilizes bits from
+    -- WRITE_ADDR port that direct the write to the appropriate region of the LUTRAM.
+    -- Match, on the other hand, must utilize an auxiliary sf_cnt as results for only
+    -- half of the stored ITEMS can be retrieved in a single CLK cycle.
 
     -- memory address
     mem_addr_g : for c in 0 to COLUMNS-1 generate
