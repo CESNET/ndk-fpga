@@ -27,22 +27,26 @@ class MVBDriver(BusDriver):
                     and "values" are their respective current values.
     """
 
-    _signals = ["vld", "src_rdy", "dst_rdy"]
-    _optional_signals = ["data", "meta", "addr", "discard", "length", "key"]
+    _signals = ["src_rdy", "dst_rdy"]
+    _optional_signals = ["data", "meta", "addr", "discard", "length", "key", "vld"]
 
     def __init__(self, entity, name, clock, array_idx=None) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
 
         self.__os = [s for s in self._optional_signals if hasattr(self.bus, s)]
+
+        if "vld" in self.__os:
+            self.__os.remove("vld")
+
         self.__item_cnt = 0
-        self.__items = len(self.bus.vld)
+        self.__items = len(self.bus.vld) if hasattr(self.bus, "vld") else 1
         self.__bus_isarray = isinstance(getattr(self.bus, self.__os[0]), ArrayObject)
         self.__item_widths = self._get_item_widths()
         self.__data = self._init_data()
+        self._items_sent = 0
 
         self._clear_control_signals()
-        self.bus.vld.value = 0
-        self.bus.src_rdy.value = 0
+        self._propagate_control_signals()
 
     @property
     def os(self) -> list:
@@ -67,6 +71,10 @@ class MVBDriver(BusDriver):
     def bus_isarray(self) -> bool:
         """Indicates whether the bus is a vector or an array."""
         return self.__bus_isarray
+
+    @property
+    def items_sent(self) -> int:
+        return self._items_sent
 
     def _get_item_widths(self) -> dict:
         """Make a dictionary of all optional signals on the bus and the width of each one's item."""
@@ -112,8 +120,10 @@ class MVBDriver(BusDriver):
                 for i in range(len(sig_obj)):
                     sig_obj[i].value = val[i]
 
-        self.bus.vld.value = self._vld
         self.bus.src_rdy.value = self._src_rdy
+
+        if hasattr(self.bus, "vld"):
+            self.bus.vld.value = self._vld
 
     async def _stack_items(self, **kwargs) -> None:
         """Concatenates transactions (MVB Items) to form a word on the bus"""
@@ -140,6 +150,8 @@ class MVBDriver(BusDriver):
             for _ in range(self.__items):
                 self._idle_gen.put(self._idle_tr)
             await self._clk_re
+
+        self._items_sent += 1
 
         self._clear_control_signals()
 
