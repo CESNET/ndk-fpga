@@ -26,16 +26,16 @@ class MVBMonitor(BusMonitor):
                   a subclass of the MvbTransaction class.
     """
 
-    _signals = ["vld", "src_rdy", "dst_rdy"]
-    _optional_signals = ["data", "meta", "addr", "discard", "length", "match"]
+    _signals = ["src_rdy", "dst_rdy"]
+    _optional_signals = ["data", "meta", "addr", "discard", "length", "match", "vld"]
 
     def __init__(self, entity, name, clock, array_idx=None, tr_type=bytes) -> None:
         super().__init__(entity, name, clock, array_idx=array_idx)
 
         self.__os = [s for s in self._optional_signals if hasattr(self.bus, s)]
         self.__item_cnt = 0
-        self.__items = len(self.bus.vld)
-        self.__bus_isarray = isinstance(getattr(self.bus, self.__os[0]), ArrayObject)
+        self.__items = len(self.bus.vld) if hasattr(self.bus, "vld") else 1
+        self.__bus_isarray = isinstance(getattr(self.bus, self.__os[0]), ArrayObject) if len(self.__os) > 0 else False
         self.__item_widths = self._get_item_widths()
         self.__item_width = sum(self.__item_widths.values())
         self.__tr_type = tr_type
@@ -139,7 +139,13 @@ class MVBMonitor(BusMonitor):
                 if issubclass(self.__tr_type, MvbTrClassicSerializable):
                     mvb_tr = self.__tr_type.deserialize(kwargs["data"])
                 else:
-                    mvb_tr = self.__tr_type(**kwargs)
+                    tr_attrs = kwargs
+
+                    if "vld" in tr_attrs.keys():
+                        del tr_attrs["vld"]
+
+                    mvb_tr = self.__tr_type(**tr_attrs)
+
                 self._recv(mvb_tr)
             vld >>= 1
 
@@ -155,6 +161,7 @@ class MVBMonitor(BusMonitor):
                 continue
 
             if self._is_valid_word(self.bus.src_rdy, self.bus.dst_rdy):
-                vld = self.bus.vld.value.to_unsigned()
-                self.__item_cnt += self.bus.vld.value.count("1")
+                vld_la = self.bus.vld.value if hasattr(self.bus, "vld") else LogicArray("1")
+                vld = vld_la.to_unsigned()
+                self.__item_cnt += vld_la.count("1")
                 self._recv_method(vld)
