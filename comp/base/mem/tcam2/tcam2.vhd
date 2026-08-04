@@ -416,14 +416,7 @@ begin
     wr_cnt_busy <= or wr_cnt;
     wr_cnt_last <= and wr_cnt;
     wr_cnt_en   <= wr_en_reg or wr_cnt_busy;
-
-    -- write ready logic
-    xilinx_wr_rdy_g : if MEMORY_DATA_WIDTH = 1 generate
-        wr_rdy <= (not wr_cnt_busy or wr_cnt_last) and not wr_en_reg;
-    end generate;
-    intel_wr_rdy_g : if MEMORY_DATA_WIDTH > 1 generate
-        wr_rdy <= not wr_cnt_busy and not wr_en_reg;
-    end generate;
+    wr_rdy      <= not wr_cnt_busy and not wr_en_reg;
 
     -- memory row address we decoder
     row_we_g : if ROWS > 1 generate
