@@ -1,8 +1,6 @@
-# cocotb_test.py:
+# SPDX-License-Identifier: BSD-3-Clause
 # Copyright (C) 2024-2026 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
-#
-# SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
 import sys
@@ -17,7 +15,9 @@ from cocotb_bus.scoreboard import Scoreboard
 
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
-from cocotbext.ofm.mvb.drivers import MVBDriver, MvbTrClassic
+from cocotbext.ofm.mfb.transaction import MfbTransaction
+from cocotbext.ofm.mvb.drivers import MVBDriver
+from cocotbext.ofm.mvb.transaction import MvbTrClassic
 from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 
@@ -25,9 +25,9 @@ from cocotbext.ofm.ver.generators import random_packets
 class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
-        self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK)
+        self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK, generics_prefix="MFB")
         self.mfb_tx_drv = BitDriver(dut.TX_MFB_DST_RDY, dut.CLK)
-        self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK)
+        self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK, generics_prefix="MVB")
         self.mfb_tx_mon = MFBMonitor(dut, "TX_MFB", dut.CLK)
 
         self.pkts_sent = 0
@@ -77,10 +77,11 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=1500)
 
     item_bytes = tb.mfb_rx_drv._item_bytes
     for mfb_pkt in random_packets(frame_size_min, frame_size_max, pkt_count, alignment=item_bytes):
-        tb.mfb_rx_drv.append(mfb_pkt)
+        mfb_tr = MfbTransaction(data=mfb_pkt)
+        tb.mfb_rx_drv.append(mfb_tr)
 
         mvb_tr = MvbTrClassic()
-        mvb_bus_width = tb.mvb_rx_drv.item_widths['data']
+        mvb_bus_width = dut.MVB_ITEM_SIZE.value * dut.MFB_ITEM_WIDTH.value
         mvb_append = randint(0, 2**mvb_bus_width-1)
         mvb_tr.data = mvb_append
         tb.mvb_rx_drv.append(mvb_tr)

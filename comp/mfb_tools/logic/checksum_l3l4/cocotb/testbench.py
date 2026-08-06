@@ -7,18 +7,20 @@ import ipaddress
 import cocotb
 import logging
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotbext.ofm.base.types import LogicArray
+from cocotbext.ofm.base.protocol import optional_signal, alias
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mfb.transaction import MfbTransaction
 from cocotbext.ofm.mvb.transaction import MvbTransaction
+from cocotbext.ofm.mvb.protocol import MvbProtocol
 from cocotb_bus.drivers import BitDriver
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMvbInterface
 from dataclasses import dataclass
 from scapy.all import raw, TCP, UDP, SCTP, ICMPv6EchoRequest
 
 from cocotbext.ofm.utils.scapy import ScapyPacketGenerator
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from scoreboard import MfbChecksumL3L4Result, compare_checksums
 
 
@@ -51,13 +53,24 @@ class MvbTxResult(MvbTransaction):
     l4_csum_en: int = 0
 
 
-class MVBDriverExt(MVBDriver):
-    _optional_signals = [
-        "l3_csum_orig", "l3_csum_en", "l3_offset", "l3_length",
-        "l4_csum_orig", "l4_csum_en", "l4_offset", "l4_length",
-        "l4_protocol", "ip_src_addr", "ip_dst_addr", "ip_ver6",
-        "pkt_length", "vld"
-    ]
+class MfbChecksumL3L4MvbProtocol(MvbProtocol):
+    mfb_regions  : int = alias(MvbProtocol.items)
+
+    l3_csum_en   : LogicArray = optional_signal(put_with="vld")
+    l3_csum_orig : LogicArray = optional_signal(put_with="l3_csum_en")
+    l3_offset    : LogicArray = optional_signal(put_with="l3_csum_en")
+    l3_length    : LogicArray = optional_signal(put_with="l3_csum_en")
+
+    l4_csum_en   : LogicArray = optional_signal(put_with="vld")
+    l4_csum_orig : LogicArray = optional_signal(put_with="l4_csum_en")
+    l4_offset    : LogicArray = optional_signal(put_with="l4_csum_en")
+    l4_length    : LogicArray = optional_signal(put_with="l4_csum_en")
+    l4_protocol  : LogicArray = optional_signal(put_with="l4_csum_en")
+
+    ip_src_addr  : LogicArray = optional_signal(put_with="vld")
+    ip_dst_addr  : LogicArray = optional_signal(put_with="vld")
+    ip_ver6      : LogicArray = optional_signal(put_with="vld")
+    pkt_length   : LogicArray = optional_signal(put_with="vld")
 
 
 class MVBMonitorExt(MVBMonitor):
@@ -80,7 +93,7 @@ class Testbench:
     Attributes:
         dut: The Device Under Test (cocotb handle).
         mfb_driver: MFBDriver for sending packet data.
-        mvb_driver: MVBDriverExt for sending L3/L4 metadata.
+        mvb_driver: MVBDriver for sending L3/L4 metadata.
         mvb_tx_monitor: MVBMonitorExt for receiving checksum results.
         backpressure: BitDriver for controlling TX backpressure.
         scoreboard: Scoreboard for comparing expected vs actual results.
@@ -92,21 +105,11 @@ class Testbench:
     def __init__(self, dut, debug=False, log_comparisons=True):
         self.dut = dut
 
-        # Setting MFB params based on generics
-        mfb_params = {
-            "regions": dut.MFB_REGIONS.value,
-            "region_size": dut.MFB_REGION_SIZE.value,
-            "block_size": dut.MFB_BLOCK_SIZE.value,
-            "item_width": dut.MFB_ITEM_WIDTH.value
-        }
-
         # MFB driver for packet data
-        self.mfb_driver = MFBDriver(dut, "RX_MFB", dut.CLK, mfb_params=mfb_params)
-        self.mfb_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
+        self.mfb_driver = MFBDriver(dut, "RX_MFB", dut.CLK, generics_prefix="MFB", rate_limiter_config=dict(max_idles=5, zero_idles_chance=50))
 
         # MVB driver for combined L3 and L4 metadata
-        self.mvb_driver = MVBDriverExt(dut, "RX_MVB", dut.CLK)
-        self.mvb_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
+        self.mvb_driver = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=MfbChecksumL3L4MvbProtocol, rate_limiter_config=dict(max_idles=5, zero_idles_chance=50))
 
         # MVB monitor for TX results
         self.mvb_tx_monitor = MVBMonitorExt(dut, "TX_MVB", dut.CLK, tr_type=MvbTxResult)

@@ -12,28 +12,29 @@ from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.mfb.transaction import MfbTransaction
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
-from cocotbext.ofm.base.generators import ItemRateLimiter
+from cocotbext.ofm.mfb.protocol import MfbParams
+from dataclasses import asdict
 
 
 class testbench():
     def __init__(self, dut):
         self.dut = dut
 
-        mfb_params = {
-            "regions"     : dut.REGIONS.value,
-            "region_size" : dut.REGION_SIZE.value,
-            "block_size"  : dut.BLOCK_SIZE.value,
-            "item_width"  : dut.ITEM_WIDTH.value
-        }
+        mfb_params = MfbParams(
+            regions=dut.REGIONS.value,
+            region_size=dut.REGION_SIZE.value,
+            block_size=dut.BLOCK_SIZE.value,
+            item_width=dut.ITEM_WIDTH.value
+        )
 
-        self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
-        self.RX_MFB.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=70))
+        self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, rate_limiter_config=dict(max_idles=5, zero_idles_chance=70))
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
-        self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK, mfb_params=mfb_params)
+        self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK, mfb_params=asdict(mfb_params), trans_type=MfbTransaction)
 
         # setting up the probe measuring throughput
         self.throughput_probe = ThroughputProbe(ThroughputProbeMfbInterface(self.TX_MFB), throughput_units="bits")
@@ -69,7 +70,8 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # calculating number of bytes in an item
     item_bytes = tb.dut.ITEM_WIDTH.value // 8
 
-    for transaction in random_packets(frame_size_min, frame_size_max, pkt_count, alignment=item_bytes):
+    for packet in random_packets(frame_size_min, frame_size_max, pkt_count, alignment=item_bytes):
+        transaction = MfbTransaction(data=packet)
         tb.model(transaction)
         # print("generated transaction: " + transaction.hex())
         tb.RX_MFB.append(transaction)
