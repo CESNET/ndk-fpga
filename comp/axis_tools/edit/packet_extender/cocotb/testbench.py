@@ -15,8 +15,11 @@ The extension bytes are not checked by this testbench.
 
 import cocotb
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.types import LogicArray
+from cocotbext.ofm.base.protocol import optional_signal
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
+from cocotbext.ofm.axi4stream.protocol import Axi4StreamProtocol
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.hex_formatter import format_bytes
@@ -36,6 +39,11 @@ class Axi4StreamTransactionWithExtLen(Axi4StreamTransaction):
     """Axi4Stream transaction with EXT_LEN_S and EXT_LEN_E signals."""
     EXT_LEN_S: int = 0
     EXT_LEN_E: int = 0
+
+
+class Axi4StreamProtocolWithExtLen(Axi4StreamProtocol):
+    EXT_LEN_S: LogicArray = optional_signal(put_with="TVALID")
+    EXT_LEN_E: LogicArray = optional_signal(put_with="TVALID")
 
 
 class Axi4StreamMasterWithExtLen(Axi4StreamMaster):
@@ -100,7 +108,7 @@ class Testbench:
         self.max_ext_len_s = 2 ** self.ext_len_s_width - 1
         self.max_ext_len_e = 2 ** self.ext_len_e_width - 1
 
-        self.rx_driver = Axi4StreamMasterWithExtLen(dut, "RX_AXI", dut.CLK)
+        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, protocol=Axi4StreamProtocolWithExtLen)
         self.tx_monitor = Axi4Stream(dut, "TX_AXI", dut.CLK, trans_type=Axi4StreamTransaction)
 
         self.pkts_sent = 0
@@ -167,19 +175,10 @@ class Testbench:
         data_width = len(self.rx_driver.bus.TDATA) // 8
         word_cnt = (len(pkt_data) + data_width - 1) // data_width
 
-        # Encode EXT_LEN values per word: first word carries ext_len, others zero
-        ext_len_s_encoded = 0
-        ext_len_e_encoded = 0
-        for i in range(word_cnt):
-            word_ext_len_s = ext_instr.ext_len_s if (i == 0) else 0
-            word_ext_len_e = ext_instr.ext_len_e if (i == 0) else 0
-            ext_len_s_encoded = (ext_len_s_encoded << self.ext_len_s_width) + word_ext_len_s
-            ext_len_e_encoded = (ext_len_e_encoded << self.ext_len_e_width) + word_ext_len_e
-
         rx_tr = Axi4StreamTransactionWithExtLen(
             TDATA=pkt_data,
-            EXT_LEN_S=ext_len_s_encoded,
-            EXT_LEN_E=ext_len_e_encoded
+            EXT_LEN_S=ext_instr.ext_len_s,
+            EXT_LEN_E=ext_instr.ext_len_e
         )
         expected = self.model(pkt_data, ext_instr)
 

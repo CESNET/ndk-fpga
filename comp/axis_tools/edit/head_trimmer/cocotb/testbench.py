@@ -13,11 +13,13 @@ signals are ignored.
 import cocotb
 import logging
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotbext.ofm.axi4stream.protocol import Axi4StreamProtocol, optional_signal
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.hex_formatter import format_bytes
+from cocotb.types import LogicArray, Logic
 from dataclasses import dataclass
 from typing import List
 
@@ -36,9 +38,9 @@ class Axi4StreamTransactionWithTrim(Axi4StreamTransaction):
     TRIM_ENABLE: int = 0
 
 
-class Axi4StreamMasterWithTrim(Axi4StreamMaster):
-    """Axi4StreamMaster with support for TRIM_LENGTH and TRIM_ENABLE signals."""
-    _optional_signals = ["TLAST", "TKEEP", "TRIM_LENGTH", "TRIM_ENABLE"]
+class Axi4StreamProtocolWithTrim(Axi4StreamProtocol):
+    TRIM_LENGTH: LogicArray = optional_signal(put_with="TRIM_ENABLE")
+    TRIM_ENABLE: Logic      = optional_signal(put_with="TVALID")
 
 
 def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTransaction,
@@ -77,11 +79,11 @@ def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTra
 class Testbench:
     """Testbench for AXIS_HEAD_TRIMMER component."""
 
-    def __init__(self, dut, debug: bool = False):
+    def __init__(self, dut, debug: bool = False, rate_limiter_config: dict = {}):
         self.dut = dut
         self.pkt_mtu = int(dut.PKT_MTU.value) if hasattr(dut, 'PKT_MTU') else 9216
 
-        self.rx_driver = Axi4StreamMasterWithTrim(dut, "RX_AXI", dut.CLK)
+        self.rx_driver = Axi4StreamMaster(self.dut, "RX_AXI", dut.CLK, protocol=Axi4StreamProtocolWithTrim, rate_limiter_config=rate_limiter_config)
         self.tx_monitor = Axi4Stream(dut, "TX_AXI", dut.CLK, trans_type=Axi4StreamTransaction)
 
         self.pkts_sent = 0
@@ -148,22 +150,10 @@ class Testbench:
         data_width = len(self.rx_driver.bus.TDATA) // 8
         word_cnt = (len(pkt_data) + data_width - 1) // data_width
 
-        trim_len_width = len(self.rx_driver.bus.TRIM_LENGTH)
-        trim_en_width = len(self.rx_driver.bus.TRIM_ENABLE)
-
-        # Encode trim values for each word (same value on every word, like SEL in AXIS_SPLITTER)
-        trim_len_encoded = 0
-        trim_en_encoded = 0
-        for i in range(word_cnt):
-            word_trim_len = trim_instr.trim_length
-            word_trim_en = trim_instr.trim_enable
-            trim_len_encoded = (trim_len_encoded << trim_len_width) + word_trim_len
-            trim_en_encoded = (trim_en_encoded << trim_en_width) + word_trim_en
-
         rx_tr = Axi4StreamTransactionWithTrim(
             TDATA=pkt_data,
-            TRIM_LENGTH=trim_len_encoded,
-            TRIM_ENABLE=trim_en_encoded
+            TRIM_LENGTH=trim_instr.trim_length,
+            TRIM_ENABLE=trim_instr.trim_enable
         )
         expected = self.model(pkt_data, trim_instr)
 

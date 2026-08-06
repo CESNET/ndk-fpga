@@ -8,12 +8,15 @@
 import cocotb
 import logging
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.types import Logic
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 
+from cocotbext.ofm.base.protocol import optional_signal
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
+from cocotbext.ofm.axi4stream.protocol import Axi4StreamProtocol
 
 
 def _format_bytes(data: bytes, bytes_per_line: int = 32) -> str:
@@ -98,13 +101,18 @@ def _compare_transactions(expected, actual, transaction_num: int = 0) -> tuple:
     return False, msg
 
 
+class Axi4StreamProtocolWithSel(Axi4StreamProtocol):
+    SEL: Logic = optional_signal(put_with="TVALID")
+
+
 class Testbench:
     """Testbench for AXIS_PACKET_CONCATENATOR component."""
 
     def __init__(self, dut, debug=False):
         self.dut = dut
-        self.rx0_drv = Axi4StreamMaster(dut, "RX0_AXIS", dut.CLK)
-        self.rx1_drv = Axi4StreamMaster(dut, "RX1_AXIS", dut.CLK)
+        idle_gen_conf = dict(random_idles=True, max_idles=5, zero_idles_chance=50)
+        self.rx0_drv = Axi4StreamMaster(dut, "RX0_AXIS", dut.CLK, protocol=Axi4StreamProtocolWithSel, rate_limiter_config=dict(rate_percentage=20, **idle_gen_conf))
+        self.rx1_drv = Axi4StreamMaster(dut, "RX1_AXIS", dut.CLK, rate_limiter_config=dict(rate_percentage=90, **idle_gen_conf))
         self.tx_mon = Axi4Stream(dut, "TX_AXIS", dut.CLK, trans_type=Axi4StreamTransaction)
         self.backpressure = BitDriver(dut.TX_AXIS_TREADY, dut.CLK)
 

@@ -12,33 +12,44 @@ from typing import List
 import cocotb
 import logging
 from cocotb.triggers import ClockCycles, RisingEdge
+from cocotb.types import Logic, LogicArray
 from cocotb_bus.scoreboard import Scoreboard
+from cocotbext.ofm.base.protocol import optional_signal
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
+from cocotbext.ofm.axi4stream.protocol import Axi4StreamProtocol
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 
 
 @dataclass
 class EditInstruction:
     """Edit instruction for one packet."""
-    edit_data: bytes
-    edit_offset: int = 0
-    edit_mask: int = 0
-    edit_enable: int = 0
+    edit_data   : bytes
+    edit_offset : int = 0
+    edit_mask   : int = 0
+    edit_enable : int = 0
 
 
 @dataclass
 class Axi4StreamTransactionWithEdit(Axi4StreamTransaction):
     """Axi4Stream transaction with edit instruction signals."""
-    EDIT_DATA: int = 0
-    EDIT_OFFSET: int = 0
-    EDIT_MASK: int = 0
-    EDIT_ENABLE: int = 0
+    EDIT_DATA   : int = 0
+    EDIT_OFFSET : int = 0
+    EDIT_MASK   : int = 0
+    EDIT_ENABLE : int = 0
 
 
-class Axi4StreamMasterWithEdit(Axi4StreamMaster):
-    """Axi4StreamMaster with support for packet edit instruction."""
-    _optional_signals = ["TLAST", "TKEEP", "EDIT_DATA", "EDIT_OFFSET", "EDIT_MASK", "EDIT_ENABLE"]
+class Axi4StreamProtocolWithEdit(Axi4StreamProtocol):
+    """Axi4StreamProtocol with support for packet edit instruction."""
+    @optional_signal.write(put_with="TVALID")
+    def EDIT_DATA(self, signal, value: LogicArray | bytes):
+        if isinstance(value, bytes):
+            value = LogicArray.from_bytes(value, byteorder="little")
+        signal.value = value
+
+    EDIT_OFFSET : LogicArray = optional_signal(put_with="TVALID")
+    EDIT_MASK   : LogicArray = optional_signal(put_with="TVALID")
+    EDIT_ENABLE : Logic      = optional_signal(put_with="TVALID")
 
 
 def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTransaction,
@@ -76,10 +87,10 @@ def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTra
 class Testbench:
     """Testbench for AXIS_PACKET_EDITOR component."""
 
-    def __init__(self, dut, debug: bool = False):
+    def __init__(self, dut, debug: bool = False, rate_limiter_config: dict = {}):
         self.dut = dut
 
-        self.rx_driver = Axi4StreamMasterWithEdit(dut, "RX_AXI", dut.CLK)
+        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, protocol=Axi4StreamProtocolWithEdit, rate_limiter_config=rate_limiter_config)
         self.tx_monitor = Axi4Stream(dut, "TX_AXI", dut.CLK, trans_type=Axi4StreamTransaction)
 
         self.edit_bytes = int(dut.EDIT_BYTES.value) if hasattr(dut, "EDIT_BYTES") else 16
@@ -139,29 +150,12 @@ class Testbench:
         data_width = len(self.rx_driver.bus.TDATA) // 8
         word_cnt = (len(pkt_data) + data_width - 1) // data_width
 
-        edit_data_width = len(self.rx_driver.bus.EDIT_DATA)
-        edit_offset_width = len(self.rx_driver.bus.EDIT_OFFSET)
-        edit_mask_width = len(self.rx_driver.bus.EDIT_MASK)
-        edit_enable_width = len(self.rx_driver.bus.EDIT_ENABLE)
-
-        edit_data_int = int.from_bytes(edit_instr.edit_data, byteorder="little")
-
-        edit_data_encoded = 0
-        edit_offset_encoded = 0
-        edit_mask_encoded = 0
-        edit_enable_encoded = 0
-        for _ in range(word_cnt):
-            edit_data_encoded = (edit_data_encoded << edit_data_width) + edit_data_int
-            edit_offset_encoded = (edit_offset_encoded << edit_offset_width) + edit_instr.edit_offset
-            edit_mask_encoded = (edit_mask_encoded << edit_mask_width) + edit_instr.edit_mask
-            edit_enable_encoded = (edit_enable_encoded << edit_enable_width) + edit_instr.edit_enable
-
         rx_tr = Axi4StreamTransactionWithEdit(
             TDATA=pkt_data,
-            EDIT_DATA=edit_data_encoded,
-            EDIT_OFFSET=edit_offset_encoded,
-            EDIT_MASK=edit_mask_encoded,
-            EDIT_ENABLE=edit_enable_encoded,
+            EDIT_DATA=edit_instr.edit_data,
+            EDIT_OFFSET=edit_instr.edit_offset,
+            EDIT_MASK=edit_instr.edit_mask,
+            EDIT_ENABLE=edit_instr.edit_enable,
         )
         expected = self.model(pkt_data, edit_instr)
 

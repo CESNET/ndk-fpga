@@ -11,7 +11,6 @@ from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from scoreboard import Scoreboard
 from cocotb_bus.drivers import BitDriver
 from random import randint
@@ -35,8 +34,9 @@ class testbench():
         self.scoreboard.add_interface(self.stream_out, self.expected_output)
 
         # generating driver for every stream
+        rate_limiter_config = dict(rate_percentage=30, random_idles=True, max_idles=5, zero_idles_chance=50)
         for i in range(self.dut.RX_STREAMS.value):
-            driver = Axi4StreamMaster(dut, "RX_AXIS", dut.CLK, array_idx=i)
+            driver = Axi4StreamMaster(dut, "RX_AXIS", dut.CLK, array_idx=i, rate_limiter_config=rate_limiter_config)
             self.stream_in.append(driver)
 
             if debug:
@@ -59,11 +59,6 @@ async def run_test(dut, min_size=4, max_size=512, pkt_count=10000):
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
     tb = testbench(dut, debug=False)
-
-    # generating rate limiter for every driver
-    idle_gen_conf = dict(random_idles=True, max_idles=5, zero_idles_chance=50)
-    for driver in tb.stream_in:
-        driver.set_idle_generator(ItemRateLimiter(rate_percentage=30, **idle_gen_conf))
 
     await tb.reset()
 
