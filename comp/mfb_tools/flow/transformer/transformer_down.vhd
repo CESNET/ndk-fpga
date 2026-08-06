@@ -74,6 +74,7 @@ architecture FULL of MFB_TRANSFORMER_DOWN is
     signal tx_sop_sel        : std_logic_vector(TX_SOP'range);
     signal tx_eop_sel        : std_logic_vector(TX_EOP'range);
     signal inside_packet_reg : std_logic := '0';
+    signal unused_part       : std_logic := '0';
 
     type   t_state is (S_IDLE, S_MAX, S_OTHERS);
     signal state : t_state;
@@ -158,6 +159,9 @@ begin
              S_MAX  when sel = MAX  else
              S_OTHERS;
 
+    -- check if current part of DATA is valid
+    unused_part <= '1' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 ELSE '0';
+
     -- counter handles the select signal for multiplexers
     -- sel signal is one bit wider (for IDLE state)
     cnt_p : process (CLK)
@@ -172,7 +176,7 @@ begin
                             sel <= (others => '0');
                         end if;
                     when S_MAX =>
-                        if (TX_DST_RDY = '1') then
+                        if (TX_DST_RDY = '1' or unused_part = '1') then
                             if (RX_SRC_RDY = '1') then
                                 sel <= (others => '0');
                             else
@@ -180,7 +184,7 @@ begin
                             end if;
                         end if;
                     when S_OTHERS =>
-                        if (TX_DST_RDY = '1') then
+                        if (TX_DST_RDY = '1' or unused_part = '1') then
                             sel <= std_logic_vector(unsigned(sel)+1);
                         end if;
                 end case;
@@ -189,7 +193,7 @@ begin
     end process;
 
     -- logic defining RX_DST_RDY, TX_SRC_RDY
-    communication_logic_p : process (RESET, state, sel, TX_DST_RDY, tx_sop_sel, tx_eop_sel, inside_packet_reg)
+    communication_logic_p : process (RESET, state, sel, TX_DST_RDY, tx_sop_sel, tx_eop_sel, inside_packet_reg, unused_part)
     begin
         RX_DST_RDY <= '0';
         TX_SRC_RDY <= '0';
@@ -197,12 +201,12 @@ begin
             when S_IDLE =>
                 RX_DST_RDY <= '1';
             when S_MAX =>
-                if (TX_DST_RDY = '1') then
+                if (TX_DST_RDY = '1' or unused_part = '1') then
                     RX_DST_RDY <= '1';
                 end if;
-                TX_SRC_RDY <= '0' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 else '1';
+                TX_SRC_RDY <= '0' when unused_part = '1' else '1';
             when S_OTHERS =>
-                TX_SRC_RDY <= '0' when inside_packet_reg = '0' and unsigned(tx_sop_sel) = 0 and unsigned(tx_eop_sel) = 0 else '1';
+                TX_SRC_RDY <= '0' when unused_part = '1' else '1';
         end case;
     end process;
 
