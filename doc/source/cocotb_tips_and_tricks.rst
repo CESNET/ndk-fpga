@@ -59,6 +59,21 @@ Available log levels are: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO``, ``DEBU
 
 .. note:: Debug logging increases simulation time and log size. Use only during development.
 
+Running a Single Test
+=====================
+
+By default, ``make`` runs every ``@cocotb.test()`` in the test module, which is slow when iterating on one failing
+test. Select a subset with ``COCOTB_TEST_FILTER``, a single regular expression matched against the test name
+(use ``|`` for alternation, not commas):
+
+.. code-block:: bash
+
+    COCOTB_TEST_FILTER=test_ndp_recvmsg make
+    COCOTB_TEST_FILTER='test_ndp_recvmsg|test_ndp_send_msgs' make
+
+.. note:: The older ``COCOTB_TESTCASE`` variable (comma-separated exact test names) still works but is deprecated by
+    cocotb in favor of ``COCOTB_TEST_FILTER``.
+
 Optional Signals on MFB/MVB/AXI4-Stream Interfaces
 ==================================================
 

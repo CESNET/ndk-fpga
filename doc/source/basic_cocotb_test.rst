@@ -8,6 +8,9 @@ This guide shows how to create a basic test for flow/storage hardware components
 
 The examples in this guide use the MVB FIFOX component test located at ``comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py`` as a reference.
 
+.. note:: This guide covers **component-level** testing, where ``dut`` is the single VHDL component under test (no
+    card, no DMA engine). To simulate an entire card's firmware end-to-end instead, see :doc:`top_level_simulation`.
+
 
 Quick Start
 -----------
@@ -179,5 +182,6 @@ In case of having trouble with the automation, the test can also be run manually
 See Also
 --------
 
+- :doc:`top_level_simulation` - Simulating an entire card's firmware (DMA, PCIe, Ethernet) instead of a single component
 - :doc:`cocotb_tips_and_tricks` - Tips for debug logging, random seed control, and optional signals
 - :doc:`cocotbext` - Overview of cocotbext-ndk extension with drivers, monitors, and utilities
