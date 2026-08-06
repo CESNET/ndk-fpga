@@ -149,6 +149,11 @@
 <span id="cocotb-ver"></span><h1>Getting Started with cocotb<a class="headerlink" href="#getting-started-with-cocotb" title="Link to this heading"></a></h1>
 <p>This guide shows how to create a basic test for flow/storage hardware components (such as pipes, FIFOs, etc.) using the cocotb framework. Cocotb allows you to write testbenches in Python, which are then used to verify VHDL/Verilog designs.</p>
 <p>The examples in this guide use the MVB FIFOX component test located at <code class="docutils literal notranslate"><span class="pre">comp/mvb_tools/storage/fifox/cocotb/cocotb_test.py</span></code> as a reference.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This guide covers <strong>component-level</strong> testing, where <code class="docutils literal notranslate"><span class="pre">dut</span></code> is the single VHDL component under test (no
+card, no DMA engine). To simulate an entire card’s firmware end-to-end instead, see <a class="reference internal" href="top_level_simulation.html"><span class="doc">Top-Level Simulation using cocotb</span></a>.</p>
+</div>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
 <p>For beginners, the easiest way to get started is:</p>
@@ -462,6 +467,7 @@
 <section id="see-also">
 <h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
 <ul class="simple">
+<li><p><a class="reference internal" href="top_level_simulation.html"><span class="doc">Top-Level Simulation using cocotb</span></a> - Simulating an entire card’s firmware (DMA, PCIe, Ethernet) instead of a single component</p></li>
 <li><p><a class="reference internal" href="cocotb_tips_and_tricks.html"><span class="doc">Cocotb tips &amp; tricks</span></a> - Tips for debug logging, random seed control, and optional signals</p></li>
 <li><p><a class="reference internal" href="cocotbext.html"><span class="doc">cocotbext-ndk</span></a> - Overview of cocotbext-ndk extension with drivers, monitors, and utilities</p></li>
 </ul>

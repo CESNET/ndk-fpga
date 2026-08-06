@@ -86,6 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#random-seed">Random Seed</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-coverage">Code Coverage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#debug-logging">Debug Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-a-single-test">Running a Single Test</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#optional-signals-on-mfb-mvb-axi4-stream-interfaces">Optional Signals on MFB/MVB/AXI4-Stream Interfaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-probes">Using probes</a></li>
 </ul>
@@ -185,6 +186,21 @@ make
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Debug logging increases simulation time and log size. Use only during development.</p>
+</div>
+</section>
+<section id="running-a-single-test">
+<h2>Running a Single Test<a class="headerlink" href="#running-a-single-test" title="Link to this heading"></a></h2>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">make</span></code> runs every <code class="docutils literal notranslate"><span class="pre">&#64;cocotb.test()</span></code> in the test module, which is slow when iterating on one failing
+test. Select a subset with <code class="docutils literal notranslate"><span class="pre">COCOTB_TEST_FILTER</span></code>, a single regular expression matched against the test name
+(use <code class="docutils literal notranslate"><span class="pre">|</span></code> for alternation, not commas):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">COCOTB_TEST_FILTER</span><span class="o">=</span>test_ndp_recvmsg<span class="w"> </span>make
+<span class="nv">COCOTB_TEST_FILTER</span><span class="o">=</span><span class="s1">&#39;test_ndp_recvmsg|test_ndp_send_msgs&#39;</span><span class="w"> </span>make
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The older <code class="docutils literal notranslate"><span class="pre">COCOTB_TESTCASE</span></code> variable (comma-separated exact test names) still works but is deprecated by
+cocotb in favor of <code class="docutils literal notranslate"><span class="pre">COCOTB_TEST_FILTER</span></code>.</p>
 </div>
 </section>
 <section id="optional-signals-on-mfb-mvb-axi4-stream-interfaces">

@@ -8,10 +8,15 @@ NDK-FPGA also includes a top-level simulation for running tests on the whole fir
 **Python** and the ``cocotb`` framework. Some parts of ``cocotb`` were also modified and extended by us to better fit our use cases, creating
 the ``cocotbext-ndk`` package. If you want to discover more about ``cocotbext-ndk``, refer to :ref:`its chapter <cocotbext-ndk>`.
 
+.. note:: This simulates an entire card's firmware end-to-end (``dut`` is the card's top-level entity, tests go
+    through ``NFBDevice`` and the ``CARD``/``DMA_TYPE``/``PCIE_CONF`` selection below). To test a single VHDL
+    component in isolation instead, see :doc:`basic_cocotb_test`.
+
 Requirements
 ============
 
-**Python version 3.11** and higher, **Intel Quartus Prime Pro** or **AMD Vivado**, and **Questa Sim** are required.
+**Python version 3.11** and higher, **Intel Quartus Prime Pro** or **AMD Vivado**, and a VHDL simulator are required.
+Either **Questa Sim** or the open-source **NVC** simulator can be used.
 
 Cloning `ndk-fpga` from GitHub with all its dependencies is also required. You can achieve this using the following command:
 
@@ -49,8 +54,33 @@ Selection of the simulated card is performed with the environment variable **CAR
 
     $ make CARD=n6010
 
+By default, the simulation runs with **Questa Sim**. To use the open-source **NVC** simulator instead, set the
+**TARGET** variable to ``nvc-sim``:
+
+.. code-block:: bash
+
+    $ make CARD=n6010 TARGET=nvc-sim
+
 .. note:: Source files used to run the simulation of all cards can be found in ``ndk-fpga/apps/minimal/build``. To find out which
     cards are supported, refer to **NFBDevice** in ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
+
+Selecting a DMA Engine / PCIe Configuration
+-------------------------------------------
+
+Some cards support more than one DMA engine or PCIe configuration (for example, a card may support both **DMA Calypte**
+and **DMA Medusa**, selected by a different PCIe endpoint mode/width), and each card simulates whatever its own
+configuration files pick as the default. To exercise a non-default combination, override the corresponding variables
+on the command line; they are forwarded to the per-card ``Makefile`` in ``ndk-fpga/apps/minimal/build/<CARD>/``:
+
+.. code-block:: bash
+
+    $ make CARD=fb2cghh DMA_TYPE=4
+
+.. note:: The valid ``(CARD, DMA_TYPE, PCIE_CONF)`` combinations are not centrally documented. Check the card's
+    ``cards/<vendor>/<card>/config/card_conf.tcl`` (look for a comment table mapping ``PCIE_CONF`` values to DMA
+    engines) and ``apps/minimal/tests/cocotb/top-level-sim.jenkinsfile`` (the ``EXTRA_COMBINATIONS`` list), which
+    documents the non-default combinations covered by CI. Some cards must be also simulated with the
+    ``BMC_ENABLE=0`` option.
 
 Architecture
 ============
