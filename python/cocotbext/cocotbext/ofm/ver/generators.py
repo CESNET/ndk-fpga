@@ -81,7 +81,13 @@ def random_transactions(trans_type: Transaction, driver: BusDriver, data_sig_nam
             if not hasattr(driver.bus, name):
                 continue
 
-            width = len(getattr(driver.bus, name)) if len(getattr(driver.bus, name)) < 8 else 8
+            signal = getattr(driver.bus, name)
+
+            # if the signal is part of the protocol, but it's not present
+            if signal is None:
+                continue
+
+            width = len(signal) if len(signal) < 8 else 8
 
             if isinstance(value, int):
                 function = random.randint
