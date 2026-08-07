@@ -120,7 +120,7 @@ class MIRequestDriver(BusDriver):
 
         return drd
 
-    async def write(self, addr: int, dwr: bytes, *, byte_enable: Optional[int] = None) -> None:
+    async def write(self, addr: int, dwr: bytes, *, byte_enable: Optional[int] = None, bus_opts=None) -> None:
         """writes variable-lenght transaction to the write signals of the MI bus.
 
         Note:
@@ -145,7 +145,7 @@ class MIRequestDriver(BusDriver):
             be = LogicArray(be_slice_inv).integer
             await self._write_word(addr + i*self.__data_width, dwr[i*self.__data_width : (i+1)*self.__data_width], be)
 
-    async def read(self, addr: int, byte_count: int, byte_enable: Optional[int] = None) -> bytes:
+    async def read(self, addr: int, byte_count: int, byte_enable: Optional[int] = None, bus_opts=None) -> bytes:
         """Reads variable-lenght transaction from the read signals of the MI bus.
 
         Note:
