@@ -9,46 +9,130 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
--- MVB_HASH_TABLE_SIMPLE is a component used for storing and retrieving data
--- from two SDP MEMX memory modules using toeplitz and simple xor hash functions.
--- MI32 bus is used for storing data, MVB bus for retrieving data.
+-- A hash-based key/value lookup table for the MVB bus. For every valid RX
+-- item, the MVB_KEY_WIDTH-bit key is hashed by two independent hash
+-- functions (a Toeplitz hash and a simple XOR hash, both keyed by the same
+-- SW-configurable HASH_KEY), each indexing its own table implemented in a
+-- separate ``SDP_MEMX`` memory (per MVB item, so 2*MVB_ITEMS
+-- memories in total). Three clock cycles later, TX_MVB_DATA/TX_MVB_MATCH
+-- report whether either table held a matching entry for that key (the
+-- stored key is compared against the original lookup key to reject hash
+-- collisions) and, if so, its stored data. TX_MVB_VLD simply follows
+-- RX_MVB_VLD (delayed); it does **not** indicate a match - always check
+-- TX_MVB_MATCH for that. When neither table matches, TX_MVB_DATA is
+-- undefined (defaults to the XOR table's read data regardless of validity).
 --
--- MI32 is also used to send commands for functions such as storing data, reading
--- the configuration of the component, clearing tables and so on. Commands are
--- sent via the MI_ADDR port, accompanied by data necessary for the requested action
--- sent via the MI_DATA port.
+-- Table entries are written through the MI bus (see the WARNING below);
+-- MVB lookups are used only for reading. Every MI_WR/MI_RD access, and the
+-- whole "clear tables" sweep, stalls RX_MVB_DST_RDY for its duration - do
+-- not expect full MVB throughput while configuring the table over MI.
 --
--- General commands:
---      0x00 - write command from MI_DWR to the command register.
---      0x04 - write data from MI_DWR to the address shift register.
---      0x08 - write data from MI_DWR to the data shift register.
---      0x0C - write from data shift register to chosen table (see Command register commands)
---             to an address from the address register.
---      0x10 - write data from MI_DWR to hash key configuration shift register.
+-- .. WARNING::
+--    TABLE_CAPACITY should be a power of two: HASH_WIDTH = log2(TABLE_CAPACITY)
+--    is used directly as the address width of the hash functions and of the
+--    underlying memories, without any additional range check.
 --
--- Command register commands (bit indexes):
---      0x00 - choose table0 (toeplitz) for writting operations
---      0x01 - choose table1 (simple xor) for writting operations
---      0x02 - clear both tables
+-- .. WARNING::
+--    There is no hash-collision detection on writes. A table address holds
+--    exactly one entry, a write to 0x0C unconditionally overwrites whatever
+--    is already stored there, and MI_RD never returns the actual table
+--    content (only the configuration constants below) - so software has no
+--    way to check what currently occupies an address before overwriting it.
+--    The two independent tables (Toeplitz/XOR) exist to give software an
+--    alternate slot for a colliding key, but choosing between them and
+--    tracking which keys occupy which slots is entirely software's
+--    responsibility; the hardware provides no support for it. This only
+--    affects writes - a lookup for a key that collides with a different
+--    key's stored entry is still handled safely (the stored-key comparison
+--    makes it report TX_MVB_MATCH = '0', never wrong data).
 --
--- Read interface of the MI32 bus is used for reading table configuration. It can be accessed by setting MI_RD to 1 and choosing data via MI_ADDR port.
+-- MI register map
+-- ----------------
 --
--- Read interface commands and returned data:
---      0x00 - MVB_ITEMS
---      0x04 - MVB_KEY_WIDTH
---      0x08 - DATA_OUT_WIDTH
---      0x0C - HASH_WIDTH
---      0x10 - HASH_KEY_WIDTH
---      0x14 - TABLE_CAPACITY
+-- Only the low 8 bits of MI_ADDR are decoded. All registers are MI_WIDTH
+-- (commonly 32) bits wide.
+--
+-- +---------+------------------------------------------------------------+------------------------------+
+-- | Address | Write (MI_WR)                                              | Read (MI_RD)                 |
+-- +=========+============================================================+==============================+
+-- | 0x00    | Command register, see below. Takes effect immediately (1   | Constant MVB_ITEMS.          |
+-- |         | CLK).                                                      |                              |
+-- +---------+------------------------------------------------------------+------------------------------+
+-- | 0x04    | Table write address register (bits HASH_WIDTH-1 downto 0   | Constant MVB_KEY_WIDTH.      |
+-- |         | of MI_DWR).                                                |                              |
+-- +---------+------------------------------------------------------------+------------------------------+
+-- | 0x08    | Shifts MI_DWR into the entry-data shift register, see the  | Constant DATA_OUT_WIDTH.     |
+-- |         | NOTE below.                                                |                              |
+-- +---------+------------------------------------------------------------+------------------------------+
+-- | 0x0C    | Commits the entry-data shift register to the table         | Constant HASH_WIDTH (=       |
+-- |         | selected by the command register, at the address set at    | log2(TABLE_CAPACITY)).       |
+-- |         | 0x04. MI_DWR is ignored; only the write access itself (to  |                              |
+-- |         | this address) matters.                                     |                              |
+-- +---------+------------------------------------------------------------+------------------------------+
+-- | 0x10    | Shifts MI_DWR into the hash-key register (shared by both   | Constant HASH_KEY_WIDTH.     |
+-- |         | hash functions).                                           |                              |
+-- +---------+------------------------------------------------------------+------------------------------+
+-- | 0x14    | (no effect)                                                | Constant TABLE_CAPACITY.     |
+-- +---------+------------------------------------------------------------+------------------------------+
+--
+-- .. NOTE::
+--    An entry only actually changes in the table at the 0x0C commit; the
+--    0x04/0x08 writes before it only prepare the new value and don't affect
+--    the table yet. So an MVB lookup can never see a half-written entry -
+--    only the complete old one or the complete new one.
+--
+--    MVB lookups are blocked for the one cycle of every individual MI
+--    access (0x04, 0x08, or 0x0C), same as for the table-clearing sweep -
+--    not just during the sweep. Between separate MI accesses, though, any
+--    gap (a cycle with no MI_WR/MI_RD) lets lookups proceed as normal, so
+--    they can still interleave with an in-progress multi-step entry update.
+--    That's fine for the table content itself (as explained above), but if
+--    your application additionally needs no lookups to happen at all for
+--    the whole duration of an entry update, you need to arrange that
+--    yourself; this component only blocks lookups access by access, not for
+--    the whole sequence.
+--
+-- Command register (bits of the value written to address 0x00):
+--
+-- * bit 0 - select the Toeplitz table for the next 0x0C commit (0 = Toeplitz, 1 = XOR).
+-- * bit 1 - start clearing (zeroing) both tables; self-clears when the sweep
+--   finishes. While set, MI_ARDY stays deasserted for approximately
+--   TABLE_CAPACITY clock cycles (a couple of cycles more in practice) and no
+--   new MI request is accepted.
+--
+-- .. NOTE::
+--    A stored entry is ``MVB_KEY_WIDTH + DATA_OUT_WIDTH + 1`` bits wide
+--    (LSB to MSB: 1 valid bit, then DATA_OUT_WIDTH data bits, then the
+--    MVB_KEY_WIDTH key), and is loaded into the entry-data shift register
+--    with one or more writes to 0x08 (``ceil(entry_width / MI_WIDTH)``
+--    writes, MI_WIDTH bits each). Each write shifts the new MI_DWR word in
+--    at the *top*, so the **first** 0x08 write must carry the
+--    **least-significant** MI_WIDTH-bit chunk of the entry (bits 0 and up,
+--    i.e. the valid bit and low data bits) and the **last** write the
+--    most-significant chunk (the key). The same shift-in convention (first
+--    write = low bits) applies to the multi-word hash-key register at 0x10;
+--    there the chunk boundaries only line up cleanly when HASH_KEY_WIDTH is
+--    itself a multiple of MI_WIDTH (unlike the entry-data register, which is
+--    rounded up to a whole number of MI_WIDTH chunks internally).
 --
 entity MVB_HASH_TABLE_SIMPLE is
     generic (
+        -- Number of entries in each of the two hash tables.
+        -- Should be a power of two, see the WARNING above.
         TABLE_CAPACITY    : natural := 256;
+        -- Number of MVB items transferred in one word.
+        -- Determines the number of instantiated SDP_MEMX memories (2*MVB_ITEMS).
         MVB_ITEMS         : natural := 4;
+        -- Width of the MVB lookup key, in bits.
         MVB_KEY_WIDTH     : natural := 8;
+        -- Width of the data value stored per table entry, in bits.
         DATA_OUT_WIDTH    : natural := 8;
+        -- Width of the MI bus, in bits (typically 32, i.e. MI32).
         MI_WIDTH          : natural := 32;
+        -- Width of the shared hash-key register (see the MI register map above), in bits.
         HASH_KEY_WIDTH    : natural := 32;
+        -- Target FPGA device, passed through to the underlying SDP_MEMX memories.
+        -- "7SERIES", "ULTRASCALE", "VERSAL", "ARRIA10", "STRATIX10", "AGILEX"
         DEVICE            : string  := "STRATIX10"
     );
     port (
@@ -61,12 +145,16 @@ entity MVB_HASH_TABLE_SIMPLE is
         RX_MVB_KEY        : in  std_logic_vector(MVB_ITEMS*MVB_KEY_WIDTH-1 downto 0);
         RX_MVB_VLD        : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY    : in  std_logic;
+        -- Deasserted (regardless of TX_MVB_DST_RDY) while any MI access or
+        -- table-clear sweep is in progress, see above.
         RX_MVB_DST_RDY    : out std_logic;
 
         -- ===========================================================================
         -- PORTS OF OUTPUT MVB BUS
         -- ===========================================================================
+        -- Valid only where TX_MVB_MATCH = '1'.
         TX_MVB_DATA       : out std_logic_vector(MVB_ITEMS*DATA_OUT_WIDTH-1 downto 0);
+        -- Set when a valid entry with a matching key was found in either table.
         TX_MVB_MATCH      : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_VLD        : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_SRC_RDY    : out std_logic;
@@ -74,9 +162,14 @@ entity MVB_HASH_TABLE_SIMPLE is
 
         -- ===========================================================================
         -- PORTS OF MI BUS
+        --
+        -- Used both to configure the hash key and write table entries, and
+        -- to read back the component's configuration constants. See the MI
+        -- register map above.
         -- ===========================================================================
         MI_ADDR           : in  std_logic_vector(MI_WIDTH-1 downto 0);
         MI_DWR            : in  std_logic_vector(MI_WIDTH-1 downto 0);
+        -- Not used (present for MI bus interface compatibility only).
         MI_BE             : in  std_logic_vector(MI_WIDTH/8-1 downto 0);
         MI_WR             : in  std_logic;
         MI_RD             : in  std_logic;

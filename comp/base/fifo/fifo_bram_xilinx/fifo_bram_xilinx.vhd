@@ -460,5 +460,11 @@ begin
             severity failure;
     end generate;
 
+    items_gen : if ITEMS > 8192 generate
+        assert false
+            report "FIFO_BRAM_XILINX: ITEMS > 8192 is not supported!"
+            severity failure;
+    end generate;
+
 end architecture;
 

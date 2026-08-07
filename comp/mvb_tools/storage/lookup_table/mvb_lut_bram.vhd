@@ -1,4 +1,4 @@
--- mvb_lut.vhd: MVB Lookup table with SW configuration (LUTRAM implementation)
+-- mvb_lut.vhd: MVB Lookup table with SW configuration (BRAM implementation)
 -- Copyright (C) 2022 CESNET
 -- Author(s): Jakub Cabal <cabal@cesnet.cz>
 --
@@ -11,6 +11,21 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
+-- BlockRAM-backed implementation of ``MVB_LOOKUP_TABLE``. Instantiates
+-- one dedicated simple dual-port ``SDP_BRAM_BE`` (one write port,
+-- one read port) per MVB item for the RX lookups, plus one additional
+-- dedicated block RAM that only mirrors the table content for the SW_*
+-- interface (its read port would otherwise contend with the per-item lookup
+-- ports). Total BRAM usage is therefore MVB_ITEMS+1 instances, each sized
+-- LUT_DEPTH x LUT_WIDTH (a single instance may itself map to more than one
+-- physical BRAM block, depending on LUT_DEPTH/LUT_WIDTH and DEVICE); all
+-- instances are written in parallel on every SW_WRITE, so their content
+-- stays consistent.
+-- RX-to-TX latency is 1 CLK cycle when OUTPUT_REG = false, or 2 CLK cycles
+-- when OUTPUT_REG = true. Not intended to be instantiated directly - use
+-- ``MVB_LOOKUP_TABLE`` with LUT_ARCH = "BRAM" (or "AUTO") instead, which
+-- selects this implementation automatically for a deep table.
+--
 entity MVB_LOOKUP_TABLE_BRAM is
     generic (
         MVB_ITEMS  : natural := 4;
@@ -25,11 +40,19 @@ entity MVB_LOOKUP_TABLE_BRAM is
         CLK             : in  std_logic;
         RESET           : in  std_logic;
 
+        -- =====================================================================
+        -- RX MVB INTERFACE
+        -- =====================================================================
+
         RX_MVB_LUT_ADDR : in  slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
         RX_MVB_METADATA : in  slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0) := (others => (others => '0'));
         RX_MVB_VLD      : in  std_logic_vector(MVB_ITEMS-1 downto 0);
         RX_MVB_SRC_RDY  : in  std_logic;
         RX_MVB_DST_RDY  : out std_logic;
+
+        -- =====================================================================
+        -- TX MVB INTERFACE
+        -- =====================================================================
 
         TX_MVB_LUT_DATA : out slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0);
         TX_MVB_LUT_ADDR : out slv_array_t(MVB_ITEMS-1 downto 0)(log2(LUT_DEPTH)-1 downto 0);
@@ -37,6 +60,10 @@ entity MVB_LOOKUP_TABLE_BRAM is
         TX_MVB_VLD      : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_SRC_RDY  : out std_logic;
         TX_MVB_DST_RDY  : in  std_logic;
+
+        -- =====================================================================
+        -- SW CONFIGURATION INTERFACE
+        -- =====================================================================
 
         SW_ADDR         : in  std_logic_vector(log2(LUT_DEPTH)-1 downto 0);
         SW_SLICE        : in  std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0);
