@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MVB Lookup Table &mdash; NDK-FPGA  documentation</title>
+  <title>MVB Hash Table Simple &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,8 +19,8 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="MVB FIFOX" href="../fifox/readme.html" />
-    <link rel="prev" title="MVB Gate" href="../../flow/gate/readme.html" /> 
+    <link rel="next" title="MVB TCAM" href="../tcam/readme.html" />
+    <link rel="prev" title="MVB FIFO" href="../fifo/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -82,12 +82,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Lookup Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lookup_table/readme.html">MVB Lookup Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fifox/readme.html">MVB FIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../asfifox/readme.html">MVB ASFIFOX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Hash Table Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tcam/readme.html">MVB TCAM</a></li>
 </ul>
 </li>
@@ -147,9 +147,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../mvb.html">MVB Components</a></li>
-      <li class="breadcrumb-item active">MVB Lookup Table</li>
+      <li class="breadcrumb-item active">MVB Hash Table Simple</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/comp/mvb_tools/storage/lookup_table/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/comp/mvb_tools/storage/mvb_hash_table_simple/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -157,54 +157,134 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mvb-lookup-table">
-<span id="id1"></span><h1>MVB Lookup Table<a class="headerlink" href="#mvb-lookup-table" title="Link to this heading"></a></h1>
+  <section id="mvb-hash-table-simple">
+<span id="id1"></span><h1>MVB Hash Table Simple<a class="headerlink" href="#mvb-hash-table-simple" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_lookup_table">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_LOOKUP_TABLE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_lookup_table" title="Link to this definition"></a></dt>
-<dd><p>MVB Lookup Table: for every valid MVB item on the RX side, looks up the
-table entry addressed by RX_MVB_LUT_ADDR and presents it on the
-corresponding TX_MVB_LUT_DATA item, together with the (registered)
-RX_MVB_LUT_ADDR and RX_MVB_METADATA of that item. This is the top-level
-(recommended) entity: it picks one of the three available implementations
-(a single register, <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_LUTRAM</span></code>, or
-<code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>) based on LUT_ARCH/LUT_DEPTH. RX-to-TX latency
-depends on which of these is selected and on OUTPUT_REG, see the
-OUTPUT_REG generic below for the exact cycle counts.</p>
-<p>The table content is configured through a synchronous SW_* register-file
-style port (address + byte-enabled data, not the CESNET MI bus) - see the
-port descriptions below. This component does <strong>not</strong> reset or initialize
-the table content on RESET; all LUT_DEPTH entries must be written through
-the SW_* interface before the first RX lookup that relies on them,
-otherwise reads of not-yet-written entries return undefined data.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>SW_WRITE never stalls or backpressures RX_MVB lookups - RX_MVB_DST_RDY
-only follows TX_MVB_DST_RDY, regardless of SW_* activity. Unlike some
-sibling components, there is also no atomicity guarantee here, not even
-for a single entry: each SW_WRITE goes straight into the table as soon
-as it happens, with no staging step that only commits a complete entry
-at once. So if LUT_WIDTH &gt; SW_WIDTH, an entry needs several SW_WRITEs
-(one per slice, see above) to fully update, and an RX_MVB lookup
-running in between can see that <em>one</em> entry half-written - part old
-slices, part new.</p>
-<p>The same applies, entry by entry, when updating several entries in a
-row. If your application needs lookups to only ever see a fully
-consistent entry (or a consistent snapshot across several entries), you
-need to arrange that yourself, e.g. by pausing RX_MVB lookups for the
-duration of an update; this component does not do it for you.</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_hash_table_simple">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_HASH_TABLE_SIMPLE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_hash_table_simple" title="Link to this definition"></a></dt>
+<dd><p>A hash-based key/value lookup table for the MVB bus. For every valid RX
+item, the MVB_KEY_WIDTH-bit key is hashed by two independent hash
+functions (a Toeplitz hash and a simple XOR hash, both keyed by the same
+SW-configurable HASH_KEY), each indexing its own table implemented in a
+separate <code class="docutils literal notranslate"><span class="pre">SDP_MEMX</span></code> memory (per MVB item, so 2*MVB_ITEMS
+memories in total). Three clock cycles later, TX_MVB_DATA/TX_MVB_MATCH
+report whether either table held a matching entry for that key (the
+stored key is compared against the original lookup key to reject hash
+collisions) and, if so, its stored data. TX_MVB_VLD simply follows
+RX_MVB_VLD (delayed); it does <strong>not</strong> indicate a match - always check
+TX_MVB_MATCH for that. When neither table matches, TX_MVB_DATA is
+undefined (defaults to the XOR table’s read data regardless of validity).</p>
+<p>Table entries are written through the MI bus (see the WARNING below);
+MVB lookups are used only for reading. Every MI_WR/MI_RD access, and the
+whole “clear tables” sweep, stalls RX_MVB_DST_RDY for its duration - do
+not expect full MVB throughput while configuring the table over MI.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TABLE_CAPACITY should be a power of two: HASH_WIDTH = log2(TABLE_CAPACITY)
+is used directly as the address width of the hash functions and of the
+underlying memories, without any additional range check.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>LUT_WIDTH must be an integer multiple of SW_WIDTH. Any other ratio is
-not correctly supported: depending on LUT_DEPTH/LUT_ARCH it causes the
-topmost bits of an entry to be silently unreachable through SW_DOUT
-(single register and <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>), aliased writes
-(single register), or an elaboration-time width mismatch
-(<code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>). <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_LUTRAM</span></code> handles the
-entry width itself correctly, but the shared SW_SLICE port is always
-sized for the exact-multiple case, so higher slices can still be
-unreachable there too.</p>
+<p>There is no hash-collision detection on writes. A table address holds
+exactly one entry, a write to 0x0C unconditionally overwrites whatever
+is already stored there, and MI_RD never returns the actual table
+content (only the configuration constants below) - so software has no
+way to check what currently occupies an address before overwriting it.
+The two independent tables (Toeplitz/XOR) exist to give software an
+alternate slot for a colliding key, but choosing between them and
+tracking which keys occupy which slots is entirely software’s
+responsibility; the hardware provides no support for it. This only
+affects writes - a lookup for a key that collides with a different
+key’s stored entry is still handled safely (the stored-key comparison
+makes it report TX_MVB_MATCH = ‘0’, never wrong data).</p>
+</div>
+<section id="mi-register-map">
+<h2>MI register map<a class="headerlink" href="#mi-register-map" title="Link to this heading"></a></h2>
+<p>Only the low 8 bits of MI_ADDR are decoded. All registers are MI_WIDTH
+(commonly 32) bits wide.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Write (MI_WR)</p></th>
+<th class="head"><p>Read (MI_RD)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x00</p></td>
+<td><p>Command register, see below. Takes effect immediately (1
+CLK).</p></td>
+<td><p>Constant MVB_ITEMS.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x04</p></td>
+<td><p>Table write address register (bits HASH_WIDTH-1 downto 0
+of MI_DWR).</p></td>
+<td><p>Constant MVB_KEY_WIDTH.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x08</p></td>
+<td><p>Shifts MI_DWR into the entry-data shift register, see the
+NOTE below.</p></td>
+<td><p>Constant DATA_OUT_WIDTH.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x0C</p></td>
+<td><p>Commits the entry-data shift register to the table
+selected by the command register, at the address set at
+0x04. MI_DWR is ignored; only the write access itself (to
+this address) matters.</p></td>
+<td><p>Constant HASH_WIDTH (=
+log2(TABLE_CAPACITY)).</p></td>
+</tr>
+<tr class="row-even"><td><p>0x10</p></td>
+<td><p>Shifts MI_DWR into the hash-key register (shared by both
+hash functions).</p></td>
+<td><p>Constant HASH_KEY_WIDTH.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x14</p></td>
+<td><p>(no effect)</p></td>
+<td><p>Constant TABLE_CAPACITY.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An entry only actually changes in the table at the 0x0C commit; the
+0x04/0x08 writes before it only prepare the new value and don’t affect
+the table yet. So an MVB lookup can never see a half-written entry -
+only the complete old one or the complete new one.</p>
+<p>MVB lookups are blocked for the one cycle of every individual MI
+access (0x04, 0x08, or 0x0C), same as for the table-clearing sweep -
+not just during the sweep. Between separate MI accesses, though, any
+gap (a cycle with no MI_WR/MI_RD) lets lookups proceed as normal, so
+they can still interleave with an in-progress multi-step entry update.
+That’s fine for the table content itself (as explained above), but if
+your application additionally needs no lookups to happen at all for
+the whole duration of an entry update, you need to arrange that
+yourself; this component only blocks lookups access by access, not for
+the whole sequence.</p>
+</div>
+<p>Command register (bits of the value written to address 0x00):</p>
+<ul class="simple">
+<li><p>bit 0 - select the Toeplitz table for the next 0x0C commit (0 = Toeplitz, 1 = XOR).</p></li>
+<li><p>bit 1 - start clearing (zeroing) both tables; self-clears when the sweep
+finishes. While set, MI_ARDY stays deasserted for approximately
+TABLE_CAPACITY clock cycles (a couple of cycles more in practice) and no
+new MI request is accepted.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A stored entry is <code class="docutils literal notranslate"><span class="pre">MVB_KEY_WIDTH</span> <span class="pre">+</span> <span class="pre">DATA_OUT_WIDTH</span> <span class="pre">+</span> <span class="pre">1</span></code> bits wide
+(LSB to MSB: 1 valid bit, then DATA_OUT_WIDTH data bits, then the
+MVB_KEY_WIDTH key), and is loaded into the entry-data shift register
+with one or more writes to 0x08 (<code class="docutils literal notranslate"><span class="pre">ceil(entry_width</span> <span class="pre">/</span> <span class="pre">MI_WIDTH)</span></code>
+writes, MI_WIDTH bits each). Each write shifts the new MI_DWR word in
+at the <em>top</em>, so the <strong>first</strong> 0x08 write must carry the
+<strong>least-significant</strong> MI_WIDTH-bit chunk of the entry (bits 0 and up,
+i.e. the valid bit and low data bits) and the <strong>last</strong> write the
+most-significant chunk (the key). The same shift-in convention (first
+write = low bits) applies to the multi-word hash-key register at 0x10;
+there the chunk boundaries only line up cleanly when HASH_KEY_WIDTH is
+itself a multiple of MI_WIDTH (unlike the entry-data register, which is
+rounded up to a whole number of MI_WIDTH chunks internally).</p>
 </div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
@@ -215,69 +295,43 @@ unreachable there too.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-mvb_items"><td><p>MVB_ITEMS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-table_capacity"><td><p>TABLE_CAPACITY</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>Number of entries in each of the two hash tables.
+Should be a power of two, see the WARNING above.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_hash_table_simple-mvb_items"><td><p>MVB_ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td><p>Number of MVB items transferred in one word.</p></td>
+<td><p>Number of MVB items transferred in one word.
+Determines the number of instantiated SDP_MEMX memories (2*MVB_ITEMS).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-lut_depth"><td><p>LUT_DEPTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-mvb_key_width"><td><p>MVB_KEY_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>128</p></td>
-<td><p>Number of entries in the lookup table.
-Any positive value; LUT_DEPTH = 1 is implemented directly as a
-single shared register regardless of LUT_ARCH.</p></td>
+<td><p>8</p></td>
+<td><p>Width of the MVB lookup key, in bits.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-lut_width"><td><p>LUT_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_hash_table_simple-data_out_width"><td><p>DATA_OUT_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>32</p></td>
-<td><p>Width of one lookup table entry in bits.
-Should be a multiple of SW_WIDTH, see the WARNING above.</p></td>
+<td><p>8</p></td>
+<td><p>Width of the data value stored per table entry, in bits.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-lut_arch"><td><p>LUT_ARCH</p></td>
-<td><p>string</p></td>
-<td><p>“AUTO”</p></td>
-<td><p>Select the memory implementation used when LUT_DEPTH &gt; 1:</p>
-<ul class="simple">
-<li><p>“LUT”  - <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_LUTRAM</span></code>, effective for a shallow table (approx. LUT_DEPTH &lt;= 64).</p></li>
-<li><p>“BRAM” - <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>, effective for a deep table (approx. LUT_DEPTH &gt; 64); consumes MVB_ITEMS+1 block RAMs.</p></li>
-<li><p>“AUTO” - chosen automatically from LUT_DEPTH using the same approx. 64-entry threshold as above.</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-sw_width"><td><p>SW_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-mi_width"><td><p>MI_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
-<td><p>Data width of the SW_* configuration port in bits.
-Must be a multiple of 8: SW_BE has one bit per byte of SW_DIN
-(SW_WIDTH/8, integer division), so a non-multiple silently loses
-byte-enable coverage over the trailing, incomplete byte.</p></td>
+<td><p>Width of the MI bus, in bits (typically 32, i.e. MI32).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-meta_width"><td><p>META_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_hash_table_simple-hash_key_width"><td><p>HASH_KEY_WIDTH</p></td>
 <td><p>natural</p></td>
-<td><p>1</p></td>
-<td><p>Width of the RX_MVB_METADATA/TX_MVB_METADATA side-channel in bits.
-Any non-negative value; the metadata is only delayed together with
-the MVB transaction, it does not influence the lookup itself.</p></td>
+<td><p>32</p></td>
+<td><p>Width of the shared hash-key register (see the MI register map above), in bits.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-output_reg"><td><p>OUTPUT_REG</p></td>
-<td><p>boolean</p></td>
-<td><p>True</p></td>
-<td><p>Adds an output register stage on the TX_MVB_* path (and, for the
-BRAM implementation, also on the internal RAM output). Improves
-timing at the cost of extra registers and one additional CLK
-cycle of RX-to-TX latency:</p>
-<ul class="simple">
-<li><p>Single register (LUT_DEPTH = 1) or LUT_ARCH = “LUT”: 0 CLK cycles
-when false, 1 CLK cycle when true.</p></li>
-<li><p>LUT_ARCH = “BRAM”: 1 CLK cycle when false, 2 CLK cycles when true.</p></li>
-</ul>
-</td>
-</tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
-<td><p>“AGILEX”</p></td>
-<td><p>Target FPGA device, passed through to the underlying memory
-implementation.</p></td>
+<td><p>“STRATIX10”</p></td>
+<td><p>Target FPGA device, passed through to the underlying SDP_MEMX memories.
+“7SERIES”, “ULTRASCALE”, “VERSAL”, “ARRIA10”, “STRATIX10”, “AGILEX”</p></td>
 </tr>
 </tbody>
 </table>
@@ -290,137 +344,122 @@ implementation.</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-clk"><td><p>CLK</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-clk"><td><p>CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-reset"><td><p>RESET</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-rst"><td><p>RST</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><p>=====</p></td>
-<td><p>RX MVB INTERFACE</p></td>
+<td><p>PORTS OF INPUT MVB BUS</p></td>
 <td><p>=====</p></td>
-<td><p>Lookup request: RX_MVB_LUT_ADDR addresses the entry to look up.</p></td>
+<td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_lut_addr"><td><p>RX_MVB_LUT_ADDR</p></td>
-<td><p>slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_key"><td><p>RX_MVB_KEY</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_KEY_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_metadata"><td><p>RX_MVB_METADATA</p></td>
-<td><p>slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td></td>
-</tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Deasserted (regardless of TX_MVB_DST_RDY) while any MI access or
+table-clear sweep is in progress, see above.</p></td>
 </tr>
-<tr class="row-even"><td><p>=====</p></td>
-<td><p>TX MVB INTERFACE</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PORTS OF OUTPUT MVB BUS</p></td>
 <td><p>=====</p></td>
-<td><p>Lookup result, RX-to-TX latency cycles later (see OUTPUT_REG above).</p></td>
+<td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_lut_data"><td><p>TX_MVB_LUT_DATA</p></td>
-<td><p>slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*DATA_OUT_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>Lookup table entry addressed by the corresponding (registered) TX_MVB_LUT_ADDR.</p></td>
+<td><p>Valid only where TX_MVB_MATCH = ‘1’.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_lut_addr"><td><p>TX_MVB_LUT_ADDR</p></td>
-<td><p>slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_match"><td><p>TX_MVB_MATCH</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Set when a valid entry with a matching key was found in either table.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_metadata"><td><p>TX_MVB_METADATA</p></td>
-<td><p>slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0)</p></td>
-<td><p>out</p></td>
-<td></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><p>=====</p></td>
-<td><p>SW CONFIGURATION INTERFACE</p></td>
+<td><p>PORTS OF MI BUS</p></td>
 <td><p>=====</p></td>
-<td><p>Synchronous register-file style port used to read/write the lookup
-table content. Not the CESNET MI bus; intended to be driven
-through an external MI (or other software-accessible bus) adapter.
-One access addresses a single LUT entry (SW_ADDR). If LUT_WIDTH is
-wider than SW_WIDTH, each access only reaches one SW_WIDTH-wide
-slice of that entry, chosen by SW_SLICE. Writing a whole entry
-therefore means repeating SW_WRITE at the same SW_ADDR once per
-slice, SW_SLICE = 0 to LUT_WIDTH/SW_WIDTH-1.</p></td>
+<td><p>Used both to configure the hash key and write table entries, and
+to read back the component’s configuration constants. See the MI
+register map above.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_addr"><td><p>SW_ADDR</p></td>
-<td><p>std_logic_vector(max(log2(LUT_DEPTH),1)-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Address of the accessed lookup table entry.</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_slice"><td><p>SW_SLICE</p></td>
-<td><p>std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Selects which SW_WIDTH-wide slice of the addressed entry is
-accessed, when LUT_WIDTH &gt; SW_WIDTH. Unused (any value valid) when
-LUT_WIDTH = SW_WIDTH (the only other case the WARNING above allows).</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_din"><td><p>SW_DIN</p></td>
-<td><p>std_logic_vector(SW_WIDTH-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>Data to write; valid when SW_WRITE = ‘1’.</p></td>
+<td><p>Not used (present for MI bus interface compatibility only).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_be"><td><p>SW_BE</p></td>
-<td><p>std_logic_vector(SW_WIDTH/8-1 downto 0)</p></td>
-<td><p>in</p></td>
-<td><p>Byte-enable for SW_DIN; only enabled bytes are written.</p></td>
-</tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_write"><td><p>SW_WRITE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_wr"><td><p>MI_WR</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>Write request for the (SW_ADDR, SW_SLICE) location, takes effect immediately (1 CLK).</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_read"><td><p>SW_READ</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_rd"><td><p>MI_RD</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>Read request for the (SW_ADDR, SW_SLICE) location; the result appears on SW_DOUT one CLK later.</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_dout"><td><p>SW_DOUT</p></td>
-<td><p>std_logic_vector(SW_WIDTH-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td><p>Read data, valid when SW_DOUT_VLD = ‘1’ (registered, one CLK after SW_READ).</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_dout_vld"><td><p>SW_DOUT_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_drdy"><td><p>MI_DRDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
+</section>
 </dd></dl>
 
 </section>
@@ -429,8 +468,8 @@ LUT_WIDTH = SW_WIDTH (the only other case the WARNING above allows).</p></td>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../../flow/gate/readme.html" class="btn btn-neutral float-left" title="MVB Gate" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../fifox/readme.html" class="btn btn-neutral float-right" title="MVB FIFOX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../fifo/readme.html" class="btn btn-neutral float-left" title="MVB FIFO" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tcam/readme.html" class="btn btn-neutral float-right" title="MVB TCAM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

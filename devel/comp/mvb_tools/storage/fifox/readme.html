@@ -19,7 +19,7 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="Network Tools" href="../../../../nic.html" />
+    <link rel="next" title="MVB ASFIFOX" href="../asfifox/readme.html" />
     <link rel="prev" title="MVB Lookup Table" href="../lookup_table/readme.html" /> 
 </head>
 
@@ -83,10 +83,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../lookup_table/readme.html">MVB Lookup Table</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB FIFOX</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#general-subcomponents">General subcomponents</a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifox/readme.html">MVB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tcam/readme.html">MVB TCAM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
@@ -160,7 +162,23 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-mvb_fifox">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_FIFOX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_fifox" title="Link to this definition"></a></dt>
-<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<dd><p>Synchronous (single clock domain) general-purpose FIFO for the MVB bus,
+implemented as a thin wrapper around the generic <code class="docutils literal notranslate"><span class="pre">FIFOX</span></code> component.
+The MVB item validity (RX_VLD/TX_VLD) is stored together with RX_DATA/TX_DATA
+in the same memory word. The TX side behaves as First-Word-Fall-Through:
+valid data is presented on TX_DATA/TX_VLD together with TX_SRC_RDY without
+needing a prior TX_DST_RDY request; a write takes at least two CLK cycles
+before the written word can appear on the TX side.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When FAKE_FIFO = true, the FIFO memory is not instantiated; RX and TX
+are connected combinationally (TX_DATA/TX_VLD = RX_DATA/RX_VLD,
+TX_SRC_RDY = RX_SRC_RDY, RX_DST_RDY = TX_DST_RDY) with zero latency.
+Unlike some other FIFO wrappers in this repository, this passthrough
+still correctly propagates TX-side backpressure to RX_DST_RDY, so it is
+always safe to use, not only when the TX side is always ready.</p>
+</div>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
 <th class="head"><p>Type</p></th>
@@ -172,66 +190,60 @@
 <tr class="row-even" id="vhdl-gengeneric-mvb_fifox-items"><td><p>ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td><p>Number of MVB items in word</p></td>
+<td><p>Number of MVB items transferred in one word.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_fifox-item_width"><td><p>ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
-<td><p>One MVB item width</p></td>
+<td><p>Width of one MVB item in bits.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_fifox-fifo_depth"><td><p>FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
-<td><p>FIFO depth, number of data words</p></td>
+<td><p>FIFO depth in number of data words.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_fifox-ram_type"><td><p>RAM_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“AUTO”</p></td>
 <td><p>Select memory implementation. Options:</p>
 <ul class="simple">
-<li><p>“LUT”   - effective when ITEMS &lt;= 64 (on Intel FPGA &lt;= 32)</p></li>
-<li><p>“BRAM”  - effective when ITEMS  &gt; 64 (on Intel FPGA  &gt; 32)</p></li>
-<li><p>“URAM”  - effective when ITEMS*FIFO_WIDTH &gt;= 288000
-and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
-<li><p>“SHIFT” - effective when ITEMS &lt;= 16</p></li>
-<li><p>“AUTO”  - effective implementation dependent on ITEMS and DEVICE</p></li>
+<li><p>“LUT”   - effective when FIFO_DEPTH &lt;= 64 (on Intel FPGA &lt;= 32)</p></li>
+<li><p>“BRAM”  - effective when FIFO_DEPTH  &gt; 64 (on Intel FPGA  &gt; 32)</p></li>
+<li><p>“URAM”  - effective when FIFO_DEPTH * (ITEMS*ITEM_WIDTH+ITEMS) &gt;= 288000
+and (ITEMS*ITEM_WIDTH+ITEMS) &gt;= 72 (URAM is only available on
+DEVICE = “ULTRASCALE” or “VERSAL”)</p></li>
+<li><p>“SHIFT” - effective when FIFO_DEPTH &lt;= 16</p></li>
+<li><p>“AUTO”  - implementation chosen automatically based on FIFO_DEPTH and DEVICE</p></li>
 </ul>
 </td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_fifox-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
-<td><p>Defines what architecture is FIFO implemented on Options:</p>
+<td><p>Defines what architecture the FIFO is implemented on. Options:</p>
 <ul class="simple">
-<li><p>“ULTRASCALE” (Xilinx)</p></li>
-<li><p>“7SERIES”    (Xilinx)</p></li>
-<li><p>“ARRIA10”    (Intel)</p></li>
-<li><p>“STRATIX10”  (Intel)</p></li>
+<li><p>“ULTRASCALE”, “7SERIES”, “VERSAL” (Xilinx)</p></li>
+<li><p>“ARRIA10”, “STRATIX10”, “AGILEX”  (Intel)</p></li>
 </ul>
 </td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_fifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td><div class="line-block">
-<div class="line">Determins how many data words left free when almost_full is triggered.</div>
-<div class="line">(ITEMS - ALMOST_FULL_OFFSET)</div>
-</div>
-</td>
+<td><p>Determines how many free data words remain when AFULL is triggered.
+(currently_stored &gt;= FIFO_DEPTH - ALMOST_FULL_OFFSET)</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_fifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td><div class="line-block">
-<div class="line">Determins how many data words present when almost_empty is triggered.</div>
-<div class="line">(0 + ALMOST_EMPTY_OFFSET)</div>
-</div>
-</td>
+<td><p>Determines how many stored data words remain when AEMPTY is triggered.
+(currently_stored &lt;= ALMOST_EMPTY_OFFSET)</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_fifox-fake_fifo"><td><p>FAKE_FIFO</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
-<td><p>Disables the FIFO implementation and replaces it with straight wires.</p></td>
+<td><p>Disables the FIFO implementation and replaces it with straight
+wires, see the NOTE above.</p></td>
 </tr>
 </tbody>
 </table>
@@ -254,25 +266,35 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_fifox-rx_data"><td><p>RX_DATA</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-rx_data"><td><p>RX_DATA</p></td>
 <td><p>std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-rx_vld"><td><p>RX_VLD</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_fifox-rx_vld"><td><p>RX_VLD</p></td>
 <td><p>std_logic_vector(ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_fifox-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_fifox-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mvb_fifox-tx_data"><td><p>TX_DATA</p></td>
 <td><p>std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0)</p></td>
@@ -294,17 +316,23 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_fifox-status"><td><p>STATUS</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>STATUS FLAGS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-status"><td><p>STATUS</p></td>
 <td><p>std_logic_vector(log2(FIFO_DEPTH) downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Number of words currently stored in the FIFO (not the number of
+free words). Held at ‘0’ when FAKE_FIFO = true.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-afull"><td><p>AFULL</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_fifox-afull"><td><p>AFULL</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_fifox-aempty"><td><p>AEMPTY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_fifox-aempty"><td><p>AEMPTY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
@@ -313,12 +341,6 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
 </table>
 </dd></dl>
 
-<section id="general-subcomponents">
-<h2>General subcomponents<a class="headerlink" href="#general-subcomponents" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="../../../base/fifo/fifox/readme.html#fifox"><span class="std std-ref">FIFOX</span></a></p></li>
-</ul>
-</section>
 </section>
 
 
@@ -326,7 +348,7 @@ and FIFO_WIDTH &gt;= 72 (URAM is only for Xilinx Ultrascale(+))</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../lookup_table/readme.html" class="btn btn-neutral float-left" title="MVB Lookup Table" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../../../nic.html" class="btn btn-neutral float-right" title="Network Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../asfifox/readme.html" class="btn btn-neutral float-right" title="MVB ASFIFOX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

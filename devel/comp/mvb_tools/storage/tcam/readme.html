@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVB TCAM &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Network Tools" href="../../../../nic.html" />
+    <link rel="prev" title="MVB Hash Table Simple" href="../mvb_hash_table_simple/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../flow/channel_router/readme.html">MVB Channel Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/discard/readme.html">MVB DISCARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_items/readme.html">MVB Merge Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams/readme.html">MVB Merge Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/demux/readme.html">MVB DEMUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mux/readme.html">MVB MUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/shakedown/readme.html">MVB Shakedown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/operation/readme.html">MVB Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lookup_table/readme.html">MVB Lookup Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifox/readme.html">MVB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifox/readme.html">MVB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB TCAM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mvb.html">MVB Components</a></li>
+      <li class="breadcrumb-item active">MVB TCAM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mvb_tools/storage/tcam/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mvb-tcam">
+<span id="id1"></span><h1>MVB TCAM<a class="headerlink" href="#mvb-tcam" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_tcam">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_TCAM</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_tcam" title="Link to this definition"></a></dt>
+<dd><section id="entity-declaration">
+<h2>Entity declaration<a class="headerlink" href="#entity-declaration" title="Link to this heading"></a></h2>
+<p>MVB wrapper around <code class="docutils literal notranslate"><span class="pre">TCAM2</span></code>: instantiates one full, independent
+TCAM2 core <strong>per MVB item</strong> (MVB_ITEMS instances), each holding its own
+complete, identical copy of the table content. This is what makes it
+possible to match MVB_ITEMS independent keys against the table in the
+same clock cycle, but it also means <strong>FPGA resource usage scales linearly
+with MVB_ITEMS</strong> - a wide MVB bus with a large or wide TCAM table can
+become very expensive; consider whether the use case really needs a full
+MVB_ITEMS-way replicated TCAM.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only TCAM2 instance 0 is built with READ_FROM_TCAM enabled; the
+READ_* interface always reads through that single instance
+(WRITE_* is broadcast identically to every instance, so all copies
+stay in sync regardless).</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>MATCH_OUT_ADDR is <strong>not</strong> a binary address like READ_ADDR/WRITE_ADDR.
+For each MVB item it is an ITEMS-bit one-hot/bitmap vector, one bit per
+stored TCAM row, since a TCAM can match multiple (or zero) rows at
+once; MATCH_OUT_HIT for that item is simply the OR of its bits.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A single WRITE_EN request and a match never overlap - the hardware
+always finishes one before starting the other - so a match always sees
+that one row’s complete old or complete new content, never a mix. You
+don’t need to add anything yourself for that.</p>
+<p>This only covers a single row, though. Updating several rows is just a
+sequence of separate writes, and matches can happen in between them -
+seeing some rows already updated and others not yet. If your
+application needs the whole table to look consistent during a
+multi-row update, that’s up to you to arrange (e.g. by holding off
+match traffic for the duration).</p>
+</div>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of MVB items transferred in one word. Directly multiplies
+FPGA resource usage, see the WARNING above.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>36</p></td>
+<td><p>Width of one TCAM item (and of WRITE_DATA/WRITE_MASK/MATCH_DATA/READ_DATA/READ_MASK per item), in bits.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-items"><td><p>ITEMS</p></td>
+<td><p>integer</p></td>
+<td><p>16</p></td>
+<td><p>Number of rows (entries) in the TCAM table.
+For optimal resource usage should be a multiple of
+2*L*(2^RESOURCES_SAVING) on Xilinx (where L is the number of
+LUTRAMs in one SLICEM), or of 16*(2^RESOURCES_SAVING) on Intel
+(32*(2^RESOURCES_SAVING) when USE_FRAGMENTED_MEM is set).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-resources_saving"><td><p>RESOURCES_SAVING</p></td>
+<td><p>integer</p></td>
+<td><p>0</p></td>
+<td><p>Trade-off between FPGA resources and matching speed. Possible
+values are 0-4 on all devices. Higher values save resources
+and speed up writes, but cost both matching throughput and latency:</p>
+<ul class="simple">
+<li><p>Throughput (how often a new match can be started): one match
+every CLK cycle at RESOURCES_SAVING = 0 (MATCH_DST_RDY stays
+asserted, one result per clock back-to-back); only one match
+every 2^RESOURCES_SAVING cycles for higher values (MATCH_DST_RDY
+drops after each accepted match until that many cycles pass).</p></li>
+<li><p>RX-to-TX latency of one result (MATCH_OUT_* after the matching
+MATCH_DATA is accepted): a fixed 3 + (2^RESOURCES_SAVING - 1)
+CLK cycles - i.e. 3 cycles at RESOURCES_SAVING = 0, growing by
+2^RESOURCES_SAVING - 1 for higher values.</p></li>
+</ul>
+<p>Write speed (time until WRITE_RDY returns after a write) is
+2^(5-RESOURCES_SAVING)+1 CLK cycles, the same on all devices.</p>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-write_before_match"><td><p>WRITE_BEFORE_MATCH</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>When true, a WRITE_EN request presented in the same cycle as a
+MATCH_EN request is served first (match is delayed); when false,
+match has priority over write. A read request is only ever
+deprioritized against a concurrent write (READ_RDY is simply
+“not WRITE_EN”) - it is not affected by match activity at all,
+regardless of this generic’s value.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-read_from_tcam"><td><p>READ_FROM_TCAM</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Enables the READ_* interface (through TCAM2 instance 0 only, see
+the WARNING above) by adding extra internal storage that mirrors
+WRITE_DATA/WRITE_MASK. Costs extra resources; leave false if the
+table content never needs to be read back.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-output_read_regs"><td><p>OUTPUT_READ_REGS</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Adds an output register stage on the READ_DATA/READ_MASK/READ_DATA_VLD
+path for better timing, at the cost of one extra CLK cycle of read
+latency. Has no effect unless READ_FROM_TCAM = true (that extra
+storage is what this register stage sits on).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-use_unmatchable"><td><p>USE_UNMATCHABLE</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Changes the meaning of a masked-out bit (WRITE_MASK bit = ‘0’):</p>
+<ul class="simple">
+<li><p>false - a masked bit is always don’t-care (matches both ‘0’ and ‘1’).</p></li>
+<li><p>true  - a masked bit is don’t-care only if the corresponding
+WRITE_DATA bit is ‘0’; if that WRITE_DATA bit is ‘1’, the whole
+row becomes permanently UNMATCHABLE.</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-use_fragmented_mem"><td><p>USE_FRAGMENTED_MEM</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Trade higher memory-primitive utilization for a discontinuous row
+address space: uses the full Intel MLAB width (20 instead of 16
+bits, rows 21-32 unused per block) or the full Xilinx SLICEM width
+(14 instead of 8 on ULTRASCALE/VERSAL, 6 instead of 4 on 7SERIES,
+rows 15-16/7-8 unused per block).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target FPGA device.
+“7SERIES”, “ULTRASCALE”, “VERSAL”, “ARRIA10”, “STRATIX10”, “AGILEX”</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-is_xilinx"><td><p>IS_XILINX</p></td>
+<td><p>boolean</p></td>
+<td><p>(DEVICE = “7SERIES” or DEVICE = “ULTRASCALE” or DEVICE = “VERSAL”)</p></td>
+<td><p>Manufacturer of the FPGA device, derived from DEVICE by default;
+only override together with DEVICE.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-is_intel"><td><p>IS_INTEL</p></td>
+<td><p>boolean</p></td>
+<td><p>(DEVICE = “ARRIA10” or DEVICE = “STRATIX10” or DEVICE = “AGILEX”)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-intel_data_width"><td><p>INTEL_DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>tsel(USE_FRAGMENTED_MEM, 20, 16)</p></td>
+<td><p>The following generics are derived automatically from the
+generics above and are not meant to be overridden directly.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-xilinx_data_width"><td><p>XILINX_DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>tsel(DEVICE = “ULTRASCALE” or DEVICE = “VERSAL”, tsel(USE_FRAGMENTED_MEM, 14, 8), tsel(USE_FRAGMENTED_MEM, 6, 4))</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-memory_data_width"><td><p>MEMORY_DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>tsel(IS_XILINX, XILINX_DATA_WIDTH, INTEL_DATA_WIDTH)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-aligned_data_width"><td><p>ALIGNED_DATA_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>2**log2(MEMORY_DATA_WIDTH)</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_tcam-items_aligned"><td><p>ITEMS_ALIGNED</p></td>
+<td><p>natural</p></td>
+<td><p>tsel(USE_FRAGMENTED_MEM, div_roundup(ITEMS,MEMORY_DATA_WIDTH)*ALIGNED_DATA_WIDTH, ITEMS)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_tcam-addr_width"><td><p>ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>max(1, log2(ITEMS_ALIGNED))</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>CLOCK AND RESET</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>READ INTERFACE (functional only when READ_FROM_TCAM = true; reads</p></td>
+<td><p>=====</p></td>
+<td><p>through TCAM2 instance 0, see the WARNING above)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-read_addr"><td><p>READ_ADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Row address to read; any value in 0 to ITEMS_ALIGNED-1.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-read_en"><td><p>READ_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-read_rdy"><td><p>READ_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Equivalent to “not WRITE_EN” (combinational); deasserted only
+while WRITE_EN is currently asserted, independent of any match
+activity or of WRITE_BEFORE_MATCH.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-read_data"><td><p>READ_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-read_mask"><td><p>READ_MASK</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-read_data_vld"><td><p>READ_DATA_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Valid one CLK cycle after a request accepted with READ_RDY = ‘1’
+(plus one more CLK cycle when OUTPUT_READ_REGS = true).</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>WRITE INTERFACE (broadcast identically to every one of the</p></td>
+<td><p>=====</p></td>
+<td><p>MVB_ITEMS replicated TCAM2 instances)</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-write_data"><td><p>WRITE_DATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-write_mask"><td><p>WRITE_MASK</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>‘0’ bit = don’t-care (or UNMATCHABLE, see USE_UNMATCHABLE); ‘1’ bit = must match WRITE_DATA.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-write_addr"><td><p>WRITE_ADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Row address to write; any value in 0 to ITEMS_ALIGNED-1.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-write_en"><td><p>WRITE_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-write_rdy"><td><p>WRITE_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Asserted only when every one of the MVB_ITEMS replicated instances is ready to accept a write.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MATCH INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-match_data"><td><p>MATCH_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-match_vld"><td><p>MATCH_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-match_src_rdy"><td><p>MATCH_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-match_dst_rdy"><td><p>MATCH_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Asserted only when every one of the MVB_ITEMS replicated instances
+is ready to match (i.e. the whole MVB word is matched together, or not at all).</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MATCH_OUT INTERFACE - result of a MATCH interface request, 3 CLK</p></td>
+<td><p>=====</p></td>
+<td><p>cycles later (plus the RESOURCES_SAVING match latency, see above)</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-match_out_hit"><td><p>MATCH_OUT_HIT</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Per MVB item: ‘1’ if the table held at least one matching row for that item’s MATCH_DATA.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-match_out_addr"><td><p>MATCH_OUT_ADDR</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Per MVB item: one-hot/bitmap of matching rows (ITEMS bits), see the WARNING above - not a binary address.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_tcam-match_out_vld"><td><p>MATCH_OUT_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_tcam-match_out_src_rdy"><td><p>MATCH_OUT_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../mvb_hash_table_simple/readme.html" class="btn btn-neutral float-left" title="MVB Hash Table Simple" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../nic.html" class="btn btn-neutral float-right" title="Network Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MVB Merge Streams &mdash; NDK-FPGA  documentation</title>
+  <title>MVB ASFIFOX &mdash; NDK-FPGA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
@@ -19,8 +19,8 @@
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="MVB DEMUX" href="../demux/readme.html" />
-    <link rel="prev" title="MVB Merge Items" href="../merge_items/readme.html" /> 
+    <link rel="next" title="MVB ASFIFO BRAM Xilinx" href="../asfifo_bram_xilinx/readme.html" />
+    <link rel="prev" title="MVB FIFOX" href="../fifox/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -68,27 +68,27 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../channel_router/readme.html">MVB Channel Router</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../discard/readme.html">MVB DISCARD</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../merge_items/readme.html">MVB Merge Items</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Merge Streams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../demux/readme.html">MVB DEMUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mux/readme.html">MVB MUX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../merge_n_to_m/readme.html">SHAKEDOWN</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../shakedown/readme.html">MVB Shakedown</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../operation/readme.html">MVB Operation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../mvb2mfb/readme.html">MVB2MFB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../gate/readme.html">MVB Gate</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/lookup_table/readme.html">MVB Lookup Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/fifox/readme.html">MVB FIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/asfifox/readme.html">MVB ASFIFOX</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/fifo/readme.html">MVB FIFO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../storage/tcam/readme.html">MVB TCAM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/channel_router/readme.html">MVB Channel Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/discard/readme.html">MVB DISCARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_items/readme.html">MVB Merge Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams/readme.html">MVB Merge Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/demux/readme.html">MVB DEMUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mux/readme.html">MVB MUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/shakedown/readme.html">MVB Shakedown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/operation/readme.html">MVB Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lookup_table/readme.html">MVB Lookup Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifox/readme.html">MVB FIFOX</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tcam/readme.html">MVB TCAM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
@@ -147,9 +147,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../../mvb.html">MVB Components</a></li>
-      <li class="breadcrumb-item active">MVB Merge Streams</li>
+      <li class="breadcrumb-item active">MVB ASFIFOX</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../../_sources/comp/mvb_tools/flow/merge_streams/readme.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../../_sources/comp/mvb_tools/storage/asfifox/readme.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -157,16 +157,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mvb-merge-streams">
-<span id="id1"></span><h1>MVB Merge Streams<a class="headerlink" href="#mvb-merge-streams" title="Link to this heading"></a></h1>
+  <section id="mvb-asfifox">
+<span id="id1"></span><h1>MVB ASFIFOX<a class="headerlink" href="#mvb-asfifox" title="Link to this heading"></a></h1>
 <dl class="vhdl autoentity">
-<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_merge_streams">
-<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_MERGE_STREAMS</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_merge_streams" title="Link to this definition"></a></dt>
-<dd><p>The MVB_MERGE_STREAMS component is used to merge two or more independent MVB
-streams into one. The order of merging items is random. The speed of
-switching between input streams can be influenced by the width of the timeout
-signal (parameter SW_TIMEOUT_W). Better transmission efficiency can be
-achieved by enabling input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).</p>
+<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_asfifox">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_ASFIFOX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_asfifox" title="Link to this definition"></a></dt>
+<dd><p>Asynchronous (independent RX/TX clock domain) FIFO for the MVB bus,
+implemented as a thin wrapper around the generic <code class="docutils literal notranslate"><span class="pre">ASFIFOX</span></code> component.
+The MVB item validity (RX_VLD/TX_VLD) is stored together with RX_DATA/TX_DATA
+in the same memory word, so both cross the clock-domain boundary atomically.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>RX_RESET and TX_RESET are combined internally (by the underlying
+ASFIFOX core) into a single reset of the whole FIFO, synchronized
+separately into each clock domain. Asserting either one resets
+<strong>both</strong> the write and the read side; they are not independent
+per-side resets.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -176,36 +183,77 @@ achieved by enabling input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams-mvb_items"><td><p>MVB_ITEMS</p></td>
-<td><p>natural</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifox-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>integer</p></td>
 <td><p>4</p></td>
-<td><p>Number of MVB items</p></td>
+<td><p>Number of MVB items transferred in one word.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_merge_streams-mvb_item_width"><td><p>MVB_ITEM_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifox-mvb_item_width"><td><p>MVB_ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Width of one MVB item in bits.
+Any positive value.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifox-fifo_items"><td><p>FIFO_ITEMS</p></td>
 <td><p>natural</p></td>
-<td><p>32</p></td>
-<td><p>MVB item width in bits</p></td>
+<td><p>512</p></td>
+<td><p>FIFO depth in number of data words.
+Must be a power of two, minimum value is 2.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams-rx_streams"><td><p>RX_STREAMS</p></td>
-<td><p>natural</p></td>
-<td><p>2</p></td>
-<td><p>Number of input MVB streams, must be power of two</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifox-ram_type"><td><p>RAM_TYPE</p></td>
+<td><p>string</p></td>
+<td><p>“BRAM”</p></td>
+<td><p>Select memory implementation:</p>
+<ul class="simple">
+<li><p>“LUT” - distributed/LUT memory, effective for a shallow FIFO (approx. FIFO_ITEMS &lt;= 64).</p></li>
+<li><p>“BRAM” - block RAM, effective for a deep FIFO (approx. FIFO_ITEMS &gt; 64).</p></li>
+<li><p>“AUTO” - treated the same as “BRAM” by the underlying core.</p></li>
+</ul>
+</td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_merge_streams-rx_shakedown_en"><td><p>RX_SHAKEDOWN_EN</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifox-fwft_mode"><td><p>FWFT_MODE</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
-<td><p>Enable MVB SHAKEDOWN on each MVB input stream</p></td>
+<td><p>First Word Fall Through mode. If true, valid data is ready at
+TX_DATA/TX_VLD (TX_SRC_RDY = ‘1’) without TX_DST_RDY having to be
+asserted first.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Setting this to false removes the automatic advance into the
+output register: the core then only reads a new word in direct
+response to TX_DST_RDY, so TX_DST_RDY must already be asserted
+one or more cycles <strong>before</strong> TX_SRC_RDY becomes valid for that
+word (unlike the default, where TX_SRC_RDY becomes valid on its
+own and TX_DST_RDY is only needed to accept/advance past it).</p>
+</div>
+</td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams-sw_timeout_w"><td><p>SW_TIMEOUT_W</p></td>
-<td><p>natural</p></td>
-<td><p>4</p></td>
-<td><p>Width of timeout counter, determines the time when the switch to
-the next active MVB stream occurs</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifox-output_reg"><td><p>OUTPUT_REG</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Adds one more register stage between the internal memory’s read
+output and TX_DATA/TX_VLD/TX_SRC_RDY. Improves timing at the cost
+of a few more flip-flops and one additional TX_CLK cycle of
+latency between writing a word (RX side) and it becoming valid
+on the TX side.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mvb_merge_streams-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifox-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
-<td><p>“AGILEX”</p></td>
-<td><p>FPGA device string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target FPGA device, passed through to the underlying memory
+implementation (affects the “LUT” RAM_TYPE only, where it selects
+the correct distributed/MLAB memory primitive).
+“7SERIES”, “ULTRASCALE”, “VERSAL”, “STRATIX10”, “ARRIA10”, “AGILEX”</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifox-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>FIFO_ITEMS/2</p></td>
+<td><p>Number of free words (write/RX side) at or below which RX_AFULL is asserted.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifox-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>FIFO_ITEMS/2</p></td>
+<td><p>Number of stored words (read/TX side) at or below which TX_AEMPTY is asserted.</p></td>
 </tr>
 </tbody>
 </table>
@@ -218,55 +266,96 @@ the next active MVB stream occurs</p></td>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even" id="vhdl-portsignal-mvb_merge_streams-clk"><td><p>CLK</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX INTERFACE (write side, RX_CLK domain)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-rx_clk"><td><p>RX_CLK</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>Clock input</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_merge_streams-reset"><td><p>RESET</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-rx_reset"><td><p>RX_RESET</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>Reset input synchronized with CLK</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_merge_streams-rx_data"><td><p>RX_DATA</p></td>
-<td><p>slv_array_t(RX_STREAMS-1 downto 0)(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>RX MVB: data word with MVB items</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_merge_streams-rx_vld"><td><p>RX_VLD</p></td>
-<td><p>slv_array_t(RX_STREAMS-1 downto 0)(MVB_ITEMS-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-rx_vld"><td><p>RX_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>RX MVB: valid of each MVB item</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_merge_streams-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
-<td><p>std_logic_vector(RX_STREAMS-1 downto 0)</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>RX MVB: source ready</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_merge_streams-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
-<td><p>std_logic_vector(RX_STREAMS-1 downto 0)</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td><p>RX MVB: destination ready</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_merge_streams-tx_data"><td><p>TX_DATA</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-rx_afull"><td><p>RX_AFULL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Asserted when the number of free words drops to or below ALMOST_FULL_OFFSET.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-rx_status"><td><p>RX_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Number of words currently stored in the FIFO (write/RX side view).</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX INTERFACE (read side, TX_CLK domain - independent of RX_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-tx_clk"><td><p>TX_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-tx_reset"><td><p>TX_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-tx_data"><td><p>TX_DATA</p></td>
 <td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>TX MVB: data word with MVB items</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_merge_streams-tx_vld"><td><p>TX_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-tx_vld"><td><p>TX_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>TX MVB: valid of each MVB item</p></td>
+<td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_merge_streams-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
-<td><p>TX MVB: source ready</p></td>
+<td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_merge_streams-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td><p>TX MVB: destination ready</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifox-tx_aempty"><td><p>TX_AEMPTY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Asserted when the number of stored words drops to or below ALMOST_EMPTY_OFFSET.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifox-tx_status"><td><p>TX_STATUS</p></td>
+<td><p>std_logic_vector(log2(FIFO_ITEMS) downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Number of words currently stored in the FIFO (read/TX side view);
+may be nonzero even before the data appears on TX_DATA/TX_VLD.</p></td>
 </tr>
 </tbody>
 </table>
@@ -278,8 +367,8 @@ the next active MVB stream occurs</p></td>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../merge_items/readme.html" class="btn btn-neutral float-left" title="MVB Merge Items" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../demux/readme.html" class="btn btn-neutral float-right" title="MVB DEMUX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../fifox/readme.html" class="btn btn-neutral float-left" title="MVB FIFOX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../asfifo_bram_xilinx/readme.html" class="btn btn-neutral float-right" title="MVB ASFIFO BRAM Xilinx" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
