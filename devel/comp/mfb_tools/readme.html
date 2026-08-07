@@ -85,6 +85,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#example-of-function-of-the-eof-pos-index">Example of function of the EOF_POS index</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#design-considerations">Design considerations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#timing-diagrams">Timing diagrams</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#scenario-1">Scenario 1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#scenario-2">Scenario 2</a></li>
@@ -393,6 +394,48 @@ no frames inside. Whether this is the case or the word is empty, is
 indicated by the <cite>SRC_RDY</cite> signal.</p>
 </div>
 </section>
+</section>
+<section id="design-considerations">
+<span id="mfb-design-considerations"></span><h2>Design considerations<a class="headerlink" href="#design-considerations" title="Link to this heading"></a></h2>
+<p>When designing a module with MFB interfaces, some handshaking schemes can
+create combinational loops or deadlock the transmission. Others can cause
+data loss or duplication. The following rules ensure that such problems don’t
+occur.</p>
+<ol class="arabic simple">
+<li><p>A handshake (data transfer between transmitter and receiver) occurs on a
+clock’s rising edge when <cite>SRC_RDY</cite> and <cite>DST_RDY</cite> are both high. The receiver must
+accept the data on this clock cycle. The transmitter must provide new data
+the following clock cycle, or deassert <cite>SRC_RDY</cite>.</p></li>
+<li><p>When the offered data are valid (<cite>SRC_RDY=1</cite>), they must remain unchanged until
+received by the receiver driving <cite>DST_RDY</cite> high. Before that happens, <cite>SRC_RDY</cite>
+also must not change value (drop low).</p></li>
+<li><p>The transmitter is not allowed to wait for <cite>DST_RDY=1</cite> before driving
+<cite>SRC_RDY</cite> high. It must provide valid data as soon as it can after the
+previous data were accepted by the receiver. In other words, both
+combinatorial and sequential dependencies of <cite>SRC_RDY</cite> on <cite>DST_RDY</cite> are
+forbidden.</p></li>
+<li><p>There are no limitations on how the receiver may set <cite>DST_RDY</cite>. It can even
+be dependent on <cite>SRC_RDY</cite>; however, this situation must be documented.</p></li>
+<li><p>The above rules apply mainly to a component’s input and output MFB
+interfaces. A component may internally deviate from these rules in a
+sensible and justifiable manner, as long as it does not affect its behavior
+to the outside.</p></li>
+<li><p>Any deviations from the rules above must be documented. This also applies to
+any sort of unexpected behavior. Place it either in the description above
+the component or inside its readme.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The behavior described in Rule#3 can be achieved in a couple of ways.
+Some examples are: a register at the output enabled by
+<cite>DST_RDY=1 or SRC_RDY=0</cite>, an <a class="reference internal" href="flow/pipe/readme.html#mfb-pipe"><span class="std std-ref">(MFB) PIPE</span></a> with generic
+<cite>USE_DST_RDY=True</cite>, an <a class="reference internal" href="storage/fifox/readme.html#mfb-fifox"><span class="std std-ref">(MFB) FIFO</span></a>, etc. However, it
+would be useful for optimization purposes if there were an option to
+use just a simple, DST_RDY-enabled output register. The usage of such
+goes against this rule but a wise user can utilize it for better
+performance (meeting the timing constraints). Due to this reason, it
+should be disabled by default.</p>
+</div>
 </section>
 <section id="timing-diagrams">
 <h2>Timing diagrams<a class="headerlink" href="#timing-diagrams" title="Link to this heading"></a></h2>
