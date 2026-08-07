@@ -101,7 +101,7 @@ proc CompileMod {FNAME OPT} {
     }
     lappend opt(VLOG_SV_FLAGS)
 
-    set VCOM_PARAM ""
+    set VCOM_PARAM "-quiet"
     set VLOG_PARAM ""
 
     if { ![info exists SIM_FLAGS(TOOL)] || $SIM_FLAGS(TOOL) == "SIM"} {

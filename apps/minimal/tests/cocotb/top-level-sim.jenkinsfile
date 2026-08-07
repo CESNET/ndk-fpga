@@ -37,13 +37,32 @@ def common_card_test_run(CARD_NAME, failed, DMA_TYPE = null, PCIE_CONF = null, l
     }
 }
 
-def CARDS = ["alveo-u200", "alveo-u55c", "vcu118", "ia-420f", "n6010", "fb2cghh", "fb4cgg3", "fb2cdg1", "nfb-200g2ql", "dk-dev-1sdx-p", "g35p", "nt200a02", "agi-fh400g", "a2700", "ia-440i"]
-
-// Additional (card, DMA_TYPE, PCIE_CONF) combinations to test on top of each card's defaults
-def EXTRA_COMBINATIONS = [
-    [card: "fb2cghh", dmaType: "4"],
-    [card: "ia-440i", pcieConf: "1xGen5x16"],
+// (CARD, DMA_TYPE, PCIE_CONF) combinations to test, DMA_TYPE/PCIE_CONF are optional and
+// fall back to the card's defaults when omitted. Keys match the make variable names
+// directly. Kept as JSON so it can be parsed easily outside of Groovy too.
+def COMBINATIONS_JSON = '''
+[
+    {"CARD": "alveo-u200"},
+    {"CARD": "alveo-u55c"},
+    {"CARD": "vcu118"},
+    {"CARD": "ia-420f"},
+    {"CARD": "n6010"},
+    {"CARD": "fb2cghh"},
+    {"CARD": "fb4cgg3"},
+    {"CARD": "fb2cdg1"},
+    {"CARD": "nfb-200g2ql"},
+    {"CARD": "dk-dev-1sdx-p"},
+    {"CARD": "g35p"},
+    {"CARD": "nt200a02"},
+    {"CARD": "agi-fh400g"},
+    {"CARD": "a2700"},
+    {"CARD": "ia-440i"},
+    {"CARD": "fb2cghh", "DMA_TYPE": "4"},
+    {"CARD": "ia-440i", "PCIE_CONF": "1xGen5x16"}
 ]
+'''
+
+def COMBINATIONS = new groovy.json.JsonSlurperClassic().parseText(COMBINATIONS_JSON)
 
 node("preklad") {
     currentBuild.result = 'SUCCESS'
@@ -68,27 +87,13 @@ node("preklad") {
 
     def failed = []
 
-    for(card_name in CARDS) {
-        try {
-            timeout(time: 1, unit: 'HOURS') {
-                stage("Run test: $card_name") {
-                    common_card_test_run(card_name, failed)
-                }
-            }
-        } catch(err) {
-            echo "Error detected, test stage failed for $card_name!"
-            currentBuild.result = 'FAILURE'
-            failed.add("$card_name")
-        }
-    }
-
-    for (combo in EXTRA_COMBINATIONS) {
-        def card_name = combo.card
-        def label = combo_label(card_name, combo.dmaType, combo.pcieConf)
+    for (combo in COMBINATIONS) {
+        def card_name = combo.CARD
+        def label = combo_label(card_name, combo.DMA_TYPE, combo.PCIE_CONF)
         try {
             timeout(time: 1, unit: 'HOURS') {
                 stage("Run test: $label") {
-                    common_card_test_run(card_name, failed, combo.dmaType, combo.pcieConf, label)
+                    common_card_test_run(card_name, failed, combo.DMA_TYPE, combo.PCIE_CONF, label)
                 }
             }
         } catch(err) {

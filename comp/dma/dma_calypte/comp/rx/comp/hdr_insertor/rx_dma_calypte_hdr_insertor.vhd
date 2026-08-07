@@ -628,7 +628,7 @@ begin
                                 TX_MFB_SRC_RDY     <= '1';
                             end if;
                         else
-                            high_shift_val_nst <= INIT_SHIFT;
+                            high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
                             TX_MFB_DATA        <= bshifter_data_out(TX_MFB_DATA'high downto 128) & HDRM_DATA_PCIE_HDR;
                             TX_MFB_SOF(0)      <= '1';
                             TX_MFB_SRC_RDY     <= '1';

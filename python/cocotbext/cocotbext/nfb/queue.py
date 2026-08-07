@@ -163,6 +163,14 @@ class QueueNdpRxCalypte(QueueNdpRx):
         self._rx_sdp_flush_pending = False
         cocotb.start_soon(self._sdp_flush_loop())
 
+    async def _push_desc(self, flush=True):
+        # Push enough blocks up front to cover one packet_length_max-sized packet.
+        blocks = (self._packet_length_max + NDP_RX_CALYPTE_BLOCK_SIZE - 1) // NDP_RX_CALYPTE_BLOCK_SIZE
+        for _ in range(blocks):
+            await QueueNdpRx._push_desc(self, flush=False)
+        if flush:
+            await e(self._ctrl.flush_sp)()
+
     async def _sdp_flush_loop(self):
         # recvmsg() runs synchronously (invoked straight from the C ndp_rx_burst_get
         # trampoline), so it can only update self._ctrl.sdp locally - it cannot await
