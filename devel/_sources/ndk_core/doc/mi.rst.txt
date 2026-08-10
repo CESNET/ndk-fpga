@@ -36,3 +36,10 @@ An address range of 26 bits is available for the whole NDK firmware. It is divid
 
 .. NOTE::
     A module with an allocated address space can further divide it among its subcomponents. A description of the address space allocation must be included in DevTree.
+
+.. WARNING::
+    The base (starting) address assigned to a component must be **aligned to the size of the address space allocated to it** -- a multiple of that size, normally a power of two. This applies at every level where an address space is divided among subcomponents: in the main allocation above, in DevTree ``reg`` properties, and in the ``ADDR_BASE`` generic of address decoders such as :ref:`MI_SPLITTER_PLUS_GEN <mi_splitter_plus_gen>`.
+
+    A component's own internal register decoder usually looks only at a limited number of the least significant ``ADDR`` bits (e.g. ``ADDR(7 downto 2)``) and assumes they are ``0`` for its first register. An unaligned base address breaks this assumption and, with it, the component's internal decoding -- even though the overall address range still does not overlap with any other component. See :ref:`address alignment <mi_addr_alignment>` for why registers use only these bits.
+
+    Example: a component needing 256 B (0x100) of address space, decoded with ``ADDR(7 downto 2)``, must start at a multiple of 0x100.
