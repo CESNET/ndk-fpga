@@ -308,12 +308,15 @@ class testbench():
         await RisingEdge(self.dut.CLK)
 
 
-# NOTE: Do not set frame_size_max > pcie_mps until the DUT suports multiple breaks per word! TODO: Remove when the DUT is fixed
-# NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
-@cocotb.test()
-async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256, pcie_mps=256):
-    assert frame_size_max <= pcie_mps, "frame_size_max must be less than or equal to PCIE_MPS for this test." # TODO: Remove when the DUT is fixed
-    assert pcie_mps in [128, 256, 512, 1024, 2048, 4096, 8192, 16384], "PCIE_MPS must be one of the standard values."
+async def _run_test(
+    dut,
+    frame_count: int = 10000,
+    frame_size_min: int = 60,
+    frame_size_max: int = 256,
+    pcie_mps: int = 256,
+    addr_gen=lambda: randint(0, 2**64 - 1)
+):
+    assert pcie_mps in [128, 256, 512, 1024, 2048, 4096], "PCIE_MPS must be one of the standard values."
 
     dut.RESET.value = 1
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
@@ -333,8 +336,13 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256
     tb.mfb_tx_drv.start((i, 3) for i in itertools.count())
     await ClockCycles(tb.dut.CLK, 10)
 
+    # Decrease max size of generated frames in case the DUT generics do not allow it
+    pkt_mtu = tb.dut.PKT_MTU.value
+    if frame_size_max > pkt_mtu:
+        frame_size_max = pkt_mtu
+
     for mfb_pkt in random_packets(frame_size_min, frame_size_max, frame_count):
-        addr = randint(0, 2**tb.dut.ADDRESS_WIDTH.value - 1)
+        addr = addr_gen()
         length = len(mfb_pkt)
         # Generate a MVB instruction for each packet
         mvb_instr = MvbTrAddressAndLength()
@@ -362,3 +370,43 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256
 
     cocotb.log.info("\n--- Test complete, getting results ---\n")
     raise tb.scoreboard.result
+
+
+# NOTE: Do not set frame_size_max > pcie_mps until the DUT suports multiple breaks per word! TODO: Remove when the DUT is fixed
+# NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
+@cocotb.test()
+async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256, pcie_mps=256):
+    assert frame_size_max <= pcie_mps, "frame_size_max must be less than or equal to PCIE_MPS for this test." # TODO: Remove when the DUT is fixed
+
+    await _run_test(
+        dut,
+        frame_count=frame_count,
+        frame_size_min=frame_size_min,
+        frame_size_max=frame_size_max,
+        pcie_mps=pcie_mps,
+        addr_gen=lambda: randint(0, 2**dut.ADDRESS_WIDTH.value - 1)
+    )
+
+
+# NOTE: Another test variant that would avoid the unspported multiple breaks per word in the DUT.
+#       In this test, we make sure the generated addresses are page-aligned so no page-break occurs.
+#       This way, we can have packet sizes of arbitrary length.
+@cocotb.test()
+async def run_test_page_aligned_frames(dut, frame_count=2000, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
+
+    page_size = dut.PAGE_SIZE.value
+    address_width = dut.ADDRESS_WIDTH.value
+    assert page_size & (page_size - 1) == 0, "PAGE_SIZE must be a power of two for the page-aligned workaround."
+
+    def _page_aligned_addr():
+        # Page-aligning the address
+        return randint(0, (2**address_width) // page_size) * page_size
+
+    await _run_test(
+        dut,
+        frame_count=frame_count,
+        frame_size_min=frame_size_min,
+        frame_size_max=frame_size_max,
+        pcie_mps=pcie_mps,
+        addr_gen=_page_aligned_addr
+    )
