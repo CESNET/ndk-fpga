@@ -4,6 +4,7 @@
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
 from typing import Optional, Union
+import logging
 import cocotb
 import cocotb.triggers
 import cocotb.utils
@@ -17,6 +18,7 @@ from cocotbext.ofm.base.bus_fixup import SignalProxy
 
 
 st = cocotb.utils.get_sim_time
+logger = logging.getLogger(__name__)
 
 
 class Bus():
@@ -40,7 +42,11 @@ class Bus():
         self._label = label
 
     def _get_handle_slice(self, name):
-        o = getattr(self._instance, self._prefix + self._sep + name)
+        attr = self._prefix + self._sep + name
+        if not hasattr(self._instance, attr):
+            return None, None
+
+        o = getattr(self._instance, attr)
         sl = ()
         if self._index is not None:
             if self._slices is not None:
@@ -58,12 +64,30 @@ class Bus():
     def _get_handle(self, name):
         return self._get_handle_slice(name)[0]
 
+    def _get_handle_span(self, name):
+        """Returns (handle, low, width) of this bus' part of the signal: the
+        whole signal, or its slice when the bus shares it with others."""
+        h, sl = self._get_handle_slice(name)
+        if h is None:
+            return None, 0, 0
+        if sl:
+            return h, sl[0], sl[1] - sl[0]
+        return h, 0, len(h)
+
     def add_wave(self, **kwargs):
+        """Adds every signal of _SIGNALS the design has."""
         groups = self._get_groups(**kwargs)
+        found = False
         for s in self._SIGNALS:
             h, sl = self._get_handle_slice(s)
-            p = self._w.cocotb2path(h, sl)
-            self._w.add_wave(p, **(kwargs | dict(groups=groups, label=s)))
+            if h is not None:
+                found = True
+                p = self._w.cocotb2path(h, sl)
+                self._w.add_wave(p, **(kwargs | dict(groups=groups, label=s)))
+
+        if not found:
+            path = getattr(self._instance, '_path', self._instance)
+            raise AttributeError(f"{type(self).__name__}: no signal of bus '{self._prefix}' found in {path}, expected some of {self._SIGNALS}")
 
     def _add_transfer(self, terms, item=None, **kwargs):
         """Adds a "transfer" virtual function, high while all present terms
@@ -92,7 +116,11 @@ class Bus():
 
 
 class MvbBus(Bus):
-    _SIGNALS = ['DATA', 'VLD', 'SRC_RDY', 'DST_RDY']
+    # Control signals; DATA, or any other signal a subclass lists in _SIGNALS,
+    # is split per item. A bus with differently named data signals can use:
+    #   _SIGNALS = ['ADDR', 'LEN'] + MvbBus._BASE_SIGNALS
+    _BASE_SIGNALS = ['VLD', 'SRC_RDY', 'DST_RDY']
+    _SIGNALS = ['DATA'] + _BASE_SIGNALS
     _ITEMS = []
 
     def add_wave(self, **kwargs):
@@ -103,20 +131,48 @@ class MvbBus(Bus):
             raise ValueError(f"{type(self).__name__}: {self._prefix}{self._sep}VLD is an array of buses, pass the bus index")
 
         super().add_wave(**kwargs)
-        o = self._get_handle('DATA')
-        sr = self._get_handle('SRC_RDY')
-        dr = self._get_handle('DST_RDY')
-        vld = self._get_handle('VLD')
+        groups = self._get_groups(**kwargs)
+        sr = self._get_handle_slice('SRC_RDY')
+        dr = self._get_handle_slice('DST_RDY')
+        vld, vld_l, vld_w = self._get_handle_span('VLD')
+        items = 1 if vld is None else vld_w
 
-        dw = len(o)
-        off = dw // len(vld)
-        for v in range(len(vld)):
-            groups = self._get_groups(**kwargs)
-            groups.append(v)
-            self._add_transfer([(sr, ()), (dr, ()), (vld[v], ())], item=v if len(vld) > 1 else None, **(kwargs | dict(groups=groups)))
-            for name, ran in self._ITEMS:
-                bus = [(o, range(ran.start + off * v, ran.stop + off * v))]
-                self._w.add_wave(f"{name}", **(kwargs | dict(groups=groups, bus=bus)))
+        # A signal is split per item only when its width divides evenly;
+        # anything else (e.g. a flag shared by all items) is shown just as
+        # a whole, by Bus.add_wave above.
+        def item_span(name):
+            h, low, width = self._get_handle_span(name)
+            if h is None or width % items != 0:
+                if h is not None and items > 1:
+                    logger.info(f"{self._prefix}_{name}: width {width} is not a multiple of {items} items, not split per item")
+                return None
+            return h, low, width // items
+
+        split = [(name, None) for name in self._SIGNALS if name not in ['DATA'] + self._BASE_SIGNALS]
+        if self._ITEMS:
+            split += [('DATA', self._ITEMS)]
+
+        spans = []
+        for name, fields in split:
+            span = item_span(name)
+            if span is not None:
+                spans.append((name, fields, *span))
+
+        for v in range(items):
+            igroups = groups + [v]
+            if vld is None:
+                vld_term = (None, ())
+            elif self._slices is not None:
+                vld_term = (vld, (vld_l + v,))
+            else:
+                vld_term = (vld[v], ())
+            self._add_transfer([sr, dr, vld_term], item=v if items > 1 else None, **(kwargs | dict(groups=igroups)))
+
+            for name, fields, h, low, w in spans:
+                off = low + w * v
+                for label, ran in (fields or [(name, range(0, w))]):
+                    bus = [(h, range(ran.start + off, ran.stop + off))]
+                    self._w.add_wave(f"{label}", **(kwargs | dict(groups=igroups, bus=bus)))
 
 
 class MfbBus(Bus):
