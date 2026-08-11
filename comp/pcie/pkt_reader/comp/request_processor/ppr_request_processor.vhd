@@ -106,10 +106,13 @@ architecture FULL of PPR_REQUEST_PROCESSOR is
     --                                CONSTANTS
     -- =====================================================================
 
+    -- DMA_REQUEST_LENGTH_W extended by 2 bits (conversion from Dwords to Bytes).
+    constant DMA_REQUEST_LENGTH_W_EXT : natural := DMA_REQUEST_LENGTH_W + 2;
+
     -- Base meta width. Contains:              orignal pkt len + pkt's ID
     constant META_WIDTH_BASE      : natural := log2(PKT_MTU+1) + ID_WIDTH;
     -- Extended meta width. Contains:          Last + partial pkt len + META_WIDTH_BASE
-    constant META_WIDTH_EXT       : natural := 1    + log2(PKT_MTU+1) + META_WIDTH_BASE;
+    constant META_WIDTH_EXT       : natural := 1    + PCIE_MRRS_WIDTH + META_WIDTH_BASE;
 
     -- Width of a base address that identifies the word in the Main Memory.
     constant MEM_BASE_ADDR_WIDTH  : natural := log2(MEMORY_ITEMS);
@@ -128,14 +131,14 @@ architecture FULL of PPR_REQUEST_PROCESSOR is
 
     signal instr_tx_meta             : std_logic_vector(MVB_ITEMS*META_WIDTH_BASE-1 downto 0);
     signal instr_tx_address          : std_logic_vector(MVB_ITEMS*DMA_REQUEST_GLOBAL_W-1 downto 0);
-    signal instr_tx_length           : std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
+    signal instr_tx_length           : std_logic_vector(MVB_ITEMS*PCIE_MRRS_WIDTH-1 downto 0);
     signal instr_tx_last             : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal instr_tx_valid            : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal instr_tx_src_rdy          : std_logic;
     signal instr_tx_dst_rdy          : std_logic;
 
     signal instr_tx_meta_arr         : slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH_BASE-1 downto 0);
-    signal instr_tx_length_arr       : slv_array_t(MVB_ITEMS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+    signal instr_tx_length_arr       : slv_array_t(MVB_ITEMS-1 downto 0)(PCIE_MRRS_WIDTH-1 downto 0);
     signal hdrgen_rx_meta_arr        : slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH_EXT-1 downto 0);
 
     signal hdrgen_tx_data            : std_logic_vector(MVB_ITEMS*DMA_UPHDR_WIDTH-1 downto 0);
@@ -147,7 +150,7 @@ architecture FULL of PPR_REQUEST_PROCESSOR is
     signal hdrgen_tx_meta_arr        : slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH_EXT-1 downto 0);
     signal hdrgen_tx_id              : std_logic_vector(ID_WIDTH-1 downto 0);
     signal hdrgen_tx_full_length     : std_logic_vector(log2(PKT_MTU+1)-1 downto 0);
-    signal hdrgen_tx_partial_length  : std_logic_vector(log2(PKT_MTU+1)-1 downto 0);
+    signal hdrgen_tx_partial_length  : std_logic_vector(PCIE_MRRS_WIDTH-1 downto 0);
     signal hdrgen_tx_last            : std_logic;
     signal hdr_valid                 : std_logic;
     signal idmem_record_vld          : std_logic;
@@ -224,7 +227,7 @@ begin
     generic map (
         MVB_ITEMS      => MVB_ITEMS,
         MVB_META_WIDTH => META_WIDTH_EXT,
-        PKT_MTU        => PKT_MTU,
+        PKT_MTU        => 2**DMA_REQUEST_LENGTH_W_EXT-1,
         DEVICE         => DEVICE
     )
     port map (
@@ -233,7 +236,7 @@ begin
 
         RX_MVB_META    => slv_array_ser(hdrgen_rx_meta_arr),
         RX_MVB_ADDRESS => instr_tx_address,
-        RX_MVB_LENGTH  => instr_tx_length,
+        RX_MVB_LENGTH  => std_logic_vector(resize(unsigned(instr_tx_length),DMA_REQUEST_LENGTH_W_EXT)),
         RX_MVB_VALID   => instr_tx_valid,
         RX_MVB_SRC_RDY => instr_tx_src_rdy,
         RX_MVB_DST_RDY => instr_tx_dst_rdy,
