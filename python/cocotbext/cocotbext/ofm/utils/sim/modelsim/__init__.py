@@ -9,6 +9,8 @@ import cocotb.utils
 
 st = cocotb.utils.get_sim_time
 
+logger = logging.getLogger(__name__)
+
 #__lib = cdll.LoadLibrary('/opt/modeltech/modeltech/linux_x86_64/libmtipli.so')
 try:
     __lib = cdll.LoadLibrary('libmtipli.so')
@@ -30,7 +32,6 @@ try:
     assert __interp
 except Exception:
     __lib = None
-    logger = logging.getLogger(__name__)
     logger.warn("can't load modelsim interpreter handle.")
 
 
