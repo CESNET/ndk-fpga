@@ -118,7 +118,7 @@ architecture FULL of PPW_PKT_BREAKER is
     constant WORD_ITEMS    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, MFB_REGIONS*REGION_ITEMS);
 
     -- Maximum amount of Words a single packet can stretch over.
-    constant PKT_MAX_WORDS   : natural := div_roundup(PKT_MTU, WORD_ITEMS) + 1;
+    constant PKT_MAX_WORDS   : natural := div_roundup(PKT_MTU+1, WORD_ITEMS);
     -- Maximum offset we can bee looking for to break a packet.
     constant OFFSET_WIDTH    : natural := log2(PKT_MAX_WORDS*WORD_ITEMS);
 

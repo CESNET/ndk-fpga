@@ -143,17 +143,19 @@ architecture FULL of PCIE_PKT_WRITER is
     -- When they are not, the value contains the amount of Regions that will make the word widths equal.
     constant PCIE_REGIONS_UNRESIZED : natural := AXI_WORD_WIDTH/(PCIE_MFB_REGION_SIZE*PCIE_MFB_BLOCK_SIZE*PCIE_MFB_ITEM_WIDTH);
 
+    -- DMA_REQUEST_LENGTH_W extended by 2 bits (conversion from Dwords to Bytes).
+    constant DMA_REQUEST_LENGTH_W_EXT : natural := DMA_REQUEST_LENGTH_W + 2;
     -- Width of instructions destined for Packet Breaker: Last flag + transaction length.
-    constant PBR_INSTR_WIDTH : natural := 1 + log2(PKT_MTU+1);
+    constant PBR_INSTR_WIDTH          : natural := 1 + DMA_REQUEST_LENGTH_W_EXT;
     -- Width of instructions destined for Packet Extender: First and Last Invalid Bytes.
-    constant EXT_INSTR_WIDTH : natural := DMA_REQUEST_FIRSTIB_W + DMA_REQUEST_LASTIB_W;
+    constant EXT_INSTR_WIDTH          : natural := DMA_REQUEST_FIRSTIB_W + DMA_REQUEST_LASTIB_W;
 
     -- =====================================================================
     --                                 SIGNALS
     -- =====================================================================
 
     signal hdrgen_rx_mvb_address        : std_logic_vector(MFB_REGIONS*ADDRESS_WIDTH-1 downto 0);
-    signal hdrgen_rx_mvb_length         : std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
+    signal hdrgen_rx_mvb_length         : std_logic_vector(MFB_REGIONS*PCIE_MPS_WIDTH-1 downto 0);
     signal hdrgen_rx_mvb_meta           : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal hdrgen_rx_mvb_valid          : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal hdrgen_rx_mvb_src_rdy        : std_logic;
@@ -166,7 +168,7 @@ architecture FULL of PCIE_PKT_WRITER is
     signal hdrgen_tx_mvb_dst_rdy        : std_logic;
 
     signal hdrgen_tx_mvb_data_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
-    signal hdrgen_tx_mvb_len_fixed      : u_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
+    signal hdrgen_tx_mvb_len_fixed      : u_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_LENGTH_W_EXT-1 downto 0);
     signal pbr_instr_fifo_rx_data_arr   : slv_array_t(MFB_REGIONS-1 downto 0)(PBR_INSTR_WIDTH-1 downto 0);
     signal pbr_instr_fifo_rx_data       : std_logic_vector(MFB_REGIONS*PBR_INSTR_WIDTH-1 downto 0);
     signal pbr_instr_fifo_rx_vld        : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -205,8 +207,8 @@ architecture FULL of PCIE_PKT_WRITER is
     signal fifo_tx_axis_tvalid          : std_logic;
     signal fifo_tx_axis_tready          : std_logic;
 
-    signal pbr_rx_mvb_length_arr        : slv_array_t(MFB_REGIONS-1 downto 0)(log2(PKT_MTU+1)-1 downto 0);
-    signal pbr_rx_mvb_length            : std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0);
+    signal pbr_rx_mvb_length_arr        : slv_array_t(MFB_REGIONS-1 downto 0)(DMA_REQUEST_LENGTH_W_EXT-1 downto 0);
+    signal pbr_rx_mvb_length            : std_logic_vector(MFB_REGIONS*DMA_REQUEST_LENGTH_W_EXT-1 downto 0);
     signal pbr_rx_mvb_last              : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal pbr_rx_mvb_valid             : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal pbr_rx_mvb_src_rdy           : std_logic;
@@ -288,7 +290,7 @@ begin
     dma_uphdr_gen_i : entity work.PPW_DMA_UPHDR_GEN
     generic map (
         MVB_ITEMS     => MFB_REGIONS,
-        PKT_MTU       => PKT_MTU,
+        PKT_MTU       => 2**DMA_REQUEST_LENGTH_W_EXT-1,
         ADDRESS_WIDTH => ADDRESS_WIDTH,
         META_WIDTH    => 1
     )
@@ -297,7 +299,7 @@ begin
         RESET          => RESET,
 
         RX_MVB_ADDRESS => hdrgen_rx_mvb_address,
-        RX_MVB_LENGTH  => hdrgen_rx_mvb_length,
+        RX_MVB_LENGTH  => std_logic_vector(resize(unsigned(hdrgen_rx_mvb_length),DMA_REQUEST_LENGTH_W_EXT)),
         RX_MVB_META    => hdrgen_rx_mvb_meta,
         RX_MVB_VALID   => hdrgen_rx_mvb_valid,
         RX_MVB_SRC_RDY => hdrgen_rx_mvb_src_rdy,
@@ -543,7 +545,7 @@ begin
         AXI_RX_DIRECT   => AXI_RX_DIRECT,
         AXI_TX_DIRECT   => True,
         AXI_TDATA_WIDTH => AXI_TDATA_WIDTH,
-        PKT_MTU         => PKT_MTU,
+        PKT_MTU         => 2**DMA_REQUEST_LENGTH_W_EXT-1,
         DEVICE          => DEVICE
     )
     port map (

@@ -51,7 +51,7 @@ entity PPW_MTU_BREAK_PLANNER is
         -- Received Metadata are duplicated for each generated partial instruction.
         TX_MVB_META    : out std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
         TX_MVB_ADDRESS : out std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
-        TX_MVB_LENGTH  : out std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
+        TX_MVB_LENGTH  : out std_logic_vector(MVB_ITEMS*PCIE_MPS_WIDTH-1 downto 0);
         -- Indicates final MVB Item for a packet.
         TX_MVB_LAST    : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_VALID   : out std_logic_vector(MVB_ITEMS-1 downto 0);
@@ -83,7 +83,7 @@ architecture FULL of PPW_MTU_BREAK_PLANNER is
 
     signal s_tx_mvb_meta     : std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
     signal s_tx_mvb_address  : std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
-    signal s_tx_mvb_length   : std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
+    signal s_tx_mvb_length   : std_logic_vector(MVB_ITEMS*PCIE_MPS_WIDTH-1 downto 0);
     signal s_tx_mvb_last     : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal s_tx_mvb_valid    : std_logic_vector(MVB_ITEMS-1 downto 0);
     signal s_tx_mvb_src_rdy  : std_logic;
@@ -96,7 +96,7 @@ architecture FULL of PPW_MTU_BREAK_PLANNER is
     signal meta_reg          : std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
 
     signal addr_offset_init : unsigned(1 downto 0);
-    signal first_chunk_len  : unsigned(log2(PKT_MTU+1)-1 downto 0);
+    signal first_chunk_len  : unsigned(PCIE_MPS_WIDTH-1 downto 0);
 
 begin
 
@@ -105,8 +105,7 @@ begin
     -- "invalid bytes" (firstib) at the beginning, reducing the usable space
     -- in the first MPS-sized chunk.
     addr_offset_init <= unsigned(RX_MVB_ADDRESS(1 downto 0));
-    first_chunk_len  <= resize(unsigned(PCIE_MPS), log2(PKT_MTU+1)) - resize(addr_offset_init, log2(PKT_MTU+1));
-
+    first_chunk_len  <= unsigned(PCIE_MPS) - resize(addr_offset_init, PCIE_MPS_WIDTH);
 
     RX_MVB_DST_RDY <= TX_MVB_DST_RDY and not (breaking and RX_MVB_SRC_RDY);
 
@@ -163,7 +162,7 @@ begin
             when ST_IDLE =>
                 s_tx_mvb_meta    <= RX_MVB_META;
                 s_tx_mvb_address <= RX_MVB_ADDRESS;
-                s_tx_mvb_length  <= std_logic_vector(first_chunk_len) when (len_over_mps = '1') else RX_MVB_LENGTH;
+                s_tx_mvb_length  <= std_logic_vector(first_chunk_len) when (len_over_mps = '1') else std_logic_vector(resize(unsigned(RX_MVB_LENGTH), PCIE_MPS_WIDTH));
                 s_tx_mvb_last    <= "0" when (len_over_mps = '1') else RX_MVB_LAST;
                 s_tx_mvb_valid   <= RX_MVB_VALID;
                 s_tx_mvb_src_rdy <= RX_MVB_SRC_RDY;
@@ -174,7 +173,7 @@ begin
             when ST_BREAK =>
                 s_tx_mvb_meta    <= meta_reg;
                 s_tx_mvb_address <= next_address_reg;
-                s_tx_mvb_length  <= std_logic_vector(resize(unsigned(PCIE_MPS), log2(PKT_MTU+1))) when (len_over_mps = '1') else std_logic_vector(len2end_reg);
+                s_tx_mvb_length  <= PCIE_MPS when (len_over_mps = '1') else std_logic_vector(resize(len2end_reg, PCIE_MPS_WIDTH));
                 s_tx_mvb_last    <= "0" when (len_over_mps = '1') else last_reg;
                 s_tx_mvb_valid   <= (others => '1');
                 s_tx_mvb_src_rdy <= '1';
