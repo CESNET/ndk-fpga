@@ -55,7 +55,7 @@ entity PPW_INSTR_GEN is
 
         TX_MVB_META    : out std_logic_vector(MVB_ITEMS*MVB_META_WIDTH-1 downto 0);
         TX_MVB_ADDRESS : out std_logic_vector(MVB_ITEMS*ADDRESS_WIDTH-1 downto 0);
-        TX_MVB_LENGTH  : out std_logic_vector(MVB_ITEMS*log2(PKT_MTU+1)-1 downto 0);
+        TX_MVB_LENGTH  : out std_logic_vector(MVB_ITEMS*PCIE_MPS_WIDTH-1 downto 0);
         -- Indicates final MVB Item for a packet.
         TX_MVB_LAST    : out std_logic_vector(MVB_ITEMS-1 downto 0);
         TX_MVB_VALID   : out std_logic_vector(MVB_ITEMS-1 downto 0);

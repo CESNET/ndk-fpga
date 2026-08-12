@@ -173,7 +173,7 @@ begin
                 s_tx_mvb_src_rdy <= RX_MVB_SRC_RDY;
 
                 nextpage_addr <= addr_page_init + 1;
-                len2end       <= unsigned(RX_MVB_LENGTH) - len2endpage_init;
+                len2end       <= resize(unsigned(RX_MVB_LENGTH) - len2endpage_init, log2(PKT_MTU+1));
                 breaking      <= '0';
 
             when ST_BREAK =>
@@ -185,7 +185,7 @@ begin
                 s_tx_mvb_src_rdy <= '1';
 
                 nextpage_addr <= nextpage_addr_reg + 1;
-                len2end       <= len2end_reg - PAGE_SIZE;
+                len2end       <= resize(len2end_reg - PAGE_SIZE, log2(PKT_MTU+1));
                 breaking      <= '1';
 
         end case;

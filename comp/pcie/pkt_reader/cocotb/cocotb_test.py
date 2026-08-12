@@ -219,6 +219,11 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     tb.user_resp_drv.start((i, 3) for i in itertools.count())
     await ClockCycles(tb.dut.CLK, 10)
 
+    # Decrease max size of generated frames in case the DUT generics do not allow it
+    pkt_mtu = tb.dut.PKT_MTU.value
+    if frame_size_max > pkt_mtu:
+        frame_size_max = pkt_mtu
+
     next_id = 0
     max_id = 2**tb.dut.ID_WIDTH.value
     id_mask = max_id - 1
