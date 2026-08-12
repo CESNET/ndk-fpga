@@ -30,6 +30,7 @@ package test;
     // 0 SOF, 1 EOF
     parameter MFB_META_ALIGNMENT = 1;
     parameter MVB_FIFO_SIZE      = 4;
+    parameter MVB_FIFOX_MULTI    = 1;
     parameter DEVICE             = "ULTRASCALE";
 
     parameter FRAME_SIZE_MIN     = 32;

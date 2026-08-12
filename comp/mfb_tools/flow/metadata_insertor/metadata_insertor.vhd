@@ -52,11 +52,11 @@ entity METADATA_INSERTOR is
 
         -- Input MVB FIFO size.
         -- Set to 0 for no FIFO at all
-        MVB_FIFO_SIZE   : natural := 0;
+        MVB_FIFO_SIZE   : natural := 32;
 
         -- Enable FIFOX Multi for better effectivity
         -- MVB_FIFO_SIZE must be >= 16
-        MVB_FIFOX_MULTI : boolean := False;
+        MVB_FIFOX_MULTI : boolean := True;
 
         -- Target device:
         --   - "ULTRASCALE",

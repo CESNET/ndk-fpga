@@ -40,6 +40,7 @@ module dut (
 
         .INSERT_MODE      (INSERT_MODE)               ,
         .MVB_FIFO_SIZE    (MVB_FIFO_SIZE)             ,
+        .MVB_FIFOX_MULTI  (MVB_FIFOX_MULTI)           ,
         .DEVICE           (DEVICE)
     ) VHDL_DUT_U (
         .CLK                (CLK)                     ,

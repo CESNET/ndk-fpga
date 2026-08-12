@@ -317,7 +317,8 @@ begin
             MFB_ITEM_WIDTH  => USR_MFB_ITEM_WIDTH,
             MFB_META_WIDTH  => 0,
             INSERT_MODE     => 0,
-            MVB_FIFO_SIZE   => 0,
+            MVB_FIFO_SIZE   => 32,
+            MVB_FIFOX_MULTI => True,
             DEVICE          => DEVICE
         )
         port map (
