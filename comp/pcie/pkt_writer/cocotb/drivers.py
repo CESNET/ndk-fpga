@@ -6,4 +6,4 @@ from cocotbext.ofm.mvb.drivers import MVBDriver
 
 
 class MvbDriverAddressAndLength(MVBDriver):
-    _optional_signals = ["address", "length"]
+    _optional_signals = ["address", "length", "vld"]
