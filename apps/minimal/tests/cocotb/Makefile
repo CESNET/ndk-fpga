@@ -8,13 +8,14 @@
 CARD ?= fb2cghh
 TARGET = cocotb
 TOP_LEVEL_ENT=fpga
+BMC_ENABLE ?= 0
 
 CARD_DIR=../../build/$(CARD)/
 
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 all:
-	make TARGET=$(TARGET) -C $(CARD_DIR) PYTHONPATH=$$PYTHONPATH:$(ROOT_DIR) TOP_LEVEL_ENT=$(TOP_LEVEL_ENT)
+	make TARGET=$(TARGET) -C $(CARD_DIR) PYTHONPATH=$$PYTHONPATH:$(ROOT_DIR) TOP_LEVEL_ENT=$(TOP_LEVEL_ENT) BMC_ENABLE=$(BMC_ENABLE)
 
 .PHONY: issues issue1 issue2
 
