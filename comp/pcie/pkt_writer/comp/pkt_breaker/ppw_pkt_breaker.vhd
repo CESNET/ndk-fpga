@@ -34,7 +34,7 @@ entity PPW_PKT_BREAKER is
         AXI_RX_DIRECT   : boolean := true;
         -- Uses the TX_AXI input interface when true, TX_MFB when false.
         AXI_TX_DIRECT   : boolean := true;
-        AXI_TDATA_WIDTH : natural := 512;
+        AXI_TDATA_WIDTH : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
 
         -- ========================================================
         -- Other parameters
@@ -111,11 +111,11 @@ architecture FULL of PPW_PKT_BREAKER is
     --                                CONSTANTS
     -- =====================================================================
 
-    constant REGION_ITEMS  : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE;
-    constant SOF_POS_WIDTH : natural := max(1,log2(MFB_REGION_SIZE));
-    constant EOF_POS_WIDTH : natural := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
-    constant WORD_WIDTH    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH, MFB_REGIONS*REGION_ITEMS*MFB_ITEM_WIDTH);
-    constant WORD_ITEMS    : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, MFB_REGIONS*REGION_ITEMS);
+    constant REGION_ITEMS    : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE;
+    constant EOF_POS_WIDTH   : natural := max(1,log2(REGION_ITEMS));
+    constant WORD_WIDTH      : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH, MFB_REGIONS*REGION_ITEMS*MFB_ITEM_WIDTH);
+    constant WORD_ITEMS      : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, MFB_REGIONS*REGION_ITEMS);
+    constant FR_OFFSET_WIDTH : natural := tsel(AXI_RX_DIRECT, log2(AXI_TDATA_WIDTH/8), EOF_POS_WIDTH);
 
     -- Maximum amount of Words a single packet can stretch over.
     constant PKT_MAX_WORDS   : natural := div_roundup(PKT_MTU+1, WORD_ITEMS);
@@ -151,7 +151,7 @@ architecture FULL of PPW_PKT_BREAKER is
     signal br_rx_axi_tvalid               : std_logic;
     signal br_rx_axi_tready               : std_logic;
     signal br_rx_fracture_en              : std_logic;
-    signal br_rx_fracture_offset          : std_logic_vector(EOF_POS_WIDTH-1 downto 0);
+    signal br_rx_fracture_offset          : std_logic_vector(FR_OFFSET_WIDTH-1 downto 0);
 
     signal br_tx_axi_tdata                : std_logic_vector(WORD_WIDTH-1 downto 0);
     signal br_tx_axi_tkeep                : std_logic_vector(WORD_ITEMS-1 downto 0);
@@ -247,8 +247,8 @@ begin
         generic map (
             MAX_WORDS     => PKT_MAX_WORDS,
             OFFSET_WIDTH  => OFFSET_WIDTH,
-            REGIONS       => MFB_REGIONS,
-            REGION_ITEMS  => REGION_ITEMS,
+            REGIONS       => tsel(AXI_RX_DIRECT, 1, MFB_REGIONS),
+            REGION_ITEMS  => tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH/8, REGION_ITEMS),
             REGION_NUMBER => r
         )
         port map (
@@ -317,7 +317,7 @@ begin
     br_rx_axi_tvalid <= conv_tx_axi_tvalid and valid_instr_ready and not last_instr_holdup;
 
     br_rx_fracture_en     <= breakpoint_reached(0);
-    br_rx_fracture_offset <= std_logic_vector(break_offset(0)(EOF_POS_WIDTH-1 downto 0));
+    br_rx_fracture_offset <= std_logic_vector(break_offset(0)(FR_OFFSET_WIDTH-1 downto 0));
 
     pkt_breaker_i : entity work.AXIS_FRAME_FRACTURER
     generic map (

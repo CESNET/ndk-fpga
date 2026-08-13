@@ -135,8 +135,8 @@ architecture FULL of PCIE_PKT_WRITER is
     constant MFB_WORD_ITEMS  : natural := MFB_WORD_WIDTH/MFB_ITEM_WIDTH;
 
     -- AXI constants
-    constant AXI_WORD_WIDTH  : natural := AXI_TDATA_WIDTH;
-    constant AXI_WORD_ITEMS  : natural := AXI_TDATA_WIDTH/8;
+    constant AXI_WORD_WIDTH  : natural := tsel(AXI_RX_DIRECT, AXI_TDATA_WIDTH, MFB_WORD_WIDTH);
+    constant AXI_WORD_ITEMS  : natural := AXI_WORD_WIDTH/8;
 
     -- Number of Regions on output MFB bus.
     -- Equal to PCIE_MFB_REGIONS when input and output MFB buses have the same width.
@@ -544,7 +544,7 @@ begin
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
         AXI_RX_DIRECT   => AXI_RX_DIRECT,
         AXI_TX_DIRECT   => True,
-        AXI_TDATA_WIDTH => AXI_TDATA_WIDTH,
+        AXI_TDATA_WIDTH => AXI_WORD_WIDTH,
         PKT_MTU         => 2**DMA_REQUEST_LENGTH_W_EXT-1,
         DEVICE          => DEVICE
     )
