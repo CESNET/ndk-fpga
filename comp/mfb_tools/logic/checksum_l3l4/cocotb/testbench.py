@@ -56,14 +56,15 @@ class MVBDriverExt(MVBDriver):
         "l3_csum_orig", "l3_csum_en", "l3_offset", "l3_length",
         "l4_csum_orig", "l4_csum_en", "l4_offset", "l4_length",
         "l4_protocol", "ip_src_addr", "ip_dst_addr", "ip_ver6",
-        "pkt_length"
+        "pkt_length", "vld"
     ]
 
 
 class MVBMonitorExt(MVBMonitor):
     _optional_signals = [
         "l3_csum", "l3_csum_ok", "l3_csum_en",
-        "l4_csum", "l4_csum_ok", "l4_csum_en"
+        "l4_csum", "l4_csum_ok", "l4_csum_en",
+        "vld"
     ]
 
 

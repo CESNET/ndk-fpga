@@ -6,4 +6,4 @@ from cocotbext.ofm.mvb.drivers import MVBDriver
 
 
 class PprDriver(MVBDriver):
-    _optional_signals = ["id", "address", "length"]
+    _optional_signals = ["id", "address", "length", "vld"]

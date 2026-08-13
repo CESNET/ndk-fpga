@@ -13,7 +13,7 @@ from cocotbext.ofm.mfb.transaction import MfbTransaction
 
 
 class PprDriver(MVBDriver):
-    _optional_signals = ["id", "address", "length"]
+    _optional_signals = ["id", "address", "length", "vld"]
 
 
 class PcieDriver(BusDriver):
