@@ -26,6 +26,81 @@ from responder import PprRequester
 from addr_tracker import AddressRangeTracker
 
 
+class FakeReaderTestbench():
+    """Simplified testbench for FAKE_READER mode.
+
+    In this mode, the DUT generates all-zero packets of the requested length
+    using MFB_USER_PACKET_GEN internally. No PCIe interfaces are used.
+    Responses are always in-order.
+    """
+
+    def __init__(self, dut, debug=False, **kwargs):
+        self.dut = dut
+        self.user_req_drv = PprDriver(dut, "USER_REQ_MVB", dut.CLK)
+        self.user_resp_mon = PprMonitor(dut, "USER_RESP_MFB", dut.CLK)
+        self.user_resp_drv = BitDriver(dut.USER_RESP_MFB_DST_RDY, dut.CLK)
+
+        # Tie PCIe DOWN inputs inactive
+        dut.PCIE_DOWN_MVB_DATA.value = 0
+        dut.PCIE_DOWN_MVB_VLD.value = 0
+        dut.PCIE_DOWN_MVB_SRC_RDY.value = 0
+        dut.PCIE_DOWN_MFB_DATA.value = 0
+        dut.PCIE_DOWN_MFB_SOF.value = 0
+        dut.PCIE_DOWN_MFB_EOF.value = 0
+        dut.PCIE_DOWN_MFB_SOF_POS.value = 0
+        dut.PCIE_DOWN_MFB_EOF_POS.value = 0
+        dut.PCIE_DOWN_MFB_SRC_RDY.value = 0
+        # Tie PCIe UP DST_RDY high (always accept)
+        dut.PCIE_UP_MVB_DST_RDY.value = 1
+
+        self.exp_output = []
+        self.packets_expected = kwargs.get("pkts_exp", 10000)
+        self.packets_received = 0
+
+        self.scoreboard = Scoreboard(dut)
+
+        def compare_wrapper(actual):
+            """Compare actual output with expected (always in-order for FAKE_READER)."""
+            if not self.exp_output:
+                cocotb.log.error("Received unexpected packet")
+                return
+
+            if actual.id != self.exp_output[0].id:
+                cocotb.log.error(f"Out-of-order response: expected ID {self.exp_output[0].id}, "
+                                 f"got ID {actual.id}")
+                self.scoreboard.errors += 1
+                assert False
+
+            expected = self.exp_output.pop(0)
+            self.packets_received += 1
+
+            match, msg = _compare_transactions(expected, actual, self.packets_received)
+            if not match:
+                cocotb.log.error(f"Packet mismatch: {msg}")
+                self.scoreboard.errors += 1
+                assert False
+            return match
+
+        self.scoreboard.add_interface(self.user_resp_mon, self.exp_output, compare_fn=compare_wrapper)
+
+        if debug:
+            self.user_req_drv.log.setLevel(logging.DEBUG)
+            self.user_resp_mon.log.setLevel(logging.DEBUG)
+
+    def model(self, instr: PprInstr, mfb_pkt: bytes = None):
+        """Model of the DUT in FAKE_READER mode: expects all-zero data of the requested length."""
+        response = PprData()
+        response.data = bytes(instr.length)
+        response.id = instr.id
+        self.exp_output.append(response)
+
+    async def reset(self):
+        self.dut.RESET.value = 1
+        await ClockCycles(self.dut.CLK, 10)
+        self.dut.RESET.value = 0
+        await RisingEdge(self.dut.CLK)
+
+
 def _format_packet_bytes(packet_bytes: bytes, label: str) -> str:
     """Format packet bytes for display, 16 bytes per line."""
     lines = [f"{label}:"]
@@ -199,23 +274,32 @@ class Testbench():
 # NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
 @cocotb.test()
 async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=1500, pcie_mrrs=512, pcie_mps=256, pcie_rcb=64):
-    assert pcie_mrrs in [128, 256, 512, 1024, 2048, 4096], "PCIE_MRRS must be one of the standard values."
-    assert pcie_mps in [128, 256, 512, 1024, 2048, 4096], "PCIE_MPS must be one of the standard values."
-    assert pcie_rcb in [64, 128], "PCIE_RCB must be one of the standard values."
+    fake_reader = bool(dut.FAKE_READER.value)
+
+    if not fake_reader:
+        assert pcie_mrrs in [128, 256, 512, 1024, 2048, 4096], "PCIE_MRRS must be one of the standard values."
+        assert pcie_mps in [128, 256, 512, 1024, 2048, 4096], "PCIE_MPS must be one of the standard values."
+        assert pcie_rcb in [64, 128], "PCIE_RCB must be one of the standard values."
 
     dut.RESET.value = 1
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
-    tb = Testbench(dut, debug=False, pkts_exp=frame_count, mps=pcie_mps, rcb=pcie_rcb)
+    if fake_reader:
+        tb = FakeReaderTestbench(dut, debug=False, pkts_exp=frame_count)
+    else:
+        tb = Testbench(dut, debug=False, pkts_exp=frame_count, mps=pcie_mps, rcb=pcie_rcb)
+
     # Change MVB driver's IdleGenerator to ItemRateLimiter
     idle_gen_conf = dict(random_idles=True, max_idles=3, zero_idles_chance=80)
     tb.user_req_drv.set_idle_generator(ItemRateLimiter(rate_percentage=50, **idle_gen_conf))
     await tb.reset()
-    tb.dut.PCIE_MRRS.value = pcie_mrrs
+
+    if not fake_reader:
+        tb.dut.PCIE_MRRS.value = pcie_mrrs
+        tb.pcie_up_drv.start((i, 3) for i in itertools.count())
 
     cocotb.log.info("\n--- Beginning the test ---\n")
 
-    tb.pcie_up_drv.start((i, 3) for i in itertools.count())
     tb.user_resp_drv.start((i, 3) for i in itertools.count())
     await ClockCycles(tb.dut.CLK, 10)
 
@@ -229,26 +313,30 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     id_mask = max_id - 1
     for mfb_pkt in random_packets(frame_size_min, frame_size_max, frame_count):
         length = len(mfb_pkt)
-        # Find a non-overlapping address using the tracker
-        addr = tb.addr_tracker.find_non_overlapping_address(length)
-        if addr is None:
-            cocotb.log.warning(f"Could not find non-overlapping address for packet of length {length}, waiting...")
-            # Wait a bit and try again
-            await ClockCycles(dut.CLK, 100)
+
+        if fake_reader:
+            addr = 0
+        else:
+            # Find a non-overlapping address using the tracker
             addr = tb.addr_tracker.find_non_overlapping_address(length)
             if addr is None:
-                raise RuntimeError(f"Could not find available address range for packet of length {length}")
+                cocotb.log.warning(f"Could not find non-overlapping address for packet of length {length}, waiting...")
+                # Wait a bit and try again
+                await ClockCycles(dut.CLK, 100)
+                addr = tb.addr_tracker.find_non_overlapping_address(length)
+                if addr is None:
+                    raise RuntimeError(f"Could not find available address range for packet of length {length}")
 
-        # Wait for an available ID (one that is not currently in use)
-        # This ensures IDs are not reused before previous packets are received
-        # Increase ID_WIDTH generic in DUT to be over log2(frame_count) to avoid waiting.
-        while len(tb.ids_in_use) >= max_id:
-            cocotb.log.debug(f"All IDs in use ({len(tb.ids_in_use)}), waiting...")
-            await ClockCycles(dut.CLK, 20)
+            # Wait for an available ID (one that is not currently in use)
+            # This ensures IDs are not reused before previous packets are received
+            # Increase ID_WIDTH generic in DUT to be over log2(frame_count) to avoid waiting.
+            while len(tb.ids_in_use) >= max_id:
+                cocotb.log.debug(f"All IDs in use ({len(tb.ids_in_use)}), waiting...")
+                await ClockCycles(dut.CLK, 20)
 
-        # Find next available ID
-        while next_id in tb.ids_in_use:
-            next_id = (next_id + 1) & id_mask
+            # Find next available ID
+            while next_id in tb.ids_in_use:
+                next_id = (next_id + 1) & id_mask
 
         # Generate a MVB instruction for each packet
         user_instr = PprInstr()
@@ -256,8 +344,9 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
         user_instr.address = addr
         user_instr.length = length
 
-        # Mark ID as in-use before sending
-        tb.ids_in_use.add(next_id)
+        if not fake_reader:
+            # Mark ID as in-use before sending
+            tb.ids_in_use.add(next_id)
 
         # Send to Driver (DUT)
         tb.user_req_drv.append(user_instr)
