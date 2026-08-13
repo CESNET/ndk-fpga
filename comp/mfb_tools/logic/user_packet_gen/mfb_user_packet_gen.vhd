@@ -86,9 +86,9 @@ end entity;
 
 architecture FULL of MFB_USER_PACKET_GEN is
 
-    constant SOF_POS_WIDTH  : natural := log2(REGION_SIZE);
-    constant EOF_POS_WIDTH  : natural := log2(REGION_SIZE*BLOCK_SIZE);
-    constant BLOCK_WIDTH    : natural := log2(BLOCK_SIZE);
+    constant SOF_POS_WIDTH  : natural := max(1,log2(REGION_SIZE));
+    constant EOF_POS_WIDTH  : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
+    constant BLOCK_WIDTH    : natural := max(1,log2(BLOCK_SIZE));
     constant WORD_CNT_WIDTH : natural := LEN_WIDTH-log2(REGIONS)-EOF_POS_WIDTH;
 
     signal s_pkt_len                 : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
@@ -107,7 +107,7 @@ architecture FULL of MFB_USER_PACKET_GEN is
     signal s_fifo_pkt_src_rdy        : std_logic;
     signal s_fifo_pkt_rd             : std_logic_vector(REGIONS-1 downto 0);
 
-    signal s_mux_sel                 : slv_array_t(REGIONS-1 downto 0)(log2(REGIONS)-1 downto 0);
+    signal s_mux_sel                 : slv_array_t(REGIONS-1 downto 0)(max(1,log2(REGIONS))-1 downto 0);
     signal s_muxed_pkt_len           : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
     signal s_muxed_pkt_gen           : std_logic_vector(REGIONS-1 downto 0);
     signal s_muxed_pkt_meta          : slv_array_t(REGIONS-1 downto 0)(META_WIDTH-1 downto 0);
@@ -125,7 +125,7 @@ architecture FULL of MFB_USER_PACKET_GEN is
     signal s_eof_curr_ok             : std_logic_vector(REGIONS-1 downto 0);
     signal s_eof_offset_prev_new     : slv_array_t(REGIONS-1 downto 0)(LEN_WIDTH-1 downto 0);
     signal s_eof_offset_prev_word    : slv_array_t(REGIONS-1 downto 0)(WORD_CNT_WIDTH-1 downto 0);
-    signal s_eof_offset_prev_region  : slv_array_t(REGIONS-1 downto 0)(log2(REGIONS)-1 downto 0);
+    signal s_eof_offset_prev_region  : slv_array_t(REGIONS-1 downto 0)(max(1,log2(REGIONS))-1 downto 0);
     signal s_eof_prev_word_ok        : std_logic_vector(REGIONS-1 downto 0);
     signal s_eof_prev_region_ok      : std_logic_vector(REGIONS-1 downto 0);
     signal s_eof_prev_ok             : std_logic_vector(REGIONS-1 downto 0);
@@ -241,7 +241,12 @@ begin
 
     pkt_gen_g : for r in 0 to REGIONS-1 generate
         -- region is full when previous packet ending on last block
-        s_region_full(r) <= and s_eof_offset_prev(r)(EOF_POS_WIDTH-1 downto BLOCK_WIDTH);
+        region_full_multi_block_g : if REGION_SIZE > 1 generate
+            s_region_full(r) <= and s_eof_offset_prev(r)(EOF_POS_WIDTH-1 downto BLOCK_WIDTH);
+        else generate
+            -- Single block per region: region is always "full"
+            s_region_full(r) <= '1';
+        end generate;
         -- set SOF in this region
         shared_regions_g : if SHARED_REGIONS generate
             s_set_sof(r) <= (s_muxed_pkt_gen(r) and not s_need_set_eof(r)) or (s_muxed_pkt_gen(r) and s_need_set_eof(r) and s_eof_prev_ok(r) and not s_region_full(r));
@@ -249,11 +254,21 @@ begin
             s_set_sof(r) <= (s_muxed_pkt_gen(r) and not s_need_set_eof(r));
         end generate;
         -- SOF_POS for shared region (region with two packet)
-        s_sof_pos_shared_region(r) <= std_logic_vector(unsigned(s_eof_offset_prev(r)(EOF_POS_WIDTH-1 downto BLOCK_WIDTH)) + 1);
+        sof_pos_shared_multi_block_g : if REGION_SIZE > 1 generate
+            s_sof_pos_shared_region(r) <= std_logic_vector(unsigned(s_eof_offset_prev(r)(EOF_POS_WIDTH-1 downto BLOCK_WIDTH)) + 1);
+        else generate
+            -- Single block per region: SOF is always at position 0
+            s_sof_pos_shared_region(r) <= (others => '0');
+        end generate;
         -- set correct SOF_POS in this region
         s_sof_pos(r)               <= s_sof_pos_shared_region(r) when (s_need_set_eof(r) = '1') else (others => '0');
         -- extended SOF_POS value
-        s_sof_pos_ext(r)           <= s_sof_pos(r) & std_logic_vector(unsigned(to_unsigned(0,BLOCK_WIDTH)));
+        sof_pos_ext_multi_block_g : if REGION_SIZE > 1 generate
+            s_sof_pos_ext(r) <= s_sof_pos(r) & std_logic_vector(to_unsigned(0,BLOCK_WIDTH));
+        else generate
+            -- Single block per region: extended SOF_POS is just zero-padded
+            s_sof_pos_ext(r) <= (others => '0');
+        end generate;
         -- SOF FAKE is inaccurate SOF, requires less logic
         s_set_sof_fake(r)          <= (not s_need_set_eof(r)) or (s_need_set_eof(r) and s_eof_prev_ok(r));
 
@@ -270,7 +285,12 @@ begin
         s_eof_offset_prev_new(r)    <= std_logic_vector(unsigned(s_eof_offset_curr(r)) + (r*REGION_SIZE*BLOCK_SIZE) + unsigned(s_sof_pos_ext(r)));
         -- unpack previous EOF offset to word and region part
         s_eof_offset_prev_word(r)   <= s_eof_offset_prev(r)(LEN_WIDTH-1 downto log2(REGIONS)+EOF_POS_WIDTH);
-        s_eof_offset_prev_region(r) <= s_eof_offset_prev(r)(log2(REGIONS)+EOF_POS_WIDTH-1 downto EOF_POS_WIDTH);
+        eof_prev_region_multi_g : if REGIONS > 1 generate
+            s_eof_offset_prev_region(r) <= s_eof_offset_prev(r)(log2(REGIONS)+EOF_POS_WIDTH-1 downto EOF_POS_WIDTH);
+        else generate
+            -- Single region: region index is always 0
+            s_eof_offset_prev_region(r) <= (others => '0');
+        end generate;
         -- checking if current position matches the previous EOF offset
         s_eof_prev_word_ok(r)       <= '1' when (unsigned(s_eof_offset_prev_word(r)) = unsigned(s_word_cnt(r))) else '0';
         s_eof_prev_region_ok(r)     <= '1' when ((REGIONS = 1) or (unsigned(s_eof_offset_prev_region(r)) = r)) else '0';
