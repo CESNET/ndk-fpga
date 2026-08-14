@@ -425,7 +425,7 @@ credits to send the transaction. If not, an exception is raised.
 
 .. note:: Use the credit interface components only for R-TILE.
 
-    For implementation of conditional switching between P-TILE and R-TILE, check out ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
+    For implementation of conditional switching between P-TILE and R-TILE, check out ``ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py``.
 
 cocotbext.ofm.axi4stream
 ------------------------
@@ -456,7 +456,7 @@ Basic transaction for AXI4-Stream that includes ``TDATA``, ``TUSER``, and ``TKEE
 
 Variant of ``Axi4StreamTransaction`` that includes selector ``SEL`` for use with AXIS Splitter component.
 
-.. note:: For example use of drivers and monitors, see ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
+.. note:: For example use of drivers and monitors, see ``ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py``.
 
 cocotbext.ofm.lbus
 ------------------
@@ -471,7 +471,7 @@ Accepts a whole packet as bytes and writes it to the master side of the bus.
 
 Reads a whole packet from the slave side of the bus and returns it as a list of integer values of the read bytes.
 
-.. note:: For example use of drivers and monitors, see ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
+.. note:: For example use of drivers and monitors, see ``ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py``.
 
 cocotbext.ofm.lii
 -----------------
@@ -507,7 +507,7 @@ Reads a whole packet from the TX side of the bus and returns it as bytes.
 
 .. note:: For example use, see ``comp/nic/mac_lite/tx_mac_lite/comp/adapters/mac_seg/cocotb/cocotb_test.py``.
 
-.. note:: For example use of drivers and monitors, see ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
+.. note:: For example use of drivers and monitors, see ``ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py``.
 
 
 cocotbext.ofm.mfb
@@ -707,7 +707,7 @@ Additional information for PCIe completion packet sent via the ``TUSER`` signal 
 
 Stores data, metadata, and the number of dwords of a packet.
 
-.. note:: For example use of requesters and completers, see ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
+.. note:: For example use of requesters and completers, see ``ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py``.
 
 .. rubric:: Axi4SCompleter.Axi4SCompleter
 
