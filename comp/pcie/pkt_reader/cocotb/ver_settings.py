@@ -7,6 +7,10 @@
 SETTINGS = {
     # The default setting of verification. Only changed generics are listed.
     "default" : {
+        "REGIONS"               : "1",
+        "REGION_SIZE"           : "8",
+        "BLOCK_SIZE"            : "8",
+        "ITEM_WIDTH"            : "8",
         "PCIE_DOWN_REGIONS"     : "2",
         "PCIE_DOWN_REGION_SIZE" : "1",
         "PCIE_DOWN_BLOCK_SIZE"  : "8",
@@ -48,6 +52,19 @@ SETTINGS = {
         "RESP_IN_ORDER"         : "False",
     },
 
+    # Fake reader variant: generates empty packets of given length (PCIe interfaces not used)
+    "fake_reader" : {
+        "FAKE_READER"           : "True",
+    },
+
+    # USER MFB interface variant for 2048 wide words and SOF-aligned (AXI-like) frames
+    "user_mfb_1r_1b_256i" : {
+        "REGIONS"               : "1",
+        "REGION_SIZE"           : "1",
+        "BLOCK_SIZE"            : "256",
+        "ITEM_WIDTH"            : "8",
+    },
+
     "_combinations_" : (
     (), # Works the same as '("default",),' as the "default" is applied in every combination
 
@@ -66,6 +83,9 @@ SETTINGS = {
     ("pcie_down_4r_1b_4i","mtu_256"),
 
     ("pcie_down_4r_1b_4i","resp_out_of_order","mtu_max"),
+
+    ("fake_reader"),
+    ("fake_reader","user_mfb_1r_1b_256i","mtu_max"),
 
     ),
 }

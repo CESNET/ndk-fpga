@@ -41,6 +41,30 @@ SETTINGS = {
         "BLOCK_SIZE"         : "8",
         "ITEM_WIDTH"         : "8",
     },
+    "mfb_pcie_comb_1" : {
+        "REGIONS"            : "1",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "8",
+        "ITEM_WIDTH"         : "32",
+    },
+    "mfb_pcie_comb_2" : {
+        "REGIONS"            : "2",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "8",
+        "ITEM_WIDTH"         : "32",
+    },
+    "mfb_pcie_comb_3" : {
+        "REGIONS"            : "4",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "8",
+        "ITEM_WIDTH"         : "32",
+    },
+    "mfb_pcie_comb_4" : {
+        "REGIONS"            : "4",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "4",
+        "ITEM_WIDTH"         : "32",
+    },
     "len_width_comb_1" : {
         "LEN_WIDTH"          : "14",
     },
@@ -55,18 +79,15 @@ SETTINGS = {
     ("region_comb_5",),
 
     ("region_comb_1", "len_width_comb_1",),
-    ("region_comb_1", "len_width_comb_2",),
-
-    ("region_comb_2", "len_width_comb_1",),
     ("region_comb_2", "len_width_comb_2",),
-
     ("region_comb_3", "len_width_comb_1",),
-    ("region_comb_3", "len_width_comb_2",),
-
-    ("region_comb_4", "len_width_comb_1",),
-    ("region_comb_4", "len_width_comb_2",),
-
-    ("region_comb_5", "len_width_comb_1",),
     ("region_comb_5", "len_width_comb_2",),
+
+    ("mfb_pcie_comb_1",),
+    ("mfb_pcie_comb_2",),
+    ("mfb_pcie_comb_3",),
+    ("mfb_pcie_comb_4",),
+    ("mfb_pcie_comb_1", "len_width_comb_1",),
+    ("mfb_pcie_comb_3", "len_width_comb_2",),
     ),
 }

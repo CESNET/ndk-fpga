@@ -30,6 +30,7 @@ lappend COMPONENTS [ list "MFB2AXI"                  "$MFB_AXI_BASE/mfb2axi"    
 lappend COMPONENTS [ list "BARREL_SHIFTER_GEN_PIPED" "$LOGIC_BASE/barrel_shifter"           "FULL"       ]
 lappend COMPONENTS [ list "SDP_MEMX"                 "$MEM_BASE/sdp_memx"                   "BEHAVIORAL" ]
 lappend COMPONENTS [ list "TRANS_SORTER"             "$MISC_BASE/trans_sorter"              "FULL"       ]
+lappend COMPONENTS [ list "MFB_USER_PACKET_GEN"      "$MFB_LOGIC_BASE/user_packet_gen"     "FULL"       ]
 
 # Modules
 lappend MOD "$ENTITY_BASE/pcie_pkt_reader.vhd"

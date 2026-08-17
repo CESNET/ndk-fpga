@@ -8,9 +8,9 @@ view wave
 delete wave *
 
 add_wave -group {PPR All} -noupdate -hex /pcie_pkt_reader/*
-add_wave -group {PPR Req Proc} -group {Top} -noupdate -hex /pcie_pkt_reader/request_processor_i/*
-add_wave -group {PPR Req Proc} -group {Instr Gen} -noupdate -hex /pcie_pkt_reader/request_processor_i/instr_generator_i/*
-add_wave -group {PPR Req Proc} -group {Hdr Gen} -noupdate -hex /pcie_pkt_reader/request_processor_i/dma_uphdr_gen_i/*
+add_wave -group {PPR Req Proc} -group {Top} -noupdate -hex /pcie_pkt_reader/fake_reader_g/request_processor_i/*
+add_wave -group {PPR Req Proc} -group {Instr Gen} -noupdate -hex /pcie_pkt_reader/fake_reader_g/request_processor_i/instr_generator_i/*
+add_wave -group {PPR Req Proc} -group {Hdr Gen} -noupdate -hex /pcie_pkt_reader/fake_reader_g/request_processor_i/dma_uphdr_gen_i/*
 
 
 config wave -signalnamewidth 1
