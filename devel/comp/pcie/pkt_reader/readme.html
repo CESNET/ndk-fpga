@@ -217,39 +217,46 @@ Number of DMA headers (MVB Items) in an upstream word.</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-pkt_mtu"><td><p>PKT_MTU</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-fake_reader"><td><p>FAKE_READER</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Instatniate “fake” PCIe pkt reader when True.
+Fake variant just generates empty packets of given length while forwarding pkt IDs (in-order only).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-pkt_mtu"><td><p>PKT_MTU</p></td>
 <td><p>natural</p></td>
 <td><p>2**12</p></td>
 <td><p>Maximum packet size (in bytes).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-memory_size"><td><p>MEMORY_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-memory_size"><td><p>MEMORY_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>1024</p></td>
 <td><p>Size of the Main Memory for responses, in number of stored MFB words.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-id_width"><td><p>ID_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-id_width"><td><p>ID_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>11</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-pcie_mrrs_width"><td><p>PCIE_MRRS_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-pcie_mrrs_width"><td><p>PCIE_MRRS_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>12</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-page_size"><td><p>PAGE_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-page_size"><td><p>PAGE_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>4096</p></td>
 <td><p>Size of a RAM page (in bytes).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-resp_in_order"><td><p>RESP_IN_ORDER</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-resp_in_order"><td><p>RESP_IN_ORDER</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
 <td><p>When True, packets are output in the same order as the original requests.
 May lead to higher latency due to the reordering process.
-When False, completed packets are output immediately regardless of request order.</p></td>
+When False, completed packets are output immediately regardless of request order.
+Automatically True with FAKE_READER=True - unable to do out-of-order.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td></td>
