@@ -87,9 +87,6 @@ architecture FULL of AXIS_PACKET_CONCATENATOR is
     -- =========================================================================
 
     constant DATA_BYTES : natural := TDATA_WIDTH/8;
-    constant BS_BLOCKS  : natural := 2*DATA_BYTES;
-    constant BS_BLOCK_W : natural := 8+1; -- A byte of data concatenated with 1 bit from last_1hot.
-    constant BS_DATA_W  : natural := BS_BLOCKS*BS_BLOCK_W;
 
     -- =========================================================================
     --                                 SIGNALS
@@ -128,30 +125,21 @@ architecture FULL of AXIS_PACKET_CONCATENATOR is
 
     signal rx0_last_valid_byte       : std_logic_vector(DATA_BYTES-1 downto 0);
     signal rx0_last_valid_byte_enc   : std_logic_vector(log2(DATA_BYTES)-1 downto 0);
-    signal rx1_start_byte_pos        : std_logic_vector(log2(BS_BLOCKS)-1 downto 0);
-    signal rx1_start_byte_pos_reg    : std_logic_vector(log2(BS_BLOCKS)-1 downto 0);
+    signal rx1_start_byte_pos        : std_logic_vector(log2(DATA_BYTES)-1 downto 0);
+    signal rx1_start_byte_pos_reg    : std_logic_vector(log2(DATA_BYTES)-1 downto 0);
     signal new_bs_shift_en           : std_logic;
     signal new_bs_shift_src          : std_logic;
     signal rx1_packet_ending_reg_en  : std_logic;
 
-    signal rx1_last_valid_byte       : std_logic_vector(DATA_BYTES-1 downto 0);
-    signal rx1_last_valid_byte_reg   : std_logic_vector(DATA_BYTES-1 downto 0);
+    signal bs_din                    : std_logic_vector(TDATA_WIDTH-1 downto 0);
+    signal bs_shift                  : std_logic_vector(log2(DATA_BYTES)-1 downto 0);
+    signal bs_dout                   : std_logic_vector(TDATA_WIDTH-1 downto 0);
 
-    signal bs_din                    : std_logic_vector(BS_DATA_W-1 downto 0);
-    signal bs_shift                  : std_logic_vector(log2(BS_BLOCKS)-1 downto 0);
-    signal bs_dout                   : std_logic_vector(BS_DATA_W-1 downto 0);
-
-    signal bs_dout_blocks            : slv_array_t(BS_BLOCKS-1 downto 0)(BS_BLOCK_W-1 downto 0);
-    signal rx1_shifted_last_1hot     : std_logic_vector(BS_BLOCKS-1 downto 0);
-    signal rx1_shifted_data          : slv_array_t(BS_BLOCKS-1 downto 0)(8-1 downto 0);
-    signal rx1_shifted_last_1hot_top : std_logic_vector(DATA_BYTES-1 downto 0);
-    signal rx1_shifted_last_1hot_bot : std_logic_vector(DATA_BYTES-1 downto 0);
-    signal rx1_shifted_data_top      : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
-    signal rx1_shifted_data_bot      : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
-    signal rx1_shifted_data_top_reg  : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
+    signal rx1_shifted_data          : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
+    signal rx1_shifted_data_reg      : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
 
     signal block_ptr                 : natural range 0 to DATA_BYTES-1;
-    signal keep_ptr                  : integer range 0 to BS_BLOCKS-1;
+    signal keep_ptr                  : integer range 0 to 2*DATA_BYTES-1;
     signal keep_ptr_reg              : integer range 0 to DATA_BYTES-1;
 
     signal s_tx_axis_tdata           : slv_array_t(DATA_BYTES-1 downto 0)(8-1 downto 0);
@@ -203,11 +191,9 @@ begin
                 rx1_valid_reg           <= RX1_AXIS_TVALID;
 
                 rx1_keep_ones_reg       <= count_ones(RX1_AXIS_TKEEP);
-                rx1_last_valid_byte_reg <= rx1_last_valid_byte;
             end if;
             if (RESET = '1') then
                 rx1_valid_reg           <= '0';
-                rx1_last_valid_byte_reg <= (others => '0');
             end if;
         end if;
     end process;
@@ -219,7 +205,7 @@ begin
     -- Detect if all bytes are valid in the last word
     rx0_all_valid          <= and RX0_AXIS_TKEEP;
     -- RX1 last word is complete => all bytes in the last word were able to fit into this word.
-    rx1_last_complete      <= or rx1_shifted_last_1hot_bot;
+    rx1_last_complete      <= '1' when (block_ptr + rx1_keep_ones_reg <= DATA_BYTES) else '0';
     -- Validated rx1_last_complete.
     rx1_packet_ending      <= rx1_last_complete and rx1_last_reg and rx1_valid_reg;
     -- A packet's last word is arriving on RX0 and not all of its bytes are valid.
@@ -327,7 +313,7 @@ begin
                 rx1_ready <= '1';
 
                 for db in 0 to DATA_BYTES-1 loop
-                    s_tx_axis_tdata(db) <= rx0_data_reg(db) when (db < block_ptr) else rx1_shifted_data_bot(db);
+                    s_tx_axis_tdata(db) <= rx0_data_reg(db) when (db < block_ptr) else rx1_shifted_data(db);
                     s_tx_axis_tkeep(db) <= '1'              when (db < keep_ptr ) else '0';
                 end loop;
                 s_tx_axis_tlast  <= rx1_last_complete and rx1_last_reg;
@@ -346,8 +332,8 @@ begin
                 rx1_ready <= not rx1_packet_ending_reg;
 
                 for db in 0 to DATA_BYTES-1 loop
-                    s_tx_axis_tdata(db) <= rx1_shifted_data_top_reg(db) when (db < block_ptr) else rx1_shifted_data_bot(db);
-                    s_tx_axis_tkeep(db) <= '1'                          when (db < keep_ptr ) else '0';
+                    s_tx_axis_tdata(db) <= rx1_shifted_data_reg(db) when (db < block_ptr) else rx1_shifted_data(db);
+                    s_tx_axis_tkeep(db) <= '1'                      when (db < keep_ptr ) else '0';
                 end loop;
                 s_tx_axis_tlast  <= (rx1_last_complete and rx1_last_reg) or rx1_packet_ending_reg;
                 s_tx_axis_tvalid <= rx1_valid_reg or rx1_packet_ending_reg;
@@ -385,7 +371,7 @@ begin
         ADDR => rx0_last_valid_byte_enc
     );
 
-    rx1_start_byte_pos <= std_logic_vector(resize(unsigned(rx0_last_valid_byte_enc)+1, log2(BS_BLOCKS)));
+    rx1_start_byte_pos <= std_logic_vector(unsigned(rx0_last_valid_byte_enc) + 1);
 
     bs_shift_reg_p : process (CLK)
     begin
@@ -405,33 +391,24 @@ begin
     end process;
 
     -- --------------------------------------------------------
-    -- Get the packet's end position, shift it, and set Last in the right word.
-    -- --------------------------------------------------------
-    rx1_last_one_i : entity work.LAST_ONE
-    generic map (
-        DATA_WIDTH => DATA_BYTES
-    )
-    port map (
-        DI => RX1_AXIS_TKEEP,
-        DO => rx1_last_valid_byte
-    );
-
-    -- --------------------------------------------------------
-    -- Shift data on RX1 (with Last Valid Byte indicator).
+    -- Rotate RX1 data left by bs_shift positions.
     --
-    -- The shifter interfaces are twice as wide to easily
-    -- detect an overflow into the next word.
-    -- Optimization to use normal interface width possible.
+    -- After left-rotation by S positions on an N-block input:
+    --   output[S..N-1] = input[0..N-1-S]  (data for current word)
+    --   output[0..S-1] = input[N-S..N-1]  (overflow for next word)
+    --
+    -- The FSM output mux selects positions >= block_ptr from the
+    -- current rotator output and positions < block_ptr from the
+    -- registered previous-cycle output (rx1_shifted_data_reg).
     -- --------------------------------------------------------
 
-    bs_din(BS_DATA_W  -1 downto BS_DATA_W/2) <= (others => '0');
-    bs_din(BS_DATA_W/2-1 downto           0) <= slv_array_ser(concat_arr(rx1_data_reg, rx1_last_valid_byte_reg));
+    bs_din <= slv_array_ser(rx1_data_reg);
 
-    -- Shift RX1 data
+    -- Rotate RX1 data
     rx1_shifter_i : entity work.BARREL_SHIFTER_GEN
     generic map (
-        BLOCKS     => BS_BLOCKS,
-        BLOCK_SIZE => BS_BLOCK_W,
+        BLOCKS     => DATA_BYTES,
+        BLOCK_SIZE => 8,
         SHIFT_LEFT => true
     )
     port map (
@@ -440,30 +417,19 @@ begin
         SEL      => bs_shift
     );
 
-    bs_dout_blocks <= slv_array_deser(bs_dout, BS_BLOCKS);
-
-    bs_dout_g : for b in 0 to BS_BLOCKS-1 generate
-        rx1_shifted_last_1hot(b) <= bs_dout_blocks(b)(BS_BLOCK_W-1);
-        rx1_shifted_data     (b) <= bs_dout_blocks(b)(BS_BLOCK_W-1-1 downto 0);
-    end generate;
-
-    rx1_shifted_last_1hot_top <= rx1_shifted_last_1hot(BS_BLOCKS  -1 downto BS_BLOCKS/2);
-    rx1_shifted_last_1hot_bot <= rx1_shifted_last_1hot(BS_BLOCKS/2-1 downto           0);
-
-    rx1_shifted_data_top <= rx1_shifted_data(BS_BLOCKS  -1 downto BS_BLOCKS/2);
-    rx1_shifted_data_bot <= rx1_shifted_data(BS_BLOCKS/2-1 downto           0);
+    rx1_shifted_data <= slv_array_deser(bs_dout, DATA_BYTES);
 
     -- =========================================================================
-    --  Lay-aside register for the data shifted over this word
+    --  Lay-aside register for the data rotated over (overflow to next word)
     -- =========================================================================
 
     lay_aside_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if ((rx1_valid_reg = '1') and (TX_AXIS_TREADY = '1')) then
-                rx1_shifted_data_top_reg <= rx1_shifted_data_top;
-                rx1_packet_ending_reg    <= (or rx1_shifted_last_1hot_top) and rx1_last_reg and rx1_packet_ending_reg_en;
-                keep_ptr_reg             <= to_integer(to_unsigned(keep_ptr, log2(DATA_BYTES)));
+                rx1_shifted_data_reg  <= rx1_shifted_data;
+                rx1_packet_ending_reg <= (not rx1_last_complete) and rx1_last_reg and rx1_packet_ending_reg_en;
+                keep_ptr_reg          <= to_integer(to_unsigned(keep_ptr, log2(DATA_BYTES)));
             end if;
             if ((RESET = '1') or ((rx1_packet_ending_reg = '1') and (TX_AXIS_TREADY = '1'))) then
                 rx1_packet_ending_reg <= '0';
