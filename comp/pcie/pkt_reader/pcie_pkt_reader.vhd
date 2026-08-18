@@ -153,10 +153,20 @@ architecture FULL of PCIE_PKT_READER is
     constant SOF_POS_WIDTH  : natural := max(1,log2(REGION_SIZE));
     constant EOF_POS_WIDTH  : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
 
-    -- Internal number of Regions on the PCIe down MFB bus.
-    -- Equal to PCIE_DOWN_REGIONS when USER and PCIE_DOWN MFB buses have the same width.
-    -- When they do not, it contains the amount of Regions that will make the word widths equal.
-    constant PCIE_DOWN_REGIONS_RESIZED : natural := WORD_WIDTH/(PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE*PCIE_DOWN_ITEM_WIDTH);
+    -- Width of a single PCIE DOWN MFB Region.
+    constant PCIE_DOWN_REGION_WIDTH    : natural := PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE*PCIE_DOWN_ITEM_WIDTH;
+
+    -- Internal (resized) MFB parameters between the Reconfigurator and MFB2AXI.
+    -- The goal is to resize the PCIE DOWN MFB so that the word width equals REGION_WIDTH
+    -- (= AXI_DATA_WIDTH for MFB2AXI). Two cases:
+    --   1) REGION_WIDTH >= PCIE_DOWN_REGION_WIDTH: only change REGIONS (cheapest path).
+    --   2) REGION_WIDTH <  PCIE_DOWN_REGION_WIDTH: set REGIONS to 1 and shrink ITEM_WIDTH
+    --      (next cheapest; avoids data shifting in the Reconfigurator).
+    -- Region Size and Block Size always stay unchanged from the PCIE DOWN side.
+    constant PCIE_DOWN_REGIONS_RESIZED : natural := tsel(REGION_WIDTH >= PCIE_DOWN_REGION_WIDTH, REGION_WIDTH/PCIE_DOWN_REGION_WIDTH, 1);
+    constant PCIE_DOWN_RS_RESIZED      : natural := PCIE_DOWN_REGION_SIZE;
+    constant PCIE_DOWN_BS_RESIZED      : natural := PCIE_DOWN_BLOCK_SIZE;
+    constant PCIE_DOWN_IW_RESIZED      : natural := tsel(REGION_WIDTH >= PCIE_DOWN_REGION_WIDTH, PCIE_DOWN_ITEM_WIDTH, REGION_WIDTH/(PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE));
 
     -- Main Memory read address (specifies a word within the memory).
     constant MM_RD_ADDR_W   : natural := log2(MEMORY_SIZE);
@@ -304,9 +314,9 @@ architecture FULL of PCIE_PKT_READER is
     signal pcie_mfb_fifo_src_rdy    : std_logic;
     signal pcie_mfb_fifo_dst_rdy    : std_logic;
 
-    signal pcie_mfb_reconf_data     : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE*PCIE_DOWN_ITEM_WIDTH-1 downto 0);
-    signal pcie_mfb_reconf_sof_pos  : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*max(1,log2(PCIE_DOWN_REGION_SIZE))-1 downto 0);
-    signal pcie_mfb_reconf_eof_pos  : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*max(1,log2(PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE))-1 downto 0);
+    signal pcie_mfb_reconf_data     : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*PCIE_DOWN_RS_RESIZED*PCIE_DOWN_BS_RESIZED*PCIE_DOWN_IW_RESIZED-1 downto 0);
+    signal pcie_mfb_reconf_sof_pos  : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*max(1,log2(PCIE_DOWN_RS_RESIZED))-1 downto 0);
+    signal pcie_mfb_reconf_eof_pos  : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED*max(1,log2(PCIE_DOWN_RS_RESIZED*PCIE_DOWN_BS_RESIZED))-1 downto 0);
     signal pcie_mfb_reconf_sof      : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED-1 downto 0);
     signal pcie_mfb_reconf_eof      : std_logic_vector(PCIE_DOWN_REGIONS_RESIZED-1 downto 0);
     signal pcie_mfb_reconf_src_rdy  : std_logic;
@@ -876,9 +886,9 @@ begin
             RX_BLOCK_SIZE         => PCIE_DOWN_BLOCK_SIZE,
             RX_ITEM_WIDTH         => PCIE_DOWN_ITEM_WIDTH,
             TX_REGIONS            => PCIE_DOWN_REGIONS_RESIZED,
-            TX_REGION_SIZE        => PCIE_DOWN_REGION_SIZE,
-            TX_BLOCK_SIZE         => PCIE_DOWN_BLOCK_SIZE,
-            TX_ITEM_WIDTH         => PCIE_DOWN_ITEM_WIDTH,
+            TX_REGION_SIZE        => PCIE_DOWN_RS_RESIZED,
+            TX_BLOCK_SIZE         => PCIE_DOWN_BS_RESIZED,
+            TX_ITEM_WIDTH         => PCIE_DOWN_IW_RESIZED,
             META_WIDTH            => 0,
             META_MODE             => 0,
             FIFO_SIZE             => 32,
@@ -917,9 +927,9 @@ begin
             USE_IN_PIPE    => True,
             USE_OUT_PIPE   => True,
             REGIONS        => PCIE_DOWN_REGIONS_RESIZED,
-            REGION_SIZE    => PCIE_DOWN_REGION_SIZE,
-            BLOCK_SIZE     => PCIE_DOWN_BLOCK_SIZE,
-            ITEM_WIDTH     => PCIE_DOWN_ITEM_WIDTH,
+            REGION_SIZE    => PCIE_DOWN_RS_RESIZED,
+            BLOCK_SIZE     => PCIE_DOWN_BS_RESIZED,
+            ITEM_WIDTH     => PCIE_DOWN_IW_RESIZED,
             AXI_DATA_WIDTH => REGION_WIDTH,
             PIPE_TYPE      => "SHREG",
             DEVICE         => DEVICE

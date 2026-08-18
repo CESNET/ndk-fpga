@@ -63,6 +63,14 @@ SETTINGS = {
         "FAKE_READER"           : "True",
     },
 
+    # USER MFB interface variant narrower than a single PCIE_DOWN region
+    "user_mfb_1r_1b_16i" : {
+        "REGIONS"               : "1",
+        "REGION_SIZE"           : "1",
+        "BLOCK_SIZE"            : "16",
+        "ITEM_WIDTH"            : "8",
+    },
+
     # USER MFB interface variant for 2048 wide words and SOF-aligned (AXI-like) frames
     "user_mfb_1r_1b_256i" : {
         "REGIONS"               : "1",
@@ -76,7 +84,7 @@ SETTINGS = {
 
     ("pcie_down_1r_1b_8i",),
     ("pcie_down_4r_1b_4i",),
-    ("pcie_down_4r_1b_8i",),
+    ("pcie_down_4r_1b_8i","user_mfb_1r_1b_16i"),
     ("mtu_127",),
     ("mtu_max",),
 
@@ -85,7 +93,7 @@ SETTINGS = {
     ("resp_out_of_order","mtu_127"),
     ("resp_out_of_order","mtu_max","no_fwft"),
 
-    ("pcie_down_1r_1b_8i","mtu_max"),
+    ("pcie_down_1r_1b_8i","user_mfb_1r_1b_16i","mtu_max"),
     ("pcie_down_4r_1b_4i","mtu_127","no_fwft"),
 
     ("pcie_down_4r_1b_4i","resp_out_of_order","mtu_max"),
