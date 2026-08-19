@@ -3,7 +3,6 @@
 # Author(s): Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 #            Daniel Kondys <kondys@cesnet.cz>
 
-
 from cocotb.handle import ArrayObject
 from cocotb.types import LogicArray
 from cocotbext.ofm.base.monitors import BusMonitor
