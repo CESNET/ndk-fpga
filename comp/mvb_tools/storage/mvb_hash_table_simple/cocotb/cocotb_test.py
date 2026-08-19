@@ -15,9 +15,13 @@ import cocotb
 import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.types import LogicArray
 from cocotbext.ofm.mi.drivers import MIRequestDriver as MIDriver
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
+from cocotbext.ofm.mvb.protocol import MvbProtocol
+from cocotbext.ofm.base.protocol import optional_signal
+from cocotbext.ofm.base.types import LogicArray2D
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
@@ -52,10 +56,22 @@ _HASH_KEY_WIDTH = 0x10
 _TABLE_CAPACITY = 0x14
 
 
+class MvbHashTableSimpleProtocol(MvbProtocol):
+    @optional_signal
+    def key(self, sigval: LogicArray) -> LogicArray2D:
+        return LogicArray2D.from_logicarray(sigval, self.items)
+
+    @key.write()
+    def key(self, signal, value: LogicArray | LogicArray2D) -> None:
+        if isinstance(value, LogicArray2D):
+            value = value.serialize()
+        signal.value = value
+
+
 class testbench():
     def __init__(self, dut, debug=False) -> None:
         self.dut = dut
-        self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK)
+        self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=MvbHashTableSimpleProtocol, generics_prefix="MVB")
         self.backpressure = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
         self.stream_out = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=MvbResTrHashTableSimple)
         self.mi_interface = MIDriver(dut, "MI", dut.CLK)
@@ -174,8 +190,8 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
     cocotb.log.debug(f"TABLE_CAPACITY: {table_capacity}")
 
     """Asserting that the read configuration match configuration of the drivers connected to the component."""
-    assert mvb_items == tb.stream_in.items
-    assert mvb_key_width_bytes == tb.stream_in.item_widths["key"] // 8 # FIXME
+    assert mvb_items == dut.MVB_ITEMS.value
+    assert mvb_key_width_bytes == dut.MVB_KEY_WIDTH.value // 8 # FIXME
     assert data_out_width_bytes == tb.stream_out.item_widths["data"] // 8 # FIXME
     assert hash_width == log2(table_capacity)
 
@@ -248,7 +264,7 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
         mvb_req_tr = MvbReqTrHashTableSimple()
         mvb_req_tr.key = int_transaction
 
-        #cocotb.log.info(f"generated transaction: {hex(mvb_req_tr.key)}")
+        cocotb.log.debug(f"generated transaction: {hex(mvb_req_tr.key)}")
         tb.stream_in.append(mvb_req_tr)
 
     last_num = 0
