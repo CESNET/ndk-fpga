@@ -14,8 +14,10 @@ use work.eth_hdr_pack.all;
 
 entity MEM_TESTER_WRAP is
     generic (
+        -- HBM parameters: number of physical HBM modules on the chip
+        HBM_MODULES           : natural := 0;
         -- HBM parameters: number of HBM ports
-        HBM_PORTS             : natural := 1;
+        HBM_PORTS             : natural := 0;
         -- HBM parameters: width of AXI address signal
         HBM_ADDR_WIDTH        : natural := 32;
         -- HBM parameters: width of AXI data signal
@@ -30,6 +32,13 @@ entity MEM_TESTER_WRAP is
         HBM_SIZE_WIDTH        : natural := 3;
         -- HBM parameters: width of AXI resp signal
         HBM_RESP_WIDTH        : natural := 2;
+        -- HBM parameters: highest address bit of one HBM port (its capacity).
+        -- 28 => 256 MB, 29 => 512 MB, 30 => 1 GB per port.
+        HBM_PORT_ADDR_HBIT    : natural := 28;
+        -- HBM parameters: multiplier for the port ID used to place each port into its own
+        -- AXI memory segment. Must be a multiple of 2**HBM_PORT_ADDR_HBIT. Use 0 when
+        -- every AXI port has its own address space (e.g. a NoC attached HBM).
+        HBM_BASE_ADDR_OFFSET  : natural := 0;
         -- Frequence of the HBM AXI bus
         HBM_FREQ_KHZ          : natural := 266660;
         -- DDR parameters: number of external memory ports (EMIFs)
@@ -63,9 +72,9 @@ entity MEM_TESTER_WRAP is
         -- =========================================================================
         -- HBM AXI INTERFACES (clocked at HBM_CLK)
         -- =========================================================================
-        HBM_CLK                 : in  std_logic;
-        HBM_RESET               : in  std_logic;
-        HBM_INIT_DONE           : in  std_logic;
+        HBM_CLK                 : in  std_logic_vector(HBM_MODULES-1 downto 0);
+        HBM_RESET               : in  std_logic_vector(HBM_MODULES-1 downto 0);
+        HBM_INIT_DONE           : in  std_logic_vector(HBM_MODULES-1 downto 0);
 
         HBM_AXI_ARADDR          : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => '0'));
         HBM_AXI_ARBURST         : out slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => '0'));
@@ -155,6 +164,8 @@ end entity;
 
 architecture FULL of MEM_TESTER_WRAP is
 
+    constant HBM_PORTS_PER_MODULE  : natural := HBM_PORTS / max(1, HBM_MODULES);
+
     constant MT_RND_GEN_DATA_WIDTH : natural := 64;
     constant MT_RND_GEN_ADDR_WIDTH : natural := 32;
 
@@ -171,7 +182,11 @@ architecture FULL of MEM_TESTER_WRAP is
     -- (DDR_PORTS   -1 downto 0)         ==> DDR-tester
     -- (2*DDR_PORTS -1 downto DDR_PORTS) ==> DDR-logger
     -- (2*DDR_PORTS)                     ==> HBM-tester
-    constant MI_PORTS_RAW      : natural := 2*DDR_PORTS + 1;
+    -- One MI port per HBM tester
+    constant HBM_MI_PORTS      : natural := tsel(HBM_PORTS > 0, HBM_MODULES, 0);
+    constant MI_PORTS_RAW      : natural := 2*DDR_PORTS + HBM_MI_PORTS;
+    -- MI_PORTS is rounded up to a power of two, so the address space above the last
+    -- tester has no target and has to be terminated.
     constant MI_PORTS          : natural := 2 ** log2(MI_PORTS_RAW);
 
     function mi_addr_base_f return slv_array_t is
@@ -203,9 +218,55 @@ architecture FULL of MEM_TESTER_WRAP is
     signal ddr_log_mi_ardy               : std_logic_vector(DDR_PORTS-1 downto 0) := (others => '0');
     signal ddr_log_mi_drdy               : std_logic_vector(DDR_PORTS-1 downto 0) := (others => '0');
 
+    signal hbm_clk_s                 : std_logic_vector(HBM_MODULES-1 downto 0);
+    signal hbm_reset_s               : std_logic_vector(HBM_MODULES-1 downto 0);
+    signal hbm_init_done_s           : std_logic_vector(HBM_MODULES-1 downto 0);
+
+    signal hbm_axi_araddr_s          : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_arburst_s         : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_arid_s            : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_arlen_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_LEN_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_arsize_s          : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_arvalid_s         : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0) := (others => (others => '0'));
+    signal hbm_axi_arready_s         : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0);
+
+    signal hbm_axi_rdata_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_DATA_WIDTH-1 downto 0);
+    signal hbm_axi_rdata_parity_s    : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0);
+    signal hbm_axi_rid_s             : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
+    signal hbm_axi_rlast_s           : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0);
+    signal hbm_axi_rresp_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_RESP_WIDTH-1 downto 0);
+    signal hbm_axi_rvalid_s          : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0);
+    signal hbm_axi_rready_s          : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0) := (others => (others => '0'));
+
+    signal hbm_axi_awaddr_s          : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_ADDR_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_awburst_s         : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_BURST_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_awid_s            : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_ID_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_awlen_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_LEN_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_awsize_s          : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_awvalid_s         : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0) := (others => (others => '0'));
+    signal hbm_axi_awready_s         : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0);
+
+    signal hbm_axi_wdata_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_DATA_WIDTH-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_wdata_parity_s    : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_wlast_s           : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0) := (others => (others => '0'));
+    signal hbm_axi_wstrb_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)((HBM_DATA_WIDTH/8)-1 downto 0) := (others => (others => (others => '0')));
+    signal hbm_axi_wvalid_s          : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0) := (others => (others => '0'));
+    signal hbm_axi_wready_s          : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0);
+
+    signal hbm_axi_bid_s             : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
+    signal hbm_axi_bresp_s           : slv_array_2d_t(HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0)(HBM_RESP_WIDTH-1 downto 0);
+    signal hbm_axi_bvalid_s          : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0);
+    signal hbm_axi_bready_s          : slv_array_t   (HBM_MODULES-1 downto 0)(HBM_PORTS_PER_MODULE-1 downto 0) := (others => (others => '0'));
+
     signal ddr_reset_repl                : slv_array_t     (DDR_PORTS-1 downto 0)(3-1 downto 0);
 
 begin
+
+    -- Only checked here for a direct or foreign-application instantiation. When going
+    -- through core_conf.tcl, core/config/core_const.tcl already enforces this.
+    assert (HBM_PORTS mod max(1, HBM_MODULES) = 0)
+        report "MEM_TESTER_WRAP: Set HBM_MODULES so that it divides HBM_PORTS without a remainder."
+        severity failure;
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
     generic map (
@@ -383,103 +444,149 @@ begin
     -- =========================================================================
 
     hbm_tester_g: if (HBM_PORTS > 0) generate
-        hbm_tester_i : entity work.HBM_TESTER
-        generic map (
-            DEBUG           => True,
-            PORTS           => HBM_PORTS,
-            CNT_WIDTH       => 24,
-            AXI_ADDR_WIDTH  => HBM_ADDR_WIDTH,
-            AXI_DATA_WIDTH  => HBM_DATA_WIDTH,
-            AXI_BURST_WIDTH => HBM_BURST_WIDTH,
-            AXI_ID_WIDTH    => HBM_ID_WIDTH,
-            AXI_LEN_WIDTH   => HBM_LEN_WIDTH,
-            AXI_SIZE_WIDTH  => HBM_SIZE_WIDTH,
-            AXI_RESP_WIDTH  => HBM_RESP_WIDTH,
-            USR_DATA_WIDTH  => HBM_DATA_WIDTH,
-            -- HBM address bits:
-            --     - Stack Select:            33
-            --     - Destination AXI Port: 32:29
-            --     - HBM Address Bits      28:5
-            --     - Unused Address Bits    4:0
-            PORT_ADDR_HBIT  => 28,
-            DEVICE          => DEVICE
-        )
-        port map (
-            HBM_CLK             => HBM_CLK,
-            HBM_RESET           => HBM_RESET,
-            HBM_INIT_DONE       => HBM_INIT_DONE,
+        hbm_test_mod_g: for i in 0 to HBM_MODULES-1 generate
+            subtype MOD_R is natural range HBM_PORTS_PER_MODULE*(i+1)-1 downto HBM_PORTS_PER_MODULE*i;
+        begin
 
-            MI_CLK              => CLK,
-            MI_RESET            => RESET,
-            MI_DWR              => split_mi_dwr(2*DDR_PORTS),
-            MI_ADDR             => split_mi_addr(2*DDR_PORTS),
-            MI_BE               => split_mi_be(2*DDR_PORTS),
-            MI_RD               => split_mi_rd(2*DDR_PORTS),
-            MI_WR               => split_mi_wr(2*DDR_PORTS),
-            MI_ARDY             => split_mi_ardy(2*DDR_PORTS),
-            MI_DRD              => split_mi_drd(2*DDR_PORTS),
-            MI_DRDY             => split_mi_drdy(2*DDR_PORTS),
+            hbm_clk_s(i)       <= HBM_CLK(i);
+            hbm_reset_s(i)     <= HBM_RESET(i);
+            hbm_init_done_s(i) <= HBM_INIT_DONE(i);
 
-            WR_ADDR             => (others => (others => '0')),
-            WR_DATA             => (others => (others => '0')),
-            WR_DATA_LAST        => (others => '0'),
-            WR_VALID            => (others => '0'),
-            WR_READY            => open,
-            WR_RSP_ACK          => open,
-            WR_RSP_VALID        => open,
-            WR_RSP_READY        => (others => '1'),
-            RD_ADDR             => (others => (others => '0')),
-            RD_ADDR_VALID       => (others => '0'),
-            RD_ADDR_READY       => open,
-            RD_DATA             => open,
-            RD_DATA_LAST        => open,
-            RD_DATA_VALID       => open,
-            RD_DATA_READY       => (others => '1'),
+            HBM_AXI_ARADDR(MOD_R)       <= hbm_axi_araddr_s(i);
+            HBM_AXI_ARBURST(MOD_R)      <= hbm_axi_arburst_s(i);
+            HBM_AXI_ARID(MOD_R)         <= hbm_axi_arid_s(i);
+            HBM_AXI_ARLEN(MOD_R)        <= hbm_axi_arlen_s(i);
+            HBM_AXI_ARSIZE(MOD_R)       <= hbm_axi_arsize_s(i);
+            HBM_AXI_ARVALID(MOD_R)      <= hbm_axi_arvalid_s(i);
+            hbm_axi_arready_s(i)        <= HBM_AXI_ARREADY(MOD_R);
 
-            AXI_AWID            => HBM_AXI_AWID,
-            AXI_AWADDR          => HBM_AXI_AWADDR,
-            AXI_AWLEN           => HBM_AXI_AWLEN,
-            AXI_AWSIZE          => HBM_AXI_AWSIZE,
-            AXI_AWBURST         => HBM_AXI_AWBURST,
-            AXI_AWPROT          => open,
-            AXI_AWQOS           => open,
-            AXI_AWUSER          => open,
-            AXI_AWVALID         => HBM_AXI_AWVALID,
-            AXI_AWREADY         => HBM_AXI_AWREADY,
-            AXI_WDATA           => HBM_AXI_WDATA,
-            AXI_WSTRB           => HBM_AXI_WSTRB,
-            AXI_WUSER_DATA      => HBM_AXI_WDATA_PARITY,
-            AXI_WUSER_STRB      => open,
-            AXI_WLAST           => HBM_AXI_WLAST,
-            AXI_WVALID          => HBM_AXI_WVALID,
-            AXI_WREADY          => HBM_AXI_WREADY,
-            AXI_BID             => HBM_AXI_BID,
-            AXI_BRESP           => HBM_AXI_BRESP,
-            AXI_BVALID          => HBM_AXI_BVALID,
-            AXI_BREADY          => HBM_AXI_BREADY,
-            AXI_ARID            => HBM_AXI_ARID,
-            AXI_ARADDR          => HBM_AXI_ARADDR,
-            AXI_ARLEN           => HBM_AXI_ARLEN,
-            AXI_ARSIZE          => HBM_AXI_ARSIZE,
-            AXI_ARBURST         => HBM_AXI_ARBURST,
-            AXI_ARPROT          => open,
-            AXI_ARQOS           => open,
-            AXI_ARUSER          => open,
-            AXI_ARVALID         => HBM_AXI_ARVALID,
-            AXI_ARREADY         => HBM_AXI_ARREADY,
-            AXI_RID             => HBM_AXI_RID,
-            AXI_RDATA           => HBM_AXI_RDATA,
-            AXI_RUSER_DATA      => HBM_AXI_RDATA_PARITY,
-            AXI_RUSER_ERR_DBE   => (others => '0'),
-            AXI_RRESP           => HBM_AXI_RRESP,
-            AXI_RLAST           => HBM_AXI_RLAST,
-            AXI_RVALID          => HBM_AXI_RVALID,
-            AXI_RREADY          => HBM_AXI_RREADY
-        );
-    else generate
-        split_mi_ardy(2*DDR_PORTS) <= split_mi_rd(2*DDR_PORTS) or split_mi_wr(2*DDR_PORTS);
-        split_mi_drd(2*DDR_PORTS)  <= (others => '0');
-        split_mi_drdy(2*DDR_PORTS) <= split_mi_rd(2*DDR_PORTS);
+            hbm_axi_rdata_s(i)          <= HBM_AXI_RDATA(MOD_R);
+            hbm_axi_rdata_parity_s(i)   <= HBM_AXI_RDATA_PARITY(MOD_R);
+            hbm_axi_rid_s(i)            <= HBM_AXI_RID(MOD_R);
+            hbm_axi_rlast_s(i)          <= HBM_AXI_RLAST(MOD_R);
+            hbm_axi_rresp_s(i)          <= HBM_AXI_RRESP(MOD_R);
+            hbm_axi_rvalid_s(i)         <= HBM_AXI_RVALID(MOD_R);
+            HBM_AXI_RREADY(MOD_R)       <= hbm_axi_rready_s(i);
+
+            HBM_AXI_AWADDR(MOD_R)       <= hbm_axi_awaddr_s(i);
+            HBM_AXI_AWBURST(MOD_R)      <= hbm_axi_awburst_s(i);
+            HBM_AXI_AWID(MOD_R)         <= hbm_axi_awid_s(i);
+            HBM_AXI_AWLEN(MOD_R)        <= hbm_axi_awlen_s(i);
+            HBM_AXI_AWSIZE(MOD_R)       <= hbm_axi_awsize_s(i);
+            HBM_AXI_AWVALID(MOD_R)      <= hbm_axi_awvalid_s(i);
+            hbm_axi_awready_s(i)        <= HBM_AXI_AWREADY(MOD_R);
+
+            HBM_AXI_WDATA(MOD_R)        <= hbm_axi_wdata_s(i);
+            HBM_AXI_WDATA_PARITY(MOD_R) <= hbm_axi_wdata_parity_s(i);
+            HBM_AXI_WLAST(MOD_R)        <= hbm_axi_wlast_s(i);
+            HBM_AXI_WSTRB(MOD_R)        <= hbm_axi_wstrb_s(i);
+            HBM_AXI_WVALID(MOD_R)       <= hbm_axi_wvalid_s(i);
+            hbm_axi_wready_s(i)         <= HBM_AXI_WREADY(MOD_R);
+
+            hbm_axi_bid_s(i)            <= HBM_AXI_BID(MOD_R);
+            hbm_axi_bresp_s(i)          <= HBM_AXI_BRESP(MOD_R);
+            hbm_axi_bvalid_s(i)         <= HBM_AXI_BVALID(MOD_R);
+            HBM_AXI_BREADY(MOD_R)       <= hbm_axi_bready_s(i);
+
+            hbm_tester_i : entity work.HBM_TESTER
+            generic map (
+                DEBUG            => True,
+                PORTS            => HBM_PORTS_PER_MODULE,
+                CNT_WIDTH        => 24,
+                AXI_ADDR_WIDTH   => HBM_ADDR_WIDTH,
+                AXI_DATA_WIDTH   => HBM_DATA_WIDTH,
+                AXI_BURST_WIDTH  => HBM_BURST_WIDTH,
+                AXI_ID_WIDTH     => HBM_ID_WIDTH,
+                AXI_LEN_WIDTH    => HBM_LEN_WIDTH,
+                AXI_SIZE_WIDTH   => HBM_SIZE_WIDTH,
+                AXI_RESP_WIDTH   => HBM_RESP_WIDTH,
+                USR_DATA_WIDTH   => HBM_DATA_WIDTH,
+                PORT_ADDR_HBIT   => HBM_PORT_ADDR_HBIT,
+                BASE_ADDR_OFFSET => HBM_BASE_ADDR_OFFSET,
+                DEVICE           => DEVICE
+            )
+            port map (
+                HBM_CLK             => hbm_clk_s(i),
+                HBM_RESET           => hbm_reset_s(i),
+                HBM_INIT_DONE       => hbm_init_done_s(i),
+
+                MI_CLK              => CLK,
+                MI_RESET            => RESET,
+                MI_DWR              => split_mi_dwr(2*DDR_PORTS + i),
+                MI_ADDR             => split_mi_addr(2*DDR_PORTS + i),
+                MI_BE               => split_mi_be(2*DDR_PORTS + i),
+                MI_RD               => split_mi_rd(2*DDR_PORTS + i),
+                MI_WR               => split_mi_wr(2*DDR_PORTS + i),
+                MI_ARDY             => split_mi_ardy(2*DDR_PORTS + i),
+                MI_DRD              => split_mi_drd(2*DDR_PORTS + i),
+                MI_DRDY             => split_mi_drdy(2*DDR_PORTS + i),
+
+                WR_ADDR             => (others => (others => '0')),
+                WR_DATA             => (others => (others => '0')),
+                WR_DATA_LAST        => (others => '0'),
+                WR_VALID            => (others => '0'),
+                WR_READY            => open,
+                WR_RSP_ACK          => open,
+                WR_RSP_VALID        => open,
+                WR_RSP_READY        => (others => '1'),
+                RD_ADDR             => (others => (others => '0')),
+                RD_ADDR_VALID       => (others => '0'),
+                RD_ADDR_READY       => open,
+                RD_DATA             => open,
+                RD_DATA_LAST        => open,
+                RD_DATA_VALID       => open,
+                RD_DATA_READY       => (others => '1'),
+
+                AXI_AWID            => hbm_axi_awid_s(i),
+                AXI_AWADDR          => hbm_axi_awaddr_s(i),
+                AXI_AWLEN           => hbm_axi_awlen_s(i),
+                AXI_AWSIZE          => hbm_axi_awsize_s(i),
+                AXI_AWBURST         => hbm_axi_awburst_s(i),
+                AXI_AWPROT          => open,
+                AXI_AWQOS           => open,
+                AXI_AWUSER          => open,
+                AXI_AWVALID         => hbm_axi_awvalid_s(i),
+                AXI_AWREADY         => hbm_axi_awready_s(i),
+                AXI_WDATA           => hbm_axi_wdata_s(i),
+                AXI_WSTRB           => hbm_axi_wstrb_s(i),
+                AXI_WUSER_DATA      => hbm_axi_wdata_parity_s(i),
+                AXI_WUSER_STRB      => open,
+                AXI_WLAST           => hbm_axi_wlast_s(i),
+                AXI_WVALID          => hbm_axi_wvalid_s(i),
+                AXI_WREADY          => hbm_axi_wready_s(i),
+                AXI_BID             => hbm_axi_bid_s(i),
+                AXI_BRESP           => hbm_axi_bresp_s(i),
+                AXI_BVALID          => hbm_axi_bvalid_s(i),
+                AXI_BREADY          => hbm_axi_bready_s(i),
+                AXI_ARID            => hbm_axi_arid_s(i),
+                AXI_ARADDR          => hbm_axi_araddr_s(i),
+                AXI_ARLEN           => hbm_axi_arlen_s(i),
+                AXI_ARSIZE          => hbm_axi_arsize_s(i),
+                AXI_ARBURST         => hbm_axi_arburst_s(i),
+                AXI_ARPROT          => open,
+                AXI_ARQOS           => open,
+                AXI_ARUSER          => open,
+                AXI_ARVALID         => hbm_axi_arvalid_s(i),
+                AXI_ARREADY         => hbm_axi_arready_s(i),
+                AXI_RID             => hbm_axi_rid_s(i),
+                AXI_RDATA           => hbm_axi_rdata_s(i),
+                AXI_RUSER_DATA      => hbm_axi_rdata_parity_s(i),
+                AXI_RUSER_ERR_DBE   => (others => '0'),
+                AXI_RRESP           => hbm_axi_rresp_s(i),
+                AXI_RLAST           => hbm_axi_rlast_s(i),
+                AXI_RVALID          => hbm_axi_rvalid_s(i),
+                AXI_RREADY          => hbm_axi_rready_s(i)
+            );
+        end generate;
+    end generate;
+
+    -- =========================================================================
+    -- TERMINATION OF UNUSED MI PORTS
+    -- =========================================================================
+    mi_unused_g : for i in MI_PORTS_RAW to MI_PORTS-1 generate
+        split_mi_ardy(i) <= split_mi_rd(i) or split_mi_wr(i);
+        split_mi_drd (i) <= (others => '0');
+        split_mi_drdy(i) <= split_mi_rd(i);
     end generate;
 
 end architecture;
