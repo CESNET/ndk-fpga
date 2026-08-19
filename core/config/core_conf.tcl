@@ -124,6 +124,13 @@ set TSU_FREQUENCY   161132812
 set MEM_PORTS       0
 set HBM_PORTS       0
 
+# Number of clock independent HBM modules. It is forced to 0 in core_const.tcl when
+# HBM_PORTS is 0, so only cards that actually have HBM need to change this.
+set HBM_MODULES     1
+
+# Width of AXI bus
+set HBM_DATA_WIDTH  256
+
 # ------------------------------------------------------------------------------
 # Enables virtual debugging (Intel SignalTap / Xilinx ILA) without a JTAG cable:
 # ------------------------------------------------------------------------------
