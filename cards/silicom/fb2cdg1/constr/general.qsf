@@ -39,8 +39,11 @@ set_global_assignment -name PRESERVE_UNUSED_XCVR_CHANNEL ON
 #100MHz clk
 set_location_assignment PIN_AB57 -to SYSCLK_100_P
 #set_location_assignment PIN_AC56 -to SYSCLK_100_N
+set_location_assignment PIN_E38 -to FPGA_RESETN_1V2
+
 set_instance_assignment -name IO_STANDARD "1.2V TRUE DIFFERENTIAL SIGNALING" -to SYSCLK_100_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to SYSCLK_100_P
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_RESETN_1V2
 
 # ==============================================================================
 # PWR MGMT - Use this if the boot fails

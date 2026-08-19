@@ -18,6 +18,9 @@ set CARD_ARCHGRP(IP_BUILD_DIR)       $CARD_BASE/src/ip
 set CARD_ARCHGRP(NET_MOD_ARCH)       $NET_MOD_ARCH
 set CARD_ARCHGRP(PCIE_ENDPOINT_MODE) $PCIE_ENDPOINT_MODE
 set CARD_ARCHGRP(PCIE_GEN)           $PCIE_GEN
+set CARD_ARCHGRP(HBM_PORTS)          $HBM_PORTS
+set CARD_ARCHGRP(HBM_MODULES)        $HBM_MODULES
+set CARD_ARCHGRP(HBM_DATA_WIDTH)     $HBM_DATA_WIDTH
 # Second dimension because of addition of an element of another array, just for clarity.
 set CARD_ARCHGRP(ETH_PORT_SPEED,0)   $ETH_PORT_SPEED(0)
 set CARD_ARCHGRP(ETH_PORT_CHAN,0)    $ETH_PORT_CHAN(0)
@@ -80,4 +83,24 @@ if {$NET_MOD_ARCH == "F_TILE"} {
     set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/qsfp.qsf"
 } else {
     set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/qsfp_virtual.qsf"
+}
+if {$HBM_MODULES != 0} {
+    set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_top.qsf"
+    if {$HBM_DATA_WIDTH == 256} {
+        set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_top_qos_256b.qsf"
+    } else {
+        set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_top_qos_512b.qsf"
+    }
+} else {
+    set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_top_empty.qsf"
+}
+if {$HBM_MODULES == 2} {
+    set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_bottom.qsf"
+    if {$HBM_DATA_WIDTH == 256} {
+        set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_bottom_qos_256b.qsf"
+    } else {
+        set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_bottom_qos_512b.qsf"
+    }
+} else {
+    set SYNTH_FLAGS(CONSTR) "$SYNTH_FLAGS(CONSTR) $CARD_BASE/constr/hbm_bottom_empty.qsf"
 }

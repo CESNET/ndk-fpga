@@ -31,6 +31,41 @@ NDK firmware support
 
     To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro and PACSign tool installed, including a valid license.
 
+HBM2e memory
+^^^^^^^^^^^^
+
+The card has two HBM2e stacks, one on each side of the die. They are attached through the
+hard Network on Chip (NoC), which gives the application 16 AXI4 ports per stack with a
+capacity of 1 GB per port. The configuration is in the
+``<NDK-FPGA_root_directory>/cards/silicom/fb2cdg1/config/card_conf.tcl`` file:
+
+- ``HBM_PORTS`` - total number of AXI4 ports, distributed evenly between the stacks.
+- ``HBM_MODULES`` - number of HBM stacks used (0, 1 or 2).
+- ``HBM_DATA_WIDTH`` - width of the AXI4 data bus, either 256 or 512 bits.
+
+.. note::
+
+    Every NoC attached port has its own address space, so the port index is not encoded in
+    the AXI address. This is why the card top level uses ``HBM_PORT_ADDR_HBIT = 30``
+    (1 GB per port) and ``HBM_BASE_ADDR_OFFSET = 0``, unlike the cards with a directly
+    attached HBM stack.
+
+.. warning::
+
+    The NoC attached HBM does not contain a reorder buffer. AXI4 only guarantees that the
+    responses of transactions sharing one AXI ID are returned in the order in which the
+    requests were issued; transactions with different IDs may complete in any order.
+
+    For this reason the HBM tester is used with ``USE_AXI_ID = False`` (a generic of the
+    ``HBM_TESTER_PORT`` module in
+    ``<NDK-FPGA_root_directory>/comp/mem_tools/debug/hbm_tester``). It then issues every
+    transaction with the same AXI ID and expects the read data in order. With
+    ``USE_AXI_ID = True`` the responses could be reordered and the data integrity test
+    would report false errors on this card.
+
+    An application that accesses the HBM directly must respect the same rule: either
+    reuse a single AXI ID, or be prepared to reorder the responses itself.
+
 :ref:`Board Variants <BOARD_VARIANT>`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

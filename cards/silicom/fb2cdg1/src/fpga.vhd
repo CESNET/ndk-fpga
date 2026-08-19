@@ -24,8 +24,8 @@ port (
     --  GENERAL CLOCKS AND PLL STATUS SIGNALS
     -- =========================================================================
     -- 100 MHz
-    SYSCLK_100_P     : in    std_logic;
-
+    SYSCLK_100_P     : in std_logic;
+    FPGA_RESETN_1V2  : in std_logic;
     -- =========================================================================
     --  PCIE INTERFACES
     -- =========================================================================
@@ -109,7 +109,27 @@ port (
     -- Single Event Upset. Active high.
     FPGA_MAX_FPGA_SEU_1V2    : out    std_logic;
     -- Thermal shutdown. Active Low
-    FPGA_MAX_THRM_SHTD_N_1V2 : out    std_logic
+    FPGA_MAX_THRM_SHTD_N_1V2 : out    std_logic;
+
+    -- =========================================================================
+    -- HBM2e via Universal interface bus (UIB)
+    -- =========================================================================
+    -- NoC top
+    CLK_NOC_TOP              : in std_logic;
+
+    CLK_UIB1_FBR1_P          : in std_logic;
+    HBM_TOP_CATTRIP_VIRTUAL  : in std_logic;
+    HBM_TOP_TEMP_VIRTUAL     : in std_logic_vector(3-1 downto 0);
+    CLK_UIB1_P               : in std_logic;
+
+    -- -- NoC bottom
+    CLK_NOC_BOTTOM           : in std_logic;
+
+    CLK_UIB0_FBR0_P          : in std_logic;
+    HBM_BOT_CATTRIP_VIRTUAL  : in std_logic;
+    HBM_BOT_TEMP_VIRTUAL     : in std_logic_vector(3-1 downto 0);
+    CLK_UIB0_P               : in std_logic
+
 );
 end entity;
 
@@ -122,6 +142,22 @@ architecture FULL of FPGA is
     constant ETH_LANES       : integer := 8;
     constant DEVICE          : string  := "AGILEX";
 
+    constant HBM_PORTS_PER_MODULE: natural := HBM_PORTS/max(1,HBM_MODULES);
+    constant HBM_AXI_ID_WIDTH    : natural := 7;
+    constant HBM_AXI_ADDR_WIDTH  : natural := 44;
+    constant HBM_AXI_LEN_WIDTH   : natural := 8;
+    constant HBM_AXI_SIZE_WIDTH  : natural := 3;
+    constant HBM_AXI_BURST_WIDTH : natural := 2;
+    constant HBM_AXI_DATA_WIDTH  : natural := HBM_DATA_WIDTH;
+    constant HBM_AXI_RESP_WIDTH  : natural := 2;
+    constant HBM_AXI_PROT_WIDTH  : natural := 3;
+    -- Each NoC attached port owns 1 GB of capacity ...
+    constant HBM_PORT_ADDR_HBIT  : natural := 30;
+    -- ... in its own address space, so the port ID is not encoded in the address.
+    constant HBM_BASE_ADDR_OFFSET: natural := 0;
+    constant HBM_AXI_QOS_WIDTH   : natural := 4;
+    constant HBM_AXI_USER_WIDTH  : natural := 11;
+
     --Ethernet
     signal eth_rx_p               : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
     signal eth_rx_n               : std_logic_vector(ETH_PORTS*ETH_LANES-1 downto 0);
@@ -130,6 +166,50 @@ architecture FULL of FPGA is
 
     signal eth_refclk_p           : std_logic_vector(ETH_PORTS-1 downto 0);
     signal eth_refclk_n           : std_logic_vector(ETH_PORTS-1 downto 0);
+
+    -- HBM memory interfaces (clocked at HBM_CLK)
+    subtype HBM_TOP_R is natural range HBM_PORTS_PER_MODULE - 1 downto 0;
+    subtype HBM_BOT_R is natural range HBM_PORTS -1             downto HBM_PORTS_PER_MODULE;
+
+    signal hbm_clk                : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_rst                : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_init_done          : std_logic_vector(HBM_PORTS-1 downto 0);
+
+    signal hbm_axi_awid           : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_ID_WIDTH-1 downto 0);
+    signal hbm_axi_awaddr         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_ADDR_WIDTH-1 downto 0);
+    signal hbm_axi_awlen          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_LEN_WIDTH-1 downto 0);
+    signal hbm_axi_awsize         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_SIZE_WIDTH-1 downto 0);
+    signal hbm_axi_awburst        : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_BURST_WIDTH-1 downto 0);
+    signal hbm_axi_awprot         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_PROT_WIDTH-1 downto 0);
+    signal hbm_axi_awqos          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_QOS_WIDTH-1 downto 0);
+    signal hbm_axi_awuser         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_USER_WIDTH-1 downto 0);
+    signal hbm_axi_awvalid        : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_awready        : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_wdata          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_DATA_WIDTH-1 downto 0);
+    signal hbm_axi_wstrb          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_DATA_WIDTH/8-1 downto 0);
+    signal hbm_axi_wlast          : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_wvalid         : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_wready         : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_bid            : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_ID_WIDTH-1 downto 0);
+    signal hbm_axi_bresp          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_RESP_WIDTH-1 downto 0);
+    signal hbm_axi_bvalid         : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_bready         : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_arid           : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_ID_WIDTH-1 downto 0);
+    signal hbm_axi_araddr         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_ADDR_WIDTH-1 downto 0);
+    signal hbm_axi_arlen          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_LEN_WIDTH-1 downto 0);
+    signal hbm_axi_arsize         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_SIZE_WIDTH-1 downto 0);
+    signal hbm_axi_arburst        : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_BURST_WIDTH-1 downto 0);
+    signal hbm_axi_arprot         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_PROT_WIDTH-1 downto 0);
+    signal hbm_axi_arqos          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_QOS_WIDTH-1 downto 0);
+    signal hbm_axi_aruser         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_USER_WIDTH-1 downto 0);
+    signal hbm_axi_arvalid        : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_arready        : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_rid            : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_ID_WIDTH-1 downto 0);
+    signal hbm_axi_rdata          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_DATA_WIDTH-1 downto 0);
+    signal hbm_axi_rresp          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_AXI_RESP_WIDTH-1 downto 0);
+    signal hbm_axi_rlast          : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_rvalid         : std_logic_vector(HBM_PORTS-1 downto 0);
+    signal hbm_axi_rready         : std_logic_vector(HBM_PORTS-1 downto 0);
 
     -- Boot
     signal boot_mi_clk            : std_logic;
@@ -169,6 +249,21 @@ begin
         PLL_OUT1_DIV            => 4,
         PLL_OUT2_DIV            => 6,
         PLL_OUT3_DIV            => 12,
+
+        HBM_MODULES             => HBM_MODULES,
+        HBM_PORTS               => HBM_PORTS,
+        HBM_ID_WIDTH            => HBM_AXI_ID_WIDTH,
+        HBM_ADDR_WIDTH          => HBM_AXI_ADDR_WIDTH,
+        HBM_LEN_WIDTH           => HBM_AXI_LEN_WIDTH,
+        HBM_SIZE_WIDTH          => HBM_AXI_SIZE_WIDTH,
+        HBM_BURST_WIDTH         => HBM_AXI_BURST_WIDTH,
+        HBM_DATA_WIDTH          => HBM_AXI_DATA_WIDTH,
+        HBM_RESP_WIDTH          => HBM_AXI_RESP_WIDTH,
+        HBM_PORT_ADDR_HBIT      => HBM_PORT_ADDR_HBIT,
+        HBM_BASE_ADDR_OFFSET    => HBM_BASE_ADDR_OFFSET,
+        HBM_PROT_WIDTH          => HBM_AXI_PROT_WIDTH,
+        HBM_QOS_WIDTH           => HBM_AXI_QOS_WIDTH,
+        HBM_USER_WIDTH          => HBM_AXI_USER_WIDTH,
 
         PCIE_CONS               => PCIE_CONS,
         PCIE_LANES              => PCIE_LANES,
@@ -247,8 +342,6 @@ begin
         QSFP_INT_N(0)           => QSFP0_INT_N,
         QSFP_INT_N(1)           => QSFP1_INT_N,
 
-        --TODO: HBM
-
         MEM_CLK                 => (others => '0'),
         MEM_RST                 => (others => '0'),
 
@@ -272,6 +365,46 @@ begin
 
         PCIE_CLK                => open,
         PCIE_RESET              => open,
+
+        HBM_CLK                 => hbm_clk,
+        HBM_RESET               => hbm_rst,
+        HBM_INIT_DONE           => hbm_init_done,
+
+        -- Warning! HBM does not contain a reorder buffer.
+        -- Transactions can be sent in any order, provided that the AXI_ID is not the same number.
+        HBM_AXI_ARID            => hbm_axi_arid,
+        HBM_AXI_ARADDR          => hbm_axi_araddr,
+        HBM_AXI_ARLEN           => hbm_axi_arlen,
+        HBM_AXI_ARSIZE          => hbm_axi_arsize,
+        HBM_AXI_ARBURST         => hbm_axi_arburst,
+        HBM_AXI_ARVALID         => hbm_axi_arvalid,
+        HBM_AXI_ARREADY         => hbm_axi_arready,
+
+        HBM_AXI_RID             => hbm_axi_rid,
+        HBM_AXI_RDATA           => hbm_axi_rdata,
+        HBM_AXI_RRESP           => hbm_axi_rresp,
+        HBM_AXI_RLAST           => hbm_axi_rlast,
+        HBM_AXI_RVALID          => hbm_axi_rvalid,
+        HBM_AXI_RREADY          => hbm_axi_rready,
+
+        HBM_AXI_AWID            => hbm_axi_awid,
+        HBM_AXI_AWADDR          => hbm_axi_awaddr,
+        HBM_AXI_AWLEN           => hbm_axi_awlen,
+        HBM_AXI_AWSIZE          => hbm_axi_awsize,
+        HBM_AXI_AWBURST         => hbm_axi_awburst,
+        HBM_AXI_AWVALID         => hbm_axi_awvalid,
+        HBM_AXI_AWREADY         => hbm_axi_awready,
+
+        HBM_AXI_WDATA           => hbm_axi_wdata,
+        HBM_AXI_WSTRB           => hbm_axi_wstrb,
+        HBM_AXI_WLAST           => hbm_axi_wlast,
+        HBM_AXI_WVALID          => hbm_axi_wvalid,
+        HBM_AXI_WREADY          => hbm_axi_wready,
+
+        HBM_AXI_BID             => hbm_axi_bid,
+        HBM_AXI_BRESP           => hbm_axi_bresp,
+        HBM_AXI_BVALID          => hbm_axi_bvalid,
+        HBM_AXI_BREADY          => hbm_axi_bready,
 
         BOOT_MI_CLK            => boot_mi_clk,
         BOOT_MI_RESET          => boot_mi_reset,
@@ -324,5 +457,124 @@ begin
         FPGA_MAX_FPGA_SEU_1V2    => FPGA_MAX_FPGA_SEU_1V2,
         FPGA_MAX_THRM_SHTD_N_1V2 => FPGA_MAX_THRM_SHTD_N_1V2
     );
+
+    -- HBM
+    hbm_top_g: if HBM_MODULES /= 0 generate
+        hbm_top_i: entity work.HBM_FB2CDG1
+        generic map(
+            HBM_PORTS           => HBM_PORTS_PER_MODULE,
+            HBM_AXI_ID_WIDTH    => HBM_AXI_ID_WIDTH,
+            HBM_AXI_ADDR_WIDTH  => HBM_AXI_ADDR_WIDTH,
+            HBM_AXI_LEN_WIDTH   => HBM_AXI_LEN_WIDTH,
+            HBM_AXI_SIZE_WIDTH  => HBM_AXI_SIZE_WIDTH,
+            HBM_AXI_BURST_WIDTH => HBM_AXI_BURST_WIDTH,
+            HBM_AXI_DATA_WIDTH  => HBM_AXI_DATA_WIDTH,
+            HBM_AXI_RESP_WIDTH  => HBM_AXI_RESP_WIDTH
+        ) port map(
+            CORE_PLL_REFCLK_CLK             => CLK_UIB1_FBR1_P,
+            HBM_CATTRIP_VIRTUAL_I_CONDUIT   => HBM_TOP_CATTRIP_VIRTUAL,
+            HBM_TEMP_VIRTUAL_I_CONDUIT      => HBM_TOP_TEMP_VIRTUAL,
+            UIBPLL_REFCLK_CLK               => CLK_UIB1_P,
+            HBM_ONLY_RESET_RESET            => not FPGA_RESETN_1V2,
+            NOC_CLK_CTRL_REFCLK_CLK         => CLK_NOC_TOP,
+
+            HBM_CLK         => hbm_clk(HBM_TOP_R),
+            HBM_RST         => hbm_rst(HBM_TOP_R),
+            HBM_INIT_DONE   => hbm_init_done(HBM_TOP_R),
+
+            HBM_AXI_AWID    => hbm_axi_awid(HBM_TOP_R),
+            HBM_AXI_AWADDR  => hbm_axi_awaddr(HBM_TOP_R),
+            HBM_AXI_AWLEN   => hbm_axi_awlen(HBM_TOP_R),
+            HBM_AXI_AWSIZE  => hbm_axi_awsize(HBM_TOP_R),
+            HBM_AXI_AWBURST => hbm_axi_awburst(HBM_TOP_R),
+            HBM_AXI_AWVALID => hbm_axi_awvalid(HBM_TOP_R),
+            HBM_AXI_AWREADY => hbm_axi_awready(HBM_TOP_R),
+
+            HBM_AXI_WDATA   => hbm_axi_wdata(HBM_TOP_R),
+            HBM_AXI_WSTRB   => hbm_axi_wstrb(HBM_TOP_R),
+            HBM_AXI_WLAST   => hbm_axi_wlast(HBM_TOP_R),
+            HBM_AXI_WVALID  => hbm_axi_wvalid(HBM_TOP_R),
+            HBM_AXI_WREADY  => hbm_axi_wready(HBM_TOP_R),
+
+            HBM_AXI_BID     => hbm_axi_bid(HBM_TOP_R),
+            HBM_AXI_BRESP   => hbm_axi_bresp(HBM_TOP_R),
+            HBM_AXI_BVALID  => hbm_axi_bvalid(HBM_TOP_R),
+            HBM_AXI_BREADY  => hbm_axi_bready(HBM_TOP_R),
+
+            HBM_AXI_ARID    => hbm_axi_arid(HBM_TOP_R),
+            HBM_AXI_ARADDR  => hbm_axi_araddr(HBM_TOP_R),
+            HBM_AXI_ARLEN   => hbm_axi_arlen(HBM_TOP_R),
+            HBM_AXI_ARSIZE  => hbm_axi_arsize(HBM_TOP_R),
+            HBM_AXI_ARBURST => hbm_axi_arburst(HBM_TOP_R),
+            HBM_AXI_ARVALID => hbm_axi_arvalid(HBM_TOP_R),
+            HBM_AXI_ARREADY => hbm_axi_arready(HBM_TOP_R),
+
+            HBM_AXI_RID     => hbm_axi_rid(HBM_TOP_R),
+            HBM_AXI_RDATA   => hbm_axi_rdata(HBM_TOP_R),
+            HBM_AXI_RRESP   => hbm_axi_rresp(HBM_TOP_R),
+            HBM_AXI_RLAST   => hbm_axi_rlast(HBM_TOP_R),
+            HBM_AXI_RVALID  => hbm_axi_rvalid(HBM_TOP_R),
+            HBM_AXI_RREADY  => hbm_axi_rready(HBM_TOP_R)
+        );
+    end generate;
+
+    hbm_bottom_g: if HBM_MODULES = 2 generate
+        hbm_bottom_i: entity work.HBM_FB2CDG1
+        generic map(
+            HBM_PORTS           => HBM_PORTS_PER_MODULE,
+            HBM_AXI_ID_WIDTH    => HBM_AXI_ID_WIDTH,
+            HBM_AXI_ADDR_WIDTH  => HBM_AXI_ADDR_WIDTH,
+            HBM_AXI_LEN_WIDTH   => HBM_AXI_LEN_WIDTH,
+            HBM_AXI_SIZE_WIDTH  => HBM_AXI_SIZE_WIDTH,
+            HBM_AXI_BURST_WIDTH => HBM_AXI_BURST_WIDTH,
+            HBM_AXI_DATA_WIDTH  => HBM_AXI_DATA_WIDTH,
+            HBM_AXI_RESP_WIDTH  => HBM_AXI_RESP_WIDTH
+        ) port map(
+            CORE_PLL_REFCLK_CLK             => CLK_UIB0_FBR0_P,
+            HBM_CATTRIP_VIRTUAL_I_CONDUIT   => HBM_BOT_CATTRIP_VIRTUAL,
+            HBM_TEMP_VIRTUAL_I_CONDUIT      => HBM_BOT_TEMP_VIRTUAL,
+            UIBPLL_REFCLK_CLK               => CLK_UIB0_P,
+            HBM_ONLY_RESET_RESET            => not FPGA_RESETN_1V2,
+            NOC_CLK_CTRL_REFCLK_CLK         => CLK_NOC_BOTTOM,
+
+            HBM_CLK         => hbm_clk(HBM_BOT_R),
+            HBM_RST         => hbm_rst(HBM_BOT_R),
+            HBM_INIT_DONE   => hbm_init_done(HBM_BOT_R),
+
+            HBM_AXI_AWID    => hbm_axi_awid(HBM_BOT_R),
+            HBM_AXI_AWADDR  => hbm_axi_awaddr(HBM_BOT_R),
+            HBM_AXI_AWLEN   => hbm_axi_awlen(HBM_BOT_R),
+            HBM_AXI_AWSIZE  => hbm_axi_awsize(HBM_BOT_R),
+            HBM_AXI_AWBURST => hbm_axi_awburst(HBM_BOT_R),
+            HBM_AXI_AWVALID => hbm_axi_awvalid(HBM_BOT_R),
+            HBM_AXI_AWREADY => hbm_axi_awready(HBM_BOT_R),
+
+            HBM_AXI_WDATA   => hbm_axi_wdata(HBM_BOT_R),
+            HBM_AXI_WSTRB   => hbm_axi_wstrb(HBM_BOT_R),
+            HBM_AXI_WLAST   => hbm_axi_wlast(HBM_BOT_R),
+            HBM_AXI_WVALID  => hbm_axi_wvalid(HBM_BOT_R),
+            HBM_AXI_WREADY  => hbm_axi_wready(HBM_BOT_R),
+
+            HBM_AXI_BID     => hbm_axi_bid(HBM_BOT_R),
+            HBM_AXI_BRESP   => hbm_axi_bresp(HBM_BOT_R),
+            HBM_AXI_BVALID  => hbm_axi_bvalid(HBM_BOT_R),
+            HBM_AXI_BREADY  => hbm_axi_bready(HBM_BOT_R),
+
+            HBM_AXI_ARID    => hbm_axi_arid(HBM_BOT_R),
+            HBM_AXI_ARADDR  => hbm_axi_araddr(HBM_BOT_R),
+            HBM_AXI_ARLEN   => hbm_axi_arlen(HBM_BOT_R),
+            HBM_AXI_ARSIZE  => hbm_axi_arsize(HBM_BOT_R),
+            HBM_AXI_ARBURST => hbm_axi_arburst(HBM_BOT_R),
+            HBM_AXI_ARVALID => hbm_axi_arvalid(HBM_BOT_R),
+            HBM_AXI_ARREADY => hbm_axi_arready(HBM_BOT_R),
+
+            HBM_AXI_RID     => hbm_axi_rid(HBM_BOT_R),
+            HBM_AXI_RDATA   => hbm_axi_rdata(HBM_BOT_R),
+            HBM_AXI_RRESP   => hbm_axi_rresp(HBM_BOT_R),
+            HBM_AXI_RLAST   => hbm_axi_rlast(HBM_BOT_R),
+            HBM_AXI_RVALID  => hbm_axi_rvalid(HBM_BOT_R),
+            HBM_AXI_RREADY  => hbm_axi_rready(HBM_BOT_R)
+        );
+    end generate;
 
 end architecture;

@@ -25,6 +25,16 @@ if {$env(DMA_TYPE) == 4} {
 set DMA_RX_BLOCKING_MODE true
 
 # ------------------------------------------------------------------------------
+# HBM parameters:
+# ------------------------------------------------------------------------------
+# allowed values 0 to 16
+
+# HBM_PORTS are equally distributed between HBM_MODULES (must be divisible by two)
+set HBM_PORTS        32
+set HBM_MODULES      2
+set HBM_DATA_WIDTH   512
+
+# ------------------------------------------------------------------------------
 # Other parameters:
 # ------------------------------------------------------------------------------
 set PROJECT_NAME "NDK_MINIMAL"

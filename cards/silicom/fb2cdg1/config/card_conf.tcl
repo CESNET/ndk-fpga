@@ -86,6 +86,23 @@ set DMA_RX_BLOCKING_MODE true
 set MEM_PORTS 0
 
 # ------------------------------------------------------------------------------
+# HBM parameters:
+# ------------------------------------------------------------------------------
+# Number of ports shared between HBM modules
+# allowed values: 0-32
+set HBM_PORTS 0
+
+# Width of HBM data bus
+# allowed values: 256, 512
+set HBM_DATA_WIDTH 256
+
+# The FPGA has HBM modules, each of which is located on the opposite side of the chip.
+# To differentiate between them, we use the HBM_MODULES parameter.
+# HBM_PORTS are shared between HBM_MODULES, with each module having 16 ports.
+# allowed values 0, 1, 2
+set HBM_MODULES 0
+
+# ------------------------------------------------------------------------------
 # Other parameters:
 # ------------------------------------------------------------------------------
 set TSU_ENABLE true

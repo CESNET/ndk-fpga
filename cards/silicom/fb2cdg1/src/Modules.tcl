@@ -12,7 +12,9 @@ set FPGA_COMMON_BASE  "$ARCHGRP_ARR(CORE_BASE)/top"
 
 # Components
 lappend COMPONENTS [list "FPGA_COMMON"   $FPGA_COMMON_BASE      $ARCHGRP]
-lappend COMPONENTS [list "BMC_WARP" "$ENTITY_BASE/comp/bmc_wrap" $ARCHGRP_ARR(BMC_CTRL_ARCH)]
+lappend COMPONENTS [list "BMC_WARP" "$ENTITY_BASE/comp/bmc_wrap"    $ARCHGRP_ARR(BMC_CTRL_ARCH) ]
+lappend COMPONENTS [list "HBM"      "$ENTITY_BASE/comp/hbm_fb2cdg1" $ARCHGRP_ARR(HBM_DATA_WIDTH)]
+
 
 # IP components
 set IP_COMMON_TCL $ARCHGRP_ARR(IP_TEMPLATE_ROOT)/common.tcl
@@ -38,6 +40,13 @@ lappend IP_COMPONENTS [list  "misc"    "mailbox_client"    "mailbox_client_ip"  
 lappend IP_COMPONENTS [list  "misc"    "reset_release"     "reset_release_ip"     0      0]
 lappend IP_COMPONENTS [list  "pcie"    "rtile_pcie"        $RTILE_PCIE_IP_NAME    0      1]
 lappend IP_COMPONENTS [list  "eth"     "ftile_eth"         $FTILE_ETH_IP_NAME     0      1]
+
+if {$ARCHGRP_ARR(HBM_MODULES) != 0} {
+    lappend IP_COMPONENTS [list  "clk"     "noc_pll"           "noc_pll"              0      1]
+    lappend IP_COMPONENTS [list  "mem"     "hbm2e_noc_target"  "hbm2e_noc_target"     0      1]
+    lappend IP_COMPONENTS [list  "noc"     "noc_clk_ctrl"      "noc_clk_ctrl"         0      1]
+    lappend IP_COMPONENTS [list  "noc"     "noc_initiator"     "noc_initiator"        0      1]
+}
 
 if {$ARCHGRP_ARR(VIRTUAL_DEBUG_ENABLE)} {
     lappend IP_COMPONENTS [list "misc"  "jtag_op"          "jtag_op_ip"           0      0]

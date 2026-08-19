@@ -1,0 +1,13 @@
+# hbm_bottom_empty.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): David Beneš <benes@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_instance_assignment -name VIRTUAL_PIN ON -to CLK_NOC_BOTTOM
+
+set_instance_assignment -name VIRTUAL_PIN ON -to CLK_UIB0_FBR0_P
+set_instance_assignment -name VIRTUAL_PIN ON -to CLK_UIB0_P
+
+set_instance_assignment -name VIRTUAL_PIN ON -to HBM_BOT_CATTRIP_VIRTUAL
+set_instance_assignment -name VIRTUAL_PIN ON -to HBM_BOT_TEMP_VIRTUAL

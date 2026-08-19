@@ -1,0 +1,138 @@
+# hbm_bottom.qsf
+# Copyright (C) 2025 DynaNIC Semiconductors, Ltd.
+# Author(s): David Beneš <benes@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+set_location_assignment PIN_EE56 -to CLK_NOC_BOTTOM
+
+set_instance_assignment -name IO_STANDARD "1.8-V" -to CLK_NOC_BOTTOM
+set_instance_assignment -name INPUT_TERMINATION OFF -to CLK_NOC_BOTTOM
+
+set_location_assignment PIN_EH37 -to CLK_UIB0_FBR0_P
+set_location_assignment PIN_EC36 -to CLK_UIB0_P
+
+set_instance_assignment -name VIRTUAL_PIN ON -to HBM_BOT_CATTRIP_VIRTUAL
+set_instance_assignment -name VIRTUAL_PIN ON -to HBM_BOT_TEMP_VIRTUAL
+
+set_instance_assignment -name IO_STANDARD "1.2V TRUE DIFFERENTIAL SIGNALING" -to CLK_UIB0_FBR0_P
+set_instance_assignment -name IO_STANDARD "1.2V TRUE DIFFERENTIAL SIGNALING" -to CLK_UIB0_P
+set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to CLK_UIB0_FBR0_P
+
+set_instance_assignment -name IO_STANDARD "1.2-V" -to HBM_BOT_CATTRIP_VIRTUAL
+set_instance_assignment -name SLEW_RATE 1 -to HBM_BOT_CATTRIP_VIRTUAL
+set_instance_assignment -name IO_STANDARD "1.2-V" -to HBM_BOT_TEMP_VIRTUAL*
+set_instance_assignment -name SLEW_RATE 1 -to HBM_BOT_TEMP_VIRTUAL*
+
+# ==============================================================================
+# NoC Initiator to HBM Target Connections (16x 256-bit 1:1 Mapping) - BOTTOM
+# ==============================================================================
+# Group assignment
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_0|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_1|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_11|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_10|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_12|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_13|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_14|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_15|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_2|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_3|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_4|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_5|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_7|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_6|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_8|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_9|initiator_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_ch1_sb|target_0.target_lite_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_ch3_sb|target_0.target_lite_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_ch5_sb|target_0.target_lite_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_ch7_sb|target_0.target_lite_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_ctrl_i|intel_noc_clock_ctrl_0|pll_inst -entity FPGA
+set_instance_assignment -name NOC_GROUP NOC_GROUP_1 -to hbm_bottom_g.hbm_bottom_i|noc_ctrl_i|intel_noc_clock_ctrl_0|ssm_inst -entity FPGA
+
+# Connection definition
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_0|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_1|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_2|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_3|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_4|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_5|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_6|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_7|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_8|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_9|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_10|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_11|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_12|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_13|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_14|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_CONNECTION ON -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_15|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u1|target_0.target_inst_0 -entity FPGA
+
+# Base address of each port
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_0|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_10|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_4|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_5|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_6|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_7|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_8|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_9|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_11|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_12|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_13|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_14|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_15|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_1|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u1|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_2|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u0|target_0.target_inst_0 -entity FPGA
+set_instance_assignment -name NOC_TARGET_BASE_ADDRESS 0X0 -from hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_3|initiator_inst_0 -to hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u1|target_0.target_inst_0 -entity FPGA
+
+# Noc physical location (added due to congestion)
+set_location_assignment NOCINITIATOR_X134_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_0|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X204_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_1|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X160_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_2|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X242_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_3|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X105_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_4|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X188_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_5|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X149_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_6|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X215_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_7|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X269_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_8|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X350_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_9|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X312_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_10|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X376_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_11|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X258_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_12|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X323_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_13|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X296_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_14|initiator_inst_0}
+set_location_assignment NOCINITIATOR_X365_Y6_N202 -to {hbm_bottom_g.hbm_bottom_i|noc_init_i|noc_init_c|intel_noc_initiator_0|iniu_15|initiator_inst_0}
+set_location_assignment NOCTARGET_X204_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X231_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch0_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X215_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X242_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch1_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X194_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X221_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch2_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X210_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X237_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch3_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X269_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X296_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch4_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X285_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X312_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch5_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X264_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X291_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch6_u1|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X275_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u0|target_0.target_inst_0}
+set_location_assignment NOCTARGET_X302_Y6_N200 -to {hbm_bottom_g.hbm_bottom_i|noc_target_i|hbm_fp_0|tniu_ch7_u1|target_0.target_inst_0}
