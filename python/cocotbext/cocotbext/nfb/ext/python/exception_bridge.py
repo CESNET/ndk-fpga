@@ -8,12 +8,15 @@ from __future__ import annotations
 import functools
 import threading
 from asyncio import CancelledError
-from typing import Callable, TypeVar
+from typing import Callable, Coroutine, ParamSpec, TypeVar
 
 import cocotb
+import cocotb.task
+from cocotb._base_triggers import Trigger
 from nfb.ext.python import ExceptionBridgeBase, get_exception_bridge
 from nfb.ext.python.shim import set_exception_bridge
 
+P = ParamSpec("P")
 R = TypeVar("R")
 
 
@@ -51,11 +54,25 @@ def install_exception_bridge() -> ExceptionBridge:
     return exc_bridge
 
 
-def bridge(func: Callable[..., R]) -> Callable[..., R]:
-    """Drop-in for ``cocotb.task.bridge`` that re-raises a stashed CancelledError."""
+def bridge(func: Callable[P, R]) -> Callable[P, Coroutine[Trigger, None, R]]:
+    """Drop-in for ``cocotb.task.bridge`` that re-raises a stashed CancelledError.
+
+    Also refuses to even start *func* if the dispatching task is already flagged
+    for cancellation, since dispatching it would just strand the bridge thread in
+    ``event.wait()`` forever. Relies on the private ``_must_cancel`` flag, as
+    there's no public API for this; skips the check if that attribute is ever
+    removed/renamed upstream rather than fail outright.
+    """
 
     @functools.wraps(func)
     def guarded(*args, **kwargs):
+        try:
+            task = cocotb.task.current_task()
+        except RuntimeError:
+            task = None
+        if task is not None and getattr(task, "_must_cancel", False):
+            raise CancelledError()
+
         try:
             result = func(*args, **kwargs)
             br = get_exception_bridge()
