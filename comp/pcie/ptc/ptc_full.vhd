@@ -65,7 +65,7 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     -- Name(s) (4-letter IDs) of Streaming Debug Probes.
     -- DRQ0 = DMA RQ 0
     constant DBG_PROBE_STR         : string := "PUMFPUMVPURQPDMFPDMVPDRC";
-    constant RST_WIDTH             : natural := 5;
+    constant RST_WIDTH             : natural := 6;
 
     ---------------------------------------------------------------------------
 
@@ -842,7 +842,7 @@ begin
         DEVICE              => DEVICE
     ) port map (
         WR_CLK    => CLK,
-        WR_RST    => rst_local(2),
+        WR_RST    => rst_local(5),
 
         WR_DATA   => pcie_tag_status_async,
         WR_EN     => '1',
