@@ -148,7 +148,7 @@ def bridge(func: Callable[P, R]) -> Callable[P, Coroutine[Trigger, None, R]]:
 
     # Not @functools.wraps(guarded): its typeshed stub would make type checkers see
     # wrapper() as returning R directly instead of a Coroutine (same pitfall as
-    # bridge_safe_asynccontextmanager in cocotbext.ofm.utils.cancellation). Copy
+    # bridge_safe_asynccontextmanager in cocotbext.ofm.utils.bridge_safe). Copy
     # the introspection metadata by hand instead.
     wrapper.__name__ = func.__name__
     wrapper.__qualname__ = func.__qualname__
