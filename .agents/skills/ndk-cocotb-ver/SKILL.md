@@ -205,6 +205,14 @@ make TARGET=nvc-sim
 make SIM_FLAGS=-c  # CLI mode (no GUI)
 ```
 
+#### Running Multiple Generic Combinations
+
+Some cocotb directories include a `ver_settings.py` with multiple generic combinations
+tested in CI. Run them with `build/scripts/multi_ver/multi_ver_cocotb.py` (use `-h` for
+options). After changing VHDL in a component that has `ver_settings.py`, ask the user
+whether they want a **default run** (`make` in the `cocotb/` dir) or a **full
+multi-ver run** (all combinations from `ver_settings.py`).
+
 ### 8. Debug Patterns
 
 #### Probing Internal DUT Signals (No Waveform GUI)
