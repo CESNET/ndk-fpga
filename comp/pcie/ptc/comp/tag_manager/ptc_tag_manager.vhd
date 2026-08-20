@@ -416,30 +416,32 @@ architecture FULL of PTC_TAG_MANAGER is
     -- Tag mapping logic
     -----------------------
     -- =======================================================
-    -- tag managing N_LOOP_OP unit (contains multiport memory)
+    -- tag mapping bank memory
     -- =======================================================
 
     -- DOWN mapping
     constant TAG_MAP_READ_PORTS  : integer := MVB_DOWN_ITEMS;
-    -- UP for assigning
-    constant TAG_MAP_OPERATORS   : integer := MVB_UP_ITEMS;
-    -- assign
-    constant TAG_MAP_OPERATIONS  : integer := 1;
+    -- one memory bank per UP item
+    constant TAG_MAP_BANKS       : integer := MVB_UP_ITEMS;
     -- Tag+ID
     constant TAG_MAP_DATA_WIDTH  : integer := DMA_TAG_WIDTH+DMA_ID_WIDTH;
-    signal   tag_map_item_sel    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
-    signal   tag_map_ops         : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_OPERATIONS-1 downto 0);
-    signal   tag_map_in_ops      : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_OPERATIONS-1 downto 0);
-    signal   tag_map_in_data     : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
-    signal   tag_map_out_data    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
+    -- Number of items of the mapping memory
+    constant TAG_MAP_ITEMS       : integer := 2**INTERNAL_PCIE_TAG_WIDTH;
+    -- Index width of the memory bank that holds the current mapping of a Tag
+    constant TAG_MAP_BANK_W      : integer := max(log2(TAG_MAP_BANKS),1);
+    -- Tag of the mapping to be written and its request, both delayed by one cycle to line
+    -- up with the DMA Tag/ID that dma_in_fifoxm_do presents, see tag_map_wr_reg_pr.
+    signal   tag_map_wr_tag_reg  : slv_array_t(TAG_MAP_BANKS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
+    signal   tag_map_wr_req_reg  : std_logic_vector(TAG_MAP_BANKS-1 downto 0);
+    signal   tag_map_wr_en       : std_logic_vector(TAG_MAP_BANKS-1 downto 0);
+    signal   tag_map_wr_data     : slv_array_t(TAG_MAP_BANKS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
     signal   tag_map_read_addr   : slv_array_t(TAG_MAP_READ_PORTS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0) := (others => (others => '0'));
     signal   tag_map_read_data   : slv_array_t(TAG_MAP_READ_PORTS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-
-    -- TAG_MAP_DATA separated
-    signal tag_map_in_data_tag    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_TAG_WIDTH-1 downto 0);
-    signal tag_map_in_data_id     : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_ID_WIDTH-1 downto 0);
-    signal tag_map_out_data_tag   : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_TAG_WIDTH-1 downto 0);
-    signal tag_map_out_data_id    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_ID_WIDTH-1 downto 0);
+    -- Index of the bank that holds the current mapping of each Tag
+    signal   tag_map_bank        : u_array_t(TAG_MAP_ITEMS-1 downto 0)(TAG_MAP_BANK_W-1 downto 0) := (others => (others => '0'));
+    signal   tag_map_bank_reg    : u_array_t(TAG_MAP_READ_PORTS-1 downto 0)(TAG_MAP_BANK_W-1 downto 0) := (others => (others => '0'));
+    signal   tag_map_bank_do_ser : slv_array_t(TAG_MAP_BANKS-1 downto 0)(TAG_MAP_READ_PORTS*TAG_MAP_DATA_WIDTH-1 downto 0);
+    signal   tag_map_bank_do     : slv_array_2d_t(TAG_MAP_BANKS-1 downto 0)(TAG_MAP_READ_PORTS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
 
     -- tag read info register
     signal tag_map_read_tag_reg      : slv_array_t     (MVB_DOWN_ITEMS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0) := (others => (others => '0'));
@@ -931,75 +933,95 @@ begin
     -- -------------------------------------------------------------------------
 
     -- -------------------------------------------------------------------------
-    -- Tags mapping N_LOOP_OP unit
+    -- Tags mapping bank memory
     -- -------------------------------------------------------------------------
 
-    tags_map_n_loop_i : entity work.N_LOOP_OP
-    generic map (
-        DATA_WIDTH     => TAG_MAP_DATA_WIDTH,
-        ITEMS          => 2**INTERNAL_PCIE_TAG_WIDTH,
-        RESET_VAL      => 0,
-        READ_PORTS     => TAG_MAP_READ_PORTS,
+    -- The mapping is only ever overwritten, never read-modify-written, and a PCIe Tag is
+    -- assigned by exactly one UP item at a time. It is therefore a plain memory with one
+    -- bank (and so one write port) per UP item, instead of the N_LOOP_OP operator
+    -- machinery used before. That halves the number of read ports of the underlying
+    -- LUTRAMs and, more importantly, splits the read into a bank select and a memory read
+    -- that no longer share a cycle.
 
-        OPERATORS      => TAG_MAP_OPERATORS,
-        OPERATIONS     => TAG_MAP_OPERATIONS,
-
-        DEVICE         => DEVICE
-    )
-    port map (
-        CLK            => CLK,
-        RESET          => RESET,
-
-        OP_ITEM_SEL    => tag_map_item_sel,
-        OP_OPERATIONS  => tag_map_ops,
-
-        OP_IN_SEL      => open,
-        OP_IN_SRC      => open,
-        OP_IN_OPS      => tag_map_in_ops,
-        OP_IN_DATA     => tag_map_in_data,
-
-        OP_OUT_DATA    => tag_map_out_data,
-
-        READ_ADDR      => tag_map_read_addr,
-        READ_DATA      => tag_map_read_data
-    );
-
-    -- operation set
-    tag_map_pr : process (all)
+    -- The write is one cycle behind the Tag read out of the Tag FIFO, which is when the
+    -- matching DMA Tag/ID appears on dma_in_fifoxm_do. This is the same offset the
+    -- N_LOOP_OP operator interface had between OP_ITEM_SEL and OP_IN_SEL.
+    tag_map_wr_reg_pr : process (CLK)
     begin
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            tag_map_item_sel(i) <= pcie_in_fifoxm_do_reg(i);
-            tag_map_ops(i)      <= (others => '0');
-            tag_map_ops(i)(0)   <= pcie_in_fifoxm_vld_reg(i);
-        end loop;
+        if (rising_edge(CLK)) then
+            tag_map_wr_tag_reg <= pcie_in_fifoxm_do_reg;
+            tag_map_wr_req_reg <= pcie_in_fifoxm_vld_reg;
+
+            if (RESET = '1') then
+                tag_map_wr_req_reg <= (others => '0');
+            end if;
+        end if;
     end process;
 
-    -- in data separation
-    tag_map_in_data_sep_gen : for i in 0 to TAG_MAP_OPERATORS-1 generate
-        tag_map_in_data_tag(i)   <= tag_map_in_data(i)(DMA_TAG_WIDTH+DMA_ID_WIDTH-1 downto DMA_ID_WIDTH);
-        tag_map_in_data_id(i)    <= tag_map_in_data(i)(DMA_ID_WIDTH-1 downto 0           );
+    tag_map_wr_g : for i in 0 to TAG_MAP_BANKS-1 generate
+        -- dma_in_fifoxm_do carries the DMA Tag and ID in the order the mapping stores
+        -- them, see dma_in_fifo_input_gen and tag_map_read_pr.
+        tag_map_wr_data(i) <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*(i+1)-1 downto DMA_IN_FIFO_DATA_WIDTH*i);
+        -- write only when there really is an instruction waiting for the Tag
+        tag_map_wr_en(i)   <= tag_map_wr_req_reg(i) and not dma_in_fifoxm_empty(i);
     end generate;
 
-    -- operators
-    tag_map_operators_pr : process (all)
-    begin
-        for i in 0 to TAG_MAP_OPERATORS-1 loop
-            tag_map_out_data_tag(i)   <= tag_map_in_data_tag(i);
-            tag_map_out_data_id(i)    <= tag_map_in_data_id(i);
-        end loop;
+    -- Each bank is read by all DOWN items and the read lands in the LUTRAM's own output
+    -- register, so nothing else shares the cycle with the memory read.
+    tag_map_bank_g : for i in 0 to TAG_MAP_BANKS-1 generate
+        tag_map_lutram_i : entity work.GEN_LUTRAM
+        generic map (
+            DATA_WIDTH         => TAG_MAP_DATA_WIDTH,
+            ITEMS              => TAG_MAP_ITEMS,
+            RD_PORTS           => TAG_MAP_READ_PORTS,
+            RD_LATENCY         => 1,
+            WRITE_USE_RD_ADDR0 => false,
+            -- A Completion cannot arrive in the same cycle in which the request it
+            -- belongs to is being assigned its Tag, so no read ever hits the address
+            -- being written and Quartus does not have to constrain that path.
+            MLAB_CONSTR_RDW_DC => false,
+            DEVICE             => DEVICE
+        )
+        port map (
+            CLK     => CLK,
+            WR_EN   => tag_map_wr_en(i),
+            WR_ADDR => tag_map_wr_tag_reg(i),
+            WR_DATA => tag_map_wr_data(i),
+            RD_ADDR => slv_array_ser(tag_map_read_addr),
+            RD_DATA => tag_map_bank_do_ser(i)
+        );
 
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            -- there is a valid instruction waiting
-            if (tag_map_in_ops(i)(0) = '1' and dma_in_fifoxm_empty(i) = '0') then
-                tag_map_out_data_tag(i) <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*i+DMA_TAG_WIDTH+DMA_ID_WIDTH-1 downto DMA_IN_FIFO_DATA_WIDTH*i+DMA_ID_WIDTH);
-                tag_map_out_data_id(i)  <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*i              +DMA_ID_WIDTH-1 downto DMA_IN_FIFO_DATA_WIDTH*i             );
-            end if;
-        end loop;
+        tag_map_bank_do(i) <= slv_array_deser(tag_map_bank_do_ser(i),TAG_MAP_READ_PORTS);
+    end generate;
+
+    -- Which bank holds the current mapping of each Tag. Only one UP item can hold a given
+    -- Tag, so the writes below never target the same item in the same cycle.
+    tag_map_bank_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to TAG_MAP_BANKS-1 loop
+                if (tag_map_wr_en(i) = '1') then
+                    tag_map_bank(to_integer(unsigned(tag_map_wr_tag_reg(i)))) <= to_unsigned(i,TAG_MAP_BANK_W);
+                end if;
+            end loop;
+        end if;
     end process;
 
-    -- out data merge
-    tag_map_out_data_merge_gen : for i in 0 to TAG_MAP_OPERATORS-1 generate
-        tag_map_out_data(i) <= tag_map_out_data_tag(i) & tag_map_out_data_id(i);
+    -- The bank select is read in parallel with the memories and registered next to their
+    -- output registers, so the wide select over tag_map_bank does not sit in series with
+    -- the memory read. Both see the same content, because a write in a given cycle
+    -- reaches both of them at its end.
+    tag_map_bank_sel_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to TAG_MAP_READ_PORTS-1 loop
+                tag_map_bank_reg(i) <= tag_map_bank(to_integer(unsigned(tag_map_read_addr(i))));
+            end loop;
+        end if;
+    end process;
+
+    tag_map_read_data_g : for i in 0 to TAG_MAP_READ_PORTS-1 generate
+        tag_map_read_data(i) <= tag_map_bank_do(to_integer(tag_map_bank_reg(i)))(i);
     end generate;
 
     -- tag map read

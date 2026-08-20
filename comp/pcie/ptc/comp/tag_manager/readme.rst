@@ -15,13 +15,16 @@ The Tag Manager is also responsible for freeing of the PCIe Tags, checking of th
 Block diagram
 ^^^^^^^^^^^^^
 
-The core part of the unit is the Tag mapping N_LOOP_OP.
-It is a memory, which stores the corresponding DMA Tag and Unit ID for each possible PCIe Tag.
-Since, this memory can be updated multiple times in each cycle, the N_LOOP_OP is used, which allows parallel memory update.
+The core part of the unit is the Tag mapping memory, which stores the corresponding DMA Tag and Unit ID for each possible PCIe Tag.
+Since this memory can be updated multiple times in each cycle, it is built as one memory bank per upstream item, each with its own write port, plus a register array that tracks which bank holds the current mapping of each Tag.
 
 The unit generates the PCIe Tags itself and passes them to the upstream transactions to be propagated to PCIe.
 It is also responsible for releasing of the PCIe Tags for repeated usage depending on the downstream transactions.
 The architecture is described in the diagram below.
+
+.. note::
+
+    The diagram is out of date: it still draws the Tag mapping as an N_LOOP_OP unit and shows the TAG_ASSIGN interface, both of which have been removed.
 
 .. _ptc_tag_manager_diag_assign:
 
