@@ -602,6 +602,29 @@ architecture RTILE of PCIE_CORE is
     constant MTC_FIFO_CRDT     : natural := CQ_FIFO_ITEMS*AVST_WORD_CRDT;
     constant CRDT_TOTAL_XPH    : natural := MTC_FIFO_CRDT/(MAX_PAYLOAD_SIZE/16);
 
+    -- R-Tile has no status bus like P-Tile's tl_cfg, so the PCIe values negotiated with
+    -- the Root Complex (MPS, MRRS, Ext Tag Enable, RCB, 10-bit Tag Requester Enable) are
+    -- shadow-decoded from the CfgWr traffic seen on the CII, see std_cap_snoop_p below.
+    -- Indexes and DW addresses of the involved registers of the PCI Express Capability
+    -- Structure of PF0 (same addresses in the x16, x8 and x4 core configuration).
+    constant STD_CAP_DEVCTL    : natural := 0; -- Device Control/Status
+    constant STD_CAP_LNKCTL    : natural := 1; -- Link Control/Status
+    constant STD_CAP_DEVCTL2   : natural := 2; -- Device Control 2/Status 2
+    constant STD_CAP_REGS      : natural := 3;
+    constant STD_CAP_DW_ADDR   : i_array_t(STD_CAP_REGS-1 downto 0) := (
+        STD_CAP_DEVCTL  => 16#78#/4,
+        STD_CAP_LNKCTL  => 16#80#/4,
+        STD_CAP_DEVCTL2 => 16#98#/4
+    );
+    -- Reset values of the shadow registers as required by the PCIe specification:
+    -- MRRS=512B, MPS=128B, RCB=64B, Ext Tag and 10-bit Tag Requester disabled.
+    constant STD_CAP_DEFAULT   : slv_array_t(STD_CAP_REGS-1 downto 0)(32-1 downto 0) := (
+        STD_CAP_DEVCTL => X"00002000",
+        others         => (others => '0')
+    );
+    -- Width of the snooped bits crossed to the pcie_clk domain, see pcie_std_cap_bits.
+    constant STD_CAP_BITS_W    : natural := 9;
+
     signal pcie_reset_status_n      : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_reset_status        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_clk                 : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
@@ -683,6 +706,12 @@ architecture RTILE of PCIE_CORE is
     signal pcie_cii_addr            : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(9 downto 0);
     signal pcie_cii_wr              : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_cii_override_din    : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(31 downto 0) := (others => (others => '0'));
+
+    -- Shadow copies of the snooped registers in the pcie_slow_clk domain. All 32 bits are
+    -- kept so that a write masked by byte enables updates only the bytes it touches.
+    signal pcie_std_cap             : slv_array_2d_t(PCIE_ENDPOINTS-1 downto 0)(STD_CAP_REGS-1 downto 0)(32-1 downto 0) := (others => STD_CAP_DEFAULT);
+    signal pcie_std_cap_bits        : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(STD_CAP_BITS_W-1 downto 0);
+    signal pcie_std_cap_sync        : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(STD_CAP_BITS_W-1 downto 0);
 
     signal cfg_ext_read             : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal cfg_ext_write            : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
@@ -1596,12 +1625,63 @@ begin
             end if;
         end process;
 
-        -- TODO
-        PCIE_MPS(i)            <= "001"; -- 256B
-        PCIE_MRRS(i)           <= "010"; -- 512B
-        PCIE_EXT_TAG_EN(i)     <= '1';
-        PCIE_RCB_SIZE(i)       <= '0';
-        PCIE_10B_TAG_REQ_EN(i) <= '0';
+        -- Passive CII write-snoop of the PCI Express Capability Structure registers listed
+        -- in STD_CAP_DW_ADDR. It only observes the CfgWr traffic that is already decoded
+        -- by the PCIE_CII2CFG_EXT instance below and it never drives CFG_EXT_READ_DV or
+        -- the CII override, so a CfgRd of these registers is still answered by the Hard
+        -- IP itself. They are real hardened registers, unlike the VSEC in PCI_EXT_CAP.
+        std_cap_snoop_p : process (pcie_slow_clk(i))
+            variable cfg_dw_addr : integer;
+        begin
+            if (rising_edge(pcie_slow_clk(i))) then
+                if (pcie_slow_rst(i) = '1') then
+                    pcie_std_cap(i) <= STD_CAP_DEFAULT;
+                elsif (cfg_ext_write(i) = '1') then
+                    cfg_dw_addr := to_integer(unsigned(cfg_ext_register(i)));
+                    for r in 0 to STD_CAP_REGS-1 loop
+                        if (cfg_dw_addr = STD_CAP_DW_ADDR(r)) then
+                            for b in 0 to 4-1 loop
+                                if (cfg_ext_write_be(i)(b) = '1') then
+                                    pcie_std_cap(i)(r)(8*b+8-1 downto 8*b) <= cfg_ext_write_data(i)(8*b+8-1 downto 8*b);
+                                end if;
+                            end loop;
+                        end if;
+                    end loop;
+                end if;
+            end if;
+        end process;
+
+        -- Only the used bits are crossed to the pcie_clk domain and they are crossed as a
+        -- single word, so that the outputs can never show a torn combination of values.
+        pcie_std_cap_bits(i) <= pcie_std_cap(i)(STD_CAP_DEVCTL)(14 downto 12) & -- MRRS
+                                pcie_std_cap(i)(STD_CAP_DEVCTL)(8)            & -- Ext Tag Enable
+                                pcie_std_cap(i)(STD_CAP_DEVCTL)(7 downto 5)   & -- MPS
+                                pcie_std_cap(i)(STD_CAP_LNKCTL)(3)            & -- RCB
+                                pcie_std_cap(i)(STD_CAP_DEVCTL2)(12);           -- 10-bit Tag Requester Enable
+
+        std_cap_sync_i : entity work.ASYNC_BUS_HANDSHAKE
+        generic map (
+            DATA_WIDTH => STD_CAP_BITS_W
+        )
+        port map (
+            ACLK     => pcie_slow_clk(i),
+            ARST     => pcie_slow_rst(i),
+            ADATAIN  => pcie_std_cap_bits(i),
+            ASEND    => '1',
+            AREADY   => open,
+
+            BCLK     => pcie_clk(i),
+            BRST     => '0',
+            BDATAOUT => pcie_std_cap_sync(i),
+            BLOAD    => '1',
+            BVALID   => open
+        );
+
+        PCIE_MPS(i)            <= pcie_std_cap_sync(i)(4 downto 2);
+        PCIE_MRRS(i)           <= pcie_std_cap_sync(i)(8 downto 6);
+        PCIE_EXT_TAG_EN(i)     <= pcie_std_cap_sync(i)(5);
+        PCIE_RCB_SIZE(i)       <= pcie_std_cap_sync(i)(1);
+        PCIE_10B_TAG_REQ_EN(i) <= pcie_std_cap_sync(i)(0);
     end generate;
 
     -- =========================================================================
