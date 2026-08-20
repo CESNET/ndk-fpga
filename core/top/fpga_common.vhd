@@ -78,9 +78,9 @@ entity FPGA_COMMON is
         QSFP_I2C_TRISTATE       : boolean := true;
         QSFP_I2C_CTRL_EN        : boolean := true;
 
-        -- Number of HBM Memory modules on the chip
-        HBM_MODULES             : natural := 1;
-        HBM_PORTS               : natural := 1;
+        -- Number of HBM Memory modules on the chip.
+        HBM_MODULES             : natural := 0;
+        HBM_PORTS               : natural := 0;
         HBM_ADDR_WIDTH          : natural := 32;
         HBM_DATA_WIDTH          : natural := 256;
         HBM_BURST_WIDTH         : natural := 2;

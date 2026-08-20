@@ -2155,6 +2155,7 @@ begin
         MEM_BURST_WIDTH         => MEM_BURST_WIDTH,
         AMM_FREQ_KHZ            => AMM_FREQ_KHZ,
 
+        HBM_MODULES             => HBM_MODULES,
         HBM_PORTS               => HBM_PORTS,
         HBM_ADDR_WIDTH          => HBM_ADDR_WIDTH,
         HBM_DATA_WIDTH          => HBM_DATA_WIDTH,

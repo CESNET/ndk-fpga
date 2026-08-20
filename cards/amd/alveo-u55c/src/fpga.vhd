@@ -1455,6 +1455,7 @@ begin
         QSFP_PORTS              => ETH_PORTS,
         QSFP_I2C_PORTS          => ETH_PORTS,
 
+        HBM_MODULES             => HBM_MODULES,
         HBM_PORTS               => HBM_PORTS,
         HBM_DATA_WIDTH          => HBM_DATA_WIDTH,
         HBM_ADDR_WIDTH          => HBM_ADDR_WIDTH,
