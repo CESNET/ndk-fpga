@@ -200,6 +200,15 @@ architecture FULL of PTC_TAG_MANAGER is
 
     constant WORDS_COUNT_WIDTH      : integer := log2(2**DMA_LEN_WIDTH*2-MFB_DOWN_REG_SIZE-MFB_DOWN_REGIONS)+1;
     constant WORDS_COUNT_SUM_WIDTH  : integer := log2(2**WORDS_COUNT_WIDTH*MVB_UP_ITEMS);
+    -- Width of the len+addr add and round_up in s1_reg_pr (see words_u there). The
+    -- rounded-up value is always an exact multiple of 2**MFB_DOWN_WORD_SIZE_WIDTH whose
+    -- shifted-down value is words_u itself, so it fits in this width by the same sizing
+    -- that already guarantees words_u fits in WORDS_COUNT_WIDTH bits (round_up's own
+    -- internal add lands on that same value, so it cannot wrap either). Running the add
+    -- at the full DMA_ADDR_WIDTH (62b) instead only put a wide, mostly unused carry
+    -- chain on the words-budget path: addr contributes just its low
+    -- MFB_DOWN_WORD_SIZE_WIDTH bits, the rest is masked off in the very same expression.
+    constant WORDS_PRE_DIV_WIDTH    : integer := WORDS_COUNT_WIDTH+MFB_DOWN_WORD_SIZE_WIDTH;
 
     -- width of pointer for completion words counting
     constant COMPL_PTR_WIDTH        : integer := log2(2**(DMA_LEN_WIDTH+2)+2**(RCB_SIZE_MAX_WIDTH+2)+1);
@@ -499,7 +508,7 @@ begin
                     len_u(i)  := unsigned(s0_len(i));
                     addr_u(i) := unsigned(s0_addr(i));
 
-                    words_u(i) := resize(enlarge_right(round_up(resize(len_u(i),addr_u(i)'length)+resize(resize(addr_u(i),MFB_DOWN_WORD_SIZE_WIDTH),addr_u(i)'length),MFB_DOWN_WORD_SIZE_WIDTH),-MFB_DOWN_WORD_SIZE_WIDTH),words_u(i)'length);
+                    words_u(i) := resize(enlarge_right(round_up(resize(len_u(i),WORDS_PRE_DIV_WIDTH)+resize(resize(addr_u(i),MFB_DOWN_WORD_SIZE_WIDTH),WORDS_PRE_DIV_WIDTH),MFB_DOWN_WORD_SIZE_WIDTH),-MFB_DOWN_WORD_SIZE_WIDTH),words_u(i)'length);
 
                     -- debug info
                     s_len_u(i)   <= len_u(i);
