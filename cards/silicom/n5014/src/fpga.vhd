@@ -2157,6 +2157,9 @@ begin
 
         HBM_MODULES             => HBM_MODULES,
         HBM_PORTS               => HBM_PORTS,
+        -- 256 MB per port, each port has its own address space
+        HBM_PORT_ADDR_HBIT      => 28,
+        HBM_BASE_ADDR_OFFSET    => 0,
         HBM_ADDR_WIDTH          => HBM_ADDR_WIDTH,
         HBM_DATA_WIDTH          => HBM_DATA_WIDTH,
         HBM_BURST_WIDTH         => HBM_BURST_WIDTH,
