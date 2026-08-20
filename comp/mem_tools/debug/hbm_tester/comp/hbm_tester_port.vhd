@@ -13,25 +13,25 @@ use work.math_pack.all;
 
 entity HBM_TESTER_PORT is
     generic (
-        DEBUG           : boolean := True;
+        DEBUG            : boolean := True;
         -- when USE_AXI_ID is false, you can disable Re-order buffer in HBM IP
-        USE_AXI_ID      : boolean := False;
+        USE_AXI_ID       : boolean := False;
         -- Size of one port in bytes, used as the base address of each port.
         -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
         -- own address space (e.g. a NoC attached HBM).
-        BASE_ADDR_OFFSET: natural := 0;
-        CNT_WIDTH       : natural := 16;
-        PORT_ID         : natural := 0;
-        AXI_ADDR_WIDTH  : natural := 32;
-        AXI_DATA_WIDTH  : natural := 256;
-        AXI_BURST_WIDTH : natural := 2;
-        AXI_ID_WIDTH    : natural := 6;
-        AXI_LEN_WIDTH   : natural := 4;
-        AXI_SIZE_WIDTH  : natural := 3;
-        AXI_RESP_WIDTH  : natural := 2;
-        USR_DATA_WIDTH  : natural := 256;
-        PORT_ADDR_HBIT  : natural := AXI_ADDR_WIDTH;
-        DEVICE          : string := "AGILEX"
+        BASE_ADDR_OFFSET : natural := 0;
+        CNT_WIDTH        : natural := 16;
+        PORT_ID          : natural := 0;
+        AXI_ADDR_WIDTH   : natural := 32;
+        AXI_DATA_WIDTH   : natural := 256;
+        AXI_BURST_WIDTH  : natural := 2;
+        AXI_ID_WIDTH     : natural := 6;
+        AXI_LEN_WIDTH    : natural := 4;
+        AXI_SIZE_WIDTH   : natural := 3;
+        AXI_RESP_WIDTH   : natural := 2;
+        USR_DATA_WIDTH   : natural := 256;
+        PORT_ADDR_HBIT   : natural := AXI_ADDR_WIDTH;
+        DEVICE           : string := "AGILEX"
     );
     port (
         -- =====================================================================
@@ -127,6 +127,7 @@ entity HBM_TESTER_PORT is
         -- Generator control: 0 = stop, 1 = run
         DB_GEN_RUN        : in  std_logic;
         DB_GEN_RW_SWITCH  : in  std_logic;
+        DB_GEN_RW_NO_WAIT : in  std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
         DB_GEN_WR_DEAD    : in  std_logic;
         -- Time of monitoring in clock cycles
@@ -154,13 +155,14 @@ architecture FULL of HBM_TESTER_PORT is
 
     signal s_reset_reg            : std_logic;
 
-    signal s_db_gen_addr_mode_reg : std_logic;
-    signal s_db_gen_connect_reg   : std_logic;
-    signal s_db_gen_bl8_mode_reg  : std_logic;
-    signal s_db_gen_run_mode_reg  : std_logic_vector(1 downto 0);
-    signal s_db_gen_run_reg       : std_logic;
-    signal s_db_gen_rw_switch_reg : std_logic;
-    signal s_db_gen_wr_dead_reg   : std_logic;
+    signal s_db_gen_addr_mode_reg  : std_logic;
+    signal s_db_gen_connect_reg    : std_logic;
+    signal s_db_gen_bl8_mode_reg   : std_logic;
+    signal s_db_gen_run_mode_reg   : std_logic_vector(1 downto 0);
+    signal s_db_gen_run_reg        : std_logic;
+    signal s_db_gen_rw_switch_reg  : std_logic;
+    signal s_db_gen_rw_no_wait_reg : std_logic;
+    signal s_db_gen_wr_dead_reg    : std_logic;
 
     signal s_db_mon_time_reg      : std_logic_vector(CNT_WIDTH-1 downto 0);
     signal s_db_mon_reset_reg     : std_logic;
@@ -274,21 +276,22 @@ architecture FULL of HBM_TESTER_PORT is
     signal s_axi_rready           : std_logic;
 
     attribute keep : string;
-    attribute keep of s_reset_reg            : signal is "true";
-    attribute keep of s_db_gen_addr_mode_reg : signal is "true";
-    attribute keep of s_db_gen_connect_reg   : signal is "true";
-    attribute keep of s_db_gen_bl8_mode_reg  : signal is "true";
-    attribute keep of s_db_gen_run_mode_reg  : signal is "true";
-    attribute keep of s_db_gen_run_reg       : signal is "true";
-    attribute keep of s_db_gen_rw_switch_reg : signal is "true";
-    attribute keep of s_db_gen_wr_dead_reg   : signal is "true";
-    attribute keep of s_db_mon_time_reg      : signal is "true";
-    attribute keep of s_db_mon_reset_reg     : signal is "true";
-    attribute keep of s_db_mon_cnt0_mode_reg : signal is "true";
-    attribute keep of s_db_mon_cnt1_mode_reg : signal is "true";
-    attribute keep of s_db_mon_done_reg      : signal is "true";
-    attribute keep of s_db_stat_cnt0_reg     : signal is "true";
-    attribute keep of s_db_stat_cnt1_reg     : signal is "true";
+    attribute keep of s_reset_reg             : signal is "true";
+    attribute keep of s_db_gen_addr_mode_reg  : signal is "true";
+    attribute keep of s_db_gen_connect_reg    : signal is "true";
+    attribute keep of s_db_gen_bl8_mode_reg   : signal is "true";
+    attribute keep of s_db_gen_run_mode_reg   : signal is "true";
+    attribute keep of s_db_gen_run_reg        : signal is "true";
+    attribute keep of s_db_gen_rw_switch_reg  : signal is "true";
+    attribute keep of s_db_gen_rw_no_wait_reg : signal is "true";
+    attribute keep of s_db_gen_wr_dead_reg    : signal is "true";
+    attribute keep of s_db_mon_time_reg       : signal is "true";
+    attribute keep of s_db_mon_reset_reg      : signal is "true";
+    attribute keep of s_db_mon_cnt0_mode_reg  : signal is "true";
+    attribute keep of s_db_mon_cnt1_mode_reg  : signal is "true";
+    attribute keep of s_db_mon_done_reg       : signal is "true";
+    attribute keep of s_db_stat_cnt0_reg      : signal is "true";
+    attribute keep of s_db_stat_cnt1_reg      : signal is "true";
 
     -- attribute mark_debug : string;
     -- attribute mark_debug of s_axi_awid : signal is "true";
@@ -338,13 +341,14 @@ begin
         if (rising_edge(CLK)) then
             s_reset_reg <= RESET;
 
-            s_db_gen_connect_reg   <= DB_GEN_CONNECT;
-            s_db_gen_addr_mode_reg <= DB_GEN_ADDR_MODE;
-            s_db_gen_bl8_mode_reg  <= DB_GEN_BL8_MODE;
-            s_db_gen_run_mode_reg  <= DB_GEN_RUN_MODE;
-            s_db_gen_run_reg       <= DB_GEN_RUN;
-            s_db_gen_rw_switch_reg <= DB_GEN_RW_SWITCH;
-            s_db_gen_wr_dead_reg   <= DB_GEN_WR_DEAD;
+            s_db_gen_connect_reg    <= DB_GEN_CONNECT;
+            s_db_gen_addr_mode_reg  <= DB_GEN_ADDR_MODE;
+            s_db_gen_bl8_mode_reg   <= DB_GEN_BL8_MODE;
+            s_db_gen_run_mode_reg   <= DB_GEN_RUN_MODE;
+            s_db_gen_run_reg        <= DB_GEN_RUN;
+            s_db_gen_rw_switch_reg  <= DB_GEN_RW_SWITCH;
+            s_db_gen_rw_no_wait_reg <= DB_GEN_RW_NO_WAIT;
+            s_db_gen_wr_dead_reg    <= DB_GEN_WR_DEAD;
 
             s_db_mon_time_reg      <= DB_MON_TIME;
             s_db_mon_reset_reg     <= DB_MON_RESET;
@@ -437,6 +441,7 @@ begin
             CS_GEN_RUN_MODE   => s_db_gen_run_mode_reg,
             CS_GEN_RUN        => s_db_gen_run_reg,
             CS_GEN_RW_SWITCH  => s_db_gen_rw_switch_reg,
+            CS_GEN_RW_NO_WAIT => s_db_gen_rw_no_wait_reg,
             CS_GEN_WR_DEAD    => s_db_gen_wr_dead_reg,
 
             STAT_DATA_OK_INC  => s_gen_data_ok_inc,
@@ -662,7 +667,7 @@ begin
     s_axi_awaddr  <= s_hbm_wr_addr;
     s_axi_awlen   <= s_hbm_burst_size;
     s_axi_awsize  <= std_logic_vector(to_unsigned(log2(AXI_DATA_WIDTH/8), AXI_SIZE_WIDTH));  -- Full bus width: WSTRB is always all-ones and address must step one whole word per beat
-    s_axi_awburst <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
+    s_axi_awburst <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH));                      -- INCR mode
     s_axi_awprot  <= (others => '0');
     s_axi_awqos   <= (others => '0');
     s_axi_awuser  <= (others => '0');
@@ -713,7 +718,7 @@ begin
     s_axi_araddr        <= s_hbm_rd_addr;
     s_axi_arlen         <= s_hbm_burst_size;
     s_axi_arsize        <= std_logic_vector(to_unsigned(log2(AXI_DATA_WIDTH/8), AXI_SIZE_WIDTH));  -- Full bus width: address must step one whole word per beat, matching the address generator
-    s_axi_arburst       <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
+    s_axi_arburst       <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH));                      -- INCR mode
     s_axi_arprot        <= (others => '0');
     s_axi_arqos         <= (others => '0');
     s_axi_aruser        <= (others => '0');

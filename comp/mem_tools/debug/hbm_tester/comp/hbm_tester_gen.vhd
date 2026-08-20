@@ -42,6 +42,8 @@ entity HBM_TESTER_GEN is
         --                     "00" = no requests
         CS_GEN_RUN_MODE   : in  std_logic_vector(1 downto 0);
         CS_GEN_RW_SWITCH  : in  std_logic;
+        -- '1' issues the read without waiting for the write response
+        CS_GEN_RW_NO_WAIT : in  std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
         CS_GEN_WR_DEAD    : in  std_logic;
         -- Generator control: 0 = stop, 1 = run
@@ -96,6 +98,8 @@ architecture FULL of HBM_TESTER_GEN is
     signal s_gen_rw_switch_en  : std_logic;
     signal s_gen_rw_switch     : std_logic;
     signal s_sequ_addr_inc     : unsigned(1 downto 0);
+    signal s_wr_rsp_pending    : std_logic;
+    signal s_rd_addr_hold      : std_logic;
     signal s_sequ_wr_addr      : unsigned(ADDR_GEN_WIDTH-1 downto 0);
     signal s_sequ_wr_addr_en   : std_logic;
     signal s_sequ_rd_addr      : unsigned(ADDR_GEN_WIDTH-1 downto 0);
@@ -228,7 +232,24 @@ begin
         end if;
     end process;
 
-    s_sequ_rd_addr_en <= s_gen_rw_switch when (CS_GEN_RW_SWITCH = '1') else '1';
+    -- A read issued right after a write burst can overtake it, the AXI write and read
+    -- channels are not ordered against each other. Hold the read back until the write
+    -- response arrives.
+    wr_rsp_pending_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (s_gen_run = '0') then
+                s_wr_rsp_pending <= '0';
+            elsif (WR_RSP_VALID = '1') then
+                s_wr_rsp_pending <= '0';
+            elsif (s_write_data_vld = '1' and s_gen_data_last = '1') then
+                s_wr_rsp_pending <= '1';
+            end if;
+        end if;
+    end process;
+
+    s_rd_addr_hold    <= s_wr_rsp_pending and not CS_GEN_RW_NO_WAIT;
+    s_sequ_rd_addr_en <= (s_gen_rw_switch and not s_rd_addr_hold) when (CS_GEN_RW_SWITCH = '1') else '1';
 
     sequ_rd_addr_reg_p : process (CLK)
     begin

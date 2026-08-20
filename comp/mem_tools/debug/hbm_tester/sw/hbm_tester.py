@@ -25,6 +25,7 @@ class hbm_tester:
     _CONF_RAND_ADDR_EN = 0x2
     _CONF_WR_DEAD_EN   = 0x4
     _CONF_RW_SWITCH_EN = 0x8
+    _CONF_RW_NO_WAIT   = 0x80
 
     _GEN_CONF_WR_ONLY = (0x1 + 0x0) * 0x10
     _GEN_CONF_RD_ONLY = (0x2 + 0x0) * 0x10
@@ -40,6 +41,7 @@ class hbm_tester:
         self.ports = 32 # TODO register
         self.width = 256 # TODO register
         self.clk_period = (1 / 450000000) * 1e9 # TODO register
+        self.rw_no_wait = False
         self.check_bl8_data_width()
 
     def check_bl8_data_width(self):
@@ -106,6 +108,8 @@ class hbm_tester:
                 gen_conf_val  = self._GEN_CONF_WR_RD
 
         conf_data = rand_test_val + dead_wr_val + switch_rw_val + gen_conf_val + mon_conf_val + conn_gen_val
+        if self.rw_no_wait:
+            conf_data += self._CONF_RW_NO_WAIT
         #print("REG_CONFIG: %s" % hex(conf_data))
         self.comp.write32(self._REG_CONFIG, conf_data)
 
@@ -246,6 +250,7 @@ if __name__ == '__main__':
     args.add_argument("-d", "--device", action="store", default='0')
     args.add_argument("-t", "--test", action="store", choices=['speed', 'latency', 'integrity', 'coherency'], default='speed')
     args.add_argument("-r", "--random", action='store_true', help="Use random addressing (only for latency or speed test), default is sequential.")
+    args.add_argument("-w", "--no-wait", action='store_true', help="Do not wait for the write response before reading the same address (coherency test).")
     args.add_argument("-p", "--ports", action="store", nargs='?', default='0', help="Number of actived ports (channels), default is all.")
     #args.add_argument("-l","--length", action="store", nargs='?', default='0xFFFFFF', help="Length of test in clock cycles (only for latency or speed test), default is 0xFFFFFF.")
     arguments = args.parse_args()
@@ -280,6 +285,7 @@ if __name__ == '__main__':
     for idx in indices_to_test:
         print(f"\n>>> Initializing HBM Tester [Index {idx}] <<<")
         tester = hbm_tester(dev, idx)
+        tester.rw_no_wait = arguments.no_wait
 
         arg_ports = int(arguments.ports, 0)
         if arg_ports == 0:

@@ -14,24 +14,24 @@ use work.type_pack.all;
 
 entity HBM_TESTER is
     generic (
-        DEBUG           : boolean := True;
-        PORTS           : natural := 32;
-        BL8_MODE        : std_logic_vector(PORTS-1 downto 0) := (others => '1');
-        CNT_WIDTH       : natural := 24; -- max = 32, min 8
-        AXI_ADDR_WIDTH  : natural := 32;
-        AXI_DATA_WIDTH  : natural := 256;
-        AXI_BURST_WIDTH : natural := 2;
-        AXI_ID_WIDTH    : natural := 6;
-        AXI_LEN_WIDTH   : natural := 4;
-        AXI_SIZE_WIDTH  : natural := 3;
-        AXI_RESP_WIDTH  : natural := 2;
-        USR_DATA_WIDTH  : natural := 256;
-        PORT_ADDR_HBIT  : natural := AXI_ADDR_WIDTH;
-        -- Multiplier for PORT_ID used to map each channel to its specific AXI memory
-        -- segment. It fills the address bits (AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT).
-        -- Use 0 when each AXI port has its own address space (e.g. a NoC attached HBM).
-        BASE_ADDR_OFFSET: natural := 0;
-        DEVICE          : string := "AGILEX"
+        DEBUG            : boolean := True;
+        PORTS            : natural := 32;
+        BL8_MODE         : std_logic_vector(PORTS-1 downto 0) := (others => '1');
+        CNT_WIDTH        : natural := 24; -- max = 32, min 8
+        AXI_ADDR_WIDTH   : natural := 32;
+        AXI_DATA_WIDTH   : natural := 256;
+        AXI_BURST_WIDTH  : natural := 2;
+        AXI_ID_WIDTH     : natural := 6;
+        AXI_LEN_WIDTH    : natural := 4;
+        AXI_SIZE_WIDTH   : natural := 3;
+        AXI_RESP_WIDTH   : natural := 2;
+        USR_DATA_WIDTH   : natural := 256;
+        PORT_ADDR_HBIT   : natural := AXI_ADDR_WIDTH;
+        -- Size of one port in bytes, used as the base address of each port.
+        -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
+        -- own address space (e.g. a NoC attached HBM).
+        BASE_ADDR_OFFSET : natural := 0;
+        DEVICE           : string := "AGILEX"
     );
     port (
         -- =====================================================================
@@ -130,13 +130,14 @@ end entity;
 
 architecture FULL of HBM_TESTER is
 
-    signal s_gen_addr_mode : std_logic;
-    signal s_gen_connect   : std_logic;
-    signal s_gen_bl8_mode  : std_logic;
-    signal s_gen_run_mode  : std_logic_vector(1 downto 0);
-    signal s_gen_run       : std_logic_vector(PORTS-1 downto 0);
-    signal s_gen_rw_switch : std_logic;
-    signal s_gen_wr_dead   : std_logic;
+    signal s_gen_addr_mode  : std_logic;
+    signal s_gen_connect    : std_logic;
+    signal s_gen_bl8_mode   : std_logic;
+    signal s_gen_run_mode   : std_logic_vector(1 downto 0);
+    signal s_gen_run        : std_logic_vector(PORTS-1 downto 0);
+    signal s_gen_rw_switch  : std_logic;
+    signal s_gen_rw_no_wait : std_logic;
+    signal s_gen_wr_dead    : std_logic;
 
     signal s_mon_done      : std_logic_vector(PORTS-1 downto 0);
     signal s_mon_reset     : std_logic_vector(PORTS-1 downto 0);
@@ -192,20 +193,20 @@ begin
     port_g : for i in 0 to PORTS-1 generate
         port_i : entity work.HBM_TESTER_PORT
         generic map (
-            DEBUG           => DEBUG,
-            CNT_WIDTH       => CNT_WIDTH,
-            PORT_ID         => i,
-            AXI_ADDR_WIDTH  => AXI_ADDR_WIDTH,
-            AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
-            AXI_BURST_WIDTH => AXI_BURST_WIDTH,
-            AXI_ID_WIDTH    => AXI_ID_WIDTH,
-            AXI_LEN_WIDTH   => AXI_LEN_WIDTH,
-            AXI_SIZE_WIDTH  => AXI_SIZE_WIDTH,
-            AXI_RESP_WIDTH  => AXI_RESP_WIDTH,
-            USR_DATA_WIDTH  => USR_DATA_WIDTH,
-            PORT_ADDR_HBIT  => PORT_ADDR_HBIT,
-            BASE_ADDR_OFFSET=> BASE_ADDR_OFFSET,
-            DEVICE          => DEVICE
+            DEBUG            => DEBUG,
+            CNT_WIDTH        => CNT_WIDTH,
+            PORT_ID          => i,
+            AXI_ADDR_WIDTH   => AXI_ADDR_WIDTH,
+            AXI_DATA_WIDTH   => AXI_DATA_WIDTH,
+            AXI_BURST_WIDTH  => AXI_BURST_WIDTH,
+            AXI_ID_WIDTH     => AXI_ID_WIDTH,
+            AXI_LEN_WIDTH    => AXI_LEN_WIDTH,
+            AXI_SIZE_WIDTH   => AXI_SIZE_WIDTH,
+            AXI_RESP_WIDTH   => AXI_RESP_WIDTH,
+            USR_DATA_WIDTH   => USR_DATA_WIDTH,
+            PORT_ADDR_HBIT   => PORT_ADDR_HBIT,
+            BASE_ADDR_OFFSET => BASE_ADDR_OFFSET,
+            DEVICE           => DEVICE
         )
         port map (
             CLK               => HBM_CLK,
@@ -277,6 +278,7 @@ begin
             DB_GEN_RUN_MODE   => s_gen_run_mode,
             DB_GEN_RUN        => s_gen_run(i),
             DB_GEN_RW_SWITCH  => s_gen_rw_switch,
+            DB_GEN_RW_NO_WAIT => s_gen_rw_no_wait,
             DB_GEN_WR_DEAD    => s_gen_wr_dead,
             DB_MON_DONE       => s_mon_done(i),
             DB_MON_RESET      => s_mon_reset(i),
@@ -365,20 +367,21 @@ begin
         MI_DRD           => s_synced_mi_drd,
         MI_DRDY          => s_synced_mi_drdy,
 
-        DB_GEN_ADDR_MODE => s_gen_addr_mode,
-        DB_GEN_CONNECT   => s_gen_connect,
-        DB_GEN_BL8_MODE  => s_gen_bl8_mode,
-        DB_GEN_RUN_MODE  => s_gen_run_mode,
-        DB_GEN_RUN       => s_gen_run,
-        DB_GEN_RW_SWITCH => s_gen_rw_switch,
-        DB_GEN_WR_DEAD   => s_gen_wr_dead,
-        DB_MON_TIME      => s_mon_time,
-        DB_MON_DONE      => s_mon_done,
-        DB_MON_RESET     => s_mon_reset,
-        DB_MON_CNT0_MODE => s_mon_cnt0_mode,
-        DB_MON_CNT1_MODE => s_mon_cnt1_mode,
-        DB_STAT_CNT0     => s_mon_cnt0,
-        DB_STAT_CNT1     => s_mon_cnt1
+        DB_GEN_ADDR_MODE  => s_gen_addr_mode,
+        DB_GEN_CONNECT    => s_gen_connect,
+        DB_GEN_BL8_MODE   => s_gen_bl8_mode,
+        DB_GEN_RUN_MODE   => s_gen_run_mode,
+        DB_GEN_RUN        => s_gen_run,
+        DB_GEN_RW_SWITCH  => s_gen_rw_switch,
+        DB_GEN_RW_NO_WAIT => s_gen_rw_no_wait,
+        DB_GEN_WR_DEAD    => s_gen_wr_dead,
+        DB_MON_TIME       => s_mon_time,
+        DB_MON_DONE       => s_mon_done,
+        DB_MON_RESET      => s_mon_reset,
+        DB_MON_CNT0_MODE  => s_mon_cnt0_mode,
+        DB_MON_CNT1_MODE  => s_mon_cnt1_mode,
+        DB_STAT_CNT0      => s_mon_cnt0,
+        DB_STAT_CNT1      => s_mon_cnt1
     );
 
 end architecture;

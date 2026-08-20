@@ -40,38 +40,39 @@ entity HBM_TESTER_ADC is
         -- DEBUG INTERFACE
         -- =====================================================================
         -- Mode of increment address: 0 = sequential, 1 = pseudorandom
-        DB_GEN_ADDR_MODE : out std_logic;
+        DB_GEN_ADDR_MODE  : out std_logic;
         -- Generator conection control: 0 = USER <-> HBM, 1 = GEN <-> HBM
-        DB_GEN_CONNECT   : out std_logic;
-        DB_GEN_BL8_MODE  : out std_logic;
+        DB_GEN_CONNECT    : out std_logic;
+        DB_GEN_BL8_MODE   : out std_logic;
         -- Generator run mode: "11" = RD and WR,
         --                     "10" = only RD,
         --                     "01" = only WR,
         --                     "00" = no requests
-        DB_GEN_RUN_MODE  : out std_logic_vector(1 downto 0);
+        DB_GEN_RUN_MODE   : out std_logic_vector(1 downto 0);
         -- Generator control per pseudo-channel: 0 = stop, 1 = run
-        DB_GEN_RUN       : out std_logic_vector(PORTS-1 downto 0);
-        DB_GEN_RW_SWITCH : out std_logic;
+        DB_GEN_RUN        : out std_logic_vector(PORTS-1 downto 0);
+        DB_GEN_RW_SWITCH  : out std_logic;
+        DB_GEN_RW_NO_WAIT : out std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
-        DB_GEN_WR_DEAD   : out std_logic;
+        DB_GEN_WR_DEAD    : out std_logic;
         -- Time of monitoring in clock cycles
-        DB_MON_TIME      : out std_logic_vector(CNT_WIDTH-1 downto 0);
+        DB_MON_TIME       : out std_logic_vector(CNT_WIDTH-1 downto 0);
         -- Monitoring is done (monitoring time is out) and statistics are ready,
         -- for next monitoring is need monitor reset
-        DB_MON_DONE      : in  std_logic_vector(PORTS-1 downto 0);
+        DB_MON_DONE       : in  std_logic_vector(PORTS-1 downto 0);
         -- Monitor reset, this clean statistics counters
-        DB_MON_RESET     : out std_logic_vector(PORTS-1 downto 0);
+        DB_MON_RESET      : out std_logic_vector(PORTS-1 downto 0);
         -- Counters mode: 000 = monitoring of read data words
         --                001 = monitoring of write data words
         --                010 = monitoring of read latency
         --                011 = monitoring of write latency
         --                100 = monitoring of read data ok
         --                101 = monitoring of read data error
-        DB_MON_CNT0_MODE : out std_logic_vector(3-1 downto 0);
-        DB_MON_CNT1_MODE : out std_logic_vector(3-1 downto 0);
+        DB_MON_CNT0_MODE  : out std_logic_vector(3-1 downto 0);
+        DB_MON_CNT1_MODE  : out std_logic_vector(3-1 downto 0);
         -- Outputs of configurable counters
-        DB_STAT_CNT0     : in  slv_array_t(PORTS-1 downto 0)(CNT_WIDTH-1 downto 0);
-        DB_STAT_CNT1     : in  slv_array_t(PORTS-1 downto 0)(CNT_WIDTH-1 downto 0)
+        DB_STAT_CNT0      : in  slv_array_t(PORTS-1 downto 0)(CNT_WIDTH-1 downto 0);
+        DB_STAT_CNT1      : in  slv_array_t(PORTS-1 downto 0)(CNT_WIDTH-1 downto 0)
     );
 end entity;
 
@@ -231,14 +232,15 @@ begin
         end if;
     end process;
 
-    DB_MON_CNT1_MODE <= s_reg_config(14 downto 12);
-    DB_MON_CNT0_MODE <= s_reg_config(10 downto 8);
-    DB_GEN_BL8_MODE  <= s_reg_config(6);
-    DB_GEN_RUN_MODE  <= s_reg_config(5 downto 4);
-    DB_GEN_RW_SWITCH <= s_reg_config(3);
-    DB_GEN_WR_DEAD   <= s_reg_config(2);
-    DB_GEN_ADDR_MODE <= s_reg_config(1);
-    DB_GEN_CONNECT   <= s_reg_config(0);
+    DB_MON_CNT1_MODE  <= s_reg_config(14 downto 12);
+    DB_MON_CNT0_MODE  <= s_reg_config(10 downto 8);
+    DB_GEN_BL8_MODE   <= s_reg_config(6);
+    DB_GEN_RUN_MODE   <= s_reg_config(5 downto 4);
+    DB_GEN_RW_NO_WAIT <= s_reg_config(7);
+    DB_GEN_RW_SWITCH  <= s_reg_config(3);
+    DB_GEN_WR_DEAD    <= s_reg_config(2);
+    DB_GEN_ADDR_MODE  <= s_reg_config(1);
+    DB_GEN_CONNECT    <= s_reg_config(0);
 
     -- -------------------------------------------------------------------------
     --  MONITOR RESET VECTOR REGISTER (RW)
