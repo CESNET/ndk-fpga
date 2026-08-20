@@ -407,6 +407,7 @@ begin
         port map (
             HBM_CLK             => HBM_CLK,
             HBM_RESET           => HBM_RESET,
+            HBM_INIT_DONE       => HBM_INIT_DONE,
 
             MI_CLK              => CLK,
             MI_RESET            => RESET,

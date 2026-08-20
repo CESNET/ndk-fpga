@@ -15,7 +15,11 @@ entity HBM_TESTER_PORT is
     generic (
         DEBUG           : boolean := True;
         -- when USE_AXI_ID is false, you can disable Re-order buffer in HBM IP
-        USE_AXI_ID      : boolean := True;
+        USE_AXI_ID      : boolean := False;
+        -- Size of one port in bytes, used as the base address of each port.
+        -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
+        -- own address space (e.g. a NoC attached HBM).
+        BASE_ADDR_OFFSET: natural := 0;
         CNT_WIDTH       : natural := 16;
         PORT_ID         : natural := 0;
         AXI_ADDR_WIDTH  : natural := 32;
@@ -417,10 +421,12 @@ begin
 
         generator_i : entity work.HBM_TESTER_GEN
         generic map (
-            USR_DATA_WIDTH => USR_DATA_WIDTH,
-            AXI_ADDR_WIDTH => AXI_ADDR_WIDTH,
-            PORT_ADDR_HBIT => PORT_ADDR_HBIT,
-            PORT_ID        => PORT_ID
+            USR_DATA_WIDTH      => USR_DATA_WIDTH,
+            AXI_DATA_WIDTH      => AXI_DATA_WIDTH,
+            AXI_ADDR_WIDTH      => AXI_ADDR_WIDTH,
+            PORT_ADDR_HBIT      => PORT_ADDR_HBIT,
+            PORT_ID             => PORT_ID,
+            BASE_ADDR_OFFSET    => BASE_ADDR_OFFSET
         )
         port map (
             CLK               => CLK,
@@ -655,7 +661,7 @@ begin
     s_axi_awid    <= std_logic_vector(s_hbm_wr_id_cnt);
     s_axi_awaddr  <= s_hbm_wr_addr;
     s_axi_awlen   <= s_hbm_burst_size;
-    s_axi_awsize  <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH));  -- MUST be 32B
+    s_axi_awsize  <= std_logic_vector(to_unsigned(log2(AXI_DATA_WIDTH/8), AXI_SIZE_WIDTH));  -- Full bus width: WSTRB is always all-ones and address must step one whole word per beat
     s_axi_awburst <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
     s_axi_awprot  <= (others => '0');
     s_axi_awqos   <= (others => '0');
@@ -706,7 +712,7 @@ begin
     s_axi_arid          <= std_logic_vector(s_hbm_rd_id_cnt);
     s_axi_araddr        <= s_hbm_rd_addr;
     s_axi_arlen         <= s_hbm_burst_size;
-    s_axi_arsize        <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH));  -- MUST be 32B
+    s_axi_arsize        <= std_logic_vector(to_unsigned(log2(AXI_DATA_WIDTH/8), AXI_SIZE_WIDTH));  -- Full bus width: address must step one whole word per beat, matching the address generator
     s_axi_arburst       <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
     s_axi_arprot        <= (others => '0');
     s_axi_arqos         <= (others => '0');
