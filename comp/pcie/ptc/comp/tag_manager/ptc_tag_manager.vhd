@@ -172,6 +172,46 @@ architecture FULL of PTC_TAG_MANAGER is
     -- one read port for each possible tag assign
     constant PCIE_FIFOXM_READ_PORTS  : integer := MVB_UP_ITEMS;
 
+    -- Balanced-tree sum of the items selected by vld: log2(items'length) adder levels
+    -- instead of an items'length-1 deep ripple chain, whatever items'length is.
+    --
+    -- vld must be copied into a local descending variable before it can be indexed. The
+    -- caller passes a logical expression (s1_reg_vld and s1_read_reg) and per the VHDL
+    -- LRM the result of an array logical operator is an anonymous ASCENDING array, it
+    -- does not inherit the "downto" direction of the signals it was computed from.
+    -- Indexing the actual as vld(vld'low+i) would therefore pair element i with lane
+    -- items'length-1-i, so the mask would silently arrive reversed with respect to
+    -- items. A plain positional assignment re-aligns it whatever the actual's direction.
+    function masked_sum (items : u_array_t; vld : std_logic_vector; sum_width : natural) return unsigned is
+        variable vld_n : std_logic_vector(items'length-1 downto 0);
+        variable terms : u_array_t(items'length-1 downto 0)(sum_width-1 downto 0);
+        variable len   : natural := items'length;
+    begin
+        vld_n := vld;
+
+        for i in 0 to items'length-1 loop
+            if (vld_n(i) = '1') then
+                terms(i) := resize(items(items'low+i),sum_width);
+            else
+                terms(i) := (others => '0');
+            end if;
+        end loop;
+
+        while (len > 1) loop
+            for i in 0 to len/2-1 loop
+                terms(i) := terms(2*i)+terms(2*i+1);
+            end loop;
+            if (len mod 2 = 1) then
+                terms(len/2) := terms(len-1);
+                len          := len/2+1;
+            else
+                len := len/2;
+            end if;
+        end loop;
+
+        return terms(0);
+    end function;
+
     -- CplH credits in PCIe receive buffer
     constant AVAILABLE_WORDS    : integer := EXTRA_WORDS;
     constant A_WORDS_WIDTH      : integer := log2(AVAILABLE_WORDS+1);
@@ -272,6 +312,12 @@ architecture FULL of PTC_TAG_MANAGER is
     signal s1_hdr_reg           : slv_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
     -- maximum number of words in responses for each read
     signal s1_max_words_num_reg : u_array_t(MVB_UP_ITEMS-1 downto 0)(WORDS_COUNT_WIDTH-1 downto 0);
+    -- Masked sum of s1_max_words_num_reg and the same sum increased by the Storage FIFOX
+    -- reserve. Both are computed already in s1_reg_pr, one stage before the sum is needed,
+    -- so that the retimed enough_free_cplh compare in free_cplh_reg_pr reads a plain
+    -- register instead of sitting behind the summation and the increment.
+    signal s1_max_words_sum_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
+    signal s1_max_words_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
 
     -- additional signals for max words counting
     signal s_len_u                : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_LEN_WIDTH-1 downto 0);
@@ -294,6 +340,8 @@ architecture FULL of PTC_TAG_MANAGER is
     -- maximum number of words in responses sum
     signal s2_max_words_sum_num_reg     : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     signal s2_max_words_sum_num_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
+    -- '1' when the group currently held in the s2 register really debits the budget
+    signal s2_debit_vld                 : std_logic;
 
     -- step 3 - reg3, Tag/ID saving FIFO input, free words counting, sending HDR OUT
 
@@ -308,7 +356,10 @@ architecture FULL of PTC_TAG_MANAGER is
 
     -- number of free words in receiving buffers
     signal free_cplh_reg    : unsigned(A_WORDS_WIDTH-1 downto 0);
-    -- enough free words
+    -- Enough free words for one more group of reads. Registered in free_cplh_reg_pr
+    -- instead of being a compare on free_cplh_reg in the same cycle: that compare used
+    -- to sit directly in series with s2_reg_en, which fans out into the whole tag
+    -- shakedown network and into the DMA up-merger FIFO write path.
     signal enough_free_cplh : std_logic;
 
     -- auto-assigned tags from PCIe tag FIFOX Multi distributed to instructions in the s2 register
@@ -491,6 +542,7 @@ begin
         variable len_u           : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_LEN_WIDTH-1 downto 0);        -- length of transaction as unsigned
         variable addr_u          : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_ADDR_WIDTH-1 downto 0);       -- dword address of transaction as unsigned
         variable words_u         : u_array_t(MVB_UP_ITEMS-1 downto 0)(WORDS_COUNT_WIDTH-1 downto 0);    -- complete number of words to reserve for the transaction
+        variable words_sum       : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);                          -- sum of words to reserve for the whole group
         variable l               : line;                                                                -- debug print line
     begin
         if (rising_edge(CLK)) then
@@ -531,12 +583,28 @@ begin
                     -- save result
                     s1_max_words_num_reg(i) <= words_u(i);
                 end loop;
+
+                -- Balanced-tree sum (see masked_sum) instead of a ripple accumulation of
+                -- up to MVB_UP_ITEMS-1 back-to-back adders, which used to be done one
+                -- stage later in s2_reg_pr.
+                words_sum            := masked_sum(words_u,s0_vld and s0_read,WORDS_COUNT_SUM_WIDTH);
+                s1_max_words_sum_reg <= words_sum;
+                -- Use a artificially increased sum to create a minimum reserve in Storage FIFOX
+                -- There was a case when the precise counting of credits led to overflow
+                -- I was not able to find out why, so this is just a simple dirty hack.
+                s1_max_words_res_reg <= words_sum+1;
             elsif (s2_reg_en = '1') then
-                s1_reg_vld <= (others => '0');
+                -- The sums cover exactly the items marked by s1_reg_vld, so they must be
+                -- cleared along with it (an empty group sums to zero, hence reserve 1).
+                s1_reg_vld           <= (others => '0');
+                s1_max_words_sum_reg <= (others => '0');
+                s1_max_words_res_reg <= to_unsigned(1,WORDS_COUNT_SUM_WIDTH);
             end if;
 
             if (RESET = '1') then
-                s1_reg_vld <= (others => '0');
+                s1_reg_vld           <= (others => '0');
+                s1_max_words_sum_reg <= (others => '0');
+                s1_max_words_res_reg <= to_unsigned(1,WORDS_COUNT_SUM_WIDTH);
             end if;
         end if;
     end process;
@@ -547,7 +615,6 @@ begin
     -- step 2 - reg2, words sum, free words counting
 
     s2_reg_pr : process (CLK)
-        variable sum : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     begin
         if (rising_edge(CLK)) then
             if (s2_reg_en = '1') then
@@ -558,17 +625,8 @@ begin
                 s2_hdr_reg           <= s1_hdr_reg;
                 s2_max_words_num_reg <= s1_max_words_num_reg;
 
-                sum := (others => '0');
-                for i in 0 to MVB_UP_ITEMS-1 loop
-                    if (s1_reg_vld(i) = '1' and s1_read_reg(i) = '1') then
-                        sum := sum+s1_max_words_num_reg(i);
-                    end if;
-                end loop;
-                s2_max_words_sum_num_reg     <= sum;
-                -- Use a artificially increased sum to create a minimum reserve in Storage FIFOX
-                -- There was a case when the precise counting of credits led to overflow
-                -- I was not able to find out why, so this is just a simple dirty hack.
-                s2_max_words_sum_num_res_reg <= sum+1;
+                s2_max_words_sum_num_reg     <= s1_max_words_sum_reg;
+                s2_max_words_sum_num_res_reg <= s1_max_words_res_reg;
             end if;
 
             if (RESET = '1') then
@@ -579,16 +637,28 @@ begin
 
     s2_read_vld <= s2_reg_vld and s2_read_reg;
 
+    -- Mirrors the debit condition of free_cplh_reg_pr below, so that the compare
+    -- retimed into that process uses exactly the same condition.
+    s2_debit_vld <= '1' when (or s2_reg_vld) = '1' and (or s2_read_reg) = '1' else '0';
+
     s2_reg_en <= '1' when s3_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1' and ((or s2_reg_vld) = '0' or enough_free_cplh = '1') else '0';
 
     -- step 3 - reg3, Tag/ID saving FIFO input, free words counting, sending HDR OUT
 
     -- free credits register
     free_cplh_reg_pr : process (CLK)
-        variable l : line; -- debug print line
+        variable l               : line; -- debug print line
+        -- Both candidate next values of free_cplh_reg, computed unconditionally so that
+        -- the retimed enough_free_cplh compare below can reuse them instead of deriving
+        -- the next value of free_cplh_reg a second time.
+        variable v_next_released : unsigned(A_WORDS_WIDTH-1 downto 0);
+        variable v_next_debited  : unsigned(A_WORDS_WIDTH-1 downto 0);
     begin
         if (rising_edge(CLK)) then
-            if (s2_reg_en = '1' and (or s2_reg_vld) = '1' and (or s2_read_reg) = '1') then
+            v_next_released := free_cplh_reg+freed_words_reg;
+            v_next_debited  := v_next_released-resize(s2_max_words_sum_num_reg,A_WORDS_WIDTH);
+
+            if (s2_reg_en = '1' and s2_debit_vld = '1') then
 
                 if (PRINT_WORDS_COUNT_INFO) then
                     write(l,string'("CPLH CHANGE ::"));write(l,now);write(l,string'("::"));write_dec(l,free_cplh_reg);write(l,string'(";"));
@@ -599,7 +669,7 @@ begin
                     writeline(output,l);
                 end if;
 
-                free_cplh_reg <= free_cplh_reg+freed_words_reg-resize(s2_max_words_sum_num_reg,A_WORDS_WIDTH);
+                free_cplh_reg <= v_next_debited;
             else
 
                 if (PRINT_WORDS_COUNT_INFO) then
@@ -610,17 +680,32 @@ begin
                     end if;
                 end if;
 
-                free_cplh_reg <= free_cplh_reg+freed_words_reg;
+                free_cplh_reg <= v_next_released;
+            end if;
+
+            -- enough_free_cplh for the next cycle, that is what the compare
+            -- "free_cplh_reg >= s2_max_words_sum_num_res_reg" evaluates to once both of
+            -- its operands reach the values computed here and in s2_reg_pr. The branches
+            -- mirror which candidate value each of the two registers really takes, so
+            -- this is a retiming of the compare across the register that already
+            -- separates this cycle from the next one, not an added pipeline stage -
+            -- s2_reg_en keeps its bubble-free enable-chain semantics.
+            if (CHECK_CPL_CREDITS = false) then
+                enough_free_cplh <= '1';
+            elsif (s2_reg_en = '1' and s2_debit_vld = '1') then
+                enough_free_cplh <= '1' when v_next_debited >= s1_max_words_res_reg else '0';
+            elsif (s2_reg_en = '1') then
+                enough_free_cplh <= '1' when v_next_released >= s1_max_words_res_reg else '0';
+            else
+                enough_free_cplh <= '1' when v_next_released >= s2_max_words_sum_num_res_reg else '0';
             end if;
 
             if (RESET = '1') then
-                free_cplh_reg <= to_unsigned(AVAILABLE_WORDS,A_WORDS_WIDTH);
+                free_cplh_reg    <= to_unsigned(AVAILABLE_WORDS,A_WORDS_WIDTH);
+                enough_free_cplh <= '1';
             end if;
         end if;
     end process;
-
-    -- is there enough space for reservation
-    enough_free_cplh <= '1' when free_cplh_reg >= s2_max_words_sum_num_res_reg or CHECK_CPL_CREDITS = false else '0';
 
     -- in DMA FIFO input register
     s3_reg_pr : process (CLK)
