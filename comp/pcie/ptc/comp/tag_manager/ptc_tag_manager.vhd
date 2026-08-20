@@ -342,6 +342,12 @@ architecture FULL of PTC_TAG_MANAGER is
     signal s2_max_words_sum_num_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     -- '1' when the group currently held in the s2 register really debits the budget
     signal s2_debit_vld                 : std_logic;
+    -- Number of UP items in the s2 register that ask for a PCIe Tag. Reading the Tag FIFO
+    -- has to be aligned to its port 0, so its read enables are just a thermometer code of
+    -- this count. Counting the items here instead of compacting them in
+    -- pcie_in_fifo_rd_pr keeps that item-by-item compaction out of the cycle in which the
+    -- read enables already have to cross the FIFO's own shakedown network.
+    signal s2_read_cnt_reg              : unsigned(log2(MVB_UP_ITEMS+1)-1 downto 0);
 
     -- step 3 - reg3, Tag/ID saving FIFO input, free words counting, sending HDR OUT
 
@@ -627,10 +633,12 @@ begin
 
                 s2_max_words_sum_num_reg     <= s1_max_words_sum_reg;
                 s2_max_words_sum_num_res_reg <= s1_max_words_res_reg;
+                s2_read_cnt_reg              <= to_unsigned(count_ones(s1_reg_vld and s1_read_reg),log2(MVB_UP_ITEMS+1));
             end if;
 
             if (RESET = '1') then
-                s2_reg_vld <= (others => '0');
+                s2_reg_vld      <= (others => '0');
+                s2_read_cnt_reg <= (others => '0');
             end if;
         end if;
     end process;
@@ -908,16 +916,16 @@ begin
 
     -- The FIFOX Multi is read (shaken down) based on the content and enable of the s2 register
     pcie_in_fifo_rd_pr : process (all)
-        variable rd_ptr : integer := 0;
     begin
         pcie_in_fifoxm_rd <= (others => '0');
-        rd_ptr            := 0;
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            if (s2_read_vld(i) = '1' and s2_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1') then
-                pcie_in_fifoxm_rd(rd_ptr) <= '1';
-                rd_ptr                    := rd_ptr+1;
-            end if;
-        end loop;
+        -- thermometer code of the number of requesting items, see s2_read_cnt_reg
+        if (s2_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1') then
+            for i in 0 to MVB_UP_ITEMS-1 loop
+                if (i < to_integer(s2_read_cnt_reg)) then
+                    pcie_in_fifoxm_rd(i) <= '1';
+                end if;
+            end loop;
+        end if;
     end process;
 
     -- -------------------------------------------------------------------------
