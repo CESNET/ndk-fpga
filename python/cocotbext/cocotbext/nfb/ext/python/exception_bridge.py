@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import functools
+import logging
 import threading
 from asyncio import CancelledError
 from typing import Callable, Coroutine, ParamSpec, TypeVar
@@ -18,6 +19,8 @@ from nfb.ext.python.shim import set_exception_bridge
 
 P = ParamSpec("P")
 R = TypeVar("R")
+
+logger = logging.getLogger(__name__)
 
 
 class ExceptionBridge(ExceptionBridgeBase):
@@ -43,6 +46,61 @@ class ExceptionBridge(ExceptionBridgeBase):
 
     def clear(self) -> None:
         self._tls.exc = None
+
+
+def _pending_threads() -> list:
+    try:
+        from cocotb._bridge import pending_threads
+
+        return pending_threads
+    except ImportError:
+        # For the cocotb <2.1
+        return cocotb._scheduler_inst._pending_threads  # type: ignore[attr-defined]
+
+
+def _dispatch_daemonic(func: Callable[..., R], *args, **kwargs) -> Coroutine[Trigger, None, R]:
+    """Locally-owned copy of cocotb's internal executor-thread dispatch, with ``daemon=True``
+    added to the executor thread it creates.
+
+    Upstream's thread isn't daemonic, so if its Task never resumes (e.g. the
+    simulator stopped scheduling after a fatal failure elsewhere while this call was
+    in flight), the thread blocks in ``event.wait()`` forever and keeps the process
+    alive. Scoped to this module's ``bridge()`` only, rather than monkey-patching
+    ``cocotb.Scheduler`` process-wide. Falls back to plain ``cocotb.task.bridge()`` if
+    the private internals it copies are ever missing/renamed upstream.
+    """
+    try:
+        from cocotb._bridge import external_waiter
+        from cocotb._outcomes import capture
+
+        pending = _pending_threads()
+        waiter = external_waiter()
+
+        def execute_external() -> None:
+            waiter._outcome = capture(func, *args, **kwargs)
+            waiter.thread_done()
+
+        async def wrapper() -> R:
+            thread = threading.Thread(
+                group=None,
+                target=execute_external,
+                name=func.__qualname__ + "_thread",
+                daemon=True,
+            )
+            waiter.thread = thread
+            pending.append(waiter)
+            await waiter.event.wait()
+            return waiter.result  # raises if there was an exception
+
+        return wrapper()
+    except (ImportError, AttributeError):
+        logger.warning(
+            "cocotb internals used to make the bridge thread daemonic are unavailable "
+            "(cocotb version mismatch?); falling back to cocotb.task.bridge(), whose "
+            "thread can strand the process if the task never resumes.",
+            exc_info=True,
+        )
+        return cocotb.task.bridge(func)(*args, **kwargs)
 
 
 def install_exception_bridge() -> ExceptionBridge:
@@ -85,4 +143,15 @@ def bridge(func: Callable[P, R]) -> Callable[P, Coroutine[Trigger, None, R]]:
                 br.clear()
             raise
 
-    return cocotb.task.bridge(guarded)
+    def wrapper(*args, **kwargs) -> Coroutine[Trigger, None, R]:
+        return _dispatch_daemonic(guarded, *args, **kwargs)
+
+    # Not @functools.wraps(guarded): its typeshed stub would make type checkers see
+    # wrapper() as returning R directly instead of a Coroutine (same pitfall as
+    # bridge_safe_asynccontextmanager in cocotbext.ofm.utils.cancellation). Copy
+    # the introspection metadata by hand instead.
+    wrapper.__name__ = func.__name__
+    wrapper.__qualname__ = func.__qualname__
+    wrapper.__doc__ = func.__doc__
+    setattr(wrapper, "__wrapped__", func)
+    return wrapper
