@@ -18,6 +18,7 @@ Components using the MFB bus are typically located in the ``comp/mvb_tools/`` di
    comp/mvb_tools/flow/mux/readme
    comp/mvb_tools/flow/merge_n_to_m/readme
    comp/mvb_tools/flow/shakedown/readme
+   comp/mvb_tools/flow/reordering/readme
    comp/mvb_tools/flow/operation/readme
    comp/mvb_tools/flow/merge_streams_ordered/readme
    comp/mvb_tools/flow/mvb2mfb/readme
