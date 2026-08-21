@@ -256,7 +256,14 @@ May lead to higher latency due to the reordering process.
 When False, completed packets are output immediately regardless of request order.
 Automatically True with FAKE_READER=True - unable to do out-of-order.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-fwft"><td><p>FWFT</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Enable FWFT (First Word Fall Through): the USER_RESP interface will contain valid data
+ASAP, regardless DST_RDY. Disable only when you know the consumer can wait for valid
+data with DST_DRY=1.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
 <td></td>
