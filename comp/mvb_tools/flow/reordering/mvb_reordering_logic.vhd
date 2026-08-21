@@ -1,4 +1,4 @@
--- mvb_reordering_logic.vhd:
+-- mvb_reordering_logic.vhd: Control logic of the MVB items reordering
 -- Copyright (C) 2017 CESNET
 -- Author(s): Jakub Cabal <xcabal05@stud.feec.vutbr.cz>
 --
@@ -11,6 +11,12 @@ use IEEE.numeric_std.all;
 
 use work.math_pack.all;
 
+-- Control logic for the MVB_REORDERING component. It converts the scatter
+-- mapping given by REORDER_KEY (RX item -> TX position) into the gather
+-- mapping needed by the output multiplexers (TX position -> RX item) and it
+-- computes the validity of each TX position. See the MVB_REORDERING entity for
+-- the conditions which REORDER_KEY must meet.
+--
 entity MVB_REORDERING_LOGIC is
     generic (
         ITEMS : natural := 4
@@ -20,17 +26,18 @@ entity MVB_REORDERING_LOGIC is
         -- INPUT CONTROL SIGNAL
         -- ====================
 
-        -- keys for reodering
+        -- Target TX position of each RX item, log2(ITEMS) bits per item.
         REORDER_KEY : in  std_logic_vector(ITEMS*log2(ITEMS)-1 downto 0);
-        -- rx valids
+        -- Validity of each RX item, key of an invalid item is ignored.
         RX_VLD      : in  std_logic_vector(ITEMS-1 downto 0);
         -- =====================
         -- OUTPUT CONTROL SIGNAL
         -- =====================
 
-        -- multiplexors select
+        -- Index of the RX item selected for each TX position, log2(ITEMS)
+        -- bits per position, valid only when the TX position is valid.
         MUX_SEL     : out std_logic_vector(ITEMS*log2(ITEMS)-1 downto 0);
-        -- valid of reorder items
+        -- Validity of each TX position, '0' when no valid RX item targets it.
         TX_VLD      : out std_logic_vector(ITEMS-1 downto 0)
     );
 end entity;
@@ -57,6 +64,10 @@ begin
             mux_sel_var := std_logic_vector(to_unsigned(i,KEY_SIZE));
             out_vld     := '0';
 
+            -- Search for the valid RX item which targets this TX position.
+            -- When more of them do so (which is forbidden, see the entity
+            -- doc), the last match wins, i.e. the item with the highest RX
+            -- index, and the other items are lost without any notice.
             for j in 0 to ITEMS-1 loop
                 if (RX_VLD(j) = '1' and key_arr(j) = std_logic_vector(to_unsigned(i,KEY_SIZE))) then
                     mux_sel_var := std_logic_vector(to_unsigned(j,KEY_SIZE));

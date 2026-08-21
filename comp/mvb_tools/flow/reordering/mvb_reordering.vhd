@@ -1,4 +1,4 @@
--- mvb_reordering.vhd:
+-- mvb_reordering.vhd: Reordering of MVB items within one MVB word
 -- Copyright (C) 2017 CESNET
 -- Author(s): Jakub Cabal <xcabal05@stud.feec.vutbr.cz>
 --
@@ -11,27 +11,83 @@ use IEEE.numeric_std.all;
 
 use work.math_pack.all;
 
+-- The MVB_REORDERING component moves MVB items to other positions within the
+-- same MVB word. Each RX item has its own key (see REORDER_KEY) which says to
+-- which TX position that item must be moved. It is a pure scatter network
+-- (ITEMS multiplexers controlled by ITEMS*ITEMS comparators) without any
+-- storage of items: an item is always transmitted in the same word in which it
+-- was received, it is never moved to another word. The amount of logic grows
+-- quadratically with ITEMS.
+--
+-- The requested reordering does not have to be a complete permutation, gaps
+-- are allowed. A TX position which is not targeted by any valid RX item gets
+-- TX_VLD='0' (data on that position are undefined). Compaction (all valid
+-- items moved to the lowest positions) as well as scattering (valid items
+-- moved to arbitrary positions) are therefore both valid use cases.
+--
+-- RX_DST_RDY is directly connected to TX_DST_RDY, the component never
+-- generates backpressure of its own. Latency is one clock cycle when
+-- OUT_REG_EN=True, otherwise the whole datapath is combinational.
+--
+-- .. WARNING::
+--     The keys are not checked in any way and there is no output reporting a
+--     discarded item. The user must guarantee these conditions for each valid
+--     RX item (an item with RX_VLD(j)='1'):
+--
+--     * **Unique keys** - two valid RX items must not target the same TX
+--       position. In case of such collision, the item on the higher RX
+--       position (higher index j) wins and the other item is silently
+--       discarded.
+--     * **Key range** - the key value must be lower than ITEMS. When ITEMS is
+--       not a power of two, the key is able to encode also higher values (for
+--       ITEMS=5 the key is 3 bits wide and encodes values 0 to 7) and an item
+--       with such key is silently discarded, because no TX position matches
+--       it.
+--
+--     Keys of invalid RX items (RX_VLD(j)='0') are don't care.
+--
 entity MVB_REORDERING is
     generic (
+        -- Number of MVB items in word, minimum value is 2.
         ITEMS         : natural := 5;
+        -- Width of one MVB item in bits.
         ITEM_WIDTH    : natural := 64;
+        -- Enable the output register on the TX MVB interface. It breaks the
+        -- combinational path through the multiplexers at the cost of one clock
+        -- cycle of latency.
         OUT_REG_EN    : boolean := True;
+        -- Enable the reordering logic. When False, the RX MVB word is passed
+        -- to the TX MVB interface unchanged and REORDER_KEY is ignored.
         REORDERING_EN : boolean := True
     );
     port (
+        -- Clock input
         CLK         : in  std_logic;
+        -- Reset input synchronized with CLK
         RESET       : in  std_logic;
-        -- MVB RX INTERFACE
+
+        -- =====================================================================
+        -- RX MVB INTERFACE (original item positions)
+        -- =====================================================================
+
         RX_DATA     : in  std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
         RX_VLD      : in  std_logic_vector(ITEMS-1 downto 0);
         RX_SRC_RDY  : in  std_logic;
         RX_DST_RDY  : out std_logic;
-        -- MVB TX INTERFACE
+
+        -- =====================================================================
+        -- TX MVB INTERFACE (new item positions)
+        -- =====================================================================
+
         TX_DATA     : out std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
         TX_VLD      : out std_logic_vector(ITEMS-1 downto 0);
         TX_SRC_RDY  : out std_logic;
         TX_DST_RDY  : in  std_logic;
-        -- KEYS FOR REODERING VALID WITH RX_VLD AND RX_SRC_RDY
+
+        -- Target TX position of each RX item, log2(ITEMS) bits per item. The
+        -- key of RX item j is REORDER_KEY((j+1)*log2(ITEMS)-1 downto
+        -- j*log2(ITEMS)). Valid with RX_VLD and RX_SRC_RDY. The keys must meet
+        -- the conditions described in the warning above.
         REORDER_KEY : in  std_logic_vector(ITEMS*log2(ITEMS)-1 downto 0)
     );
 end entity;
