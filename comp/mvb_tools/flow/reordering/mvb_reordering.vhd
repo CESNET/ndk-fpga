@@ -29,6 +29,11 @@ use work.math_pack.all;
 -- generates backpressure of its own. Latency is one clock cycle when
 -- OUT_REG_EN=True, otherwise the whole datapath is combinational.
 --
+-- The reordering logic needs at least 2 items, because the key of a single
+-- item would be zero bits wide. ITEMS=1 is therefore allowed only together
+-- with the bypass mode (REORDERING_EN=False), any other use is refused by an
+-- assert during elaboration.
+--
 -- .. WARNING::
 --     The keys are not checked in any way and there is no output reporting a
 --     discarded item. The user must guarantee these conditions for each valid
@@ -48,7 +53,8 @@ use work.math_pack.all;
 --
 entity MVB_REORDERING is
     generic (
-        -- Number of MVB items in word, minimum value is 2.
+        -- Number of MVB items in word. The minimum value is 2, ITEMS=1 is
+        -- allowed only with REORDERING_EN=False.
         ITEMS         : natural := 5;
         -- Width of one MVB item in bits.
         ITEM_WIDTH    : natural := 64;
@@ -57,7 +63,8 @@ entity MVB_REORDERING is
         -- cycle of latency.
         OUT_REG_EN    : boolean := True;
         -- Enable the reordering logic. When False, the RX MVB word is passed
-        -- to the TX MVB interface unchanged and REORDER_KEY is ignored.
+        -- to the TX MVB interface unchanged and REORDER_KEY is ignored. This
+        -- bypass mode is the only mode supported with ITEMS=1.
         REORDERING_EN : boolean := True
     );
     port (
@@ -93,6 +100,21 @@ entity MVB_REORDERING is
 end entity;
 
 architecture FULL of MVB_REORDERING is
+
+    -- The key of a single item is zero bits wide, so the item multiplexers
+    -- cannot be built for ITEMS=1 at all. The check is done in the declarative
+    -- part on purpose: a plain concurrent assert would never be reached,
+    -- because elaboration of the GEN_MUX port map fails earlier with a bare
+    -- width mismatch report.
+    function cfg_check return boolean is
+    begin
+        assert (ITEMS > 1 or REORDERING_EN = False)
+            report "MVB_REORDERING: Use ITEMS of 2 or more, or select the bypass mode with REORDERING_EN=False."
+            severity failure;
+        return true;
+    end function;
+
+    constant CFG_CHECKED : boolean := cfg_check;
 
     constant KEY_SIZE : natural := log2(ITEMS);
 
