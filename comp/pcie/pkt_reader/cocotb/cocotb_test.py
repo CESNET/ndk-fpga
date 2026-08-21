@@ -15,13 +15,14 @@ from cocotb_bus.scoreboard import Scoreboard
 
 from cocotbext.ofm.utils import RAM
 from cocotbext.ofm.mvb.transaction import MvbTrClassic
+from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 
 from transaction import PprInstr, PprData
-from drivers import PprDriver, PcieDriver
+from drivers import PcieDriver
 from monitors import PprMonitor
+from protocol import PprDriverProtocol
 from responder import PprRequester
 from addr_tracker import AddressRangeTracker
 
@@ -36,7 +37,7 @@ class FakeReaderTestbench():
 
     def __init__(self, dut, debug=False, **kwargs):
         self.dut = dut
-        self.user_req_drv = PprDriver(dut, "USER_REQ_MVB", dut.CLK)
+        self.user_req_drv = MVBDriver(dut, "USER_REQ_MVB", dut.CLK, protocol=PprDriverProtocol, rate_limiter_config=dict(rate_percentage=50, random_idles=True, max_idles=3, zero_idles_chance=80))
         self.user_resp_mon = PprMonitor(dut, "USER_RESP_MFB", dut.CLK)
         self.user_resp_drv = BitDriver(dut.USER_RESP_MFB_DST_RDY, dut.CLK)
 
@@ -156,7 +157,7 @@ def _compare_transactions(expected: PprData, actual: PprData, packet_num: int = 
 class Testbench():
     def __init__(self, dut, debug=False, **kwargs):
         self.dut = dut
-        self.user_req_drv = PprDriver(dut, "USER_REQ_MVB", dut.CLK)
+        self.user_req_drv = MVBDriver(dut, "USER_REQ_MVB", dut.CLK, protocol=PprDriverProtocol, rate_limiter_config=dict(rate_percentage=50, random_idles=True, max_idles=3, zero_idles_chance=80))
         self.pcie_up_drv = BitDriver(dut.PCIE_UP_MVB_DST_RDY, dut.CLK)
         self.pcie_up_mon = MVBMonitor(dut, "PCIE_UP_MVB", dut.CLK, tr_type=MvbTrClassic)
         self.pcie_down_drv = PcieDriver(dut, "PCIE_DOWN", dut.CLK)
@@ -289,9 +290,6 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     else:
         tb = Testbench(dut, debug=False, pkts_exp=frame_count, mps=pcie_mps, rcb=pcie_rcb)
 
-    # Change MVB driver's IdleGenerator to ItemRateLimiter
-    idle_gen_conf = dict(random_idles=True, max_idles=3, zero_idles_chance=80)
-    tb.user_req_drv.set_idle_generator(ItemRateLimiter(rate_percentage=50, **idle_gen_conf))
     await tb.reset()
 
     if not fake_reader:

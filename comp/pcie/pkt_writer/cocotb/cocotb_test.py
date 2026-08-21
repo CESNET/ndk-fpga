@@ -19,16 +19,17 @@ from cocotb_bus.scoreboard import Scoreboard
 
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.mfb.transaction import MfbTransaction
+from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mvb.transaction import MvbTrClassicSerializable, hdrfield, serializableheader
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 from cocotbext.ofm.utils.hex_formatter import format_bytes
 
 from transaction import MvbTrAddressAndLength
-from drivers import MvbDriverAddressAndLength as MVBDriver
+from protocol import MvbProtocolWithAddressAndLength
 
 
 # A copy from the dma_bus_pack.vhd
@@ -143,12 +144,12 @@ class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
         if dut.AXI_RX_DIRECT.value:
-            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK)
+            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, no_default_rate_limiter=True)
             self.mfb_rx_drv = None
         else:
-            self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK)
+            self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK, generics_prefix="MFB", no_default_rate_limiter=True)
             self.axis_rx_drv = None
-        self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK)
+        self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=MvbProtocolWithAddressAndLength, rate_limiter_config=dict(rate_percentage=50, random_idles=True, max_idles=3, zero_idles_chance=80))
         self.mfb_tx_drv = BitDriver(dut.TX_MFB_DST_RDY, dut.CLK)
         self.mvb_tx_drv = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
         self.mfb_tx_mon = MFBMonitor(dut, "TX_MFB", dut.CLK)
@@ -322,9 +323,6 @@ async def _run_test(
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut)
-    # Change MVB driver's IdleGenerator to ItemRateLimiter
-    idle_gen_conf = dict(random_idles=True, max_idles=3, zero_idles_chance=80)
-    tb.mvb_rx_drv.set_idle_generator(ItemRateLimiter(rate_percentage=50, **idle_gen_conf))
     # TODO: Change MFB driver's IdleGenerator to EthernetRateLimiter
     # MFB Drive first needs to implement support for IdleGenerator!
     await tb.reset()
@@ -351,7 +349,7 @@ async def _run_test(
 
         # Send to Driver (DUT)
         if tb.mfb_rx_drv is not None:
-            tb.mfb_rx_drv.append(mfb_pkt)
+            tb.mfb_rx_drv.append(MfbTransaction(data=mfb_pkt))
         else:
             axis_tr = Axi4StreamTransaction()
             axis_tr.TDATA = mfb_pkt

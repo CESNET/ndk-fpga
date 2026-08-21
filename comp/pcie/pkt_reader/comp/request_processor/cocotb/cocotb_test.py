@@ -17,12 +17,12 @@ from cocotb.triggers import RisingEdge, ClockCycles
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 
+from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 
 from transaction import PprInstr, IdMemTr, TagMemTr
-from drivers import PprDriver
+from protocol import PprDriverProtocol
 from monitors import IdMemMonitor, TagMemMonitor
 from probe import DmaUphdr, PprProbeInterface, PprProbe
 
@@ -30,7 +30,7 @@ from probe import DmaUphdr, PprProbeInterface, PprProbe
 class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
-        self.rx_mvb_drv = PprDriver(dut, "RX_MVB", dut.CLK)
+        self.rx_mvb_drv = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=PprDriverProtocol, generics_prefix="MVB", rate_limiter_config=dict(rate_percentage=50, random_idles=True, max_idles=3, zero_idles_chance=80))
         self.tx_mvb_drv = BitDriver(dut.TX_MVB_DST_RDY, dut.CLK)
         self.tx_mvb_mon = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=DmaUphdr)
         self.idmem_mon = IdMemMonitor(dut, "IDMEM", dut.CLK)
@@ -199,9 +199,6 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=150
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut, debug=False)
-    # Change MVB driver's IdleGenerator to ItemRateLimiter
-    idle_gen_conf = dict(random_idles=True, max_idles=3, zero_idles_chance=80)
-    tb.rx_mvb_drv.set_idle_generator(ItemRateLimiter(rate_percentage=50, **idle_gen_conf))
     await tb.reset()
     tb.dut.PCIE_MRRS.value = pcie_mrrs
     cocotb.start_soon(tb.recycle_tags())
