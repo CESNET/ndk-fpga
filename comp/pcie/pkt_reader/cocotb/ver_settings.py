@@ -41,8 +41,8 @@ SETTINGS = {
     },
 
     # Packet MTU variants
-    "mtu_256" : {
-        "PKT_MTU"               : "2**8",
+    "mtu_127" : {
+        "PKT_MTU"               : "2**7-1",
     },
     "mtu_max" : {
         "PKT_MTU"               : "16383",
@@ -77,16 +77,16 @@ SETTINGS = {
     ("pcie_down_1r_1b_8i",),
     ("pcie_down_4r_1b_4i",),
     ("pcie_down_4r_1b_8i",),
-    ("mtu_256",),
+    ("mtu_127",),
     ("mtu_max",),
 
     ("resp_out_of_order",),
     ("resp_out_of_order","pcie_down_4r_1b_8i"),
-    ("resp_out_of_order","mtu_256"),
+    ("resp_out_of_order","mtu_127"),
     ("resp_out_of_order","mtu_max","no_fwft"),
 
     ("pcie_down_1r_1b_8i","mtu_max"),
-    ("pcie_down_4r_1b_4i","mtu_256","no_fwft"),
+    ("pcie_down_4r_1b_4i","mtu_127","no_fwft"),
 
     ("pcie_down_4r_1b_4i","resp_out_of_order","mtu_max"),
 
