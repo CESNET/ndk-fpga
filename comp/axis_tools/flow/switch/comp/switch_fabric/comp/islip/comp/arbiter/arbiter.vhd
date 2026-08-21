@@ -39,7 +39,7 @@ begin
     priority_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (RESET = '1') then
+            if (RESET = '1' or unsigned(s_port_addr) = to_unsigned(NUM_PORTS-1, log2(NUM_PORTS))) then
                 s_priority_reg <= (others => '0');
             elsif (PRIORITY_INC = '1') then
                 s_priority_reg <= std_logic_vector(unsigned(s_port_addr) + 1);
