@@ -15,7 +15,7 @@ SETTINGS = {
         "PCIE_DOWN_REGION_SIZE" : "1",
         "PCIE_DOWN_BLOCK_SIZE"  : "8",
         "PCIE_DOWN_ITEM_WIDTH"  : "32",
-        "PKT_MTU"               : "2**12",
+        "PKT_MTU"               : "4096",
         "RESP_IN_ORDER"         : "True",
         "FWFT"                  : "True",
     },
@@ -42,7 +42,7 @@ SETTINGS = {
 
     # Packet MTU variants
     "mtu_127" : {
-        "PKT_MTU"               : "2**7-1",
+        "PKT_MTU"               : "127",
     },
     "mtu_max" : {
         "PKT_MTU"               : "16383",
