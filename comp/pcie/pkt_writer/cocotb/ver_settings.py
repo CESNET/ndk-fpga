@@ -17,7 +17,7 @@ SETTINGS = {
         "PCIE_MFB_ITEM_WIDTH"  : "32",
         "AXI_RX_DIRECT"        : "True",
         "AXI_TDATA_WIDTH"      : "512",
-        "PKT_MTU"              : "2**12",
+        "PKT_MTU"              : "4096",
     },
 
     # PCIe MFB interface variants
@@ -60,8 +60,8 @@ SETTINGS = {
     },
 
     # Packet MTU variants
-    "mtu_256" : {
-        "PKT_MTU"              : "2**8",
+    "mtu_127" : {
+        "PKT_MTU"              : "127",
     },
     "mtu_max" : {
         "PKT_MTU"              : "16383",
@@ -73,19 +73,17 @@ SETTINGS = {
     ("pcie_mfb_1r_1b_8i",),
     ("pcie_mfb_4r_1b_4i",),
     ("pcie_mfb_4r_1b_8i",),
-    ("mtu_256",),
-    ("mtu_max",),
 
-    ("rx_via_mfb",),
     ("rx_via_mfb","pcie_mfb_4r_1b_8i"),
-    ("rx_via_mfb","mtu_256"),
+    ("rx_via_mfb","mtu_127"),
+    ("rx_via_mfb","mtu_max"),
 
     ("pcie_mfb_1r_1b_8i","mtu_max"),
-    ("pcie_mfb_4r_1b_4i","mtu_256"),
+    ("pcie_mfb_4r_1b_4i","mtu_127"),
 
     ("wide_rx_axi","mtu_max"),
 
-    ("wide_rx_mfb",),
+    ("wide_rx_mfb","mtu_127"),
     ("wide_rx_mfb","pcie_mfb_4r_1b_8i","mtu_max"),
 
     ),

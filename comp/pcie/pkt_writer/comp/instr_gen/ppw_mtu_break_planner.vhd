@@ -66,7 +66,7 @@ architecture FULL of PPW_MTU_BREAK_PLANNER is
     --                                CONSTANTS
     -- =====================================================================
 
-    constant LEN_WIDTH_EXT   : natural := log2(PKT_MTU+1) + 1;
+    constant LEN_WIDTH_EXT   : natural := max(log2(PKT_MTU+1), PCIE_MPS_WIDTH) + 1;
 
     -- =====================================================================
     --                                 SIGNALS

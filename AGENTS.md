@@ -92,6 +92,10 @@ Waveform GUI)"), which covers both the component-level and top-level-sim variant
   then see "Per-component simulation/synthesis check" below for a deeper check. CI
   also enforces style with `vsg` (`tests/ci/vsg_config.yaml`); if unavailable locally,
   at least match the surrounding file's formatting by hand.
+  - If the component has a `cocotb/` directory, run the cocotb test. Ask the user
+    whether they want a **default run** (`make` in the `cocotb/` dir) or a **full
+    multi-ver run** (all combinations from `ver_settings.py`). See the "Running
+    Multiple Generic Combinations" section in `.agents/skills/ndk-cocotb-ver/SKILL.md`.
 - Changed Verilog/SystemVerilog? `python3 tests/verible/verible_runner.py` (rules/
   exclusions in `tests/verible/`).
 - Commit messages follow Conventional Commits (`type(scope): summary`, e.g.

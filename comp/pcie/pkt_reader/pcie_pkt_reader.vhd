@@ -73,6 +73,10 @@ entity PCIE_PKT_READER is
         -- When False, completed packets are output immediately regardless of request order.
         -- Automatically True with FAKE_READER=True - unable to do out-of-order.
         RESP_IN_ORDER         : boolean := True;
+        -- Enable FWFT (First Word Fall Through): the USER_RESP interface will contain valid data
+        -- ASAP, regardless DST_RDY. Disable only when you know the consumer can wait for valid
+        -- data with DST_DRY=1.
+        FWFT                  : boolean := True;
         DEVICE                : string := "AGILEX"
     );
     port (
@@ -394,6 +398,7 @@ architecture FULL of PCIE_PKT_READER is
     signal tx_mfb_src_rdy           : std_logic;
     signal rd_instr_addr_cnt        : unsigned(MAX_WORDS_W-1 downto 0);
     signal reading_last_word        : std_logic;
+    signal output_pipe_en           : std_logic;
 
 begin
 
@@ -1118,7 +1123,16 @@ begin
             );
         end generate;
 
-        mm_rd_pipe_en <= (others => USER_RESP_MFB_DST_RDY);
+        fwft_g : if FWFT generate
+            -- Advance the output pipeline when the output register is empty (no valid data held)
+            -- or when the downstream accepts data. This prevents a deadlock where the consumer
+            -- waits for SRC_RDY before asserting DST_RDY.
+            output_pipe_en <= USER_RESP_MFB_DST_RDY or not tx_mfb_src_rdy;
+        else generate
+            output_pipe_en <= USER_RESP_MFB_DST_RDY;
+        end generate;
+
+        mm_rd_pipe_en <= (others => output_pipe_en);
         mm_rd_addr    <= (others => mm_rd_curr_addr);
 
         mm_rd_curr_addr <= std_logic_vector(unsigned(rd_instr_addr_reg) + rd_instr_addr_cnt);
@@ -1172,11 +1186,11 @@ begin
         );
 
         -- Read one at a time
-        rd_instr_fifo_rd(0) <= not rd_instr_fifo_empty(0) and USER_RESP_MFB_DST_RDY and (not rd_instr_vld_reg or reading_last_word);
+        rd_instr_fifo_rd(0) <= not rd_instr_fifo_empty(0) and output_pipe_en and (not rd_instr_vld_reg or reading_last_word);
 
         (rd_instr_id, rd_instr_addr, rd_instr_words, rd_instr_eofpos) <= rd_instr_fifo_do;
 
-        rd_instr_invalidate <= rd_instr_fifo_empty(0) and reading_last_word and USER_RESP_MFB_DST_RDY;
+        rd_instr_invalidate <= rd_instr_fifo_empty(0) and reading_last_word and output_pipe_en;
 
         process (CLK)
         begin
@@ -1198,7 +1212,7 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if (USER_RESP_MFB_DST_RDY = '1') then
+                if (output_pipe_en = '1') then
                     tx_mfb_id           <= rd_instr_id_reg;
                     tx_mfb_eofpos       <= rd_instr_eofpos_reg(EOF_POS_WIDTH-1 downto 0);
                     rd_instr_new_loaded <= rd_instr_fifo_rd(0); -- Loading a new RD instruction will result ...
@@ -1217,10 +1231,10 @@ begin
         process (CLK)
         begin
             if rising_edge(CLK) then
-                if ((USER_RESP_MFB_DST_RDY = '1') and (rd_instr_vld_reg = '1')) then
+                if ((output_pipe_en = '1') and (rd_instr_vld_reg = '1')) then
                     rd_instr_addr_cnt <= rd_instr_addr_cnt + 1;
                 end if;
-                if ((RESET = '1') or ((reading_last_word = '1') and (USER_RESP_MFB_DST_RDY = '1'))) then
+                if ((RESET = '1') or ((reading_last_word = '1') and (output_pipe_en = '1'))) then
                     rd_instr_addr_cnt <= (others => '0');
                 end if;
             end if;

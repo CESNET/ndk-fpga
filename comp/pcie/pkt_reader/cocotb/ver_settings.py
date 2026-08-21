@@ -15,8 +15,9 @@ SETTINGS = {
         "PCIE_DOWN_REGION_SIZE" : "1",
         "PCIE_DOWN_BLOCK_SIZE"  : "8",
         "PCIE_DOWN_ITEM_WIDTH"  : "32",
-        "PKT_MTU"               : "2**12",
+        "PKT_MTU"               : "4096",
         "RESP_IN_ORDER"         : "True",
+        "FWFT"                  : "True",
     },
 
     # PCIe down MFB interface variants
@@ -40,8 +41,8 @@ SETTINGS = {
     },
 
     # Packet MTU variants
-    "mtu_256" : {
-        "PKT_MTU"               : "2**8",
+    "mtu_127" : {
+        "PKT_MTU"               : "127",
     },
     "mtu_max" : {
         "PKT_MTU"               : "16383",
@@ -50,6 +51,11 @@ SETTINGS = {
     # Output responses as they complete, ignoring the request order
     "resp_out_of_order" : {
         "RESP_IN_ORDER"         : "False",
+    },
+
+    # Disable First Word Fall Through on USER_RESP interface
+    "no_fwft" : {
+        "FWFT"                  : "False",
     },
 
     # Fake reader variant: generates empty packets of given length (PCIe interfaces not used)
@@ -71,16 +77,16 @@ SETTINGS = {
     ("pcie_down_1r_1b_8i",),
     ("pcie_down_4r_1b_4i",),
     ("pcie_down_4r_1b_8i",),
-    ("mtu_256",),
+    ("mtu_127",),
     ("mtu_max",),
 
     ("resp_out_of_order",),
     ("resp_out_of_order","pcie_down_4r_1b_8i"),
-    ("resp_out_of_order","mtu_256"),
-    ("resp_out_of_order","mtu_max"),
+    ("resp_out_of_order","mtu_127"),
+    ("resp_out_of_order","mtu_max","no_fwft"),
 
     ("pcie_down_1r_1b_8i","mtu_max"),
-    ("pcie_down_4r_1b_4i","mtu_256"),
+    ("pcie_down_4r_1b_4i","mtu_127","no_fwft"),
 
     ("pcie_down_4r_1b_4i","resp_out_of_order","mtu_max"),
 
