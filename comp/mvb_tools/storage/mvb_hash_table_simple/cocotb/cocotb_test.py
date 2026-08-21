@@ -25,7 +25,7 @@ from cocotb_bus.scoreboard import Scoreboard
 
 import nfb
 from ofm.comp.mvb_tools.storage.mvb_hash_table_simple.mvb_hash_table_simple import MvbHashTableSimple, toeplitz_hash, simple_xor_hash
-from cocotbext.ofm.utils.servicer import Servicer
+from cocotbext.ofm.utils.servicer import Servicer, bridge
 from cocotbext.ofm.utils.device import create_dtb_simple
 from cocotbext.ofm.utils.math import ceildiv
 from transaction import MvbReqTrHashTableSimple, MvbResTrHashTableSimple
@@ -222,9 +222,9 @@ async def run_test(dut, config_file: str = "test_configs/test_config_1B.yaml", c
             compatible_str="cesnet,ndk,mvb_hash_table_simple")
 
         servicer = Servicer(device=tb.mi_interface, dtb=dtb)
-        dev = await cocotb.task.bridge(nfb.open)(servicer.path())
+        dev = await bridge(nfb.open)(servicer.path())
 
-        await cocotb.task.bridge(MvbHashTableSimple)(mod_path=config_file, dev=dev)
+        await bridge(MvbHashTableSimple)(mod_path=config_file, dev=dev)
 
     else:
         raise RuntimeError("Invalid configuration setting.")
