@@ -68,6 +68,7 @@ if cocotb.__version__ >= "2.0.0":
     class _EdgeProxyBase(_EdgeBase):
         _instances = {}
         _cbhdls = {}
+        _can_fire = set()
 
         def _is_edge_event(self, last_value, current_value) -> bool:
             return last_value != current_value
@@ -97,6 +98,8 @@ if cocotb.__version__ >= "2.0.0":
         def _prime(self, callback) -> None:
             cls = type(self)
 
+            cls._can_fire.add(self)
+
             self._last_val = int(self.signal.value)
 
             if cls._cbhdls[self._path] is None:
@@ -105,6 +108,10 @@ if cocotb.__version__ >= "2.0.0":
                 )
                 if cls._cbhdls[self._path] is None:
                     raise RuntimeError(f"Unable set up {self!s} Trigger")
+
+        def _unprime(self):
+            self._can_fire.discard(self)
+            super()._unprime()
 
         @classmethod
         def _distribute_callback(cls, trigger: "_EdgeProxyBase", callback: Callable):
@@ -121,10 +128,11 @@ if cocotb.__version__ >= "2.0.0":
                 trigger._prime(callback)
 
         def _do_callback(self, callback) -> bool:
+            cls = type(self)
             did_callback = False
             current = int(self.signal.value)
 
-            if self._is_edge_event(self._last_val, current):
+            if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
                 callback(self)
                 did_callback = True
 
