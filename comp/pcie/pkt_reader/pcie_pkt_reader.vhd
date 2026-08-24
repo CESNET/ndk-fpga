@@ -468,10 +468,10 @@ begin
         );
 
         -- NOTE: DMA headers are assigned only to Region 0, even in the case of multiple PCIE_UP_REGIONS.
-        PCIE_UP_MVB_DATA(DMA_UPHDR_WIDTH-1 downto 0) <= pcie_uphdr_data(DMA_UPHDR_WIDTH-1 downto 0);
-        PCIE_UP_MVB_VLD(0)                           <= pcie_uphdr_vld(0);
-        PCIE_UP_MVB_SRC_RDY                          <= pcie_uphdr_src_rdy;
-        pcie_uphdr_dst_rdy                           <= PCIE_UP_MVB_DST_RDY;
+        PCIE_UP_MVB_DATA(REGIONS*DMA_UPHDR_WIDTH-1 downto 0) <= pcie_uphdr_data;
+        PCIE_UP_MVB_VLD                                      <= (PCIE_UP_REGIONS-1 downto REGIONS => '0') & pcie_uphdr_vld;
+        PCIE_UP_MVB_SRC_RDY                                  <= pcie_uphdr_src_rdy;
+        pcie_uphdr_dst_rdy                                   <= PCIE_UP_MVB_DST_RDY;
 
         free_tag     <= wr_instr_tag;
         free_tag_vld <= tag_completed;
