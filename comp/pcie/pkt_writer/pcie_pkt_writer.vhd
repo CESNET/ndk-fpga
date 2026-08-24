@@ -320,10 +320,10 @@ begin
 
     -- NOTE2: DMA headers are assigned only to Region 0, even in the case of multiple PCIE_MFB_REGIONS.
 
-    TX_MVB_DATA(DMA_UPHDR_WIDTH-1 downto 0) <= hdrgen_tx_mvb_data(DMA_UPHDR_WIDTH-1 downto 0);
-    TX_MVB_VLD(0)                           <= hdrgen_tx_mvb_valid(0);
-    TX_MVB_SRC_RDY                          <= hdrgen_tx_mvb_src_rdy and ext_instr_fifo_rx_dst_rdy;
-    hdrgen_tx_mvb_dst_rdy                   <= TX_MVB_DST_RDY and ext_instr_fifo_rx_dst_rdy;
+    TX_MVB_DATA(MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0) <= hdrgen_tx_mvb_data;
+    TX_MVB_VLD                                          <= (PCIE_MFB_REGIONS-1 downto MFB_REGIONS => '0') & hdrgen_tx_mvb_valid;
+    TX_MVB_SRC_RDY                                      <= hdrgen_tx_mvb_src_rdy and ext_instr_fifo_rx_dst_rdy;
+    hdrgen_tx_mvb_dst_rdy                               <= TX_MVB_DST_RDY and ext_instr_fifo_rx_dst_rdy;
 
     -- ========================================================
     --  Clone DMA header data
