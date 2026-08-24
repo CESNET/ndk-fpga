@@ -90,6 +90,29 @@ program TEST (
         status = sc_empty != 1;
     endtask
 
+    task TestDep(output bit status);
+        bit sc_empty;
+
+        $write("\n\n############ TEST CASE AXI DEPENDENCY ############\n\n");
+
+        // enable dependency
+        responder.treadyDepEn = 1'b1;
+
+        resetDesign();
+        generator.setEnabled(1000);
+        wait(!generator.enabled);
+        disableTestEnvironment();
+        scoreboard.display();
+
+        // check if scoreboard is empty
+        scoreboard.is_empty(sc_empty);
+        // return 1 in case scoreboard is not empty
+        status = sc_empty != 1;
+
+        // disable dependency
+        responder.treadyDepEn = 1'b0;
+    endtask
+
     task test_speed(input int frame_size, output bit status);
         bit sc_empty;
 
@@ -114,16 +137,26 @@ program TEST (
     endtask
 
     initial begin
-        bit status;
+        bit status_tmp;
+        bit status = 1'b0;
 
         createGeneratorEnvironment(FRAME_SIZE_MAX, FRAME_SIZE_MIN);
         createEnvironment();
 
         // test 1
-        test1(status);
-        if (status) begin
+        test1(status_tmp);
+        if (status_tmp) begin
             $write("Test1: Verification Failed! Scoreboard table is not empty\n");
             $stop();
+            status = 1'b1;
+        end
+
+        // test dep
+        TestDep(status_tmp);
+        if (status_tmp) begin
+            $write("TestDep: Verification Failed! Scoreboard table is not empty\n");
+            $stop();
+            status = 1'b1;
         end
 
         if (ENABLE_SPEED_TEST) begin

@@ -25,6 +25,11 @@ use work.math_pack.all;
 --
 -- Architecture of this IP is:
 -- 1. input stage (optional PIPE)
+--   Note that without an input PIPE, DST_RDY = comb_logic(SRC_RDY, SOF, EOF, state, tready_out),
+--   where tready_out may be TX_AXI_TREADY or the output PIPE register based on the selected config.
+--   Note that DST_RDY is driven high when SRC_RDY is low - this implementation reduces the risk of
+--   deadlocks. It is recommended to use a PIPE in case the transmitting component has
+--   SRC_RDY <= comb_logic(DST_RDY) to avoid combinatorial paths.
 -- 2. pre-processor stage (used only for REGIONS > 1) with output registers
 -- 3. combinatorial bridge stage (main logic translating MFB to AXI)
 -- 4. output state (optional PIPE)
@@ -41,6 +46,8 @@ entity MFB2AXI is
         -- input/output reg. config
         -- =========================================================================
         -- enables input register stage
+        -- Note: when set to false, DST_RDY = comb_logic(SRC_RDY, ...) as input PIPE is
+        -- used also as input buffer.
         USE_IN_PIPE          : boolean := true;
         -- enables output register stage
         USE_OUT_PIPE         : boolean := true;
@@ -472,13 +479,14 @@ begin
             begin
                 -- default assignment
                 pp_valid      <= '0';
-                dst_rdy_in    <= '0';
+                dst_rdy_in    <= not src_rdy_in; -- when there is no transaction, be ready
                 sof_reg_ptr_d <= sof_reg_ptr_q;
                 eof_reg_ptr_d <= eof_reg_ptr_q;
                 pp_sof_cnt    <= sof_cnt(PP_CNT_WIDTH-1 downto 0);
                 pp_eof_cnt    <= eof_cnt(PP_CNT_WIDTH-1 downto 0);
 
                 if (src_rdy_in = '1' and br_rdy = '1') then
+                    dst_rdy_in    <= '0'; -- do not confirm valid transaction which can be accepted by default
                     pp_valid      <= '1';
                     sof_reg_ptr_d <= sof_first + 1;
                     eof_reg_ptr_d <= eof_first + 1;
@@ -712,7 +720,7 @@ begin
             br_data_ptr_d       <= br_data_ptr_q;
             axi_tlast_out       <= '0';
             tvalid_out          <= pp_valid_q;
-            br_rdy              <= tready_out;
+            br_rdy              <= tready_out or not pp_valid_q; -- be ready if there is no transaction
             br_eof_data_len_off <= (others => '0');
             br_eof_data_len_h   <= (others => '0');
             br_eof_data_len_l   <= (others => '0');
