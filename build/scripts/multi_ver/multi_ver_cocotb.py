@@ -43,18 +43,17 @@ def find_venv() -> str | None:
     return None
 
 
-def run_modelsim(settings: dict, venv: str | None = None, gui=False, cocotb_testcase: str | None = None):
+def run_modelsim(settings: dict, test_name: str, venv: str | None = None, gui=False, cocotb_testcase: str | None = None):
     command = ""
 
     if venv is not None:
         command += f"source {venv}/bin/activate\n"
 
+    sim_flags = f"-logfile \"{test_name}\""
     if not gui:
-        sim_flags = "SIM_FLAGS=\"-c -do quit\""
-    else:
-        sim_flags = ""
+        sim_flags = f"{sim_flags} -c -do quit"
 
-    command += f"make TARGET=cocotb {sim_flags}"
+    command += f"make TARGET=cocotb SIM_FLAGS=\"{sim_flags}\""
 
     if cocotb_testcase is not None:
         command += f" COCOTB_TESTCASE='{cocotb_testcase}'"
@@ -169,7 +168,7 @@ if args.setting is None and args.test_name is None:
         print(f"Running combination: {key} ({comb_name})")
         if (not args.dry_run):
             vsim_time_start = time.time()
-            result = run_modelsim(SETTING, venv=venv, cocotb_testcase=args.cocotb_testcase)
+            result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{key}", venv=venv, cocotb_testcase=args.cocotb_testcase)
             vsim_time_stop = time.time()
             time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
             if result: # detect failure
@@ -199,7 +198,7 @@ else:
 
     print("Running combination: " + " ".join(test_setings))
     if (not args.dry_run):
-        result = run_modelsim(SETTING, venv=venv, gui=(not args.command_line), cocotb_testcase=args.cocotb_testcase)
+        result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{test_name}", venv=venv, gui=(not args.command_line), cocotb_testcase=args.cocotb_testcase)
         if result: # detect failure
             print("Run SUCCEEDED (" + " ".join(test_setings) + ")")
         else:
