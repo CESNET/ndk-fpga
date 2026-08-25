@@ -116,7 +116,16 @@ class RateLimiter(nfb.BaseComp):
         return self._comp.read32(self._REG_STATUS) & self._SR_SHAPE_FLAG
 
     def print_cfg(self):
-        """Print current configuration"""
+        """Print current configuration
+
+        .. warning::
+            This method writes to the speed pointer register internally.
+            The speed pointer register is only writable in the CONFIGURATION state.
+            In IDLE or RUN states, the pointer writes are ignored by the hardware,
+            and all speed register reads will return the value of the currently
+            active speed register (pointed to by the hardware-managed pointer).
+            For accurate results, call this method only in the CONFIGURATION state.
+        """
 
         try:
             status     = self._comp.read32(self._REG_STATUS)
@@ -163,7 +172,16 @@ class RateLimiter(nfb.BaseComp):
             print("{}: Error while reading configuration!".format(self._name))
 
     def configure(self, cfg):
-        """Configure component"""
+        """Configure component
+
+        .. warning::
+            If the component is currently in the RUN state with live traffic,
+            calling this method transitions directly to CONFIGURATION state,
+            which immediately blocks the data path. If a packet is mid-transfer,
+            this may result in a partial packet being delivered downstream.
+            For safe reconfiguration during live traffic, call stop_shaping()
+            first and allow sufficient time for in-flight packets to complete.
+        """
 
         try:
             frequency  = self._comp.read32(self._REG_FREQ)
@@ -201,6 +219,6 @@ class RateLimiter(nfb.BaseComp):
         self._comp.write32(self._REG_STATUS, self._SR_RUN_FLAG)
 
     def stop_shaping(self):
-        """Stop traffic shaping"""
+        """Stop traffic shaping (transition to IDLE - full pass-through)"""
 
         self._comp.write32(self._REG_STATUS, 0)
