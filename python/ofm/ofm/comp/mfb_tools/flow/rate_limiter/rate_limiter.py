@@ -12,6 +12,11 @@ class RateLimiter(nfb.BaseComp):
     """Rate Limiter component class
 
     This class mediates the HW component address space and communication protocol.
+
+    Args:
+        mfb_word_width: MFB bus word width in bits (default 512 for 100G, use 2048 for 400G).
+        mfb_regions: Number of MFB regions (default 1 for 100G, use 4 for 400G).
+        **kwargs: Additional arguments passed to nfb.BaseComp.
     """
 
     # DevTree compatible string
@@ -33,8 +38,14 @@ class RateLimiter(nfb.BaseComp):
     _SR_WR_AUX_FLAG = 0x08  # bit 3
     _SR_SHAPE_FLAG  = 0x10  # bit 4
 
-    def __init__(self, **kwargs):
-        """Constructor"""
+    def __init__(self, mfb_word_width=512, mfb_regions=1, **kwargs):
+        """Constructor
+
+        Args:
+            mfb_word_width: MFB bus word width in bits (100G: 512, 400G: 2048).
+            mfb_regions: Number of MFB regions (100G: 1, 400G: 4).
+            **kwargs: Arguments passed to nfb.BaseComp (dev, node, index, etc.).
+        """
 
         try:
             super().__init__(**kwargs)
@@ -43,6 +54,9 @@ class RateLimiter(nfb.BaseComp):
                 self._name += " " + str(kwargs.get("index"))
         except Exception:
             print("Error while opening Rate Limiter component!")
+
+        self._mfb_word_width = mfb_word_width
+        self._mfb_regions = mfb_regions
 
     def _fix_sec_len(self, orig_speed, sec_len, freq, min_speed):
         """Increase Section length when the speed of the Speed register would be below the limit"""
@@ -54,9 +68,7 @@ class RateLimiter(nfb.BaseComp):
     def _conv_Gbs2Bscn(self, speed, sec_len, freq):
         """Convert Gb/s to B/section"""
 
-        # TODO: automatic setting
-        mfb_word_width = 512 # 100G -> 512, 400G -> 2048
-        min_speed = 1 + 3 * mfb_word_width / 8
+        min_speed = 1 + 3 * self._mfb_word_width / 8
         fixed_sec_len = self._fix_sec_len(speed * 125_000_000, sec_len, freq * 1_000_000, min_speed)
 
         self._comp.write32(self._REG_SEC_LEN, fixed_sec_len)
@@ -77,9 +89,7 @@ class RateLimiter(nfb.BaseComp):
     def _conv_Ps2Pscn(self, speed, sec_len, freq):
         """Convert pkts/s to pkts/section"""
 
-        # TODO: automatic setting
-        mfb_regions = 1 # 100G -> 1, 400G -> 4
-        min_speed = 1 + mfb_regions
+        min_speed = 1 + self._mfb_regions
         fixed_sec_len = self._fix_sec_len(speed, sec_len, freq * 1_000_000, min_speed)
 
         self._comp.write32(self._REG_SEC_LEN, fixed_sec_len)
