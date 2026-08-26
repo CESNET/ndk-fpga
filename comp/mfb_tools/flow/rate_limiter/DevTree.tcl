@@ -1,10 +1,10 @@
-proc dts_rate_limiter {base sec_len int_len max_ints speed} {
+proc dts_rate_limiter {base sec_len int_len max_ints speed {name "rate_limiter"}} {
     # The default output speed in Gigabits per second
     # considering that the frequency of the APP clock is 200 MHz.
     # <speed (in Bytes per Section)> * <sections_per_second>; convert to bits per second; convert to Gbps
     set speed_gbps [expr $speed * (200000000 / $sec_len) * 8 / 1000000000]
     set ret ""
-    append ret "rate_limiter {"
+    append ret "$name {"
     append ret "compatible = \"cesnet,ofm,rate_limiter\";"
     append ret "version = <0x00000002>;"
     append ret "reg = <$base 0x1c>;"
