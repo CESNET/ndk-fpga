@@ -979,11 +979,19 @@ begin
             pcie_axi_tkeep_fixed <= pcie_axi_tkeep;
             -- Invalidate bytes at the Start Of Frame.
             if (pcie_axi_sof = '1') then
-                pcie_axi_tkeep_fixed(to_integer(unsigned(wr_instr_firstib))-1 downto 0) <= (others => '0');
+                for i in 0 to WORD_ITEMS-1 loop
+                    if (i < to_integer(unsigned(wr_instr_firstib))) then
+                        pcie_axi_tkeep_fixed(i) <= '0';
+                    end if;
+                end loop;
             end if;
             -- Invalidate bytes at the End Of Frame.
             if ((pkt_ends = '1') and (problem = '0')) then
-                pcie_axi_tkeep_fixed(WORD_ITEMS-1 downto pcie_axi_tkeep_ones-wr_instr_lastib_int) <= (others => '0');
+                for i in 0 to WORD_ITEMS-1 loop
+                    if (i >= pcie_axi_tkeep_ones - wr_instr_lastib_int) then
+                        pcie_axi_tkeep_fixed(i) <= '0';
+                    end if;
+                end loop;
             end if;
         end process;
 
@@ -1008,7 +1016,11 @@ begin
             pcie_axi_tkeep_reg_fixed <= pcie_axi_tkeep_reg;
             -- Invalidate bytes at the End Of Frame when Last Invalid Bytes underflow into this word.
             if (problem = '1') then
-                pcie_axi_tkeep_reg_fixed(WORD_ITEMS-1 downto WORD_ITEMS-(wr_instr_lastib_int-pcie_axi_tkeep_ones)) <= (others => '0');
+                for i in 0 to WORD_ITEMS-1 loop
+                    if (i >= WORD_ITEMS - (wr_instr_lastib_int - pcie_axi_tkeep_ones)) then
+                        pcie_axi_tkeep_reg_fixed(i) <= '0';
+                    end if;
+                end loop;
             end if;
         end process;
         pcie_axi_tlast_reg_fixed <= '1' when (problem = '1') else pcie_axi_tlast_reg;
