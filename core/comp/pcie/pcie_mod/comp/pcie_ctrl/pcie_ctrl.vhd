@@ -60,6 +60,8 @@ entity PCIE_CTRL is
         PTC_DISABLE         : boolean := false;
         -- Enable CQ/CC interface for DMA-BAR, DMA_PORTS must be 1
         DMA_BAR_ENABLE      : boolean := false;
+        -- Maximum payload size (in bytes) used by the MTC for its completions
+        MTC_PCIE_MPS        : natural := 256;
         -- Dynamic routing parameters of the DMA bus
         DMA_ROUTE           : dma_route_path_array_t := dma_route_path_array_default(DMA_PORTS);
         -- Connected PCIe endpoint type
@@ -730,6 +732,7 @@ begin
         BAR5_BASE_ADDR    => BAR5_BASE_ADDR,
         EXP_ROM_BASE_ADDR => EXP_ROM_BASE_ADDR,
 
+        PCIE_MPS          => MTC_PCIE_MPS,
         ENDPOINT_TYPE     => ENDPOINT_TYPE,
         DEVICE            => DEVICE
     )
