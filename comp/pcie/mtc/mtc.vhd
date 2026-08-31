@@ -60,6 +60,11 @@ entity MTC is
         MI_DATA_WIDTH     : natural := 32;
         -- MI bus: width of address word in bits, must be 32.
         MI_ADDR_WIDTH     : natural := 32;
+        -- Maximum payload size (in bytes) usable by this module. It limits the
+        -- value from the CTL_MAX_PAYLOAD_SIZE port from above and it dimensions
+        -- the buffer for the completion payload. Allowed values: 128, 256, 512,
+        -- 1024, 2048 and 4096.
+        PCIE_MPS          : natural := 4096;
         -- Select correct FPGA device: "ULTRASCALE", "VERSAL", "STRATIX10", "AGILEX"
         DEVICE            : string := "ULTRASCALE";
         -- Intel PCIe endpoint type:
@@ -142,13 +147,17 @@ architecture FULL of MTC is
     constant MI_PER_CQ_WORD  : natural := CQ_DATA_WIDTH/MI_DATA_WIDTH;
     constant MI_PER_CC_WORD  : natural := CC_DATA_WIDTH/MI_DATA_WIDTH;
     constant DW_PER_CC_WORD  : natural := CC_DATA_WIDTH/32;
-    constant CC_MAX_SIZE     : natural := 2**log2(4096+12); -- maximum MPS + HDR size
+    -- Code of PCIE_MPS in the format of the CTL_MAX_PAYLOAD_SIZE port.
+    constant PCIE_MPS_CODE   : std_logic_vector(2 downto 0) := std_logic_vector(to_unsigned(log2(PCIE_MPS)-7,3));
+    -- Maximum MPS + HDR size, at least two CC words.
+    constant CC_MAX_SIZE     : natural := max(2*(CC_DATA_WIDTH/8),2**log2(PCIE_MPS+12));
     constant CC_MAX_MI_WORDS : natural := CC_MAX_SIZE/(MI_DATA_WIDTH/8);
     constant CC_MEM_ITEMS    : natural := CC_MAX_SIZE/(CC_DATA_WIDTH/8);
 
     type mi_fsm_t is (ST_IDLE, ST_WRITE, ST_WAIT_FOR_DATA, ST_READ, ST_WAIT_FOR_DRDY, ST_CC_DONE_MTU, ST_ERROR, ST_IGNORE, ST_CC_DONE_LAST);
     type cc_fsm_t is (ST_IDLE, ST_START_READ, ST_READ, ST_ERROR, ST_CC_DONE);
 
+    signal ctl_mps                   : std_logic_vector(2 downto 0);
     signal reg_mps                   : unsigned(12 downto 0);
     signal reg_mps_mi                : unsigned(13-log2(MI_DATA_WIDTH/8)-1 downto 0);
     signal reg_mps_mask              : unsigned(12 downto 0);
@@ -343,14 +352,23 @@ begin
         report "MTC: unsupported ENDPOINT_TYPE (Intel FPGA only)!"
         severity failure;
 
+    assert (PCIE_MPS = 128 or PCIE_MPS = 256 or PCIE_MPS = 512 or PCIE_MPS = 1024 or PCIE_MPS = 2048 or PCIE_MPS = 4096)
+        report "MTC: unsupported PCIE_MPS value!"
+        severity failure;
+
     -- =========================================================================
     --  CONFIGURATION LOGIC AND REGISTERS
     -- =========================================================================
 
+    -- The MPS negotiated with the Root Complex can be larger than the payload size
+    -- this module is dimensioned for, so it is limited from above by PCIE_MPS. An
+    -- undefined value must be left untouched for the decoder below to handle it.
+    ctl_mps <= PCIE_MPS_CODE when (unsigned(CTL_MAX_PAYLOAD_SIZE) > unsigned(PCIE_MPS_CODE)) else CTL_MAX_PAYLOAD_SIZE;
+
     process (CLK)
     begin
         if (rising_edge(CLK)) then
-            case CTL_MAX_PAYLOAD_SIZE is
+            case ctl_mps is
                 when "001"  =>
                     reg_mps      <= to_unsigned(256,reg_mps'length);
                     reg_mps_mask <= to_unsigned(255,reg_mps'length);
