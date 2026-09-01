@@ -803,13 +803,6 @@ begin
         CHECK_CPL_CREDITS          => not DISABLE_STFIFO,
         EXTRA_WORDS                => DOWN_FIFO_ITEMS,
 
-        AUTO_ASSIGN_TAGS           => AUTO_ASSIGN_TAGS,
-
-        DMA_IN_FIFO_ITEMS          => 32,
-
-        PCIE_IN_FIFO_ITEMS         => 32,
-        PCIE_IN_FIFO_AFULL_OFFSET  => 16,
-
         DEVICE                     => DEVICE
     )
     port map (
@@ -826,9 +819,6 @@ begin
         MVB_UP_HDR_OUT_VLD      => tagm_mvb_out_vld,
         MVB_UP_HDR_OUT_SRC_RDY  => tagm_mvb_out_src_rdy,
         MVB_UP_HDR_OUT_DST_RDY  => tagm_mvb_out_dst_rdy,
-
-        TAG_ASSIGN              => TAG_ASSIGN,
-        TAG_ASSIGN_VLD          => TAG_ASSIGN_VLD,
 
         TAG                     => tagm_tag,
         TAG_COMPL_LOW_ADDR      => tagm_tag_compl_low_addr,

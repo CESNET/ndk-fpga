@@ -131,13 +131,6 @@ entity PCIE_TRANSACTION_CTRL is
         -- Each credit represents one available 64B or 128B word in receiving buffer.
         -- The goal is to calculate, whether UP read request's response fits in available words in receiving buffer.
 
-        -- Auto-assign PCIe tags
-        -- true  -> Tag Manager automaticaly generates remapped tags and sends transactions up with these tags.
-        -- false -> Tag Manager receives tags from PCIe endpoint via the TAG_ASSIGN interface.
-        --          (Can only be used on Xilinx FPGAs)
-        -- This option must correspond with the PCIe settings.
-        AUTO_ASSIGN_TAGS    : boolean := true;
-
         -- Enable debug probes
         DBG_ENABLE          : boolean := False;
 
@@ -265,17 +258,12 @@ entity PCIE_TRANSACTION_CTRL is
         DOWN_MFB_DST_RDY : in  std_logic_vector(DMA_PORTS-1 downto 0);
 
         -- ========================================================================
-        -- Tag assigning interface to PCIe endpoint
+        -- Configuration status interface
         -- ========================================================================
 
-        -- Configuration Status Interface
         -- Read completion boundary status ('0' = RCB is 64B, '1' = RCB is 128B)
         RCB_SIZE       : in  std_logic;
 
-        -- PCIe tag assigned to send transaction
-        TAG_ASSIGN          : in  std_logic_vector(MVB_UP_ITEMS*PCIE_TAG_WIDTH-1 downto 0);
-        -- Valid bit for assigned tags
-        TAG_ASSIGN_VLD      : in  std_logic_vector(MVB_UP_ITEMS               -1 downto 0);
         -- The number of currently free PCIE tags (on CLK_DMA)
         PCIE_TAG_STATUS     : out std_logic_vector(11-1 downto 0);
 

@@ -46,12 +46,6 @@ package test;
     parameter DOWN_ASFIFO_ITEMS     = 512;
     parameter DOWN_FIFO_ITEMS       = 512;
 
-    // Auto-assign PCIe tags
-    // true  -> Tag Manager automaticaly generates remapped tags and sends transactions up with these tags.
-    // false -> Tag Manager receives tags from PCIe endpoint via the TAG_ASSIGN interface.
-    //          (Can only be used on Xilinx FPGAs)
-    // This option must correspond with the PCIe settings.
-    parameter AUTO_ASSIGN_TAGS      = 1;
     parameter DEVICE                = "STRATIX10"; // "VIRTEX6", "7SERIES", "ULTRASCALE", "STRATIX10"
     // Connected PCIe endpoint type ("H_TILE" or "P_TILE" or "R_TILE") (only relevant on Intel FPGAs)
     parameter ENDPOINT_TYPE         = "P_TILE";
