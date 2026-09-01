@@ -15,6 +15,7 @@ SETTINGS = {
         "PCIE_DOWN_REGION_SIZE" : "1",
         "PCIE_DOWN_BLOCK_SIZE"  : "8",
         "PCIE_DOWN_ITEM_WIDTH"  : "32",
+        "FAKE_READER"           : "False",
         "PKT_MTU"               : "4096",
         "RESP_IN_ORDER"         : "True",
         "FWFT"                  : "True",
