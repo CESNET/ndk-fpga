@@ -57,6 +57,9 @@ set env(TOPLEVEL) work.[string tolower $SYNTH_FLAGS(MODULE)]
 set env(TOPLEVEL_LANG) vhdl
 set env(COCOTB_RESOLVE_X) "ZEROS"
 set env(PYGPI_PYTHON_BIN) [exec which python]
+if {![catch {eval cocotb-config --pygpi-entry-point} pygpi_entry_point]} {
+    set env(GPI_USERS) "[eval cocotb-config --libpython];$pygpi_entry_point"
+}
 #set env(COCOTB_ATTACH) 1
 #set env(COCOTB_LOG_LEVEL) DEBUG
 
