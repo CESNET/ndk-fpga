@@ -9,7 +9,7 @@ set GEN_ENC_BASE       "$OFM_PATH/comp/base/logic/enc"
 set GEN_NOR_BASE       "$OFM_PATH/comp/base/logic/gen_nor"
 set FIFOXM_BASE        "$OFM_PATH/comp/base/fifo/fifox_multi"
 set TREE_ADDER_BASE    "$OFM_PATH/comp/base/logic/pipe_tree_adder"
-set N_LOOP_OP_BASE     "$OFM_PATH/comp/base/logic/n_loop_op"
+set GEN_LUTRAM_BASE    "$OFM_PATH/comp/base/mem/gen_lutram"
 set SHAKEDOWN_BASE     "$OFM_PATH/comp/mvb_tools/flow/merge_n_to_m"
 
 # Packages
@@ -24,7 +24,7 @@ set COMPONENTS [list \
     [ list "GEN_NOR"         $GEN_NOR_BASE    "FULL" ] \
     [ list "FIFOX_MULTI"     $FIFOXM_BASE     "FULL" ] \
     [ list "PIPE_TREE_ADDER" $TREE_ADDER_BASE "FULL" ] \
-    [ list "N_LOOP_OP"       $N_LOOP_OP_BASE  "FULL" ] \
+    [ list "GEN_LUTRAM"      $GEN_LUTRAM_BASE "FULL" ] \
     [ list "SHAKEDOWN"       $SHAKEDOWN_BASE  "FULL" ] \
     [ list "VHDL_VER_TOOLS" "$OFM_PATH/comp/ver/vhdl_ver_tools/basics" "FULL"] \
 ]

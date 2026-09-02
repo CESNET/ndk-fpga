@@ -336,9 +336,6 @@ architecture USP of PCIE_CORE is
     signal pcie_cc_axi_ready        : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
     signal pcie_rq_axi_ready        : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3 downto 0);
 
-    signal tag_assign_int       : slv_array_t(PCIE_ENDPOINTS -1 downto 0)(16 -1 downto 0);
-    signal tag_assign_vld_int   : slv_array_t(PCIE_ENDPOINTS -1 downto 0)(2 -1 downto 0);
-
     --==============================================================================================
     -- Inserting Debug nets:
     --==============================================================================================
@@ -442,9 +439,6 @@ begin
 
             pcie_clk(i) <= pcie_hip_clk(i);
 
-            TAG_ASSIGN(i)     <= tag_assign_int(i)(RQ_MFB_REGIONS*8 -1 downto 0);
-            TAG_ASSIGN_VLD(i) <= tag_assign_vld_int(i)(RQ_MFB_REGIONS -1 downto 0);
-
             pcie0_g : if (i = 0) generate
                 pcie_i : component pcie4_uscale_plus
                 port map (
@@ -488,10 +482,10 @@ begin
 
                     pcie_rq_seq_num0                  => open,
                     pcie_rq_seq_num_vld0              => open,
-                    pcie_rq_tag0                      => tag_assign_int(i)(7 downto 0),
-                    pcie_rq_tag_vld0                  => tag_assign_vld_int(i)(0),
-                    pcie_rq_tag1                      => tag_assign_int(i)(15 downto 8),
-                    pcie_rq_tag_vld1                  => tag_assign_vld_int(i)(1),
+                    pcie_rq_tag0                      => open,
+                    pcie_rq_tag_vld0                  => open,
+                    pcie_rq_tag1                      => open,
+                    pcie_rq_tag_vld1                  => open,
 
                     pcie_cq_np_req                    => (others => '1'),
                     pcie_cq_np_req_count              => open,
@@ -605,10 +599,10 @@ begin
 
                     pcie_rq_seq_num0                  => open,
                     pcie_rq_seq_num_vld0              => open,
-                    pcie_rq_tag0                      => tag_assign_int(i)(7 downto 0),
-                    pcie_rq_tag_vld0                  => tag_assign_vld_int(i)(0),
-                    pcie_rq_tag1                      => tag_assign_int(i)(15 downto 8),
-                    pcie_rq_tag_vld1                  => tag_assign_vld_int(i)(1),
+                    pcie_rq_tag0                      => open,
+                    pcie_rq_tag_vld0                  => open,
+                    pcie_rq_tag1                      => open,
+                    pcie_rq_tag_vld1                  => open,
 
                     pcie_cq_np_req                    => (others => '1'),
                     pcie_cq_np_req_count              => open,
@@ -705,9 +699,6 @@ begin
 
                 pcie_clk(2*i+j) <= pcie_hip_clk(2*i+j);
 
-                TAG_ASSIGN(2*i+j)     <= tag_assign_int(2*i+j)(RQ_MFB_REGIONS*8 -1 downto 0);
-                TAG_ASSIGN_VLD(2*i+j) <= tag_assign_vld_int(2*i+j)(RQ_MFB_REGIONS -1 downto 0);
-
                 pcie0_i : if (j = 0) generate
                     pcie4_uscale_plus_0_i : component pcie4_uscale_plus
                     port map (
@@ -751,10 +742,10 @@ begin
 
                         pcie_rq_seq_num0                  => open,
                         pcie_rq_seq_num_vld0              => open,
-                        pcie_rq_tag0                      => tag_assign_int(2*i+j)(7 downto 0),
-                        pcie_rq_tag_vld0                  => tag_assign_vld_int(2*i+j)(0),
-                        pcie_rq_tag1                      => tag_assign_int(2*i+j)(15 downto 8),
-                        pcie_rq_tag_vld1                  => tag_assign_vld_int(2*i+j)(1),
+                        pcie_rq_tag0                      => open,
+                        pcie_rq_tag_vld0                  => open,
+                        pcie_rq_tag1                      => open,
+                        pcie_rq_tag_vld1                  => open,
 
                         pcie_cq_np_req                    => (others => '1'),
                         pcie_cq_np_req_count              => open,
@@ -868,10 +859,10 @@ begin
 
                         pcie_rq_seq_num0                  => open,
                         pcie_rq_seq_num_vld0              => open,
-                        pcie_rq_tag0                      => tag_assign_int(2*i+j)(7 downto 0),
-                        pcie_rq_tag_vld0                  => tag_assign_vld_int(2*i+j)(0),
-                        pcie_rq_tag1                      => tag_assign_int(2*i+j)(15 downto 8),
-                        pcie_rq_tag_vld1                  => tag_assign_vld_int(2*i+j)(1),
+                        pcie_rq_tag0                      => open,
+                        pcie_rq_tag_vld0                  => open,
+                        pcie_rq_tag1                      => open,
+                        pcie_rq_tag_vld1                  => open,
 
                         pcie_cq_np_req                    => (others => '1'),
                         pcie_cq_np_req_count              => open,

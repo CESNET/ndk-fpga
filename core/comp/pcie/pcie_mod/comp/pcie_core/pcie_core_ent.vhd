@@ -185,14 +185,6 @@ entity PCIE_CORE is
         CARD_ID             : in slv_array_t(PCIE_ENDPOINTS-1 downto 0)(CARD_ID_WIDTH-1 downto 0);
 
         -- =====================================================================
-        -- PCIe tags interface - Xilinx FPGA Only (PCIE_USER_CLK)
-        -- =====================================================================
-        -- PCIe tag assigned to send transaction
-        TAG_ASSIGN          : out slv_array_t(PCIE_ENDPOINTS-1 downto 0)(RQ_MFB_REGIONS*8-1 downto 0);
-        -- Valid bit for assigned tags
-        TAG_ASSIGN_VLD      : out slv_array_t(PCIE_ENDPOINTS-1 downto 0)(RQ_MFB_REGIONS-1 downto 0) := (others => (others => '0'));
-
-        -- =====================================================================
         -- MI interface (for debugging)
         -- =====================================================================
         MI_CLK             : in  std_logic;

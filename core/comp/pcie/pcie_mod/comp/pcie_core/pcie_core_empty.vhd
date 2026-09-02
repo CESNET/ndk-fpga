@@ -46,7 +46,4 @@ begin
 
     RQ_MFB_DST_RDY      <= (others => '0');
 
-    TAG_ASSIGN          <= (others => (others => '0'));
-    TAG_ASSIGN_VLD      <= (others => (others => '0'));
-
 end architecture;

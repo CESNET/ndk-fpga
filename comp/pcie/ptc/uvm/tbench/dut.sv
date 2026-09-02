@@ -215,7 +215,6 @@ module dut (
         .DOWN_FIFO_ITEMS      (DOWN_FIFO_ITEMS)     ,
         .RQ_TUSER_WIDTH       (uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)),
         .RC_TUSER_WIDTH       (uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)),
-        .AUTO_ASSIGN_TAGS     (AUTO_ASSIGN_TAGS)    ,
         .DEVICE               (DEVICE)              ,
         .ENDPOINT_TYPE        (ENDPOINT_TYPE)
     ) VHDL_DUT_U (
@@ -340,11 +339,9 @@ module dut (
         .DOWN_MFB_SRC_RDY (down_mfb_src_rdy),
         .DOWN_MFB_DST_RDY (down_mfb_dst_rdy),
         //-------------------------------------------------------------------------
-        // Tag assigning interface to PCIe endpoint
+        // Configuration Status Interface
         //-------------------------------------------------------------------------
-        .RCB_SIZE         (RCB_SIZE),
-        .TAG_ASSIGN       (),
-        .TAG_ASSIGN_VLD   ()
+        .RCB_SIZE         (RCB_SIZE)
     );
 
 

@@ -242,14 +242,6 @@ entity PCIE_CTRL is
         DMA_CC_MFB_DST_RDY  : out std_logic_vector(DMA_PORTS-1 downto 0);
 
         -- =====================================================================
-        --  PCIe tags interface - Xilinx FPGA Only (PCIE_CLK)
-        -- =====================================================================
-        -- PCIe tag assigned to send transaction
-        RQ_TAG_ASSIGN       : in  std_logic_vector(RQ_MFB_REGIONS*8-1 downto 0);
-        -- Valid bit for assigned tags
-        RQ_TAG_ASSIGN_VLD   : in  std_logic_vector(RQ_MFB_REGIONS-1 downto 0);
-
-        -- =====================================================================
         -- MI32 interface (MI_CLK)
         --
         -- Root of the MI32 bus tree.
@@ -469,7 +461,6 @@ begin
             MFB_DOWN_ITEM_WIDTH  => RC_MFB_ITEM_WIDTH,
 
             DOWN_FIFO_ITEMS      => 1024,
-            AUTO_ASSIGN_TAGS     => true,
 
             DMA_ROUTE            => DMA_ROUTE,
             DBG_ENABLE           => DEBUG_EN,
@@ -534,8 +525,6 @@ begin
 
             RCB_SIZE           => CTL_RCB_SIZE,
 
-            TAG_ASSIGN         => RQ_TAG_ASSIGN,
-            TAG_ASSIGN_VLD     => RQ_TAG_ASSIGN_VLD,
             PCIE_TAG_STATUS    => PCIE_TAG_STATUS,
 
             DBG_MI_DWR         => mi_sync_dbg_dwr  (DBG_MI_PORTS-1),

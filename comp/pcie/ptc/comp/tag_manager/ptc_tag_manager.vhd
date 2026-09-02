@@ -50,22 +50,6 @@ entity PTC_TAG_MANAGER is
         -- Available space in receiving buffer (in data words) (added to base 64 words available in PCIe core)
         EXTRA_WORDS         : integer := 512;
 
-        -- Auto-assign PCIe tags
-        -- true  -> Tag Manager automaticaly generates remapped tags and sends transactions up with these tags.
-        -- false -> Tag Manager receives tags from PCIe endpoint via the TAG_ASSIGN interface.
-        --          (Can only be used on Xilinx FPGAs)
-        -- This option must correspond with the PCIe settings.
-        AUTO_ASSIGN_TAGS    : boolean := false;
-
-        -- Size of FIFO for saving UP Tags and IDs while waiting for assigned Tag from PCIe endpoint [words]
-        DMA_IN_FIFO_ITEMS   : integer := 16;
-
-        -- Size of FIFO for saving PCIE assigned Tags while waiting for their freeing [words]
-        -- Only used when AUTO_ASSIGN_TAGS is set to true.
-        PCIE_IN_FIFO_ITEMS        : integer := 16;
-        -- Offset for almost full of PCIE assigned tags FIFO [words]
-        PCIE_IN_FIFO_AFULL_OFFSET : integer := 8;
-
         -- Target device
         -- "VIRTEX6", "7SERIES", "ULTRASCALE"
         DEVICE              : string  := "ULTRASCALE"
@@ -103,15 +87,6 @@ entity PTC_TAG_MANAGER is
         MVB_UP_HDR_OUT_SRC_RDY  : out std_logic;
         -- Destination ready for entire UP stream
         MVB_UP_HDR_OUT_DST_RDY  : in  std_logic;
-
-        ---------------------------------------------------------------------------
-        -- Interface to PCIe core tag assign (only used when AUTO_ASSIGN_TAGS is se to false)
-        ---------------------------------------------------------------------------
-
-        -- PCIe tag assigned to send transaction
-        TAG_ASSIGN          : in  std_logic_vector(MVB_UP_ITEMS*PCIE_TAG_WIDTH-1 downto 0);
-        -- Valid bit for assigned tags
-        TAG_ASSIGN_VLD      : in  std_logic_vector(MVB_UP_ITEMS               -1 downto 0);
 
         ---------------------------------------------------------------------------
         -- Interface to MVB DOWN receiving
@@ -190,31 +165,51 @@ architecture FULL of PTC_TAG_MANAGER is
         end if;
     end function;
 
-    function get_pcie_fifoxm_items return integer is
-    begin
-        if (AUTO_ASSIGN_TAGS) then
-            return 2**INTERNAL_PCIE_TAG_WIDTH;      -- enough space for all possible tags
-        else
-            return PCIE_IN_FIFO_ITEMS*MVB_UP_ITEMS; -- user-defined size
-        end if;
-    end function;
+    -- enough space for all possible tags
+    constant PCIE_FIFOXM_ITEMS       : integer := 2**INTERNAL_PCIE_TAG_WIDTH;
+    -- one write port for each possible tag release
+    constant PCIE_FIFOXM_WRITE_PORTS : integer := MVB_DOWN_ITEMS;
+    -- one read port for each possible tag assign
+    constant PCIE_FIFOXM_READ_PORTS  : integer := MVB_UP_ITEMS;
 
-    function get_pcie_fifoxm_write_ports return integer is
+    -- Balanced-tree sum of the items selected by vld: log2(items'length) adder levels
+    -- instead of an items'length-1 deep ripple chain, whatever items'length is.
+    --
+    -- vld must be copied into a local descending variable before it can be indexed. The
+    -- caller passes a logical expression (s1_reg_vld and s1_read_reg) and per the VHDL
+    -- LRM the result of an array logical operator is an anonymous ASCENDING array, it
+    -- does not inherit the "downto" direction of the signals it was computed from.
+    -- Indexing the actual as vld(vld'low+i) would therefore pair element i with lane
+    -- items'length-1-i, so the mask would silently arrive reversed with respect to
+    -- items. A plain positional assignment re-aligns it whatever the actual's direction.
+    function masked_sum (items : u_array_t; vld : std_logic_vector; sum_width : natural) return unsigned is
+        variable vld_n : std_logic_vector(items'length-1 downto 0);
+        variable terms : u_array_t(items'length-1 downto 0)(sum_width-1 downto 0);
+        variable len   : natural := items'length;
     begin
-        if (AUTO_ASSIGN_TAGS) then
-            return MVB_DOWN_ITEMS; -- one for each possible tag release
-        else
-            return MVB_UP_ITEMS;   -- one for each possible tag assign from PCIe endpoint
-        end if;
-    end function;
+        vld_n := vld;
 
-    function get_pcie_fifoxm_read_ports return integer is
-    begin
-        if (AUTO_ASSIGN_TAGS) then
-            return MVB_UP_ITEMS;   -- one for each possible tag assign
-        else
-            return MVB_UP_ITEMS*2; -- one for each possible tag assign in this or the previous tick (on unsuccessful assign)
-        end if;
+        for i in 0 to items'length-1 loop
+            if (vld_n(i) = '1') then
+                terms(i) := resize(items(items'low+i),sum_width);
+            else
+                terms(i) := (others => '0');
+            end if;
+        end loop;
+
+        while (len > 1) loop
+            for i in 0 to len/2-1 loop
+                terms(i) := terms(2*i)+terms(2*i+1);
+            end loop;
+            if (len mod 2 = 1) then
+                terms(len/2) := terms(len-1);
+                len          := len/2+1;
+            else
+                len := len/2;
+            end if;
+        end loop;
+
+        return terms(0);
     end function;
 
     -- CplH credits in PCIe receive buffer
@@ -245,6 +240,15 @@ architecture FULL of PTC_TAG_MANAGER is
 
     constant WORDS_COUNT_WIDTH      : integer := log2(2**DMA_LEN_WIDTH*2-MFB_DOWN_REG_SIZE-MFB_DOWN_REGIONS)+1;
     constant WORDS_COUNT_SUM_WIDTH  : integer := log2(2**WORDS_COUNT_WIDTH*MVB_UP_ITEMS);
+    -- Width of the len+addr add and round_up in s1_reg_pr (see words_u there). The
+    -- rounded-up value is always an exact multiple of 2**MFB_DOWN_WORD_SIZE_WIDTH whose
+    -- shifted-down value is words_u itself, so it fits in this width by the same sizing
+    -- that already guarantees words_u fits in WORDS_COUNT_WIDTH bits (round_up's own
+    -- internal add lands on that same value, so it cannot wrap either). Running the add
+    -- at the full DMA_ADDR_WIDTH (62b) instead only put a wide, mostly unused carry
+    -- chain on the words-budget path: addr contributes just its low
+    -- MFB_DOWN_WORD_SIZE_WIDTH bits, the rest is masked off in the very same expression.
+    constant WORDS_PRE_DIV_WIDTH    : integer := WORDS_COUNT_WIDTH+MFB_DOWN_WORD_SIZE_WIDTH;
 
     -- width of pointer for completion words counting
     constant COMPL_PTR_WIDTH        : integer := log2(2**(DMA_LEN_WIDTH+2)+2**(RCB_SIZE_MAX_WIDTH+2)+1);
@@ -276,7 +280,6 @@ architecture FULL of PTC_TAG_MANAGER is
     ---------------------------------------------------------------------------
 
     -- IN signals to arrays conversion
-    signal tag_assign_arr        : slv_array_t(MVB_UP_ITEMS  -1 downto 0)(INTERNAL_PCIE_TAG_WIDTH -1 downto 0);
     signal mvb_up_hdr_in_arr     : slv_array_t(MVB_UP_ITEMS  -1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
 
     -----------------------
@@ -309,6 +312,12 @@ architecture FULL of PTC_TAG_MANAGER is
     signal s1_hdr_reg           : slv_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_UPHDR_WIDTH-1 downto 0);
     -- maximum number of words in responses for each read
     signal s1_max_words_num_reg : u_array_t(MVB_UP_ITEMS-1 downto 0)(WORDS_COUNT_WIDTH-1 downto 0);
+    -- Masked sum of s1_max_words_num_reg and the same sum increased by the Storage FIFOX
+    -- reserve. Both are computed already in s1_reg_pr, one stage before the sum is needed,
+    -- so that the retimed enough_free_cplh compare in free_cplh_reg_pr reads a plain
+    -- register instead of sitting behind the summation and the increment.
+    signal s1_max_words_sum_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
+    signal s1_max_words_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
 
     -- additional signals for max words counting
     signal s_len_u                : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_LEN_WIDTH-1 downto 0);
@@ -331,6 +340,14 @@ architecture FULL of PTC_TAG_MANAGER is
     -- maximum number of words in responses sum
     signal s2_max_words_sum_num_reg     : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     signal s2_max_words_sum_num_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
+    -- '1' when the group currently held in the s2 register really debits the budget
+    signal s2_debit_vld                 : std_logic;
+    -- Number of UP items in the s2 register that ask for a PCIe Tag. Reading the Tag FIFO
+    -- has to be aligned to its port 0, so its read enables are just a thermometer code of
+    -- this count. Counting the items here instead of compacting them in
+    -- pcie_in_fifo_rd_pr keeps that item-by-item compaction out of the cycle in which the
+    -- read enables already have to cross the FIFO's own shakedown network.
+    signal s2_read_cnt_reg              : unsigned(log2(MVB_UP_ITEMS+1)-1 downto 0);
 
     -- step 3 - reg3, Tag/ID saving FIFO input, free words counting, sending HDR OUT
 
@@ -345,7 +362,10 @@ architecture FULL of PTC_TAG_MANAGER is
 
     -- number of free words in receiving buffers
     signal free_cplh_reg    : unsigned(A_WORDS_WIDTH-1 downto 0);
-    -- enough free words
+    -- Enough free words for one more group of reads. Registered in free_cplh_reg_pr
+    -- instead of being a compare on free_cplh_reg in the same cycle: that compare used
+    -- to sit directly in series with s2_reg_en, which fans out into the whole tag
+    -- shakedown network and into the DMA up-merger FIFO write path.
     signal enough_free_cplh : std_logic;
 
     -- auto-assigned tags from PCIe tag FIFOX Multi distributed to instructions in the s2 register
@@ -359,56 +379,35 @@ architecture FULL of PTC_TAG_MANAGER is
     -- Tag assign input FIFOs
     -----------------------
 
-    -- DMA Tag and ID saving FIFOX_MULTI interface
-    -- Recomendation:
-    -- -- Adjust generic DMA_IN_FIFO_ITEMS so that full is allways 0.
+    -- DMA Tag and ID saving shakedown interface
     -- Warning:
     -- -- Empty should never be 1 when attempting to read!
     -- -- For each assigned PCIe Tag there must allways be a corresponding DMA Tag and ID!
     constant DMA_IN_FIFO_DATA_WIDTH : integer := DMA_TAG_WIDTH+DMA_ID_WIDTH;
     signal   dma_in_fifoxm_di       : std_logic_vector(MVB_UP_ITEMS*DMA_IN_FIFO_DATA_WIDTH-1 downto 0);
     signal   dma_in_fifoxm_wr       : std_logic_vector(MVB_UP_ITEMS-1 downto 0);
-    signal   dma_in_fifoxm_full     : std_logic;
     signal   dma_in_fifoxm_do       : std_logic_vector(MVB_UP_ITEMS*DMA_IN_FIFO_DATA_WIDTH-1 downto 0);
-    signal   dma_in_fifoxm_rd       : std_logic_vector(MVB_UP_ITEMS-1 downto 0) := (others => '0');
     signal   dma_in_fifoxm_empty    : std_logic_vector(MVB_UP_ITEMS-1 downto 0) := (others => '0');
     signal   dma_in_fifoxm_n_empty  : std_logic_vector(MVB_UP_ITEMS-1 downto 0) := (others => '0');
 
     -- Assigned PCIe Tag saving FIFOX_MULTI interface
-    -- When AUTO_ASSIGN_TAGS is false:
-    --     This FIFO only starts filling up when PCIe starts assigning Tags
-    --     before the Tag Manager freed them here.
-    --     Requirement: PCIE_IN_FIFO_ITEMS must be set, so that the FIFO never overflows
-    --     (depends on PCIe endpoint behavior).
     constant PCIE_IN_FIFO_DATA_WIDTH : integer := INTERNAL_PCIE_TAG_WIDTH;
-    signal   pcie_in_fifoxm_di       : std_logic_vector(get_pcie_fifoxm_write_ports*PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
-    signal   pcie_in_fifoxm_wr       : std_logic_vector(get_pcie_fifoxm_write_ports-1 downto 0) := (others => '0');
+    signal   pcie_in_fifoxm_di       : std_logic_vector(PCIE_FIFOXM_WRITE_PORTS*PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
+    signal   pcie_in_fifoxm_wr       : std_logic_vector(PCIE_FIFOXM_WRITE_PORTS-1 downto 0) := (others => '0');
     signal   pcie_in_fifoxm_full     : std_logic := '0';
-    signal   pcie_in_fifoxm_afull    : std_logic;
-    signal   pcie_in_fifoxm_do       : std_logic_vector(get_pcie_fifoxm_read_ports*PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
-    signal   pcie_in_fifoxm_rd       : std_logic_vector(get_pcie_fifoxm_read_ports-1 downto 0);
-    signal   pcie_in_fifoxm_empty    : std_logic_vector(get_pcie_fifoxm_read_ports-1 downto 0);
+    signal   pcie_in_fifoxm_do       : std_logic_vector(PCIE_FIFOXM_READ_PORTS*PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
+    signal   pcie_in_fifoxm_rd       : std_logic_vector(PCIE_FIFOXM_READ_PORTS-1 downto 0);
+    signal   pcie_in_fifoxm_empty    : std_logic_vector(PCIE_FIFOXM_READ_PORTS-1 downto 0);
 
-    signal pcie_in_fifoxm_do_arr  : slv_array_t(get_pcie_fifoxm_read_ports-1 downto 0)(PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
-    signal pcie_in_fifoxm_do_reg  : slv_array_t(get_pcie_fifoxm_read_ports-1 downto 0)(PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
-    signal pcie_in_fifoxm_vld_reg : std_logic_vector(get_pcie_fifoxm_read_ports-1 downto 0);
-
-    -- shift of pcie fifo read based on assign_unsuccess
-    signal pcie_fifo_rd_shift : unsigned(log2(MVB_UP_ITEMS+1)-1 downto 0) := (others => '0');
-
-    -- this pcie fifo output has ordered an assign
-    signal assign_ordered_reg : std_logic_vector(MVB_UP_ITEMS-1 downto 0);
-
-    -- tag requesting for mapping is also being released now
-    signal being_released     : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
-    -- assign unsuccessful flag for each pcie fifo output reg
-    signal assign_unsuccess   : std_logic_vector(MVB_UP_ITEMS-1 downto 0);
+    signal pcie_in_fifoxm_do_arr  : slv_array_t(PCIE_FIFOXM_READ_PORTS-1 downto 0)(PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
+    signal pcie_in_fifoxm_do_reg  : slv_array_t(PCIE_FIFOXM_READ_PORTS-1 downto 0)(PCIE_IN_FIFO_DATA_WIDTH-1 downto 0);
+    signal pcie_in_fifoxm_vld_reg : std_logic_vector(PCIE_FIFOXM_READ_PORTS-1 downto 0);
 
     -- tag auto-assign init counters (used to fill the PCIe Tag FIFOX Multi after reset)
     signal tag_assign_init_cnts : u_array_t(MVB_DOWN_ITEMS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH+1-1 downto 0);
 
-    signal pcie_tag_write      : std_logic_vector(get_pcie_fifoxm_write_ports-1 downto 0);
-    signal pcie_tag_read       : std_logic_vector(get_pcie_fifoxm_read_ports-1 downto 0);
+    signal pcie_tag_write      : std_logic_vector(PCIE_FIFOXM_WRITE_PORTS-1 downto 0);
+    signal pcie_tag_read       : std_logic_vector(PCIE_FIFOXM_READ_PORTS-1 downto 0);
     signal pcie_tag_status_reg : unsigned(11-1 downto 0);
 
     -----------------------
@@ -417,32 +416,32 @@ architecture FULL of PTC_TAG_MANAGER is
     -- Tag mapping logic
     -----------------------
     -- =======================================================
-    -- tag managing N_LOOP_OP unit (contains multiport memory)
+    -- tag mapping bank memory
     -- =======================================================
 
     -- DOWN mapping
     constant TAG_MAP_READ_PORTS  : integer := MVB_DOWN_ITEMS;
-    -- UP for assigning
-    constant TAG_MAP_OPERATORS   : integer := MVB_UP_ITEMS;
-    -- assign
-    constant TAG_MAP_OPERATIONS  : integer := 1;
+    -- one memory bank per UP item
+    constant TAG_MAP_BANKS       : integer := MVB_UP_ITEMS;
     -- Tag+ID
     constant TAG_MAP_DATA_WIDTH  : integer := DMA_TAG_WIDTH+DMA_ID_WIDTH;
-    signal   tag_map_item_sel    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
-    signal   tag_map_ops         : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_OPERATIONS-1 downto 0);
-    signal   tag_map_in_sel      : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
-    signal   tag_map_in_src      : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_OPERATORS-1 downto 0);
-    signal   tag_map_in_ops      : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_OPERATIONS-1 downto 0);
-    signal   tag_map_in_data     : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
-    signal   tag_map_out_data    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
+    -- Number of items of the mapping memory
+    constant TAG_MAP_ITEMS       : integer := 2**INTERNAL_PCIE_TAG_WIDTH;
+    -- Index width of the memory bank that holds the current mapping of a Tag
+    constant TAG_MAP_BANK_W      : integer := max(log2(TAG_MAP_BANKS),1);
+    -- Tag of the mapping to be written and its request, both delayed by one cycle to line
+    -- up with the DMA Tag/ID that dma_in_fifoxm_do presents, see tag_map_wr_reg_pr.
+    signal   tag_map_wr_tag_reg  : slv_array_t(TAG_MAP_BANKS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
+    signal   tag_map_wr_req_reg  : std_logic_vector(TAG_MAP_BANKS-1 downto 0);
+    signal   tag_map_wr_en       : std_logic_vector(TAG_MAP_BANKS-1 downto 0);
+    signal   tag_map_wr_data     : slv_array_t(TAG_MAP_BANKS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
     signal   tag_map_read_addr   : slv_array_t(TAG_MAP_READ_PORTS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0) := (others => (others => '0'));
     signal   tag_map_read_data   : slv_array_t(TAG_MAP_READ_PORTS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0) := (others => (others => '0'));
-
-    -- TAG_MAP_DATA separated
-    signal tag_map_in_data_tag    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_TAG_WIDTH-1 downto 0);
-    signal tag_map_in_data_id     : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_ID_WIDTH-1 downto 0);
-    signal tag_map_out_data_tag   : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_TAG_WIDTH-1 downto 0);
-    signal tag_map_out_data_id    : slv_array_t(TAG_MAP_OPERATORS-1 downto 0)(DMA_ID_WIDTH-1 downto 0);
+    -- Index of the bank that holds the current mapping of each Tag
+    signal   tag_map_bank        : u_array_t(TAG_MAP_ITEMS-1 downto 0)(TAG_MAP_BANK_W-1 downto 0) := (others => (others => '0'));
+    signal   tag_map_bank_reg    : u_array_t(TAG_MAP_READ_PORTS-1 downto 0)(TAG_MAP_BANK_W-1 downto 0) := (others => (others => '0'));
+    signal   tag_map_bank_do_ser : slv_array_t(TAG_MAP_BANKS-1 downto 0)(TAG_MAP_READ_PORTS*TAG_MAP_DATA_WIDTH-1 downto 0);
+    signal   tag_map_bank_do     : slv_array_2d_t(TAG_MAP_BANKS-1 downto 0)(TAG_MAP_READ_PORTS-1 downto 0)(TAG_MAP_DATA_WIDTH-1 downto 0);
 
     -- tag read info register
     signal tag_map_read_tag_reg      : slv_array_t     (MVB_DOWN_ITEMS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0) := (others => (others => '0'));
@@ -451,14 +450,8 @@ architecture FULL of PTC_TAG_MANAGER is
     signal tag_map_read_rel_reg      : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
     signal tag_map_read_reg_vld      : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0) := (others => '0');
 
-    -- valid bit for each tag mapping
-    signal tag_map_vld_reg : std_logic_vector(2**INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
-
-    -- tag assign / release control
-    signal tag_ass_tag   : slv_array_t     (MVB_UP_ITEMS  -1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
-    signal tag_ass_vld   : std_logic_vector(MVB_UP_ITEMS  -1 downto 0);
+    -- tag release control
     signal tag_rel_tag   : slv_array_t     (MVB_DOWN_ITEMS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
-    signal tag_touch_vld : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
     signal tag_rel_vld   : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
 
     -- recently freed words sum counting unit
@@ -527,7 +520,6 @@ begin
 
     in_arr_conv_gen : for i in 0 to MVB_UP_ITEMS-1 generate
         mvb_up_hdr_in_arr(i) <= MVB_UP_HDR_IN(DMA_UPHDR_WIDTH*(i+1)-1 downto DMA_UPHDR_WIDTH*i);
-        tag_assign_arr(i)    <= pcie_tag_ext_to_int(TAG_ASSIGN(PCIE_TAG_WIDTH*(i+1)-1 downto PCIE_TAG_WIDTH*i));
     end generate;
 
     -- -------------------------------------------------------------------------
@@ -558,6 +550,7 @@ begin
         variable len_u           : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_LEN_WIDTH-1 downto 0);        -- length of transaction as unsigned
         variable addr_u          : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_ADDR_WIDTH-1 downto 0);       -- dword address of transaction as unsigned
         variable words_u         : u_array_t(MVB_UP_ITEMS-1 downto 0)(WORDS_COUNT_WIDTH-1 downto 0);    -- complete number of words to reserve for the transaction
+        variable words_sum       : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);                          -- sum of words to reserve for the whole group
         variable l               : line;                                                                -- debug print line
     begin
         if (rising_edge(CLK)) then
@@ -575,7 +568,7 @@ begin
                     len_u(i)  := unsigned(s0_len(i));
                     addr_u(i) := unsigned(s0_addr(i));
 
-                    words_u(i) := resize(enlarge_right(round_up(resize(len_u(i),addr_u(i)'length)+resize(resize(addr_u(i),MFB_DOWN_WORD_SIZE_WIDTH),addr_u(i)'length),MFB_DOWN_WORD_SIZE_WIDTH),-MFB_DOWN_WORD_SIZE_WIDTH),words_u(i)'length);
+                    words_u(i) := resize(enlarge_right(round_up(resize(len_u(i),WORDS_PRE_DIV_WIDTH)+resize(resize(addr_u(i),MFB_DOWN_WORD_SIZE_WIDTH),WORDS_PRE_DIV_WIDTH),MFB_DOWN_WORD_SIZE_WIDTH),-MFB_DOWN_WORD_SIZE_WIDTH),words_u(i)'length);
 
                     -- debug info
                     s_len_u(i)   <= len_u(i);
@@ -598,28 +591,38 @@ begin
                     -- save result
                     s1_max_words_num_reg(i) <= words_u(i);
                 end loop;
+
+                -- Balanced-tree sum (see masked_sum) instead of a ripple accumulation of
+                -- up to MVB_UP_ITEMS-1 back-to-back adders, which used to be done one
+                -- stage later in s2_reg_pr.
+                words_sum            := masked_sum(words_u,s0_vld and s0_read,WORDS_COUNT_SUM_WIDTH);
+                s1_max_words_sum_reg <= words_sum;
+                -- Use a artificially increased sum to create a minimum reserve in Storage FIFOX
+                -- There was a case when the precise counting of credits led to overflow
+                -- I was not able to find out why, so this is just a simple dirty hack.
+                s1_max_words_res_reg <= words_sum+1;
             elsif (s2_reg_en = '1') then
-                s1_reg_vld <= (others => '0');
+                -- The sums cover exactly the items marked by s1_reg_vld, so they must be
+                -- cleared along with it (an empty group sums to zero, hence reserve 1).
+                s1_reg_vld           <= (others => '0');
+                s1_max_words_sum_reg <= (others => '0');
+                s1_max_words_res_reg <= to_unsigned(1,WORDS_COUNT_SUM_WIDTH);
             end if;
 
             if (RESET = '1') then
-                s1_reg_vld <= (others => '0');
+                s1_reg_vld           <= (others => '0');
+                s1_max_words_sum_reg <= (others => '0');
+                s1_max_words_res_reg <= to_unsigned(1,WORDS_COUNT_SUM_WIDTH);
             end if;
         end if;
     end process;
 
-    auto_assign_s1_reg_en_gen : if (AUTO_ASSIGN_TAGS) generate
-        s1_reg_en <= '1' when s2_reg_en = '1' and tag_assign_init_cnts(0)(PCIE_IN_FIFO_DATA_WIDTH) = '1' else '0';
-    end generate;
-
-    no_auto_assign_s1_reg_en_gen : if (not AUTO_ASSIGN_TAGS) generate
-        s1_reg_en <= '1' when s2_reg_en = '1' and pcie_in_fifoxm_afull = '0' else '0';
-    end generate;
+    -- the pipeline may only start once the PCIe Tag FIFOX Multi has been filled with all tags
+    s1_reg_en <= '1' when s2_reg_en = '1' and tag_assign_init_cnts(0)(PCIE_IN_FIFO_DATA_WIDTH) = '1' else '0';
 
     -- step 2 - reg2, words sum, free words counting
 
     s2_reg_pr : process (CLK)
-        variable sum : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     begin
         if (rising_edge(CLK)) then
             if (s2_reg_en = '1') then
@@ -630,26 +633,23 @@ begin
                 s2_hdr_reg           <= s1_hdr_reg;
                 s2_max_words_num_reg <= s1_max_words_num_reg;
 
-                sum := (others => '0');
-                for i in 0 to MVB_UP_ITEMS-1 loop
-                    if (s1_reg_vld(i) = '1' and s1_read_reg(i) = '1') then
-                        sum := sum+s1_max_words_num_reg(i);
-                    end if;
-                end loop;
-                s2_max_words_sum_num_reg     <= sum;
-                -- Use a artificially increased sum to create a minimum reserve in Storage FIFOX
-                -- There was a case when the precise counting of credits led to overflow
-                -- I was not able to find out why, so this is just a simple dirty hack.
-                s2_max_words_sum_num_res_reg <= sum+1;
+                s2_max_words_sum_num_reg     <= s1_max_words_sum_reg;
+                s2_max_words_sum_num_res_reg <= s1_max_words_res_reg;
+                s2_read_cnt_reg              <= to_unsigned(count_ones(s1_reg_vld and s1_read_reg),log2(MVB_UP_ITEMS+1));
             end if;
 
             if (RESET = '1') then
-                s2_reg_vld <= (others => '0');
+                s2_reg_vld      <= (others => '0');
+                s2_read_cnt_reg <= (others => '0');
             end if;
         end if;
     end process;
 
     s2_read_vld <= s2_reg_vld and s2_read_reg;
+
+    -- Mirrors the debit condition of free_cplh_reg_pr below, so that the compare
+    -- retimed into that process uses exactly the same condition.
+    s2_debit_vld <= '1' when (or s2_reg_vld) = '1' and (or s2_read_reg) = '1' else '0';
 
     s2_reg_en <= '1' when s3_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1' and ((or s2_reg_vld) = '0' or enough_free_cplh = '1') else '0';
 
@@ -657,10 +657,18 @@ begin
 
     -- free credits register
     free_cplh_reg_pr : process (CLK)
-        variable l : line; -- debug print line
+        variable l               : line; -- debug print line
+        -- Both candidate next values of free_cplh_reg, computed unconditionally so that
+        -- the retimed enough_free_cplh compare below can reuse them instead of deriving
+        -- the next value of free_cplh_reg a second time.
+        variable v_next_released : unsigned(A_WORDS_WIDTH-1 downto 0);
+        variable v_next_debited  : unsigned(A_WORDS_WIDTH-1 downto 0);
     begin
         if (rising_edge(CLK)) then
-            if (s2_reg_en = '1' and (or s2_reg_vld) = '1' and (or s2_read_reg) = '1') then
+            v_next_released := free_cplh_reg+freed_words_reg;
+            v_next_debited  := v_next_released-resize(s2_max_words_sum_num_reg,A_WORDS_WIDTH);
+
+            if (s2_reg_en = '1' and s2_debit_vld = '1') then
 
                 if (PRINT_WORDS_COUNT_INFO) then
                     write(l,string'("CPLH CHANGE ::"));write(l,now);write(l,string'("::"));write_dec(l,free_cplh_reg);write(l,string'(";"));
@@ -671,7 +679,7 @@ begin
                     writeline(output,l);
                 end if;
 
-                free_cplh_reg <= free_cplh_reg+freed_words_reg-resize(s2_max_words_sum_num_reg,A_WORDS_WIDTH);
+                free_cplh_reg <= v_next_debited;
             else
 
                 if (PRINT_WORDS_COUNT_INFO) then
@@ -682,17 +690,32 @@ begin
                     end if;
                 end if;
 
-                free_cplh_reg <= free_cplh_reg+freed_words_reg;
+                free_cplh_reg <= v_next_released;
+            end if;
+
+            -- enough_free_cplh for the next cycle, that is what the compare
+            -- "free_cplh_reg >= s2_max_words_sum_num_res_reg" evaluates to once both of
+            -- its operands reach the values computed here and in s2_reg_pr. The branches
+            -- mirror which candidate value each of the two registers really takes, so
+            -- this is a retiming of the compare across the register that already
+            -- separates this cycle from the next one, not an added pipeline stage -
+            -- s2_reg_en keeps its bubble-free enable-chain semantics.
+            if (CHECK_CPL_CREDITS = false) then
+                enough_free_cplh <= '1';
+            elsif (s2_reg_en = '1' and s2_debit_vld = '1') then
+                enough_free_cplh <= '1' when v_next_debited >= s1_max_words_res_reg else '0';
+            elsif (s2_reg_en = '1') then
+                enough_free_cplh <= '1' when v_next_released >= s1_max_words_res_reg else '0';
+            else
+                enough_free_cplh <= '1' when v_next_released >= s2_max_words_sum_num_res_reg else '0';
             end if;
 
             if (RESET = '1') then
-                free_cplh_reg <= to_unsigned(AVAILABLE_WORDS,A_WORDS_WIDTH);
+                free_cplh_reg    <= to_unsigned(AVAILABLE_WORDS,A_WORDS_WIDTH);
+                enough_free_cplh <= '1';
             end if;
         end if;
     end process;
-
-    -- is there enough space for reservation
-    enough_free_cplh <= '1' when free_cplh_reg >= s2_max_words_sum_num_res_reg or CHECK_CPL_CREDITS = false else '0';
 
     -- in DMA FIFO input register
     s3_reg_pr : process (CLK)
@@ -703,7 +726,7 @@ begin
                 s3_tag_reg           <= s2_tag_reg;
                 s3_id_reg            <= s2_id_reg;
                 s3_max_words_num_reg <= s2_max_words_num_reg;
-            elsif (dma_in_fifoxm_full = '0') then
+            else
                 s3_reg_vld <= (others => '0');
             end if;
 
@@ -713,49 +736,35 @@ begin
         end if;
     end process;
 
-    s3_reg_en <= '1' when dma_in_fifoxm_full = '0' and ((not AUTO_ASSIGN_TAGS) or auto_assign_rdy = '1') else '0';
+    s3_reg_en <= auto_assign_rdy;
 
-    auto_assign_hdr_out_gen : if (AUTO_ASSIGN_TAGS) generate
-
-        -- tags distribution from PCIe tag FIFOX Multi
-        pcie_tags_dist_pr : process (s2_read_vld,pcie_in_fifoxm_do_arr,pcie_in_fifoxm_empty)
-            variable rd_ptr : integer := 0;
-        begin
-            auto_assigned_tags <= (others => (others => '0'));
-            auto_assign_rdy    <= '1';
-            rd_ptr             := 0;
-            for i in 0 to MVB_UP_ITEMS-1 loop
-                if (s2_read_vld(i) = '1') then
-                    if (pcie_in_fifoxm_empty(i) = '1') then -- There is not enough PCIe tags to assign -> stop the pipeline
-                        auto_assign_rdy <= '0';
-                    end if;
-                    auto_assigned_tags(i) <= pcie_in_fifoxm_do_arr(rd_ptr);
-                    rd_ptr                := rd_ptr+1;
+    -- tags distribution from PCIe tag FIFOX Multi
+    pcie_tags_dist_pr : process (s2_read_vld,pcie_in_fifoxm_do_arr,pcie_in_fifoxm_empty)
+        variable rd_ptr : integer := 0;
+    begin
+        auto_assigned_tags <= (others => (others => '0'));
+        auto_assign_rdy    <= '1';
+        rd_ptr             := 0;
+        for i in 0 to MVB_UP_ITEMS-1 loop
+            if (s2_read_vld(i) = '1') then
+                if (pcie_in_fifoxm_empty(i) = '1') then -- There is not enough PCIe tags to assign -> stop the pipeline
+                    auto_assign_rdy <= '0';
                 end if;
-            end loop;
-        end process;
+                auto_assigned_tags(i) <= pcie_in_fifoxm_do_arr(rd_ptr);
+                rd_ptr                := rd_ptr+1;
+            end if;
+        end loop;
+    end process;
 
-        -- HDR OUT sending
-        hdr_out_gen_pr : process (s2_hdr_reg,auto_assigned_tags,s2_reg_vld)
-        begin
-            for i in 0 to MVB_UP_ITEMS-1 loop
-                MVB_UP_HDR_OUT(DMA_UPHDR_WIDTH*(i+1)-1 downto DMA_UPHDR_WIDTH*i) <= s2_hdr_reg(i);
-                MVB_UP_TAG_OUT((i+1)*PCIE_TAG_WIDTH-1 downto i*PCIE_TAG_WIDTH)   <= pcie_tag_int_to_ext(auto_assigned_tags(i));
-                MVB_UP_HDR_OUT_VLD(i)                                            <= s2_reg_vld(i);
-            end loop;
-        end process;
-
-    end generate;
-
-    no_auto_assign_hdr_out_gen : if (not AUTO_ASSIGN_TAGS) generate
-
-        -- HDR OUT sending
-        hdr_out_gen : for i in 0 to MVB_UP_ITEMS-1 generate
+    -- HDR OUT sending
+    hdr_out_gen_pr : process (s2_hdr_reg,auto_assigned_tags,s2_reg_vld)
+    begin
+        for i in 0 to MVB_UP_ITEMS-1 loop
             MVB_UP_HDR_OUT(DMA_UPHDR_WIDTH*(i+1)-1 downto DMA_UPHDR_WIDTH*i) <= s2_hdr_reg(i);
-            MVB_UP_HDR_OUT_VLD(i)                                            <= '1' when s2_reg_vld(i) = '1' else '0';
-        end generate;
-
-    end generate;
+            MVB_UP_TAG_OUT((i+1)*PCIE_TAG_WIDTH-1 downto i*PCIE_TAG_WIDTH)   <= pcie_tag_int_to_ext(auto_assigned_tags(i));
+            MVB_UP_HDR_OUT_VLD(i)                                            <= s2_reg_vld(i);
+        end loop;
+    end process;
 
     MVB_UP_HDR_OUT_SRC_RDY <= '1' when (or s2_reg_vld) = '1' and s3_reg_en = '1' and enough_free_cplh = '1' else '0';
 
@@ -770,73 +779,26 @@ begin
         dma_in_fifoxm_wr(i)                                                              <= s3_reg_vld(i);
     end generate;
 
-    auto_assign_fake_dma_fifoxm_gen : if (AUTO_ASSIGN_TAGS) generate
+    dma_in_shakedown_i : entity work.SHAKEDOWN
+    generic map (
+        INPUTS     => MVB_UP_ITEMS,
+        OUTPUTS    => MVB_UP_ITEMS,
+        DATA_WIDTH => DMA_IN_FIFO_DATA_WIDTH,
+        OUTPUT_REG => true
+    )
+    port map (
+        CLK      => CLK,
+        RESET    => RESET,
 
-        dma_in_shakedown_i : entity work.SHAKEDOWN
-        generic map (
-            INPUTS     => MVB_UP_ITEMS,
-            OUTPUTS    => MVB_UP_ITEMS,
-            DATA_WIDTH => DMA_IN_FIFO_DATA_WIDTH,
-            OUTPUT_REG => true
-        )
-        port map (
-            CLK      => CLK,
-            RESET    => RESET,
+        DIN      => dma_in_fifoxm_di,
+        DIN_VLD  => dma_in_fifoxm_wr,
 
-            DIN      => dma_in_fifoxm_di,
-            DIN_VLD  => dma_in_fifoxm_wr,
+        DOUT     => dma_in_fifoxm_do,
+        DOUT_VLD => dma_in_fifoxm_n_empty
+    );
 
-            DOUT     => dma_in_fifoxm_do,
-            DOUT_VLD => dma_in_fifoxm_n_empty
-        );
-
-        fake_dma_fifo_empty_full_gen : for i in 0 to MVB_UP_ITEMS-1 generate
-            dma_in_fifoxm_empty(i) <= not dma_in_fifoxm_n_empty(i);
-        end generate;
-        dma_in_fifoxm_full <= '0';
-
-    end generate;
-
-    no_auto_assign_dma_fifoxm_gen : if (not AUTO_ASSIGN_TAGS) generate
-
-        dma_in_fifoxm_i : entity work.FIFOX_MULTI
-        generic map (
-            DATA_WIDTH          => DMA_IN_FIFO_DATA_WIDTH,
-            ITEMS               => DMA_IN_FIFO_ITEMS*MVB_UP_ITEMS,
-
-            WRITE_PORTS         => MVB_UP_ITEMS,
-            READ_PORTS          => MVB_UP_ITEMS,
-            RAM_TYPE            => "AUTO",
-            DEVICE              => DEVICE,
-            SAFE_READ_MODE      => false,
-            ALMOST_FULL_OFFSET  => 0,
-            ALMOST_EMPTY_OFFSET => 0,
-            ALLOW_SINGLE_FIFO   => false -- This FIFO must not have a lower latency than pcie_in_fifoxm
-        )
-        port map (
-            CLK    => CLK,
-            RESET  => RESET,
-
-            DI     => dma_in_fifoxm_di,
-            WR     => dma_in_fifoxm_wr,
-            FULL   => dma_in_fifoxm_full,
-            AFULL  => open,
-
-            DO     => dma_in_fifoxm_do,
-            RD     => dma_in_fifoxm_rd,
-            EMPTY  => dma_in_fifoxm_empty,
-            AEMPTY => open
-        );
-
-        -- DMA in FIFO read by tag map unit
-        dma_fifo_rd_gen : for i in 0 to MVB_UP_ITEMS-1 generate
-            dma_in_fifoxm_rd(i) <= '1' when pcie_in_fifoxm_rd(i) = '1' and pcie_in_fifoxm_empty(i) = '0' else '0';
-
-            -- check reading from empty fifo
-            -- psl assert_in_fifo_underflow :
-            --      assert always ((dma_in_fifoxm_rd(i)='1' and dma_in_fifoxm_empty(i)='1')=false) @rising_edge(CLK)
-            --      report "Reading from empty FIFO! Invalid state in this case!";
-        end generate;
+    dma_in_empty_gen : for i in 0 to MVB_UP_ITEMS-1 generate
+        dma_in_fifoxm_empty(i) <= not dma_in_fifoxm_n_empty(i);
     end generate;
 
     -- -------------------------------------------------------------------------
@@ -845,56 +807,46 @@ begin
     -- PCIe assign Tag saving FIFO
     -- -------------------------------------------------------------------------
 
-    auto_assign_pcie_in_fifoxm_in_gen : if (AUTO_ASSIGN_TAGS) generate
-
-        -- these counters fill the PCIe tag FIFOX Multi with all possible tags after reset
-        tag_assign_init_cnts_pr : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                for i in 0 to MVB_DOWN_ITEMS-1 loop
-                    if (tag_assign_init_cnts(i)(INTERNAL_PCIE_TAG_WIDTH) = '0' and (or tag_rel_vld) = '0') then
-                        tag_assign_init_cnts(i) <= tag_assign_init_cnts(i)+MVB_DOWN_ITEMS;
-                    end if;
-                end loop;
-
-                if (RESET = '1') then
-                    for i in 0 to MVB_DOWN_ITEMS-1 loop
-                        tag_assign_init_cnts(i) <= to_unsigned(i,INTERNAL_PCIE_TAG_WIDTH+1);
-                    end loop;
+    -- these counters fill the PCIe tag FIFOX Multi with all possible tags after reset
+    tag_assign_init_cnts_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to MVB_DOWN_ITEMS-1 loop
+                if (tag_assign_init_cnts(i)(INTERNAL_PCIE_TAG_WIDTH) = '0' and (or tag_rel_vld) = '0') then
+                    tag_assign_init_cnts(i) <= tag_assign_init_cnts(i)+MVB_DOWN_ITEMS;
                 end if;
+            end loop;
+
+            if (RESET = '1') then
+                for i in 0 to MVB_DOWN_ITEMS-1 loop
+                    tag_assign_init_cnts(i) <= to_unsigned(i,INTERNAL_PCIE_TAG_WIDTH+1);
+                end loop;
             end if;
-        end process;
+        end if;
+    end process;
 
-        -- after initial filling the FIFOX Multi is given every freed PCIe tag
-        pcie_in_fifoxm_in_gen : for i in 0 to MVB_DOWN_ITEMS-1 generate
-            pcie_in_fifoxm_di((i+1)*PCIE_IN_FIFO_DATA_WIDTH-1 downto i*PCIE_IN_FIFO_DATA_WIDTH)
-                                   <= tag_rel_tag(i) -- tag release has priority
-                                 when (or tag_rel_vld) = '1' else
-                                 std_logic_vector(tag_assign_init_cnts(i)(PCIE_IN_FIFO_DATA_WIDTH-1 downto 0));
-            pcie_in_fifoxm_wr(i)   <= tag_rel_vld(i) -- tag release has priority
-                                 when (or tag_rel_vld) = '1' else
-                                 (not tag_assign_init_cnts(i)(PCIE_IN_FIFO_DATA_WIDTH));
-        end generate;
-    end generate;
-
-    no_auto_assign_pcie_in_fifoxm_in_gen : if (not AUTO_ASSIGN_TAGS) generate
-        no_auto_assign_pcie_in_fifoxm_di_gen : for i in 0 to MVB_UP_ITEMS-1 generate
-            pcie_in_fifoxm_di((i+1)*INTERNAL_PCIE_TAG_WIDTH-1 downto i*INTERNAL_PCIE_TAG_WIDTH) <= pcie_tag_ext_to_int(TAG_ASSIGN((i+1)*PCIE_TAG_WIDTH-1 downto i*PCIE_TAG_WIDTH));
-        end generate;
-        pcie_in_fifoxm_wr <= TAG_ASSIGN_VLD;
+    -- after initial filling the FIFOX Multi is given every freed PCIe tag
+    pcie_in_fifoxm_in_gen : for i in 0 to MVB_DOWN_ITEMS-1 generate
+        pcie_in_fifoxm_di((i+1)*PCIE_IN_FIFO_DATA_WIDTH-1 downto i*PCIE_IN_FIFO_DATA_WIDTH)
+                               <= tag_rel_tag(i) -- tag release has priority
+                             when (or tag_rel_vld) = '1' else
+                             std_logic_vector(tag_assign_init_cnts(i)(PCIE_IN_FIFO_DATA_WIDTH-1 downto 0));
+        pcie_in_fifoxm_wr(i)   <= tag_rel_vld(i) -- tag release has priority
+                             when (or tag_rel_vld) = '1' else
+                             (not tag_assign_init_cnts(i)(PCIE_IN_FIFO_DATA_WIDTH));
     end generate;
 
     pcie_in_fifoxm_i : entity work.FIFOX_MULTI
     generic map (
         DATA_WIDTH          => PCIE_IN_FIFO_DATA_WIDTH,
-        ITEMS               => get_pcie_fifoxm_items*get_pcie_fifoxm_write_ports,
+        ITEMS               => PCIE_FIFOXM_ITEMS*PCIE_FIFOXM_WRITE_PORTS,
 
-        WRITE_PORTS         => get_pcie_fifoxm_write_ports,
-        READ_PORTS          => get_pcie_fifoxm_read_ports,
+        WRITE_PORTS         => PCIE_FIFOXM_WRITE_PORTS,
+        READ_PORTS          => PCIE_FIFOXM_READ_PORTS,
         RAM_TYPE            => "AUTO",
         DEVICE              => DEVICE,
         SAFE_READ_MODE      => false,
-        ALMOST_FULL_OFFSET  => PCIE_IN_FIFO_AFULL_OFFSET,
+        ALMOST_FULL_OFFSET  => 0,
         ALMOST_EMPTY_OFFSET => 0,
         ALLOW_SINGLE_FIFO   => false,
         FIFOX_MULTI_ARCH    => "SHAKEDOWN"
@@ -906,7 +858,7 @@ begin
         DI     => pcie_in_fifoxm_di,
         WR     => pcie_in_fifoxm_wr,
         FULL   => pcie_in_fifoxm_full,
-        AFULL  => pcie_in_fifoxm_afull,
+        AFULL  => open,
 
         DO     => pcie_in_fifoxm_do,
         RD     => pcie_in_fifoxm_rd,
@@ -915,7 +867,7 @@ begin
     );
 
     -- check writing in full fifo
-    pcie_fifo_write_check : for i in 0 to MVB_UP_ITEMS-1 generate
+    pcie_fifo_write_check : for i in 0 to PCIE_FIFOXM_WRITE_PORTS-1 generate
         -- psl assert_fifo_owerflow :
         --      assert always (not (pcie_in_fifoxm_wr(i)='1' and pcie_in_fifoxm_full='1')) abort (RESET) @rising_edge(CLK)
         --      report "Writing in full FIFO! Invalid state in this case!";
@@ -929,8 +881,8 @@ begin
     begin
         if (rising_edge(CLK)) then
             v_pcie_tag_status   := pcie_tag_status_reg;
-            v_pcie_tag_status   := v_pcie_tag_status + to_unsigned(count_ones(pcie_tag_write), log2(get_pcie_fifoxm_write_ports+1));
-            v_pcie_tag_status   := v_pcie_tag_status - to_unsigned(count_ones(pcie_tag_read), log2(get_pcie_fifoxm_read_ports+1));
+            v_pcie_tag_status   := v_pcie_tag_status + to_unsigned(count_ones(pcie_tag_write), log2(PCIE_FIFOXM_WRITE_PORTS+1));
+            v_pcie_tag_status   := v_pcie_tag_status - to_unsigned(count_ones(pcie_tag_read), log2(PCIE_FIFOXM_READ_PORTS+1));
             pcie_tag_status_reg <= v_pcie_tag_status;
 
             if (RESET = '1') then
@@ -941,25 +893,22 @@ begin
 
     PCIE_TAG_STATUS <= std_logic_vector(pcie_tag_status_reg);
 
-    pcie_in_fifoxm_out_reg_gen : if (AUTO_ASSIGN_TAGS) generate
-
-        pcie_in_fifoxm_do_arr_gen : for i in 0 to MVB_UP_ITEMS-1 generate
-            pcie_in_fifoxm_do_arr(i) <= pcie_in_fifoxm_do((i+1)*INTERNAL_PCIE_TAG_WIDTH-1 downto i*INTERNAL_PCIE_TAG_WIDTH);
-        end generate;
-
-        -- Tag FIFOX Multi output register
-        pcie_in_fifoxm_out_reg_pr : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                pcie_in_fifoxm_do_reg  <= pcie_in_fifoxm_do_arr;
-                pcie_in_fifoxm_vld_reg <= pcie_in_fifoxm_rd;
-
-                if (RESET = '1') then
-                    pcie_in_fifoxm_vld_reg <= (others => '0');
-                end if;
-            end if;
-        end process;
+    pcie_in_fifoxm_do_arr_gen : for i in 0 to MVB_UP_ITEMS-1 generate
+        pcie_in_fifoxm_do_arr(i) <= pcie_in_fifoxm_do((i+1)*INTERNAL_PCIE_TAG_WIDTH-1 downto i*INTERNAL_PCIE_TAG_WIDTH);
     end generate;
+
+    -- Tag FIFOX Multi output register
+    pcie_in_fifoxm_out_reg_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            pcie_in_fifoxm_do_reg  <= pcie_in_fifoxm_do_arr;
+            pcie_in_fifoxm_vld_reg <= pcie_in_fifoxm_rd;
+
+            if (RESET = '1') then
+                pcie_in_fifoxm_vld_reg <= (others => '0');
+            end if;
+        end if;
+    end process;
 
     -- -------------------------------------------------------------------------
 
@@ -967,195 +916,112 @@ begin
     -- PCIe assign Tag saving FIFO reading
     -- -------------------------------------------------------------------------
 
-    assign_ordered_reg_pr : process (CLK)
+    -- The FIFOX Multi is read (shaken down) based on the content and enable of the s2 register
+    pcie_in_fifo_rd_pr : process (all)
+    begin
+        pcie_in_fifoxm_rd <= (others => '0');
+        -- thermometer code of the number of requesting items, see s2_read_cnt_reg
+        if (s2_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1') then
+            for i in 0 to MVB_UP_ITEMS-1 loop
+                if (i < to_integer(s2_read_cnt_reg)) then
+                    pcie_in_fifoxm_rd(i) <= '1';
+                end if;
+            end loop;
+        end if;
+    end process;
+
+    -- -------------------------------------------------------------------------
+
+    -- -------------------------------------------------------------------------
+    -- Tags mapping bank memory
+    -- -------------------------------------------------------------------------
+
+    -- The mapping is only ever overwritten, never read-modify-written, and a PCIe Tag is
+    -- assigned by exactly one UP item at a time. It is therefore a plain memory with one
+    -- bank (and so one write port) per UP item, instead of the N_LOOP_OP operator
+    -- machinery used before. That halves the number of read ports of the underlying
+    -- LUTRAMs and, more importantly, splits the read into a bank select and a memory read
+    -- that no longer share a cycle.
+
+    -- The write is one cycle behind the Tag read out of the Tag FIFO, which is when the
+    -- matching DMA Tag/ID appears on dma_in_fifoxm_do. This is the same offset the
+    -- N_LOOP_OP operator interface had between OP_ITEM_SEL and OP_IN_SEL.
+    tag_map_wr_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            for i in 0 to MVB_UP_ITEMS-1 loop
-                assign_ordered_reg(i) <= not pcie_in_fifoxm_empty(to_integer(pcie_fifo_rd_shift)+i);
-            end loop;
+            tag_map_wr_tag_reg <= pcie_in_fifoxm_do_reg;
+            tag_map_wr_req_reg <= pcie_in_fifoxm_vld_reg;
 
             if (RESET = '1') then
-                assign_ordered_reg <= (others => '0');
+                tag_map_wr_req_reg <= (others => '0');
             end if;
         end if;
     end process;
 
-    -- first unsuccessful assign detection
-    pcie_in_fifo_rd_pr : process (all)
-        variable rd_ptr : integer := 0;
-    begin
-        pcie_fifo_rd_shift <= (others => '0');
-        pcie_in_fifoxm_rd  <= (others => '0');
-        if ((not AUTO_ASSIGN_TAGS)) then                                                            -- this logic only applies when recieving tags from PCIe endpoint
-            -- first 1 detection
-            for i in 0 to MVB_UP_ITEMS-1 loop
-                exit when (assign_unsuccess(i) = '1' or assign_ordered_reg(i) = '0');
-                pcie_fifo_rd_shift   <= to_unsigned(i+1,log2(MVB_UP_ITEMS+1));
-                pcie_in_fifoxm_rd(i) <= '1';
-            end loop;
-        else                                                                                        -- with auto-assigned tags the FIFOX Multi is read based on the content and enable of the s2 register
-            -- shakedown
-            rd_ptr := 0;
-            for i in 0 to MVB_UP_ITEMS-1 loop
-                if (s2_read_vld(i) = '1' and s2_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1') then
-                    pcie_in_fifoxm_rd(rd_ptr) <= '1';
-                    rd_ptr                    := rd_ptr+1;
-                end if;
-            end loop;
-        end if;
-    end process;
-
-    being_released_det_pr : process (tag_rel_tag,tag_map_in_sel,tag_rel_vld)
-    begin
-        being_released <= (others => '0');
-        -- detect if this tag is being released right now
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            for e in 0 to MVB_DOWN_ITEMS-1 loop
-                if (tag_rel_tag(e) = tag_map_in_sel(i) and tag_rel_vld(e) = '1') then
-                    being_released(i) <= '1';
-                end if;
-            end loop;
-        end loop;
-    end process;
-
-    -- successful assign detection
-    ass_succ_pr : process (tag_map_in_ops,tag_map_in_src,tag_map_vld_reg,tag_map_in_sel,being_released)
-        variable tag_map_in_prev : boolean_vector(MVB_UP_ITEMS-1 downto 0);
-    begin
-        assign_unsuccess <= (others => '0');
-
-        if (not AUTO_ASSIGN_TAGS) then -- This logic only applies when the unit is not auto-assigning tags
-            for i in 0 to MVB_UP_ITEMS-1 loop
-                for e in 0 to MVB_UP_ITEMS-1 loop
-
-                    -- ((    assign ordered    ) and (ordered from this interface))
-                    if (tag_map_in_ops(e)(0) = '1' and    tag_map_in_src(e)(i) = '1'  ) then
-
-                        -- ((                           not free                       ))
-                        if (tag_map_vld_reg(to_integer(unsigned(tag_map_in_sel(e)))) = '1') then
-
-                            assign_unsuccess(i) <= '1';
-
-                        --    ((not the first interface) and (        ordered from some previous interface        ))
-                        elsif (i > 0            and tag_map_in_src(e)(i-1 downto 0) /= (i-1 downto 0 => '0')) then
-
-                            assign_unsuccess(i) <= '1';
-
-                        end if;
-
-                    end if;
-
-                end loop;
-            end loop;
-        end if;
-    end process;
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Tags mapping N_LOOP_OP unit
-    -- -------------------------------------------------------------------------
-
-    tags_map_n_loop_i : entity work.N_LOOP_OP
-    generic map (
-        DATA_WIDTH     => TAG_MAP_DATA_WIDTH,
-        ITEMS          => 2**INTERNAL_PCIE_TAG_WIDTH,
-        RESET_VAL      => 0,
-        READ_PORTS     => TAG_MAP_READ_PORTS,
-
-        OPERATORS      => TAG_MAP_OPERATORS,
-        OPERATIONS     => TAG_MAP_OPERATIONS,
-
-        DEVICE         => DEVICE
-    )
-    port map (
-        CLK            => CLK,
-        RESET          => RESET,
-
-        OP_ITEM_SEL    => tag_map_item_sel,
-        OP_OPERATIONS  => tag_map_ops,
-
-        OP_IN_SEL      => tag_map_in_sel,
-        OP_IN_SRC      => tag_map_in_src,
-        OP_IN_OPS      => tag_map_in_ops,
-        OP_IN_DATA     => tag_map_in_data,
-
-        OP_OUT_DATA    => tag_map_out_data,
-
-        READ_ADDR      => tag_map_read_addr,
-        READ_DATA      => tag_map_read_data
-    );
-
-    -- operation set
-    tag_map_pr : process (all)
-        variable ops_i_shift : integer := 0;
-    begin
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            if (not AUTO_ASSIGN_TAGS) then
-                tag_map_item_sel(i) <= pcie_in_fifoxm_do(INTERNAL_PCIE_TAG_WIDTH*(to_integer(pcie_fifo_rd_shift)+i+1)-1 downto INTERNAL_PCIE_TAG_WIDTH*(to_integer(pcie_fifo_rd_shift)+i));
-                tag_map_ops(i)      <= (others => '0');
-                tag_map_ops(i)(0)   <= (not pcie_in_fifoxm_empty(to_integer(pcie_fifo_rd_shift)+i));
-            else
-                tag_map_item_sel(i) <= pcie_in_fifoxm_do_reg(i);
-                tag_map_ops(i)      <= (others => '0');
-                tag_map_ops(i)(0)   <= pcie_in_fifoxm_vld_reg(i);
-            end if;
-        end loop;
-    end process;
-
-    -- in data separation
-    tag_map_in_data_sep_gen : for i in 0 to TAG_MAP_OPERATORS-1 generate
-        tag_map_in_data_tag(i)   <= tag_map_in_data(i)(DMA_TAG_WIDTH+DMA_ID_WIDTH-1 downto DMA_ID_WIDTH);
-        tag_map_in_data_id(i)    <= tag_map_in_data(i)(DMA_ID_WIDTH-1 downto 0           );
+    tag_map_wr_g : for i in 0 to TAG_MAP_BANKS-1 generate
+        -- dma_in_fifoxm_do carries the DMA Tag and ID in the order the mapping stores
+        -- them, see dma_in_fifo_input_gen and tag_map_read_pr.
+        tag_map_wr_data(i) <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*(i+1)-1 downto DMA_IN_FIFO_DATA_WIDTH*i);
+        -- write only when there really is an instruction waiting for the Tag
+        tag_map_wr_en(i)   <= tag_map_wr_req_reg(i) and not dma_in_fifoxm_empty(i);
     end generate;
 
-    -- operators
-    tag_map_operators_pr : process (all)
-    begin
-        for i in 0 to TAG_MAP_OPERATORS-1 loop
-            tag_map_out_data_tag(i)   <= tag_map_in_data_tag(i);
-            tag_map_out_data_id(i)    <= tag_map_in_data_id(i);
-        end loop;
+    -- Each bank is read by all DOWN items and the read lands in the LUTRAM's own output
+    -- register, so nothing else shares the cycle with the memory read.
+    tag_map_bank_g : for i in 0 to TAG_MAP_BANKS-1 generate
+        tag_map_lutram_i : entity work.GEN_LUTRAM
+        generic map (
+            DATA_WIDTH         => TAG_MAP_DATA_WIDTH,
+            ITEMS              => TAG_MAP_ITEMS,
+            RD_PORTS           => TAG_MAP_READ_PORTS,
+            RD_LATENCY         => 1,
+            WRITE_USE_RD_ADDR0 => false,
+            -- A Completion cannot arrive in the same cycle in which the request it
+            -- belongs to is being assigned its Tag, so no read ever hits the address
+            -- being written and Quartus does not have to constrain that path.
+            MLAB_CONSTR_RDW_DC => false,
+            DEVICE             => DEVICE
+        )
+        port map (
+            CLK     => CLK,
+            WR_EN   => tag_map_wr_en(i),
+            WR_ADDR => tag_map_wr_tag_reg(i),
+            WR_DATA => tag_map_wr_data(i),
+            RD_ADDR => slv_array_ser(tag_map_read_addr),
+            RD_DATA => tag_map_bank_do_ser(i)
+        );
 
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            tag_ass_tag(i) <= tag_map_in_sel(i);
-            if (tag_map_in_ops(i)(0) = '1') then
-                if (AUTO_ASSIGN_TAGS) then
-                    if (dma_in_fifoxm_empty(i) = '0') then                                                                                                               -- there is a valid instruction waiting
-                        tag_map_out_data_tag(i) <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*i+DMA_TAG_WIDTH+DMA_ID_WIDTH-1 downto DMA_IN_FIFO_DATA_WIDTH*i+DMA_ID_WIDTH);
-                        tag_map_out_data_id(i)  <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*i              +DMA_ID_WIDTH-1 downto DMA_IN_FIFO_DATA_WIDTH*i             );
-                    end if;
-                else
-                    if (pcie_in_fifoxm_rd(i) = '1') then                                                                                                                 -- all up to here can be assigned
-                        tag_map_out_data_tag(i) <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*i+DMA_TAG_WIDTH+DMA_ID_WIDTH-1 downto DMA_IN_FIFO_DATA_WIDTH*i+DMA_ID_WIDTH);
-                        tag_map_out_data_id(i)  <= dma_in_fifoxm_do(DMA_IN_FIFO_DATA_WIDTH*i              +DMA_ID_WIDTH-1 downto DMA_IN_FIFO_DATA_WIDTH*i             );
-                    end if;
+        tag_map_bank_do(i) <= slv_array_deser(tag_map_bank_do_ser(i),TAG_MAP_READ_PORTS);
+    end generate;
+
+    -- Which bank holds the current mapping of each Tag. Only one UP item can hold a given
+    -- Tag, so the writes below never target the same item in the same cycle.
+    tag_map_bank_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to TAG_MAP_BANKS-1 loop
+                if (tag_map_wr_en(i) = '1') then
+                    tag_map_bank(to_integer(unsigned(tag_map_wr_tag_reg(i)))) <= to_unsigned(i,TAG_MAP_BANK_W);
                 end if;
-            end if;
-        end loop;
+            end loop;
+        end if;
     end process;
 
-    tag_ass_vld_p : process (all)
+    -- The bank select is read in parallel with the memories and registered next to their
+    -- output registers, so the wide select over tag_map_bank does not sit in series with
+    -- the memory read. Both see the same content, because a write in a given cycle
+    -- reaches both of them at its end.
+    tag_map_bank_sel_pr : process (CLK)
     begin
-        for i in 0 to MVB_UP_ITEMS-1 loop
-            tag_ass_vld(i) <= '0';
-            if (tag_map_in_ops(i)(0) = '1') then
-                if (AUTO_ASSIGN_TAGS) then
-                    if (dma_in_fifoxm_empty(i) = '0') then -- there is a valid instruction waiting
-                        tag_ass_vld(i) <= '1';
-                    end if;
-                else
-                    if (pcie_in_fifoxm_rd(i) = '1') then   -- all up to here can be assigned
-                        tag_ass_vld(i) <= '1';
-                    end if;
-                end if;
-            end if;
-        end loop;
+        if (rising_edge(CLK)) then
+            for i in 0 to TAG_MAP_READ_PORTS-1 loop
+                tag_map_bank_reg(i) <= tag_map_bank(to_integer(unsigned(tag_map_read_addr(i))));
+            end loop;
+        end if;
     end process;
 
-    -- out data merge
-    tag_map_out_data_merge_gen : for i in 0 to TAG_MAP_OPERATORS-1 generate
-        tag_map_out_data(i) <= tag_map_out_data_tag(i) & tag_map_out_data_id(i);
+    tag_map_read_data_g : for i in 0 to TAG_MAP_READ_PORTS-1 generate
+        tag_map_read_data(i) <= tag_map_bank_do(to_integer(tag_map_bank_reg(i)))(i);
     end generate;
 
     -- tag map read
@@ -1183,44 +1049,8 @@ begin
         end if;
     end process;
 
-    tag_rel_tag   <= tag_map_read_tag_reg;
-    tag_touch_vld <= tag_map_read_reg_vld;
-    tag_rel_vld   <= tag_map_read_rel_reg;
-
-    -- -------------------------------------------------------------------------
-
-    -- -------------------------------------------------------------------------
-    -- Tag assign / release
-    -- -------------------------------------------------------------------------
-
-    tag_map_vld_gen : if (not AUTO_ASSIGN_TAGS) generate -- only when receiving tags for PCIe endpoint
-        -- tag map valid register fields
-        tag_map_vld_reg_pr : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                -- release
-                for i in 0 to MVB_DOWN_ITEMS-1 loop
-                    if (tag_touch_vld(i) = '1') then
-                        if (tag_rel_vld(i) = '1') then
-                            tag_map_vld_reg(to_integer(unsigned(tag_rel_tag(i)))) <= '0';
-                        end if;
-                    end if;
-                end loop;
-
-                -- assign
-                for i in 0 to MVB_UP_ITEMS-1 loop
-                    if (tag_ass_vld(i) = '1') then
-                        tag_map_vld_reg      (to_integer(unsigned(tag_ass_tag(i)))) <= '1';
-                    end if;
-                end loop;
-
-                -- reset
-                if (RESET = '1') then
-                    tag_map_vld_reg <= (others => '0');
-                end if;
-            end if;
-        end process;
-    end generate;
+    tag_rel_tag <= tag_map_read_tag_reg;
+    tag_rel_vld <= tag_map_read_rel_reg;
 
     -- -------------------------------------------------------------------------
 

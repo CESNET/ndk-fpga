@@ -349,8 +349,6 @@ architecture FULL of PCIE is
     signal core_cc_mfb_eof_pos     : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(CC_MFB_REGIONS*max(1,log2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE))-1 downto 0);
     signal core_cc_mfb_src_rdy     : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal core_cc_mfb_dst_rdy     : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
-    signal core_rq_tag_assign      : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(CORE_RQ_MFB_REGIONS*8-1 downto 0);
-    signal core_rq_tag_assign_vld  : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(CORE_RQ_MFB_REGIONS-1 downto 0);
 
     signal mi_dbg_split_dwr        : slv_array_t     (MI_SPLIT_PORTS-1 downto 0)(32-1 downto 0);
     signal mi_dbg_split_addr       : slv_array_t     (MI_SPLIT_PORTS-1 downto 0)(32-1 downto 0);
@@ -469,9 +467,6 @@ begin
         RQ_MFB_EOF_POS      => core_rq_mfb_eof_pos,
         RQ_MFB_SRC_RDY      => core_rq_mfb_src_rdy,
         RQ_MFB_DST_RDY      => core_rq_mfb_dst_rdy,
-
-        TAG_ASSIGN          => core_rq_tag_assign,
-        TAG_ASSIGN_VLD      => core_rq_tag_assign_vld,
 
         MI_CLK              => MI_CLK,
         MI_RESET            => MI_RESET,
@@ -638,9 +633,6 @@ begin
             DMA_CC_MFB_EOF_POS  => DMA_CC_MFB_EOF_POS(DPE),
             DMA_CC_MFB_SRC_RDY  => DMA_CC_MFB_SRC_RDY(DPE),
             DMA_CC_MFB_DST_RDY  => DMA_CC_MFB_DST_RDY(DPE),
-
-            RQ_TAG_ASSIGN       => core_rq_tag_assign(i),
-            RQ_TAG_ASSIGN_VLD   => core_rq_tag_assign_vld(i),
 
             MI_DWR              => MI_DWR (i),
             MI_ADDR             => MI_ADDR(i),

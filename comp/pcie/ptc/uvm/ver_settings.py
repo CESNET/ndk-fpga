@@ -21,7 +21,6 @@ SETTINGS = {
         "DEVICE"               : "\\\"STRATIX10\\\""    ,
         "CLK_PERIOD"           : "2.22222222ns"         ,
         "CLK_DMA_PERIOD"       : "5ns"                  ,
-        "AUTO_ASSIGN_TAGS"     : "1"                    ,
         "RCB_SIZE"             : "1'b0"                 ,
         "TR_MIN"               : "100"                  ,
         "TR_MAX"               : "300"                  ,
