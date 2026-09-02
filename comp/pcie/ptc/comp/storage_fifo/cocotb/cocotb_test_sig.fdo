@@ -1,0 +1,18 @@
+# cocotb_test_sig.fdo : Include file with signals
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /ptc_storage_fifo/*
+add_wave -group {RX_MVB} -noupdate -hex /ptc_storage_fifo/RX_MVB_*
+add_wave -group {RX_MFB} -noupdate -hex /ptc_storage_fifo/RX_MFB_*
+add_wave -group {TX_MVB} -noupdate -hex /ptc_storage_fifo/TX_MVB_*
+add_wave -group {TX_MFB} -noupdate -hex /ptc_storage_fifo/TX_MFB_*
+add_wave -group {COMPACTOR} -noupdate -hex /ptc_storage_fifo/input_mfb_compactor_i/*
+add_wave -group {MFB_FIFOX} -noupdate -hex /ptc_storage_fifo/main_mfb_storage_fifo_i/*
+
+config wave -signalnamewidth 1
