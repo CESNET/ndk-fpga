@@ -9,29 +9,47 @@ from os import system
 from importlib.machinery import SourceFileLoader
 import time
 import os.path as op
+import xml.etree.ElementTree as ET
 from multi_ver_utils import reduce_combinations, create_setting_from_combination
 
 FAIL = False
 
 
-def junit(testResults: str, allowEmptyResults: bool = False) -> bool:
-    if not op.exists(testResults):
-        if allowEmptyResults:
-            return True
-        else:
-            return False
+def parse_results(results_file: str = "results.xml") -> dict:
+    """Parse a cocotb JUnit XML results file.
 
-    if op.getsize(testResults) == 0:
-        if allowEmptyResults:
-            return True
-        else:
-            return False
+    Returns a dict with keys: passed (bool), num_tests (int),
+    num_failed (int), seed (str or None).
 
-    results_file = open(testResults, "r")
-    results = results_file.read()
-    results_file.close()
+    A missing or empty results file is treated as a failure.
+    """
+    result = {"passed": False, "num_tests": 0, "num_failed": 0, "seed": None}
 
-    return False if "failure" in results else True
+    if not op.exists(results_file) or op.getsize(results_file) == 0:
+        return result
+
+    try:
+        tree = ET.parse(results_file)
+    except ET.ParseError:
+        return result
+
+    for ts in tree.iter("testsuite"):
+        for prop in ts.iter("property"):
+            if prop.get("name") == "random_seed":
+                result["seed"] = prop.get("value")
+
+        for tc in ts.iter("testcase"):
+            result["num_tests"] += 1
+            for _ in tc.iter("failure"):
+                result["num_failed"] += 1
+                break  # count at most one failure per testcase
+            else:
+                for _ in tc.iter("error"):
+                    result["num_failed"] += 1
+                    break  # count at most one error per testcase
+
+    result["passed"] = result["num_tests"] > 0 and result["num_failed"] == 0
+    return result
 
 
 def find_venv() -> str | None:
@@ -68,10 +86,7 @@ def run_modelsim(settings: dict, test_name: str, venv: str | None = None, gui=Fa
 
     system(command)
 
-    #process = sp.Popen('grep -i "FAIL=0" transcript', shell=True, stdout=sp.PIPE, stderr=sp.PIPE)
-    #stdout, stderr = process.communicate()
-
-    return junit(testResults="results.xml", allowEmptyResults=True)
+    return parse_results()
 
 ##########
 # Parsing script arguments
@@ -171,7 +186,7 @@ if args.setting is None and args.test_name is None:
             result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{key}", venv=venv, cocotb_testcase=args.cocotb_testcase)
             vsim_time_stop = time.time()
             time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
-            if result: # detect failure
+            if result["passed"]:
                 print(f"Run SUCCEEDED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
             else:
                 print(f"Run FAILED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
@@ -199,7 +214,7 @@ else:
     print("Running combination: " + " ".join(test_setings))
     if (not args.dry_run):
         result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{test_name}", venv=venv, gui=(not args.command_line), cocotb_testcase=args.cocotb_testcase)
-        if result: # detect failure
+        if result["passed"]:
             print("Run SUCCEEDED (" + " ".join(test_setings) + ")")
         else:
             print("Run FAILED (" + " ".join(test_setings) + ")")
