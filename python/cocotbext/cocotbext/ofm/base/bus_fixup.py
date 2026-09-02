@@ -111,7 +111,6 @@ if cocotb.__version__ >= "2.0.0":
 
         def _unprime(self):
             self._can_fire.discard(self)
-            super()._unprime()
 
         @classmethod
         def _distribute_callback(cls, trigger: "_EdgeProxyBase", callback: Callable):
