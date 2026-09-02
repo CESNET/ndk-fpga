@@ -285,6 +285,10 @@ architecture FULL of PCIE is
     constant CORE_RC_MFB_REGIONS : natural := core_regions_f(RC_MFB_REGIONS);
     constant RESET_WIDTH         : natural := 6;
     constant BAR_APERTURE        : natural := 26;
+    -- Maximum payload size (in bytes) used by the MTC for its completions.
+    -- A larger payload makes no sense for MI transactions and it only enlarges
+    -- the completion buffer inside the MTC.
+    constant MTC_PCIE_MPS        : natural := 256;
 
     -- One PCIe Core and PCIE_ENDPOINTS * PCIe Ctrl
     constant MI_SPLIT_PORTS        : natural := 1 + PCIE_ENDPOINTS;
@@ -536,6 +540,7 @@ begin
             DBG_ENABLE          => PCIE_CTRL_DBG_ENABLE,
             PTC_DISABLE         => PTC_DISABLE,
             DMA_BAR_ENABLE      => DMA_BAR_ENABLE,
+            MTC_PCIE_MPS        => MTC_PCIE_MPS,
             ENDPOINT_TYPE       => PCIE_ENDPOINT_TYPE,
             DMA_ROUTE           => PCIE_DMA_ROUTE,
             DEVICE              => DEVICE

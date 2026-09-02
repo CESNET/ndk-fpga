@@ -6,6 +6,7 @@
 
 # Paths to components
 set ASYNC_RESET_BASE   "$OFM_PATH/comp/base/async/reset"
+set BUS_HANDSHAKE_BASE "$OFM_PATH/comp/base/async/bus_handshake"
 set PCI_EXT_CAP_BASE   "$OFM_PATH/comp/pcie/common"
 set PCIE_COMP_BASE     "$ENTITY_BASE/../"
 set STREAMING_DBG_BASE "$OFM_PATH/comp/debug/streaming_debug"
@@ -37,8 +38,9 @@ if {$ARCHGRP == "P_TILE"} {
     lappend COMPONENTS [ list "PCIE_CII2CFG" "$PCIE_COMP_BASE/pcie_cii2cfg" "FULL" ]
     lappend MOD "$ENTITY_BASE/pcie_core_ptile.vhd"
 } elseif {$ARCHGRP == "R_TILE"} {
-    lappend COMPONENTS [ list "PCIE_CII2CFG" "$PCIE_COMP_BASE/pcie_cii2cfg" "FULL" ]
-    lappend COMPONENTS [ list "PCIE_CRDT"    "$PCIE_COMP_BASE/pcie_crdt"    "FULL" ]
+    lappend COMPONENTS [ list "PCIE_CII2CFG"        "$PCIE_COMP_BASE/pcie_cii2cfg" "FULL" ]
+    lappend COMPONENTS [ list "PCIE_CRDT"           "$PCIE_COMP_BASE/pcie_crdt"    "FULL" ]
+    lappend COMPONENTS [ list "ASYNC_BUS_HANDSHAKE" $BUS_HANDSHAKE_BASE            "FULL" ]
     lappend MOD "$ENTITY_BASE/pcie_core_rtile.vhd"
 } elseif {$ARCHGRP == "H_TILE"} {
     lappend MOD "$ENTITY_BASE/pcie_core_htile.vhd"

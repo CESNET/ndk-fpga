@@ -13,6 +13,12 @@ proc do_rtile_pcie_gen5_2x8 {pci_vendor_id pci_device_id usr_clkfreq} {
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_0_k_cii_addr_size0_attr_user_hwtcl} {767}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_0_k_cii_pf_en0_attr_user_hwtcl} {1}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_0_k_cii_start_addr0_attr_user_hwtcl} {3328}
+    # CII range 1 covers the PCI Express Capability Structure of PF0 (byte 0x70 - 0x9F),
+    # which is snooped in pcie_core_rtile.vhd to get the values negotiated with the Root
+    # Complex (MPS, MRRS, Ext Tag Enable, RCB, 10-bit Tag Requester Enable).
+    set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_1_k_cii_addr_size1_attr_user_hwtcl} {48}
+    set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_1_k_cii_pf_en1_attr_user_hwtcl} {1}
+    set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_1_k_cii_start_addr1_attr_user_hwtcl} {112}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_enable_cii_hwtcl} {1}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_pf0_bar0_address_width_user_hwtcl} {26}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_pf0_bar0_type_user_hwtcl} {64-bit non-prefetchable memory}
@@ -59,6 +65,12 @@ proc do_rtile_pcie_common {} {
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_0_k_cii_addr_size0_attr_user_hwtcl} {767}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_0_k_cii_pf_en0_attr_user_hwtcl} {1}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_0_k_cii_start_addr0_attr_user_hwtcl} {3328}
+    # CII range 1 covers the PCI Express Capability Structure of PF0 (byte 0x70 - 0x9F),
+    # which is snooped in pcie_core_rtile.vhd to get the values negotiated with the Root
+    # Complex (MPS, MRRS, Ext Tag Enable, RCB, 10-bit Tag Requester Enable).
+    set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_1_k_cii_addr_size1_attr_user_hwtcl} {48}
+    set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_1_k_cii_pf_en1_attr_user_hwtcl} {1}
+    set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_1_k_cii_start_addr1_attr_user_hwtcl} {112}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_enable_cii_hwtcl} {1}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_pf0_bar0_address_width_user_hwtcl} {26}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_pf0_bar0_type_user_hwtcl} {64-bit non-prefetchable memory}

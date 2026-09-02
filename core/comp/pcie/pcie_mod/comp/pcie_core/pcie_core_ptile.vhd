@@ -305,6 +305,12 @@ architecture PTILE of PCIE_CORE is
 
     constant VSEC_BASE_ADDRESS : integer := 16#D00#;
     constant PCIE_EPS_INST     : natural := tsel(ENDPOINT_MODE = 0,PCIE_CONS,2*PCIE_CONS);
+    -- Unlike MPS, MRRS, Ext Tag Enable and RCB, the 10-bit Tag Requester Enable bit is
+    -- not multiplexed onto the tl_cfg bus at any address, so it is shadow-decoded from
+    -- the CfgWr traffic seen on the CII, see std_cap_snoop_p below. This is the DW
+    -- address of the Device Control 2/Status 2 register in the PCI Express Capability
+    -- Structure of PF0.
+    constant STD_CAP_DEVCTL2   : natural := 16#98#/4;
 
     signal pcie_reset_status_n      : std_logic_vector(PCIE_EPS_INST-1 downto 0);
     signal pcie_reset_status        : std_logic_vector(PCIE_EPS_INST-1 downto 0);
@@ -342,10 +348,8 @@ architecture PTILE of PCIE_CORE is
     signal pcie_cfg_pf0_sel         : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_cfg_reg0_sel        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_cfg_reg2_sel        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
-    signal pcie_cfg_reg21_sel       : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_cfg_reg0_en         : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal pcie_cfg_reg2_en         : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
-    signal pcie_cfg_reg21_en        : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
 
     signal pcie_cii_hdr_poisoned    : std_logic_vector(PCIE_EPS_INST-1 downto 0);
     signal pcie_cii_override_en     : std_logic_vector(PCIE_EPS_INST-1 downto 0) := (others => '0');
@@ -871,14 +875,12 @@ begin
         pcie_cfg_pf0_sel(i)   <= '1' when (unsigned(pcie_cfg_func(i)) = 0) else '0';
         pcie_cfg_reg0_sel(i)  <= '1' when (unsigned(pcie_cfg_addr(i)) = 0) else '0';
         pcie_cfg_reg2_sel(i)  <= '1' when (unsigned(pcie_cfg_addr(i)) = 2) else '0';
-        pcie_cfg_reg21_sel(i) <= '1' when (unsigned(pcie_cfg_addr(i)) = 21) else '0';
 
         process (pcie_clk(i))
         begin
             if (rising_edge(pcie_clk(i))) then
                 pcie_cfg_reg0_en(i)  <= pcie_cfg_reg0_sel(i) and pcie_cfg_pf0_sel(i);
                 pcie_cfg_reg2_en(i)  <= pcie_cfg_reg2_sel(i) and pcie_cfg_pf0_sel(i);
-                pcie_cfg_reg21_en(i) <= pcie_cfg_reg21_sel(i) and pcie_cfg_pf0_sel(i);
                 pcie_cfg_data_reg(i) <= pcie_cfg_data(i);
             end if;
         end process;
@@ -894,8 +896,25 @@ begin
                 if (pcie_cfg_reg2_en(i) = '1') then
                     PCIE_RCB_SIZE(i) <= pcie_cfg_data_reg(i)(14);
                 end if;
-                if (pcie_cfg_reg21_en(i) = '1') then
-                    PCIE_10B_TAG_REQ_EN(i) <= pcie_cfg_data_reg(i)(14);
+            end if;
+        end process;
+
+        -- Passive CII write-snoop of the Device Control 2 register (see STD_CAP_DEVCTL2).
+        -- It only observes the CfgWr traffic that is already decoded by the
+        -- PCIE_CII2CFG_EXT instance below and it never drives CFG_EXT_READ_DV or the CII
+        -- override, so a CfgRd of this register is still answered by the Hard IP itself.
+        -- It is a real hardened register, unlike the VSEC in PCI_EXT_CAP.
+        std_cap_snoop_p : process (pcie_clk(i))
+            variable cfg_dw_addr : integer;
+        begin
+            if (rising_edge(pcie_clk(i))) then
+                if (pcie_rst(i)(0) = '1') then
+                    PCIE_10B_TAG_REQ_EN(i) <= '0';
+                elsif (cfg_ext_write(i) = '1') then
+                    cfg_dw_addr := to_integer(unsigned(cfg_ext_register(i)));
+                    if (cfg_dw_addr = STD_CAP_DEVCTL2 and cfg_ext_write_be(i)(1) = '1') then
+                        PCIE_10B_TAG_REQ_EN(i) <= cfg_ext_write_data(i)(12);
+                    end if;
                 end if;
             end if;
         end process;

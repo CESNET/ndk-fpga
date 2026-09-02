@@ -209,7 +209,54 @@ module testbench;
     generate
         // physical endpoints
         for (genvar pcie_connection = 0; pcie_connection < PCIE_CONS; pcie_connection++) begin
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_hip_clk[pcie_connection] = PCIE_USER_CLK;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_hip_clk[pcie_connection]      = PCIE_USER_CLK;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_hip_slow_clk[pcie_connection] = PCIE_USER_CLK;
+        end
+
+        // The PCIe Hard IP is not present in the simulation, so the configuration
+        // written by the Root Complex never appears on the CII. Replay the writes to
+        // the PCI Express Capability Structure that the PCIe core snoops, otherwise
+        // the negotiated values (MPS, MRRS, RCB, ...) stay undefined.
+        for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin : cii_cfg_g
+            logic [10-1 : 0] cii_addr;
+            logic [32-1 : 0] cii_dout;
+            logic [4 -1 : 0] cii_be;
+            logic            cii_req;
+            logic            cii_wr;
+
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cii_req[pcie_e]          = cii_req;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cii_wr[pcie_e]           = cii_wr;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cii_addr[pcie_e]         = cii_addr;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cii_dout[pcie_e]         = cii_dout;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cii_hdr_first_be[pcie_e] = cii_be;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cii_hdr_poisoned[pcie_e] = 1'b0;
+
+            task automatic cii_cfg_write(input logic [10-1 : 0] dw_addr, input logic [32-1 : 0] data);
+                @(posedge PCIE_USER_CLK);
+                cii_addr <= dw_addr;
+                cii_dout <= data;
+                cii_be   <= '1;
+                cii_wr   <= 1'b1;
+                cii_req  <= 1'b1;
+                @(posedge PCIE_USER_CLK);
+                cii_req  <= 1'b0;
+                repeat (8) @(posedge PCIE_USER_CLK);
+            endtask
+
+            initial begin
+                cii_req  = 1'b0;
+                cii_wr   = 1'b0;
+                cii_addr = '0;
+                cii_dout = '0;
+                cii_be   = '0;
+                repeat (16) @(posedge PCIE_USER_CLK);
+                // Device Control: MPS=256B, MRRS=512B, Extended Tag enabled
+                cii_cfg_write(12'h078 >> 2, 32'h00002120);
+                // Link Control: RCB=64B
+                cii_cfg_write(12'h080 >> 2, 32'h00000000);
+                // Device Control 2: 10-bit Tag Requester disabled
+                cii_cfg_write(12'h098 >> 2, 32'h00000000);
+            end
         end
 
         // PCIE endpoints
