@@ -254,12 +254,20 @@ will be broken and the guest PC may get into an unexpected state.</p>
 <td><p>32</p></td>
 <td><p>MI bus: width of address word in bits, must be 32.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mtc-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-pcie_mps"><td><p>PCIE_MPS</p></td>
+<td><p>natural</p></td>
+<td><p>4096</p></td>
+<td><p>Maximum payload size (in bytes) usable by this module. It limits the
+value from the CTL_MAX_PAYLOAD_SIZE port from above and it dimensions
+the buffer for the completion payload. Allowed values: 128, 256, 512,
+1024, 2048 and 4096.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mtc-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>Select correct FPGA device: “ULTRASCALE”, “VERSAL”, “STRATIX10”, “AGILEX”</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mtc-endpoint_type"><td><p>ENDPOINT_TYPE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mtc-endpoint_type"><td><p>ENDPOINT_TYPE</p></td>
 <td><p>string</p></td>
 <td><p>“USP”</p></td>
 <td><p>Intel PCIe endpoint type:</p></td>
