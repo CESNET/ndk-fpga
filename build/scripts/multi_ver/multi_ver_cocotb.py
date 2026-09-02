@@ -7,6 +7,7 @@ import argparse
 import os
 from os import system
 from importlib.machinery import SourceFileLoader
+import shutil
 import time
 import os.path as op
 import xml.etree.ElementTree as ET
@@ -14,8 +15,10 @@ from multi_ver_utils import reduce_combinations, create_setting_from_combination
 
 FAIL = False
 
+RESULTS_FILE = "results.xml"
 
-def parse_results(results_file: str = "results.xml") -> dict:
+
+def parse_results(results_file: str = RESULTS_FILE) -> dict:
     """Parse a cocotb JUnit XML results file.
 
     Returns a dict with keys: passed (bool), num_tests (int),
@@ -87,6 +90,56 @@ def run_modelsim(settings: dict, test_name: str, venv: str | None = None, gui=Fa
     system(command)
 
     return parse_results()
+
+
+def backup_results(test_name: str):
+    """Copy results.xml to results_{test_name}.xml for archival."""
+    if op.exists(RESULTS_FILE):
+        shutil.copy2(RESULTS_FILE, f"results_{test_name}.xml")
+
+
+def print_summary(results_summary: list):
+    """Print a summary table of all combination results.
+
+    Each entry in results_summary is a tuple:
+        (combination_name, result_dict, elapsed_minutes)
+    """
+    if not results_summary:
+        return
+
+    # Determine column widths
+    name_width = max(len(name) for name, _, _ in results_summary)
+    name_width = max(name_width, len("COMBINATION"))
+
+    header_fmt = f" {{:<3}}  {{:<{name_width}}}  {{:<6}}  {{:<5}}  {{:<10}}  {{}}"
+    row_fmt = f" {{:<3}}  {{:<{name_width}}}  {{:<6}}  {{:<5}}  {{:<10}}  {{}}"
+
+    total_width = 3 + 2 + name_width + 2 + 6 + 2 + 5 + 2 + 10 + 2 + 12 + 2
+    sep = "=" * total_width
+
+    print(f"\n{sep}")
+    print(header_fmt.format("#", "COMBINATION", "STATUS", "TESTS", "TIME (min)", "SEED"))
+    print(sep)
+
+    num_passed = 0
+    num_failed = 0
+
+    for idx, (name, result, elapsed) in enumerate(results_summary):
+        status = "PASS" if result["passed"] else "FAIL"
+        tests = result["num_tests"]
+        seed = result["seed"] if result["seed"] is not None else "N/A"
+
+        if result["passed"]:
+            num_passed += 1
+        else:
+            num_failed += 1
+
+        print(row_fmt.format(idx, name, status, tests, f"{elapsed:.2f}", seed))
+
+    total = num_passed + num_failed
+    print(sep)
+    print(f" TOTAL: {total} | PASSED: {num_passed} | FAILED: {num_failed}")
+    print(f"{sep}\n")
 
 ##########
 # Parsing script arguments
@@ -175,6 +228,8 @@ if args.setting is None and args.test_name is None:
     # Run all settings
     ##########
 
+    results_summary = []
+
     for key in COMBINATIONS:
         comb = COMBINATIONS[key]
         SETTING = create_setting_from_combination(SETTINGS, comb)
@@ -186,16 +241,18 @@ if args.setting is None and args.test_name is None:
             result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{key}", venv=venv, cocotb_testcase=args.cocotb_testcase)
             vsim_time_stop = time.time()
             time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
+
+            backup_results(f"{test_name_prefix}{key}")
+            results_summary.append((f"{test_name_prefix}{key}", result, time_vsim_consumption))
+
             if result["passed"]:
                 print(f"Run SUCCEEDED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
             else:
                 print(f"Run FAILED ({test_name_prefix}{key})\n\ttime consumption: {time_vsim_consumption:.2f} min")
                 FAIL = True
 
-        # backup transcript
-        # system("cp transcript transcript_"+"_".join(c))
-        # backup test_pkg
-        # system("cp {} {}_".format(args.test_pkg_file,args.test_pkg_file)+"_".join(c))
+    if not args.dry_run:
+        print_summary(results_summary)
     ##########
 else:
     ##########
