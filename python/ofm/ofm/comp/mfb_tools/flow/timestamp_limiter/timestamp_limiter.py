@@ -24,13 +24,10 @@ class TimestampLimiter(nfb.BaseComp):
     def __init__(self, **kwargs):
         """Constructor"""
 
-        try:
-            super().__init__(**kwargs)
-            self._name = "Timestamp Limiter"
-            if "index" in kwargs:
-                self._name += " " + str(kwargs.get("index"))
-        except Exception:
-            print("Error while opening Timestamp Limiter component!")
+        super().__init__(**kwargs)
+        self._name = "Timestamp Limiter"
+        if "index" in kwargs:
+            self._name += " " + str(kwargs.get("index"))
 
     def print_cfg(self):
         """Print current configuration"""
@@ -62,9 +59,9 @@ class TimestampLimiter(nfb.BaseComp):
             self._comp.write32(self._SEL_QUEUE_REG, cfg["select_queue_bitmap"])
             self._comp.write32(self._TOP_SPEED_REG, cfg["top_speed_en"])
         except Exception:
-            print("{}: Error while writing configuration!".format(self._name))
             # Reset all queues in the default state
             self._comp.write32(self._SEL_QUEUE_REG, 2**32 - 1)
+            raise
 
     def reset(self):
         """Issue a reset for the selected queues"""
