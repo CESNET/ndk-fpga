@@ -202,6 +202,22 @@ To set the auxiliary flags, set the AUXILIARY FLAG (bit number three) to 1 and w
 Auxiliary bits are always set simultaneously, so for data consistency, either store their values (keep them in the memory) or read their values before every change.
 For example, if you're using packet limiting - the LIMITING TYPE flag is set to 1 - and you wish to modify another flag (future versions), make sure you also set the LIMITING TYPE flag to 1 because this single write request will overwrite both bits.
 
+Known limitations
+^^^^^^^^^^^^^^^^^
+
+.. warning::
+    **Mid-packet state transitions (RUN → CONF or RUN → IDLE):**
+    The component does not wait for the current packet to finish before transitioning states.
+    If a state transition occurs while a packet is mid-transfer (between SOF and EOF), the downstream may receive a partial packet with no EOF, corrupting the packet stream.
+    To avoid this, ensure that no packet is actively being transmitted when changing states, or transition from RUN to IDLE first and allow sufficient time for in-flight packets to complete before entering CONFIGURATION.
+
+.. warning::
+    **Speed pointer register is only writable in CONFIGURATION state:**
+    The speed pointer register (0x14) can only be modified via MI writes when the component is in the CONFIGURATION state.
+    In IDLE and RUN states, writes to this register are silently ignored by the hardware.
+    This means that reading speed registers (by setting the pointer and reading the data register) only works correctly in the CONFIGURATION state.
+    In other states, the speed data register always returns the value pointed to by the hardware-managed pointer (the currently active speed).
+
 Notes
 ^^^^^
 

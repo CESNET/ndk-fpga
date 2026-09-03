@@ -12,29 +12,40 @@ class RateLimiter(nfb.BaseComp):
     """Rate Limiter component class
 
     This class mediates the HW component address space and communication protocol.
+
+    Args:
+        mfb_word_width: MFB bus word width in bits (default 512 for 100G, use 2048 for 400G).
+        mfb_regions: Number of MFB regions (default 1 for 100G, use 4 for 400G).
+        **kwargs: Additional arguments passed to nfb.BaseComp.
     """
 
     # DevTree compatible string
     DT_COMPATIBLE = "cesnet,ofm,rate_limiter"
 
     # MI ADDRESS SPACE
-    _REG_STATUS  = 0x00
-    _REG_SEC_LEN = 0x04
-    _REG_INT_LEN = 0x08
-    _REG_INT_CNT = 0x0c
-    _REG_FREQ    = 0x10
-    _REG_SPEED   = 0x14
+    _REG_STATUS    = 0x00
+    _REG_SEC_LEN   = 0x04
+    _REG_INT_LEN   = 0x08
+    _REG_INT_CNT   = 0x0c
+    _REG_FREQ      = 0x10
+    _REG_SPEED_PTR = 0x14
+    _REG_SPEED     = 0x18
 
     # STATUS REGISTER FLAGS
-    _SR_IDLE_FLAG    = 0x01
-    _SR_CONF_FLAG    = 0x02
-    _SR_RUN_FLAG     = 0x04
-    _SR_WR_AUX_FLAG  = 0x08
-    _SR_PTR_RST_FLAG = 0x10
-    _SR_SHAPE_FLAG   = 0x20
+    _SR_IDLE_FLAG   = 0x01  # bit 0
+    _SR_CONF_FLAG   = 0x02  # bit 1
+    _SR_RUN_FLAG    = 0x04  # bit 2
+    _SR_WR_AUX_FLAG = 0x08  # bit 3
+    _SR_SHAPE_FLAG  = 0x10  # bit 4
 
-    def __init__(self, **kwargs):
-        """Constructor"""
+    def __init__(self, mfb_word_width=512, mfb_regions=1, **kwargs):
+        """Constructor
+
+        Args:
+            mfb_word_width: MFB bus word width in bits (100G: 512, 400G: 2048).
+            mfb_regions: Number of MFB regions (100G: 1, 400G: 4).
+            **kwargs: Arguments passed to nfb.BaseComp (dev, node, index, etc.).
+        """
 
         try:
             super().__init__(**kwargs)
@@ -43,6 +54,9 @@ class RateLimiter(nfb.BaseComp):
                 self._name += " " + str(kwargs.get("index"))
         except Exception:
             print("Error while opening Rate Limiter component!")
+
+        self._mfb_word_width = mfb_word_width
+        self._mfb_regions = mfb_regions
 
     def _fix_sec_len(self, orig_speed, sec_len, freq, min_speed):
         """Increase Section length when the speed of the Speed register would be below the limit"""
@@ -54,9 +68,7 @@ class RateLimiter(nfb.BaseComp):
     def _conv_Gbs2Bscn(self, speed, sec_len, freq):
         """Convert Gb/s to B/section"""
 
-        # TODO: automatic setting
-        mfb_word_width = 512 # 100G -> 512, 400G -> 2048
-        min_speed = 1 + 3 * mfb_word_width / 8
+        min_speed = 1 + 3 * self._mfb_word_width / 8
         fixed_sec_len = self._fix_sec_len(speed * 125_000_000, sec_len, freq * 1_000_000, min_speed)
 
         self._comp.write32(self._REG_SEC_LEN, fixed_sec_len)
@@ -77,9 +89,7 @@ class RateLimiter(nfb.BaseComp):
     def _conv_Ps2Pscn(self, speed, sec_len, freq):
         """Convert pkts/s to pkts/section"""
 
-        # TODO: automatic setting
-        mfb_regions = 1 # 100G -> 1, 400G -> 4
-        min_speed = 1 + mfb_regions
+        min_speed = 1 + self._mfb_regions
         fixed_sec_len = self._fix_sec_len(speed, sec_len, freq * 1_000_000, min_speed)
 
         self._comp.write32(self._REG_SEC_LEN, fixed_sec_len)
@@ -106,7 +116,16 @@ class RateLimiter(nfb.BaseComp):
         return self._comp.read32(self._REG_STATUS) & self._SR_SHAPE_FLAG
 
     def print_cfg(self):
-        """Print current configuration"""
+        """Print current configuration
+
+        .. warning::
+            This method writes to the speed pointer register internally.
+            The speed pointer register is only writable in the CONFIGURATION state.
+            In IDLE or RUN states, the pointer writes are ignored by the hardware,
+            and all speed register reads will return the value of the currently
+            active speed register (pointed to by the hardware-managed pointer).
+            For accurate results, call this method only in the CONFIGURATION state.
+        """
 
         try:
             status     = self._comp.read32(self._REG_STATUS)
@@ -126,11 +145,11 @@ class RateLimiter(nfb.BaseComp):
                 limit_s     = "pkts/s"
                 limit_alt_s = "pkts/section"
 
-            speed_reg     = self._REG_SPEED
             output_speeds = []
             alt_speeds    = []
-            while (len(output_speeds) < max_speeds):
-                speed = self._comp.read32(speed_reg)
+            for i in range(max_speeds):
+                self._comp.write32(self._REG_SPEED_PTR, i)
+                speed = self._comp.read32(self._REG_SPEED)
                 valid = speed & (1 << 31)
                 speed &= (1 << 31) - 1
                 if (valid == 0):
@@ -140,7 +159,6 @@ class RateLimiter(nfb.BaseComp):
                 else:
                     output_speeds.append(self._conv_Bscn2Gbs(speed, sec_len, frequency))
                 alt_speeds.append(speed)
-                speed_reg += 4
 
             print("\"{}\"".format(self._name))
             print("Status:          {0:08x} ({1})".format(status, status_s))
@@ -154,7 +172,16 @@ class RateLimiter(nfb.BaseComp):
             print("{}: Error while reading configuration!".format(self._name))
 
     def configure(self, cfg):
-        """Configure component"""
+        """Configure component
+
+        .. warning::
+            If the component is currently in the RUN state with live traffic,
+            calling this method transitions directly to CONFIGURATION state,
+            which immediately blocks the data path. If a packet is mid-transfer,
+            this may result in a partial packet being delivered downstream.
+            For safe reconfiguration during live traffic, call stop_shaping()
+            first and allow sufficient time for in-flight packets to complete.
+        """
 
         try:
             frequency  = self._comp.read32(self._REG_FREQ)
@@ -168,16 +195,15 @@ class RateLimiter(nfb.BaseComp):
 
             max_speeds = self._comp.read32(self._REG_INT_CNT)
             available  = max_speeds
-            speed_reg  = self._REG_SPEED
-            for speed in cfg["output_speed"]:
+            for i, speed in enumerate(cfg["output_speed"]):
                 if (available == 0):
                     print("{0}: Insufficient number of speed regs in the design ({1})! Ignoring speeds over the limit...".format(self._name, max_speeds))
                     break
+                self._comp.write32(self._REG_SPEED_PTR, i)
                 if (cfg["limit_packets"]):
-                    self._comp.write32(speed_reg, self._conv_Ps2Pscn(speed, cfg["section_length"], frequency))
+                    self._comp.write32(self._REG_SPEED, self._conv_Ps2Pscn(speed, cfg["section_length"], frequency))
                 else:
-                    self._comp.write32(speed_reg, self._conv_Gbs2Bscn(speed, cfg["section_length"], frequency))
-                speed_reg += 4
+                    self._comp.write32(self._REG_SPEED, self._conv_Gbs2Bscn(speed, cfg["section_length"], frequency))
                 available -= 1
         except Exception:
             print("{}: Error while writing configuration!".format(self._name))
@@ -187,16 +213,12 @@ class RateLimiter(nfb.BaseComp):
                 auxiliary_flags |= self._SR_SHAPE_FLAG
             self._comp.write32(self._REG_STATUS, (self._SR_WR_AUX_FLAG | auxiliary_flags))
 
-    def start_shaping(self, ptr_reset=False):
+    def start_shaping(self):
         """Start traffic shaping"""
 
-        if (ptr_reset):
-            status = self._comp.read32(self._REG_STATUS)
-            auxiliary_flags = status - (status & (self._SR_WR_AUX_FLAG - 1))
-            self._comp.write32(self._REG_STATUS, (self._SR_WR_AUX_FLAG | auxiliary_flags | self._SR_PTR_RST_FLAG))
         self._comp.write32(self._REG_STATUS, self._SR_RUN_FLAG)
 
     def stop_shaping(self):
-        """Stop traffic shaping"""
+        """Stop traffic shaping (transition to IDLE - full pass-through)"""
 
         self._comp.write32(self._REG_STATUS, 0)
