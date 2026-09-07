@@ -15,6 +15,7 @@ set CORE_COMP_BASE "$OFM_PATH/core/comp"
 
 set ASYNC_RESET_BASE     "$OFM_PATH/comp/base/async/reset"
 set ASYNC_OPEN_LOOP_BASE "$OFM_PATH/comp/base/async/open_loop"
+set ASYNC_HANDSHAKE_BASE "$OFM_PATH/comp/base/async/bus_handshake"
 set TSU_BASE             "$OFM_PATH/comp/tsu/tsu_gen"
 set PCIE_BASE            "$CORE_COMP_BASE/pcie/pcie_mod"
 set DMA_BASE             "$CORE_COMP_BASE/dma/dma_mod"
@@ -62,6 +63,7 @@ if { $ARCHGRP_ARR(APPLICATION_CORE_ENTITY_ONLY) } {
   lappend COMPONENTS [list "SDM_CTRL"        $SDM_CTRL_BASE        $ARCHGRP_ARR(SDM_SYSMON_ARCH)]
   lappend COMPONENTS [list "ASYNC_RESET"     $ASYNC_RESET_BASE     "FULL"                       ]
   lappend COMPONENTS [list "ASYNC_OPEN_LOOP" $ASYNC_OPEN_LOOP_BASE "FULL"                       ]
+  lappend COMPONENTS [list "ASYNC_HANDSHAKE" $ASYNC_HANDSHAKE_BASE "FULL"                       ]
   lappend COMPONENTS [list "TSU"             $TSU_BASE             "FULL"                       ]
   lappend COMPONENTS [list "HWID"            $HWID_BASE            $ARCHGRP_ARR(CLOCK_GEN_ARCH) ]
   lappend COMPONENTS [list "RESET_TREE_GEN"  $RESET_TREE_GEN_BASE  "FULL"                       ]

@@ -206,6 +206,9 @@ begin
         PCIE_USR_CLK   => PCIE_USR_CLK,
         PCIE_USR_RESET => PCIE_USR_RESET,
 
+        PCIE_MPS_DYN   => PCIE_MPS_DYN,
+        PCIE_MRRS_DYN  => PCIE_MRRS_DYN,
+
         RX_USR_MVB_LEN      => dma_rx_usr_mvb_len,
         RX_USR_MVB_HDR_META => dma_rx_usr_mvb_hdr_meta,
         RX_USR_MVB_CHANNEL  => dma_rx_usr_mvb_channel,
