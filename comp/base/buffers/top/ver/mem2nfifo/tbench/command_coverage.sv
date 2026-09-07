@@ -1,7 +1,7 @@
 /*
  * command_coverage: Mem2nFifo Coverage class - transaction coverage
  * Copyright (C) 2008 CESNET
- * Author(s): Marcela Simkov· <xsimko03@stud.fit.vutbr.cz>
+ * Author(s): Marcela Simkov√° <xsimko03@stud.fit.vutbr.cz>
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
