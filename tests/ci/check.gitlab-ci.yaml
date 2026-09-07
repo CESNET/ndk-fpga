@@ -14,7 +14,7 @@ editorconfig:
   stage: check
   needs: []
   image: mstruebing/editorconfig-checker
-  script: [ec]
+  script: [editorconfig-checker]
 
 shebang:
   stage: check
