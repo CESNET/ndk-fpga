@@ -1,7 +1,7 @@
 /*
  * sv_mi32_pkg.sv: SystemVerilog mi32 package
  * Copyright (C) 2008 CESNET
- * Author(s): Petr Kobierský <kobiersky@liberuter.org>
+ * Author(s): Petr KobierskÃ½ <kobiersky@liberuter.org>
  *            Petr Kastovsky <kastovsky@liberuter.org>
  *
  * SPDX-License-Identifier: BSD-3-Clause

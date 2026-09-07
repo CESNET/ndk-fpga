@@ -1,7 +1,7 @@
 /*
  * fl_command_coverage: Frame Link Coverage class - transaction coverage
  * Copyright (C) 2007 CESNET
- * Author(s): Marcela ©imkov· <xsimko03@stud.fit.vutbr.cz>
+ * Author(s): Marcela Simkov√° <xsimko03@stud.fit.vutbr.cz>
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *

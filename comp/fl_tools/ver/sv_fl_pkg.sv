@@ -1,7 +1,7 @@
 /*
  * sv_fl_pkg.sv: SystemVerilog FrameLink package
  * Copyright (C) 2007 CESNET
- * Author(s): Petr Kobierský <kobiersky@liberuter.org>
+ * Author(s): Petr KobierskÃ½ <kobiersky@liberuter.org>
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
