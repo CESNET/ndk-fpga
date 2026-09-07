@@ -47,13 +47,10 @@ class RateLimiter(nfb.BaseComp):
             **kwargs: Arguments passed to nfb.BaseComp (dev, node, index, etc.).
         """
 
-        try:
-            super().__init__(**kwargs)
-            self._name = "Rate Limiter"
-            if "index" in kwargs:
-                self._name += " " + str(kwargs.get("index"))
-        except Exception:
-            print("Error while opening Rate Limiter component!")
+        super().__init__(**kwargs)
+        self._name = "Rate Limiter"
+        if "index" in kwargs:
+            self._name += " " + str(kwargs.get("index"))
 
         self._mfb_word_width = mfb_word_width
         self._mfb_regions = mfb_regions
@@ -127,49 +124,46 @@ class RateLimiter(nfb.BaseComp):
             For accurate results, call this method only in the CONFIGURATION state.
         """
 
-        try:
-            status     = self._comp.read32(self._REG_STATUS)
-            sec_len    = self._comp.read32(self._REG_SEC_LEN)
-            max_speeds = self._comp.read32(self._REG_INT_CNT)
-            frequency  = self._comp.read32(self._REG_FREQ)
+        status     = self._comp.read32(self._REG_STATUS)
+        sec_len    = self._comp.read32(self._REG_SEC_LEN)
+        max_speeds = self._comp.read32(self._REG_INT_CNT)
+        frequency  = self._comp.read32(self._REG_FREQ)
 
-            status_s     = "Idle"
-            if (status & self._SR_CONF_FLAG):
-                status_s = "Configuration"
-            elif (status & self._SR_RUN_FLAG):
-                status_s = "Running traffic shaping"
+        status_s     = "Idle"
+        if (status & self._SR_CONF_FLAG):
+            status_s = "Configuration"
+        elif (status & self._SR_RUN_FLAG):
+            status_s = "Running traffic shaping"
 
-            limit_s      = "Gb/s"
-            limit_alt_s  = "Bytes/section"
+        limit_s      = "Gb/s"
+        limit_alt_s  = "Bytes/section"
+        if (status & self._SR_SHAPE_FLAG):
+            limit_s     = "pkts/s"
+            limit_alt_s = "pkts/section"
+
+        output_speeds = []
+        alt_speeds    = []
+        for i in range(max_speeds):
+            self._comp.write32(self._REG_SPEED_PTR, i)
+            speed = self._comp.read32(self._REG_SPEED)
+            valid = speed & (1 << 31)
+            speed &= (1 << 31) - 1
+            if (valid == 0):
+                break
             if (status & self._SR_SHAPE_FLAG):
-                limit_s     = "pkts/s"
-                limit_alt_s = "pkts/section"
+                output_speeds.append(self._conv_Pscn2Ps(speed, sec_len, frequency))
+            else:
+                output_speeds.append(self._conv_Bscn2Gbs(speed, sec_len, frequency))
+            alt_speeds.append(speed)
 
-            output_speeds = []
-            alt_speeds    = []
-            for i in range(max_speeds):
-                self._comp.write32(self._REG_SPEED_PTR, i)
-                speed = self._comp.read32(self._REG_SPEED)
-                valid = speed & (1 << 31)
-                speed &= (1 << 31) - 1
-                if (valid == 0):
-                    break
-                if (status & self._SR_SHAPE_FLAG):
-                    output_speeds.append(self._conv_Pscn2Ps(speed, sec_len, frequency))
-                else:
-                    output_speeds.append(self._conv_Bscn2Gbs(speed, sec_len, frequency))
-                alt_speeds.append(speed)
-
-            print("\"{}\"".format(self._name))
-            print("Status:          {0:08x} ({1})".format(status, status_s))
-            print("Section length:  {} clock cycles".format(sec_len))
-            print("Interval length: {} sections".format(self._comp.read32(self._REG_INT_LEN)))
-            print("Interval count:  {} intervals".format(max_speeds))
-            print("Frequency:       {} MHz".format(frequency))
-            print("Output speed:    {0} {1}".format(output_speeds, limit_s))
-            print("Output speed:    {0} {1}".format(alt_speeds, limit_alt_s))
-        except Exception:
-            print("{}: Error while reading configuration!".format(self._name))
+        print("\"{}\"".format(self._name))
+        print("Status:          {0:08x} ({1})".format(status, status_s))
+        print("Section length:  {} clock cycles".format(sec_len))
+        print("Interval length: {} sections".format(self._comp.read32(self._REG_INT_LEN)))
+        print("Interval count:  {} intervals".format(max_speeds))
+        print("Frequency:       {} MHz".format(frequency))
+        print("Output speed:    {0} {1}".format(output_speeds, limit_s))
+        print("Output speed:    {0} {1}".format(alt_speeds, limit_alt_s))
 
     def configure(self, cfg):
         """Configure component
@@ -205,8 +199,6 @@ class RateLimiter(nfb.BaseComp):
                 else:
                     self._comp.write32(self._REG_SPEED, self._conv_Gbs2Bscn(speed, cfg["section_length"], frequency))
                 available -= 1
-        except Exception:
-            print("{}: Error while writing configuration!".format(self._name))
         finally:
             auxiliary_flags = 0
             if (cfg["limit_packets"]):

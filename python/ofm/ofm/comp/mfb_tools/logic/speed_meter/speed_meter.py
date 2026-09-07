@@ -35,13 +35,10 @@ class SpeedMeter(nfb.BaseComp):
     def __init__(self, lightweight: bool = False, **kwargs):
         """Constructor"""
 
-        try:
-            super().__init__(**kwargs)
-            self._name = "Speed Meter"
-            if "index" in kwargs:
-                self._name += " " + str(kwargs.get("index"))
-        except Exception as e:
-            print(f"Error while opening Speed Meter component: {e}")
+        super().__init__(**kwargs)
+        self._name = "Speed Meter"
+        if "index" in kwargs:
+            self._name += " " + str(kwargs.get("index"))
 
         self._lightweight = lightweight
 
