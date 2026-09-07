@@ -423,6 +423,7 @@ architecture ETILE of NETWORK_MOD_CORE is
 
     constant MI_ADDR_BASES_PHY      : natural := ETH_PORT_CHAN + tsel(TS_DEMO_EN, 1, 0);
     constant MGMT_OFF               : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0) := X"0004_0000";
+    constant CLK_MASTER_CHANNEL     : natural := 0; -- Select clock master channel
 
     function mi_addr_base_init_phy_f return slv_array_t is
         variable mi_addr_base_var : slv_array_t(MI_ADDR_BASES_PHY-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -500,6 +501,7 @@ architecture ETILE of NETWORK_MOD_CORE is
 
     signal etile_clk_out_vec      : std_logic_vector(ETH_PORT_CHAN-1 downto 0); -- in case of multiple IP cores, only one is chosen
     signal etile_clk_out          : std_logic;                                  -- drives i_clk_rx and i_clk_tx of one or more other IP cores
+    signal etile_clk_stable       : std_logic;
 
     signal tx_avst_data      : std_logic_vector(ETH_PORT_CHAN*AVST_DATA_WIDTH -1 downto 0);
     signal tx_avst_sop       : std_logic_vector(ETH_PORT_CHAN                 -1 downto 0);
@@ -541,6 +543,7 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal rx_block_lock     : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     signal rx_am_lock        : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     signal tx_lanes_stable   : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
+    signal tx_pll_locked     : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
     signal ehip_ready        : std_logic_vector(LANES-1 downto 0);
 
     -- MI_PHY for E-tile reconfiguration interfaces (Ethernet, Transceiver (XCVR), RS-FEC)
@@ -1004,7 +1007,7 @@ begin
             port map (
                 i_stats_snapshot              => '1',
                 o_cdr_lock                    => open,
-                o_tx_pll_locked               => open,
+                o_tx_pll_locked               => tx_pll_locked,
                 -- Eth reconfig inf (0x0)
                 i_eth_reconfig_addr           => eth_inf_addr_phy_res_ser,
                 i_eth_reconfig_read           => eth_inf_rd_phy(0),
@@ -1135,7 +1138,7 @@ begin
             )
             port map (
                 o_cdr_lock                       => open,
-                o_tx_pll_locked                  => open,
+                o_tx_pll_locked                  => tx_pll_locked,
                 -- RS-FEC reconfig inf (0x8)
                 i_rsfec_reconfig_addr            => rsfec_inf_addr_phy_res,
                 i_rsfec_reconfig_read            => rsfec_inf_rd_phy,
@@ -1271,7 +1274,7 @@ begin
             )
             port map (
                 o_cdr_lock                       => open,
-                o_tx_pll_locked                  => open,
+                o_tx_pll_locked                  => tx_pll_locked,
                 i_clk_ref                        => (others => QSFP_REFCLK_P),
                 o_clk_pll_div64                  => etile_clk_out_vec,
                 o_clk_pll_div66                  => open,
@@ -1349,8 +1352,13 @@ begin
     -- =========================================================================
     -- ADAPTERS
     -- =========================================================================
-    etile_clk_out <= etile_clk_out_vec(0);
-    CLK_ETH       <= etile_clk_out;
+    etile_clk_out    <= etile_clk_out_vec(CLK_MASTER_CHANNEL);
+    etile_clk_stable <= tx_pll_locked(CLK_MASTER_CHANNEL);
+    CLK_ETH          <= etile_clk_out;
+    -- TODO: It would be a good idea to assign CLK_STABLE, however this has currently unwanted
+    -- side effects in NETWORK_MOD: it clears the RX MAC Lite statistics and desynchronizes
+    -- the TX FIFO pointers (MARK_ASFIFO in TX_MAC_LITE resets only the read side).
+    -- CLK_STABLE       <= (others => etile_clk_stable);
 
     -- TX adaption -------------------------------------------------------------
     tx_avst_data  <= slv_array_ser(tx_avst_data_arr);
@@ -1392,7 +1400,17 @@ begin
         -- the delta delay (for simulators) between the clock and data signals!
         RX_MFB_DST_RDY(IT) <= mfb2avst_rx_mfb_dst_rdy(IT);
 
-        rx_reset <= RESET_ETH or (not rx_pcs_ready(IT));
+        rxrst_sync_i : entity work.ASYNC_RESET
+        generic map (
+            TWO_REG  => false,
+            OUT_REG  => true,
+            REPLICAS => 1
+        )
+        port map (
+            CLK         => etile_clk_out,
+            ASYNC_RST   => RESET_ETH or (not rx_pcs_ready(IT)) or (not etile_clk_stable),
+            OUT_RST(0)  => rx_reset
+        );
 
         -- TX adaption
         mfb2avst_i : entity work.TX_MAC_LITE_ADAPTER_AVST_100G
