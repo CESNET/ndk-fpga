@@ -49,6 +49,7 @@ def COMPONENTS_MULTIVER = [\
     ['MERGE_STREAMS_ORDERED'    , 'comp/mvb_tools/flow/merge_streams_ordered/uvm'    , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
     ['MVB_MERGE_STREAMS'        , 'comp/mvb_tools/flow/merge_streams/uvm'            , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
     ['MVB_SHAKEDOWN'            , 'comp/mvb_tools/flow/shakedown/uvm'                , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['MVB_REORDERING'           , 'comp/mvb_tools/flow/reordering/uvm'               , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
 ]
 // /////////////////////////////////////////////////////////////////////////////
 
