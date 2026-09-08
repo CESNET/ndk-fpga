@@ -150,7 +150,7 @@ architecture FULL of PPW_PKT_BREAKER is
     signal br_rx_axi_tlast                : std_logic;
     signal br_rx_axi_tvalid               : std_logic;
     signal br_rx_axi_tready               : std_logic;
-    signal br_rx_fracture_en              : std_logic;
+    signal br_rx_fracture_en              : std_logic_vector(0 downto 0);
     signal br_rx_fracture_offset          : std_logic_vector(FR_OFFSET_WIDTH-1 downto 0);
 
     signal br_tx_axi_tdata                : std_logic_vector(WORD_WIDTH-1 downto 0);
@@ -182,7 +182,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if ((br_rx_axi_tvalid = '1') and (br_rx_axi_tready = '1')) then
-                last_instr_holdup <= br_rx_axi_tlast and br_rx_fracture_en;
+                last_instr_holdup <= br_rx_axi_tlast and br_rx_fracture_en(0);
             end if;
             if ((RESET = '1') or (((RX_MVB_LAST(0) = '1') and (valid_instr_ready = '1')) and (comps_ready = '1'))) then
                 last_instr_holdup <= '0';
@@ -316,7 +316,7 @@ begin
     br_rx_axi_tlast  <= conv_tx_axi_tlast;
     br_rx_axi_tvalid <= conv_tx_axi_tvalid and valid_instr_ready and not last_instr_holdup;
 
-    br_rx_fracture_en     <= breakpoint_reached(0);
+    br_rx_fracture_en(0)  <= breakpoint_reached(0);
     br_rx_fracture_offset <= std_logic_vector(break_offset(0)(FR_OFFSET_WIDTH-1 downto 0));
 
     pkt_breaker_i : entity work.AXIS_FRAME_FRACTURER
