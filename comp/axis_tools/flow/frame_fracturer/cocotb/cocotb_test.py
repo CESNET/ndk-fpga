@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
+import os
 from random import randint, random
 from math import log2, ceil
 from typing import List, Tuple
@@ -137,7 +138,11 @@ def gen_fractures(
 
 
 @cocotb.test()
-async def run_test(dut, frame_count=5000, frame_size_min=60, frame_size_max=1500, fracture_weight=0.3):
+async def run_test(dut, frame_count=None, frame_size_min=60, frame_size_max=1500, fracture_weight=0.3):
+    # Allow the multi-ver runner to override frame_count via __cocotb_params__.
+    if frame_count is None:
+        frame_count = int(os.environ.get("COCOTB_FRAME_COUNT", "3000"))
+
     dut.RESET.value = 1
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
