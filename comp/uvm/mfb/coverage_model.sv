@@ -88,20 +88,20 @@ class coverage_model #(
         option.name = {this.get_full_name(), ".region"};
 
         cov_sof_after_eof : coverpoint sof & eof & (sof_pos*BLOCK_SIZE > eof_pos) {
-            bins sof_before = {1};
-            bins sof_after  = {0};
+            bins sof_before = {0};
+            bins sof_after  = {1};
         }
 
         cov_sof_position : coverpoint sof_pos iff sof === 1 {
-            bins position [] = {[0:REGION_SIZE]};
+            bins position [] = {[0:REGION_SIZE-1]};
         }
 
         cov_eof_position : coverpoint eof_pos iff eof === 1 {
-            bins position [] = {[0:REGION_SIZE*BLOCK_SIZE]};
+            bins position [] = {[0:REGION_SIZE*BLOCK_SIZE-1]};
         }
 
         cov_region_num : coverpoint region_num {
-            bins region [] = {[0:REGION_SIZE-1]};
+            bins region [] = {[0:REGIONS-1]};
         }
 
 
