@@ -94,7 +94,7 @@ class LogicArray2D(Array):
                 self[i][:] = logic_array[i * item_width : (i + 1) * item_width - 1]
 
     @classmethod
-    def from_logicarray(logic_array: LogicArray, items: Optional[int] = None, direction: str = "auto") -> "LogicArray2D":
+    def from_logicarray(cls, logic_array: LogicArray, items: Optional[int] = None, direction: str = "auto") -> "LogicArray2D":
         """
         Create a ``LogicArray2D`` from a flat ``LogicArray``.
 
@@ -108,7 +108,10 @@ class LogicArray2D(Array):
         assert len(logic_array) % items == 0, f"LogicArray of length {len(logic_array)} does not fit into {items} items."
         assert direction in ["auto", "downto", "to"], f"Deserialization direction must be 'auto', 'downto' or 'to', not '{direction}'."
 
-        la_range: Range = logic_array.range
+        if logic_array.range.direction == "downto":
+            la_range = Range(len(logic_array) // items - 1, "downto", 0)
+        else:
+            la_range = Range(0, "to", len(logic_array) // items - 1)
 
         # get direction from the original logic array
         if direction == "auto":

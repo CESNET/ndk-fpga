@@ -11,7 +11,6 @@ from typing import Optional, Tuple
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.backpressure import BackpressureConfig, apply_backpressure
 from cocotbext.ofm.ver.generators import random_packets
 
@@ -34,14 +33,13 @@ async def _run_test(
     cocotb.log.info(f"Starting AXIS_PACKET_EDITOR {test_name} test")
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
-    tb = Testbench(dut, debug=False)
+    rate_limiter_config = dict(max_idles=5, zero_idles_chance=50)
+    tb = Testbench(dut, debug=False, rate_limiter_config=rate_limiter_config)
     await tb.reset()
     cocotb.log.info("Reset completed")
 
     edit_bytes = tb.edit_bytes
     data_width_bytes = len(dut.RX_AXI_TDATA) // 8
-
-    tb.rx_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
 
     tx_task = None
     if tx_cfg:

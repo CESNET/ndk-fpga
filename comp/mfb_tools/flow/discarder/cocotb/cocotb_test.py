@@ -8,10 +8,14 @@ import cocotb
 import logging
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.types import LogicArray
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
+from cocotbext.ofm.mvb.protocol import MvbProtocol
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.mfb.protocol import MfbProtocol
+from cocotbext.ofm.base.protocol import alias, optional_signal
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotbext.ofm.ver.generators import random_integers
@@ -20,6 +24,23 @@ from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 from cocotbext.ofm.mvb.transaction import MvbTrClassic
 from cocotbext.ofm.mfb.transaction import MfbTransaction
+
+
+class MvbTransactionWithDiscard(MvbTrClassic):
+    discard: int = 0
+
+
+class MfbDiscarderMfbProtocol(MfbProtocol):
+    MFB_REG_SIZE   : int = alias(MfbProtocol.REGION_SIZE)
+    MFB_BLOCK_SIZE : int = alias(MfbProtocol.BLOCK_SIZE)
+    MFB_ITEM_WIDTH : int = alias(MfbProtocol.ITEM_WIDTH)
+
+
+class MfbDiscarderMvbProtocol(MvbProtocol):
+    regions        : int = alias(MvbProtocol.items)
+    mvb_item_width : int = alias(MvbProtocol.item_width)
+
+    discard: LogicArray = optional_signal(put_with="vld")
 
 
 # definition of the class encapsulating components of the test
@@ -38,9 +59,9 @@ class testbench():
         }
 
         # setting up the MVB input driver and connecting it to signals beginning with "RX_MVB"
-        self.mvb_stream_in = MVBDriver(dut, "RX_MVB", dut.CLK)
+        self.mvb_stream_in = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=MfbDiscarderMvbProtocol, no_default_rate_limiter=True)
         # setting up the MFB input driver and connecting it to signals beginning with "RX_MFB"
-        self.mfb_stream_in = MFBDriver(dut, "RX_MFB", dut.CLK, mfb_params=mfb_params)
+        self.mfb_stream_in = MFBDriver(dut, "RX_MFB", dut.CLK, protocol=MfbDiscarderMfbProtocol, no_default_rate_limiter=True)
 
         # choosing the right transaction type
         self.mfb_trans_type = MfbTransaction
@@ -112,7 +133,7 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # dynamically getting the width of the data signal that will be set (useful if the width of the signal may change)
-    mvb_data_width = tb.mvb_stream_in.item_widths["data"]
+    mvb_data_width = tb.mvb_stream_in.bus.item_width
 
     # generate random packets - mfb and mvb transactions
     packets_mvb = random_integers(0, 2**mvb_data_width-1, pkt_count)
@@ -123,9 +144,12 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     # generate transactions from mvb and mfb packet pairs
     for (packet_mvb, packet_mfb, discard) in zip(packets_mvb, packets_mfb, packets_discard):
         # creating new MVB transaction object, assigning data
-        mvb_tr = MvbTrClassic()
-        mvb_tr.data = packet_mvb
-        mvb_tr.discard = discard
+        mvb_tr_in = MvbTransactionWithDiscard()
+        mvb_tr_in.data = packet_mvb
+        mvb_tr_in.discard = discard
+
+        mvb_tr_out = MvbTrClassic()
+        mvb_tr_out.data = mvb_tr_in.data
 
         # creating new MFB transaction object, assigning data
         mfb_tr      = tb.mfb_trans_type()
@@ -133,14 +157,14 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
 
         if (discard == 0):
             # adding generated packet to expected output
-            tb.model(mvb_tr, mfb_tr)
+            tb.model(mvb_tr_out, mfb_tr)
             exp_out_pkts += 1
 
         # logging the generated packet
-        cocotb.log.debug(f"generated transaction: MVB: {mvb_tr},\n MFB: {mfb_tr}")
+        cocotb.log.debug(f"generated transaction: MVB: {mvb_tr_in},\n MFB: {mfb_tr}")
 
         # passing generated packet to the driver to be sent to the bus
-        tb.mvb_stream_in.append(mvb_tr)
+        tb.mvb_stream_in.append(mvb_tr_in)
         tb.mfb_stream_in.append(mfb_tr)
 
     last_num = 0

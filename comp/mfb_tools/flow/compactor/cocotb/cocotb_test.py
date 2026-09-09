@@ -71,11 +71,12 @@ class testbench():
             "item_width"  : dut.ITEM_WIDTH.value,
             "meta_width"  : dut.META_WIDTH.value,
         }
+
         self._regions = int(dut.REGIONS.value)
         self._meta_width = int(dut.META_WIDTH.value)
         self._fwft_mode = bool(int(dut.FWFT_MODE.value))
 
-        self.mfb_stream_in = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
+        self.mfb_stream_in = MFBDriver(dut, "RX", dut.CLK)
         # META_WIDTH=0 (the default) keeps the plain MfbTransaction; a non-zero
         # META_WIDTH (set via a GENERICS override) switches driver/model/monitor
         # to MfbTransactionWithMeta so the META passthrough path gets exercised.

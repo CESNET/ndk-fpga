@@ -6,6 +6,8 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mfb.drivers import MFBDriver
+from cocotbext.ofm.mfb.transaction import MfbTransaction
+from cocotbext.ofm.mfb.protocol import MfbProtocol
 from cocotbext.ofm.mac_segmented.monitors import MAC_Segmented_TX_Monitor
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
@@ -14,10 +16,18 @@ import logging
 #from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 
 
+class TxMacLiteAdapterMfbProtocol(MfbProtocol):
+    BLOCK_SIZE: int = 8
+    ITEM_WIDTH: int = 8
+
+
 class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
-        self.stream_in = MFBDriver(dut, "IN_MFB", dut.CLK)
+        # Default rate_limiter_config runs at only ~30 % throughput, which makes
+        # this test unnecessarily slow. Use a high-throughput config instead.
+        self.stream_in = MFBDriver(dut, "IN_MFB", dut.CLK, protocol=TxMacLiteAdapterMfbProtocol,
+                                   rate_limiter_config=dict(rate_percentage=95, random_idles=True, max_idles=2, zero_idles_chance=50))
         self.backpressure = BitDriver(dut.IN_MFB_DST_RDY, dut.CLK)
         self.stream_out = MAC_Segmented_TX_Monitor(dut, "OUT_MAC", dut.CLK)
 
@@ -48,7 +58,7 @@ class testbench():
 
 
 @cocotb.test()
-async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=2048):
+async def run_test(dut, pkt_count=10_000, frame_size_min=60, frame_size_max=2048):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 2482, unit="ps").start())
     tb = testbench(dut, debug=False)
@@ -57,9 +67,10 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=2048)
     await tb.reset()
     dut.IN_MFB_DST_RDY.value = 1
 
-    for transaction in random_packets(frame_size_min, frame_size_max, pkt_count):
-        tb.model(transaction)
-        cocotb.log.debug("generated transaction: " + transaction.hex())
+    for packet in random_packets(frame_size_min, frame_size_max, pkt_count):
+        tb.model(packet)
+        cocotb.log.debug("generated transaction: " + packet.hex())
+        transaction = MfbTransaction(data=packet)
         tb.stream_in.append(transaction)
 
     last_num = 0

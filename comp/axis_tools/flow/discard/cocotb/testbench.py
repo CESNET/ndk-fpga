@@ -12,12 +12,15 @@ dropped and not forwarded to the TX interface.
 
 import cocotb
 import logging
+from cocotb.types import Logic
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
+from cocotbext.ofm.axi4stream.protocol import Axi4StreamProtocol
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.hex_formatter import format_bytes
+from cocotbext.ofm.base.protocol import optional_signal
 from dataclasses import dataclass
 from typing import List
 
@@ -34,9 +37,9 @@ class Axi4StreamTransactionWithDiscard(Axi4StreamTransaction):
     DISCARD: int = 0
 
 
-class Axi4StreamMasterWithDiscard(Axi4StreamMaster):
+class Axi4StreamProtocolWithDiscard(Axi4StreamProtocol):
     """Axi4StreamMaster with support for DISCARD signal."""
-    _optional_signals = ["TLAST", "TKEEP", "TUSER", "DISCARD"]
+    DISCARD: Logic = optional_signal(put_with="TVALID")
 
 
 def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTransaction,
@@ -75,10 +78,10 @@ def _compare_transactions(expected: Axi4StreamTransaction, actual: Axi4StreamTra
 class Testbench:
     """Testbench for AXIS_DISCARD component."""
 
-    def __init__(self, dut, debug: bool = False):
+    def __init__(self, dut, debug: bool = False, rate_limiter_config: dict = {}):
         self.dut = dut
 
-        self.rx_driver = Axi4StreamMasterWithDiscard(dut, "RX_AXI", dut.CLK)
+        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, protocol=Axi4StreamProtocolWithDiscard, rate_limiter_config=rate_limiter_config)
         self.tx_monitor = Axi4Stream(dut, "TX_AXI", dut.CLK, trans_type=Axi4StreamTransaction)
 
         self.pkts_sent = 0
@@ -151,17 +154,9 @@ class Testbench:
         data_width = len(self.rx_driver.bus.TDATA) // 8
         word_cnt = (len(pkt_data) + data_width - 1) // data_width
 
-        discard_width = len(self.rx_driver.bus.DISCARD)
-
-        # Encode discard values for each word (value on first word, zeros on rest)
-        discard_encoded = 0
-        for i in range(word_cnt):
-            word_discard = discard_instr.discard if i == 0 else 0
-            discard_encoded = (discard_encoded << discard_width) + word_discard
-
         rx_tr = Axi4StreamTransactionWithDiscard(
             TDATA=pkt_data,
-            DISCARD=discard_encoded
+            DISCARD=discard_instr.discard
         )
         self.model(pkt_data, discard_instr)
 

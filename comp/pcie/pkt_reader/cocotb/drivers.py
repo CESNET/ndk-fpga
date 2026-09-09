@@ -2,34 +2,31 @@
 # Copyright (C) 2026 CESNET z. s. p. o.
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 
-from random import randint
-
-from cocotb.triggers import ClockCycles
-
-from cocotbext.ofm.base.drivers import BusDriver
+from cocotbext.ofm.base.transaction import IdleTransaction
+from cocotbext.ofm.base.drivers import ModularBusDriver
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.transaction import MfbTransaction
+from protocol import PcieMvbProtocol
 
 
-class PprDriver(MVBDriver):
-    _optional_signals = ["id", "address", "length", "vld"]
-
-
-class PcieDriver(BusDriver):
-    _signals = ["data", "sof", "eof", "sof_pos", "eof_pos"]
-
+class PcieDriver(ModularBusDriver):
     def __init__(self, entity, name, clock, array_idx=None):
         super().__init__(entity, name, clock, array_idx=array_idx)
-        self.mfb_drv = MFBDriver(entity, name+"_MFB", clock, array_idx=array_idx)
-        self.mvb_drv = MVBDriver(entity, name+"_MVB", clock, array_idx=array_idx)
+        self.mfb_drv = MFBDriver(entity, name+"_MFB", clock, array_idx=array_idx, no_inner_idles=True, generics_prefix="PCIE_DOWN")
+        self.mvb_drv = MVBDriver(entity, name+"_MVB", clock, array_idx=array_idx, protocol=PcieMvbProtocol)
 
-    async def _driver_send(self, transaction, sync=True, **kwargs) -> None:
-        """Distributes the data and header to the respective interface drivers."""
+    def append(self, transaction):
         hdr, data = transaction
+
         if self.mfb_drv.frame_cnt == 0:
-            await ClockCycles(self.clock, 5)
-        await ClockCycles(self.clock, randint(0, 10))
-        # TODO: Idle generators
+            pass
+
         self.mfb_drv.append(MfbTransaction(data=data))
         self.mvb_drv.append(hdr)
+
+    async def _split_transaction(self, transaction):
+        if isinstance(transaction, IdleTransaction):
+            await self._clk_re
+            return
+        yield

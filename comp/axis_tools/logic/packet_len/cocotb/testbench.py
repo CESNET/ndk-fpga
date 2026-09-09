@@ -42,11 +42,11 @@ class Testbench:
         length_errors: Counter of packet length mismatches.
     """
 
-    def __init__(self, dut, debug: bool = False):
+    def __init__(self, dut, debug: bool = False, rate_limiter_config: dict = {}):
         self.dut = dut
 
         # RX AXI4-Stream master driver
-        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK)
+        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, rate_limiter_config=rate_limiter_config)
 
         # TX AXI4-Stream monitor
         self.tx_monitor = Axi4Stream(dut, "TX_AXI", dut.CLK, trans_type=Axi4StreamTransaction)

@@ -15,7 +15,6 @@ from typing import Optional, Tuple
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.backpressure import BackpressureConfig, apply_backpressure
 
 from testbench import Testbench
@@ -34,11 +33,11 @@ async def _run_test(
     cocotb.log.info(f"Starting AXIS_ETH_PARSER {test_name} test")
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
-    tb = Testbench(dut, debug=False)
+    rate_limiter_config = dict(max_idles=5, zero_idles_chance=50)
+    tb = Testbench(dut, debug=False, rate_limiter_config=rate_limiter_config)
     await tb.reset()
     cocotb.log.info("Reset completed")
 
-    tb.rx_driver.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=50))
     tb.tx_driver.bus.TREADY.value = 1
 
     tx_task = cocotb.start_soon(apply_backpressure(dut.TX_AXI_TREADY, dut.CLK, tx_cfg))
@@ -60,8 +59,8 @@ async def _run_test(
         await ClockCycles(dut.CLK, 10)
         timeout += 1
 
-    tx_task.kill()
-    hdr_task.kill()
+    tx_task.cancel()
+    hdr_task.cancel()
 
     cocotb.log.info(f"Test completed: {tb.headers_monitor.item_cnt}/{pkt_count} packets")
 

@@ -35,10 +35,12 @@ import logging
 from random import randint
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotbext.ofm.base.protocol import alias
 from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.mfb.protocol import MfbProtocol
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
@@ -46,6 +48,10 @@ from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 from cocotbext.ofm.mvb.transaction import MvbTrClassic
 from cocotbext.ofm.mfb.transaction import MfbTransaction
+
+
+class MfbProtocolWithRegSize(MfbProtocol):
+    REG_SIZE: int = alias(MfbProtocol.REGION_SIZE)
 
 
 class testbench():
@@ -75,8 +81,8 @@ class testbench():
         # generators would break this pairing and corrupt safe_mvb_items_reg,
         # so NO idle generator is used on RX; input stress comes from the MVB
         # driver's own word-packing and from the TX backpressure below.
-        self.mvb_stream_in = MVBDriver(dut, "RX_MVB", dut.CLK)
-        self.mfb_stream_in = MFBDriver(dut, "RX_MFB", dut.CLK, mfb_params=mfb_params)
+        self.mvb_stream_in = MVBDriver(dut, "RX_MVB", dut.CLK, generics_prefix="MVB", no_default_rate_limiter=True)
+        self.mfb_stream_in = MFBDriver(dut, "RX_MFB", dut.CLK, protocol=MfbProtocolWithRegSize, generics_prefix="MFB", no_default_rate_limiter=True)
 
         # TX side monitors.
         self.mvb_stream_out = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=MvbTrClassic)
@@ -130,8 +136,8 @@ def _mfb_align_bytes(tb):
     region starts, matching how the PCIe completer frames completions, and
     yields a byte-exact in-order reference model.
     """
-    d = tb.mfb_stream_in
-    return d._region_size * d._block_size * (d._item_width // 8)
+    db = tb.mfb_stream_in.bus
+    return db.REGION_SIZE * db.BLOCK_SIZE * (db.ITEM_WIDTH // 8)
 
 
 async def _drive_pairs(tb, packets_mvb, packets_mfb):
@@ -195,7 +201,7 @@ async def run_test_basic(dut, pkt_count=5000, frame_size_min=60, frame_size_max=
     tb.mvb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
     tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
-    mvb_data_width = tb.mvb_stream_in.item_widths["data"]
+    mvb_data_width = tb.mvb_stream_in.bus.item_width
     align_bytes = _mfb_align_bytes(tb)
     packets_mvb = [randint(0, 2 ** mvb_data_width - 1) for _ in range(pkt_count)]
     # Frame lengths aligned to a region boundary (16 B): keeps SOF/EOF on region
@@ -234,7 +240,7 @@ async def run_test_unfinished_packet_tail(dut, pkt_count=2000):
     tb.mvb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 3, 0.5)))
     tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 3, 0.5)))
 
-    mvb_data_width = tb.mvb_stream_in.item_widths["data"]
+    mvb_data_width = tb.mvb_stream_in.bus.item_width
     align_bytes = _mfb_align_bytes(tb)
     packets_mvb = [randint(0, 2 ** mvb_data_width - 1) for _ in range(pkt_count)]
     packets_mfb = [
@@ -266,7 +272,7 @@ async def run_test_mvb_stall(dut, pkt_count=1500):
     # MFB drains freely; MVB held off for a long window, then opened.
     tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 3, 0.5)))
 
-    mvb_data_width = tb.mvb_stream_in.item_widths["data"]
+    mvb_data_width = tb.mvb_stream_in.bus.item_width
     align_bytes = _mfb_align_bytes(tb)
     packets_mvb = [randint(0, 2 ** mvb_data_width - 1) for _ in range(pkt_count)]
     packets_mfb = list(random_packets(60, 512, pkt_count, alignment=align_bytes))
@@ -302,7 +308,7 @@ async def run_test_reset_mid_stream(dut, pkt_count=400):
     tb.mvb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
     tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
-    mvb_data_width = tb.mvb_stream_in.item_widths["data"]
+    mvb_data_width = tb.mvb_stream_in.bus.item_width
     align_bytes = _mfb_align_bytes(tb)
 
     # First burst: modelled/expected, fully drained before reset so no stale
@@ -339,7 +345,7 @@ async def run_test_min_frame(dut, pkt_count=1000):
     tb.mvb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
     tb.mfb_backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
-    mvb_data_width = tb.mvb_stream_in.item_widths["data"]
+    mvb_data_width = tb.mvb_stream_in.bus.item_width
     align_bytes = _mfb_align_bytes(tb)
     packets_mvb = [randint(0, 2 ** mvb_data_width - 1) for _ in range(pkt_count)]
     # Smallest region-aligned frame (16 B = one region) back-to-back.

@@ -10,14 +10,15 @@ from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
+from cocotbext.ofm.mfb.protocol import MfbParams
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_packets
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMfbInterface
 from cocotbext.ofm.mfb.transaction import MfbTransaction, MfbTransactionWithMeta
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from random import randint
+from dataclasses import asdict
 
 
 # definition of the class encapsulating components of the test
@@ -27,23 +28,20 @@ class testbench():
         self.dut = dut
 
         # setting MFB params based on generics
-        mfb_params = {
-            "regions"     : dut.REGIONS.value,
-            "region_size" : dut.REGION_SIZE.value,
-            "block_size"  : dut.BLOCK_SIZE.value,
-            "item_width"  : dut.ITEM_WIDTH.value,
-            "meta_width"  : dut.META_WIDTH.value
-        }
+        mfb_params = MfbParams(
+            regions=dut.REGIONS.value,
+            region_size=dut.REGION_SIZE.value,
+            block_size=dut.BLOCK_SIZE.value,
+            item_width=dut.ITEM_WIDTH.value
+        )
 
         # setting up the input driver and connecting it to signals begging with "RX"
-        self.stream_in = MFBDriver(dut, "RX", dut.CLK, mfb_params=mfb_params)
-        # adding idle generator to driver
-        self.stream_in.set_idle_generator(ItemRateLimiter(max_idles=5, zero_idles_chance=70))
+        self.stream_in = MFBDriver(dut, "RX", dut.CLK, rate_limiter_config=dict(max_idles=5, zero_idles_chance=70))
         # choosing the right transaction type based on legth of the meta signal
-        self.trans_type = MfbTransactionWithMeta if len(self.stream_in.bus.meta) > 0 else MfbTransaction
+        self.trans_type = MfbTransactionWithMeta if len(self.stream_in.bus.META) > 0 else MfbTransaction
 
         # setting up the output monitor and connecting it to signals begging with "TX"
-        self.stream_out = MFBMonitor(dut, "TX", dut.CLK, mfb_params=mfb_params, trans_type=self.trans_type)
+        self.stream_out = MFBMonitor(dut, "TX", dut.CLK, mfb_params=asdict(mfb_params), trans_type=self.trans_type)
         # setting up driver of the DST_RDY so it randomly fluctuates between 0 and 1
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
 
@@ -86,7 +84,7 @@ class testbench():
 
 # defining a test. Functions with "@cocotb.test()" decorator will be automatically found and run
 @cocotb.test()
-async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
+async def run_test(dut, pkt_count=10_000, frame_size_min=60, frame_size_max=512):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
@@ -100,7 +98,7 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # calculating width of the meta signal for a region
-    meta_width = len(tb.stream_in.bus.meta) // len(tb.stream_in.bus.sof)
+    meta_width = len(tb.stream_in.bus.META) // len(tb.stream_in.bus.SOF)
 
     # calculating number of bytes in an item
     item_bytes = tb.dut.ITEM_WIDTH.value // 8

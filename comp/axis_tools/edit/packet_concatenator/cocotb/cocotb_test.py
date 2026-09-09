@@ -11,7 +11,6 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction, Axi4StreamTransactionWithSelect
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_transactions
 
 from testbench import Testbench
@@ -27,11 +26,6 @@ async def run_base_test(dut, min_size=40, max_size=200, pkt_count=10000):
 
     tb = Testbench(dut, debug=False)
 
-    # Set up rate limiters for both input streams
-    idle_gen_conf = dict(random_idles=True, max_idles=5, zero_idles_chance=50)
-    tb.rx0_drv.set_idle_generator(ItemRateLimiter(rate_percentage=20, **idle_gen_conf))
-    tb.rx1_drv.set_idle_generator(ItemRateLimiter(rate_percentage=90, **idle_gen_conf))
-
     await tb.reset()
 
     # Start backpressure
@@ -44,9 +38,10 @@ async def run_base_test(dut, min_size=40, max_size=200, pkt_count=10000):
     for i, (rx0_tr, rx1_tr) in enumerate(zip(rx0_gen, rx1_gen)):
         cocotb.log.debug(f"Generated packets iteration #{i}: RX0={len(rx0_tr.TDATA)}B, RX1={len(rx1_tr.TDATA)}B")
 
-        rx0_tr_ce     = Axi4StreamTransactionWithSelect()
-        rx0_tr_ce     = rx0_tr
-        rx0_tr_ce.SEL = getrandbits(1)
+        rx0_tr_ce       = Axi4StreamTransactionWithSelect()
+        rx0_tr_ce.TDATA = rx0_tr.TDATA
+        rx0_tr_ce.TUSER = rx0_tr.TUSER
+        rx0_tr_ce.SEL   = getrandbits(1)
 
         # Model the expected output
         tb.model(rx0_tr, rx1_tr if rx0_tr_ce.SEL else Axi4StreamTransaction())
@@ -93,9 +88,10 @@ async def run_full_speed_test(dut, min_size=40, max_size=500, pkt_count=10000):
     for i, (rx0_tr, rx1_tr) in enumerate(zip(rx0_gen, rx1_gen)):
         cocotb.log.debug(f"Generated packets iteration #{i}: RX0={len(rx0_tr.TDATA)}B, RX1={len(rx1_tr.TDATA)}B")
 
-        rx0_tr_ce     = Axi4StreamTransactionWithSelect()
-        rx0_tr_ce     = rx0_tr
-        rx0_tr_ce.SEL = getrandbits(1)
+        rx0_tr_ce       = Axi4StreamTransactionWithSelect()
+        rx0_tr_ce.TDATA = rx0_tr.TDATA
+        rx0_tr_ce.TUSER = rx0_tr.TUSER
+        rx0_tr_ce.SEL   = getrandbits(1)
 
         # Model the expected output
         tb.model(rx0_tr, rx1_tr if rx0_tr_ce.SEL else Axi4StreamTransaction())

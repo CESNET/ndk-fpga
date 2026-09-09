@@ -13,7 +13,6 @@ from cocotbext.ofm.ver.generators import random_integers
 from cocotb_bus.drivers import BitDriver
 from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMvbInterface
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.mvb.transaction import MvbTrClassicWithMeta
 
 
@@ -23,7 +22,7 @@ class testbench():
         self.dut = dut
 
         # setting up the input driver and connecting it to signals beginning with "RX"
-        self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK)
+        self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK, rate_limiter_config=dict(rate_percentage=30, random_idles=True, max_idles=5, zero_idles_chance=50))
 
         # setting up the output monitor and connecting it to signals beginning with "TX"
         self.stream_out = MVBMonitor(dut, "TX_MVB", dut.CLK, tr_type=MvbTrClassicWithMeta)
@@ -76,12 +75,6 @@ async def run_test(dut, pkt_count=10000):
     # initialization of the test bench
     tb = testbench(dut, debug=False)
 
-    # change MVB driver's IdleGenerator to ItemRateLimiter
-    # note: the RateLimiter's rate is affected by backpressure (DST_RDY).
-    # Even though it takes into account cycles with DST_RDY=0, the desired rate might not be achievable.
-    idle_gen_conf = dict(random_idles=True, max_idles=5, zero_idles_chance=50)
-    tb.stream_in.set_idle_generator(ItemRateLimiter(rate_percentage=30, **idle_gen_conf))
-
     # running simulated reset
     await tb.reset()
 
@@ -89,8 +82,8 @@ async def run_test(dut, pkt_count=10000):
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # dynamically getting the width of the data signal that will be set (useful if the width of the signal may change)
-    data_width = tb.stream_in.item_widths["data"]
-    meta_width = tb.stream_in.item_widths["meta"]
+    data_width = dut.ITEM_WIDTH.value
+    meta_width = dut.META_WIDTH.value
 
     # generating MVB items as random integers between the minimum and maximum unsigned value of the item
     for transaction in random_integers(0, 2**data_width-1, pkt_count):

@@ -49,12 +49,13 @@ class Testbench:
         expected_output: List of expected AxisEthParserResult objects.
     """
 
-    def __init__(self, dut, debug=False):
+    def __init__(self, dut, debug=False, rate_limiter_config: dict = {}):
         """Initialize the testbench.
 
         Args:
             dut: Device Under Test handle
             debug: Enable debug logging (default: False)
+            rate_limiter_config: Configuration for the RX driver's ItemRateLimiter
         """
         self.dut = dut
 
@@ -62,7 +63,7 @@ class Testbench:
         self.verbose = False
 
         # RX AXI4-Stream master driver
-        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK)
+        self.rx_driver = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, rate_limiter_config=rate_limiter_config)
 
         # TX AXI4-Stream slave driver (for backpressure control)
         self.tx_driver = Axi4StreamSlave(dut, "TX_AXI", dut.CLK)

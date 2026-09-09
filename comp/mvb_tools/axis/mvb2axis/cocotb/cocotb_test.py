@@ -14,7 +14,6 @@ from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.transaction import MvbTrClassicWithMeta
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.ver.generators import random_integers
 
@@ -36,7 +35,7 @@ class Testbench:
         self.axis_width = int(dut.TDATA_WIDTH.value)
 
         # 1. Input MVB Driver (Matches prefix RX_MVB_*)
-        self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK)
+        self.stream_in = MVBDriver(dut, "RX_MVB", dut.CLK, rate_limiter_config=dict(rate_percentage=40, random_idles=True, max_idles=5, zero_idles_chance=50))
 
         # 2. Output AXI4-Stream Monitor (Matches prefix TX_AXIS_*)
         self.stream_out = Axi4Stream(dut, "TX_AXIS", dut.CLK, trans_type=Axi4StreamTransaction)
@@ -63,8 +62,8 @@ class Testbench:
         axi_tr = Axi4StreamTransaction()
 
         # Get MVB data width in bits and convert to byte length
-        item_width_bits = self.stream_in.item_widths["data"]
-        meta_width_bits = self.stream_in.item_widths["meta"]
+        item_width_bits = self.dut.ITEM_WIDTH.value
+        meta_width_bits = self.dut.META_WIDTH.value
         item_width_bytes = (item_width_bits + 7) // 8
         meta_width_bytes = (meta_width_bits + 7) // 8
 
@@ -109,10 +108,6 @@ async def run_test(dut, pkt_count=10000):
     # Initialize Testbench
     tb = Testbench(dut, debug=False)
 
-    # Configure input rate-limiter for the MVB driver
-    idle_gen_conf = dict(random_idles=True, max_idles=5, zero_idles_chance=50)
-    tb.stream_in.set_idle_generator(ItemRateLimiter(rate_percentage=40, **idle_gen_conf))
-
     # Apply Reset Sequence
     await tb.reset()
 
@@ -120,8 +115,8 @@ async def run_test(dut, pkt_count=10000):
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
 
     # Get dynamically resolved MVB item width
-    data_width = tb.stream_in.item_widths["data"]
-    meta_width = tb.stream_in.item_widths["meta"]
+    data_width = dut.ITEM_WIDTH.value
+    meta_width = dut.META_WIDTH.value
 
     cocotb.log.info(f"Starting transaction generation loop for {pkt_count} items...")
 

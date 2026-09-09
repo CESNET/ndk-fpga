@@ -12,7 +12,6 @@ from typing import Optional, Tuple
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
-from cocotbext.ofm.base.generators import ItemRateLimiter
 from cocotbext.ofm.ver.generators import random_packets
 
 from testbench import Testbench, DiscardInstruction
@@ -52,11 +51,10 @@ async def _run_test(
     cocotb.log.info(f"Starting AXIS_DISCARD {test_name} test")
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
-    tb = Testbench(dut, debug=False)
+    rate_limiter_config = dict(max_idles=max_idles, zero_idles_chance=zero_idles_chance)
+    tb = Testbench(dut, debug=False, rate_limiter_config=rate_limiter_config)
     await tb.reset()
     cocotb.log.info("Reset completed")
-
-    tb.rx_driver.set_idle_generator(ItemRateLimiter(max_idles=max_idles, zero_idles_chance=zero_idles_chance))
 
     tx_task = None
     if tx_cfg:
