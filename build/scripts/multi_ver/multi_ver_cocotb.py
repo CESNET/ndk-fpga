@@ -64,7 +64,7 @@ def find_venv() -> str | None:
     return None
 
 
-def run_modelsim(settings: dict, test_name: str, venv: str | None = None, gui=False, cocotb_testcase: str | None = None):
+def run_sim(settings: dict, test_name: str, venv: str | None = None, gui=False, cocotb_testcase: str | None = None, nvc_sim: bool = False):
     command = ""
 
     if venv is not None:
@@ -74,7 +74,7 @@ def run_modelsim(settings: dict, test_name: str, venv: str | None = None, gui=Fa
     if not gui:
         sim_flags = f"{sim_flags} -c -do quit"
 
-    command += f"make TARGET=cocotb SIM_FLAGS=\"{sim_flags}\""
+    command += f"make TARGET={'nvc-sim' if nvc_sim else 'cocotb'} SIM_FLAGS=\"{sim_flags}\""
 
     if cocotb_testcase is not None:
         command += f" COCOTB_TESTCASE='{cocotb_testcase}'"
@@ -156,6 +156,7 @@ parser.add_argument("-r", "--run-percantage", action="store", help="(Used withou
 parser.add_argument("-n", "--test-name", action="store", help="(Used with '-s') select name of test. Some file will be saved with this suffix")
 parser.add_argument("-p", "--prefix-name", action="store", help="this create prefix for test_name to prevent rewrite older files", default="")
 parser.add_argument("-t", "--cocotb-testcase", action="store", help="Name of a cocotb testcase to run (passed as COCOTB_TESTCASE)")
+parser.add_argument("-nvc", "--nvc-sim", action="store_true", help="Run in NVC sim.")
 
 args = parser.parse_args()
 
@@ -238,7 +239,7 @@ if args.setting is None and args.test_name is None:
         print(f"Running combination: {key} ({comb_name})")
         if (not args.dry_run):
             vsim_time_start = time.time()
-            result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{key}", venv=venv, cocotb_testcase=args.cocotb_testcase)
+            result = run_sim(SETTING, test_name=f"{test_name_prefix}{key}", venv=venv, cocotb_testcase=args.cocotb_testcase, nvc_sim=args.nvc_sim)
             vsim_time_stop = time.time()
             time_vsim_consumption = (vsim_time_stop - vsim_time_start)/60
 
@@ -270,7 +271,7 @@ else:
 
     print("Running combination: " + " ".join(test_setings))
     if (not args.dry_run):
-        result = run_modelsim(SETTING, test_name=f"{test_name_prefix}{test_name}", venv=venv, gui=(not args.command_line), cocotb_testcase=args.cocotb_testcase)
+        result = run_sim(SETTING, test_name=f"{test_name_prefix}{test_name}", venv=venv, gui=(not args.command_line), cocotb_testcase=args.cocotb_testcase, nvc_sim=args.nvc_sim)
         if result["passed"]:
             print("Run SUCCEEDED (" + " ".join(test_setings) + ")")
         else:
