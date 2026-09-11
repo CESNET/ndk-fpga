@@ -19,27 +19,25 @@ module testbench;
 
     logic CLK = 0;
     logic RESET;
-    iMfbRx #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) RX0(CLK, RESET);
-    iMfbRx #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) RX1(CLK, RESET);
-    iMfbTx #(REGIONS,REGION_SIZE,BLOCK_SIZE,ITEM_WIDTH) TX(CLK, RESET);
+
+    iMfbRx #(MFB_REGIONS,MFB_REGION_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) RX_MFB[MERGER_INPUTS] (CLK, RESET);
+    iMfbTx #(MFB_REGIONS,MFB_REGION_SIZE,MFB_BLOCK_SIZE,MFB_ITEM_WIDTH,MFB_META_WIDTH) TX_MFB(CLK, RESET);
 
     always #(CLK_PERIOD/2) CLK = ~CLK;
 
     DUT DUT_U (
-        .CLK     (CLK),
-        .RESET   (RESET),
-        .RX0     (RX0),
-        .RX1     (RX1),
-        .TX      (TX)
+        .CLK    (CLK   ),
+        .RESET  (RESET ),
+        .RX_MFB (RX_MFB),
+        .TX_MFB (TX_MFB)
     );
 
     TEST TEST_U (
-        .CLK     (CLK),
-        .RESET   (RESET),
-        .RX0     (RX0),
-        .RX1     (RX1),
-        .TX      (TX),
-        .MONITOR (TX)
+        .CLK     (CLK   ),
+        .RESET   (RESET ),
+        .RX_MFB  (RX_MFB),
+        .TX_MFB  (TX_MFB),
+        .MONITOR (TX_MFB)
     );
 
 endmodule
