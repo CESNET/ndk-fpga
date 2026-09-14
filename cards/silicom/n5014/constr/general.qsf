@@ -87,4 +87,4 @@ set_instance_assignment -name SLEW_RATE 0 -to SPI_MOSI
 # ==============================================================================
 # Others
 # ==============================================================================
-set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
+set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT WITH MAXIMUM PLACEMENT EFFORT"
