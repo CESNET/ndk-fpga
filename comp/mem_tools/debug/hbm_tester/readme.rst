@@ -165,6 +165,8 @@ Command Line Arguments
    * - ``-w, --no-wait``
      - Do not wait for the write response before reading the same address (coherency
        test).
+   * - ``-b, --bl8``
+     - Use the BL8 burst mode, that is a 64B access (default: BL4, a 32B access).
    * - ``-p, --ports``
      - Number of active ports/channels (default: all).
    * - ``-P, --tester-ports``
@@ -239,8 +241,9 @@ Configuration Register (0x14) Bitfield
      - 00 = none, 01 = WR only, 10 = RD only, 11 = RD and WR.
    * - ``[6]``
      - Burst Mode
-     - Length of one burst in bus words: 0 = 1 word, 1 = 2 words. On a 256b bus that is
-       BL4 (32B) and BL8 (64B), on a 512b bus 64B and 128B.
+     - Size of one access: 0 = BL4 (32B), 1 = BL8 (64B). The number of bus words the
+       access takes is derived from ``HBM_DATA_WIDTH``. A bus wider than 32B cannot
+       generate BL4 and issues the 64B of BL8 in both modes.
    * - ``[7]``
      - R/W No Wait
      - 0 = wait for the write response before reading the same address, 1 = read

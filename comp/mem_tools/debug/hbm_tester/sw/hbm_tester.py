@@ -25,6 +25,7 @@ class hbm_tester:
     _CONF_RAND_ADDR_EN = 0x2
     _CONF_WR_DEAD_EN   = 0x4
     _CONF_RW_SWITCH_EN = 0x8
+    _CONF_BL8_MODE     = 0x40
     _CONF_RW_NO_WAIT   = 0x80
 
     _GEN_CONF_WR_ONLY = (0x1 + 0x0) * 0x10
@@ -42,16 +43,6 @@ class hbm_tester:
         self.width = width
         self.clk_period = (1 / (freq * 1e6)) * 1e9
         self.rw_no_wait = False
-        self.check_bl8_data_width()
-
-    def check_bl8_data_width(self):
-        # BL8 mode (CONFIG register bit [6]) only produces a real 64B burst on a
-        # 256b data bus. On any other bus width the generated access size no
-        # longer matches BL8, mirroring the HBM_TESTER_GEN PSL assertion.
-        if self.width != 256:
-            access_size = 2 * (self.width // 8)
-            print("WARNING: HBM_TESTER: BL8 mode is set on a %db data bus, which "
-                  "generates a %dB access instead of the 64B of a BL8 burst." % (self.width, access_size))
 
     def reset_all_counters(self):
         self.comp.write32(self._REG_RESET, self.get_ports_vector(self.ports))
@@ -62,7 +53,24 @@ class hbm_tester:
         #print("REG_TIME: %s" % hex(test_length))
         self.comp.write32(self._REG_TIME, test_length)
 
-    def set_config_reg(self, test_type, test_phase, rand_addr):
+    def check_bl_mode(self):
+        # BL4 is a 32B access, so it needs a data bus
+        # of at most 32B. On a wider bus one word already carries more than that and
+        # the tester falls back to the 64B access of BL8.
+        conf_data = self.comp.read32(self._REG_CONFIG)
+        bl4_set   = (conf_data & self._CONF_BL8_MODE) == 0
+
+        if bl4_set and self.width > 256:
+            print("WARNING: HBM_TESTER: BL4 mode cannot generate its 32B access on a %db "
+                  "data bus, the tester issues the 64B of BL8 instead." % self.width)
+
+    def get_bl_mode_string(self, bl8):
+        if bl8 is True:
+            return "BL8"
+        else:
+            return "BL4"
+
+    def set_config_reg(self, test_type, test_phase, rand_addr, bl8=False):
         if rand_addr is True:
             rand_test_val = self._CONF_RAND_ADDR_EN
         else:
@@ -110,8 +118,11 @@ class hbm_tester:
         conf_data = rand_test_val + dead_wr_val + switch_rw_val + gen_conf_val + mon_conf_val + conn_gen_val
         if self.rw_no_wait:
             conf_data += self._CONF_RW_NO_WAIT
+        if bl8:
+            conf_data += self._CONF_BL8_MODE
         #print("REG_CONFIG: %s" % hex(conf_data))
         self.comp.write32(self._REG_CONFIG, conf_data)
+        self.check_bl_mode()
 
     def get_ports_vector(self, hbm_ports):
         return int(math.pow(2, hbm_ports) - 1)
@@ -207,13 +218,14 @@ class hbm_tester:
         else:
             return "sequential"
 
-    def hbm_test(self, test_type, rand_addr, hbm_ports, test_length):
+    def hbm_test(self, test_type, rand_addr, hbm_ports, test_length, bl8=False):
         print("===========================")
         print("HBM TESTER by CESNET")
         print("===========================")
         print("TEST TYPE:   " + str(test_type))
         print("TEST LENGTH: " + hex(test_length))
         print("ADDR MODE:   " + str(self.get_addr_mode_string(rand_addr)))
+        print("BURST MODE:  " + str(self.get_bl_mode_string(bl8)))
         print("USED PORTS:  " + str(hbm_ports))
         print("===========================")
 
@@ -222,7 +234,7 @@ class hbm_tester:
             self.set_test_length(0xFFFF)
         else:
             self.set_test_length(test_length)
-        self.set_config_reg(test_type, 0, rand_addr)
+        self.set_config_reg(test_type, 0, rand_addr, bl8)
         self.run_test(hbm_ports)
 
         # Track speeds for the return value
@@ -236,7 +248,7 @@ class hbm_tester:
             #self.print_data_result(hbm_ports)
             self.reset_all_counters()
             self.set_test_length(0xEFFF)
-            self.set_config_reg(test_type, 1, rand_addr)
+            self.set_config_reg(test_type, 1, rand_addr, bl8)
             self.run_test(hbm_ports)
             self.print_data_result(hbm_ports)
 
@@ -251,6 +263,7 @@ if __name__ == '__main__':
     args.add_argument("-t", "--test", action="store", choices=['speed', 'latency', 'integrity', 'coherency'], default='speed')
     args.add_argument("-r", "--random", action='store_true', help="Use random addressing (only for latency or speed test), default is sequential.")
     args.add_argument("-w", "--no-wait", action='store_true', help="Do not wait for the write response before reading the same address (coherency test).")
+    args.add_argument("-b", "--bl8", action='store_true', help="Use the BL8 burst mode (64B access), default is BL4 (32B access).")
     args.add_argument("-p", "--ports", action="store", nargs='?', default='0', help="Number of actived ports (channels), default is all.")
     args.add_argument("-P", "--tester-ports", type=int, default=32, help="Number of ports of one tester instance (HBM_PORTS/HBM_MODULES), default 32.")
     args.add_argument("-W", "--data-width", type=int, default=256, help="HBM_DATA_WIDTH of the build (256 or 512), default 256.")
@@ -297,7 +310,7 @@ if __name__ == '__main__':
         arg_length = 0xFFFFF
 
         # Capture the returned speeds from each tester instance
-        rd, wr = tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length)
+        rd, wr = tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length, arguments.bl8)
 
         if arguments.test == 'speed':
             grand_total_rd_speed += rd

@@ -21,7 +21,12 @@ entity HBM_TESTER_GEN is
         -- Size of one port in bytes, used as the base address of each port.
         -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
         -- own address space (e.g. a NoC attached HBM).
-        BASE_ADDR_OFFSET    : natural := 0
+        BASE_ADDR_OFFSET    : natural := 0;
+        -- Length of the BL8 (64B) and BL4 (32B) burst in bus words. Both are
+        -- computed only in HBM_TESTER_PORT, which announces the same burst on AXI.
+        -- The defaults match the default 256b data bus.
+        BL8_WORDS           : natural := 2;
+        BL4_WORDS           : natural := 1
     );
     port (
         -- =====================================================================
@@ -117,14 +122,13 @@ architecture FULL of HBM_TESTER_GEN is
 
 begin
 
-    -- Warning! - The BL8 mode only supports a 256b wide data bus.
-    -- The burst is counted in bus words, so this encoding only produces a real BL4 (32B)
-    -- or BL8 (64B) access on a 256b bus. The address stride always follows the burst, so
-    -- the generated traffic stays contiguous on a wider bus, but the access size no
-    -- longer matches the name of the mode: on a 512b bus the BL4 mode issues 64B and the
-    -- BL8 mode 128B, and a real 32B access cannot be generated at all.
-    s_gen_burst_max <= "01" when (CS_GEN_BL8_MODE = '1') else "00"; -- 2 words per burst, 1 word per burst
-    s_sequ_addr_inc <= "10" when (CS_GEN_BL8_MODE = '1') else "01"; -- address + 2 words, address + 1 word
+    -- Warning! - On a bus wider than 256b both modes issue the same 64B access,
+    -- because one bus word is already that large and nothing shorter can be put on
+    -- the bus. The efficiency of the short 32B access therefore cannot be measured
+    -- on such a build. The address stride follows the burst in both modes, so the
+    -- generated traffic stays contiguous whatever the length turns out to be.
+    s_gen_burst_max <= to_unsigned(BL8_WORDS-1, 2) when (CS_GEN_BL8_MODE = '1') else to_unsigned(BL4_WORDS-1, 2);
+    s_sequ_addr_inc <= to_unsigned(BL8_WORDS, 2)   when (CS_GEN_BL8_MODE = '1') else to_unsigned(BL4_WORDS, 2);
 
     -- -------------------------------------------------------------------------
     --  RUN CONTROL LOGIC

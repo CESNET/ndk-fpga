@@ -153,6 +153,18 @@ end entity;
 
 architecture FULL of HBM_TESTER_PORT is
 
+    -- Length of one burst in bus words. One HBM pseudo channel is 64b wide, so a BL4
+    -- burst moves 4*64b = 32B and a BL8 burst 8*64b = 64B. The data bus here is much
+    -- wider and carries the same access in fewer but wider words, which is why the
+    -- burst length has to be derived from AXI_DATA_WIDTH rather than fixed. The clamp
+    -- to one word covers a bus at least as wide as the access itself: a 512b word
+    -- already holds the whole 64B of BL8, so the 32B of BL4 cannot be expressed and
+    -- both modes end up issuing the same 64B.
+    -- The constants are passed to HBM_TESTER_GEN, so the AXI burst announced here
+    -- always covers the same number of words as the generator produces.
+    constant BL8_WORDS : natural := max(1, 64/(AXI_DATA_WIDTH/8));
+    constant BL4_WORDS : natural := max(1, 32/(AXI_DATA_WIDTH/8));
+
     signal s_reset_reg            : std_logic;
 
     signal s_db_gen_addr_mode_reg  : std_logic;
@@ -364,21 +376,23 @@ begin
     -- -------------------------------------------------------------------------
     --  HMC BURST PARAMETERS
     -- -------------------------------------------------------------------------
-    -- Burst Size. This signal indicates the size of each transfer in
-    -- the burst: "101" = 32 Bytes (BL4), "110" = 64 Bytes
-    -- The 32B and 64B access refers to data corresponding to 64 bits
-    -- (one Pseudo Channel) for 4 burst cycles (32B) or 8 burst cycles (64B).
-    -- The 64B access granularity is the default for better efficiency.
+    -- Burst Size. The 32B (BL4) and 64B (BL8) access is counted on one Pseudo
+    -- Channel, which is 64 bits wide, over 4 burst cycles (32B) or 8 burst cycles
+    -- (64B) of the DRAM. The 64B granularity is the default for better efficiency,
+    -- it needs half as many commands for the same amount of data. How many AXI
+    -- beats that access takes depends on the width of the bus, so AXI_LEN comes
+    -- from the constants above. AXI_SIZE stays the full bus width, which is also
+    -- the reason a beat cannot be made shorter than one whole word.
 
     process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s_db_gen_bl8_mode_reg = '1') then
-                s_hbm_burst_size       <= std_logic_vector(to_unsigned(1, AXI_LEN_WIDTH));
-                s_hbm_wr_burst_cnt_max <= "01";
+                s_hbm_burst_size       <= std_logic_vector(to_unsigned(BL8_WORDS-1, AXI_LEN_WIDTH));
+                s_hbm_wr_burst_cnt_max <= to_unsigned(BL8_WORDS-1, 2);
             else
-                s_hbm_burst_size       <= std_logic_vector(to_unsigned(0, AXI_LEN_WIDTH));
-                s_hbm_wr_burst_cnt_max <= "00";
+                s_hbm_burst_size       <= std_logic_vector(to_unsigned(BL4_WORDS-1, AXI_LEN_WIDTH));
+                s_hbm_wr_burst_cnt_max <= to_unsigned(BL4_WORDS-1, 2);
             end if;
         end if;
     end process;
@@ -430,7 +444,9 @@ begin
             AXI_ADDR_WIDTH      => AXI_ADDR_WIDTH,
             PORT_ADDR_HBIT      => PORT_ADDR_HBIT,
             PORT_ID             => PORT_ID,
-            BASE_ADDR_OFFSET    => BASE_ADDR_OFFSET
+            BASE_ADDR_OFFSET    => BASE_ADDR_OFFSET,
+            BL8_WORDS           => BL8_WORDS,
+            BL4_WORDS           => BL4_WORDS
         )
         port map (
             CLK               => CLK,
