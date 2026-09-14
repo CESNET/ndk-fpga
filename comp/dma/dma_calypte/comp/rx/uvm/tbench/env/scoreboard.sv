@@ -4,6 +4,77 @@
 
 //-- SPDX-License-Identifier: BSD-3-Clause
 
+
+// Comparer of the DUT PCIe RQ transactions against the model expectations.
+//
+// It is based on the uvm_common::comparer_base_ordered which pairs a model and
+// a DUT transaction only when both of them are available, keeps the unpaired
+// transactions in queues visible to used()/check_phase and flags the
+// transactions which wait too long for their counterpart (delay watchdogs).
+class pcie_rq_comparer #(type MODEL_ITEM) extends uvm_common::comparer_base_ordered #(MODEL_ITEM, uvm_pcie::header);
+    `uvm_component_param_utils(uvm_dma_ll::pcie_rq_comparer #(MODEL_ITEM))
+
+    localparam int unsigned MPS       = 256;
+    localparam int unsigned PAGE_SIZE = 4096;
+
+    // When set, the delay of the first data part of each packet is recorded
+    // (used only by the DMA data comparer).
+    uvm_common::stats delay_stat;
+
+    function new(string name, uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
+    virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
+        uvm_pcie::request_header dut_rq;
+        dma_model_packet         model_pkt;
+        bit                      ret = 1;
+
+        assert($cast(dut_rq, tr_dut));
+
+        ret &= dut_rq.fmt                === tr_model.fmt;
+        ret &= dut_rq.pcie_type          === tr_model.pcie_type;
+        ret &= dut_rq.traffic_class      === tr_model.traffic_class;
+        ret &= dut_rq.id_based_ordering  === tr_model.id_based_ordering;
+        ret &= dut_rq.relaxed_ordering   === tr_model.relaxed_ordering;
+        ret &= dut_rq.no_snoop           === tr_model.no_snoop;
+        ret &= dut_rq.th                 === tr_model.th; // TLP Processing Hints
+        ret &= dut_rq.td                 === tr_model.td;
+        ret &= dut_rq.ep                 === tr_model.ep; // poisoned
+        ret &= dut_rq.at                 === tr_model.at;
+        ret &= dut_rq.length             === tr_model.length; //dwords
+        ret &= (dut_rq.data              ==? tr_model.data) === 1'b1;
+        ret &= dut_rq.requester_id       === tr_model.requester_id;
+        ret &= dut_rq.tag                === tr_model.tag;
+        ret &= dut_rq.lbe                === tr_model.lbe;
+        ret &= dut_rq.fbe                === tr_model.fbe;
+        ret &= dut_rq.address            === tr_model.address;
+        ret &= dut_rq.ph                 === tr_model.ph;
+
+        //Check pcie requiretments
+        if (dut_rq.data.size() > MPS || ((({dut_rq.address, 2'b00} & (PAGE_SIZE-1)) + dut_rq.data.size()) > PAGE_SIZE)) begin
+            const logic [64-1:0] tmp_addr = (({dut_rq.address, 2'b00} & (PAGE_SIZE-1)) + dut_rq.data.size());
+            string err_msg = $sformatf("\n\tPacket doesn't meet pcie requirements.");
+            err_msg = {err_msg, $sformatf("\n\t\tPacket size %0d", dut_rq.data.size())};
+            err_msg = {err_msg, $sformatf("\n\t\tMaximum payload(%0d) exceeded %0d", MPS, dut_rq.data.size() > MPS)};
+            err_msg = {err_msg, $sformatf("\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
+                                                    PAGE_SIZE,
+                                                    tmp_addr > PAGE_SIZE,
+                                                    {dut_rq.address, 2'b00})};
+            `uvm_error(this.get_full_name(), err_msg);
+        end
+
+        // Delay statistic of the first data part of a packet (DMA data comparer only).
+        if (ret != 0 && delay_stat != null && $cast(model_pkt, tr_model)
+            && model_pkt.part == 1 && model_pkt.data_packet == 1) begin
+            delay_stat.next_val((dut_rq.time_last() - model_pkt.time_last())/1ns);
+        end
+
+        return ret;
+    endfunction
+endclass
+
+
 class scoreboard #(
     int unsigned USR_MFB_ITEM_WIDTH,
     int unsigned CHANNELS,
@@ -18,8 +89,6 @@ class scoreboard #(
 
     localparam LOGIC_WIDTH            = 24 + $clog2(PKT_SIZE_MAX+1) + $clog2(CHANNELS);
     localparam IS_INTEL_DEV           = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
-    localparam MPS                    = 256;
-    localparam PAGE_SIZE              = 4096;
     localparam PTR_UPD_REQ_MVB_ITEM_W = 2*POINTER_WIDTH + 1 + SW_ADDR_WIDTH;
 
     //INPUT TO DUT
@@ -29,18 +98,16 @@ class scoreboard #(
     //DUT OUTPUT
     uvm_analysis_export #(uvm_pcie::header)              m_pcie_rq_data_dut;
     protected uvm_tlm_analysis_fifo #(uvm_pcie::header)  m_pcie_rq_data_dut_meter;
-    protected uvm_tlm_analysis_fifo #(uvm_pcie::header)  m_pcie_rq_data_dut_cmp;
 
     uvm_analysis_export #(uvm_logic_vector::sequence_item #(PTR_UPD_REQ_MVB_ITEM_W)) m_ptr_upd_req_mvb_exp;
 
     uvm_analysis_export #(uvm_pcie::header)              m_pcie_rq_upd_dut;
-    protected uvm_tlm_analysis_fifo #(uvm_pcie::header)  m_pcie_rq_upd_dut_cmp;
 
-    // Models with their output fifos
+    // Models with comparers of their output against the DUT output
     local dma_model #(USR_MFB_ITEM_WIDTH, CHANNELS, PKT_SIZE_MAX) m_dma_model;
-    local uvm_tlm_analysis_fifo #(dma_model_packet)               m_dma_model_output_fifo;
     local ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH)       m_ptr_updater_model;
-    local uvm_tlm_analysis_fifo #(uvm_pcie::request_header)       m_ptr_upd_model_output_fifo;
+    local pcie_rq_comparer #(dma_model_packet)                    m_data_cmp;
+    local pcie_rq_comparer #(uvm_pcie::request_header)            m_upd_cmp;
 
     local uvm_common::stats                                                                    m_input_speed_stat;
     local uvm_tlm_analysis_fifo #(uvm_logic_vector_array::sequence_item #(USR_MFB_ITEM_WIDTH)) m_input_speed_meter_fifo;
@@ -64,14 +131,10 @@ class scoreboard #(
         m_usr_mfb_data_exp     = new("m_usr_mfb_data_exp", this);
         m_usr_mfb_meta_exp     = new("m_usr_mfb_meta_exp", this);
         m_ptr_upd_req_mvb_exp  = new("m_ptr_upd_req_mvb_exp", this);
-        m_pcie_rq_upd_dut       = new("m_pcie_rq_upd_dut", this);
-        m_pcie_rq_upd_dut_cmp   = new("m_pcie_rq_upd_dut_cmp", this);
+        m_pcie_rq_upd_dut      = new("m_pcie_rq_upd_dut", this);
 
-        m_pcie_rq_data_dut = new("m_pcie_rq_data_dut", this);
+        m_pcie_rq_data_dut        = new("m_pcie_rq_data_dut", this);
         m_pcie_rq_data_dut_meter  = new("m_pcie_rq_data_dut_meter", this);
-        m_pcie_rq_data_dut_cmp    = new("m_pcie_rq_data_dut_cmp", this);
-        m_dma_model_output_fifo     = new("m_dma_model_output_fifo", this);
-        m_ptr_upd_model_output_fifo = new("m_ptr_upd_model_output_fifo", this);
 
         //LOCAL VARIABLES
         m_input_speed_stat       = new();
@@ -90,77 +153,44 @@ class scoreboard #(
                               ::create("m_dma_model", this);
         m_ptr_updater_model = ptr_updater_model #(POINTER_WIDTH, SW_ADDR_WIDTH)::type_id
                               ::create("m_ptr_updater_model", this);
+
+        m_data_cmp = pcie_rq_comparer #(dma_model_packet)::type_id::create("m_data_cmp", this);
+        m_data_cmp.delay_stat = m_delay_stat;
+        m_upd_cmp  = pcie_rq_comparer #(uvm_pcie::request_header)::type_id::create("m_upd_cmp", this);
+        // The model expectations are synchronized to the DUT header-manager probe,
+        // which triggers when the DUT emits the packet DMA header (the last
+        // transaction of the packet). The DUT therefore legitimately leads the
+        // model by the packet emission time, so the DUT-side delay watchdog must
+        // stay effectively disabled; unpaired transactions are reported by
+        // check_phase instead.
+        m_data_cmp.model_tr_timeout_set(10s);
+        m_upd_cmp.model_tr_timeout_set(10s);
     endfunction
 
     function void connect_phase(uvm_phase phase);
         m_usr_mfb_data_exp.connect(m_dma_model.m_usr_mfb_data_fifo.analysis_export);
         m_usr_mfb_meta_exp.connect(m_dma_model.m_usr_mfb_meta_fifo.analysis_export);
-        m_dma_model.m_pcie_rq_mfb_port.connect(m_dma_model_output_fifo.analysis_export);
+        m_dma_model.m_pcie_rq_mfb_port.connect(m_data_cmp.analysis_imp_model);
 
-        m_pcie_rq_upd_dut.connect(m_pcie_rq_upd_dut_cmp  .analysis_export);
+        m_pcie_rq_upd_dut.connect(m_upd_cmp.analysis_imp_dut);
 
         m_ptr_upd_req_mvb_exp.connect(m_ptr_updater_model.m_ptr_upd_req_fifo.analysis_export);
-        m_ptr_updater_model.m_ptr_upd_rq_mfb_port.connect(m_ptr_upd_model_output_fifo.analysis_export);
+        m_ptr_updater_model.m_ptr_upd_rq_mfb_port.connect(m_upd_cmp.analysis_imp_model);
 
         m_usr_mfb_data_exp.connect(m_input_speed_meter_fifo.analysis_export);
 
         m_pcie_rq_data_dut.connect(m_pcie_rq_data_dut_meter.analysis_export);
-        m_pcie_rq_data_dut.connect(m_pcie_rq_data_dut_cmp  .analysis_export);
+        m_pcie_rq_data_dut.connect(m_data_cmp.analysis_imp_dut);
     endfunction
 
     function int unsigned used();
         int unsigned ret = 0;
-        ret |= (m_pcie_rq_data_dut_cmp.used() != 0);
-        ret |= (m_dma_model_output_fifo.used() != 0);
-        ret |= (m_ptr_upd_model_output_fifo.used() != 0);
+        ret |= (m_data_cmp.used() != 0);
+        ret |= (m_upd_cmp.used() != 0);
         ret |= (m_dma_model.used() != 0);
         ret |= (m_ptr_updater_model.used() != 0);
-        ret |= (m_pcie_rq_upd_dut_cmp.used() != 0);
         return ret;
     endfunction
-
-    function bit pcie_compare(
-            uvm_pcie::request_header  dut,
-            uvm_pcie::request_header  model
-        );
-
-        bit ret = 1;
-
-        ret &= dut.fmt                === model.fmt;
-        ret &= dut.pcie_type          === model.pcie_type;
-        ret &= dut.traffic_class      === model.traffic_class;
-        ret &= dut.id_based_ordering  === model.id_based_ordering;
-        ret &= dut.relaxed_ordering   === model.relaxed_ordering;
-        ret &= dut.no_snoop           === model.no_snoop;
-        ret &= dut.th                 === model.th; // TLP Processing Hints
-        ret &= dut.td                 === model.td;
-        ret &= dut.ep                 === model.ep; // poisoned
-        ret &= dut.at                 === model.at;
-        ret &= dut.length             === model.length; //dwords
-        ret &= (dut.data              ==? model.data) === 1'b1;
-        ret &= dut.requester_id       === model.requester_id;
-        ret &= dut.tag                === model.tag;
-        ret &= dut.lbe                === model.lbe;
-        ret &= dut.fbe                === model.fbe;
-        ret &= dut.address            === model.address;
-        ret &= dut.ph                 === model.ph;
-
-        //Check pcie requiretments
-        if (dut.data.size() > MPS || ((({dut.address, 2'b00} & (PAGE_SIZE-1)) + dut.data.size()) > PAGE_SIZE)) begin
-            const logic [64-1:0] tmp_addr = (({dut.address, 2'b00} & (PAGE_SIZE-1)) + dut.data.size());
-            string err_msg = $sformatf("\n\tPacket doesn't meet pcie requirements.");
-            err_msg = {err_msg, $sformaf("\n\t\tPacket size %0d", dut.data.size())};
-            err_msg = {err_msg, $sformaf("\n\t\tMaximum payload(%0d) exceeded %0d", MPS, dut.data.size() > MPS)};
-            err_msg = {err_msg, $sformaf("\n\t\tPage(%0d) boundary exceeded %0d addr 0x%h",
-                                                    PAGE_SIZE,
-                                                    tmp_addr > PAGE_SIZE,
-                                                    {dut.address, 2'b00})};
-            `uvm_error(this.get_full_name(), err_msg);
-        end
-
-        return ret;
-    endfunction
-
 
     task run_input_meter();
         int unsigned speed_packet_size = 0;
@@ -212,112 +242,14 @@ class scoreboard #(
         end
     endtask
 
-    task run_data_cmp();
-        forever begin
-            string msg;
-            uvm_pcie::request_header  dut_hdr_rq;
-            uvm_pcie::header dut_hdr;
-            dma_model_packet model_hdr;
-
-            m_pcie_rq_data_dut_cmp.get(dut_hdr);
-            assert($cast(dut_hdr_rq, dut_hdr));
-            m_dma_model_output_fifo.get(model_hdr);
-
-            m_dma_tr_compared++;
-
-            msg = $sformatf("\nDMA Segments compared : %0d, segments erroneous: %0d. Channel: %0d, Packet num %0d",
-                            m_dma_tr_compared, m_dma_tr_errors, model_hdr.channel,
-                            model_hdr.packet_num);
-
-            //if (tr_dut.compare(packet_dma_model) == 0) begin
-            if (pcie_compare(dut_hdr_rq, model_hdr) == 0) begin
-                m_dma_tr_errors++;
-
-                msg = {msg, $sformatf("\nExpected transaction is:\n\t\tPart is : %s",
-                                      model_hdr.data_packet == 1 ? "DATA" : "HEADER")};
-                msg = {msg, $sformatf("\n\t\tChannel : %0d", model_hdr.channel)};
-                msg = {msg, $sformatf("\n\t\tPart %0d/%0d", model_hdr.part, model_hdr.part_num)};
-                msg = {msg, $sformatf("\n\t\tInput time\n\t\t\t%s", model_hdr.time2string())};
-                msg = {msg, $sformatf("\n\tDUT Transaction doesnt match Model transaction")};
-                msg = {msg, $sformatf("\n\tDUT Transaction: \n\t%s\n\t",
-                                      dut_hdr.convert2string())};
-                msg = {msg, $sformatf("\nMODEL TRANSACTION %s\n", model_hdr.convert2string())};
-                `uvm_error(this.get_full_name(), msg);
-            end else begin
-                msg = {msg, $sformatf("\nRecive correct transaction:")};
-                msg = {msg, $sformatf("\n\t\tSegment contains: %s", model_hdr.data_packet == 1
-                                      ? "DATA" : "HEADER")};
-                msg = {msg, $sformatf("\n\t\tChannel: %0d", model_hdr.channel)};
-                msg = {msg, $sformatf("\n\t\tPart %0d/%0d", model_hdr.part, model_hdr.part_num)};
-                msg = {msg, $sformatf("\n\t\tPart is delay from SOF on input %0dns",
-                                      (dut_hdr.time_last() - model_hdr.time_last())/1ns)};
-                `uvm_info(this.get_full_name(), $sformatf("%s\nTransaction%s", msg,
-                                                          model_hdr.convert2string()), UVM_MEDIUM);
-
-                //Count delay if you get first data packet.
-                if (model_hdr.part == 1 && model_hdr.data_packet == 1) begin
-                    m_delay_stat.next_val((dut_hdr.time_last() - model_hdr.time_last())/1ns);
-                end
-            end
-        end
-    endtask
-
-    task run_upd_cmp();
-        forever begin
-            string msg;
-            uvm_pcie::request_header model_tr;
-            uvm_pcie::header dut_tr;
-            uvm_pcie::request_header dut_rq_tr;
-
-
-            m_pcie_rq_upd_dut_cmp.get(dut_tr);
-            assert($cast(dut_rq_tr, dut_tr));
-            m_ptr_upd_model_output_fifo.get(model_tr);
-
-            m_ptr_upd_tr_compared++;
-            msg = $sformatf("\nPTR_UPD tr compared : %0d, PTR_UPD tr erroneous: %0d.",
-                            m_ptr_upd_tr_compared, m_ptr_upd_tr_errors);
-
-            if (pcie_compare(dut_rq_tr, model_tr) == 0) begin
-                m_ptr_upd_tr_errors++;
-
-                msg = {msg, $sformatf("\nTransactions DO NOT match!")};
-                msg = {msg, $sformatf("\n\t====== DUT ======t%s\n", dut_rq_tr.convert2string())};
-                msg = {msg, $sformatf("\n\t====== MODEL ======\n\t%s\n", model_tr.convert2string())};
-                `uvm_error(this.get_full_name(), msg);
-            end else begin
-                msg = {msg, $sformatf("\nReceived correct transaction: %s", model_tr.convert2string())};
-                `uvm_info(this.get_full_name(), msg, UVM_MEDIUM);
-            end
-        end
-    endtask
-
     task run_phase(uvm_phase phase);
 
         // Two routines that insert times for input and output transactions for throughput and latency measurement
         fork
             run_data_meter();
-            run_data_cmp();
             run_input_meter();
-
-            run_upd_cmp();
         join
     endtask
-
-    function void check_phase(uvm_phase phase);
-        string msg = "";
-
-        if (m_pcie_rq_data_dut_cmp.used() != 0  || m_pcie_rq_upd_dut_cmp.size() != 0 ||
-            m_dma_model_output_fifo.size() != 0 || m_ptr_upd_model_output_fifo.size() != 0) begin
-
-            msg = {msg, "\nExpected some data\n:"};
-            msg = {msg, $sformatf("\tDMA MODEL transactions: (%0d)\n", m_dma_model_output_fifo.size())};
-            msg = {msg, $sformatf("\tDMA DUT data packets: (%0d)\n", m_pcie_rq_data_dut_cmp.size())};
-            msg = {msg, $sformatf("\tPTR_UPDATER MODEL transactions: (%0d)\n", m_ptr_upd_model_output_fifo.size())};
-            msg = {msg, $sformatf("\tPTR_UPDATER DUT data packets: (%0d)\n", m_pcie_rq_upd_dut_cmp.size())};
-            `uvm_error(this.get_full_name(), msg);
-        end
-    endfunction
 
     function void report_phase(uvm_phase phase);
         real   min;
@@ -329,6 +261,13 @@ class scoreboard #(
         int    byte_cntr_diff;
         int    disc_pkt_cntr_diff;
         int    disc_byte_cntr_diff;
+
+        // Take over the results of the comparers (their check_phase reports the
+        // unpaired transactions).
+        m_dma_tr_compared     = m_data_cmp.compared;
+        m_dma_tr_errors       = m_data_cmp.errors;
+        m_ptr_upd_tr_compared = m_upd_cmp.compared;
+        m_ptr_upd_tr_errors   = m_upd_cmp.errors;
 
         //-----------------------------------------------------------------------
         // Counter statistics (latency and throughput on each interface)

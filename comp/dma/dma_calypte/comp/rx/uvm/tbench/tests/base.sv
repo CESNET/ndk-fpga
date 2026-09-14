@@ -92,6 +92,10 @@ class base #(
             `uvm_info(this.get_full_name(), "\n\tWaiting after virtual sequence finished.", UVM_MEDIUM);
         end
 
+        // Wait for all packets to be fully processed by the DUT before reading the stats,
+        // so the counters are up to date.
+        #(3us);
+
         for (int unsigned chan = 0; chan < CHANNELS; chan++) begin
             m_env.m_regmodel.m_regmodel.channel[chan].sent_packets_cnt.write(status_r, {32'h1, 32'h1});
             m_env.m_regmodel.m_regmodel.channel[chan].sent_packets_cnt.read(status_r, pkt_cnt[chan]);
