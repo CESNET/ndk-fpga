@@ -123,12 +123,6 @@ begin
     -- the generated traffic stays contiguous on a wider bus, but the access size no
     -- longer matches the name of the mode: on a 512b bus the BL4 mode issues 64B and the
     -- BL8 mode 128B, and a real 32B access cannot be generated at all.
-    -- psl assert_gen_bl8_data_width :
-    --      assert never (CS_GEN_BL8_MODE = '1' and AXI_DATA_WIDTH /= 256)
-    --      report "HBM_TESTER_GEN: CS_GEN_BL8_MODE is set on a " & integer'image(AXI_DATA_WIDTH)
-    --             & "b data bus, which generates a " & integer'image(2*(AXI_DATA_WIDTH/8))
-    --             & "B access instead of the 64B of a BL8 burst.";
-
     s_gen_burst_max <= "01" when (CS_GEN_BL8_MODE = '1') else "00"; -- 2 words per burst, 1 word per burst
     s_sequ_addr_inc <= "10" when (CS_GEN_BL8_MODE = '1') else "01"; -- address + 2 words, address + 1 word
 

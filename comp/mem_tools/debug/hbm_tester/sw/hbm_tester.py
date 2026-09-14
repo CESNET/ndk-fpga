@@ -35,12 +35,12 @@ class hbm_tester:
     _MON_CONF_LATENCY_TEST = 0x32 * 0x100 # counter0 = RD latency, counter1 = WR latency
     _MON_CONF_DATA_TEST    = 0x54 * 0x100 # counter0 = data OK, counter1 = dat ERROR
 
-    def __init__(self, dev, index):
+    def __init__(self, dev, index, ports=32, width=256, freq=450.0):
         self.node = dev.fdt_get_compatible(self.DT_COMPATIBLE)[index]
         self.comp = dev.comp_open(self.node)
-        self.ports = 32 # TODO register
-        self.width = 256 # TODO register
-        self.clk_period = (1 / 450000000) * 1e9 # TODO register
+        self.ports = ports
+        self.width = width
+        self.clk_period = (1 / (freq * 1e6)) * 1e9
         self.rw_no_wait = False
         self.check_bl8_data_width()
 
@@ -252,6 +252,9 @@ if __name__ == '__main__':
     args.add_argument("-r", "--random", action='store_true', help="Use random addressing (only for latency or speed test), default is sequential.")
     args.add_argument("-w", "--no-wait", action='store_true', help="Do not wait for the write response before reading the same address (coherency test).")
     args.add_argument("-p", "--ports", action="store", nargs='?', default='0', help="Number of actived ports (channels), default is all.")
+    args.add_argument("-P", "--tester-ports", type=int, default=32, help="Number of ports of one tester instance (HBM_PORTS/HBM_MODULES), default 32.")
+    args.add_argument("-W", "--data-width", type=int, default=256, help="HBM_DATA_WIDTH of the build (256 or 512), default 256.")
+    args.add_argument("-F", "--freq", type=float, default=450.0, help="HBM_CLK frequency in MHz, default 450.")
     #args.add_argument("-l","--length", action="store", nargs='?', default='0xFFFFFF', help="Length of test in clock cycles (only for latency or speed test), default is 0xFFFFFF.")
     arguments = args.parse_args()
 
@@ -284,7 +287,7 @@ if __name__ == '__main__':
     # Run tests on selected instances
     for idx in indices_to_test:
         print(f"\n>>> Initializing HBM Tester [Index {idx}] <<<")
-        tester = hbm_tester(dev, idx)
+        tester = hbm_tester(dev, idx, ports=arguments.tester_ports, width=arguments.data_width, freq=arguments.freq)
         tester.rw_no_wait = arguments.no_wait
 
         arg_ports = int(arguments.ports, 0)

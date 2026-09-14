@@ -111,41 +111,16 @@ Control Software
 The ``hbm_tester.py`` script in the ``sw`` directory controls the hardware.
 
 .. warning::
-   **The script is not self-configuring and has to be adapted to your build before it is
-   used.** It does not read the geometry of the tester from the firmware or from the
-   Device Tree, it simply assumes the constants listed below. When they do not match the
-   design, the script reports wrong numbers without any warning, or accesses the registers
-   of ports that do not exist.
+   **The script is not self-configuring and has to be told the geometry of your build.**
+   It does not read the geometry of the tester from the firmware or from the Device Tree,
+   it assumes 32 ports per tester instance, a 256b data bus and a 450 MHz ``HBM_CLK``.
+   When these defaults do not match the design, pass the correct values with ``-P``,
+   ``-W`` and ``-F``, otherwise the script reports wrong numbers without any warning, or
+   accesses the registers of ports that do not exist.
 
-Initial Setup
-"""""""""""""
-
-Edit the constants in the ``__init__`` function of the ``hbm_tester`` class so that they
-match the firmware you are talking to:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 15 65
-
-   * - Constant
-     - Default
-     - Has to be set to
-   * - ``self.ports``
-     - ``32``
-     - Number of ports of **one** tester instance, that is ``HBM_PORTS / HBM_MODULES``.
-       On ThunderFjord (fb2cdg1) and on n5014 this is ``16``, not 32.
-   * - ``self.width``
-     - ``256``
-     - The ``HBM_DATA_WIDTH`` of the build. A wrong value scales every reported speed by
-       the same factor.
-   * - ``self.clk_period``
-     - 450 MHz
-     - Period of ``HBM_CLK``. The counters are converted to seconds with it, so it scales
-       both the speed and the latency results.
-
-One ``hbm_tester`` object is created per Device Tree node, that is per HBM module, and all
-of them share these constants. A design whose modules do not have the same geometry is not
-supported by the script.
+One ``hbm_tester`` object is created per Device Tree node, that is per HBM module, and the
+values given on the command line are used for all of them. A design whose modules do not
+have the same geometry is not supported by the script.
 
 Tests
 """""
@@ -192,6 +167,15 @@ Command Line Arguments
        test).
    * - ``-p, --ports``
      - Number of active ports/channels (default: all).
+   * - ``-P, --tester-ports``
+     - Number of ports of **one** tester instance, that is ``HBM_PORTS / HBM_MODULES``
+       (default: ``32``).
+   * - ``-W, --data-width``
+     - The ``HBM_DATA_WIDTH`` of the build (default: ``256``). A wrong value scales every
+       reported speed by the same factor.
+   * - ``-F, --freq``
+     - Frequency of ``HBM_CLK`` in MHz (default: ``450``). The counters are converted to
+       seconds with it, so it scales both the speed and the latency results.
 
 Register Map
 ^^^^^^^^^^^^
