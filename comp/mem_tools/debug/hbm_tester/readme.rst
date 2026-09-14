@@ -173,8 +173,8 @@ Command Line Arguments
      - Number of ports of **one** tester instance, that is ``HBM_PORTS / HBM_MODULES``
        (default: ``32``).
    * - ``-W, --data-width``
-     - The ``HBM_DATA_WIDTH`` of the build (default: ``256``). A wrong value scales every
-       reported speed by the same factor.
+     - The ``HBM_DATA_WIDTH`` of the build, ``256`` or ``512`` (default: ``256``). A wrong
+       value scales every reported speed by the same factor.
    * - ``-F, --freq``
      - Frequency of ``HBM_CLK`` in MHz (default: ``450``). The counters are converted to
        seconds with it, so it scales both the speed and the latency results.

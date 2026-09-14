@@ -266,7 +266,7 @@ if __name__ == '__main__':
     args.add_argument("-b", "--bl8", action='store_true', help="Use the BL8 burst mode (64B access), default is BL4 (32B access).")
     args.add_argument("-p", "--ports", action="store", nargs='?', default='0', help="Number of actived ports (channels), default is all.")
     args.add_argument("-P", "--tester-ports", type=int, default=32, help="Number of ports of one tester instance (HBM_PORTS/HBM_MODULES), default 32.")
-    args.add_argument("-W", "--data-width", type=int, default=256, help="HBM_DATA_WIDTH of the build (256 or 512), default 256.")
+    args.add_argument("-W", "--data-width", type=int, choices=[256, 512], default=256, help="HBM_DATA_WIDTH of the build, default 256.")
     args.add_argument("-F", "--freq", type=float, default=450.0, help="HBM_CLK frequency in MHz, default 450.")
     #args.add_argument("-l","--length", action="store", nargs='?', default='0xFFFFFF', help="Length of test in clock cycles (only for latency or speed test), default is 0xFFFFFF.")
     arguments = args.parse_args()
