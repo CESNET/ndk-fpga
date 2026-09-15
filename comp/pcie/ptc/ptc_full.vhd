@@ -524,9 +524,16 @@ begin
             MFB_REG_SIZE     => MFB_UP_REG_SIZE,
             MFB_BLOCK_SIZE   => MFB_UP_BLOCK_SIZE,
             MFB_ITEM_WIDTH   => MFB_UP_ITEM_WIDTH,
-            INPUT_FIFO_SIZE  => 512,
             RX_PAYLOAD_EN    => (others => true),
-            MID_MFB_FIFOS_EN => true,
+            -- Buffer the merger inputs wherever the UP MFB transformer really
+            -- gathers Regions. With both widths equal it is a plain wire and
+            -- the asynch FIFO above already buffers.
+            IN_MFB_FIFO_EN   => (DMA_MFB_UP_REGIONS /= MFB_UP_REGIONS),
+            -- Shallow on purpose, so the DMA ports keep sharing the link evenly.
+            IN_MFB_FIFO_SIZE => 32,
+            -- Meeting timing here needs the merger inputs separated by a skid
+            -- buffer.
+            IN_REG_SKID_EN   => true,
             IN_PIPE_EN       => false,
             OUT_PIPE_EN      => true,
             FIFOX_MULTI_ARCH => "FULL",
@@ -1263,7 +1270,10 @@ begin
             MFB_BLOCK_SIZE   => MFB_DOWN_BLOCK_SIZE,
             MFB_ITEM_WIDTH   => MFB_DOWN_ITEM_WIDTH,
             OUTPUT_FIFO_SIZE => 16,
-            MID_MFB_FIFOS_EN => true,
+            -- Buffer the splitter outputs wherever the DOWN MFB transformer
+            -- really spreads Regions. With both widths equal it is a plain wire
+            -- and the asynch FIFO below already buffers.
+            OUT_MFB_FIFO_EN  => (MFB_DOWN_REGIONS /= DMA_MFB_DOWN_REGIONS),
             MFB_FIFO_DEPTH   => 512,
             OUT_PIPE_EN      => true,
             DEVICE           => DEVICE
