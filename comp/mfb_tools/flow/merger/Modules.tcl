@@ -30,6 +30,7 @@ lappend COMPONENTS [ list "MVB_MERGE_ST" $MVB_MERGE_ST_BASE "FULL" ]
 lappend COMPONENTS [ list "MFB_FIFOX"    $MFB_FIFOX_BASE   "FULL" ]
 
 # Source files for implemented component
+lappend MOD "$ENTITY_BASE/mfb_merger_flat.vhd"
 lappend MOD "$ENTITY_BASE/mfb_merger_ent.vhd"
 lappend MOD "$ENTITY_BASE/mfb_merger_full.vhd"
 lappend MOD "$ENTITY_BASE/mfb_merger_gen.vhd"
