@@ -52,7 +52,8 @@ class pcie_rq_comparer #(type MODEL_ITEM) extends uvm_common::comparer_base_orde
         ret &= dut_rq.ph                 === tr_model.ph;
 
         //Check pcie requiretments
-        if (dut_rq.data.size() > MPS || ((({dut_rq.address, 2'b00} & (PAGE_SIZE-1)) + dut_rq.data.size()) > PAGE_SIZE)) begin
+        if (dut_rq.data.size() > MPS ||
+            ((({dut_rq.address, 2'b00} & (PAGE_SIZE-1)) + dut_rq.data.size()) > PAGE_SIZE)) begin
             const logic [64-1:0] tmp_addr = (({dut_rq.address, 2'b00} & (PAGE_SIZE-1)) + dut_rq.data.size());
             string err_msg = $sformatf("\n\tPacket doesn't meet pcie requirements.");
             err_msg = {err_msg, $sformatf("\n\t\tPacket size %0d", dut_rq.data.size())};
