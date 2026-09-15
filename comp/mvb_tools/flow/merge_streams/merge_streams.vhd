@@ -13,10 +13,10 @@ use work.math_pack.all;
 use work.type_pack.all;
 
 -- The MVB_MERGE_STREAMS component is used to merge two or more independent MVB
--- streams into one. The order of merging items is random. The speed of
--- switching between input streams can be influenced by the width of the timeout
--- signal (parameter SW_TIMEOUT_W). Better transmission efficiency can be
--- achieved by enabling input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).
+-- streams into one. The order of merging items is random. A stream is switched
+-- after a set number of transferred words (parameter SW_TIMEOUT_W) or as soon
+-- as it runs empty. Better transmission efficiency can be achieved by enabling
+-- input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).
 --
 entity MVB_MERGE_STREAMS is
     generic (
@@ -28,8 +28,8 @@ entity MVB_MERGE_STREAMS is
         RX_STREAMS      : natural := 2;
         -- Enable MVB SHAKEDOWN on each MVB input stream
         RX_SHAKEDOWN_EN : boolean := True;
-        -- Width of timeout counter, determines the time when the switch to
-        -- the next active MVB stream occurs
+        -- Width of the timeout counter. It counts transferred words, so one
+        -- stream is served for 2**(SW_TIMEOUT_W-1) words.
         SW_TIMEOUT_W    : natural := 4;
         -- FPGA device string
         DEVICE          : string := "AGILEX"
