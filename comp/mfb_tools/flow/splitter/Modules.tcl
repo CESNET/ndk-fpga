@@ -25,5 +25,5 @@ set COMPONENTS [ list \
 
 # entity and architecture
 lappend MOD "$ENTITY_BASE/mfb_splitter_flat.vhd"
-lappend MOD "$ENTITY_BASE/mfb_splitter.vhd"
 lappend MOD "$ENTITY_BASE/mfb_splitter_gen.vhd"
+lappend MOD "$ENTITY_BASE/mfb_splitter.vhd"
