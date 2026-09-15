@@ -5,6 +5,11 @@ MFB Merger Gen
 
 .. vhdl:autoentity:: MFB_MERGER_GEN
 
+MFB Merger Flat
+---------------
+
+.. vhdl:autoentity:: MFB_MERGER_FLAT
+
 MFB Merger
 ----------
 

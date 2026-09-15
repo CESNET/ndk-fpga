@@ -15,3 +15,8 @@ MFB Splitter Gen
 ----------------
 
 .. vhdl:autoentity:: MFB_SPLITTER_GEN
+
+MFB Splitter Flat
+-----------------
+
+.. vhdl:autoentity:: MFB_SPLITTER_FLAT

@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger/readme.html">MFB Merger Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger/readme.html#mfb-merger-flat">MFB Merger Flat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger/readme.html#id1">MFB Merger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html">MFB Merger Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html#id1">MFB Merger Simple GEN</a></li>
@@ -92,6 +93,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Splitter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">MFB Splitter Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mfb-splitter-flat">MFB Splitter Flat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../timestamp_limiter/readme.html">Timestamp Limiter</a></li>
@@ -181,6 +183,12 @@
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_SPLITTER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_splitter" title="Link to this definition"></a></dt>
 <dd><p>Splits RX MFB+MVB interface to two intefaces.
 Switches packets based on one bit SWITCH for each MVB header.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Headers and frames are paired by order, not by content. The k-th frame on
+RX MFB belongs to the k-th header that has <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD(i)='1'</span></code>. A
+header with <code class="docutils literal notranslate"><span class="pre">'0'</span></code> takes no frame.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -244,23 +252,52 @@ DMA_DOWNHDR_WIDTH, DMA_UPHDR_WIDTH</p></td>
 <tr class="row-even" id="vhdl-gengeneric-mfb_splitter-mvb_output_fifo_size"><td><p>MVB_OUTPUT_FIFO_SIZE</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
-<td><p>Size of mvb output FIFOXs (in words)
-The minimum value is 2</p></td>
+<td><p>Obsolete, use OUT_MVB_FIFO_SIZE instead, which it sets the default of</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter-out_mvb_fifo_size"><td><p>OUT_MVB_FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>MVB_OUTPUT_FIFO_SIZE</p></td>
+<td><p>Depth of the output MVB FIFOs in words
+Minimum value is 2. They keep the outputs in step with the switch
+FIFO inside the splitter and cannot be turned off.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>false</p></td>
-<td><p>To enable optional MFB FIFOs at input</p></td>
+<td><p>Enable an MFB FIFO on the input of the splitter
+true: Holds the frame back until the header that says where to route
+it has arrived. A source that puts the header out at the end of the
+frame needs it.
+false: Direct connection without input buffering</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_splitter-mfb_fifo_depth"><td><p>MFB_FIFO_DEPTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter-mfb_fifo_depth"><td><p>MFB_FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
-<td><p>Size of MFB FIFOs (in words)</p></td>
+<td><p>Obsolete, use IN_MFB_FIFO_SIZE instead, which it sets the default of</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter-in_mfb_fifo_size"><td><p>IN_MFB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>MFB_FIFO_DEPTH</p></td>
+<td><p>Depth of the input MFB FIFO in words
+Only used when IN_MFB_FIFO_EN is true</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter-out_mfb_fifo_en"><td><p>OUT_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable the output MFB FIFOs. A whole word is routed at once, so
+without them the slowest output holds up all the others.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter-out_mfb_fifo_size"><td><p>OUT_MFB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Depth of the output MFB FIFOs in words
+Only used when OUT_MFB_FIFO_EN is true</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_splitter-use_outreg"><td><p>USE_OUTREG</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
-<td><p>Create output register PIPEs</p></td>
+<td><p>Obsolete, has no effect. The output registers are inside the splitter
+and are not optional.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mfb_splitter-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
@@ -523,7 +560,15 @@ The minimum value is 2</p></td>
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_splitter_gen">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_SPLITTER_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_splitter_gen" title="Link to this definition"></a></dt>
-<dd><p>MFB+MVB bus splitter with generic number of outputs</p>
+<dd><p>MFB+MVB bus splitter with generic number of outputs.</p>
+<p>All outputs are served in one step by a single <a class="reference internal" href="#vhdl-entity-mfb_splitter_flat"><code class="xref vhdl vhdl-entity docutils literal notranslate"><span class="pre">MFB_SPLITTER_FLAT</span></code></a>
+unit, whatever their number.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Headers and frames are paired by order, not by content. The k-th frame on
+RX MFB belongs to the k-th header that has <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD(i)='1'</span></code>. A
+header with <code class="docutils literal notranslate"><span class="pre">'0'</span></code> takes no frame.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -587,29 +632,62 @@ The minimum value is 2</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Size of output MVB FIFOs (in words)
-Minimum value is 2!</p></td>
+Minimum value is 2!
+Obsolete, use OUT_MVB_FIFO_SIZE instead, which it sets the default of</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable the input MFB FIFO. It holds the frame back until the header
+that says where to route it has arrived.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_gen-in_mfb_fifo_size"><td><p>IN_MFB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Depth of the input MFB FIFO in words
+Only used when IN_MFB_FIFO_EN is true</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-out_mvb_fifo_size"><td><p>OUT_MVB_FIFO_SIZE</p></td>
+<td><p>integer</p></td>
+<td><p>OUTPUT_FIFO_SIZE</p></td>
+<td><p>Depth of the output MVB FIFOs in words, minimum value is 2. They keep
+the outputs in step with the switch FIFO and cannot be turned off.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_gen-out_mfb_fifo_en"><td><p>OUT_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable the output MFB FIFOs. A whole word is routed at once, so
+without them the slowest output holds up all the others.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-mid_mfb_fifos_en"><td><p>MID_MFB_FIFOS_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>False</p></td>
-<td><p>To enable optional MFB FIFOs at middle stages</p></td>
+<td><p>Obsolete, use OUT_MFB_FIFO_EN instead, which it activates</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mfb_splitter_gen-mfb_fifo_depth"><td><p>MFB_FIFO_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
-<td><p>Size of MFB FIFOs (in words)</p></td>
+<td><p>Size of MFB FIFOs (in words)
+Obsolete, use OUT_MFB_FIFO_SIZE instead, which it sets the default of</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-out_mfb_fifo_size"><td><p>OUT_MFB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>MFB_FIFO_DEPTH</p></td>
+<td><p>Depth of the output MFB FIFOs in words
+Only used when OUT_MFB_FIFO_EN is true</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_gen-out_pipe_en"><td><p>OUT_PIPE_EN</p></td>
 <td><p>boolean</p></td>
 <td><p>true</p></td>
-<td><p>Output PIPE enable for all 2:1 splitters</p></td>
+<td><p>Obsolete, has no effect. It was passed to the 1:2 splitters of the
+tree, which never used it either.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_gen-device"><td><p>DEVICE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“ULTRASCALE”</p></td>
 <td><p>“ULTRASCALE”, “STRATIX10”,…</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_gen-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_gen-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
 <td><p>string</p></td>
 <td><p>“SHAKEDOWN”</p></td>
 <td><p>“FULL”, “SHAKEDOWN”</p></td>
@@ -771,6 +849,283 @@ Minimum value is 2!</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_splitter_gen-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
+<td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="mfb-splitter-flat">
+<h1>MFB Splitter Flat<a class="headerlink" href="#mfb-splitter-flat" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mfb_splitter_flat">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_SPLITTER_FLAT</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_splitter_flat" title="Link to this definition"></a></dt>
+<dd><p>MFB+MVB bus splitter which routes to all its outputs in a single step.</p>
+<p>Splits one input MVB+MFB stream into <code class="docutils literal notranslate"><span class="pre">SPLITTER_OUTPUTS</span></code> output streams.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Headers and frames are paired by order, not by content. The k-th frame on
+RX MFB belongs to the k-th header that has <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD(i)='1'</span></code>. A
+header with <code class="docutils literal notranslate"><span class="pre">'0'</span></code> takes no frame.</p>
+</div>
+<p><strong>How it works</strong></p>
+<p>Headers and payload are routed by two halves of this component, kept in step
+by the switch FIFO.</p>
+<p>The MVB half is a plain demultiplexer. <code class="docutils literal notranslate"><span class="pre">RX_MVB_SWITCH</span></code> says which output
+each header goes to, so the header is written into that output’s MVB FIFO.
+Every header that announces a payload also writes its output number into the
+switch FIFO. That FIFO holds one item per packet, in the order the packets
+arrive on MFB.</p>
+<p>The MFB half follows the switch FIFO. A word may carry one packet per Region,
+so it takes as many items as the word has SOFs. Each Region is handed the
+output number of the packet it belongs to, and
+<a class="reference internal" href="../splitter_simple/readme.html#vhdl-entity-mfb_splitter_simple_gen"><code class="xref vhdl vhdl-entity docutils literal notranslate"><span class="pre">MFB_SPLITTER_SIMPLE_GEN</span></code></a> does the routing. A word only passes
+once the FIFO holds an item for every SOF in it. Otherwise the MFB half would
+route a packet whose header has not arrived yet.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-splitter_outputs"><td><p>SPLITTER_OUTPUTS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of splitter output streams, must be at least 2</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of MVB headers per word</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-mvb_item_width"><td><p>MVB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Width of one MVB header in bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of Regions per MFB word</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-mfb_reg_size"><td><p>MFB_REG_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of Blocks per Region</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Number of Items per Block</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Width of one MFB Item in bits</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-in_mfb_fifo_en"><td><p>IN_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable the input MFB FIFO. It holds the frame back until the header
+that says where to route it has arrived.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-in_mfb_fifo_size"><td><p>IN_MFB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Depth of the input MFB FIFO in words, only used when IN_MFB_FIFO_EN
+is true</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-out_mvb_fifo_size"><td><p>OUT_MVB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Depth of the output MVB FIFOs in words, minimum value is 2. They keep
+the outputs in step with the switch FIFO and cannot be turned off.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-out_mfb_fifo_en"><td><p>OUT_MFB_FIFO_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Enable the output MFB FIFOs. A whole word is routed at once, so
+without them the slowest output holds up all the others.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-out_mfb_fifo_size"><td><p>OUT_MFB_FIFO_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Depth of the output MFB FIFOs in words, only used when
+OUT_MFB_FIFO_EN is true</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_splitter_flat-fifox_multi_arch"><td><p>FIFOX_MULTI_ARCH</p></td>
+<td><p>string</p></td>
+<td><p>“SHAKEDOWN”</p></td>
+<td><p>Architecture of the internal FIFOX_MULTI, “SHAKEDOWN” or “FULL”</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_splitter_flat-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“ULTRASCALE”</p></td>
+<td><p>Target device family</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>COMMON SIGNALS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>RX INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mvb_data"><td><p>RX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-rx_mvb_switch"><td><p>RX_MVB_SWITCH</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*log2(SPLITTER_OUTPUTS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Output select for each header, valid with RX_MVB_VLD</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mvb_payload"><td><p>RX_MVB_PAYLOAD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>The header is associated with a payload frame on MFB</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_data"><td><p>RX_MFB_DATA</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_sof"><td><p>RX_MFB_SOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_eof"><td><p>RX_MFB_EOF</p></td>
+<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_sof_pos"><td><p>RX_MFB_SOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_eof_pos"><td><p>RX_MFB_EOF_POS</p></td>
+<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_src_rdy"><td><p>RX_MFB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-rx_mfb_dst_rdy"><td><p>RX_MFB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>TX INTERFACES (per output port)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-tx_mvb_payload"><td><p>TX_MVB_PAYLOAD</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_data"><td><p>TX_MFB_DATA</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_sof"><td><p>TX_MFB_SOF</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_eof"><td><p>TX_MFB_EOF</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_sof_pos"><td><p>TX_MFB_SOF_POS</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_eof_pos"><td><p>TX_MFB_EOF_POS</p></td>
+<td><p>slv_array_t     (SPLITTER_OUTPUTS-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_src_rdy"><td><p>TX_MFB_SRC_RDY</p></td>
+<td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mfb_splitter_flat-tx_mfb_dst_rdy"><td><p>TX_MFB_DST_RDY</p></td>
 <td><p>std_logic_vector(SPLITTER_OUTPUTS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>

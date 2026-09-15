@@ -164,10 +164,10 @@
 <dt class="sig sig-object vhdl" id="vhdl-entity-mvb_merge_streams">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_MERGE_STREAMS</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_merge_streams" title="Link to this definition"></a></dt>
 <dd><p>The MVB_MERGE_STREAMS component is used to merge two or more independent MVB
-streams into one. The order of merging items is random. The speed of
-switching between input streams can be influenced by the width of the timeout
-signal (parameter SW_TIMEOUT_W). Better transmission efficiency can be
-achieved by enabling input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).</p>
+streams into one. The order of merging items is random. A stream is switched
+after a set number of transferred words (parameter SW_TIMEOUT_W) or as soon
+as it runs empty. Better transmission efficiency can be achieved by enabling
+input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -200,8 +200,8 @@ achieved by enabling input MVB SHAKEDOWNS (parameter RX_SHAKEDOWN_EN).</p>
 <tr class="row-even" id="vhdl-gengeneric-mvb_merge_streams-sw_timeout_w"><td><p>SW_TIMEOUT_W</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td><p>Width of timeout counter, determines the time when the switch to
-the next active MVB stream occurs</p></td>
+<td><p>Width of the timeout counter. It counts transferred words, so one
+stream is served for 2**(SW_TIMEOUT_W-1) words.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_merge_streams-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
