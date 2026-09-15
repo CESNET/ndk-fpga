@@ -17,33 +17,42 @@ use work.type_pack.all;
 --                           Entity Declaration
 -- ----------------------------------------------------------------------------
 
--- MFB+MVB bus splitter with generic number of outputs
+-- MFB+MVB bus splitter with generic number of outputs.
+--
+-- All outputs are served in one step by a single :vhdl:entity:`MFB_SPLITTER_FLAT`
+-- unit, whatever their number.
+--
+-- .. warning::
+--   Headers and frames are paired by order, not by content. The k-th frame on
+--   RX MFB belongs to the k-th header that has ``RX_MVB_PAYLOAD(i)='1'``. A
+--   header with ``'0'`` takes no frame.
+--
 entity MFB_SPLITTER_GEN is
     generic (
         -- number of splitter outputs
-        SPLITTER_OUTPUTS : integer := 2;
+        SPLITTER_OUTPUTS  : integer := 2;
 
         -- ===================
         -- MVB characteristics
         -- ===================
 
         -- number of headers
-        MVB_ITEMS        : integer := 2;
+        MVB_ITEMS         : integer := 2;
         -- width of header
-        MVB_ITEM_WIDTH   : integer := 32;
+        MVB_ITEM_WIDTH    : integer := 32;
 
         -- ===================
         -- MFB characteristics
         -- ===================
 
         -- number of regions in word
-        MFB_REGIONS      : integer := 2;
+        MFB_REGIONS       : integer := 2;
         -- number of blocks in region
-        MFB_REG_SIZE     : integer := 1;
+        MFB_REG_SIZE      : integer := 1;
         -- number of items in block
-        MFB_BLOCK_SIZE   : integer := 8;
+        MFB_BLOCK_SIZE    : integer := 8;
         -- width  of one item (in bits)
-        MFB_ITEM_WIDTH   : integer := 32;
+        MFB_ITEM_WIDTH    : integer := 32;
 
         -- ===================
         -- Others
@@ -51,22 +60,45 @@ entity MFB_SPLITTER_GEN is
 
         -- Size of output MVB FIFOs (in words)
         -- Minimum value is 2!
-        OUTPUT_FIFO_SIZE : integer := 8;
+        -- Obsolete, use OUT_MVB_FIFO_SIZE instead, which it sets the default of
+        OUTPUT_FIFO_SIZE  : integer := 8;
 
-        -- To enable optional MFB FIFOs at middle stages
-        MID_MFB_FIFOS_EN : boolean := False;
+        -- Enable the input MFB FIFO. It holds the frame back until the header
+        -- that says where to route it has arrived.
+        IN_MFB_FIFO_EN    : boolean := false;
+
+        -- Depth of the input MFB FIFO in words
+        -- Only used when IN_MFB_FIFO_EN is true
+        IN_MFB_FIFO_SIZE  : natural := 512;
+
+        -- Depth of the output MVB FIFOs in words, minimum value is 2. They keep
+        -- the outputs in step with the switch FIFO and cannot be turned off.
+        OUT_MVB_FIFO_SIZE : integer := OUTPUT_FIFO_SIZE;
+
+        -- Enable the output MFB FIFOs. A whole word is routed at once, so
+        -- without them the slowest output holds up all the others.
+        OUT_MFB_FIFO_EN   : boolean := false;
+
+        -- Obsolete, use OUT_MFB_FIFO_EN instead, which it activates
+        MID_MFB_FIFOS_EN  : boolean := False;
 
         -- Size of MFB FIFOs (in words)
-        MFB_FIFO_DEPTH   : natural := 512;
+        -- Obsolete, use OUT_MFB_FIFO_SIZE instead, which it sets the default of
+        MFB_FIFO_DEPTH    : natural := 512;
 
-        -- Output PIPE enable for all 2:1 splitters
-        OUT_PIPE_EN     : boolean := true;
+        -- Depth of the output MFB FIFOs in words
+        -- Only used when OUT_MFB_FIFO_EN is true
+        OUT_MFB_FIFO_SIZE : natural := MFB_FIFO_DEPTH;
+
+        -- Obsolete, has no effect. It was passed to the 1:2 splitters of the
+        -- tree, which never used it either.
+        OUT_PIPE_EN       : boolean := true;
 
         -- "ULTRASCALE", "STRATIX10",...
-        DEVICE          : string  := "ULTRASCALE";
+        DEVICE            : string  := "ULTRASCALE";
 
         -- "FULL", "SHAKEDOWN"
-        FIFOX_MULTI_ARCH : string  := "SHAKEDOWN"
+        FIFOX_MULTI_ARCH  : string  := "SHAKEDOWN"
     );
     port (
         -- ===================
@@ -120,126 +152,81 @@ end entity;
 
 architecture FULL of MFB_SPLITTER_GEN is
 
-    constant TREE_STAGES : natural := log2(SPLITTER_OUTPUTS);
-    constant SO_2_POW    : natural := 2**log2(SPLITTER_OUTPUTS);
-
-    signal s_rx_mvb_data    : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS*MVB_ITEM_WIDTH-1 downto 0);
-    signal s_rx_mvb_switch  : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS*log2(SPLITTER_OUTPUTS)-1 downto 0);
-    signal s_rx_mvb_sel     : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS-1 downto 0) := (others => (others => (others => '0')));
-    signal s_rx_mvb_payload : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS-1 downto 0) := (others => (others => (others => '0')));
-    signal s_rx_mvb_vld     : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MVB_ITEMS-1 downto 0) := (others => (others => (others => '0')));
-    signal s_rx_mvb_src_rdy : slv_array_t   (TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0) := (others => (others => '0'));
-    signal s_rx_mvb_dst_rdy : slv_array_t   (TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0);
-    signal s_rx_mfb_data    : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0);
-    signal s_rx_mfb_sof     : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MFB_REGIONS-1 downto 0);
-    signal s_rx_mfb_eof     : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MFB_REGIONS-1 downto 0);
-    signal s_rx_mfb_sof_pos : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE))-1 downto 0);
-    signal s_rx_mfb_eof_pos : slv_array_2d_t(TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0)(MFB_REGIONS*max(1,log2(MFB_REG_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
-    signal s_rx_mfb_src_rdy : slv_array_t   (TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0);
-    signal s_rx_mfb_dst_rdy : slv_array_t   (TREE_STAGES+1-1 downto 0)(SO_2_POW-1 downto 0);
-
 begin
 
-    s_rx_mvb_data   (0)(0) <= RX_MVB_DATA;
-    s_rx_mvb_payload(0)(0) <= RX_MVB_PAYLOAD;
-    s_rx_mvb_switch (0)(0) <= RX_MVB_SWITCH;
-    s_rx_mvb_vld    (0)(0) <= RX_MVB_VLD;
-    s_rx_mvb_src_rdy(0)(0) <= RX_MVB_SRC_RDY;
-    RX_MVB_DST_RDY         <= s_rx_mvb_dst_rdy(0)(0);
+    -- With a single output there is nothing to decide, so the streams are wired
+    -- straight through.
+    bypass_g : if (SPLITTER_OUTPUTS = 1) generate
 
-    s_rx_mfb_data   (0)(0) <= RX_MFB_DATA;
-    s_rx_mfb_sof    (0)(0) <= RX_MFB_SOF;
-    s_rx_mfb_eof    (0)(0) <= RX_MFB_EOF;
-    s_rx_mfb_sof_pos(0)(0) <= RX_MFB_SOF_POS;
-    s_rx_mfb_eof_pos(0)(0) <= RX_MFB_EOF_POS;
-    s_rx_mfb_src_rdy(0)(0) <= RX_MFB_SRC_RDY;
-    RX_MFB_DST_RDY         <= s_rx_mfb_dst_rdy(0)(0);
+        TX_MVB_DATA(0)    <= RX_MVB_DATA;
+        TX_MVB_PAYLOAD(0) <= RX_MVB_PAYLOAD;
+        TX_MVB_VLD(0)     <= RX_MVB_VLD;
+        TX_MVB_SRC_RDY(0) <= RX_MVB_SRC_RDY;
+        RX_MVB_DST_RDY    <= TX_MVB_DST_RDY(0);
 
-    stage_g : for s in 0 to TREE_STAGES-1 generate
-        splitter_g : for i in 0 to (2**s)-1 generate
-            mvb_sel_g: for r in 0 to MVB_ITEMS-1 generate
-                s_rx_mvb_sel(s)(i)(r) <= s_rx_mvb_switch(s)(i)(r*log2(SPLITTER_OUTPUTS)+log2(SPLITTER_OUTPUTS)-1-s);
-            end generate;
-            splitter_i: entity work.MFB_SPLITTER
-            generic map (
-                MVB_ITEMS            => MVB_ITEMS,
-                MVB_META_WIDTH       => log2(SPLITTER_OUTPUTS),
-                MFB_REGIONS          => MFB_REGIONS,
-                MFB_REG_SIZE         => MFB_REG_SIZE,
-                MFB_BLOCK_SIZE       => MFB_BLOCK_SIZE,
-                MFB_ITEM_WIDTH       => MFB_ITEM_WIDTH,
-                HDR_WIDTH            => MVB_ITEM_WIDTH,
-                MVB_OUTPUT_FIFO_SIZE => OUTPUT_FIFO_SIZE,
-                IN_MFB_FIFO_EN       => (s /= 0 and MID_MFB_FIFOS_EN),
-                MFB_FIFO_DEPTH       => MFB_FIFO_DEPTH,
-                USE_OUTREG           => OUT_PIPE_EN,
-                DEVICE               => DEVICE,
-                FIFOX_MULTI_ARCH     => FIFOX_MULTI_ARCH
-            )
-            port map (
-                CLK              => CLK,
-                RESET            => RESET,
+        TX_MFB_DATA(0)    <= RX_MFB_DATA;
+        TX_MFB_SOF(0)     <= RX_MFB_SOF;
+        TX_MFB_EOF(0)     <= RX_MFB_EOF;
+        TX_MFB_SOF_POS(0) <= RX_MFB_SOF_POS;
+        TX_MFB_EOF_POS(0) <= RX_MFB_EOF_POS;
+        TX_MFB_SRC_RDY(0) <= RX_MFB_SRC_RDY;
+        RX_MFB_DST_RDY    <= TX_MFB_DST_RDY(0);
 
-                RX_MVB_HDR       => s_rx_mvb_data   (s)(i),
-                RX_MVB_META      => s_rx_mvb_switch (s)(i),
-                RX_MVB_SWITCH    => s_rx_mvb_sel    (s)(i),
-                RX_MVB_PAYLOAD   => s_rx_mvb_payload(s)(i),
-                RX_MVB_VLD       => s_rx_mvb_vld    (s)(i),
-                RX_MVB_SRC_RDY   => s_rx_mvb_src_rdy(s)(i),
-                RX_MVB_DST_RDY   => s_rx_mvb_dst_rdy(s)(i),
-                RX_MFB_DATA      => s_rx_mfb_data   (s)(i),
-                RX_MFB_SOF       => s_rx_mfb_sof    (s)(i),
-                RX_MFB_EOF       => s_rx_mfb_eof    (s)(i),
-                RX_MFB_SOF_POS   => s_rx_mfb_sof_pos(s)(i),
-                RX_MFB_EOF_POS   => s_rx_mfb_eof_pos(s)(i),
-                RX_MFB_SRC_RDY   => s_rx_mfb_src_rdy(s)(i),
-                RX_MFB_DST_RDY   => s_rx_mfb_dst_rdy(s)(i),
-
-                TX0_MVB_HDR      => s_rx_mvb_data   (s+1)(2*i),
-                TX0_MVB_META     => s_rx_mvb_switch (s+1)(2*i),
-                TX0_MVB_PAYLOAD  => s_rx_mvb_payload(s+1)(2*i),
-                TX0_MVB_VLD      => s_rx_mvb_vld    (s+1)(2*i),
-                TX0_MVB_SRC_RDY  => s_rx_mvb_src_rdy(s+1)(2*i),
-                TX0_MVB_DST_RDY  => s_rx_mvb_dst_rdy(s+1)(2*i),
-                TX0_MFB_DATA     => s_rx_mfb_data   (s+1)(2*i),
-                TX0_MFB_SOF      => s_rx_mfb_sof    (s+1)(2*i),
-                TX0_MFB_EOF      => s_rx_mfb_eof    (s+1)(2*i),
-                TX0_MFB_SOF_POS  => s_rx_mfb_sof_pos(s+1)(2*i),
-                TX0_MFB_EOF_POS  => s_rx_mfb_eof_pos(s+1)(2*i),
-                TX0_MFB_SRC_RDY  => s_rx_mfb_src_rdy(s+1)(2*i),
-                TX0_MFB_DST_RDY  => s_rx_mfb_dst_rdy(s+1)(2*i),
-
-                TX1_MVB_HDR      => s_rx_mvb_data   (s+1)(2*i+1),
-                TX1_MVB_META     => s_rx_mvb_switch (s+1)(2*i+1),
-                TX1_MVB_PAYLOAD  => s_rx_mvb_payload(s+1)(2*i+1),
-                TX1_MVB_VLD      => s_rx_mvb_vld    (s+1)(2*i+1),
-                TX1_MVB_SRC_RDY  => s_rx_mvb_src_rdy(s+1)(2*i+1),
-                TX1_MVB_DST_RDY  => s_rx_mvb_dst_rdy(s+1)(2*i+1),
-                TX1_MFB_DATA     => s_rx_mfb_data   (s+1)(2*i+1),
-                TX1_MFB_SOF      => s_rx_mfb_sof    (s+1)(2*i+1),
-                TX1_MFB_EOF      => s_rx_mfb_eof    (s+1)(2*i+1),
-                TX1_MFB_SOF_POS  => s_rx_mfb_sof_pos(s+1)(2*i+1),
-                TX1_MFB_EOF_POS  => s_rx_mfb_eof_pos(s+1)(2*i+1),
-                TX1_MFB_SRC_RDY  => s_rx_mfb_src_rdy(s+1)(2*i+1),
-                TX1_MFB_DST_RDY  => s_rx_mfb_dst_rdy(s+1)(2*i+1)
-            );
-        end generate;
     end generate;
 
-    outputs_g : for i in 0 to SPLITTER_OUTPUTS-1 generate
-        TX_MVB_DATA(i)                   <= s_rx_mvb_data   (TREE_STAGES)(i);
-        TX_MVB_PAYLOAD(i)                <= s_rx_mvb_payload(TREE_STAGES)(i);
-        TX_MVB_VLD(i)                    <= s_rx_mvb_vld    (TREE_STAGES)(i);
-        TX_MVB_SRC_RDY(i)                <= s_rx_mvb_src_rdy(TREE_STAGES)(i);
-        s_rx_mvb_dst_rdy(TREE_STAGES)(i) <= TX_MVB_DST_RDY(i);
+    splitter_g : if (SPLITTER_OUTPUTS > 1) generate
 
-        TX_MFB_DATA(i)                   <= s_rx_mfb_data   (TREE_STAGES)(i);
-        TX_MFB_SOF(i)                    <= s_rx_mfb_sof    (TREE_STAGES)(i);
-        TX_MFB_EOF(i)                    <= s_rx_mfb_eof    (TREE_STAGES)(i);
-        TX_MFB_SOF_POS(i)                <= s_rx_mfb_sof_pos(TREE_STAGES)(i);
-        TX_MFB_EOF_POS(i)                <= s_rx_mfb_eof_pos(TREE_STAGES)(i);
-        TX_MFB_SRC_RDY(i)                <= s_rx_mfb_src_rdy(TREE_STAGES)(i);
-        s_rx_mfb_dst_rdy(TREE_STAGES)(i) <= TX_MFB_DST_RDY(i);
+        splitter_i : entity work.MFB_SPLITTER_FLAT
+        generic map (
+            SPLITTER_OUTPUTS  => SPLITTER_OUTPUTS,
+            MVB_ITEMS         => MVB_ITEMS,
+            MVB_ITEM_WIDTH    => MVB_ITEM_WIDTH,
+            MFB_REGIONS       => MFB_REGIONS,
+            MFB_REG_SIZE      => MFB_REG_SIZE,
+            MFB_BLOCK_SIZE    => MFB_BLOCK_SIZE,
+            MFB_ITEM_WIDTH    => MFB_ITEM_WIDTH,
+            IN_MFB_FIFO_EN    => IN_MFB_FIFO_EN,
+            IN_MFB_FIFO_SIZE  => IN_MFB_FIFO_SIZE,
+            OUT_MVB_FIFO_SIZE => OUT_MVB_FIFO_SIZE,
+            OUT_MFB_FIFO_EN   => (MID_MFB_FIFOS_EN or OUT_MFB_FIFO_EN),
+            OUT_MFB_FIFO_SIZE => OUT_MFB_FIFO_SIZE,
+            FIFOX_MULTI_ARCH  => FIFOX_MULTI_ARCH,
+            DEVICE            => DEVICE
+        )
+        port map (
+            CLK   => CLK,
+            RESET => RESET,
+
+            RX_MVB_DATA    => RX_MVB_DATA,
+            RX_MVB_SWITCH  => RX_MVB_SWITCH,
+            RX_MVB_PAYLOAD => RX_MVB_PAYLOAD,
+            RX_MVB_VLD     => RX_MVB_VLD,
+            RX_MVB_SRC_RDY => RX_MVB_SRC_RDY,
+            RX_MVB_DST_RDY => RX_MVB_DST_RDY,
+
+            RX_MFB_DATA    => RX_MFB_DATA,
+            RX_MFB_SOF     => RX_MFB_SOF,
+            RX_MFB_EOF     => RX_MFB_EOF,
+            RX_MFB_SOF_POS => RX_MFB_SOF_POS,
+            RX_MFB_EOF_POS => RX_MFB_EOF_POS,
+            RX_MFB_SRC_RDY => RX_MFB_SRC_RDY,
+            RX_MFB_DST_RDY => RX_MFB_DST_RDY,
+
+            TX_MVB_DATA    => TX_MVB_DATA,
+            TX_MVB_PAYLOAD => TX_MVB_PAYLOAD,
+            TX_MVB_VLD     => TX_MVB_VLD,
+            TX_MVB_SRC_RDY => TX_MVB_SRC_RDY,
+            TX_MVB_DST_RDY => TX_MVB_DST_RDY,
+
+            TX_MFB_DATA    => TX_MFB_DATA,
+            TX_MFB_SOF     => TX_MFB_SOF,
+            TX_MFB_EOF     => TX_MFB_EOF,
+            TX_MFB_SOF_POS => TX_MFB_SOF_POS,
+            TX_MFB_EOF_POS => TX_MFB_EOF_POS,
+            TX_MFB_SRC_RDY => TX_MFB_SRC_RDY,
+            TX_MFB_DST_RDY => TX_MFB_DST_RDY
+        );
+
     end generate;
 
 end architecture;
