@@ -528,6 +528,10 @@ architecture FULL of FPGA_COMMON is
 
     signal pcie_link_up                  : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
     signal dma_pcie_link_up              : std_logic_vector(PCIE_ENDPOINTS-1 downto 0);
+    signal pcie_cfg_mps                  : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0);
+    signal pcie_cfg_mrrs                 : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0);
+    signal dma_pcie_cfg_mps              : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0);
+    signal dma_pcie_cfg_mrrs             : slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0);
     signal app_pcie_link_up              : std_logic_vector(PCIE_ENDPOINTS-1 downto 0) := (others => '0');
 
     signal xilinx_dna                    : std_logic_vector(95 downto 0);
@@ -982,6 +986,8 @@ begin
         PCIE_USER_CLK      => clk_pci,
         PCIE_USER_RESET    => rst_pci,
         PCIE_LINK_UP       => pcie_link_up,
+        PCIE_MPS           => pcie_cfg_mps,
+        PCIE_MRRS          => pcie_cfg_mrrs,
 
         CARD_ID            => pcie_fpga_id,
 
@@ -1086,6 +1092,45 @@ begin
             BRST     => '0',
             ADATAIN  => pcie_link_up(i),
             BDATAOUT => app_pcie_link_up(i)
+        );
+
+        -- An MPS/MRRS code can change by more than one bit at once, so the crossing
+        -- must deliver the whole value coherently. ASEND and BLOAD are tied high,
+        -- so the handshake keeps re-sending the current value.
+        cdc_pcie_mps_dma_i: entity work.ASYNC_BUS_HANDSHAKE
+        generic map (
+            DATA_WIDTH => 3
+        )
+        port map (
+            ACLK     => clk_pci(i),
+            ARST     => rst_pci(i),
+            ADATAIN  => pcie_cfg_mps(i),
+            ASEND    => '1',
+            AREADY   => open,
+
+            BCLK     => clk_dma,
+            BRST     => rst_dma(1),
+            BDATAOUT => dma_pcie_cfg_mps(i),
+            BLOAD    => '1',
+            BVALID   => open
+        );
+
+        cdc_pcie_mrrs_dma_i: entity work.ASYNC_BUS_HANDSHAKE
+        generic map (
+            DATA_WIDTH => 3
+        )
+        port map (
+            ACLK     => clk_pci(i),
+            ARST     => rst_pci(i),
+            ADATAIN  => pcie_cfg_mrrs(i),
+            ASEND    => '1',
+            AREADY   => open,
+
+            BCLK     => clk_dma,
+            BRST     => rst_dma(1),
+            BDATAOUT => dma_pcie_cfg_mrrs(i),
+            BLOAD    => '1',
+            BVALID   => open
         );
 
         cdc_pcie_fpga_id_i: entity work.ASYNC_OPEN_LOOP_SMD
@@ -1493,6 +1538,9 @@ begin
 
         PCIE_USR_CLK        => clk_pci,
         PCIE_USR_RESET      => rst_pci,
+
+        PCIE_MPS_DYN        => dma_pcie_cfg_mps,
+        PCIE_MRRS_DYN       => dma_pcie_cfg_mrrs,
 
         RX_USR_MVB_LEN      => slv_array_downto_deser(app_dma_rx_mvb_len, DMA_STREAMS),
         RX_USR_MVB_HDR_META => slv_array_downto_deser(app_dma_rx_mvb_hdr_meta, DMA_STREAMS),

@@ -192,7 +192,10 @@ begin
     -- =====================================================================
 
     dma_medusa_g : for i in 0 to DMA_STREAMS-1 generate
-        subtype DPE is natural range (i+1)*DMA_EP_PER_DMA-1 downto i*DMA_EP_PER_DMA;
+        subtype  DPE is natural range (i+1)*DMA_EP_PER_DMA-1 downto i*DMA_EP_PER_DMA;
+        -- The first PCIe Endpoint this DMA stream uses. A stream can span several
+        -- Endpoints, but all Endpoints of one device negotiate the same MPS/MRRS.
+        constant PE : natural := (i*DMA_EP_PER_DMA)/DMA_PER_PCIE;
     begin
         dma_medusa_i : entity work.DMA_MEDUSA
         generic map (
@@ -256,6 +259,9 @@ begin
 
             USR_CLK              => USR_CLK,
             USR_RESET            => USR_RESET,
+
+            PCIE_MPS_DYN         => PCIE_MPS_DYN(PE),
+            PCIE_MRRS_DYN        => PCIE_MRRS_DYN(PE),
 
             RX_USR_MVB_LEN       => RX_USR_MVB_LEN(i),
             RX_USR_MVB_HDR_META  => RX_USR_MVB_HDR_META(i),

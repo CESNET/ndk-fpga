@@ -107,6 +107,18 @@ entity DMA_WRAPPER is
         -- Clock and reset from the PCIe Endpoint (DMA Calypte only)
         PCIE_USR_CLK        : in std_logic_vector(PCIE_ENDPOINTS -1 downto 0);
         PCIE_USR_RESET      : in std_logic_vector(PCIE_ENDPOINTS -1 downto 0);
+
+        -- =====================================================================
+        --  PCIe configuration (dynamic)
+        -- =====================================================================
+
+        -- Negotiated PCIe Max Payload Size, one item per PCIe Endpoint. Each item
+        -- holds the raw 3-bit PCIe Device Control code (0 = 128 B ... 5 = 4096 B).
+        PCIE_MPS_DYN        : in  slv_array_t(PCIE_ENDPOINTS -1 downto 0)(3-1 downto 0) := (others => std_logic_vector(to_unsigned(log2(PCIE_MPS/128), 3)));
+        -- Negotiated PCIe Max Read Request Size in the same code as PCIE_MPS_DYN.
+        -- Both ports default to the code matching the PCIE_MPS/PCIE_MRRS generics.
+        -- Those generics still set the maximum the design is built for.
+        PCIE_MRRS_DYN       : in  slv_array_t(PCIE_ENDPOINTS -1 downto 0)(3-1 downto 0) := (others => std_logic_vector(to_unsigned(log2(PCIE_MRRS/128), 3)));
         -- =====================================================================
 
         -- =====================================================================
