@@ -60,38 +60,40 @@ entity MFB_SPLITTER_GEN is
 
         -- Size of output MVB FIFOs (in words)
         -- Minimum value is 2!
-        -- Obsolete, use OUT_MVB_FIFO_SIZE instead, which it sets the default of
+        -- Obsolete, use OUT_MVB_FIFO_SIZE instead. This generic only sets its
+        -- default value.
         OUTPUT_FIFO_SIZE  : integer := 8;
 
-        -- Enable the input MFB FIFO. It holds the frame back until the header
-        -- that says where to route it has arrived.
+        -- Enable the input MFB FIFO. It stores the frame until the header that
+        -- selects the output has arrived.
         IN_MFB_FIFO_EN    : boolean := false;
 
         -- Depth of the input MFB FIFO in words
         -- Only used when IN_MFB_FIFO_EN is true
         IN_MFB_FIFO_SIZE  : natural := 512;
 
-        -- Depth of the output MVB FIFOs in words, minimum value is 2. They keep
-        -- the outputs in step with the switch FIFO and cannot be turned off.
+        -- Depth of the output MVB FIFOs in words, minimum value is 2. These FIFOs
+        -- are always generated and keep the headers aligned with the switch FIFO.
         OUT_MVB_FIFO_SIZE : integer := OUTPUT_FIFO_SIZE;
 
-        -- Enable the output MFB FIFOs. A whole word is routed at once, so
-        -- without them the slowest output holds up all the others.
+        -- Enable the output MFB FIFOs. All outputs get a word in the same clock
+        -- cycle, so without these FIFOs the slowest output stops all the others.
         OUT_MFB_FIFO_EN   : boolean := false;
 
-        -- Obsolete, use OUT_MFB_FIFO_EN instead, which it activates
+        -- Obsolete, use OUT_MFB_FIFO_EN instead. Setting this generic to true
+        -- has the same effect.
         MID_MFB_FIFOS_EN  : boolean := False;
 
         -- Size of MFB FIFOs (in words)
-        -- Obsolete, use OUT_MFB_FIFO_SIZE instead, which it sets the default of
+        -- Obsolete, use OUT_MFB_FIFO_SIZE instead. This generic only sets its
+        -- default value.
         MFB_FIFO_DEPTH    : natural := 512;
 
         -- Depth of the output MFB FIFOs in words
         -- Only used when OUT_MFB_FIFO_EN is true
         OUT_MFB_FIFO_SIZE : natural := MFB_FIFO_DEPTH;
 
-        -- Obsolete, has no effect. It was passed to the 1:2 splitters of the
-        -- tree, which never used it either.
+        -- Obsolete, has no effect.
         OUT_PIPE_EN       : boolean := true;
 
         -- "ULTRASCALE", "STRATIX10",...
@@ -154,8 +156,8 @@ architecture FULL of MFB_SPLITTER_GEN is
 
 begin
 
-    -- With a single output there is nothing to decide, so the streams are wired
-    -- straight through.
+    -- With a single output there is nothing to route, so the streams are
+    -- connected straight through.
     bypass_g : if (SPLITTER_OUTPUTS = 1) generate
 
         TX_MVB_DATA(0)    <= RX_MVB_DATA;

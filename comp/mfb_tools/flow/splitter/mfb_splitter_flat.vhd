@@ -64,8 +64,8 @@ entity MFB_SPLITTER_FLAT is
         -- is true
         IN_MFB_FIFO_SIZE  : natural := 512;
 
-        -- Depth of the output MVB FIFOs in words, minimum value is 2. They keep
-        -- the outputs in step with the switch FIFO and cannot be turned off.
+        -- Depth of the output MVB FIFOs in words, minimum value is 2. These FIFOs
+        -- are always generated and keep the headers aligned with the switch FIFO.
         OUT_MVB_FIFO_SIZE : natural := 8;
 
         -- Enable the output MFB FIFOs. A whole word is routed at once, so

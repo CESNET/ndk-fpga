@@ -780,7 +780,7 @@ begin
         rd_ptr             := 0;
         for i in 0 to MVB_UP_ITEMS-1 loop
             if (s2_read_vld(i) = '1') then
-                if (pcie_in_fifoxm_empty(i) = '1') then -- There is not enough PCIe tags to assign -> stop the pipeline
+                if (pcie_in_fifoxm_empty(rd_ptr) = '1') then -- There is not enough PCIe tags to assign -> stop the pipeline
                     auto_assign_rdy <= '0';
                 end if;
                 auto_assigned_tags(i) <= pcie_in_fifoxm_do_arr(rd_ptr);
