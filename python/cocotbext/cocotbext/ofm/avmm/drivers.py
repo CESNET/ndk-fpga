@@ -9,10 +9,9 @@ from typing import Optional
 import cocotb
 from cocotb.types import LogicArray
 from cocotb.queue import Queue
-from cocotb.triggers import Event, ClockCycles
+from cocotb.triggers import Event, ClockCycles, ReadOnly
 from cocotbext.ofm.base.drivers import BusDriver
 from cocotbext.ofm.utils.signals import await_signal_sync
-from cocotbext.ofm.utils.math import ceildiv
 from cocotbext.ofm.avmm.config import AvalonMMDataUnits, AvalonMMParams
 from cocotbext.ofm.avmm.transaction import AvalonMMWriteRequestTransaction, AvalonMMReadRequestTransaction, AvalonMMReadResponseTransaction, AvalonMMWriteResponseTransaction, AvalonMMResponseValue
 from cocotbext.ofm.utils.ram import RAM
@@ -22,7 +21,20 @@ class AvalonMMDriverMaster(BusDriver):
     _signals = []
     _optional_signals = ["address", "read", "readdata", "readdatavalid", "write", "writedata", "burstcount", "ready", "waitrequest"]
 
-    def __init__(self, entity, name, clock, array_idx=None, params: Optional[AvalonMMParams] = None, **kwargs):
+    def __init__(self, entity, name, clock, array_idx=None, params: Optional[AvalonMMParams] = None, signal_map: Optional[dict] = None, **kwargs):
+        # Signal_map maps the Avalon-MM signal name to the name used by the component.
+        # Set before super().__init__(), which reads self._optional_signals to build the bus.
+        if signal_map is not None:
+            defaults = AvalonMMDriverMaster._optional_signals
+            unknown = set(signal_map) - set(defaults)
+            if unknown:
+                raise ValueError(
+                    f"signal_map contains unknown Avalon-MM signal name(s): {sorted(unknown)}. "
+                    f"Known names: {defaults}")
+            # Merged over the defaults, so a map that renames only the signals whose
+            # names differ does not drop the rest of the bus.
+            self._optional_signals = {**{name: name for name in defaults}, **signal_map}
+
         super().__init__(entity, name, clock, array_idx, **kwargs)
 
         self._address_width    : int   = len(self.bus.address) if hasattr(self.bus, "address") else 0
@@ -35,15 +47,20 @@ class AvalonMMDriverMaster(BusDriver):
 
         self._response_queue   : Queue = Queue()
         self._request_queue    : Queue = Queue()
+        self._read_beats       : Queue = Queue()
 
         # use default setting of parameters if they are not set by the user
         self._params = params if params is not None else AvalonMMParams()
 
         self._clear_control_signals()
+        self._propagate_control_signals()
 
         # start the request/response loops
         cocotb.start_soon(self._request_loop())
         cocotb.start_soon(self._response_loop())
+
+        if hasattr(self.bus, "readdatavalid"):
+            cocotb.start_soon(self._read_beat_capture_loop())
 
     async def write(self, address: int, data: bytes, burst_count: Optional[int] = None, sync: bool = True):
         # create write transaction
@@ -55,7 +72,7 @@ class AvalonMMDriverMaster(BusDriver):
         await self._send_write_request(transaction, sync)
 
     def send_write_request(self, transaction: AvalonMMWriteRequestTransaction, sync: bool = True) -> None:
-        self._request_queue.put((transaction, sync))
+        self._request_queue.put_nowait((transaction, sync))
 
     async def read(self, address: int, burst_count: Optional[int] = None, sync: bool = True) -> AvalonMMReadResponseTransaction:
         # create read request transactions
@@ -73,7 +90,7 @@ class AvalonMMDriverMaster(BusDriver):
         return transaction.response
 
     def send_read_request(self, transaction: AvalonMMReadRequestTransaction, sync: bool = True):
-        self._request_queue.put((transaction, sync))
+        self._request_queue.put_nowait((transaction, sync))
 
     def _clear_control_signals(self):
         self._address     = LogicArray("X" * self._address_width)
@@ -81,9 +98,9 @@ class AvalonMMDriverMaster(BusDriver):
         self._burst_count = LogicArray("X" * self._burstcount_width)
         self._read        = 0
         self._write       = 0
-        self._ready       = 0
 
     def _propagate_control_signals(self):
+        # ready/waitrequest are driven by the slave, the master must only read them
         if hasattr(self.bus, "address"):
             self.bus.address.value = self._address
         if hasattr(self.bus, "read"):
@@ -94,100 +111,127 @@ class AvalonMMDriverMaster(BusDriver):
             self.bus.writedata.value = self._write_data
         if hasattr(self.bus, "burstcount"):
             self.bus.burstcount.value = self._burst_count
-        if hasattr(self.bus, "ready"):
-            self.bus.ready.value = self._ready
 
-    async def _write_word(self, address: int | LogicArray, word: int, sync: bool = True):
-        if sync:
-            await self._clk_re
+    def _address_step(self, word_count: int) -> int:
+        return word_count if self._params.addressUnits == AvalonMMDataUnits.words else word_count * self._write_data_bytes
 
-        self._write      = 1
-        self._address    = address
-        self._write_data = word
+    def _split_to_words(self, data: bytes) -> list[int]:
+        return [int.from_bytes(data[i:i + self._write_data_bytes], "little")
+                for i in range(0, len(data), self._write_data_bytes)]
 
-        self._propagate_control_signals()
-
-        await self._clk_re
-
+    async def _await_slave_accept(self) -> None:
+        """Holds the currently driven request until the slave accepts it."""
         if hasattr(self.bus, "ready"):
             await await_signal_sync(self._clk_re, self.bus.ready)
         elif hasattr(self.bus, "waitrequest"):
             await await_signal_sync(self._clk_re, self.bus.waitrequest, 0)
 
-        self._clear_control_signals()
+    async def _drive_beat(self, read: int, write: int, address, burst_count, write_data=None) -> None:
+        """Drives a single request beat and returns once the slave has accepted it.
 
-    async def _write_burst(self, start_address: int, data: bytes, max_bursts: int, sync: bool = True) -> int:
-        address  = start_address
-        word_cnt = ceildiv(self._write_data_bytes, data)
-        bursts   = word_cnt if word_cnt < max_bursts else max_bursts
+        The request stays asserted while the slave is not ready, as required by
+        the Avalon-MM specification.
+        """
+        self._read        = read
+        self._write       = write
+        self._address     = address
+        self._burst_count = burst_count
 
-        self._burst_count = bursts
+        if write_data is not None:
+            self._write_data = write_data
 
-        for _ in range(bursts):
-            word = data[:self._write_data_bytes]
-            data = data[self._write_data_bytes:]
+        self._propagate_control_signals()
 
-            await self._write_word(address, int.from_bytes(word, "little"), sync)
+        await self._clk_re
+        await self._await_slave_accept()
 
-            # clear the address since it's not needed anymore
-            if address == start_address:
-                address = LogicArray("X" * self._address_width)
+    async def _insert_idles(self) -> None:
+        """Pauses the burst for the number of cycles the idle generator asks for.
 
-        return bursts
+        Avalon-MM lets a master deassert its request between the beats of a
+        burst and continue later. Only the request is dropped, the rest of the
+        signals keep their values the way a stalled master pipeline would.
+        """
+        idles = self._idle_gen.get(self._idle_tr)
+
+        if idles <= 0:
+            return
+
+        self._read  = 0
+        self._write = 0
+        self._propagate_control_signals()
+
+        for _ in range(idles):
+            await self._clk_re
+
+        self._idle_gen.put(self._idle_tr, items=idles, end=True)
+
+    async def _write_burst(self, address: int, words: list[int], sync: bool = True) -> None:
+        if sync:
+            await self._clk_re
+
+        burst_count = len(words)
+
+        for i, word in enumerate(words):
+            if i > 0:
+                await self._insert_idles()
+
+            if i == 0 or self._params.constantBurstBehavior:
+                beat_address, beat_burst = address, burst_count
+            else:
+                # Avalon-MM defines address and burstcount only for the first beat
+                # of a burst; drive them as don't-care unless the master is
+                # configured to hold them for the whole burst.
+                beat_address = LogicArray("X" * self._address_width)
+                beat_burst   = LogicArray("X" * self._burstcount_width)
+
+            await self._drive_beat(read=0, write=1, address=beat_address,
+                                   burst_count=beat_burst, write_data=word)
 
     async def _send_write_request(self, transaction: AvalonMMWriteRequestTransaction, sync: bool = True) -> None:
         assert self._write_data_bytes > 0, "Write interface not present on the bus or is of null width."
 
-        address     : int   = transaction.address
-        data        : bytes = transaction.data
-        burst_count : int   = transaction.burst_count
-        slice_width : int   = burst_count * self._write_data_bytes if burst_count is not None else self._write_data_bytes
+        address     : int  = transaction.address
+        words       : list[int] = self._split_to_words(transaction.data)
+        burst_count : int  = transaction.burst_count if transaction.burst_count is not None else 1
 
-        while data:
-            # get slice of the transaction
-            data_slice = data[:slice_width]
-            data = data[slice_width:]
+        for index, offset in enumerate(range(0, len(words), burst_count)):
+            chunk = words[offset:offset + burst_count]
 
-            # write the word to the bus
-            if burst_count is not None:
-                actual_bursts = await self._write_burst(address, data_slice, max_bursts=burst_count, sync=sync)
-                # increment the address corespondingly to the address units and lenght of the burst
-                address += actual_bursts if self._params.addressUnits == AvalonMMDataUnits.words else len(data_slice)
-            else:
-                await self._write_word(address, int.from_bytes(data_slice, "little"), sync)
-                # increment the address corespondingly to the address units
-                address += 1 if self._params.addressUnits == AvalonMMDataUnits.words else len(data_slice)
+            # The bursts of one request follow each other without a gap, the way
+            # the NDK Avalon-MM masters drive them, so only the first one aligns
+            # to a clock edge.
+            await self._write_burst(address, chunk, sync=sync and index == 0)
+
+            address += self._address_step(len(chunk))
+
+        self._clear_control_signals()
+        self._propagate_control_signals()
 
     async def _send_read_request(self, transaction: AvalonMMReadRequestTransaction, sync: bool = True):
         if sync:
             await self._clk_re
 
-        self._read    = 1
-        self._address = transaction.address
+        burst_count = transaction.burst_count if transaction.burst_count is not None else 1
 
-        if transaction.burst_count is not None:
-            self._burst_count = transaction.burst_count
+        # A pipelined slave can return the first beat in the cycle right after the
+        # request is accepted, so the response collector must know about the
+        # request before the handshake completes.
+        self._response_queue.put_nowait(transaction)
 
-        self._propagate_control_signals()
-
-        await self._clk_re
-
-        if hasattr(self.bus, "ready"):
-            await await_signal_sync(self._clk_re, self.bus.ready)
-        elif hasattr(self.bus, "waitrequest"):
-            await await_signal_sync(self._clk_re, self.bus.waitrequest, 0)
+        await self._drive_beat(read=1, write=0, address=transaction.address, burst_count=burst_count)
 
         self._clear_control_signals()
-
-        # put the transaction into the request queue
-        await self._response_queue.put(transaction)
+        self._propagate_control_signals()
 
     async def _wait_for_read_response(self):
-        # data is validated by the readdatavalid signal
-        if hasattr(self.bus, "readdatavalid"):
-            await await_signal_sync(self._clk_re, self.bus.readdatavalid)
+        """Times the read beats of a bus without readdatavalid.
+
+        A bus that has readdatavalid is served by _read_beat_capture_loop instead,
+        and readLatency/readWaitTime then have no effect on it.
+        """
         # fixed read latency
-        elif self._params.readLatency > 0:
+        if self._params.readLatency > 0:
             for _ in range(self._params.readLatency):
                 await self._clk_re
         # data is validated by the waitrequest signal rising to 1 and falling to 0
@@ -199,49 +243,51 @@ class AvalonMMDriverMaster(BusDriver):
             await await_signal_sync(self._clk_re, self.bus.ready, 0)
             await await_signal_sync(self._clk_re, self.bus.ready, 1)
 
-    async def _read_data_from_bus(self, burst_count: Optional[int] = None) -> bytes:
-        data = b""
+    async def _read_beat_capture_loop(self):
+        """Collects every read data beat as it appears on the bus.
 
-        if burst_count is not None:
-            for _ in range(burst_count):
-                await await_signal_sync(self._clk_re, self.bus.readdatavalid)
-                data += self.bus.readdata.value.to_bytes(byteorder="little")
-                await self._clk_re
-        else:
-            data = self.bus.readdata.value.to_bytes(byteorder="little")
+        Beats are collected independently of the request that produced them, so
+        that responses of consecutive pipelined requests are never missed, no
+        matter whether they arrive back-to-back or with gaps.
+        """
+        while True:
+            await self._clk_re
+            # Reading straight after the edge is not portable: some simulators have
+            # propagated the values the edge produces and some have not. ReadOnly
+            # runs once the timestep has settled, so every simulator sees the same
+            # beat in the same cycle.
+            await ReadOnly()
 
-        return data
+            if self.bus.readdatavalid.value == 1:
+                self._read_beats.put_nowait(self.bus.readdata.value.to_bytes(byteorder="little"))
 
     async def _request_loop(self):
         while True:
-            while self._request_queue.empty():
-                await self._clk_re
+            transaction, sync = await self._request_queue.get()
 
-            # get request to be sent
-            while not self._request_queue.empty():
-                transaction, sync = await self._request_queue.get()
-
-                if isinstance(transaction, AvalonMMWriteRequestTransaction):
-                    await self._send_write_request(transaction, sync)
-                else:
-                    await self._send_read_request(transaction, sync)
+            if isinstance(transaction, AvalonMMWriteRequestTransaction):
+                await self._send_write_request(transaction, sync)
+            else:
+                await self._send_read_request(transaction, sync)
 
     async def _response_loop(self):
         while True:
-            while self._response_queue.empty():
-                await self._clk_re
+            request = await self._response_queue.get()
 
-            while not self._response_queue.empty():
-                # get request awaiting response
-                request = await self._response_queue.get()
-                # wait until valid read
-                await self._wait_for_read_response()
+            beats = request.burst_count if request.burst_count is not None else 1
+            data  = b""
 
-                # read data from bus
-                request.response.data = await self._read_data_from_bus(request.burst_count)
+            for _ in range(beats):
+                if hasattr(self.bus, "readdatavalid"):
+                    data += await self._read_beats.get()
+                else:
+                    await self._wait_for_read_response()
+                    data += self.bus.readdata.value.to_bytes(byteorder="little")
+
+            request.response.data = data
+
+            if request.event is not None:
                 request.event.set()
-
-                await self._clk_re
 
 
 class AvalonMMDriverSlave(BusDriver):
