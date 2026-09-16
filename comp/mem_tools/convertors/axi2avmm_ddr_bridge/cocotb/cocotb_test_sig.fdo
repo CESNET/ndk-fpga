@@ -1,0 +1,19 @@
+# cocotb_test_sig.fdo: Waveform signal setup of the AXI-AVMM bridge cocotb test
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author: David Beneš <benes@dyna-nic.com>, 2026
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {AVALON} -noupdate -hex /AXI2AVMM_BRIDGE/AMM_*
+add_wave -group {AXI WRITE} -noupdate -hex /AXI2AVMM_BRIDGE/DDR_S_AXI_AW*
+add_wave -group {AXI WRITE} -noupdate -hex /AXI2AVMM_BRIDGE/DDR_S_AXI_W*
+add_wave -group {AXI WRITE} -noupdate -hex /AXI2AVMM_BRIDGE/DDR_S_AXI_B*
+add_wave -group {AXI READ} -noupdate -hex /AXI2AVMM_BRIDGE/DDR_S_AXI_AR*
+add_wave -group {AXI READ} -noupdate -hex /AXI2AVMM_BRIDGE/DDR_S_AXI_R*
+add_wave -group {FSM} -noupdate /AXI2AVMM_BRIDGE/state
+add_wave -group {FSM} -noupdate -unsigned /AXI2AVMM_BRIDGE/word_cnt_q
+
+config wave -signalnamewidth 1
