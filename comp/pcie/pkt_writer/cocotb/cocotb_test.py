@@ -370,11 +370,9 @@ async def _run_test(
     raise tb.scoreboard.result
 
 
-# NOTE: Do not set frame_size_max > pcie_mps until the DUT suports multiple breaks per word! TODO: Remove when the DUT is fixed
 # NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
 @cocotb.test()
-async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256, pcie_mps=256):
-    assert frame_size_max <= pcie_mps, "frame_size_max must be less than or equal to PCIE_MPS for this test." # TODO: Remove when the DUT is fixed
+async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
 
     await _run_test(
         dut,
@@ -386,9 +384,9 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256
     )
 
 
-# NOTE: Another test variant that would avoid the unspported multiple breaks per word in the DUT.
-#       In this test, we make sure the generated addresses are page-aligned so no page-break occurs.
-#       This way, we can have packet sizes of arbitrary length.
+# In this test, we make sure the generated addresses are page-aligned so no
+# page-break occurs.  This way, the only breaks are MPS breaks, which is a
+# simpler (but still important) scenario to verify.
 @cocotb.test()
 async def run_test_page_aligned_frames(dut, frame_count=2000, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
 
