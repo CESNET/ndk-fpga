@@ -390,6 +390,9 @@ architecture FULL of PTC_TAG_MANAGER is
 
     -- auto-assigned tags from PCIe tag FIFOX Multi distributed to instructions in the s2 register
     signal auto_assigned_tags : slv_array_t(MVB_UP_ITEMS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
+    -- Index of the last Tag FIFO port that the group in the s2 register reads. It is 0
+    -- when the group reads no tag. auto_assign_rdy ignores it in that case.
+    signal tag_rd_last_port   : natural range 0 to MVB_UP_ITEMS-1;
     -- enough tags available for auto-assign
     signal auto_assign_rdy    : std_logic;
 
@@ -772,22 +775,25 @@ begin
     s3_reg_en <= auto_assign_rdy;
 
     -- tags distribution from PCIe tag FIFOX Multi
-    pcie_tags_dist_pr : process (s2_read_vld,pcie_in_fifoxm_do_arr,pcie_in_fifoxm_empty)
+    pcie_tags_dist_pr : process (s2_read_vld,pcie_in_fifoxm_do_arr)
         variable rd_ptr : integer := 0;
     begin
         auto_assigned_tags <= (others => (others => '0'));
-        auto_assign_rdy    <= '1';
         rd_ptr             := 0;
         for i in 0 to MVB_UP_ITEMS-1 loop
             if (s2_read_vld(i) = '1') then
-                if (pcie_in_fifoxm_empty(rd_ptr) = '1') then -- There is not enough PCIe tags to assign -> stop the pipeline
-                    auto_assign_rdy <= '0';
-                end if;
                 auto_assigned_tags(i) <= pcie_in_fifoxm_do_arr(rd_ptr);
                 rd_ptr                := rd_ptr+1;
             end if;
         end loop;
     end process;
+
+    tag_rd_last_port <= to_integer(s2_read_cnt_reg)-1 when s2_read_cnt_reg > 0 else 0;
+
+    -- The group reads the Tag FIFO ports 0 to s2_read_cnt_reg-1. The FIFO compacts its
+    -- valid items towards port 0, so only the last of these ports has to be checked.
+    -- The index comes from a register, so s2_read_vld stays off the path to s2_reg_en.
+    auto_assign_rdy <= '0' when s2_read_cnt_reg > 0 and pcie_in_fifoxm_empty(tag_rd_last_port) = '1' else '1';
 
     -- HDR OUT sending
     hdr_out_gen_pr : process (s2_hdr_reg,auto_assigned_tags,s2_reg_vld)
