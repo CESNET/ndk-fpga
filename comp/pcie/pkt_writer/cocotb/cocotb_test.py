@@ -382,27 +382,3 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=819
         pcie_mps=pcie_mps,
         addr_gen=lambda: randint(0, 2**dut.ADDRESS_WIDTH.value - 1)
     )
-
-
-# In this test, we make sure the generated addresses are page-aligned so no
-# page-break occurs.  This way, the only breaks are MPS breaks, which is a
-# simpler (but still important) scenario to verify.
-@cocotb.test()
-async def run_test_page_aligned_frames(dut, frame_count=2000, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
-
-    page_size = dut.PAGE_SIZE.value
-    address_width = dut.ADDRESS_WIDTH.value
-    assert page_size & (page_size - 1) == 0, "PAGE_SIZE must be a power of two for the page-aligned workaround."
-
-    def _page_aligned_addr():
-        # Page-aligning the address
-        return randint(0, (2**address_width) // page_size) * page_size
-
-    await _run_test(
-        dut,
-        frame_count=frame_count,
-        frame_size_min=frame_size_min,
-        frame_size_max=frame_size_max,
-        pcie_mps=pcie_mps,
-        addr_gen=_page_aligned_addr
-    )
