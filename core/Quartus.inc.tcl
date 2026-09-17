@@ -7,3 +7,5 @@
 # Including synthesis procedures
 source $OFM_PATH/build/Quartus.inc.tcl
 source $CORE_BASE/common.inc.tcl
+
+lappend SYNTH_FLAGS(CONSTR) "$CORE_BASE/config/quartus_default.qsf"

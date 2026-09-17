@@ -1,0 +1,11 @@
+# Copyright (C) 2026 CESNET, z.s.p.o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Default Quartus settings applied to every build.
+
+# Optimize synthesis and placement for the maximum clock frequency (Fmax)
+set_global_assignment -name OPTIMIZATION_MODE "High Performance Effort"
+# Let the router spend more effort on timing closure and on shorter wires
+set_global_assignment -name ROUTER_TIMING_OPTIMIZATION_LEVEL MAXIMUM
