@@ -56,6 +56,11 @@ entity PCIE is
         PCIE_ENDPOINT_TYPE   : string  := "P_TILE";
         -- Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8
         PCIE_ENDPOINT_MODE   : natural := 0;
+        -- Largest Max Payload Size (in bytes) the PCIe module is built for
+        PCIE_MPS_MAX         : natural := 256;
+        -- Largest Max Read Request Size (in bytes) the PCIe module is built for.
+        -- It must cover every read the DMA module can issue.
+        PCIE_MRRS_MAX        : natural := 512;
         -- Number of PCIe endpoints
         PCIE_ENDPOINTS       : natural := 1;
         -- Number of PCIe clocks per PCIe connector
@@ -615,6 +620,8 @@ begin
             PTC_DISABLE         => PTC_DISABLE,
             DMA_BAR_ENABLE      => DMA_BAR_ENABLE,
             MTC_PCIE_MPS        => MTC_PCIE_MPS,
+            PCIE_MPS_MAX        => PCIE_MPS_MAX,
+            PCIE_MRRS_MAX       => PCIE_MRRS_MAX,
             ENDPOINT_TYPE       => PCIE_ENDPOINT_TYPE,
             DMA_ROUTE           => PCIE_DMA_ROUTE,
             DEVICE              => DEVICE

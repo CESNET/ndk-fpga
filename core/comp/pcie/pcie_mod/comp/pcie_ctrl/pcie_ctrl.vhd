@@ -62,6 +62,11 @@ entity PCIE_CTRL is
         DMA_BAR_ENABLE      : boolean := false;
         -- Maximum payload size (in bytes) used by the MTC for its completions
         MTC_PCIE_MPS        : natural := 256;
+        -- Largest Max Payload Size (in bytes) the PTC is built for
+        PCIE_MPS_MAX        : natural := 256;
+        -- Largest Max Read Request Size (in bytes) the PTC is built for. It sizes
+        -- the DOWN splitter FIFO, so it must cover every read the DMA can issue.
+        PCIE_MRRS_MAX       : natural := 512;
         -- Dynamic routing parameters of the DMA bus
         DMA_ROUTE           : dma_route_path_array_t := dma_route_path_array_default(DMA_PORTS);
         -- Connected PCIe endpoint type
@@ -478,6 +483,8 @@ begin
             MFB_DOWN_ITEM_WIDTH  => RC_MFB_ITEM_WIDTH,
 
             DOWN_FIFO_ITEMS      => 1024,
+            MPS                  => PCIE_MPS_MAX/4,
+            MRRS                 => PCIE_MRRS_MAX/4,
 
             DMA_ROUTE            => DMA_ROUTE,
             DBG_ENABLE           => DEBUG_EN,

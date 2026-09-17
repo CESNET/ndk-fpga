@@ -957,6 +957,8 @@ begin
         DMA_PORTS           => DMA_ENDPOINTS,
         PCIE_ENDPOINT_TYPE  => PCIE_ENDPOINT_TYPE,
         PCIE_ENDPOINT_MODE  => PCIE_ENDPOINT_MODE,
+        PCIE_MPS_MAX        => PCIE_MPS,
+        PCIE_MRRS_MAX       => PCIE_MRRS,
         PCIE_ENDPOINTS      => PCIE_ENDPOINTS,
         PCIE_CLKS           => PCIE_CLKS,
         PCIE_CONS           => PCIE_CONS,
