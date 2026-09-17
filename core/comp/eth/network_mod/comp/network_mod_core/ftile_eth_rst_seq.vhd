@@ -59,6 +59,11 @@ architecture FULL of FTILE_ETH_RST_SEQ is
     );
 
     signal state             : t_state;
+    -- Input clock is not stable causing the FSM to exhibit erratic behavior. The safe FSM
+    -- logic helps to recover and return to a defined state
+    attribute syn_encoding   : string;
+    attribute syn_encoding of state : signal is "safe";
+
     signal rst_sync          : std_logic;
     signal dp_deassert_cnt   : natural range 0 to 7;
     signal rx_link_rst_d     : std_logic;
@@ -94,78 +99,77 @@ begin
     -- ---------------------------------------------------------------
     fsm_proc : process (CLK)
     begin
-        if rising_edge(CLK) then
-            if (rst_sync = '1') then
-                state           <= S_RST_FULL;
-                dp_deassert_cnt <= 0;
-            else
-                case state is
+        -- Async reset helps to recover the FSM from an invalid state as a result of unstable clock
+        if (rst_sync = '1') then
+            state           <= S_RST_FULL;
+            dp_deassert_cnt <= 0;
+        elsif rising_edge(CLK) then
+            case state is
 
-                    when S_RST_FULL =>
-                        dp_deassert_cnt <= 0;
-                        state           <= S_DEASSERT_DP;
+                when S_RST_FULL =>
+                    dp_deassert_cnt <= 0;
+                    state           <= S_DEASSERT_DP;
 
-                    when S_DEASSERT_DP =>
-                        -- Ensure i_tx_rst_n and i_rx_rst_n are deasserted for several
-                        -- clock cycles before releasing i_rst_n (per Intel specification:
-                        -- "Drive the i_rst_n reset signal high while i_tx_rst_n and
-                        -- i_rx_rst_n reset signals are already deasserted")
-                        if (dp_deassert_cnt = 3) then
-                            state <= S_RELEASE_FULL;
-                        else
-                            dp_deassert_cnt <= dp_deassert_cnt + 1;
-                        end if;
+                when S_DEASSERT_DP =>
+                    -- Ensure i_tx_rst_n and i_rx_rst_n are deasserted for several
+                    -- clock cycles before releasing i_rst_n (per Intel specification:
+                    -- "Drive the i_rst_n reset signal high while i_tx_rst_n and
+                    -- i_rx_rst_n reset signals are already deasserted")
+                    if (dp_deassert_cnt = 3) then
+                        state <= S_RELEASE_FULL;
+                    else
+                        dp_deassert_cnt <= dp_deassert_cnt + 1;
+                    end if;
 
-                    when S_RELEASE_FULL =>
-                        -- Wait for IP to acknowledge release from full reset
-                        if (RST_ACK_N = '1') then
-                            state <= S_TX_RESET;
-                        end if;
+                when S_RELEASE_FULL =>
+                    -- Wait for IP to acknowledge release from full reset
+                    if (RST_ACK_N = '1') then
+                        state <= S_TX_RESET;
+                    end if;
 
-                    when S_TX_RESET =>
-                        -- TX reset asserted, wait for TX lanes to become unstable
-                        if (TX_LANES_STABLE = '0') then
-                            state <= S_TX_ACK_WAIT;
-                        end if;
+                when S_TX_RESET =>
+                    -- TX reset asserted, wait for TX lanes to become unstable
+                    if (TX_LANES_STABLE = '0') then
+                        state <= S_TX_ACK_WAIT;
+                    end if;
 
-                    when S_TX_ACK_WAIT =>
-                        -- Wait for TX datapath to acknowledge being in reset
-                        if (TX_RST_ACK_N = '0') then
-                            state <= S_TX_RELEASE;
-                        end if;
+                when S_TX_ACK_WAIT =>
+                    -- Wait for TX datapath to acknowledge being in reset
+                    if (TX_RST_ACK_N = '0') then
+                        state <= S_TX_RELEASE;
+                    end if;
 
-                    when S_TX_RELEASE =>
-                        -- TX reset released, wait for TX lanes to stabilize
-                        if (TX_LANES_STABLE = '1') then
-                            state <= S_RX_RESET;
-                        end if;
+                when S_TX_RELEASE =>
+                    -- TX reset released, wait for TX lanes to stabilize
+                    if (TX_LANES_STABLE = '1') then
+                        state <= S_RX_RESET;
+                    end if;
 
-                    when S_RX_RESET =>
-                        -- RX reset asserted, wait for RX PCS to become not ready
-                        if (RX_PCS_READY = '0') then
-                            state <= S_RX_ACK_WAIT;
-                        end if;
+                when S_RX_RESET =>
+                    -- RX reset asserted, wait for RX PCS to become not ready
+                    if (RX_PCS_READY = '0') then
+                        state <= S_RX_ACK_WAIT;
+                    end if;
 
-                    when S_RX_ACK_WAIT =>
-                        -- Wait for RX datapath to acknowledge being in reset
-                        if (RX_RST_ACK_N = '0') then
-                            state <= S_RX_RELEASE;
-                        end if;
+                when S_RX_ACK_WAIT =>
+                    -- Wait for RX datapath to acknowledge being in reset
+                    if (RX_RST_ACK_N = '0') then
+                        state <= S_RX_RELEASE;
+                    end if;
 
-                    when S_RX_RELEASE =>
-                        -- RX reset released, wait for RX PCS to become ready
-                        if (RX_PCS_READY = '1') then
-                            state <= S_IDLE;
-                        end if;
+                when S_RX_RELEASE =>
+                    -- RX reset released, wait for RX PCS to become ready
+                    if (RX_PCS_READY = '1') then
+                        state <= S_IDLE;
+                    end if;
 
-                    when S_IDLE =>
-                        -- Normal operation; check for RX link recovery request
-                        if (RX_LINK_RST = '1' and rx_link_rst_d = '0') then
-                            state <= S_RX_RESET;
-                        end if;
+                when S_IDLE =>
+                    -- Normal operation; check for RX link recovery request
+                    if (RX_LINK_RST = '1' and rx_link_rst_d = '0') then
+                        state <= S_RX_RESET;
+                    end if;
 
-                end case;
-            end if;
+            end case;
         end if;
     end process;
 
