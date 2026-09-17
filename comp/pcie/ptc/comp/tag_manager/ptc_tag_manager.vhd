@@ -132,8 +132,8 @@ entity PTC_TAG_MANAGER is
         -- smaller than the number of tags this cycle asks for
         TELEM_TAG_SHORTAGE  : out std_logic;
         -- The UP stream is stopped by the tag FIFO even though the pool is deep
-        -- enough. The flags of that FIFO describe the output register of its
-        -- shakedown, which needs a cycle to refill after a burst of reads.
+        -- enough. A released tag counts as free as soon as it is written, but it
+        -- reaches the read ports of that FIFO only a few cycles later.
         TELEM_TAG_NOT_READY : out std_logic;
         -- The UP stream is stopped because the completion buffer has no free space
         TELEM_CPLH_SHORTAGE : out std_logic;
@@ -882,7 +882,11 @@ begin
         ALMOST_FULL_OFFSET  => 0,
         ALMOST_EMPTY_OFFSET => 0,
         ALLOW_SINGLE_FIFO   => false,
-        FIFOX_MULTI_ARCH    => "SHAKEDOWN"
+        -- The SHAKEDOWN architecture provides a read port from a register that
+        -- needs one cycle to refill, so it cannot provide a tag in every cycle.
+        -- FULL removes the gaps inside the FIFO instead and provides every read
+        -- port in every cycle. It costs more resources.
+        FIFOX_MULTI_ARCH    => "FULL"
     )
     port map (
         CLK    => CLK,
@@ -929,10 +933,10 @@ begin
     -- tag path stops it in two situations that look alike from the outside but
     -- ask for different answers. Either the pool of free tags really is smaller
     -- than what this cycle asks for, which means the completions are not coming
-    -- back fast enough, or the pool is deep and only the output register of the
-    -- tag FIFO ran dry for a cycle, which is a property of that FIFO and not of
-    -- the traffic. Reporting them apart keeps an exhausted pool from taking the
-    -- blame for a hiccup that costs a single cycle.
+    -- back fast enough, or the pool is deep and a released tag has not reached
+    -- the read port of the tag FIFO yet. The second case is a property of that
+    -- FIFO and not of the traffic. Reporting them apart keeps an exhausted pool
+    -- from taking the blame for a wait of a few cycles.
     cplh_free <= (others => '1') when A_WORDS_WIDTH > 16 else
                  std_logic_vector(resize(free_cplh_reg,16));
 

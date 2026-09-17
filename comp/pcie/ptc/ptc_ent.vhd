@@ -275,8 +275,8 @@ entity PCIE_TRANSACTION_CTRL is
         -- smaller than the number of tags this cycle asks for
         TELEM_TAG_SHORTAGE  : out std_logic;
         -- The UP stream is stopped by the tag FIFO even though the pool is deep
-        -- enough. The flags of that FIFO describe the output register of its
-        -- shakedown, which needs a cycle to refill after a burst of reads.
+        -- enough. A released tag counts as free as soon as it is written, but it
+        -- reaches the read ports of that FIFO only a few cycles later.
         TELEM_TAG_NOT_READY : out std_logic;
         -- The UP stream is stopped because the free space left in the DOWN storage
         -- FIFO no longer covers the completions of the next group of requests.
