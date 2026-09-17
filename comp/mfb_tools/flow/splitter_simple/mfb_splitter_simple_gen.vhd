@@ -18,7 +18,16 @@ use work.type_pack.all;
 -- =========================================================================
 
 -- This is a 1:N MFB splitter.
--- It consists of numerous 1:2 MFB splitters in ``log2(SPLITTER_OUTPUTS)`` stages.
+-- ``RX_MFB_SEL`` selects the output for each frame. The whole RX word is sent
+-- to every output in the same clock cycle. Each output gets the word with the
+-- SOFs and EOFs of the other outputs masked out. ``TX_MFB_SRC_RDY`` of an
+-- output stays low when the word carries no frame for that output. The latency
+-- is one clock cycle.
+--
+-- .. warning::
+--   An RX word is taken only once every output can accept it, so the slowest
+--   output stops all the others.
+--
 entity MFB_SPLITTER_SIMPLE_GEN is
     generic (
         -- Number of splitter outputs.
@@ -88,114 +97,197 @@ end entity;
 
 architecture FULL of MFB_SPLITTER_SIMPLE_GEN is
 
-    constant TREE_STAGES         : natural := log2(SPLITTER_OUTPUTS);
-    constant SPLIT_OUTPUTS_2_POW : natural := 2**TREE_STAGES;
-    --                                        MFB meta   + SEL
-    constant SPLIT_META_W        : natural := META_WIDTH + max(1,TREE_STAGES);
+    -- =========================================================================
+    --  CONSTANTS
+    -- =========================================================================
 
-    signal rx_mfb_meta_arr   : slv_array_t   (REGIONS            -1 downto 0)(META_WIDTH         -1 downto 0);
-    signal splitter_meta_st0 : slv_array_t   (REGIONS            -1 downto 0)(SPLIT_META_W       -1 downto 0);
-    signal splitter_meta     : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS*(SPLIT_META_W)-1 downto 0);
-    signal splitter_meta_tmp : slv_array_3d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS-1 downto 0)(SPLIT_META_W-1 downto 0);
-    signal splitter_meta_arr : slv_array_2d_t(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS            -1 downto 0)(SPLIT_META_W-1 downto 0);
-    signal tx_mfb_meta_arr   : slv_array_2d_t(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS            -1 downto 0)(META_WIDTH  -1 downto 0);
-    signal rx_mfb_sel_arr    : slv_array_t   (REGIONS            -1 downto 0)(max(1,TREE_STAGES) -1 downto 0);
-    signal splitter_sel      : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS-1 downto 0);
-    signal splitter_data     : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    signal splitter_sof      : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS-1 downto 0);
-    signal splitter_eof      : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS-1 downto 0);
-    signal splitter_sof_pos  : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0);
-    signal splitter_eof_pos  : slv_array_2d_t(TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0)(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0);
-    signal splitter_src_rdy  : slv_array_t   (TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0);
-    signal splitter_dst_rdy  : slv_array_t   (TREE_STAGES+1      -1 downto 0)(SPLIT_OUTPUTS_2_POW-1 downto 0);
+    constant SEL_WIDTH     : natural := max(1,log2(SPLITTER_OUTPUTS));
+    constant SOF_POS_WIDTH : natural := max(1,log2(REGION_SIZE));
+    constant EOF_POS_WIDTH : natural := max(1,log2(REGION_SIZE*BLOCK_SIZE));
+    constant DATA_WIDTH    : natural := REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
+
+    -- =========================================================================
+    --  SIGNALS
+    -- =========================================================================
+
+    signal rx_sel_arr     : slv_array_t(REGIONS-1 downto 0)(SEL_WIDTH-1 downto 0);
+    signal rx_sof_pos_arr : slv_array_t(REGIONS-1 downto 0)(SOF_POS_WIDTH-1 downto 0);
+    signal rx_eof_pos_arr : slv_array_t(REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
+
+    -- Bit r is '1' when the SOF and the EOF of Region r belong to one frame
+    signal sof_b4_eof     : std_logic_vector(REGIONS-1 downto 0);
+    signal sof_pos_cmp    : u_array_t(REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
+    signal eof_pos_cmp    : u_array_t(REGIONS-1 downto 0)(EOF_POS_WIDTH-1 downto 0);
+
+    -- The masked control signals of each output, before the output registers
+    signal new_sof        : slv_array_t(SPLITTER_OUTPUTS-1 downto 0)(REGIONS-1 downto 0);
+    signal new_eof        : slv_array_t(SPLITTER_OUTPUTS-1 downto 0)(REGIONS-1 downto 0);
+    signal new_src_rdy    : std_logic_vector(SPLITTER_OUTPUTS-1 downto 0);
+
+    -- need_eof(o)(r) is '1' when the last SOF before Region r selected output o.
+    -- Bit REGIONS is the value that the next word starts from.
+    signal need_eof       : slv_array_t(SPLITTER_OUTPUTS-1 downto 0)(REGIONS downto 0);
+    -- pkt_cont(o)(r) is '1' when a frame of output o is open in front of Region r.
+    -- Bit REGIONS is the value that the next word starts from.
+    signal pkt_cont       : slv_array_t(SPLITTER_OUTPUTS-1 downto 0)(REGIONS downto 0);
+    signal need_eof_reg   : std_logic_vector(SPLITTER_OUTPUTS-1 downto 0);
+    signal pkt_cont_reg   : std_logic_vector(SPLITTER_OUTPUTS-1 downto 0);
+
+    signal new_dst_rdy    : std_logic_vector(SPLITTER_OUTPUTS-1 downto 0);
+    signal rx_dst_rdy     : std_logic;
+    -- An RX word is taken in this clock cycle
+    signal word_vld       : std_logic;
+
+    signal tx_data_reg    : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal tx_meta_reg    : std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
+    signal tx_sof_pos_reg : std_logic_vector(REGIONS*SOF_POS_WIDTH-1 downto 0);
+    signal tx_eof_pos_reg : std_logic_vector(REGIONS*EOF_POS_WIDTH-1 downto 0);
+    signal tx_sof_reg     : slv_array_t(SPLITTER_OUTPUTS-1 downto 0)(REGIONS-1 downto 0);
+    signal tx_eof_reg     : slv_array_t(SPLITTER_OUTPUTS-1 downto 0)(REGIONS-1 downto 0);
+    signal tx_src_rdy_reg : std_logic_vector(SPLITTER_OUTPUTS-1 downto 0);
 
 begin
 
-    rx_mfb_meta_arr <= slv_array_downto_deser(RX_MFB_META, REGIONS);
-    rx_mfb_sel_arr  <= slv_array_downto_deser(RX_MFB_SEL, REGIONS);
-    splitter_meta_g : for i in REGIONS-1 downto 0 generate
-        splitter_meta_st0  (i) <= rx_mfb_meta_arr(i) & rx_mfb_sel_arr(i);
-    end generate;
+    -- A single output takes every frame, so there is nothing to mask.
+    bypass_g : if (SPLITTER_OUTPUTS = 1) generate
 
-    splitter_data   (0)(0) <= RX_MFB_DATA;
-    splitter_meta   (0)(0) <= slv_array_ser(splitter_meta_st0);
-    splitter_sof    (0)(0) <= RX_MFB_SOF;
-    splitter_eof    (0)(0) <= RX_MFB_EOF;
-    splitter_sof_pos(0)(0) <= RX_MFB_SOF_POS;
-    splitter_eof_pos(0)(0) <= RX_MFB_EOF_POS;
-    splitter_src_rdy(0)(0) <= RX_MFB_SRC_RDY;
+        TX_MFB_DATA(0)    <= RX_MFB_DATA;
+        TX_MFB_META(0)    <= RX_MFB_META;
+        TX_MFB_SOF(0)     <= RX_MFB_SOF;
+        TX_MFB_EOF(0)     <= RX_MFB_EOF;
+        TX_MFB_SOF_POS(0) <= RX_MFB_SOF_POS;
+        TX_MFB_EOF_POS(0) <= RX_MFB_EOF_POS;
+        TX_MFB_SRC_RDY(0) <= RX_MFB_SRC_RDY;
+        RX_MFB_DST_RDY    <= TX_MFB_DST_RDY(0);
 
-    RX_MFB_DST_RDY <= splitter_dst_rdy(0)(0);
+    else generate
 
-    stage_g : for s in 0 to TREE_STAGES-1 generate
-        splitter_g : for i in 0 to (2**s)-1 generate
-            splitter_i: entity work.MFB_SPLITTER_SIMPLE
-            generic map (
-                REGIONS         => REGIONS,
-                REGION_SIZE     => REGION_SIZE,
-                BLOCK_SIZE      => BLOCK_SIZE,
-                ITEM_WIDTH      => ITEM_WIDTH,
-                META_WIDTH      => SPLIT_META_W
-            )
-            port map (
-                CLK             => CLK,
-                RST             => RESET,
+        rx_sel_arr     <= slv_array_deser(RX_MFB_SEL,REGIONS);
+        rx_sof_pos_arr <= slv_array_deser(RX_MFB_SOF_POS,REGIONS);
+        rx_eof_pos_arr <= slv_array_deser(RX_MFB_EOF_POS,REGIONS);
 
-                RX_MFB_SEL      => splitter_sel    (s)(i),
-                RX_MFB_DATA     => splitter_data   (s)(i),
-                RX_MFB_META     => splitter_meta   (s)(i),
-                RX_MFB_SOF      => splitter_sof    (s)(i),
-                RX_MFB_EOF      => splitter_eof    (s)(i),
-                RX_MFB_SOF_POS  => splitter_sof_pos(s)(i),
-                RX_MFB_EOF_POS  => splitter_eof_pos(s)(i),
-                RX_MFB_SRC_RDY  => splitter_src_rdy(s)(i),
-                RX_MFB_DST_RDY  => splitter_dst_rdy(s)(i),
+        -- =====================================================================
+        --  1. SOF AND EOF MASKING
+        -- =====================================================================
 
-                TX0_MFB_DATA    => splitter_data   (s+1)(2*i),
-                TX0_MFB_META    => splitter_meta   (s+1)(2*i),
-                TX0_MFB_SOF     => splitter_sof    (s+1)(2*i),
-                TX0_MFB_EOF     => splitter_eof    (s+1)(2*i),
-                TX0_MFB_SOF_POS => splitter_sof_pos(s+1)(2*i),
-                TX0_MFB_EOF_POS => splitter_eof_pos(s+1)(2*i),
-                TX0_MFB_SRC_RDY => splitter_src_rdy(s+1)(2*i),
-                TX0_MFB_DST_RDY => splitter_dst_rdy(s+1)(2*i),
+        -- With REGION_SIZE of 1 a frame always starts at the Region start, so
+        -- the SOF is never after the EOF.
+        sof_b4_eof_g : if (REGION_SIZE > 1) generate
+            sof_b4_eof_r_g : for r in 0 to REGIONS-1 generate
+                sof_pos_cmp(r) <= resize_right(unsigned(rx_sof_pos_arr(r)),EOF_POS_WIDTH);
+                eof_pos_cmp(r) <= unsigned(rx_eof_pos_arr(r));
+                sof_b4_eof(r)  <= '1' when (sof_pos_cmp(r) <= eof_pos_cmp(r)) else '0';
+            end generate;
+        else generate
+            sof_b4_eof <= (others => '1');
+        end generate;
 
-                TX1_MFB_DATA    => splitter_data   (s+1)(2*i+1),
-                TX1_MFB_META    => splitter_meta   (s+1)(2*i+1),
-                TX1_MFB_SOF     => splitter_sof    (s+1)(2*i+1),
-                TX1_MFB_EOF     => splitter_eof    (s+1)(2*i+1),
-                TX1_MFB_SOF_POS => splitter_sof_pos(s+1)(2*i+1),
-                TX1_MFB_EOF_POS => splitter_eof_pos(s+1)(2*i+1),
-                TX1_MFB_SRC_RDY => splitter_src_rdy(s+1)(2*i+1),
-                TX1_MFB_DST_RDY => splitter_dst_rdy(s+1)(2*i+1)
-            );
+        out_logic_g : for o in 0 to SPLITTER_OUTPUTS-1 generate
 
-            splitter_meta_tmp(s)(i) <= slv_array_downto_deser(splitter_meta(s)(i), REGIONS);
-            sel_g : for j in REGIONS-1 downto 0 generate
-                -- SEL bits are located at the end of this signal
-                splitter_sel(s)(i)(j) <= splitter_meta_tmp(s)(i)(j)(max(1,TREE_STAGES)-s-1);
+            need_eof(o)(0) <= need_eof_reg(o);
+            pkt_cont(o)(0) <= pkt_cont_reg(o);
+
+            region_g : for r in 0 to REGIONS-1 generate
+
+                new_sof(o)(r) <= '1' when (RX_MFB_SOF(r) = '1' and unsigned(rx_sel_arr(r)) = o) else
+                                 '0';
+
+                -- An SOF sets this state for the output it selects and clears
+                -- it for all the other outputs.
+                need_eof(o)(r+1) <= new_sof(o)(r) when (RX_MFB_SOF(r) = '1') else
+                                    need_eof(o)(r);
+
+                -- When one Region holds both the SOF and the EOF of the same
+                -- frame, the EOF belongs to the output of that SOF. Otherwise
+                -- the EOF ends the frame that is already open.
+                new_eof(o)(r) <= new_sof(o)(r) when (RX_MFB_SOF(r) = '1' and RX_MFB_EOF(r) = '1' and sof_b4_eof(r) = '1') else
+                                 (need_eof(o)(r) and RX_MFB_EOF(r));
+
+                pkt_cont(o)(r+1) <= (new_sof(o)(r) and not new_eof(o)(r) and not pkt_cont(o)(r)) or
+                                    (new_sof(o)(r) and new_eof(o)(r) and pkt_cont(o)(r)) or
+                                    (not new_sof(o)(r) and not new_eof(o)(r) and pkt_cont(o)(r));
+
             end generate;
 
+            -- Output o gets the word when a frame of output o starts in it or
+            -- continues through it.
+            new_src_rdy(o) <= (or (new_sof(o) or pkt_cont(o)(REGIONS-1 downto 0))) and word_vld;
+
         end generate;
 
-    end generate;
+        -- =====================================================================
+        --  2. HANDSHAKE
+        -- =====================================================================
+        -- An output is ready when its registered word is being taken, or when it
+        -- holds no word. The RX word is taken only once all outputs are ready.
 
-    outputs_g : for i in SPLITTER_OUTPUTS-1 downto 0 generate
-
-        splitter_meta_arr(i) <= slv_array_deser(splitter_meta(TREE_STAGES)(i), REGIONS);
-        tx_mfb_meta_g : for j in REGIONS-1 downto 0 generate
-            tx_mfb_meta_arr(i)(j) <= splitter_meta_arr(i)(j)(SPLIT_META_W-1 downto SPLIT_META_W-META_WIDTH);
+        new_dst_rdy_g : for o in 0 to SPLITTER_OUTPUTS-1 generate
+            new_dst_rdy(o) <= TX_MFB_DST_RDY(o) or not tx_src_rdy_reg(o);
         end generate;
 
-        TX_MFB_DATA(i)    <= splitter_data   (TREE_STAGES)(i);
-        TX_MFB_META(i)    <= slv_array_ser(tx_mfb_meta_arr(i));
-        TX_MFB_SOF(i)     <= splitter_sof    (TREE_STAGES)(i);
-        TX_MFB_EOF(i)     <= splitter_eof    (TREE_STAGES)(i);
-        TX_MFB_SOF_POS(i) <= splitter_sof_pos(TREE_STAGES)(i);
-        TX_MFB_EOF_POS(i) <= splitter_eof_pos(TREE_STAGES)(i);
-        TX_MFB_SRC_RDY(i) <= splitter_src_rdy(TREE_STAGES)(i);
+        rx_dst_rdy     <= and new_dst_rdy;
+        RX_MFB_DST_RDY <= rx_dst_rdy;
+        word_vld       <= RX_MFB_SRC_RDY and rx_dst_rdy;
 
-        splitter_dst_rdy(TREE_STAGES)(i) <= TX_MFB_DST_RDY(i);
+        -- =====================================================================
+        --  3. OUTPUT REGISTERS
+        -- =====================================================================
+        -- Every output gets the same word in the same clock cycle, so the
+        -- payload is registered once. Only the masked control signals are kept
+        -- per output.
+
+        word_reg_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (word_vld = '1') then
+                    tx_data_reg    <= RX_MFB_DATA;
+                    tx_meta_reg    <= RX_MFB_META;
+                    tx_sof_pos_reg <= RX_MFB_SOF_POS;
+                    tx_eof_pos_reg <= RX_MFB_EOF_POS;
+                end if;
+            end if;
+        end process;
+
+        out_reg_g : for o in 0 to SPLITTER_OUTPUTS-1 generate
+            out_reg_p : process (CLK)
+            begin
+                if (rising_edge(CLK)) then
+                    if (new_dst_rdy(o) = '1') then
+                        tx_sof_reg(o)     <= new_sof(o);
+                        tx_eof_reg(o)     <= new_eof(o);
+                        tx_src_rdy_reg(o) <= new_src_rdy(o);
+                    end if;
+                    if (RESET = '1') then
+                        tx_src_rdy_reg(o) <= '0';
+                    end if;
+                end if;
+            end process;
+        end generate;
+
+        state_reg_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    need_eof_reg <= (others => '0');
+                    pkt_cont_reg <= (others => '0');
+                elsif (word_vld = '1') then
+                    for o in 0 to SPLITTER_OUTPUTS-1 loop
+                        need_eof_reg(o) <= need_eof(o)(REGIONS);
+                        pkt_cont_reg(o) <= pkt_cont(o)(REGIONS);
+                    end loop;
+                end if;
+            end if;
+        end process;
+
+        tx_g : for o in 0 to SPLITTER_OUTPUTS-1 generate
+            TX_MFB_DATA(o)    <= tx_data_reg;
+            TX_MFB_META(o)    <= tx_meta_reg;
+            TX_MFB_SOF(o)     <= tx_sof_reg(o);
+            TX_MFB_EOF(o)     <= tx_eof_reg(o);
+            TX_MFB_SOF_POS(o) <= tx_sof_pos_reg;
+            TX_MFB_EOF_POS(o) <= tx_eof_pos_reg;
+            TX_MFB_SRC_RDY(o) <= tx_src_rdy_reg(o);
+        end generate;
 
     end generate;
 
