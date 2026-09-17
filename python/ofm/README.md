@@ -34,6 +34,7 @@ $ pip install .
  - ofm-data-logger
  - ofm-mem-logger
  - ofm-mvb-hash-table-simple
+ - nfb-pcie-telemetry
 
 ## Available modules to import:
  - ofm.comp.base.misc.frequency_meter
@@ -43,6 +44,7 @@ $ pip install .
  - ofm.comp.mfb_tools.flow.timestamp_limiter
  - ofm.comp.mfb_tools.logic.speed_meter
  - ofm.comp.mvb_tools.storage.mvb_hash_table_simple.mvb_hash_table_simple
+ - ofm.comp.pcie.telemetry
 
 **Notes**
 
