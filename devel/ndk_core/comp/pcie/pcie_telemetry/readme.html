@@ -1,0 +1,1208 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PCIe telemetry &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="The Memory Controller" href="../../../doc/mem.html" />
+    <link rel="prev" title="The PCIe module" href="../../../doc/pcie.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../doc/readme.html">NDK Architecture</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/app.html">The Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/mi.html">The MI bus interconnect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/eth.html">The Network Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/dma.html">The DMA module</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../../doc/pcie.html">The PCIe module</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../../../doc/pcie.html#selecting-a-pcie-configuration">Selecting a PCIe configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../doc/pcie.html#the-pcie-core-pcie-core">The PCIe Core (PCIE_CORE)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../doc/pcie.html#the-pcie-control-unit-pcie-ctrl">The PCIe Control unit (PCIE_CTRL)</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../../../doc/pcie.html#the-pcie-telemetry-pcie-telemetry-mi">The PCIe telemetry (PCIE_TELEMETRY_MI)</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">PCIe telemetry</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../doc/pcie.html#the-pcie-module-entity">The PCIe module entity</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/mem.html">The Memory Controller</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/tsu.html">Time Stamp Unit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../doc/dma_bus.html">DMA Bus</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../doc/readme.html">NDK Architecture</a></li>
+          <li class="breadcrumb-item"><a href="../../../doc/pcie.html">The PCIe module</a></li>
+      <li class="breadcrumb-item active">PCIe telemetry</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ndk_core/comp/pcie/pcie_telemetry/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pcie-telemetry">
+<span id="pcie-telemetry-mi"></span><h1>PCIe telemetry<a class="headerlink" href="#pcie-telemetry" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-pcie_telemetry_mi">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE_TELEMETRY_MI</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie_telemetry_mi" title="Link to this definition"></a></dt>
+<dd><p>The PCIE_TELEMETRY_MI collects performance data of the PCIe infrastructure of
+the NDK and makes it readable over the MI bus. It observes, for every PCIe
+endpoint, the four MFB buses around the PTC module and the sources that stop
+the PCIe transfer.</p>
+<p>A BRAKE is one input signal of this module. It is active in every cycle in
+which one named reason stopped the data flow of the PTC.</p>
+<p><strong>What is measured</strong></p>
+<ul class="simple">
+<li><p>the PCIe settings negotiated with the host: maximum payload size (MPS),
+maximum read request size (MRRS), extended tag, 10-bit tag, read completion
+boundary (RCB) and link up,</p></li>
+<li><p>the free PCIe tags of the PTC and the free words of its downstream storage
+FIFO. Each of them is reported twice, as the value now and as the lowest
+value reached,</p></li>
+<li><p>per MFB bus: transferred words, transferred MFB items, started transactions
+and the cycles the bus was stalled by its consumer. The cycles in which each
+region carried data are counted separately,</p></li>
+<li><p>the MVB items of the buses between the DMA and the PTC. These buses carry
+the headers of the transactions on a separate MVB,</p></li>
+<li><p>the cycles in which a BRAKE signal stopped the transfer, one counter per
+reason. The reasons are those listed at the PCIE_PTC_BRAKE port. A firmware
+that does not report a reason leaves that counter at zero,</p></li>
+<li><p>how long the PCIe tags and the storage FIFO words were short. Each of the
+two is a histogram of four bands, from exhausted to more than half free.</p></li>
+</ul>
+<p>Every clock domain has its own counter of elapsed cycles, so every share can
+be computed from one measurement window. The counters of the PCIe clock and
+the BRAKE signals are measured on that same clock, so they describe the same
+cycles.</p>
+<p><strong>Structure</strong></p>
+<p>The module instantiates two <a class="reference internal" href="#pcie-telemetry-probe"><span class="std std-ref">PCIE_TELEMETRY_PROBE</span></a>
+units per PCIe endpoint, one for the PCIe clock domain and one for the DMA
+clock domain. <a class="reference internal" href="#pcie-telemetry-acc"><span class="std std-ref">PCIE_TELEMETRY_ACC</span></a> sums what the
+probes report into the wide counters that software reads.</p>
+<p><strong>Reading the counters</strong></p>
+<p>Reading all counters takes many MI transactions, so software must first issue
+the SNAPSHOT command. It copies all counters into a second memory. The counter
+window then returns that second memory. All values read after one SNAPSHOT
+therefore belong to the same moment.</p>
+<p><strong>Register map</strong> (byte offsets, all registers are 32-bit)</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>0x0000 RO MAGIC        = 0x50544C4D
+0x0004 RO VERSION      [31:16] major, [15:0] minor
+0x0008 RO CFG_TOPOLOGY [7:0] PCIe endpoints, [15:8] DMA ports per endpoint,
+                       [23:16] probes
+0x000C RO CFG_LAYOUT   [15:0] counters, [23:16] counter width,
+                       [31:24] counters per endpoint
+0x0010 RO CFG_PCIE     [7:0] channels, [15:8] buses, [23:16] regions of
+                       the probe, [31:24] BRAKE signals of the PCIe probe
+0x0014 RO CFG_DMA      the same for the DMA clock probe
+0x0018 RO CFG_DRAIN    [15:0] DRAIN_PERIOD in cycles,
+                       [23:16] bytes per MFB item
+0x001C RO CNT_BASE     byte offset of the counter window
+0x0020 WO COMMAND      bit0 snapshot, bit1 clear counters, bit2 clear flags,
+                       bit3 clear the lowest values in PCIE_TAGS and PCIE_STFIFO
+0x0024 RO STATUS       bit0 busy, bit1 a delta was lost,
+                       bit2 a read-out started too early
+0x0028 RW READ_SEL     bit0 0 = read snapshot copy, 1 = read live copy
+0x002C RO CFG_REGIONS  regions each bus really has, [7:0] RQ, [15:8] RC,
+                       [23:16] UP, [31:24] DOWN. A bus narrower than its
+                       probe is padded, its extra regions never carry data.
+0x0030 RO CFG_WIDTH    [15:0] bytes per region of the RQ bus,
+                       [31:16] bytes per region of the RC bus
+0x003C RO CFG_WIDTH_DMA [15:0] bytes per region of the UP bus,
+                       [31:16] bytes per region of the DOWN bus
+0x0034 RO CFG_HIST     [7:0] bands per histogram, [15:8] histograms of the
+                       PCIe clock probe, [23:16] of the DMA clock probe.
+                       The bands are the last BRAKE channels of a probe,
+                       in the order of the signals they belong to: the tags
+                       first, then the storage FIFO.
+0x0038 RO CFG_CAPACITY [15:0] PCIe tags, [31:16] storage FIFO words. The
+                       band thresholds are an eighth and a half of these.
+0x0040 RO PCIE_STATUS  one register per endpoint
+                       [2:0] MPS, [5:3] MRRS, [6] extended tag enable,
+                       [7] 10-bit tag enable, [8] RCB, [9] link up
+0x0080 RO PCIE_TAGS    one register per endpoint
+                       [15:0] free tags, [31:16] lowest free tags
+0x00C0 RO PCIE_STFIFO  one register per endpoint
+                       [15:0] free FIFO words, [31:16] lowest free words
+0x8000 RO counters, two 32-bit words per counter, low word first
+</pre></div>
+</div>
+<p>Counter numbering is described at <a class="reference internal" href="#pcie-telemetry-probe"><span class="std std-ref">PCIE_TELEMETRY_PROBE</span></a>. Counters of one endpoint are stored together. The
+counters of its PCIe clock probe come first, those of its DMA clock probe
+second.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-pcie_endpoints"><td><p>PCIE_ENDPOINTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of monitored PCIe endpoints.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-dma_ports"><td><p>DMA_PORTS</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>Number of DMA ports (PTC DMA side streams) per PCIe endpoint.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-pcie_rq_mfb_regions"><td><p>PCIE_RQ_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions of the RQ bus, that is PTC to PCIe. The RQ and
+RC buses are measured together with the larger of the two values. Tie
+the unused SOF and EOF bits of the narrower bus to zero.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-pcie_rc_mfb_regions"><td><p>PCIE_RC_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions of the RC bus, that is PCIe to PTC.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-dma_up_mfb_regions"><td><p>DMA_UP_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions of the UP bus, that is DMA to PTC.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-dma_down_mfb_regions"><td><p>DMA_DOWN_MFB_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions of the DOWN bus, that is PTC to DMA.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-pcie_rq_mfb_region_bytes"><td><p>PCIE_RQ_MFB_REGION_BYTES</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Number of bytes in one MFB region of the RQ bus. The value is only
+reported to software and changes nothing in this module.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-pcie_rc_mfb_region_bytes"><td><p>PCIE_RC_MFB_REGION_BYTES</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Number of bytes in one MFB region of the RC bus.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-dma_up_mfb_region_bytes"><td><p>DMA_UP_MFB_REGION_BYTES</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Number of bytes in one MFB region of the UP bus.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-dma_down_mfb_region_bytes"><td><p>DMA_DOWN_MFB_REGION_BYTES</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Number of bytes in one MFB region of the DOWN bus.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-mfb_item_bytes"><td><p>MFB_ITEM_BYTES</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of bytes in one MFB item. It converts the region sizes into
+item counts. The EOF_POS fields address items, not bytes.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-pcie_eof_pos_width"><td><p>PCIE_EOF_POS_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>Width of one EOF_POS field of the PCIe side buses. It is the log2 of
+the item count of the larger region of the two.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-dma_eof_pos_width"><td><p>DMA_EOF_POS_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>The same for the DMA side buses.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-cnt_width"><td><p>CNT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>48</p></td>
+<td><p>Width of the counters that software reads, allowed range is 33 to 64.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-drain_period"><td><p>DRAIN_PERIOD</p></td>
+<td><p>natural</p></td>
+<td><p>4096</p></td>
+<td><p>Number of cycles between two read-outs of the probe counters. It must
+be a power of two. A longer period costs more flip-flops in the fast
+clock domains, but it leaves more time for the MI clock domain.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-tag_capacity"><td><p>TAG_CAPACITY</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>Number of PCIe tags the PTC can use at the same time. It only sets the
+thresholds of the tag histogram, which are an eighth and a half of it.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_mi-stfifo_capacity"><td><p>STFIFO_CAPACITY</p></td>
+<td><p>natural</p></td>
+<td><p>1024</p></td>
+<td><p>Number of words the PTC storage FIFO holds. It sets the thresholds of
+the storage FIFO histogram, which are an eighth and a half of it.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_mi-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>FPGA device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>MI INTERFACE (MI_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-mi_clk"><td><p>MI_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-mi_reset"><td><p>MI_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PCIE CLOCK DOMAIN OF EACH ENDPOINT</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_clk"><td><p>PCIE_CLK</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_reset"><td><p>PCIE_RESET</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mfb_sof"><td><p>PCIE_MFB_SOF</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*max(PCIE_RQ_MFB_REGIONS,PCIE_RC_MFB_REGIONS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Observed buses, bus 0 = PTC to PCIe (RQ), bus 1 = PCIe to PTC (RC).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mfb_eof"><td><p>PCIE_MFB_EOF</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*max(PCIE_RQ_MFB_REGIONS,PCIE_RC_MFB_REGIONS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mfb_eof_pos"><td><p>PCIE_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*max(PCIE_RQ_MFB_REGIONS,PCIE_RC_MFB_REGIONS)*PCIE_EOF_POS_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Item of the region in which the frame ends, valid with PCIE_MFB_EOF.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mfb_src_rdy"><td><p>PCIE_MFB_SRC_RDY</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mfb_dst_rdy"><td><p>PCIE_MFB_DST_RDY</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_ptc_brake"><td><p>PCIE_PTC_BRAKE</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(6-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><dl class="simple">
+<dt>BRAKE signals of the PTC, one bit per reason:</dt><dd><p>bit 0 = the pool of free PCIe tags is too small,
+bit 1 = the tag FIFO had no tag ready, although the pool is deep enough,
+bit 2 = no free space in the downstream storage FIFO,
+bit 3 = no free entry in the Completion Header buffer of the PCIe Hard IP,
+bit 4 = the MFB is held before the split between the DMA ports,
+bit 5 = the MVB is held before that same split.</p>
+</dd>
+</dl>
+<p>Bits 0 to 3 stop the stream towards PCIe. Bits 4 and 5 stop the stream
+towards the DMA module. A firmware that does not report a reason leaves
+its bit at zero. Software reads the number of reasons from CFG_PCIE.</p>
+</td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_stfifo_free"><td><p>PCIE_STFIFO_FREE</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(16-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Free words of the PTC downstream storage FIFO.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mps"><td><p>PCIE_MPS</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Negotiated PCIe configuration.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_mrrs"><td><p>PCIE_MRRS</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(3-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_ext_tag_en"><td><p>PCIE_EXT_TAG_EN</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_10b_tag_req_en"><td><p>PCIE_10B_TAG_REQ_EN</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-pcie_rcb_size"><td><p>PCIE_RCB_SIZE</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_link_up"><td><p>PCIE_LINK_UP</p></td>
+<td><p>std_logic_vector(PCIE_ENDPOINTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>DMA CLOCK DOMAIN</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-dma_clk"><td><p>DMA_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-dma_reset"><td><p>DMA_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-dma_mfb_sof"><td><p>DMA_MFB_SOF</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS*max(DMA_UP_MFB_REGIONS,DMA_DOWN_MFB_REGIONS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Observed buses, bus 2*p = DMA to PTC (UP), bus 2*p+1 = PTC to DMA
+(DOWN) of the DMA port p.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-dma_mfb_eof"><td><p>DMA_MFB_EOF</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS*max(DMA_UP_MFB_REGIONS,DMA_DOWN_MFB_REGIONS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-dma_mfb_eof_pos"><td><p>DMA_MFB_EOF_POS</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS*max(DMA_UP_MFB_REGIONS,DMA_DOWN_MFB_REGIONS)*DMA_EOF_POS_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Item of the region in which the frame ends, valid with DMA_MFB_EOF.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-dma_mfb_src_rdy"><td><p>DMA_MFB_SRC_RDY</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-dma_mfb_dst_rdy"><td><p>DMA_MFB_DST_RDY</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-dma_mvb_vld"><td><p>DMA_MVB_VLD</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS*max(DMA_UP_MFB_REGIONS,DMA_DOWN_MFB_REGIONS)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>The headers of the DMA side are carried on separate MVB buses. Every
+request has an item here, but only a request with payload also reaches
+the MFB.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-dma_mvb_src_rdy"><td><p>DMA_MVB_SRC_RDY</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_mi-dma_mvb_dst_rdy"><td><p>DMA_MVB_DST_RDY</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(2*DMA_PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_mi-pcie_tag_free"><td><p>PCIE_TAG_FREE</p></td>
+<td><p>slv_array_t(PCIE_ENDPOINTS-1 downto 0)(11-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Number of free PCIe tags in the PTC, on the PCIe clock. The PTC also
+provides this value resynchronised to the DMA clock. It is measured
+here so that it shares the clock with the BRAKE signal that becomes
+active when the tags run out.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<section id="telemetry-probe">
+<span id="pcie-telemetry-probe"></span><h2>Telemetry probe<a class="headerlink" href="#telemetry-probe" title="Link to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-pcie_telemetry_probe">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE_TELEMETRY_PROBE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie_telemetry_probe" title="Link to this definition"></a></dt>
+<dd><p>The PCIE_TELEMETRY_PROBE observes several MFB buses and several BRAKE signals
+in one fast clock domain. It reports the measured event counts to a slow clock
+domain. A BRAKE signal is active in every cycle in which one named reason
+stopped the data flow.</p>
+<p>The probe keeps one narrow counter per telemetry channel. Every DRAIN_PERIOD
+cycles all counters are read out and cleared. Each read value is called
+a delta. The deltas are sent one by one into an asynchronous FIFO. The deltas
+are summed into wide counters in the slow clock domain, so this module needs
+only narrow counters. A counter cannot overflow between two read-outs, so no
+event is lost.</p>
+<p>The path from the observed signals to the counters has three register stages:
+registered inputs, computed increments and the counters. The read-out path
+adds two more, the group register and the FIFO input register.</p>
+<p>Channel numbering, which also gives the order of the counters in memory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> – elapsed CLK cycles,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">0</span></code> – words transferred on bus <code class="docutils literal notranslate"><span class="pre">b</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">1</span></code> – cycles bus <code class="docutils literal notranslate"><span class="pre">b</span></code> was stalled by its consumer,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">2</span></code> – transactions (SOF) started on bus <code class="docutils literal notranslate"><span class="pre">b</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">3</span></code> – items transferred on the MVB bus that belongs
+to bus <code class="docutils literal notranslate"><span class="pre">b</span></code>. Where the headers are carried on a separate MVB bus, every
+transaction has an item here. Only a transaction with payload also appears
+on the MFB. Buses with no MVB leave this counter at zero.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">4</span></code> – cycles the MVB bus of bus <code class="docutils literal notranslate"><span class="pre">b</span></code> was stalled by
+its consumer. The MVB has a handshake of its own, so it can be stalled while
+the MFB of the same bus runs. Buses with no MVB leave this at zero.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">5</span></code> – MFB items transferred on bus <code class="docutils literal notranslate"><span class="pre">b</span></code>. A region
+that ends a frame counts the items up to RX_EOF_POS. Every other region of
+an open frame counts all of its items.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">b*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">6</span> <span class="pre">+</span> <span class="pre">r</span></code> – cycles region <code class="docutils literal notranslate"><span class="pre">r</span></code> of bus <code class="docutils literal notranslate"><span class="pre">b</span></code> carried data,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">BUSES*(6+REGIONS)</span> <span class="pre">+</span> <span class="pre">k</span></code> – cycles the BRAKE signal <code class="docutils literal notranslate"><span class="pre">k</span></code> was active.</p></li>
+</ul>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_probe-buses"><td><p>BUSES</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of observed MFB buses.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_probe-regions"><td><p>REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of MFB regions of each observed bus. Buses with fewer regions
+must have the unused SOF/EOF bits tied to zero.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_probe-region_items"><td><p>REGION_ITEMS</p></td>
+<td><p>i_array_t(BUSES-1 downto 0)</p></td>
+<td><p>(others =&gt; 8)</p></td>
+<td><p>Number of MFB items in one region of each observed bus. A region must
+hold a single block, so that a frame always starts at its first item.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_probe-eof_pos_width"><td><p>EOF_POS_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td><p>Width of one RX_EOF_POS field, the log2 of the largest REGION_ITEMS.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_probe-region_items_max"><td><p>REGION_ITEMS_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>The largest REGION_ITEMS of any observed bus. It sizes the counters.
+The port clause needs the value as a plain generic, because it cannot
+search the REGION_ITEMS array.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_probe-brakes"><td><p>BRAKES</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of observed BRAKE signals.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_probe-drain_period"><td><p>DRAIN_PERIOD</p></td>
+<td><p>natural</p></td>
+<td><p>4096</p></td>
+<td><p>Number of CLK cycles between two read-outs of the counters. It must
+be a power of two. It also sets the counter width CNT_WIDTH.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_probe-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>FPGA device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>OBSERVED CLOCK DOMAIN</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-rx_sof"><td><p>RX_SOF</p></td>
+<td><p>std_logic_vector(BUSES*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Start of frame of each region of each observed bus.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-rx_eof"><td><p>RX_EOF</p></td>
+<td><p>std_logic_vector(BUSES*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>End of frame of each region of each observed bus.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-rx_eof_pos"><td><p>RX_EOF_POS</p></td>
+<td><p>std_logic_vector(BUSES*REGIONS*EOF_POS_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Item of the region in which the frame ends, valid with RX_EOF. The
+fields keep the order of RX_EOF. Unused high bits stay at zero.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic_vector(BUSES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic_vector(BUSES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-rx_brake"><td><p>RX_BRAKE</p></td>
+<td><p>std_logic_vector(max(1,BRAKES)-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>BRAKE signals. Each bit is active while the reason it reports blocks
+the data.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(BUSES*REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Valid items of the MVB bus that belongs to each observed MFB bus, and
+its handshake. Tie SRC_RDY low on buses that have no MVB.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic_vector(BUSES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic_vector(BUSES-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-drain_tick"><td><p>DRAIN_TICK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Active for one CLK cycle at the start of every read-out of the
+counters.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>REPORTING CLOCK DOMAIN</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-mi_clk"><td><p>MI_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-mi_reset"><td><p>MI_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-tx_index"><td><p>TX_INDEX</p></td>
+<td><p>std_logic_vector(log2(1+BUSES*(6+REGIONS)+BRAKES)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Channel index of the reported delta.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-tx_delta"><td><p>TX_DELTA</p></td>
+<td><p>std_logic_vector(log2(DRAIN_PERIOD*max(1,REGIONS*REGION_ITEMS_MAX)+1)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Number of events counted on the channel since the previous read-out.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-tx_vld"><td><p>TX_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-tx_rd"><td><p>TX_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-mi_flag_clr"><td><p>MI_FLAG_CLR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Every change of this level clears both flags below.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_probe-tx_fifo_ovf"><td><p>TX_FIFO_OVF</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Set when the FIFO was full and a delta was lost. Stays set until the
+level of MI_FLAG_CLR changes.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_probe-tx_overrun"><td><p>TX_OVERRUN</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Set when a read-out started before the previous one finished. Stays
+set until the level of MI_FLAG_CLR changes.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="telemetry-counter-memory">
+<span id="pcie-telemetry-acc"></span><h2>Telemetry counter memory<a class="headerlink" href="#telemetry-counter-memory" title="Link to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-pcie_telemetry_acc">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">PCIE_TELEMETRY_ACC</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-pcie_telemetry_acc" title="Link to this definition"></a></dt>
+<dd><p>The PCIE_TELEMETRY_ACC merges the delta streams of all telemetry probes into
+one memory of wide free-running counters. The deltas arrive one by one, so a
+single adder and a single memory are enough for all channels.</p>
+<p>The memory holds two copies of the counters. The deltas update the live copy.
+The SNAPSHOT command writes the snapshot copy. Software reads the snapshot
+copy, so all values it reads belong to the same moment, even though reading
+them takes many bus transactions.</p>
+<p>Deltas keep arriving while a SNAPSHOT or CLEAR command runs. They wait in the
+probe FIFOs and are applied when the command is done.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_acc-streams"><td><p>STREAMS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of delta streams (probes).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_acc-stream_base"><td><p>STREAM_BASE</p></td>
+<td><p>i_array_t</p></td>
+<td><p>(0,16)</p></td>
+<td><p>First counter index of each stream.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_acc-entries"><td><p>ENTRIES</p></td>
+<td><p>natural</p></td>
+<td><p>64</p></td>
+<td><p>Number of counters. It must be a power of two.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_acc-idx_width"><td><p>IDX_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>5</p></td>
+<td><p>Width of the channel index of a delta.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_telemetry_acc-delta_width"><td><p>DELTA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>14</p></td>
+<td><p>Width of the value of a delta.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_telemetry_acc-cnt_width"><td><p>CNT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>48</p></td>
+<td><p>Width of the counters in the memory.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_acc-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>DELTA STREAMS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_acc-rx_index"><td><p>RX_INDEX</p></td>
+<td><p>slv_array_t(STREAMS-1 downto 0)(IDX_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-rx_delta"><td><p>RX_DELTA</p></td>
+<td><p>slv_array_t(STREAMS-1 downto 0)(DELTA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_acc-rx_vld"><td><p>RX_VLD</p></td>
+<td><p>std_logic_vector(STREAMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-rx_rd"><td><p>RX_RD</p></td>
+<td><p>std_logic_vector(STREAMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>COMMANDS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-snapshot"><td><p>SNAPSHOT</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Copies the live counters into the snapshot copy.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_acc-clear"><td><p>CLEAR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Zeroes both copies of the counters.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-busy"><td><p>BUSY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>A command is in progress. Deltas are not applied while it runs.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>SOFTWARE READ PORT</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-rd_addr"><td><p>RD_ADDR</p></td>
+<td><p>std_logic_vector(log2(ENTRIES)+1-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>The highest bit selects the copy, 0 = live, 1 = snapshot.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie_telemetry_acc-rd_en"><td><p>RD_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie_telemetry_acc-rd_data"><td><p>RD_DATA</p></td>
+<td><p>std_logic_vector(CNT_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="software">
+<h2>Software<a class="headerlink" href="#software" title="Link to this heading"></a></h2>
+<p>The component is read out by the <code class="docutils literal notranslate"><span class="pre">nfb-pcie-telemetry</span></code> tool from the OFM
+Python package. The tool takes its whole layout from the configuration registers
+of the component. The same binary therefore works with any number of PCIe
+endpoints, DMA ports and MFB regions, without being rebuilt.</p>
+<section id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h3>
+<p>The tool needs Python 3.11 or newer and the <code class="docutils literal notranslate"><span class="pre">nfb</span></code> module from the NDK-SW
+repository. Install the OFM package from the <code class="docutils literal notranslate"><span class="pre">python/ofm</span></code> directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3.11<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>my-venv
+<span class="nb">source</span><span class="w"> </span>my-venv/bin/activate
+<span class="nb">source</span><span class="w"> </span>&lt;ndk-fpga&gt;/env.sh
+<span class="nb">cd</span><span class="w"> </span>&lt;ndk-fpga&gt;/python/ofm
+pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> instead while you modify the tool itself. It installs
+the package in editable mode.</p>
+</section>
+<section id="usage">
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+<p>Print the traffic measured over one second and exit:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nfb-pcie-telemetry
+</pre></div>
+</div>
+<p>Options:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">d</span><span class="p">,</span> <span class="o">--</span><span class="n">device</span> <span class="n">PATH</span>      <span class="n">path</span> <span class="n">to</span> <span class="n">the</span> <span class="n">NFB</span> <span class="n">device</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">the</span> <span class="n">first</span> <span class="n">one</span><span class="p">)</span>
+<span class="o">-</span><span class="n">i</span><span class="p">,</span> <span class="o">--</span><span class="n">index</span> <span class="n">N</span>          <span class="n">index</span> <span class="n">of</span> <span class="n">the</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">DeviceTree</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
+<span class="o">-</span><span class="n">t</span><span class="p">,</span> <span class="o">--</span><span class="n">interval</span> <span class="n">SEC</span>     <span class="n">length</span> <span class="n">of</span> <span class="n">the</span> <span class="n">measured</span> <span class="n">interval</span> <span class="ow">in</span> <span class="n">seconds</span><span class="p">;</span> <span class="mi">0</span> <span class="n">prints</span>
+                       <span class="n">the</span> <span class="n">totals</span> <span class="n">accumulated</span> <span class="n">since</span> <span class="n">the</span> <span class="n">last</span> <span class="n">clear</span>
+<span class="o">-</span><span class="n">w</span><span class="p">,</span> <span class="o">--</span><span class="n">watch</span>            <span class="n">keep</span> <span class="n">measuring</span> <span class="ow">and</span> <span class="n">printing</span> <span class="n">until</span> <span class="n">interrupted</span>
+<span class="o">-</span><span class="n">c</span><span class="p">,</span> <span class="o">--</span><span class="n">clear</span>            <span class="n">zero</span> <span class="nb">all</span> <span class="n">counters</span> <span class="ow">and</span> <span class="n">exit</span>
+<span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="o">--</span><span class="n">json</span>             <span class="nb">print</span> <span class="n">the</span> <span class="n">raw</span> <span class="n">values</span> <span class="k">as</span> <span class="n">JSON</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">a</span> <span class="n">table</span>
+</pre></div>
+</div>
+<p>With a non-zero interval the tool takes two snapshots and prints their
+difference, so the report describes only that interval. With <code class="docutils literal notranslate"><span class="pre">--interval</span> <span class="pre">0</span></code>
+it prints one snapshot, which is the traffic since the counters were last
+cleared. The counters are wide enough (48 bits by default) that they do not
+overflow in any practical measurement.</p>
+<p>Example of the output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PCIe</span> <span class="n">telemetry</span> <span class="o">-</span> <span class="mi">1</span> <span class="n">endpoint</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="mi">1</span> <span class="n">DMA</span> <span class="n">port</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="n">per</span> <span class="n">endpoint</span>
+<span class="o">==========================================================</span>
+<span class="n">Measured</span> <span class="n">over</span> <span class="mf">1.00</span> <span class="n">s</span>
+
+<span class="n">PCIe</span> <span class="n">endpoint</span> <span class="mi">0</span>
+<span class="o">------------------------------------------------------------</span>
+<span class="n">Link</span>                      <span class="n">up</span>
+<span class="n">Max</span> <span class="n">payload</span> <span class="n">size</span> <span class="p">(</span><span class="n">MPS</span><span class="p">)</span>    <span class="mi">512</span> <span class="n">B</span>
+<span class="n">Max</span> <span class="n">read</span> <span class="n">request</span> <span class="p">(</span><span class="n">MRRS</span><span class="p">)</span>   <span class="mi">4096</span> <span class="n">B</span>
+<span class="n">Extended</span> <span class="n">tag</span> <span class="p">(</span><span class="mi">8</span><span class="o">-</span><span class="n">bit</span><span class="p">)</span>      <span class="n">on</span>
+<span class="mi">10</span><span class="o">-</span><span class="n">bit</span> <span class="n">tag</span>                <span class="n">off</span>
+<span class="n">Read</span> <span class="n">completion</span> <span class="n">boundary</span>  <span class="mi">64</span> <span class="n">B</span>
+<span class="n">PTC</span> <span class="n">tags</span> <span class="n">free</span>             <span class="mi">118</span> <span class="p">(</span><span class="n">lowest</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">PTC</span> <span class="n">storage</span> <span class="n">FIFO</span> <span class="n">free</span>     <span class="mi">640</span> <span class="n">words</span> <span class="p">(</span><span class="n">lowest</span> <span class="mi">96</span><span class="p">)</span>
+
+  <span class="n">PCIe</span> <span class="n">clock</span> <span class="mf">400.0</span> <span class="n">MHz</span><span class="p">,</span> <span class="n">DMA</span> <span class="n">clock</span> <span class="mf">200.0</span> <span class="n">MHz</span>
+
+<span class="n">Bus</span>                 <span class="n">Used</span> <span class="o">%</span>  <span class="n">Words</span> <span class="o">%</span>  <span class="n">MFB</span> <span class="n">stall</span> <span class="o">%</span>  <span class="n">MVB</span> <span class="n">stall</span> <span class="o">%</span>  <span class="n">Used</span> <span class="n">per</span> <span class="n">region</span> <span class="o">%</span>    <span class="n">Gbps</span>    <span class="n">Mpps</span>    <span class="n">RD</span> <span class="o">%</span>   <span class="n">Avg</span> <span class="n">B</span>
+<span class="o">------------------</span>  <span class="o">------</span>  <span class="o">-------</span>  <span class="o">-----------</span>  <span class="o">-----------</span>  <span class="o">-------------------</span>  <span class="o">------</span>  <span class="o">------</span>  <span class="o">-----</span>  <span class="o">-----</span>
+<span class="n">PTC</span> <span class="o">-&gt;</span> <span class="n">PCIe</span> <span class="p">(</span><span class="n">RQ</span><span class="p">)</span>    <span class="mf">70.15</span>   <span class="mf">89.90</span>    <span class="mf">0.01</span>         <span class="o">-</span>            <span class="mf">89.9</span> <span class="mf">63.6</span> <span class="mf">63.6</span> <span class="mf">63.5</span>  <span class="mf">287.33</span>  <span class="mf">58.000</span>  <span class="o">-</span>      <span class="mi">619</span>
+<span class="n">PCIe</span> <span class="o">-&gt;</span> <span class="n">PTC</span> <span class="p">(</span><span class="n">RC</span><span class="p">)</span>    <span class="mf">44.67</span>   <span class="mf">49.40</span>    <span class="mf">0.00</span>         <span class="o">-</span>            <span class="mf">44.8</span> <span class="mf">44.7</span> <span class="mf">44.6</span> <span class="mf">44.6</span>  <span class="mf">182.99</span>  <span class="mf">34.000</span>  <span class="o">-</span>      <span class="mi">673</span>
+<span class="n">DMA0</span> <span class="o">-&gt;</span> <span class="n">PTC</span> <span class="p">(</span><span class="n">UP</span><span class="p">)</span>    <span class="mf">66.45</span>   <span class="mf">66.90</span>    <span class="mf">22.70</span>        <span class="mf">13.90</span>        <span class="mf">66.7</span> <span class="mf">66.2</span>            <span class="mf">68.04</span>   <span class="mf">58.000</span>  <span class="mf">25.86</span>  <span class="mi">198</span>
+<span class="n">PTC</span> <span class="o">-&gt;</span> <span class="n">DMA0</span> <span class="p">(</span><span class="n">DOWN</span><span class="p">)</span>  <span class="mf">45.45</span>   <span class="mf">48.60</span>    <span class="mf">0.80</span>         <span class="mf">0.30</span>         <span class="mf">45.5</span> <span class="mf">45.4</span>            <span class="mf">46.54</span>   <span class="mf">34.800</span>  <span class="o">-</span>      <span class="mi">167</span>
+
+  <span class="n">Why</span> <span class="n">the</span> <span class="n">PCIe</span> <span class="n">transfer</span> <span class="n">stopped</span> <span class="p">(</span><span class="n">share</span> <span class="n">of</span> <span class="n">PCIe</span> <span class="n">clock</span> <span class="n">cycles</span><span class="p">)</span>
+    <span class="n">UP</span> <span class="n">stream</span>                              <span class="n">DOWN</span> <span class="n">stream</span>
+    <span class="n">no</span> <span class="n">free</span> <span class="n">PCIe</span> <span class="n">tag</span>           <span class="mf">13.60</span> <span class="o">%</span>     <span class="n">MFB</span> <span class="n">stalled</span> <span class="n">towards</span> <span class="n">DMA</span>  <span class="mf">8.40</span> <span class="o">%</span>
+    <span class="n">PCIe</span> <span class="n">tag</span> <span class="ow">not</span> <span class="n">ready</span>          <span class="mf">0.40</span> <span class="o">%</span>     <span class="n">MVB</span> <span class="n">stalled</span> <span class="n">towards</span> <span class="n">DMA</span>  <span class="mf">0.10</span> <span class="o">%</span>
+    <span class="n">no</span> <span class="n">room</span> <span class="k">for</span> <span class="n">completions</span>     <span class="mf">0.00</span> <span class="o">%</span>
+    <span class="n">no</span> <span class="n">completion</span> <span class="n">header</span> <span class="n">entry</span>  <span class="mf">0.00</span> <span class="o">%</span>
+    <span class="n">PCIe</span> <span class="n">endpoint</span> <span class="ow">not</span> <span class="n">ready</span>     <span class="mf">0.01</span> <span class="o">%</span>
+
+<span class="n">Time</span> <span class="n">spent</span> <span class="n">low</span>          <span class="n">of</span>    <span class="n">none</span>    <span class="o">&lt;=</span><span class="mi">1</span><span class="o">/</span><span class="mi">8</span>    <span class="o">&lt;=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span>    <span class="n">rest</span>
+<span class="o">----------------------</span>  <span class="o">----</span>  <span class="o">------</span>  <span class="o">-------</span>  <span class="o">-------</span>  <span class="o">------</span>
+<span class="n">PCIe</span> <span class="n">tags</span>               <span class="mi">256</span>   <span class="mf">0.30</span>    <span class="mf">39.80</span>    <span class="mf">7.90</span>     <span class="mf">52.00</span>
+<span class="n">PTC</span> <span class="n">storage</span> <span class="n">FIFO</span> <span class="n">words</span>  <span class="mi">1024</span>  <span class="mf">0.00</span>    <span class="mf">21.00</span>    <span class="mf">27.00</span>    <span class="mf">52.00</span>
+</pre></div>
+</div>
+</section>
+<section id="reading-the-report">
+<h3>Reading the report<a class="headerlink" href="#reading-the-report" title="Link to this heading"></a></h3>
+<p>The header of each endpoint shows the PCIe parameters negotiated with the host
+(MPS, MRRS, extended and 10-bit tags, read completion boundary). It also shows
+how many PTC tags and how many words of the PTC storage FIFO are free now, and
+the lowest value each of them reached in the measured interval. Read that lowest
+value first when the throughput is lower than expected. The histograms below
+then say how long the resource stayed that low.</p>
+<p>The clock frequencies are not read from a register. They are derived from the
+cycle counters and the wall-clock length of the interval. They therefore also
+serve as a sanity check that the measurement really covered the interval it
+claims to.</p>
+<p>Meaning of the columns:</p>
+<dl class="simple">
+<dt>Used %</dt><dd><p>Occupancy of the bus, that is the sum of its region counters divided by the
+elapsed cycles times the regions of that bus. A region counts in a cycle in
+which the bus moved a word and a frame was open in that region. The whole
+region counts even when the frame ends in the middle of it, so this is the
+width the traffic occupied and not the width it filled.</p>
+</dd>
+<dt>Words %</dt><dd><p>Share of clock cycles in which the bus moved a word, that is both SRC_RDY
+and DST_RDY were high. The denominator is every elapsed cycle, so 100 % says
+the bus never idled and was never stalled.</p>
+</dd>
+<dt>MFB stall %</dt><dd><p>Share of clock cycles in which SRC_RDY was high and DST_RDY was low. What is
+left of 100 % after this column and <em>Words %</em> is the time the source had
+nothing to send.</p>
+</dd>
+<dt>MVB stall %</dt><dd><p>The same for the MVB that carries the headers. The MVB has a handshake of
+its own, so it can be stalled while the MFB of the same bus runs. Buses
+without an MVB show a dash.</p>
+</dd>
+<dt>Used per region %</dt><dd><p>The counter of one region divided by the elapsed cycles, region 0 first.
+Values that decrease towards the higher regions mean short transactions.
+Such transactions do not fill the whole word.</p>
+</dd>
+<dt>Gbps</dt><dd><p>Rate of the transferred MFB items times the item size. A region that ends a
+frame contributes only the items up to its EOF_POS, so this is the length
+the traffic really had. The two sides of the PTC count different things.
+Between the DMA and the PTC the headers are carried on a separate MVB bus,
+so the DMA side buses carry payload alone. On the PCIe request bus the TLP
+header is part of the data stream and is counted in. The difference between
+the two sides is therefore the header overhead.</p>
+</dd>
+<dt>Mpps</dt><dd><p>Transaction rate, millions of transactions per second. The DMA side buses
+have an MVB of their own, so their rate comes from the MVB items and holds
+every request including those that carry no payload. The PCIe side buses
+have no MVB and their frames are counted instead. The choice follows the
+bus, never the traffic, so it cannot change between two readings.</p>
+</dd>
+<dt>RD %</dt><dd><p>Share of the requests that carry no payload. On the bus from the DMA module
+to the PTC these are the reads, and the writes are the remainder. Only that
+bus carries both kinds of request, so the others show a dash. A completion
+always has payload. On the PCIe side the header is part of the data stream,
+where these counters cannot tell a read from a write.</p>
+</dd>
+<dt>Avg B</dt><dd><p>Transferred bytes divided by the frames on the MFB, that is the average
+length of one frame. <em>Mpps</em> counts requests rather than frames, so these two
+columns do not multiply out to <em>Gbps</em>.</p>
+</dd>
+</dl>
+<p>The block at the bottom says how often the PTC had to stop a stream and why.
+The <em>UP stream</em> column holds the reasons that stop the read requests on their
+way to PCIe:</p>
+<ul class="simple">
+<li><p>the pool of free PCIe tags was smaller than what that cycle asked for,</p></li>
+<li><p>the tag FIFO had no tag ready, even though the pool was deep enough,</p></li>
+<li><p>the space left in the storage FIFO no longer covered the completions of the
+next group of requests,</p></li>
+<li><p>the Completion Header buffer of the PCIe Hard IP had no entry left for one
+more read,</p></li>
+<li><p>the PCIe endpoint itself stopped taking data.</p></li>
+</ul>
+<p>The <em>DOWN stream</em> column holds the reasons that stop the completions on their
+way to the DMA module. Both are measured before the split between the DMA ports.
+One is measured on the MFB that carries the data. The other is measured on the
+MVB that carries the headers. They become active before the <em>MFB stall %</em> of a
+DOWN bus does. That column is measured on the far side of the clock crossing,
+where the asynchronous FIFOs have already taken the burst. A DOWN reason is the usual cause of <em>no room
+for completions</em> in the other column.</p>
+<p>The first two reasons both come from the tag path and are counted apart,
+because they ask for opposite changes. The first one means the completions do
+not come back fast enough. It is answered by more tags or by shorter reads. The
+second one is a property of the tag FIFO, not of the traffic. A released tag
+counts as free as soon as it is written, but it reaches the read ports of that
+FIFO only a few cycles later. The second reason therefore says nothing about how
+many tags are left. It appears even when almost the whole pool is free. Use the
+histogram below, not this line, to decide whether the tags are running out.</p>
+<p>The third one needs care when it is read. The storage FIFO is not full when
+this reason becomes active, because the space is only reserved ahead. The reason
+therefore appears well before the histogram reaches its lowest band. The fourth
+one covers a buffer inside the PCIe Hard IP for which no credit is counted. It
+stays at zero on endpoint types that manage that buffer themselves. The last one is not a
+counter of its own. It repeats the stalled cycles of the RQ bus, so that every
+reason can be compared in one place.</p>
+<p>Every reason is its own counter of cycles. It is divided by the elapsed PCIe
+clock cycles of the same period as the rest of the report. The second line of
+the header names that period: the measured interval, or everything since the
+last clear.</p>
+<p>The two histograms below them say how long each of the two resources that can
+run out was short. The lowest value in the header cannot say this: four free tags
+means the same whether it lasted one cycle or half a second.
+Each histogram splits the time into four bands by how much of the resource was
+free: none at all, up to an eighth, up to a half, and the rest. The bands are
+narrowest near zero, because that is where the resource limits the transfer. The
+<code class="docutils literal notranslate"><span class="pre">of</span></code> column gives the capacity the bands are shares of. The band thresholds are
+derived from that same number. Each band is a counter of cycles divided by the
+elapsed PCIe clock cycles. Time spent in the lowest band is time in which the
+PTC was close to a stall. A few percent there is worth reading even when the
+average over the whole interval shows no shortage.</p>
+<p>Both resources are counted on the PCIe clock. The reasons they cause are
+observed on that same clock. The share of time in the lowest band and the share
+of time the matching reason was active therefore describe the same cycles, and
+the two can be compared.</p>
+<p>If the counters could not keep up, the tool prints a <code class="docutils literal notranslate"><span class="pre">LOST</span> <span class="pre">DELTAS</span></code> or a
+<code class="docutils literal notranslate"><span class="pre">READ-OUT</span> <span class="pre">OVERRUN</span></code> warning at the top of the report. The numbers must not be
+trusted then. The firmware keeps both flags set until software clears them. The
+tool clears them at the start of every measured interval, so the warning
+describes only the interval that was just printed. With <code class="docutils literal notranslate"><span class="pre">--interval</span> <span class="pre">0</span></code> there
+is no such start, so the flags describe everything since the last <code class="docutils literal notranslate"><span class="pre">--clear</span></code>.</p>
+</section>
+<section id="python-api">
+<h3>Python API<a class="headerlink" href="#python-api" title="Link to this heading"></a></h3>
+<p>The same data is available to scripts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.pcie.telemetry</span> <span class="kn">import</span> <span class="n">PcieTelemetry</span><span class="p">,</span> <span class="n">format_report</span>
+
+<span class="n">telemetry</span> <span class="o">=</span> <span class="n">PcieTelemetry</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">telemetry</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>          <span class="c1"># takes a snapshot and returns a dict</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">format_report</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>  <span class="c1"># or render it the same way the tool does</span>
+
+<span class="n">telemetry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>                <span class="c1"># zero all counters</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">telemetry</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>          <span class="c1"># busy, lost_deltas, readout_overrun</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">read()</span></code> first takes a snapshot in the firmware and only then reads it out, so
+the returned values are consistent with each other even though reading them
+takes many MI transactions.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../doc/pcie.html" class="btn btn-neutral float-left" title="The PCIe module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../doc/mem.html" class="btn btn-neutral float-right" title="The Memory Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

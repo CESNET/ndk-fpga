@@ -19,7 +19,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="The Memory Controller" href="mem.html" />
+    <link rel="next" title="PCIe telemetry" href="../comp/pcie/pcie_telemetry/readme.html" />
     <link rel="prev" title="The DMA module" href="dma.html" /> 
 </head>
 
@@ -58,6 +58,10 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#the-pcie-control-unit-pcie-ctrl">The PCIe Control unit (PCIE_CTRL)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-pcie-telemetry-pcie-telemetry-mi">The PCIe telemetry (PCIE_TELEMETRY_MI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../comp/pcie/pcie_telemetry/readme.html">PCIe telemetry</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#the-pcie-module-entity">The PCIe module entity</a></li>
 </ul>
 </li>
@@ -194,6 +198,17 @@
 <p>We assume that 64-bit PCIe BARs are used, meaning that half of them are available at most (BAR0, BAR2, and BAR4). You can find more information in the PCIe specification.</p>
 </div>
 <p>By default, this unit also contains the <a class="reference internal" href="../../comp/pcie/ptc/readme.html#ptc"><span class="std std-ref">PTC module</span></a>, which transforms memory requests (in a simplified format) coming from the DMA into the desired PCIe format and vice versa. The PTC module also implements a completion buffer and handles the allocation of the PCIe TAGs, etc. The PTC can be disabled using the <code class="docutils literal notranslate"><span class="pre">PTC_DISABLE</span></code> parameter, in which case the DMA requests (in the PCIe transaction format) are directly forwarded to the PCIe Hard IP and vice versa.</p>
+</section>
+<section id="the-pcie-telemetry-pcie-telemetry-mi">
+<h2>The PCIe telemetry (PCIE_TELEMETRY_MI)<a class="headerlink" href="#the-pcie-telemetry-pcie-telemetry-mi" title="Link to this heading"></a></h2>
+<p>The PCIe module also contains a telemetry unit. It counts how well the buses
+around the PTC are used and how often the transfer is stopped. It is described in
+a chapter of its own, together with the tool that reads it out.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../comp/pcie/pcie_telemetry/readme.html">PCIe telemetry</a></li>
+</ul>
+</div>
 </section>
 <section id="the-pcie-module-entity">
 <h2>The PCIe module entity<a class="headerlink" href="#the-pcie-module-entity" title="Link to this heading"></a></h2>
@@ -353,6 +368,17 @@
 <td><p>natural</p></td>
 <td><p>0</p></td>
 <td><p>Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_mps_max"><td><p>PCIE_MPS_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>Largest Max Payload Size (in bytes) the PCIe module is built for</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie-pcie_mrrs_max"><td><p>PCIE_MRRS_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Largest Max Read Request Size (in bytes) the PCIe module is built for.
+It must cover every read the DMA module can issue.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-pcie-pcie_endpoints"><td><p>PCIE_ENDPOINTS</p></td>
 <td><p>natural</p></td>
@@ -885,6 +911,46 @@ MI_DBG - MI interface to PCIe registers (currently only debug registers)</p></td
 <td><p>out</p></td>
 <td></td>
 </tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_telem_dwr"><td><p>MI_TELEM_DWR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>MI_TELEM - MI interface to the PCIe telemetry registers</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_telem_addr"><td><p>MI_TELEM_ADDR</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_telem_be"><td><p>MI_TELEM_BE</p></td>
+<td><p>std_logic_vector(32/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_telem_rd"><td><p>MI_TELEM_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_telem_wr"><td><p>MI_TELEM_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_telem_drd"><td><p>MI_TELEM_DRD</p></td>
+<td><p>std_logic_vector(32-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-pcie-mi_telem_ardy"><td><p>MI_TELEM_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-pcie-mi_telem_drdy"><td><p>MI_TELEM_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
 <tr class="row-odd"><td><p>=====</p></td>
 <td><p>MISC SIGNALS (the clock signal is not defined)</p></td>
 <td><p>=====</p></td>
@@ -912,7 +978,7 @@ MI_DBG - MI interface to PCIe registers (currently only debug registers)</p></td
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="dma.html" class="btn btn-neutral float-left" title="The DMA module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="mem.html" class="btn btn-neutral float-right" title="The Memory Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../comp/pcie/pcie_telemetry/readme.html" class="btn btn-neutral float-right" title="PCIe telemetry" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
