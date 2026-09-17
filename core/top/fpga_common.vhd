@@ -1061,6 +1061,15 @@ begin
         MI_DBG_ARDY        => mi_adc_ardy(MI_ADC_PORT_PCI_DBG),
         MI_DBG_DRDY        => mi_adc_drdy(MI_ADC_PORT_PCI_DBG),
 
+        MI_TELEM_DWR       => mi_adc_dwr (MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_ADDR      => mi_adc_addr(MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_BE        => mi_adc_be  (MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_RD        => mi_adc_rd  (MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_WR        => mi_adc_wr  (MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_DRD       => mi_adc_drd (MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_ARDY      => mi_adc_ardy(MI_ADC_PORT_PCI_TELEM),
+        MI_TELEM_DRDY      => mi_adc_drdy(MI_ADC_PORT_PCI_TELEM),
+
         MISC_TOP2PCIE      => MISC_TOP2PCIE,
         MISC_PCIE2TOP      => MISC_PCIE2TOP
     );

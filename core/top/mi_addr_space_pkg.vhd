@@ -14,7 +14,7 @@ use work.type_pack.all;
 package mi_addr_space_pack is
 
     -- Number of output MI ports
-    constant MI_ADC_PORTS : natural := 13;
+    constant MI_ADC_PORTS : natural := 14;
 
     -- Address Space definition
     constant MI_ADC_ADDR_BASE : slv_array_t(MI_ADC_PORTS-1 downto 0)(32-1 downto 0) :=
@@ -27,24 +27,26 @@ package mi_addr_space_pack is
              6 => X"0000_5000",  -- Debug GLS modules
              7 => X"0000_8000",  -- Ethernet MACs
              8 => X"0001_0000",  -- Intel JTAG-over-protocol IP
-             9 => X"0080_0000",  -- Ethernet PCS/PMA
-            10 => X"0100_0000",  -- DMA controller
-            11 => X"0140_0000",  -- PCIe Debug space
-            12 => X"0200_0000"); -- The application
+             9 => X"0002_0000",  -- PCIe telemetry
+            10 => X"0080_0000",  -- Ethernet PCS/PMA
+            11 => X"0100_0000",  -- DMA controller
+            12 => X"0140_0000",  -- PCIe Debug space
+            13 => X"0200_0000"); -- The application
 
-    constant MI_ADC_PORT_TEST    : natural := 0;
-    constant MI_ADC_PORT_FMETER  : natural := 1;
-    constant MI_ADC_PORT_SENSOR  : natural := 2;
-    constant MI_ADC_PORT_BOOT    : natural := 3;
-    constant MI_ADC_PORT_ETHPMD  : natural := 4;
-    constant MI_ADC_PORT_TSU     : natural := 5;
-    constant MI_ADC_PORT_GENLOOP : natural := 6;
-    constant MI_ADC_PORT_NETMOD  : natural := 7;
-    constant MI_ADC_PORT_JTAG_IP : natural := 8;
-    constant MI_ADC_PORT_ETHMOD  : natural := 9;
-    constant MI_ADC_PORT_DMA     : natural := 10;
-    constant MI_ADC_PORT_PCI_DBG : natural := 11;
-    constant MI_ADC_PORT_USERAPP : natural := 12;
+    constant MI_ADC_PORT_TEST      : natural := 0;
+    constant MI_ADC_PORT_FMETER    : natural := 1;
+    constant MI_ADC_PORT_SENSOR    : natural := 2;
+    constant MI_ADC_PORT_BOOT      : natural := 3;
+    constant MI_ADC_PORT_ETHPMD    : natural := 4;
+    constant MI_ADC_PORT_TSU       : natural := 5;
+    constant MI_ADC_PORT_GENLOOP   : natural := 6;
+    constant MI_ADC_PORT_NETMOD    : natural := 7;
+    constant MI_ADC_PORT_JTAG_IP   : natural := 8;
+    constant MI_ADC_PORT_PCI_TELEM : natural := 9;
+    constant MI_ADC_PORT_ETHMOD    : natural := 10;
+    constant MI_ADC_PORT_DMA       : natural := 11;
+    constant MI_ADC_PORT_PCI_DBG   : natural := 12;
+    constant MI_ADC_PORT_USERAPP   : natural := 13;
 
 end package;
 

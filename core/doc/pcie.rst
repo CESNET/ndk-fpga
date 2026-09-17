@@ -49,6 +49,18 @@ The PCIe Control unit always includes the :ref:`MI Transaction Controller (MTC) 
 
 By default, this unit also contains the :ref:`PTC module <ptc>`, which transforms memory requests (in a simplified format) coming from the DMA into the desired PCIe format and vice versa. The PTC module also implements a completion buffer and handles the allocation of the PCIe TAGs, etc. The PTC can be disabled using the ``PTC_DISABLE`` parameter, in which case the DMA requests (in the PCIe transaction format) are directly forwarded to the PCIe Hard IP and vice versa.
 
+The PCIe telemetry (PCIE_TELEMETRY_MI)
+**************************************
+
+The PCIe module also contains a telemetry unit. It counts how well the buses
+around the PTC are used and how often the transfer is stopped. It is described in
+a chapter of its own, together with the tool that reads it out.
+
+.. toctree::
+   :maxdepth: 1
+
+   ../comp/pcie/pcie_telemetry/readme
+
 The PCIe module entity
 **********************
 
