@@ -255,6 +255,11 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     signal down_mvb_asfifo_in_vld     : slv_array_t(DMA_PORTS-1 downto 0)(DMA_MVB_DOWN_ITEMS                  -1 downto 0) := (others => (others => '0'));
     signal down_mvb_asfifo_in_src_rdy : std_logic_vector(DMA_PORTS-1 downto 0);
     signal down_mvb_asfifo_in_dst_rdy : std_logic_vector(DMA_PORTS-1 downto 0);
+
+    signal down_mfb_hold              : std_logic;
+    signal down_mvb_hold              : std_logic;
+    signal down_mfb_hold_dly          : std_logic;
+    signal down_mvb_hold_dly          : std_logic;
     signal down_mvb_asfifo_afull      : std_logic_vector(DMA_PORTS-1 downto 0);
     signal down_mvb_asfifo_afull_reg  : std_logic_vector(DMA_PORTS-1 downto 0);
 
@@ -837,7 +842,12 @@ begin
         DMA_DOWN_HDR_ID         => tagm_dma_down_id,
 
         RCB_SIZE                => RCB_SIZE,
-        PCIE_TAG_STATUS         => pcie_tag_status_async
+        PCIE_TAG_STATUS         => pcie_tag_status_async,
+
+        TELEM_TAG_SHORTAGE      => TELEM_TAG_SHORTAGE,
+        TELEM_TAG_NOT_READY     => TELEM_TAG_NOT_READY,
+        TELEM_CPLH_SHORTAGE     => TELEM_CPLH_SHORTAGE,
+        TELEM_CPLH_FREE         => TELEM_STFIFO_FREE
     );
 
     pcie_tag_status_asfifo_i : entity work.ASFIFOX
@@ -866,6 +876,24 @@ begin
         RD_AEMPTY => open,
         RD_STATUS => open
     );
+
+    TELEM_TAG_FREE <= pcie_tag_status_async;
+
+    -- The DOWN stream held before the split between the DMA ports. It backs up
+    -- long before the DMA module stops taking data, because the asynchronous
+    -- FIFOs behind the split absorb the bursts.
+    down_mfb_hold <= down_mfb_splfi_in_src_rdy and not down_mfb_splfi_in_dst_rdy;
+    down_mvb_hold <= down_mvb_split_in_src_rdy and not down_mvb_split_in_dst_rdy;
+
+    telem_down_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            down_mfb_hold_dly   <= down_mfb_hold;
+            down_mvb_hold_dly   <= down_mvb_hold;
+            TELEM_DOWN_MFB_HOLD <= down_mfb_hold_dly;
+            TELEM_DOWN_MVB_HOLD <= down_mvb_hold_dly;
+        end if;
+    end process;
 
     process (CLK_DMA)
     begin

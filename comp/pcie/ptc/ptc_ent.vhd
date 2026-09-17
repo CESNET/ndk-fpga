@@ -268,6 +268,35 @@ entity PCIE_TRANSACTION_CTRL is
         PCIE_TAG_STATUS     : out std_logic_vector(11-1 downto 0);
 
         -- ========================================================================
+        -- TELEMETRY PORTS (on CLK)
+        -- ========================================================================
+
+        -- The UP stream is stopped because the pool of free PCIe tags is
+        -- smaller than the number of tags this cycle asks for
+        TELEM_TAG_SHORTAGE  : out std_logic;
+        -- The UP stream is stopped by the tag FIFO even though the pool is deep
+        -- enough. The flags of that FIFO describe the output register of its
+        -- shakedown, which needs a cycle to refill after a burst of reads.
+        TELEM_TAG_NOT_READY : out std_logic;
+        -- The UP stream is stopped because the free space left in the DOWN storage
+        -- FIFO no longer covers the completions of the next group of requests.
+        -- The FIFO itself is not full yet when this happens. The space is only
+        -- reserved ahead.
+        TELEM_CPLH_SHORTAGE : out std_logic;
+        -- The number of free words of the DOWN storage FIFO
+        TELEM_STFIFO_FREE   : out std_logic_vector(16-1 downto 0);
+        -- The number of free PCIe tags. PCIE_TAG_STATUS carries the same value,
+        -- but resynchronised to CLK_DMA, which is of no use to anything that
+        -- has to react before the tags run out.
+        TELEM_TAG_FREE      : out std_logic_vector(11-1 downto 0);
+        -- The DOWN stream is held before the split between the DMA ports. It is
+        -- the aggregate over all of them and it lags by two CLK cycles, like the
+        -- signals above.
+        TELEM_DOWN_MFB_HOLD : out std_logic;
+        -- The same for the MVB that carries the DOWN headers.
+        TELEM_DOWN_MVB_HOLD : out std_logic;
+
+        -- ========================================================================
         -- DEBUG PORTS
         -- ========================================================================
         DBG_MI_DWR     : in  std_logic_vector(31 downto 0) := (others => '0');

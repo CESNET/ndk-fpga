@@ -117,8 +117,28 @@ entity PTC_TAG_MANAGER is
         -- Read completition boundary status ('0' = RCB is 64B, '1' = RCB is 128B)
         -- Must not be changed while running.
         RCB_SIZE            : in  std_logic;
-        -- The number of currently free PCIE tags
-        PCIE_TAG_STATUS     : out std_logic_vector(11-1 downto 0)
+        -- The number of currently free PCIE tags. It lags the tag pool by two
+        -- CLK cycles, the same as the telemetry interface below.
+        PCIE_TAG_STATUS     : out std_logic_vector(11-1 downto 0);
+
+        ---------------------------------------------------------------------------
+        -- Telemetry interface
+        ---------------------------------------------------------------------------
+        -- Every signal of this interface lags the event it describes by two CLK
+        -- cycles. They share that lag, so they can be compared with each other.
+        ---------------------------------------------------------------------------
+
+        -- The UP stream is stopped because the pool of free PCIe tags is
+        -- smaller than the number of tags this cycle asks for
+        TELEM_TAG_SHORTAGE  : out std_logic;
+        -- The UP stream is stopped by the tag FIFO even though the pool is deep
+        -- enough. The flags of that FIFO describe the output register of its
+        -- shakedown, which needs a cycle to refill after a burst of reads.
+        TELEM_TAG_NOT_READY : out std_logic;
+        -- The UP stream is stopped because the completion buffer has no free space
+        TELEM_CPLH_SHORTAGE : out std_logic;
+        -- The number of free words of the completion buffer, saturated to 16 bits
+        TELEM_CPLH_FREE     : out std_logic_vector(16-1 downto 0)
     );
 end entity;
 
@@ -409,6 +429,19 @@ architecture FULL of PTC_TAG_MANAGER is
     signal pcie_tag_write      : std_logic_vector(PCIE_FIFOXM_WRITE_PORTS-1 downto 0);
     signal pcie_tag_read       : std_logic_vector(PCIE_FIFOXM_READ_PORTS-1 downto 0);
     signal pcie_tag_status_reg : unsigned(11-1 downto 0);
+
+    -- How many tags the items in the s2 register ask for, and whether the pool
+    -- cannot cover it. Both only feed the telemetry outputs.
+    signal s2_read_vld_dly      : std_logic_vector(MVB_UP_ITEMS-1 downto 0);
+    signal pcie_tag_status_dly  : unsigned(11-1 downto 0);
+    signal auto_assign_rdy_dly  : std_logic;
+    signal enough_free_cplh_dly : std_logic;
+    signal cplh_free            : std_logic_vector(16-1 downto 0);
+    signal cplh_free_dly        : std_logic_vector(16-1 downto 0);
+    signal tag_demand           : unsigned(11-1 downto 0);
+    signal tag_pool_low         : std_logic;
+    signal tag_shortage         : std_logic;
+    signal tag_not_ready        : std_logic;
 
     -----------------------
 
@@ -891,7 +924,50 @@ begin
         end if;
     end process;
 
-    PCIE_TAG_STATUS <= std_logic_vector(pcie_tag_status_reg);
+
+    -- Telemetry outputs that report why this module stops the UP stream. The
+    -- tag path stops it in two situations that look alike from the outside but
+    -- ask for different answers. Either the pool of free tags really is smaller
+    -- than what this cycle asks for, which means the completions are not coming
+    -- back fast enough, or the pool is deep and only the output register of the
+    -- tag FIFO ran dry for a cycle, which is a property of that FIFO and not of
+    -- the traffic. Reporting them apart keeps an exhausted pool from taking the
+    -- blame for a hiccup that costs a single cycle.
+    cplh_free <= (others => '1') when A_WORDS_WIDTH > 16 else
+                 std_logic_vector(resize(free_cplh_reg,16));
+
+    -- Copies of the observed signals, so that the signals driving the pipeline
+    -- carry no logic of this section. Both stages reload every cycle from
+    -- signals that RESET drives, so they need no reset of their own.
+    telem_in_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            s2_read_vld_dly      <= s2_read_vld;
+            pcie_tag_status_dly  <= pcie_tag_status_reg;
+            auto_assign_rdy_dly  <= auto_assign_rdy;
+            enough_free_cplh_dly <= enough_free_cplh;
+            cplh_free_dly        <= cplh_free;
+        end if;
+    end process;
+
+    tag_demand   <= to_unsigned(count_ones(s2_read_vld_dly),tag_demand'length);
+    tag_pool_low <= '1' when (pcie_tag_status_dly < tag_demand) else '0';
+
+    tag_shortage  <= (not auto_assign_rdy_dly) and tag_pool_low;
+    tag_not_ready <= (not auto_assign_rdy_dly) and (not tag_pool_low);
+
+    -- The telemetry unit sits several modules away, so the route to it starts
+    -- at a register of its own.
+    telem_out_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            PCIE_TAG_STATUS     <= std_logic_vector(pcie_tag_status_dly);
+            TELEM_TAG_SHORTAGE  <= tag_shortage;
+            TELEM_TAG_NOT_READY <= tag_not_ready;
+            TELEM_CPLH_SHORTAGE <= not enough_free_cplh_dly;
+            TELEM_CPLH_FREE     <= cplh_free_dly;
+        end if;
+    end process;
 
     pcie_in_fifoxm_do_arr_gen : for i in 0 to MVB_UP_ITEMS-1 generate
         pcie_in_fifoxm_do_arr(i) <= pcie_in_fifoxm_do((i+1)*INTERNAL_PCIE_TAG_WIDTH-1 downto i*INTERNAL_PCIE_TAG_WIDTH);
