@@ -1993,7 +1993,12 @@ architecture FULL of FPGA is
     constant STATUS_LEDS     : natural := 4; -- fake leds
 
     -- DDR4 + HBM
-    constant DDR_PORTS       : integer := 2;
+    -- The card has two DDR4 channels, but they are only instantiated when
+    -- MEM_PORTS says so. This constant sizes the AVMM signals towards
+    -- FPGA_COMMON, so it has to follow MEM_PORTS: otherwise the application
+    -- builds memory testers for channels that are not there, and their MI
+    -- registers sit on a clock that is tied low and never answer.
+    constant DDR_PORTS       : integer := MEM_PORTS;
     constant MEM_ADDR_WIDTH  : natural := 28;
     constant MEM_DATA_WIDTH  : natural := 512;
     constant MEM_BURST_WIDTH : natural := 7;
@@ -2332,7 +2337,6 @@ begin
             amm_readdatavalid_0       => mem_avmm_readdatavalid (0)
         );
     else generate
-        emif_rst_done(0)           <= '0';
         DDR4_CH0_CK_P(0 downto 0)  <= (others=>'X');
         DDR4_CH0_CK_N(0 downto 0)  <= (others=>'X');
         DDR4_CH0_A(16 downto 0)    <= (others=>'X');
@@ -2348,14 +2352,6 @@ begin
         DDR4_CH0_DQS_N(8 downto 0) <= (others=>'Z');
         DDR4_CH0_DQ                <= (others=>'Z');
         DDR4_CH0_DBI_N(8 downto 0) <= (others=>'Z');
-        emif_cal_success(0)        <= '0';
-        emif_cal_fail(0)           <= '0';
-        mem_rst_n(0)               <= '0';
-        mem_clk(0)                 <= '0';
-        emif_ecc_usr_int(0)        <= '0';
-        mem_avmm_ready(0)          <= '1';
-        mem_avmm_readdata(0)       <= (others=>'1');
-        mem_avmm_readdatavalid (0) <= mem_avmm_read(0);
     end generate;
 
     ddr4_1_enable_g : if MEM_PORTS >= 2 generate
@@ -2400,7 +2396,6 @@ begin
             amm_readdatavalid_0       => mem_avmm_readdatavalid (1)
         );
     else generate
-        emif_rst_done(0)           <= '0';
         DDR4_CH1_CK_P(0 downto 0)  <= (others=>'X');
         DDR4_CH1_CK_N(0 downto 0)  <= (others=>'X');
         DDR4_CH1_A(16 downto 0)    <= (others=>'X');
@@ -2416,14 +2411,6 @@ begin
         DDR4_CH1_DQS_N(8 downto 0) <= (others=>'Z');
         DDR4_CH1_DQ                <= (others=>'Z');
         DDR4_CH1_DBI_N(8 downto 0) <= (others=>'Z');
-        emif_cal_success(1)        <= '0';
-        emif_cal_fail(1)           <= '0';
-        mem_rst_n(1)               <= '0';
-        mem_clk(1)                 <= '0';
-        emif_ecc_usr_int(1)        <= '0';
-        mem_avmm_ready(1)          <= '1';
-        mem_avmm_readdata(1)       <= (others=>'1');
-        mem_avmm_readdatavalid (1) <= mem_avmm_read(1);
     end generate;
 
     -- =========================================================================
