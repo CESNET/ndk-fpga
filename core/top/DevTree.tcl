@@ -13,6 +13,7 @@ namespace eval NdkCore {
     set ADDR_GEN_LOOP   "0x00005000"
     set ADDR_ETH_MAC    "0x00008000"
     set ADDR_JTAG_IP    "0x00010000"
+    set ADDR_PCIE_TELEM "0x00020000"
     set ADDR_DMA_MOD    "0x01000000"
     set ADDR_PCIE_DBG   "0x01400000"
     set ADDR_ETH_PCS    "0x00800000"
@@ -153,6 +154,10 @@ proc dts_ndp_core_main_mi {DTS} {
             append ret [dts_gen_loop_switch [expr $NdkCore::ADDR_GEN_LOOP + $gls_offset] "dbg_gls$i"]
         }
     }
+
+    # PCIe telemetry
+    global PCIE_ENDPOINTS
+    append ret [dts_pcie_telemetry_mi $NdkCore::ADDR_PCIE_TELEM $PCIE_ENDPOINTS]
 
     # PCIe Debug
     global PCIE_ENDPOINTS PCIE_CORE_DEBUG_ENABLE PCIE_CTRL_DEBUG_ENABLE PCIE_ENDPOINT_MODE PCIE_MOD_ARCH

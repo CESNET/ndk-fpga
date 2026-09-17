@@ -62,6 +62,11 @@ entity PCIE_CTRL is
         DMA_BAR_ENABLE      : boolean := false;
         -- Maximum payload size (in bytes) used by the MTC for its completions
         MTC_PCIE_MPS        : natural := 256;
+        -- Largest Max Payload Size (in bytes) the PTC is built for
+        PCIE_MPS_MAX        : natural := 256;
+        -- Largest Max Read Request Size (in bytes) the PTC is built for. It sizes
+        -- the DOWN splitter FIFO, so it must cover every read the DMA can issue.
+        PCIE_MRRS_MAX       : natural := 512;
         -- Dynamic routing parameters of the DMA bus
         DMA_ROUTE           : dma_route_path_array_t := dma_route_path_array_default(DMA_PORTS);
         -- Connected PCIe endpoint type
@@ -240,6 +245,23 @@ entity PCIE_CTRL is
         DMA_CC_MFB_EOF_POS  : in  slv_array_t(DMA_PORTS-1 downto 0)(CC_MFB_REGIONS*max(1,log2(CC_MFB_REGION_SIZE*CC_MFB_BLOCK_SIZE))-1 downto 0);
         DMA_CC_MFB_SRC_RDY  : in  std_logic_vector(DMA_PORTS-1 downto 0);
         DMA_CC_MFB_DST_RDY  : out std_logic_vector(DMA_PORTS-1 downto 0);
+
+        -- =====================================================================
+        --  PCIE TELEMETRY INTERFACE (PCIE_CLK)
+        -- =====================================================================
+        -- Reasons why the PTC stops the stream, one bit per reason:
+        --   bit 0 = the pool of free PCIe tags is too small,
+        --   bit 1 = the tag FIFO had no tag ready, although the pool is deep enough,
+        --   bit 2 = no free space in the DOWN storage FIFO,
+        --   bit 3 = no free entry in the Completion Header buffer of the PCIe Hard IP,
+        --   bit 4 = the MFB is held before the split between the DMA ports,
+        --   bit 5 = the MVB is held before that same split.
+        -- Bits 0 to 3 stop the UP stream. Bits 4 and 5 stop the DOWN stream. This
+        -- PTC does not measure the buffer of bit 3, so that bit stays at zero.
+        TELEM_PTC_BRAKE     : out std_logic_vector(6-1 downto 0);
+        -- The number of free words of the PTC DOWN storage FIFO
+        TELEM_STFIFO_FREE   : out std_logic_vector(16-1 downto 0);
+        TELEM_TAG_FREE      : out std_logic_vector(11-1 downto 0);
 
         -- =====================================================================
         -- MI32 interface (MI_CLK)
@@ -461,6 +483,8 @@ begin
             MFB_DOWN_ITEM_WIDTH  => RC_MFB_ITEM_WIDTH,
 
             DOWN_FIFO_ITEMS      => 1024,
+            MPS                  => PCIE_MPS_MAX/4,
+            MRRS                 => PCIE_MRRS_MAX/4,
 
             DMA_ROUTE            => DMA_ROUTE,
             DBG_ENABLE           => DEBUG_EN,
@@ -525,7 +549,15 @@ begin
 
             RCB_SIZE           => CTL_RCB_SIZE,
 
-            PCIE_TAG_STATUS    => PCIE_TAG_STATUS,
+            PCIE_TAG_STATUS     => PCIE_TAG_STATUS,
+
+            TELEM_TAG_SHORTAGE  => TELEM_PTC_BRAKE(0),
+            TELEM_TAG_NOT_READY => TELEM_PTC_BRAKE(1),
+            TELEM_CPLH_SHORTAGE => TELEM_PTC_BRAKE(2),
+            TELEM_DOWN_MFB_HOLD => TELEM_PTC_BRAKE(4),
+            TELEM_DOWN_MVB_HOLD => TELEM_PTC_BRAKE(5),
+            TELEM_STFIFO_FREE   => TELEM_STFIFO_FREE,
+            TELEM_TAG_FREE      => TELEM_TAG_FREE,
 
             DBG_MI_DWR         => mi_sync_dbg_dwr  (DBG_MI_PORTS-1),
             DBG_MI_ADDR        => mi_sync_dbg_addr (DBG_MI_PORTS-1),
@@ -536,7 +568,16 @@ begin
             DBG_MI_ARDY        => mi_sync_dbg_ardy (DBG_MI_PORTS-1),
             DBG_MI_DRDY        => mi_sync_dbg_drdy (DBG_MI_PORTS-1)
         );
+
+        -- This PTC does not watch the Completion Header buffer of the Hard IP.
+        TELEM_PTC_BRAKE(3) <= '0';
     else generate
+        -- Without the PTC there is nothing to report.
+        PCIE_TAG_STATUS    <= (others => '0');
+        TELEM_PTC_BRAKE    <= (others => '0');
+        TELEM_STFIFO_FREE  <= (others => '0');
+        TELEM_TAG_FREE     <= (others => '0');
+
         -- DMA_RQ/RC_* clocked at PCIE_CLK
         DMA_RQ_MVB_DST_RDY <= (others => '0');
 

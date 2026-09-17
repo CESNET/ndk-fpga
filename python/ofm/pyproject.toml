@@ -24,6 +24,7 @@ ofm-data-logger = "ofm.comp.debug.data_logger.data_logger.data_logger:main"
 ofm-mem-logger = "ofm.comp.debug.data_logger.mem_logger.mem_logger:main"
 ofm-mvb-hash-table-simple = "ofm.comp.mvb_tools.storage.mvb_hash_table_simple:main"
 ofm-gls = "ofm.comp.mfb_tools.debug.gen_loop_switch.gen_loop_switch:main"
+nfb-pcie-telemetry = "ofm.comp.pcie.telemetry.pcie_telemetry:main"
 
 [project.optional-dependencies]
 test = [

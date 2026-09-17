@@ -7,6 +7,7 @@
 # Paths
 set PCIE_COMP_BASE    "$ENTITY_BASE/comp"
 set MI_SPLITTER_BASE  "$OFM_PATH/comp/mi_tools/splitter_plus_gen"
+set PCIE_TELEMETRY_BASE "$ENTITY_BASE/../pcie_telemetry"
 
 # Packages
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -18,6 +19,7 @@ lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" 
 lappend COMPONENTS [ list "PCIE_CORE"   "$PCIE_COMP_BASE/pcie_core" $ARCHGRP ]
 lappend COMPONENTS [ list "PCIE_CTRL"   "$PCIE_COMP_BASE/pcie_ctrl" "FULL"   ]
 lappend COMPONENTS [ list "MI_SPLITTER" $MI_SPLITTER_BASE           "FULL"   ]
+lappend COMPONENTS [ list "PCIE_TELEMETRY_MI" $PCIE_TELEMETRY_BASE  "FULL"   ]
 
 # Files
 lappend MOD "$ENTITY_BASE/pcie_pkg.vhd"
