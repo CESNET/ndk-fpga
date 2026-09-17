@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
+import os
 from random import randint
 from math import log2, ceil
 from typing import Tuple
@@ -372,7 +373,10 @@ async def _run_test(
 
 # NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
 @cocotb.test()
-async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
+async def run_test(dut, frame_count=None, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
+    # Allow the multi-ver runner to override frame_count via __cocotb_params__.
+    if frame_count is None:
+        frame_count = int(os.environ.get("COCOTB_FRAME_COUNT", "3000"))
 
     await _run_test(
         dut,
