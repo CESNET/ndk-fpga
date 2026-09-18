@@ -27,6 +27,7 @@ class hbm_tester:
     _CONF_RW_SWITCH_EN = 0x8
     _CONF_BL8_MODE     = 0x40
     _CONF_RW_NO_WAIT   = 0x80
+    _CONF_USE_AXI_ID   = 0x10000
 
     _GEN_CONF_WR_ONLY = (0x1 + 0x0) * 0x10
     _GEN_CONF_RD_ONLY = (0x2 + 0x0) * 0x10
@@ -73,7 +74,7 @@ class hbm_tester:
         else:
             return "BL4"
 
-    def set_config_reg(self, test_type, test_phase, rand_addr, bl8=False):
+    def set_config_reg(self, test_type, test_phase, rand_addr, bl8=False, axi_id=False):
         if rand_addr is True:
             rand_test_val = self._CONF_RAND_ADDR_EN
         else:
@@ -128,6 +129,8 @@ class hbm_tester:
             conf_data += self._CONF_RW_NO_WAIT
         if bl8:
             conf_data += self._CONF_BL8_MODE
+        if axi_id:
+            conf_data += self._CONF_USE_AXI_ID
         #print("REG_CONFIG: %s" % hex(conf_data))
         self.comp.write32(self._REG_CONFIG, conf_data)
         self.check_bl_mode()
@@ -220,13 +223,19 @@ class hbm_tester:
         self.comp.write32(self._REG_RUN_TEST, 0x0)
         time.sleep(0.1)
 
+    def get_axi_id_mode_string(self, axi_id):
+        if axi_id is True:
+            return "a new ID for each transaction"
+        else:
+            return "one ID for all transactions"
+
     def get_addr_mode_string(self, rand_addr):
         if rand_addr is True:
             return "pseudorandom"
         else:
             return "sequential"
 
-    def hbm_test(self, test_type, rand_addr, hbm_ports, test_length, bl8=False):
+    def hbm_test(self, test_type, rand_addr, hbm_ports, test_length, bl8=False, axi_id=False):
         print("===========================")
         print("HBM TESTER by CESNET")
         print("===========================")
@@ -234,6 +243,7 @@ class hbm_tester:
         print("TEST LENGTH: " + hex(test_length))
         print("ADDR MODE:   " + str(self.get_addr_mode_string(rand_addr)))
         print("BURST MODE:  " + str(self.get_bl_mode_string(bl8)))
+        print("AXI ID MODE: " + str(self.get_axi_id_mode_string(axi_id)))
         print("USED PORTS:  " + str(hbm_ports))
         print("===========================")
 
@@ -242,7 +252,7 @@ class hbm_tester:
             self.set_test_length(0xFFFF)
         else:
             self.set_test_length(test_length)
-        self.set_config_reg(test_type, 0, rand_addr, bl8)
+        self.set_config_reg(test_type, 0, rand_addr, bl8, axi_id)
         self.run_test(hbm_ports)
 
         # Track speeds for the return value
@@ -256,7 +266,7 @@ class hbm_tester:
             #self.print_data_result(hbm_ports)
             self.reset_all_counters()
             self.set_test_length(0xEFFF)
-            self.set_config_reg(test_type, 1, rand_addr, bl8)
+            self.set_config_reg(test_type, 1, rand_addr, bl8, axi_id)
             self.run_test(hbm_ports)
             self.print_data_result(hbm_ports)
 
@@ -272,6 +282,7 @@ if __name__ == '__main__':
     args.add_argument("-r", "--random", action='store_true', help="Use random addressing (only for latency or speed test), default is sequential.")
     args.add_argument("-w", "--no-wait", action='store_true', help="Do not wait for the write response before reading the same address (coherency test).")
     args.add_argument("-b", "--bl8", action='store_true', help="Use the BL8 burst mode (64B access), default is BL4 (32B access).")
+    args.add_argument("-I", "--axi-id", action='store_true', help="Give each transaction its own AXI ID, default is one ID for all of them. The memory needs a reorder buffer for this.")
     args.add_argument("-p", "--ports", action="store", nargs='?', default='0', help="Number of actived ports (channels), default is all.")
     args.add_argument("-P", "--tester-ports", type=int, default=32, help="Number of ports of one tester instance (HBM_PORTS/HBM_MODULES), default 32.")
     args.add_argument("-W", "--data-width", type=int, choices=[256, 512], default=256, help="HBM_DATA_WIDTH of the build, default 256.")
@@ -318,7 +329,7 @@ if __name__ == '__main__':
         arg_length = 0xFFFFF
 
         # Capture the returned speeds from each tester instance
-        rd, wr = tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length, arguments.bl8)
+        rd, wr = tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length, arguments.bl8, arguments.axi_id)
 
         if arguments.test in hbm_tester._SPEED_TESTS:
             grand_total_rd_speed += rd

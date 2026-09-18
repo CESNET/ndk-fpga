@@ -33,16 +33,6 @@ Hardware Configuration
 * **CNT_WIDTH** -- width of the test duration counter. The maximum duration is
   ``2**CNT_WIDTH`` clock cycles.
 
-* **USE_AXI_ID** -- located in the ``HBM_TESTER_PORT`` module, the default is **False**.
-
-  * **True**: generates unique AXI IDs for transactions. The memory (or its IP) then has
-    to contain a reorder buffer, otherwise the responses may come back in a different
-    order than the tester expects and the data integrity test reports false errors.
-  * **False**: every transaction uses the same AXI ID, so AXI4 guarantees the order of
-    responses within a single channel. AXI does not guarantee ordering between the write
-    and read channels, see `Read after Write`_. Required if the system lacks a reorder
-    buffer, which is the case for the NoC attached HBM on ThunderFjord (fb2cdg1).
-
 Principle of Operation
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -173,6 +163,8 @@ Command Line Arguments
        test).
    * - ``-b, --bl8``
      - Use the BL8 burst mode, that is a 64B access (default: BL4, a 32B access).
+   * - ``-I, --axi-id``
+     - Give each transaction its own AXI ID, the default is one ID for all of them.
    * - ``-p, --ports``
      - Number of active ports/channels (default: all).
    * - ``-P, --tester-ports``
@@ -254,6 +246,15 @@ Configuration Register (0x14) Bitfield
      - R/W No Wait
      - 0 = wait for the write response before reading the same address, 1 = read
        immediately. See `Read after Write`_.
+   * - ``[16]``
+     - AXI ID Mode
+     - 0 = one ID for all transactions, 1 = a new ID for each one. With one ID, AXI4
+       guarantees the order of the responses within a channel. It does not guarantee
+       the order between the write and the read channel, see `Read after Write`_. A new
+       ID for each transaction needs a reorder buffer in the memory or its IP, otherwise
+       the responses come back in a different order than the tester expects and the data
+       integrity test reports false errors. The NoC attached HBM on ThunderFjord
+       (fb2cdg1) has no reorder buffer, so leave the bit at 0 there.
    * - ``[10:8]``
      - Counter 0 Mode
      - Selects the metric for result counter 0 (see below).

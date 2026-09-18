@@ -14,8 +14,6 @@ use work.math_pack.all;
 entity HBM_TESTER_PORT is
     generic (
         DEBUG            : boolean := True;
-        -- when USE_AXI_ID is false, you can disable Re-order buffer in HBM IP
-        USE_AXI_ID       : boolean := False;
         -- Size of one port in bytes, used as the base address of each port.
         -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
         -- own address space (e.g. a NoC attached HBM).
@@ -128,6 +126,8 @@ entity HBM_TESTER_PORT is
         DB_GEN_RUN        : in  std_logic;
         DB_GEN_RW_SWITCH  : in  std_logic;
         DB_GEN_RW_NO_WAIT : in  std_logic;
+        -- AXI ID mode: 0 = one ID for all transactions, 1 = a new ID for each one
+        DB_GEN_USE_AXI_ID : in  std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
         DB_GEN_WR_DEAD    : in  std_logic;
         -- Time of monitoring in clock cycles
@@ -170,6 +170,7 @@ architecture FULL of HBM_TESTER_PORT is
     signal s_db_gen_addr_mode_reg  : std_logic;
     signal s_db_gen_connect_reg    : std_logic;
     signal s_db_gen_bl8_mode_reg   : std_logic;
+    signal s_db_gen_use_axi_id_reg : std_logic;
     signal s_db_gen_run_mode_reg   : std_logic_vector(1 downto 0);
     signal s_db_gen_run_reg        : std_logic;
     signal s_db_gen_rw_switch_reg  : std_logic;
@@ -360,6 +361,7 @@ begin
             s_db_gen_run_reg        <= DB_GEN_RUN;
             s_db_gen_rw_switch_reg  <= DB_GEN_RW_SWITCH;
             s_db_gen_rw_no_wait_reg <= DB_GEN_RW_NO_WAIT;
+            s_db_gen_use_axi_id_reg <= DB_GEN_USE_AXI_ID;
             s_db_gen_wr_dead_reg    <= DB_GEN_WR_DEAD;
 
             s_db_mon_time_reg      <= DB_MON_TIME;
@@ -656,24 +658,23 @@ begin
         end if;
     end process;
 
-    axi_awid_on_g : if USE_AXI_ID generate
-        -- counter of write id
-        hbm_wr_id_cnt_p : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (s_reset_reg = '1') then
-                    s_hbm_wr_id_cnt <= (others => '0');
-                elsif (s_hbm_wr_valid = '1' and s_hbm_wr_ready = '1' and s_hbm_wr_burst_last = '1') then
+    -- Counter of the write ID. It runs only when the AXI ID mode is on. When the mode
+    -- is off the counter stays at zero, so every write uses the same ID and AXI keeps
+    -- the write responses in order. With the mode on the memory needs a reorder buffer.
+    hbm_wr_id_cnt_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (s_reset_reg = '1') then
+                s_hbm_wr_id_cnt <= (others => '0');
+            elsif (s_db_gen_use_axi_id_reg = '1') then
+                if (s_hbm_wr_valid = '1' and s_hbm_wr_ready = '1' and s_hbm_wr_burst_last = '1') then
                     s_hbm_wr_id_cnt <= s_hbm_wr_id_cnt + 1;
                 end if;
+            else
+                s_hbm_wr_id_cnt <= (others => '0');
             end if;
-        end process;
-    end generate;
-
-    axi_awid_off_g : if not USE_AXI_ID generate
-        -- Each trancastion has same ID!
-        s_hbm_wr_id_cnt <= (others => '0');
-    end generate;
+        end if;
+    end process;
 
     s_hbm_wr_burst_first <= '1' when (s_hbm_wr_burst_cnt = "00") else '0';
     s_hbm_wr_burst_last  <= '1' when (s_hbm_wr_burst_cnt = s_hbm_wr_burst_cnt_max) else '0';
@@ -710,24 +711,21 @@ begin
     s_hbm_wr_rsp_valid <= s_axi_bvalid;
     s_axi_bready       <= s_hbm_wr_rsp_ready;
 
-    axi_arid_on_g : if USE_AXI_ID generate
-        -- counter of read id
-        hbm_rd_id_cnt_p : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (s_reset_reg = '1') then
-                    s_hbm_rd_id_cnt <= (others => '0');
-                elsif (s_hbm_rd_addr_valid = '1' and s_hbm_rd_addr_ready = '1') then
+    -- Counter of the read ID, the same rule as for the write ID above.
+    hbm_rd_id_cnt_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (s_reset_reg = '1') then
+                s_hbm_rd_id_cnt <= (others => '0');
+            elsif (s_db_gen_use_axi_id_reg = '1') then
+                if (s_hbm_rd_addr_valid = '1' and s_hbm_rd_addr_ready = '1') then
                     s_hbm_rd_id_cnt <= s_hbm_rd_id_cnt + 1;
                 end if;
+            else
+                s_hbm_rd_id_cnt <= (others => '0');
             end if;
-        end process;
-    end generate;
-
-    axi_arid_off_g : if not USE_AXI_ID generate
-        -- Each trancastion has same ID!
-        s_hbm_rd_id_cnt <= (others => '0');
-    end generate;
+        end if;
+    end process;
 
     -- HBM read address signals
     s_axi_arid          <= std_logic_vector(s_hbm_rd_id_cnt);

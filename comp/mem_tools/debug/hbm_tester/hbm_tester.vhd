@@ -137,6 +137,7 @@ architecture FULL of HBM_TESTER is
     signal s_gen_run        : std_logic_vector(PORTS-1 downto 0);
     signal s_gen_rw_switch  : std_logic;
     signal s_gen_rw_no_wait : std_logic;
+    signal s_gen_use_axi_id : std_logic;
     signal s_gen_wr_dead    : std_logic;
 
     signal s_mon_done      : std_logic_vector(PORTS-1 downto 0);
@@ -279,6 +280,7 @@ begin
             DB_GEN_RUN        => s_gen_run(i),
             DB_GEN_RW_SWITCH  => s_gen_rw_switch,
             DB_GEN_RW_NO_WAIT => s_gen_rw_no_wait,
+            DB_GEN_USE_AXI_ID => s_gen_use_axi_id,
             DB_GEN_WR_DEAD    => s_gen_wr_dead,
             DB_MON_DONE       => s_mon_done(i),
             DB_MON_RESET      => s_mon_reset(i),
@@ -374,6 +376,7 @@ begin
         DB_GEN_RUN        => s_gen_run,
         DB_GEN_RW_SWITCH  => s_gen_rw_switch,
         DB_GEN_RW_NO_WAIT => s_gen_rw_no_wait,
+        DB_GEN_USE_AXI_ID => s_gen_use_axi_id,
         DB_GEN_WR_DEAD    => s_gen_wr_dead,
         DB_MON_TIME       => s_mon_time,
         DB_MON_DONE       => s_mon_done,

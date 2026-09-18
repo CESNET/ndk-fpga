@@ -53,6 +53,8 @@ entity HBM_TESTER_ADC is
         DB_GEN_RUN        : out std_logic_vector(PORTS-1 downto 0);
         DB_GEN_RW_SWITCH  : out std_logic;
         DB_GEN_RW_NO_WAIT : out std_logic;
+        -- AXI ID mode: 0 = one ID for all transactions, 1 = a new ID for each one
+        DB_GEN_USE_AXI_ID : out std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
         DB_GEN_WR_DEAD    : out std_logic;
         -- Time of monitoring in clock cycles
@@ -237,6 +239,7 @@ begin
     DB_GEN_BL8_MODE   <= s_reg_config(6);
     DB_GEN_RUN_MODE   <= s_reg_config(5 downto 4);
     DB_GEN_RW_NO_WAIT <= s_reg_config(7);
+    DB_GEN_USE_AXI_ID <= s_reg_config(16);
     DB_GEN_RW_SWITCH  <= s_reg_config(3);
     DB_GEN_WR_DEAD    <= s_reg_config(2);
     DB_GEN_ADDR_MODE  <= s_reg_config(1);
