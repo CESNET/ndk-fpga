@@ -133,6 +133,11 @@ Tests
      - What it does
    * - ``speed``
      - Writes and reads continuously and reports the throughput of each port.
+   * - ``speed-rd``
+     - Same, but the generator only reads. The write counter stays at zero, so the read
+       figure is what a port reaches with the whole bus to itself.
+   * - ``speed-wr``
+     - Same, but the generator only writes.
    * - ``latency``
      - Same traffic, but reports the average read and write latency. Use ``-r`` for the
        worst case, it stops the controller from hitting open rows.
@@ -159,7 +164,8 @@ Command Line Arguments
    * - ``-d, --device``
      - Device index (default: ``0`` for ``/dev/nfb0``).
    * - ``-t, --test``
-     - Type of test: ``speed``, ``latency``, ``integrity`` or ``coherency``.
+     - Type of test: ``speed``, ``speed-rd``, ``speed-wr``, ``latency``, ``integrity`` or
+       ``coherency``.
    * - ``-r, --random``
      - Enable random addressing (for latency or speed tests).
    * - ``-w, --no-wait``

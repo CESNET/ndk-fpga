@@ -32,6 +32,9 @@ class hbm_tester:
     _GEN_CONF_RD_ONLY = (0x2 + 0x0) * 0x10
     _GEN_CONF_WR_RD   = (0x3 + 0x0) * 0x10
 
+    # Throughput tests, they differ only in the direction the generator drives.
+    _SPEED_TESTS = ("speed", "speed-rd", "speed-wr")
+
     _MON_CONF_SPEED_TEST   = 0x10 * 0x100 # counter0 = RD words, counter1 = WR words
     _MON_CONF_LATENCY_TEST = 0x32 * 0x100 # counter0 = RD latency, counter1 = WR latency
     _MON_CONF_DATA_TEST    = 0x54 * 0x100 # counter0 = data OK, counter1 = dat ERROR
@@ -82,12 +85,17 @@ class hbm_tester:
             switch_rw_val = self._CONF_DISABLED
             gen_conf_val  = self._GEN_CONF_WR_RD
             mon_conf_val  = self._MON_CONF_SPEED_TEST
-        elif test_type == "speed":
+        elif test_type in self._SPEED_TESTS:
             conn_gen_val  = self._CONF_GEN_EN
             dead_wr_val   = self._CONF_DISABLED
             switch_rw_val = self._CONF_DISABLED
-            gen_conf_val  = self._GEN_CONF_WR_RD
             mon_conf_val  = self._MON_CONF_SPEED_TEST
+            if test_type == "speed-rd":
+                gen_conf_val = self._GEN_CONF_RD_ONLY
+            elif test_type == "speed-wr":
+                gen_conf_val = self._GEN_CONF_WR_ONLY
+            else:
+                gen_conf_val = self._GEN_CONF_WR_RD
         elif test_type == "latency":
             conn_gen_val  = self._CONF_GEN_EN
             dead_wr_val   = self._CONF_DISABLED
@@ -240,7 +248,7 @@ class hbm_tester:
         # Track speeds for the return value
         rd_speed, wr_speed = 0.0, 0.0
 
-        if test_type == "speed":
+        if test_type in self._SPEED_TESTS:
             rd_speed, wr_speed = self.print_speed_result(test_length, hbm_ports)
         elif test_type == "latency":
             self.print_latency_result(hbm_ports)
@@ -260,7 +268,7 @@ if __name__ == '__main__':
     args = argparse.ArgumentParser()
     args.add_argument("-i", "--index", action="store", default='all', help="Index of the HBM tester (e.g., 0 or 1), or 'all' to run on both.")
     args.add_argument("-d", "--device", action="store", default='0')
-    args.add_argument("-t", "--test", action="store", choices=['speed', 'latency', 'integrity', 'coherency'], default='speed')
+    args.add_argument("-t", "--test", action="store", choices=['speed', 'speed-rd', 'speed-wr', 'latency', 'integrity', 'coherency'], default='speed')
     args.add_argument("-r", "--random", action='store_true', help="Use random addressing (only for latency or speed test), default is sequential.")
     args.add_argument("-w", "--no-wait", action='store_true', help="Do not wait for the write response before reading the same address (coherency test).")
     args.add_argument("-b", "--bl8", action='store_true', help="Use the BL8 burst mode (64B access), default is BL4 (32B access).")
@@ -312,12 +320,12 @@ if __name__ == '__main__':
         # Capture the returned speeds from each tester instance
         rd, wr = tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length, arguments.bl8)
 
-        if arguments.test == 'speed':
+        if arguments.test in hbm_tester._SPEED_TESTS:
             grand_total_rd_speed += rd
             grand_total_wr_speed += wr
 
     # Print the grand total if we ran a speed test on more than one tester
-    if arguments.test == 'speed' and len(indices_to_test) > 1:
+    if arguments.test in hbm_tester._SPEED_TESTS and len(indices_to_test) > 1:
         print("\n=================================================")
         print("OVERALL HBM SPEED TOTALS (ALL TESTERS)")
         print("=================================================")
