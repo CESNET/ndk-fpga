@@ -155,12 +155,14 @@ begin
     --  BURST CONTROL LOGIC
     -- -------------------------------------------------------------------------
 
-    -- counter of word in burst
+    -- Counter of the word in burst. It counts only when a write is really sent.
+    -- In the coherency test the generator stops writing during the read half, but
+    -- WR_READY stays high. Counting on WR_READY alone would shift the next burst.
     gen_burst_cnt_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s_gen_run = '1') then
-                if (WR_READY = '1') then
+                if (s_write_data_vld = '1') then
                     if (s_gen_data_last = '1') then
                         s_gen_burst_cnt <= (others => '0');
                     else
