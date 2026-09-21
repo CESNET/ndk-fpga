@@ -4,7 +4,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import itertools
 import os
 from random import randint
 from math import log2, ceil
@@ -25,6 +24,7 @@ from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mvb.transaction import MvbTrClassicSerializable, hdrfield, serializableheader
 from cocotbext.ofm.ver.generators import random_packets
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 from cocotbext.ofm.utils.hex_formatter import format_bytes
@@ -145,9 +145,12 @@ class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
         if dut.AXI_RX_DIRECT.value:
-            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, no_default_rate_limiter=True)
+            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, rate_limiter_config=dict(rate_percentage=80, random_idles=True))
             self.mfb_rx_drv = None
         else:
+            # TODO: Add rate limiting to the MFB RX driver once the MFB driver's
+            # IdleGenerator support is fixed. The current ItemRateLimiter can produce illegal MFB
+            # words with SRC_RDY=1 but SOF=0/EOF=0!
             self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK, generics_prefix="MFB", no_default_rate_limiter=True)
             self.axis_rx_drv = None
         self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=MvbProtocolWithAddressAndLength, rate_limiter_config=dict(rate_percentage=50, random_idles=True, max_idles=3, zero_idles_chance=80))
@@ -324,15 +327,13 @@ async def _run_test(
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut)
-    # TODO: Change MFB driver's IdleGenerator to EthernetRateLimiter
-    # MFB Drive first needs to implement support for IdleGenerator!
     await tb.reset()
     tb.dut.PCIE_MPS.value = pcie_mps
 
     cocotb.log.info("\n--- Beginning the test ---\n")
 
-    tb.mvb_tx_drv.start((i, 3) for i in itertools.count())
-    tb.mfb_tx_drv.start((i, 3) for i in itertools.count())
+    tb.mvb_tx_drv.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.3)))
+    tb.mfb_tx_drv.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.3)))
     await ClockCycles(tb.dut.CLK, 10)
 
     # Decrease max size of generated frames in case the DUT generics do not allow it
