@@ -1290,21 +1290,24 @@ begin
 
         dma_down_splitter_i : entity work.MFB_SPLITTER_GEN
         generic map (
-            SPLITTER_OUTPUTS => DMA_PORTS,
-            MVB_ITEMS        => MVB_DOWN_ITEMS,
-            MVB_ITEM_WIDTH   => DMA_DOWNHDR_WIDTH,
-            MFB_REGIONS      => MFB_DOWN_REGIONS,
-            MFB_REG_SIZE     => MFB_DOWN_REG_SIZE,
-            MFB_BLOCK_SIZE   => MFB_DOWN_BLOCK_SIZE,
-            MFB_ITEM_WIDTH   => MFB_DOWN_ITEM_WIDTH,
-            OUTPUT_FIFO_SIZE => 16,
+            SPLITTER_OUTPUTS     => DMA_PORTS,
+            MVB_ITEMS            => MVB_DOWN_ITEMS,
+            MVB_ITEM_WIDTH       => DMA_DOWNHDR_WIDTH,
+            MFB_REGIONS          => MFB_DOWN_REGIONS,
+            MFB_REG_SIZE         => MFB_DOWN_REG_SIZE,
+            MFB_BLOCK_SIZE       => MFB_DOWN_BLOCK_SIZE,
+            MFB_ITEM_WIDTH       => MFB_DOWN_ITEM_WIDTH,
+            OUTPUT_FIFO_SIZE     => 16,
+            -- A DOWN word carries transactions of several DMA ports, so each
+            -- output has the Regions of the other ports left empty.
+            OUT_MFB_COMPACTOR_EN => true,
             -- Buffer the splitter outputs wherever the DOWN MFB transformer
             -- really spreads Regions. With both widths equal it is a plain wire
             -- and the asynch FIFO below already buffers.
-            OUT_MFB_FIFO_EN  => (MFB_DOWN_REGIONS /= DMA_MFB_DOWN_REGIONS),
-            MFB_FIFO_DEPTH   => 512,
-            OUT_PIPE_EN      => true,
-            DEVICE           => DEVICE
+            OUT_MFB_FIFO_EN      => (MFB_DOWN_REGIONS /= DMA_MFB_DOWN_REGIONS),
+            MFB_FIFO_DEPTH       => 512,
+            OUT_PIPE_EN          => true,
+            DEVICE               => DEVICE
         )
         port map (
             CLK            => CLK,

@@ -8,6 +8,7 @@ set FIFOXM_BASE         "$OFM_PATH/comp/base/fifo/fifox_multi"
 set FIFOX_BASE          "$OFM_PATH/comp/base/fifo/fifox"
 set SPLITTER_BASE       "$OFM_PATH/comp/mfb_tools/flow/splitter_simple"
 set MFB_FIFOX_BASE      "$OFM_PATH/comp/mfb_tools/storage/fifox"
+set MFB_COMPACTOR_BASE  "$OFM_PATH/comp/mfb_tools/flow/compactor"
 
 set PKG_BASE            "$OFM_PATH/comp/base/pkg"
 
@@ -21,6 +22,7 @@ set COMPONENTS [ list \
    [ list "FIFOX"         $FIFOX_BASE          "FULL" ] \
    [ list "SPLITTER"      $SPLITTER_BASE       "FULL" ] \
    [ list "MFB_FIFOX"     $MFB_FIFOX_BASE      "FULL" ] \
+   [ list "MFB_COMPACTOR" $MFB_COMPACTOR_BASE  "FULL" ] \
 ]
 
 # entity and architecture
