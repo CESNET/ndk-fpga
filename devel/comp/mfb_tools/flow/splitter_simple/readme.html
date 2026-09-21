@@ -388,7 +388,16 @@
 <dt class="sig sig-object vhdl" id="vhdl-entity-mfb_splitter_simple_gen">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_SPLITTER_SIMPLE_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_splitter_simple_gen" title="Link to this definition"></a></dt>
 <dd><p>This is a 1:N MFB splitter.
-It consists of numerous 1:2 MFB splitters in <code class="docutils literal notranslate"><span class="pre">log2(SPLITTER_OUTPUTS)</span></code> stages.</p>
+<code class="docutils literal notranslate"><span class="pre">RX_MFB_SEL</span></code> selects the output for each frame. The whole RX word is sent
+to every output in the same clock cycle. Each output gets the word with the
+SOFs and EOFs of the other outputs masked out. <code class="docutils literal notranslate"><span class="pre">TX_MFB_SRC_RDY</span></code> of an
+output stays low when the word carries no frame for that output. The latency
+is one clock cycle.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>An RX word is taken only once every output can accept it, so the slowest
+output stops all the others.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
