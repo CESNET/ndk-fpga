@@ -7,6 +7,7 @@
 
 import re
 import subprocess
+import tempfile
 import time
 import os
 import csv
@@ -37,6 +38,44 @@ class GracefulExiter():
 
     def exit(self):
         return self.state
+
+
+def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen | None:
+    """Start an NDP tool that must keep running for the whole test, e.g. "ndp-read".
+
+    Returns None if the mode does not need one. A tool that exits right after the start
+    (missing binary, DMA queues already used) is reported here together with its stderr.
+    Without this check it would show up only as an all-zero throughput curve.
+    """
+    if not ndp_cmd:
+        return None
+
+    pname = f"{ndp_cmd} -d {device}"
+    # The child process needs a real file for its stderr. It keeps its own handle open,
+    # so the file can be removed here as soon as it has been read.
+    stderr_log = tempfile.NamedTemporaryFile(prefix="gls_mod_ndp_", suffix=".log", delete=False)
+    try:
+        process = subprocess.Popen(
+            pname,
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=stderr_log,
+            start_new_session=True, # spawns new session / process group
+        )
+        time.sleep(0.3) # wait for an immediate exit (missing tool, DMA queues already used)
+        if process.poll() is not None:
+            stderr_log.seek(0)
+            err = stderr_log.read().decode(errors="replace").strip()
+            raise RuntimeError(
+                f"'{pname}' exited immediately (code {process.returncode}): "
+                f"{err or '(no stderr output)'}"
+            )
+    finally:
+        stderr_log.close()
+        os.unlink(stderr_log.name)
+
+    logging.info(f"Started persistent NDP process ({pname})")
+    return process
 
 
 def stop_process(p: subprocess.Popen | None, timeout: float = 0.5) -> None:
@@ -431,19 +470,6 @@ def main():
     # TEST CONFIGURATION
     # ==========================================================================
 
-    # Enable RX DMA
-    ndp_read = None
-    if sel_mode.ndp_read:
-        pname = f"ndp-read -d {args.device}"
-        ndp_read = subprocess.Popen(
-            pname,
-            shell=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True, # spawns new session / process group
-        )
-        logging.info(f"Enabled RX DMA ({pname})")
-
     logging.info("Finding information about NDK firmware...")
     fdt_firmware = nfb.Nfb(args.device).fdt.get_node("firmware")
     card_name = fdt_firmware.get_property("card-name").value
@@ -613,42 +639,50 @@ def main():
 
     logging.info("Initial test setup completed.\n")
 
+    # Start the RX DMA reader required by the selected mode, if it needs one. Started only
+    # now, after all setup that can still fail, so a failed setup never leaves a stray NDP
+    # process running in the background, still consuming DMA queues and poisoning later
+    # measurements.
+    ndp_persistent = start_persistent_ndp("ndp-read" if sel_mode.ndp_read else None, args.device)
+
     # ==========================================================================
     # GLS TEST START
     # ==========================================================================
 
     x = 1
     exiter = GracefulExiter()
-    while True:
-        logging.info(f"Test #{x} started...")
-        x += 1
-        now = datetime.datetime.now()
-        date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-        host_name = socket.gethostname().partition(".")[0] # get short hostname without domain (.liberouter.org)
-        report_name = host_name + "_" + card_name + "_" + args.mode + "_ch" + full_chan_range + "_" + date_time
-        run_test(
-            gls_internals=gls_internals_list,
-            mode=args.mode,
-            fr_sizes=fr_sizes,
-            gls_clk_freq=args.frequency,
-            log_en=args.log,
-            demo_en=args.log_demo,
-            global_chan_range=full_chan_range,
-            rate_layer=args.rate_layer,
-            cycles=args.test_cycles,
-            report_name=report_name,
-            device=args.device,
-            exiter=exiter,
-        )
-        logging.info("Test finished.\n")
-        if not args.repeat or exiter.exit():
-            print("END: Exiting...")
-            for gi in gls_internals_list:
-                if gi.gen is not None:
-                    gi.gen.enabled = False
-            time.sleep(1.0)
-            stop_process(ndp_read)
-            break
+    try:
+        while True:
+            logging.info(f"Test #{x} started...")
+            x += 1
+            now = datetime.datetime.now()
+            date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+            host_name = socket.gethostname().partition(".")[0] # get short hostname without domain (.liberouter.org)
+            report_name = host_name + "_" + card_name + "_" + args.mode + "_ch" + full_chan_range + "_" + date_time
+            run_test(
+                gls_internals=gls_internals_list,
+                mode=args.mode,
+                fr_sizes=fr_sizes,
+                gls_clk_freq=args.frequency,
+                log_en=args.log,
+                demo_en=args.log_demo,
+                global_chan_range=full_chan_range,
+                rate_layer=args.rate_layer,
+                cycles=args.test_cycles,
+                report_name=report_name,
+                device=args.device,
+                exiter=exiter,
+            )
+            logging.info("Test finished.\n")
+            if not args.repeat or exiter.exit():
+                print("END: Exiting...")
+                for gi in gls_internals_list:
+                    if gi.gen is not None:
+                        gi.gen.enabled = False
+                time.sleep(1.0)
+                break
+    finally:
+        stop_process(ndp_persistent)
 
 
 if __name__ == "__main__":
