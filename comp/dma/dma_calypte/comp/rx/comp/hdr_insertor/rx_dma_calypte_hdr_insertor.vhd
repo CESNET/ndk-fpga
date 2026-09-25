@@ -1057,7 +1057,9 @@ begin
             TX_MFB_EOF            <= (others => '0');
             TX_MFB_SOF_POS        <= (others => '0');
             tx_mfb_eof_pos_arr(0) <= (others => '0');
-            tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(5, maximum(1, log2(TX_REGION_SIZE*TX_BLOCK_SIZE))));
+            -- This default value belongs to the DMA header sent in the second region. The header
+            -- is 2 DWs long because the PCIe header is carried in TX_MFB_META.
+            tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(1, maximum(1, log2(TX_REGION_SIZE*TX_BLOCK_SIZE))));
             TX_MFB_SRC_RDY        <= '0';
 
             rx_mfb_eof_pos_u   := unsigned(RX_MFB_EOF_POS);
@@ -1108,7 +1110,7 @@ begin
                             elsif (rx_mfb_eof_pos_u >= 32 and rx_mfb_eof_pos_u < 64) then
                                 TX_MFB_SOF(0)         <= '1';
                                 TX_MFB_EOF            <= "10";
-                                tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2) + 4);
+                                tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
                                 TX_MFB_SRC_RDY        <= '1';
 
                             elsif ((rx_mfb_eof_pos_u >= 64 and rx_mfb_eof_pos_u < 96 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1')
