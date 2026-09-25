@@ -54,12 +54,12 @@ if { $ETH_PORTS == 3 } {
 # ------------------------------------------------------------------------------
 # Supported combinations for this card:
 # 1x PCIe Gen4 x16  -- PCIE_GEN=4, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (Note: for DMA Calypte)
-# 1x PCIe Gen5 x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (Note: for DMA Medusa only)
+# 1x PCIe Gen5 x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (Note: for DMA Medusa only, requires PCIe bifurcation enabled in BIOS)
 # 1x PCIe Gen5 x16  -- PCIE_GEN=5, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (Note: for DMA Medusa only)
 # ------------------------------------------------------------------------------
 
 # Set default PCIe configuration
-set PCIE_CONF "1xGen5x8x8"
+set PCIE_CONF "1xGen5x16"
 if { [info exist env(PCIE_CONF)] } {
     set PCIE_CONF $env(PCIE_CONF)
 }
@@ -71,11 +71,12 @@ set pcie_conf_list [ParsePcieConf $PCIE_CONF]
 # 4 = PCIe Gen4 (Stratix 10 with P-Tile or Agilex)
 # 5 = PCIe Gen5 (Agilex with R-Tile)
 set PCIE_GEN           [lindex $pcie_conf_list 1]
-# PCIe endpoints (possible values: 2, 4):
-# 2 = 2x PCIe x16 in two slot OR 2x PCIe x8 in one slot (bifurcation x8+x8)
-# 4 = 4x PCIe x8 in two slots (bifurcation x8+x8)
+# PCIe endpoints (possible values: 1, 2):
+# 1 = 1x PCIe x16 in one slot
+# 2 = 2x PCIe x8 in one slot (bifurcation x8+x8)
 set PCIE_ENDPOINTS     [lindex $pcie_conf_list 0]
-# PCIe endpoint mode (possible values: 1):
+# PCIe endpoint mode (possible values: 0, 1):
+# 0 = 1x16 lanes
 # 1 = 2x8 lanes (bifurcation x8+x8)
 set PCIE_ENDPOINT_MODE [lindex $pcie_conf_list 2]
 

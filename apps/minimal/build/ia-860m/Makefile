@@ -12,7 +12,7 @@ APP_CONF = app_conf.tcl
 BOARD_VARIANT ?= 0
 export BOARD_VARIANT
 
-PCIE_CONF ?= 1xgen5x8x8
+PCIE_CONF ?= 1xgen5x16
 export PCIE_CONF
 
 OUTPUT_NAME = ia-860m-minimal-pcie$(PCIE_CONF)

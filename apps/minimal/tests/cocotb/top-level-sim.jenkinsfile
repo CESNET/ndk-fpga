@@ -49,14 +49,14 @@ def COMBINATIONS_JSON = '''
     {"CARD": "n6010"},
     {"CARD": "fb2cghh"},
     {"CARD": "fb4cgg3"},
-    {"CARD": "fb2cdg1"},
+    {"CARD": "fb2cdg1", "PCIE_CONF": "1xGen5x8x8"},
     {"CARD": "nfb-200g2ql"},
     {"CARD": "dk-dev-1sdx-p"},
     {"CARD": "g35p"},
     {"CARD": "nt200a02"},
-    {"CARD": "agi-fh400g"},
-    {"CARD": "a2700"},
-    {"CARD": "ia-440i"},
+    {"CARD": "agi-fh400g", "PCIE_CONF": "2xGen5x8x8"},
+    {"CARD": "a2700", "PCIE_CONF": "1xGen5x8x8"},
+    {"CARD": "ia-440i", "PCIE_CONF": "1xGen5x8x8"},
     {"CARD": "fb2cghh", "DMA_TYPE": "4"},
     {"CARD": "ia-440i", "PCIE_CONF": "1xGen5x16"}
 ]
