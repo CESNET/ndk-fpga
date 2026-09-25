@@ -71,7 +71,7 @@ proc sim_pre_run {} {
         view wave
         delete wave *
         config wave -signalnamewidth 1
-        source $env(COCOTB_MODULE)_sig.fdo
+        uplevel #0 [list source $env(COCOTB_MODULE)_sig.fdo]
     }
 }
 
