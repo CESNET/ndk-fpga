@@ -72,9 +72,10 @@ set for one channel is shown in the following table:
       - W/R
       - Write pointer for headers (up to 16 bits)
     * - 0x20
-      - -Reserved-
-      - N/A
-      - \-
+      - Update timeout
+      - R/W
+      - Number of clock cycles after which a pointer update is sent again while a channel is
+        stopping. Set to 0 to send the update only once.
     * - 0x24
       - -Reserved-
       - N/A
@@ -120,13 +121,13 @@ set for one channel is shown in the following table:
       - R/W
       - Base addres of the header buffer in a host memory (upper 32 bits).
     * - 0x50
-      - -Reserved-
-      - N/A
-      - \-
+      - Update buffer base address (lower part)
+      - R/W
+      - Bits 31:0 of the host address where HDP and HHP are written
     * - 0x54
-      - -Reserved-
-      - N/A
-      - \-
+      - Update buffer base address (upper part)
+      - R/W
+      - Bits 63:32 of the host address where HDP and HHP are written
     * - 0x58
       - Data pointer mask (DPM)
       - R/W
@@ -179,6 +180,11 @@ set for one channel is shown in the following table:
     Write to one counter register affects all counters as well as their registers. This ensures
     value coherency between the counters.
 
+.. NOTE::
+   The update buffer base address must be a multiple of 8. The controller writes HDP and HHP
+   together as one 8 B PCIe write. A single PCIe request must not cross a 4 kB boundary, and an
+   address that is not a multiple of 8 can place the write across such a boundary.
+
 Start sequence
 ^^^^^^^^^^^^^^
 
@@ -189,6 +195,8 @@ registers need to be initialized from the MI bus:
 #. The *DataBaseL*, *DataBaseH*, *HeaderBaseL* and *HeaderBaseH* registers need
    to contain valid addresses that were previously reserved in the host memory.
    This memory needs to be initialized as DMA-able.
+#. The *Update buffer base address* registers need to be set to the host address that receives
+   HDP and HHP.
 #. The SDP and SHP pointer registers need to be initialized to 0.
 #. Finally, a write of value ``0b1`` to the Control register is issued. This
    immediately starts the required channel that responds by setting the Status
