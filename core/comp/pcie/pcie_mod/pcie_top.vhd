@@ -747,43 +747,49 @@ begin
         -- TELEMETRY TAPS OF THIS ENDPOINT
         -- ---------------------------------------------------------------------
 
-        -- PCIe side, bus 0 = PTC to PCIe (RQ), bus 1 = PCIe to PTC (RC).
-        telem_pcie_sof(i)     <= telem_pad(core_rc_mfb_sof(i), TELEM_PCIE_REGIONS) &
-                                 telem_pad(core_rq_mfb_sof(i), TELEM_PCIE_REGIONS);
-        telem_pcie_eof(i)     <= telem_pad(core_rc_mfb_eof(i), TELEM_PCIE_REGIONS) &
-                                 telem_pad(core_rq_mfb_eof(i), TELEM_PCIE_REGIONS);
-        telem_pcie_eof_pos(i) <= telem_pad_pos(core_rc_mfb_eof_pos(i), CORE_RC_MFB_REGIONS, TELEM_PCIE_REGIONS) &
-                                 telem_pad_pos(core_rq_mfb_eof_pos(i), CORE_RQ_MFB_REGIONS, TELEM_PCIE_REGIONS);
-        telem_pcie_src_rdy(i) <= core_rc_mfb_src_rdy(i) & core_rq_mfb_src_rdy(i);
-        telem_pcie_dst_rdy(i) <= core_rc_mfb_dst_rdy(i) & core_rq_mfb_dst_rdy(i);
+        -- The telemetry is only implemented with the PTC (DMA Medusa). Without
+        -- the PTC the DMA side buses are clocked at the PCIe clock and there is
+        -- nothing to measure.
+        telem_taps_g : if (not PTC_DISABLE) generate
 
-        -- DMA side, bus 2*p = DMA to PTC (UP), bus 2*p+1 = PTC to DMA (DOWN).
-        telem_dma_g : for p in 0 to DMA_PORTS_PER_EP-1 generate
-            constant DP : natural := i*DMA_PORTS_PER_EP + p;
-            subtype  UP_R is natural range (2*p+1)*TELEM_DMA_REGIONS-1 downto (2*p+0)*TELEM_DMA_REGIONS;
-            subtype  DOWN_R is natural range (2*p+2)*TELEM_DMA_REGIONS-1 downto (2*p+1)*TELEM_DMA_REGIONS;
-            subtype  UP_P is natural range (2*p+1)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W-1 downto (2*p+0)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W;
-            subtype  DOWN_P is natural range (2*p+2)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W-1 downto (2*p+1)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W;
-        begin
-            telem_dma_sof(i)(UP_R)       <= telem_pad(DMA_RQ_MFB_SOF(DP), TELEM_DMA_REGIONS);
-            telem_dma_sof(i)(DOWN_R)     <= telem_pad(dma_rc_mfb_sof_sig(DP), TELEM_DMA_REGIONS);
-            telem_dma_eof(i)(UP_R)       <= telem_pad(DMA_RQ_MFB_EOF(DP), TELEM_DMA_REGIONS);
-            telem_dma_eof(i)(DOWN_R)     <= telem_pad(dma_rc_mfb_eof_sig(DP), TELEM_DMA_REGIONS);
-            telem_dma_eof_pos(i)(UP_P)   <= telem_pad_pos(DMA_RQ_MFB_EOF_POS(DP), RQ_MFB_REGIONS, TELEM_DMA_REGIONS);
-            telem_dma_eof_pos(i)(DOWN_P) <= telem_pad_pos(dma_rc_mfb_eof_pos_sig(DP), RC_MFB_REGIONS, TELEM_DMA_REGIONS);
+            -- PCIe side, bus 0 = PTC to PCIe (RQ), bus 1 = PCIe to PTC (RC).
+            telem_pcie_sof(i)     <= telem_pad(core_rc_mfb_sof(i), TELEM_PCIE_REGIONS) &
+                                     telem_pad(core_rq_mfb_sof(i), TELEM_PCIE_REGIONS);
+            telem_pcie_eof(i)     <= telem_pad(core_rc_mfb_eof(i), TELEM_PCIE_REGIONS) &
+                                     telem_pad(core_rq_mfb_eof(i), TELEM_PCIE_REGIONS);
+            telem_pcie_eof_pos(i) <= telem_pad_pos(core_rc_mfb_eof_pos(i), CORE_RC_MFB_REGIONS, TELEM_PCIE_REGIONS) &
+                                     telem_pad_pos(core_rq_mfb_eof_pos(i), CORE_RQ_MFB_REGIONS, TELEM_PCIE_REGIONS);
+            telem_pcie_src_rdy(i) <= core_rc_mfb_src_rdy(i) & core_rq_mfb_src_rdy(i);
+            telem_pcie_dst_rdy(i) <= core_rc_mfb_dst_rdy(i) & core_rq_mfb_dst_rdy(i);
 
-            telem_dma_src_rdy(i)(2*p+0) <= DMA_RQ_MFB_SRC_RDY(DP);
-            telem_dma_dst_rdy(i)(2*p+0) <= dma_rq_mfb_dst_rdy_sig(DP);
-            telem_dma_src_rdy(i)(2*p+1) <= dma_rc_mfb_src_rdy_sig(DP);
-            telem_dma_dst_rdy(i)(2*p+1) <= DMA_RC_MFB_DST_RDY(DP);
+            -- DMA side, bus 2*p = DMA to PTC (UP), bus 2*p+1 = PTC to DMA (DOWN).
+            telem_dma_g : for p in 0 to DMA_PORTS_PER_EP-1 generate
+                constant DP : natural := i*DMA_PORTS_PER_EP + p;
+                subtype  UP_R is natural range (2*p+1)*TELEM_DMA_REGIONS-1 downto (2*p+0)*TELEM_DMA_REGIONS;
+                subtype  DOWN_R is natural range (2*p+2)*TELEM_DMA_REGIONS-1 downto (2*p+1)*TELEM_DMA_REGIONS;
+                subtype  UP_P is natural range (2*p+1)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W-1 downto (2*p+0)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W;
+                subtype  DOWN_P is natural range (2*p+2)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W-1 downto (2*p+1)*TELEM_DMA_REGIONS*TELEM_EOF_POS_W;
+            begin
+                telem_dma_sof(i)(UP_R)       <= telem_pad(DMA_RQ_MFB_SOF(DP), TELEM_DMA_REGIONS);
+                telem_dma_sof(i)(DOWN_R)     <= telem_pad(dma_rc_mfb_sof_sig(DP), TELEM_DMA_REGIONS);
+                telem_dma_eof(i)(UP_R)       <= telem_pad(DMA_RQ_MFB_EOF(DP), TELEM_DMA_REGIONS);
+                telem_dma_eof(i)(DOWN_R)     <= telem_pad(dma_rc_mfb_eof_sig(DP), TELEM_DMA_REGIONS);
+                telem_dma_eof_pos(i)(UP_P)   <= telem_pad_pos(DMA_RQ_MFB_EOF_POS(DP), RQ_MFB_REGIONS, TELEM_DMA_REGIONS);
+                telem_dma_eof_pos(i)(DOWN_P) <= telem_pad_pos(dma_rc_mfb_eof_pos_sig(DP), RC_MFB_REGIONS, TELEM_DMA_REGIONS);
 
-            telem_dma_mvb_vld(i)(UP_R)   <= telem_pad(DMA_RQ_MVB_VLD(DP), TELEM_DMA_REGIONS);
-            telem_dma_mvb_vld(i)(DOWN_R) <= telem_pad(dma_rc_mvb_vld_sig(DP), TELEM_DMA_REGIONS);
+                telem_dma_src_rdy(i)(2*p+0) <= DMA_RQ_MFB_SRC_RDY(DP);
+                telem_dma_dst_rdy(i)(2*p+0) <= dma_rq_mfb_dst_rdy_sig(DP);
+                telem_dma_src_rdy(i)(2*p+1) <= dma_rc_mfb_src_rdy_sig(DP);
+                telem_dma_dst_rdy(i)(2*p+1) <= DMA_RC_MFB_DST_RDY(DP);
 
-            telem_dma_mvb_src_rdy(i)(2*p+0) <= DMA_RQ_MVB_SRC_RDY(DP);
-            telem_dma_mvb_dst_rdy(i)(2*p+0) <= dma_rq_mvb_dst_rdy_sig(DP);
-            telem_dma_mvb_src_rdy(i)(2*p+1) <= dma_rc_mvb_src_rdy_sig(DP);
-            telem_dma_mvb_dst_rdy(i)(2*p+1) <= DMA_RC_MVB_DST_RDY(DP);
+                telem_dma_mvb_vld(i)(UP_R)   <= telem_pad(DMA_RQ_MVB_VLD(DP), TELEM_DMA_REGIONS);
+                telem_dma_mvb_vld(i)(DOWN_R) <= telem_pad(dma_rc_mvb_vld_sig(DP), TELEM_DMA_REGIONS);
+
+                telem_dma_mvb_src_rdy(i)(2*p+0) <= DMA_RQ_MVB_SRC_RDY(DP);
+                telem_dma_mvb_dst_rdy(i)(2*p+0) <= dma_rq_mvb_dst_rdy_sig(DP);
+                telem_dma_mvb_src_rdy(i)(2*p+1) <= dma_rc_mvb_src_rdy_sig(DP);
+                telem_dma_mvb_dst_rdy(i)(2*p+1) <= DMA_RC_MVB_DST_RDY(DP);
+            end generate;
         end generate;
     end generate;
 
@@ -800,76 +806,88 @@ begin
     --  PCIE TELEMETRY
     -- =========================================================================
 
-    telemetry_i : entity work.PCIE_TELEMETRY_MI
-    generic map (
-        PCIE_ENDPOINTS            => PCIE_ENDPOINTS,
-        DMA_PORTS                 => DMA_PORTS_PER_EP,
+    -- The telemetry observes the four MFB buses around the PTC module, without
+    -- the PTC (that is without DMA Medusa) it has no meaning and is not built.
+    telemetry_g : if (not PTC_DISABLE) generate
 
-        PCIE_RQ_MFB_REGIONS       => CORE_RQ_MFB_REGIONS,
-        PCIE_RC_MFB_REGIONS       => CORE_RC_MFB_REGIONS,
-        DMA_UP_MFB_REGIONS        => RQ_MFB_REGIONS,
-        DMA_DOWN_MFB_REGIONS      => RC_MFB_REGIONS,
+        telemetry_i : entity work.PCIE_TELEMETRY_MI
+        generic map (
+            PCIE_ENDPOINTS            => PCIE_ENDPOINTS,
+            DMA_PORTS                 => DMA_PORTS_PER_EP,
 
-        PCIE_RQ_MFB_REGION_BYTES  => RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*RQ_MFB_ITEM_WIDTH/8,
-        PCIE_RC_MFB_REGION_BYTES  => RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*RC_MFB_ITEM_WIDTH/8,
-        DMA_UP_MFB_REGION_BYTES   => RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*RQ_MFB_ITEM_WIDTH/8,
-        DMA_DOWN_MFB_REGION_BYTES => RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*RC_MFB_ITEM_WIDTH/8,
-        MFB_ITEM_BYTES            => RQ_MFB_ITEM_WIDTH/8,
-        PCIE_EOF_POS_WIDTH        => TELEM_EOF_POS_W,
-        DMA_EOF_POS_WIDTH         => TELEM_EOF_POS_W,
+            PCIE_RQ_MFB_REGIONS       => CORE_RQ_MFB_REGIONS,
+            PCIE_RC_MFB_REGIONS       => CORE_RC_MFB_REGIONS,
+            DMA_UP_MFB_REGIONS        => RQ_MFB_REGIONS,
+            DMA_DOWN_MFB_REGIONS      => RC_MFB_REGIONS,
 
-        TAG_CAPACITY              => TELEM_TAG_CAPACITY,
-        STFIFO_CAPACITY           => TELEM_STFIFO_CAPACITY,
+            PCIE_RQ_MFB_REGION_BYTES  => RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*RQ_MFB_ITEM_WIDTH/8,
+            PCIE_RC_MFB_REGION_BYTES  => RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*RC_MFB_ITEM_WIDTH/8,
+            DMA_UP_MFB_REGION_BYTES   => RQ_MFB_REGION_SIZE*RQ_MFB_BLOCK_SIZE*RQ_MFB_ITEM_WIDTH/8,
+            DMA_DOWN_MFB_REGION_BYTES => RC_MFB_REGION_SIZE*RC_MFB_BLOCK_SIZE*RC_MFB_ITEM_WIDTH/8,
+            MFB_ITEM_BYTES            => RQ_MFB_ITEM_WIDTH/8,
+            PCIE_EOF_POS_WIDTH        => TELEM_EOF_POS_W,
+            DMA_EOF_POS_WIDTH         => TELEM_EOF_POS_W,
 
-        DEVICE                    => DEVICE
-    )
-    port map (
-        MI_CLK              => MI_CLK,
-        MI_RESET            => MI_RESET,
+            TAG_CAPACITY              => TELEM_TAG_CAPACITY,
+            STFIFO_CAPACITY           => TELEM_STFIFO_CAPACITY,
 
-        MI_DWR              => MI_TELEM_DWR,
-        MI_ADDR             => MI_TELEM_ADDR,
-        MI_BE               => MI_TELEM_BE,
-        MI_RD               => MI_TELEM_RD,
-        MI_WR               => MI_TELEM_WR,
-        MI_DRD              => MI_TELEM_DRD,
-        MI_ARDY             => MI_TELEM_ARDY,
-        MI_DRDY             => MI_TELEM_DRDY,
+            DEVICE                    => DEVICE
+        )
+        port map (
+            MI_CLK              => MI_CLK,
+            MI_RESET            => MI_RESET,
 
-        PCIE_CLK            => pcie_clk,
-        PCIE_RESET          => pcie_usr_reset,
+            MI_DWR              => MI_TELEM_DWR,
+            MI_ADDR             => MI_TELEM_ADDR,
+            MI_BE               => MI_TELEM_BE,
+            MI_RD               => MI_TELEM_RD,
+            MI_WR               => MI_TELEM_WR,
+            MI_DRD              => MI_TELEM_DRD,
+            MI_ARDY             => MI_TELEM_ARDY,
+            MI_DRDY             => MI_TELEM_DRDY,
 
-        PCIE_MFB_SOF        => telem_pcie_sof,
-        PCIE_MFB_EOF        => telem_pcie_eof,
-        PCIE_MFB_EOF_POS    => telem_pcie_eof_pos,
-        PCIE_MFB_SRC_RDY    => telem_pcie_src_rdy,
-        PCIE_MFB_DST_RDY    => telem_pcie_dst_rdy,
+            PCIE_CLK            => pcie_clk,
+            PCIE_RESET          => pcie_usr_reset,
 
-        PCIE_PTC_BRAKE      => telem_ptc_brake,
-        PCIE_STFIFO_FREE    => telem_stfifo_free,
+            PCIE_MFB_SOF        => telem_pcie_sof,
+            PCIE_MFB_EOF        => telem_pcie_eof,
+            PCIE_MFB_EOF_POS    => telem_pcie_eof_pos,
+            PCIE_MFB_SRC_RDY    => telem_pcie_src_rdy,
+            PCIE_MFB_DST_RDY    => telem_pcie_dst_rdy,
 
-        PCIE_MPS            => pcie_cfg_mps,
-        PCIE_MRRS           => pcie_cfg_mrrs,
-        PCIE_EXT_TAG_EN     => pcie_cfg_ext_tag_en,
-        PCIE_10B_TAG_REQ_EN => pcie_cfg_10b_tag_req_en,
-        PCIE_RCB_SIZE       => pcie_cfg_rcb_size,
-        PCIE_LINK_UP        => pcie_link_up_sig,
+            PCIE_PTC_BRAKE      => telem_ptc_brake,
+            PCIE_STFIFO_FREE    => telem_stfifo_free,
 
-        DMA_CLK             => DMA_CLK,
-        DMA_RESET           => DMA_RESET,
+            PCIE_MPS            => pcie_cfg_mps,
+            PCIE_MRRS           => pcie_cfg_mrrs,
+            PCIE_EXT_TAG_EN     => pcie_cfg_ext_tag_en,
+            PCIE_10B_TAG_REQ_EN => pcie_cfg_10b_tag_req_en,
+            PCIE_RCB_SIZE       => pcie_cfg_rcb_size,
+            PCIE_LINK_UP        => pcie_link_up_sig,
 
-        DMA_MFB_SOF         => telem_dma_sof,
-        DMA_MFB_EOF         => telem_dma_eof,
-        DMA_MFB_EOF_POS     => telem_dma_eof_pos,
-        DMA_MFB_SRC_RDY     => telem_dma_src_rdy,
-        DMA_MFB_DST_RDY     => telem_dma_dst_rdy,
+            DMA_CLK             => DMA_CLK,
+            DMA_RESET           => DMA_RESET,
 
-        DMA_MVB_VLD         => telem_dma_mvb_vld,
-        DMA_MVB_SRC_RDY     => telem_dma_mvb_src_rdy,
-        DMA_MVB_DST_RDY     => telem_dma_mvb_dst_rdy,
+            DMA_MFB_SOF         => telem_dma_sof,
+            DMA_MFB_EOF         => telem_dma_eof,
+            DMA_MFB_EOF_POS     => telem_dma_eof_pos,
+            DMA_MFB_SRC_RDY     => telem_dma_src_rdy,
+            DMA_MFB_DST_RDY     => telem_dma_dst_rdy,
 
-        PCIE_TAG_FREE       => telem_tag_free
-    );
+            DMA_MVB_VLD         => telem_dma_mvb_vld,
+            DMA_MVB_SRC_RDY     => telem_dma_mvb_src_rdy,
+            DMA_MVB_DST_RDY     => telem_dma_mvb_dst_rdy,
+
+            PCIE_TAG_FREE       => telem_tag_free
+        );
+
+    else generate
+        -- Answer reads with zeros, software cannot find the component in the
+        -- Device Tree of a firmware without the PTC.
+        MI_TELEM_DRD  <= (others => '0');
+        MI_TELEM_ARDY <= MI_TELEM_RD or MI_TELEM_WR;
+        MI_TELEM_DRDY <= MI_TELEM_RD;
+    end generate;
 
     mi_splitter_i : entity work.MI_SPLITTER_PLUS_GEN
     generic map (
