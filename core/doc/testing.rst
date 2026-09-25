@@ -205,6 +205,74 @@ A single run of the script takes a while and can be terminated using Ctrl+C (onc
 Partial test is finished before exiting, which causes a slight delay.
 When `-r`, `--repeat` option is used, the script continues to run tests until interrupted using Ctrl+C (once).
 
+Automated DMA throughput sweeps and FW comparison
+**************************************************
+
+The companion script ``dma_throughput_sweep.py`` (in the same ``./sw`` directory) automates a full
+DMA throughput characterization by driving ``gls_mod.py`` across the four DMA scenarios
+(`dma_rx`, `dma_tx`, `dma_rxtx`, `dma_swloop`) over a configurable range of frame lengths, and
+plots the results.
+
+.. code-block:: bash
+
+    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -o results/
+
+Every chart has four panels: RX DMA on the left, TX DMA on the right, the bit rate in Gbps in the
+top row and the frame rate in Mpps in the bottom row. The frame rate is derived from the bit rate
+and the frame length of the same measurement point.
+
+The measured frame lengths are set by ``-s MIN MAX STEP``. A single value measures only that one
+frame length:
+
+.. code-block:: bash
+
+    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -s 64 -o results/
+
+Each run is tagged with the FW build identity (card name, project name/variant, and
+``build-revision``, all read from the Device Tree) so results are grouped per FW build. Two or
+more such runs (e.g. from different FW versions) can then be overlaid on common charts:
+
+.. code-block:: bash
+
+    $ python3 dma_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
+
+The `compare` subcommand warns if the compared runs used different frame-size ranges, channel
+counts, cycles, clock frequency, rate layer, DMA buffer settings, or Ethernet rate, since those
+settings must match for the throughput numbers to be comparable across FW versions.
+
+Every chart also carries a small subtitle line summarizing the run configuration (channels,
+cycles, clock frequency, rate layer, DMA buffer settings, Ethernet rate). When ``--eth-rate`` is
+given, each panel also gets a dashed reference curve for the theoretical maximum throughput at
+that physical line rate. At rate layer 2 the reported frame length already contains the CRC, so
+the reference curve subtracts the remaining per-frame overhead of 20 B (8 B preamble with SFD and
+12 B minimum interframe gap). At rate layer 1 the reported frame length contains that overhead
+already, so the reference curve equals the line rate:
+
+.. code-block:: bash
+
+    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --eth-rate 100 -o results/
+
+The script can also configure the kernel DMA buffer count/size (DMA Medusa only) via the
+``nfb-dma`` tool before starting the sweep, using the ``--buffer-count`` and ``--buffer-size``
+options:
+
+.. code-block:: bash
+
+    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --buffer-count 4096 --buffer-size 2048 -o results/
+
+This runs ``sudo nfb-dma -d <device> -C <buffer_count> -B <buffer_size>`` once, before any
+measurement starts, and may prompt for a sudo password. The setting is global to the device and
+persists after the script exits (it is not restored), so it also affects any other process using
+the card until changed again. Both options are recorded in the results and compared by the
+`compare` subcommand.
+
+.. Note::
+
+    For MTU/jumbo-sized packets (roughly 4096 B and up), the default kernel DMA buffer size is
+    typically too small to fit a whole packet into a single DMA descriptor, and ``--buffer-size``
+    must be increased accordingly (large enough for the max expected packet size) or such packets
+    will not fit into the descriptor.
+
 Alongside the report CSV, each measured mode keeps the stdout and stderr of the NDP tools it
 started, in a log file named after the tool (``ndp-read.log``, ``ndp-loopback.log``,
 ``ndp-generate.log``). ``gls_mod.py`` writes them next to its own ``report_*.csv``. A curve with
