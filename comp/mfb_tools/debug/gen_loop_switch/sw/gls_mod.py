@@ -7,7 +7,6 @@
 
 import re
 import subprocess
-import tempfile
 import time
 import os
 import csv
@@ -40,41 +39,55 @@ class GracefulExiter():
         return self.state
 
 
+def ndp_log_path(ndp_cmd: str) -> str:
+    """Path of the log file that keeps one NDP tool's output, named after the tool.
+
+    The file is created in the current directory, next to the report CSV that this
+    script writes there.
+    """
+    return os.path.abspath("./" + ndp_cmd.split()[0] + ".log")
+
+
+def read_log_tail(path: str, lines: int = 5) -> str:
+    """Last few lines of an NDP log, condensed to one line for an error message."""
+    try:
+        with open(path, errors="replace") as log:
+            return " | ".join(log.read().strip().splitlines()[-lines:])
+    except OSError:
+        return ""
+
+
 def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen | None:
     """Start an NDP tool that must keep running for the whole test, e.g. "ndp-read".
 
-    Returns None if the mode does not need one. A tool that exits right after the start
-    (missing binary, DMA queues already used) is reported here together with its stderr.
-    Without this check it would show up only as an all-zero throughput curve.
+    Returns None if the mode does not need one. The tool's stdout and stderr go into a log
+    file that is kept after the test, so a run with unexpected numbers can still be
+    analysed. A tool that exits right after the start (missing binary, DMA queues already
+    used) is reported here. Without this check it would show up only as an all-zero
+    throughput curve.
     """
     if not ndp_cmd:
         return None
 
     pname = f"{ndp_cmd} -d {device}"
-    # The child process needs a real file for its stderr. It keeps its own handle open,
-    # so the file can be removed here as soon as it has been read.
-    stderr_log = tempfile.NamedTemporaryFile(prefix="gls_mod_ndp_", suffix=".log", delete=False)
-    try:
+    log_path = ndp_log_path(ndp_cmd)
+    # The child process gets its own handle on the log file, so it can be closed here.
+    with open(log_path, "w") as log:
         process = subprocess.Popen(
             pname,
             shell=True,
-            stdout=subprocess.DEVNULL,
-            stderr=stderr_log,
+            stdout=log,
+            stderr=subprocess.STDOUT,
             start_new_session=True, # spawns new session / process group
         )
-        time.sleep(0.3) # wait for an immediate exit (missing tool, DMA queues already used)
-        if process.poll() is not None:
-            stderr_log.seek(0)
-            err = stderr_log.read().decode(errors="replace").strip()
-            raise RuntimeError(
-                f"'{pname}' exited immediately (code {process.returncode}): "
-                f"{err or '(no stderr output)'}"
-            )
-    finally:
-        stderr_log.close()
-        os.unlink(stderr_log.name)
+    time.sleep(0.3) # wait for an immediate exit (missing tool, DMA queues already used)
+    if process.poll() is not None:
+        raise RuntimeError(
+            f"'{pname}' exited immediately (code {process.returncode}), see {log_path}: "
+            f"{read_log_tail(log_path) or '(no output)'}"
+        )
 
-    logging.info(f"Started persistent NDP process ({pname})")
+    logging.info(f"Started persistent NDP process ({pname}), its output goes to {log_path}")
     return process
 
 
@@ -170,6 +183,13 @@ def run_test(
     else:
         use_ndp_gen = False
 
+    # The generator is restarted for every frame length, so its log is appended to.
+    # The file is truncated once per test and then holds the whole history of one run.
+    gen_log_path = ndp_log_path("ndp-generate")
+    if use_ndp_gen:
+        open(gen_log_path, "w").close()
+        logging.info(f"Traffic generator output goes to {gen_log_path}")
+
     try:
         for length in fr_sizes:
 
@@ -188,13 +208,17 @@ def run_test(
 
             # Start generating traffic
             if use_ndp_gen:
-                ndp_gen = subprocess.Popen(
-                    f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}",
-                    shell=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    start_new_session=True, # spawns new session / process group
-                )
+                gen_cmd = f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}"
+                with open(gen_log_path, "a") as log:
+                    log.write(f"\n=== {gen_cmd} ===\n")
+                    log.flush() # header must reach the file before the child writes to it
+                    ndp_gen = subprocess.Popen(
+                        gen_cmd,
+                        shell=True,
+                        stdout=log,
+                        stderr=subprocess.STDOUT,
+                        start_new_session=True, # spawns new session / process group
+                    )
             for g in gls_internals:
                 if g.gen is not None:
                     g.gen.frame_length = gen_length

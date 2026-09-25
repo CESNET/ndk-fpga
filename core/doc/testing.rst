@@ -204,3 +204,9 @@ End of test
 A single run of the script takes a while and can be terminated using Ctrl+C (once).
 Partial test is finished before exiting, which causes a slight delay.
 When `-r`, `--repeat` option is used, the script continues to run tests until interrupted using Ctrl+C (once).
+
+Alongside the report CSV, each measured mode keeps the stdout and stderr of the NDP tools it
+started, in a log file named after the tool (``ndp-read.log``, ``ndp-loopback.log``,
+``ndp-generate.log``). ``gls_mod.py`` writes them next to its own ``report_*.csv``. A curve with
+unexpected values can then be checked against the output of the tool. The next run of the same
+mode rewrites the logs, so copy the files you need to keep.
