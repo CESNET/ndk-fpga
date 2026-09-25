@@ -46,12 +46,12 @@ if {[info exists USER_VFLAGS]} {
 
 set SIM_MODULE $SYNTH_FLAGS(MODULE)
 
-# Cocotb environment variables
-set env(MODULE) $env(COCOTB_MODULE)
-
-if {![info exists env(COCOTB_TEST_MODULES)]} {
+if {[info exists env(COCOTB_TEST_MODULES)]} {
+    set env(COCOTB_MODULE) [lindex [split $env(COCOTB_TEST_MODULES) ,] 0]
+} else {
     set env(COCOTB_TEST_MODULES) $env(COCOTB_MODULE)
 }
+set env(MODULE) $env(COCOTB_TEST_MODULES)
 
 set env(TOPLEVEL) work.[string tolower $SYNTH_FLAGS(MODULE)]
 set env(TOPLEVEL_LANG) vhdl
