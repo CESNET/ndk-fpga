@@ -39,6 +39,58 @@ class GracefulExiter():
         return self.state
 
 
+def ndp_log_path(ndp_cmd: str) -> str:
+    """Path of the log file that keeps one NDP tool's output, named after the tool.
+
+    The file is created in the current directory, next to the report CSV that this
+    script writes there.
+    """
+    return os.path.abspath("./" + ndp_cmd.split()[0] + ".log")
+
+
+def read_log_tail(path: str, lines: int = 5) -> str:
+    """Last few lines of an NDP log, condensed to one line for an error message."""
+    try:
+        with open(path, errors="replace") as log:
+            return " | ".join(log.read().strip().splitlines()[-lines:])
+    except OSError:
+        return ""
+
+
+def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen | None:
+    """Start an NDP tool that must keep running for the whole test, e.g. "ndp-read".
+
+    Returns None if the mode does not need one. The tool's stdout and stderr go into a log
+    file that is kept after the test, so a run with unexpected numbers can still be
+    analysed. A tool that exits right after the start (missing binary, DMA queues already
+    used) is reported here. Without this check it would show up only as an all-zero
+    throughput curve.
+    """
+    if not ndp_cmd:
+        return None
+
+    pname = f"{ndp_cmd} -d {device}"
+    log_path = ndp_log_path(ndp_cmd)
+    # The child process gets its own handle on the log file, so it can be closed here.
+    with open(log_path, "w") as log:
+        process = subprocess.Popen(
+            pname,
+            shell=True,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            start_new_session=True, # spawns new session / process group
+        )
+    time.sleep(0.3) # wait for an immediate exit (missing tool, DMA queues already used)
+    if process.poll() is not None:
+        raise RuntimeError(
+            f"'{pname}' exited immediately (code {process.returncode}), see {log_path}: "
+            f"{read_log_tail(log_path) or '(no output)'}"
+        )
+
+    logging.info(f"Started persistent NDP process ({pname}), its output goes to {log_path}")
+    return process
+
+
 def stop_process(p: subprocess.Popen | None, timeout: float = 0.5) -> None:
     """Best-effort stop of a process group or single process."""
     if p is None:
@@ -84,7 +136,7 @@ class TestModeSpec:
     tx_sm: Optional[int] # None means it does not matter which one of the two will be used
     rx_sm: Optional[int] # None means it does not matter which one of the two will be used
     eth_loop: bool
-    ndp_read: bool
+    ndp_persistent_cmd: Optional[str] # NDP tool started once and kept running for the whole test, None = not needed
 
 
 @dataclass
@@ -131,6 +183,13 @@ def run_test(
     else:
         use_ndp_gen = False
 
+    # The generator is restarted for every frame length, so its log is appended to.
+    # The file is truncated once per test and then holds the whole history of one run.
+    gen_log_path = ndp_log_path("ndp-generate")
+    if use_ndp_gen:
+        open(gen_log_path, "w").close()
+        logging.info(f"Traffic generator output goes to {gen_log_path}")
+
     try:
         for length in fr_sizes:
 
@@ -149,13 +208,17 @@ def run_test(
 
             # Start generating traffic
             if use_ndp_gen:
-                ndp_gen = subprocess.Popen(
-                    f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}",
-                    shell=True,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
-                    start_new_session=True, # spawns new session / process group
-                )
+                gen_cmd = f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}"
+                with open(gen_log_path, "a") as log:
+                    log.write(f"\n=== {gen_cmd} ===\n")
+                    log.flush() # header must reach the file before the child writes to it
+                    ndp_gen = subprocess.Popen(
+                        gen_cmd,
+                        shell=True,
+                        stdout=log,
+                        stderr=subprocess.STDOUT,
+                        start_new_session=True, # spawns new session / process group
+                    )
             for g in gls_internals:
                 if g.gen is not None:
                     g.gen.frame_length = gen_length
@@ -302,7 +365,7 @@ def main():
                         tx_sm=1,
                         rx_sm=2,
                         eth_loop=True,
-                        ndp_read=False,
+                        ndp_persistent_cmd=None,
                     ),
         "rx":       TestModeSpec(
                         desc="HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)",
@@ -311,7 +374,7 @@ def main():
                         tx_sm=1,
                         rx_sm=0,
                         eth_loop=True,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "tx":       TestModeSpec(
                         desc="TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)",
@@ -320,7 +383,7 @@ def main():
                         tx_sm=1, # Both (1 or 3) can be used
                         rx_sm=2,
                         eth_loop=True,
-                        ndp_read=False,
+                        ndp_persistent_cmd=None,
                     ),
         "rxtx":     TestModeSpec(
                         desc="TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)",
@@ -329,7 +392,7 @@ def main():
                         tx_sm=1, # Both (1 or 3) can be used
                         rx_sm=0, # Both (0 or 2) can be used
                         eth_loop=True,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "dma_rx":   TestModeSpec(
                         desc="HW Gen --> RX DMA     ###",
@@ -338,7 +401,7 @@ def main():
                         tx_sm=None, # Speed Meter not used
                         rx_sm=0,
                         eth_loop=False,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "dma_tx":   TestModeSpec(
                         desc="TX DMA --> Black Hole ###",
@@ -347,25 +410,34 @@ def main():
                         tx_sm=3,
                         rx_sm=None, # Speed Meter not used
                         eth_loop=False,
-                        ndp_read=False,
+                        ndp_persistent_cmd=None,
                     ),
         "dma_rxtx": TestModeSpec(
-                        desc="TX DMA --> Black Hole ### HW Gen --> RX DMA;",
+                        desc="TX DMA --> Black Hole ### HW Gen --> RX DMA;                    (RX/TX independent)",
                         mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=1, l2r_loop=0),
                         gen_rev_chan=False, # Setting this true may have positive impact on performance
                         tx_sm=3,
                         rx_sm=0,
                         eth_loop=False,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "dma_loop": TestModeSpec(
-                        desc="TX DMA --> RX DMA     ### (internal DMA loopback)",
+                        desc="TX DMA --> RX DMA     ### (internal FW DMA loopback)",
                         mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=None, l2r_loop=1),
                         gen_rev_chan=False,
                         tx_sm=3,
                         rx_sm=0,
                         eth_loop=False,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
+                    ),
+        "dma_swloop": TestModeSpec(
+                        desc="HW Gen --> RX DMA --> (ndp-loopback, SW) --> TX DMA --> Black Hole ### (SW DMA loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=1, l2r_loop=0),
+                        gen_rev_chan=False, # Setting this true may have positive impact on performance
+                        tx_sm=3,
+                        rx_sm=0,
+                        eth_loop=False,
+                        ndp_persistent_cmd="ndp-loopback",
                     ),
     }
 
@@ -430,19 +502,6 @@ def main():
     # ==========================================================================
     # TEST CONFIGURATION
     # ==========================================================================
-
-    # Enable RX DMA
-    ndp_read = None
-    if sel_mode.ndp_read:
-        pname = f"ndp-read -d {args.device}"
-        ndp_read = subprocess.Popen(
-            pname,
-            shell=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            start_new_session=True, # spawns new session / process group
-        )
-        logging.info(f"Enabled RX DMA ({pname})")
 
     logging.info("Finding information about NDK firmware...")
     fdt_firmware = nfb.Nfb(args.device).fdt.get_node("firmware")
@@ -556,7 +615,7 @@ def main():
         # Select and configure the generator according to the selected mode
         if args.mode in ["eth_gen", "rx"]:
             gls_gen = gls.r2l.gen
-        elif args.mode in ["dma_rx", "dma_rxtx"]:
+        elif args.mode in ["dma_rx", "dma_rxtx", "dma_swloop"]:
             gls_gen = gls.l2r.gen
         else:
             gls_gen = None
@@ -613,42 +672,49 @@ def main():
 
     logging.info("Initial test setup completed.\n")
 
+    # Start the persistent NDP tool that the selected mode needs (the RX DMA reader or the SW
+    # loopback). It starts after all setup that can still fail. A failed setup would otherwise
+    # leave the tool running in the background, where it keeps the DMA queues used.
+    ndp_persistent = start_persistent_ndp(sel_mode.ndp_persistent_cmd, args.device)
+
     # ==========================================================================
     # GLS TEST START
     # ==========================================================================
 
     x = 1
     exiter = GracefulExiter()
-    while True:
-        logging.info(f"Test #{x} started...")
-        x += 1
-        now = datetime.datetime.now()
-        date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-        host_name = socket.gethostname().partition(".")[0] # get short hostname without domain (.liberouter.org)
-        report_name = host_name + "_" + card_name + "_" + args.mode + "_ch" + full_chan_range + "_" + date_time
-        run_test(
-            gls_internals=gls_internals_list,
-            mode=args.mode,
-            fr_sizes=fr_sizes,
-            gls_clk_freq=args.frequency,
-            log_en=args.log,
-            demo_en=args.log_demo,
-            global_chan_range=full_chan_range,
-            rate_layer=args.rate_layer,
-            cycles=args.test_cycles,
-            report_name=report_name,
-            device=args.device,
-            exiter=exiter,
-        )
-        logging.info("Test finished.\n")
-        if not args.repeat or exiter.exit():
-            print("END: Exiting...")
-            for gi in gls_internals_list:
-                if gi.gen is not None:
-                    gi.gen.enabled = False
-            time.sleep(1.0)
-            stop_process(ndp_read)
-            break
+    try:
+        while True:
+            logging.info(f"Test #{x} started...")
+            x += 1
+            now = datetime.datetime.now()
+            date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+            host_name = socket.gethostname().partition(".")[0] # get short hostname without domain (.liberouter.org)
+            report_name = host_name + "_" + card_name + "_" + args.mode + "_ch" + full_chan_range + "_" + date_time
+            run_test(
+                gls_internals=gls_internals_list,
+                mode=args.mode,
+                fr_sizes=fr_sizes,
+                gls_clk_freq=args.frequency,
+                log_en=args.log,
+                demo_en=args.log_demo,
+                global_chan_range=full_chan_range,
+                rate_layer=args.rate_layer,
+                cycles=args.test_cycles,
+                report_name=report_name,
+                device=args.device,
+                exiter=exiter,
+            )
+            logging.info("Test finished.\n")
+            if not args.repeat or exiter.exit():
+                print("END: Exiting...")
+                for gi in gls_internals_list:
+                    if gi.gen is not None:
+                        gi.gen.enabled = False
+                time.sleep(1.0)
+                break
+    finally:
+        stop_process(ndp_persistent)
 
 
 if __name__ == "__main__":
