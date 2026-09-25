@@ -34,7 +34,7 @@ use work.type_pack.all;
 -- However, the overall architecture is quite simple.
 -- The component consists of three main blocks:
 --
--- - Input shift register (two or more stages according to the :vhdl:genconstant:`INPUT_REGS <AXIS_FRAME_FRACTURER.INPUT_REGS>` generic)
+-- - Input shift register (two or more stages according to the :vhdl:genconstant:`SHREG_STAGES <AXIS_FRAME_FRACTURER.SHREG_STAGES>` generic)
 -- - :ref:`Barrel Shifter <barrel_shifter>` (BS)
 -- - Output AXI Stream FIFO
 --
@@ -55,8 +55,12 @@ entity AXIS_FRAME_FRACTURER is
         -- Maximum fractures per input word; must be 1 or 2.
         -- Offsets must be strictly increasing; enables must be contiguous from index 0.
         MAX_FRACTURES    : natural := 1;
-        -- Number of input registers, must be at least 2.
-        INPUT_REGS       : natural := 2;
+        -- Number of shift register stages, must be at least 2.
+        SHREG_STAGES     : natural := 2;
+        -- Insert a register between the RX interface and the LAST_ONE + encoder
+        -- combinational logic.  Breaks the long carry-chain path at the cost of
+        -- one extra cycle of latency.  Recommended for wide buses (> 512 bits).
+        INPUT_REG        : boolean := false;
         -- Target device.
         DEVICE           : string := "AGILEX"
     );
@@ -99,7 +103,6 @@ architecture FULL of AXIS_FRAME_FRACTURER is
 
     constant WORD_ITEMS    : natural := AXI_TDATA_WIDTH/8;
     constant OFF_W         : natural := log2(WORD_ITEMS);
-    constant SHREG_STAGES  : natural := INPUT_REGS;
     constant BS_BLOCKS     : natural := 2*WORD_ITEMS;
 
     -- =====================================================================
@@ -110,6 +113,14 @@ architecture FULL of AXIS_FRAME_FRACTURER is
 
     signal rx_axi_tkeep_lastone     : std_logic_vector(WORD_ITEMS-1 downto 0);
     signal rx_axi_last_eofpos       : std_logic_vector(OFF_W-1 downto 0);
+
+    -- Signals between the optional input register and the LAST_ONE + encoder.
+    signal inp_axi_tdata            : std_logic_vector(AXI_TDATA_WIDTH-1 downto 0);
+    signal inp_axi_tkeep            : std_logic_vector(WORD_ITEMS-1 downto 0);
+    signal inp_axi_tlast            : std_logic;
+    signal inp_axi_tvalid           : std_logic;
+    signal inp_fracture_en          : std_logic_vector(MAX_FRACTURES-1 downto 0);
+    signal inp_fracture_offset      : std_logic_vector(MAX_FRACTURES*OFF_W-1 downto 0);
 
     signal stage_next               : std_logic_vector(SHREG_STAGES-1 downto 0);
     signal stage_next_shreg         : std_logic_vector(SHREG_STAGES-1 downto 0);
@@ -156,8 +167,8 @@ architecture FULL of AXIS_FRAME_FRACTURER is
 
 begin
 
-    assert INPUT_REGS >= 2
-        report "AXIS_FRAME_FRACTURER: the lowest number of INPUT_REGS is 2."
+    assert SHREG_STAGES >= 2
+        report "AXIS_FRAME_FRACTURER: the lowest number of SHREG_STAGES is 2."
         severity Failure;
 
     assert (MAX_FRACTURES = 1) or (MAX_FRACTURES = 2)
@@ -170,12 +181,45 @@ begin
 
     RX_AXI_TREADY <= ready(0);
 
+    -- When INPUT_REG is true, a register stage is inserted between the RX
+    -- interface and the LAST_ONE + encoder combinational logic.  This breaks
+    -- the long carry-chain path that is critical for wide buses (>= 2048 b).
+    input_reg_g : if INPUT_REG generate
+
+        process (CLK)
+        begin
+            if rising_edge(CLK) then
+                if (ready(0) = '1') then
+                    inp_axi_tdata       <= RX_AXI_TDATA;
+                    inp_axi_tkeep       <= RX_AXI_TKEEP;
+                    inp_axi_tlast       <= RX_AXI_TLAST;
+                    inp_axi_tvalid      <= RX_AXI_TVALID;
+                    inp_fracture_en     <= RX_FRACTURE_EN;
+                    inp_fracture_offset <= RX_FRACTURE_OFFSET;
+                end if;
+                if (RESET = '1') then
+                    inp_axi_tvalid <= '0';
+                end if;
+            end if;
+        end process;
+
+    else generate
+
+        inp_axi_tdata       <= RX_AXI_TDATA;
+        inp_axi_tkeep       <= RX_AXI_TKEEP;
+        inp_axi_tlast       <= RX_AXI_TLAST;
+        inp_axi_tvalid      <= RX_AXI_TVALID;
+        inp_fracture_en     <= RX_FRACTURE_EN;
+        inp_fracture_offset <= RX_FRACTURE_OFFSET;
+
+    end generate;
+
     last_one_i : entity work.LAST_ONE
     generic map (
         DATA_WIDTH => WORD_ITEMS
     )
     port map (
-        DI => RX_AXI_TKEEP,
+        DI => inp_axi_tkeep,
         DO => rx_axi_tkeep_lastone
     );
 
@@ -189,14 +233,14 @@ begin
         ADDR => rx_axi_last_eofpos
     );
 
-    shreg_axi_tdata  (0) <= RX_AXI_TDATA;
+    shreg_axi_tdata  (0) <= inp_axi_tdata;
     shreg_last_eofpos(0) <= unsigned(rx_axi_last_eofpos);
-    shreg_axi_tlast  (0) <= RX_AXI_TLAST;
-    shreg_axi_tvalid (0) <= RX_AXI_TVALID;
-    shreg_fracture_en(0) <= RX_FRACTURE_EN;
+    shreg_axi_tlast  (0) <= inp_axi_tlast;
+    shreg_axi_tvalid (0) <= inp_axi_tvalid;
+    shreg_fracture_en(0) <= inp_fracture_en;
 
     rx_fracture_offset_deser_g : for f in 0 to MAX_FRACTURES-1 generate
-        shreg_fracture_offset(0)(f) <= unsigned(RX_FRACTURE_OFFSET((f+1)*OFF_W-1 downto f*OFF_W));
+        shreg_fracture_offset(0)(f) <= unsigned(inp_fracture_offset((f+1)*OFF_W-1 downto f*OFF_W));
     end generate;
 
     -- =====================================================================
