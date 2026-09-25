@@ -1,0 +1,15 @@
+[project]
+name = "cocotb-AXI2AVMM_BRIDGE"
+version = "0.1.0"
+dependencies = [
+    # 2.1.0 crashes both simulators at startup (QuestaSim: SIGSEGV, NVC: "No GPI_USERS
+    # specified"), so the upper bound stays until that is resolved upstream.
+    "cocotb >= 2.0.0, < 2.1.0",
+    "cocotbext-ofm @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+    "cocotbext-axi >= 0.1.28",
+    "setuptools",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
