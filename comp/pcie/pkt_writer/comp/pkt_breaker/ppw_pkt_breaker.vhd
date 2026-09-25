@@ -523,6 +523,7 @@ begin
     generic map (
         AXI_TDATA_WIDTH => WORD_WIDTH,
         MAX_FRACTURES   => MAX_FRACTURES,
+        INPUT_REG       => true,
         DEVICE          => DEVICE
     )
     port map (
