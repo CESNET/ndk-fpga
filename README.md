@@ -1,6 +1,12 @@
 # NDK-FPGA
 
-This repository contains FPGA part of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability to support up to 400 Gigabit Ethernet. The NDK-based Minimal (reference) application is also included in this (NDK-FPGA) repository.
+[![GitHub release](https://img.shields.io/github/v/release/CESNET/ndk-fpga)](https://github.com/CESNET/ndk-fpga/releases)
+[![Docs build](https://github.com/CESNET/ndk-fpga/actions/workflows/doc.yml/badge.svg)](https://github.com/CESNET/ndk-fpga/actions/workflows/doc.yml)
+[![docs: release](https://img.shields.io/badge/docs-release-blue)](https://cesnet.github.io/ndk-fpga/release/)
+[![docs: devel](https://img.shields.io/badge/docs-devel-blue)](https://cesnet.github.io/ndk-fpga/devel/)
+[![License](https://img.shields.io/github/license/CESNET/ndk-fpga)](LICENSE)
+
+This repository contains FPGA part of the Network Development Kit (NDK) for FPGA acceleration cards. The NDK allows users to quickly and easily develop FPGA-accelerated network applications. The NDK is optimized for high throughput and scalability: it scales from 10G to 400G Ethernet, depending on the target card (see the table below). The NDK-based Minimal (reference) application is also included in this (NDK-FPGA) repository.
 
 The NDK-based Minimal application is a simple example of how to build an FPGA application using the NDK. It can also be a starting point for your NDK-based application. The NDK-based Minimal application does not process network packets in any way; it only sends and receives them. If the DMA IP is enabled, then it forwards the network packets to the computer memory. You can find more detailed information in [the NDK-FPGA documentation (devel branch) here](https://cesnet.github.io/ndk-fpga/devel/).
 
@@ -12,29 +18,44 @@ Before you get started, there are a few requirements that you need to have.
 
 ### Requirements and supported FPGA cards
 
-- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 25.1** or **Xilinx Vivado 2025.1** (depending on the target card), including a valid license.
-- We recommend using the **Questa Sim-64 2025.2** tool to run HDL verifications (UVM).
+- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 25.1** or the **Xilinx Vivado 2025.1** tool, depending on the target card (see the table below), including a valid license.
+- To run HDL verifications, we recommend using the **Questa Sim-64 2025.2** tool. Verification is based on UVM and [cocotb](https://www.cocotb.org/) (Python); Questa is the default simulator for both.
 - To control an FPGA card with an application based on the NDK framework, you also need:
-    - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw)
+    - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw). We recommend using the latest version; we try to maintain backward compatibility between the NDK-FPGA and NDK-SW versions, but it is not 100% guaranteed.
 - Supported FPGA cards in the NDK framework available as open-source:
-    - ReflexCES XpressSX AGI-FH400G card (BOARD_REV = 0 or 1 requires Quartus version 22.4)
-    - Intel Stratix 10 DX FPGA Development Kit (DK-DEV-1SDX-P)
-    - Silicom fb4CGg3@VU9P card (also in variant fb2CGg3@VU9P)
-    - Silicom fb2CGhh@KU15P card
-    - Silicom fb2CDg1@AGM39D-2 (ThunderFjord) card.
-    - Silicom N5014 card
-    - Silicom N6010 card
-    - Bittware IA-420f card
-    - Bittware IA-440i card
-    - AMD/Xilinx Alveo U200
-    - AMD/Xilinx Alveo U55C
-    - AMD/Xilinx Virtex UltraScale+ FPGA VCU118 Evaluation Kit
-    - PRO DESIGN FALCON Stratix 10 (only EXPERIMENTAL support)
-    - Terasic Mercury A2700 Accelerator Card
-    - iWave G35P Accelerator card
-    - Napatech NT200A02
-- Other supported FPGA cards in the NDK framework but not available as open-source:
-    - Netcope NFB-200G2QL card
+
+| FPGA card | Required tool | Ethernet (max) | PCIe (max) |
+| --- | --- | --- | --- |
+| ReflexCES XpressSX AGI-FH400G [1] | Quartus Prime Pro | 1x 400G | Gen5 x16 |
+| Intel Stratix 10 DX FPGA Development Kit [2] | Quartus Prime Pro | 2x 100G | Gen4 x16 |
+| Silicom fb4CGg3@VU9P [3] | Vivado | 4x 100G | Gen3 x16 |
+| Silicom fb2CGhh@KU15P | Vivado | 2x 100G | Gen3 x16 |
+| Silicom fb2CDg1@AGM39D-2 [4] | Quartus Prime Pro | 2x 400G | Gen5 x16 |
+| Silicom N5014 | Quartus Prime Pro | 4x 100G | Gen4 x16 |
+| Silicom N6010 | Quartus Prime Pro | 2x 100G | Gen4 x16 |
+| BittWare IA-420f | Quartus Prime Pro | 2x 100G | Gen4 x16 |
+| BittWare IA-440i | Quartus Prime Pro | 1x 400G | Gen5 x16 |
+| BittWare IA-860m | Quartus Prime Pro | 2x 400G | Gen5 x16 |
+| AMD/Xilinx Alveo U200 | Vivado | 2x 100G | Gen3 x16 |
+| AMD/Xilinx Alveo U55C | Vivado | 2x 100G | Gen3 x16 |
+| AMD/Xilinx VCU118 Evaluation Kit [5] | Vivado | 2x 100G | Gen3 x16 |
+| PRO DESIGN FALCON Stratix 10 [6] | Quartus Prime Pro | 2x 100G | Gen3 x16 |
+| Terasic Mercury A2700 Accelerator Card | Quartus Prime Pro | 1x 400G | Gen5 x16 |
+| iWave G35P Accelerator card | Vivado | 2x 100G | Gen3 x16 |
+| Napatech NT200A02 | Vivado | 2x 100G | Gen3 x16 |
+
+Notes:
+
+1. AGI-FH400G cards with BOARD_REV = 0 or 1 are an exception and require the older Quartus Prime Pro 22.4; newer board revisions use the current version stated above.
+2. Product code DK-DEV-1SDX-P.
+3. Also available in the fb2CGg3@VU9P variant with 2x 100G Ethernet.
+4. Also known as ThunderFjord.
+5. Full name: AMD/Xilinx Virtex UltraScale+ FPGA VCU118 Evaluation Kit.
+6. EXPERIMENTAL support only.
+
+The Ethernet and PCIe columns show the maximum configuration supported by the NDK firmware on the given card; lower speeds and other PCIe configurations are typically also available (see the readme of each card).
+
+**Please note:** Support for the FPGA cards listed above is provided on a best-effort community basis; we do not have the capacity to regularly test all cards and all their possible configurations. If you need professional support or guaranteed maintenance, it can typically be arranged through our partners (see the [Partners](#partners) section).
 
 ### How to clone the necessary repositories
 
@@ -49,9 +70,30 @@ CESNET developers who have access to closed-source repositories can use a single
 git clone --recursive git@gitlab.liberouter.org:ndk/ndk-fpga.git
 ```
 
+Note: The public GitHub repository does not use Git submodules; the `extra/` directory contains only integration points for closed-source IP (available to CESNET developers and partners). For a stable state of the repository, use a release tag or the `release` branch; active development takes place on the `devel` branch. See [CHANGELOG.md](CHANGELOG.md) for an overview of changes between releases.
+
+### Quick start: build the firmware
+
+To build the FPGA firmware of the Minimal application for your card, run:
+
+```
+make -C apps/minimal/build/<card>   # e.g. make -C apps/minimal/build/n6010
+```
+
 ### Next steps
 
 The [NDK-FPGA documentation (devel branch) in chapter "How to start"](https://cesnet.github.io/ndk-fpga/devel/ndk_core/doc/how_to_start.html) lists further steps for building the FPGA firmware, loading it into the FPGA card and also using it.
+
+## Repository structure
+
+- `comp/`: reusable VHDL components and IP (bus infrastructure, DMA, PCIe, NIC, ...), often with their own verifications
+- `core/`: the NDK core (network/PCIe/DMA pipeline, MI address space and device tree), instantiated by every application
+- `apps/minimal/`: the NDK-based Minimal (reference) application, including firmware build Makefiles and tests
+- `cards/`: card-specific configuration, constraints and IP
+- `build/`: shared Tcl/Make build system scripts
+- `doc/`: sources of the Sphinx-based documentation
+- `python/`: Python packages used by verifications and tools
+- `extra/`: integration points for closed-source IP (private Git submodules)
 
 ## Documentation
 
@@ -75,6 +117,13 @@ $ make html
 ```
 
 The output is in the `doc/build/index.html` file.
+
+## Reporting issues
+
+- Issues in the FPGA firmware and this repository in general: use [GitHub Issues of NDK-FPGA](https://github.com/CESNET/ndk-fpga/issues).
+- Issues with the Linux driver and SW tools: use [GitHub Issues of NDK-SW](https://github.com/CESNET/ndk-sw/issues).
+
+For professional (paid) support, see the [Partners](#partners) section.
 
 ## Partners
 

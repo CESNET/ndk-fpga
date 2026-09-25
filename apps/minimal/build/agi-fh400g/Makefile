@@ -12,7 +12,7 @@ APP_CONF = app_conf.tcl
 
 BOARD_REV ?= 2
 export BOARD_REV
-PCIE_CONF ?= 2xgen5x8x8
+PCIE_CONF ?= 1xgen5x16
 export PCIE_CONF
 
 OUTPUT_NAME = agi-fh400g-rev$(BOARD_REV)-minimal-pcie$(PCIE_CONF)

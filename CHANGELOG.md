@@ -6,6 +6,82 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [Unreleased]
+
+### Added
+- cocotb: Introduced ModularBusDriver as a replacement for the deprecated BusDriver.
+- cocotb: Implemented ModularBusDriver-based MFB, MVB and AXI4-Stream drivers in cocotbext.
+- cocotb: Added Avalon-MM drivers, transactions and configuration to cocotbext.
+- cocotb: Added flag for code coverage capture.
+- comp: Introduced MFB_COMPACTOR module.
+- comp: Introduced MFB_GET_LAST_ITEMS module.
+- comp: Introduced MFB_MERGER_GEN and rebuilt MFB_MERGER on it.
+- comp: Introduced MFB_SPLITTER_GEN and rebuilt MFB_SPLITTER on it.
+- comp: Introduced AXIS_PACKET_EXTENDER module with extend-at-start/end option.
+- comp: Introduced MVB-to-AXIS converter and MVB_SERIALIZER modules.
+- comp: Introduced AXI2AVMM_DDR_BRIDGE module with cocotb verification.
+- comp: Introduced PCIE_TELEMETRY_MI module exposing PCIe telemetry to the MI address space.
+- comp: Introduced f-tile reset sequence controller in network_mod.
+- comp: Introduced AXI_VECTOR2PACKET module with UVM verification.
+- comp: Added PCASD/PCARX hash functions (VHDL, Python implementation and evaluation scripts).
+- comp: Added MFB and MVB VHDL packages with bus configuration types.
+- comp: Added support for cut offset to MFB_CUTTER.
+- comp: Added fake packet generator variant to PCIe Packet Reader.
+- comp: Added programmable in-order response mode to PCIe Packet Reader.
+- comp: Added a simple version of MVB_MERGE_STREAMS_ORDERED.
+- comp: Exported PTC telemetry signals reporting why a DMA stream is stopped.
+- core: Added dma_bus_pack package with dma_route mechanism and propagated it to PTC, PCIe and DMA module.
+- core: Added DMA bus to the application core.
+- core: Added support for propagation of negotiated PCIe MPS/MRRS values into PTC and DMA Medusa.
+- python: Added nfb-pcie-telemetry tool.
+- sw: Added automated DMA throughput sweep script for gls_mod.
+- docs: Added UPGRADE.md with migration instructions for breaking changes.
+- docs: Added AGENTS.md signpost and AI-agent skills (ndk-cocotb-ver, vhdl-lint).
+- build: Added support for loading a custom SignalTap (.stp) file in Quartus builds.
+- build: Added SYNTH_FLAGS(POWER_ANALYSIS_EN) to toggle power analysis.
+- build: Added optional -pkg argument to VhdlPkgGen.tcl.
+- build: Added results summary table and per-test XML backup to multi_ver.
+- build: Added -t option to select specific cocotb testcase in multi_ver.
+- build: Added support for NVC simulator in cocotb multiver script.
+- ci: Replaced GitLab runner with local repo-wide Verible lint runner.
+- ci: Added check for correct Python shebang and executable mode.
+- cards: Added support for 2xGen5x16 PCIe configuration on the AGI-FH400G card.
+
+### Changed
+- docs: Reworked supported cards overview and getting-started info in README.
+- cards: Changed the default PCIe configuration to non-bifurcated Gen5 x16 on IA-440i, IA-860m, AGI-FH400G, FB2CDG1 and A2700 cards (bifurcated modes remain available via PCIE_CONF).
+- cocotb: Migrated all cocotb tests and cocotbext to cocotb 2.0 (removed 1.9.2 compatibility).
+- cocotb: Reimplemented MVB/MFB/AXI drivers and monitors using Serializable transactions with packed data fields.
+- comp: Optimized PTC tag manager.
+- comp: Compacted PTC DOWN completions on write instead of on FIFO read.
+- comp: Rebuilt hierarchical MFB_MERGER and MFB_SPLITTER on single-stage flat implementations.
+- comp: Merged MFB_MERGER_SIMPLE inputs with one round-robin arbiter.
+- build: Split combo_user_const into multiple packages; introduced ndk_app_pkg.
+- build: Set random Quartus fitter SEED by default.
+- build: Raised the default Quartus optimization effort level.
+- ci: Updated Verible and fixed all its style violations in UVM SystemVerilog files.
+- python: Moved pynfb/libnfb-ext dependencies to PyPi.
+
+### Removed
+- core: Removed AUTO_ASSIGN_TAGS=false mode from the PCIe tag manager.
+- core: Removed obsolete ID_PROJECT_TEXT constant.
+- cocotb: Removed backward compatibility with cocotb 1.9.2.
+
+### Fixed
+- comp: Fixed writes to unaligned addresses in PCIe Packet Writer by extending packets with Invalid Bytes.
+- comp: Fixed address collisions with NP LUTRAM in PCIe Packet Reader.
+- comp: Fixed logic loop on RX DST_RDY in PPW Page Break Planner.
+- comp: Fixed F-tile reset FSM and kept E-tile RX path in reset until RX PLL lock.
+- dma: Fixed header insertor shift advance in DMA Calypte for long packets.
+- comp: Rejected ITEMS > 8192 in Xilinx BRAM FIFOs instead of silently clamping.
+- comp: Replaced Quartus-incorrect masking logic in PCIe Packet Reader.
+- dma: Fixed DMA_ENDPOINTS interpretation (total, not per-PCIE_ENDPOINT) in PCIE_MOD.
+- cards: Returned the R-Tile PCIe Gen5x16 hard IP frequency back to 500 MHz.
+- cards: Run R-Tile PCIe Gen4 x16 hard IP at 400 MHz when using DMA Calypte.
+- cards: Fixed DMA_ENDPOINTS value on IA-420f card for DMA Calypte compatibility.
+- python: Fixed swallowed exceptions in rate_limiter, timestamp_limiter and speed_meter constructors.
+- ci: Fixed false-positive failure emails in app-minimal-test.
+
 ## [2026.6.0] - 2026-06-03
 
 ### Added

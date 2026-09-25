@@ -155,9 +155,11 @@ proc dts_ndp_core_main_mi {DTS} {
         }
     }
 
-    # PCIe telemetry
-    global PCIE_ENDPOINTS
-    append ret [dts_pcie_telemetry_mi $NdkCore::ADDR_PCIE_TELEM $PCIE_ENDPOINTS]
+    # PCIe telemetry, it is only built with the PTC (DMA Medusa)
+    global PCIE_ENDPOINTS DMA_TYPE
+    if {$DMA_TYPE == 3} {
+        append ret [dts_pcie_telemetry_mi $NdkCore::ADDR_PCIE_TELEM $PCIE_ENDPOINTS]
+    }
 
     # PCIe Debug
     global PCIE_ENDPOINTS PCIE_CORE_DEBUG_ENABLE PCIE_CTRL_DEBUG_ENABLE PCIE_ENDPOINT_MODE PCIE_MOD_ARCH
