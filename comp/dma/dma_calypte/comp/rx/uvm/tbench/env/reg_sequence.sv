@@ -41,8 +41,10 @@ class start_channel extends uvm_sequence;
         data_base_addr % 128 == 0;
         // Packet header size
         hdr_base_addr  % 8   == 0;
-        // Update buffer address
-        update_base_addr % 4 == 0;
+        // The pointer update is one 8 B write. An address that is not a multiple of 8 lets that
+        // write cross a 4 kB boundary, which a single PCIe request must not do. The driver maps
+        // the update buffer as a whole page, so only aligned addresses reach the design.
+        update_base_addr % 8 == 0;
 
         //Random 32-bit address
         data_base_addr  [64-1:32] dist { 0 :/ 1, [0:$] :/ 1 };
