@@ -53,6 +53,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#steps-to-launch">Steps to launch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#end-of-test">End of test</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automated-dma-throughput-sweeps-and-fw-comparison">Automated DMA throughput sweeps and FW comparison</a></li>
 </ul>
 </li>
 </ul>
@@ -202,7 +203,7 @@ Add path before the script name if it is not in the current directory.</p>
 <h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
 <p>See the test modes and other options by running the script with the <code class="docutils literal notranslate"><span class="pre">-h</span></code> option:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python gls_mod.py -h
-usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
+usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
 
         Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -214,26 +215,29 @@ options:
                         select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0
 -l, --log               enable logging to a CSV file
 -L, --log_demo          enable for demo - logs to a TXT file in /tmp directory
--m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop}
+-m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
                         set the test mode; options:
 
-                        +----------+-----------------------------------------------------------------+
-                        | eth_gen  | HW Gen --&gt; TX ETH     ==&gt; RX ETH --&gt; Black Hole; (ETH loopback) |
-                        +----------+-----------------------------------------------------------------+
-                        | rx       | HW Gen --&gt; TX ETH     ==&gt; RX ETH --&gt; RX DMA;     (ETH loopback) |
-                        +----------+-----------------------------------------------------------------+
-                        | tx       | TX DMA --&gt; TX ETH     ==&gt; RX ETH --&gt; Black Hole; (ETH loopback) |
-                        +----------+-----------------------------------------------------------------+
-                        | rxtx     | TX DMA --&gt; TX ETH     ==&gt; RX ETH --&gt; RX DMA;     (ETH loopback) |
-                        +----------+-----------------------------------------------------------------+
-                        | dma_rx   | HW Gen --&gt; RX DMA     ###                                       |
-                        +----------+-----------------------------------------------------------------+
-                        | dma_tx   | TX DMA --&gt; Black Hole ###                                       |
-                        +----------+-----------------------------------------------------------------+
-                        | dma_rxtx | TX DMA --&gt; Black Hole ### HW Gen --&gt; RX DMA;                    |
-                        +----------+-----------------------------------------------------------------+
-                        | dma_loop | TX DMA --&gt; RX DMA     ### (internal DMA loopback)               |
-                        +----------+-----------------------------------------------------------------+
+                        +-------------+--------------------------------------------------------------------------------+
+                        | eth_gen     | HW Gen --&gt; TX ETH     ==&gt; RX ETH --&gt; Black Hole; (ETH loopback)                |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | rx          | HW Gen --&gt; TX ETH     ==&gt; RX ETH --&gt; RX DMA;     (ETH loopback)                |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | tx          | TX DMA --&gt; TX ETH     ==&gt; RX ETH --&gt; Black Hole; (ETH loopback)                |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | rxtx        | TX DMA --&gt; TX ETH     ==&gt; RX ETH --&gt; RX DMA;     (ETH loopback)                |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | dma_rx      | HW Gen --&gt; RX DMA     ###                                                      |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | dma_tx      | TX DMA --&gt; Black Hole ###                                                      |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | dma_rxtx    | TX DMA --&gt; Black Hole ### HW Gen --&gt; RX DMA;             (RX/TX independent)   |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | dma_loop    | TX DMA --&gt; RX DMA     ### (internal FW DMA loopback)                           |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | dma_swloop  | HW Gen --&gt; RX DMA --&gt; (ndp-loopback, SW) --&gt; TX DMA --&gt; Black Hole ### (SW DMA |
+                        |             | loopback)                                                                      |
+                        +-------------+--------------------------------------------------------------------------------+
 
 -c CHANNELS, --channels CHANNELS
                         select the range of Channels used in the test in &#39;min-max&#39; format; default = all available
@@ -254,6 +258,9 @@ When using TX DMA, the scripts uses the <code class="docutils literal notranslat
 Other source of data can be one of the HW packet generators inside the GLS module (see <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">GLS module documentation</span></a>).
 When using RX DMA, the script uses the <code class="docutils literal notranslate"><span class="pre">ndp-read</span></code> tool to accept packets from the FPGA.
 Else packets are dropped in the RX DMA module, which can be observed using the <code class="docutils literal notranslate"><span class="pre">nfb-dma</span></code> tool.
+The <cite>dma_swloop</cite> mode instead uses the <code class="docutils literal notranslate"><span class="pre">ndp-loopback</span></code> tool. This tool receives packets from RX DMA
+and sends the same packets back through TX DMA in software. RX and TX DMA are therefore measured
+together, without the FW-internal loopback that <cite>dma_loop</cite> uses.
 The variations of tests are set by the <cite>-m</cite>, <cite>–mode</cite> parameter (the only required one).
 One test run in the selected mode consists of multiple partial tests for different lengths of generated frames, defined by the <cite>-s</cite>, <cite>–frame_size</cite> parameter that expects three values in bytes like so: <cite>min max step</cite>.</p>
 <p>Some tests require an available DMA controller; test mode <cite>eth_gen</cite> can be used for NDK firmware without a DMA controller.
@@ -316,6 +323,66 @@ This way, it is possible to select one of/both Ethernet ports to be used in the 
 <p>A single run of the script takes a while and can be terminated using Ctrl+C (once).
 Partial test is finished before exiting, which causes a slight delay.
 When <cite>-r</cite>, <cite>–repeat</cite> option is used, the script continues to run tests until interrupted using Ctrl+C (once).</p>
+</section>
+<section id="automated-dma-throughput-sweeps-and-fw-comparison">
+<h3>Automated DMA throughput sweeps and FW comparison<a class="headerlink" href="#automated-dma-throughput-sweeps-and-fw-comparison" title="Link to this heading"></a></h3>
+<p>The companion script <code class="docutils literal notranslate"><span class="pre">dma_throughput_sweep.py</span></code> (in the same <code class="docutils literal notranslate"><span class="pre">./sw</span></code> directory) automates a full
+DMA throughput characterization by driving <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code> across the four DMA scenarios
+(<cite>dma_rx</cite>, <cite>dma_tx</cite>, <cite>dma_rxtx</cite>, <cite>dma_swloop</cite>) over a configurable range of frame lengths, and
+plots the results.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>-o<span class="w"> </span>results/
+</pre></div>
+</div>
+<p>Every chart has four panels: RX DMA on the left, TX DMA on the right, the bit rate in Gbps in the
+top row and the frame rate in Mpps in the bottom row. The frame rate is derived from the bit rate
+and the frame length of the same measurement point.</p>
+<p>The measured frame lengths are set by <code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">MIN</span> <span class="pre">MAX</span> <span class="pre">STEP</span></code>. A single value measures only that one
+frame length:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>-s<span class="w"> </span><span class="m">64</span><span class="w"> </span>-o<span class="w"> </span>results/
+</pre></div>
+</div>
+<p>Each run is tagged with the FW build identity (card name, project name/variant, and
+<code class="docutils literal notranslate"><span class="pre">build-revision</span></code>, all read from the Device Tree) so results are grouped per FW build. Two or
+more such runs (e.g. from different FW versions) can then be overlaid on common charts:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>compare<span class="w"> </span>results/&lt;fw_id_A&gt;<span class="w"> </span>results/&lt;fw_id_B&gt;
+</pre></div>
+</div>
+<p>The <cite>compare</cite> subcommand warns if the compared runs used different frame-size ranges, channel
+counts, cycles, clock frequency, rate layer, DMA buffer settings, or Ethernet rate, since those
+settings must match for the throughput numbers to be comparable across FW versions.</p>
+<p>Every chart also carries a small subtitle line summarizing the run configuration (channels,
+cycles, clock frequency, rate layer, DMA buffer settings, Ethernet rate). When <code class="docutils literal notranslate"><span class="pre">--eth-rate</span></code> is
+given, each panel also gets a dashed reference curve for the theoretical maximum throughput at
+that physical line rate. At rate layer 2 the reported frame length already contains the CRC, so
+the reference curve subtracts the remaining per-frame overhead of 20 B (8 B preamble with SFD and
+12 B minimum interframe gap). At rate layer 1 the reported frame length contains that overhead
+already, so the reference curve equals the line rate:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--eth-rate<span class="w"> </span><span class="m">100</span><span class="w"> </span>-o<span class="w"> </span>results/
+</pre></div>
+</div>
+<p>The script can also configure the kernel DMA buffer count/size (DMA Medusa only) via the
+<code class="docutils literal notranslate"><span class="pre">nfb-dma</span></code> tool before starting the sweep, using the <code class="docutils literal notranslate"><span class="pre">--buffer-count</span></code> and <code class="docutils literal notranslate"><span class="pre">--buffer-size</span></code>
+options:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--buffer-count<span class="w"> </span><span class="m">4096</span><span class="w"> </span>--buffer-size<span class="w"> </span><span class="m">2048</span><span class="w"> </span>-o<span class="w"> </span>results/
+</pre></div>
+</div>
+<p>This runs <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">nfb-dma</span> <span class="pre">-d</span> <span class="pre">&lt;device&gt;</span> <span class="pre">-C</span> <span class="pre">&lt;buffer_count&gt;</span> <span class="pre">-B</span> <span class="pre">&lt;buffer_size&gt;</span></code> once, before any
+measurement starts, and may prompt for a sudo password. The setting is global to the device and
+persists after the script exits (it is not restored), so it also affects any other process using
+the card until changed again. Both options are recorded in the results and compared by the
+<cite>compare</cite> subcommand.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For MTU/jumbo-sized packets (roughly 4096 B and up), the default kernel DMA buffer size is
+typically too small to fit a whole packet into a single DMA descriptor, and <code class="docutils literal notranslate"><span class="pre">--buffer-size</span></code>
+must be increased accordingly (large enough for the max expected packet size) or such packets
+will not fit into the descriptor.</p>
+</div>
+<p>Alongside the report CSV, each measured mode keeps the stdout and stderr of the NDP tools it
+started, in a log file named after the tool (<code class="docutils literal notranslate"><span class="pre">ndp-read.log</span></code>, <code class="docutils literal notranslate"><span class="pre">ndp-loopback.log</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ndp-generate.log</span></code>). <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code> writes them next to its own <code class="docutils literal notranslate"><span class="pre">report_*.csv</span></code>. A curve with
+unexpected values can then be checked against the output of the tool. The next run of the same
+mode rewrites the logs, so copy the files you need to keep.</p>
 </section>
 </section>
 </section>
