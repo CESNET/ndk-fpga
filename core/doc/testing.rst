@@ -78,7 +78,7 @@ See the test modes and other options by running the script with the ``-h`` optio
 .. code-block:: text
 
     $ python gls_mod.py -h
-    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
+    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
 
             Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -90,26 +90,29 @@ See the test modes and other options by running the script with the ``-h`` optio
                             select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0
     -l, --log               enable logging to a CSV file
     -L, --log_demo          enable for demo - logs to a TXT file in /tmp directory
-    -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop}
+    -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
                             set the test mode; options:
 
-                            +----------+-----------------------------------------------------------------+
-                            | eth_gen  | HW Gen --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback) |
-                            +----------+-----------------------------------------------------------------+
-                            | rx       | HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback) |
-                            +----------+-----------------------------------------------------------------+
-                            | tx       | TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback) |
-                            +----------+-----------------------------------------------------------------+
-                            | rxtx     | TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback) |
-                            +----------+-----------------------------------------------------------------+
-                            | dma_rx   | HW Gen --> RX DMA     ###                                       |
-                            +----------+-----------------------------------------------------------------+
-                            | dma_tx   | TX DMA --> Black Hole ###                                       |
-                            +----------+-----------------------------------------------------------------+
-                            | dma_rxtx | TX DMA --> Black Hole ### HW Gen --> RX DMA;                    |
-                            +----------+-----------------------------------------------------------------+
-                            | dma_loop | TX DMA --> RX DMA     ### (internal DMA loopback)               |
-                            +----------+-----------------------------------------------------------------+
+                            +-------------+--------------------------------------------------------------------------------+
+                            | eth_gen     | HW Gen --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)                |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | rx          | HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)                |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | tx          | TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)                |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | rxtx        | TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)                |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | dma_rx      | HW Gen --> RX DMA     ###                                                      |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | dma_tx      | TX DMA --> Black Hole ###                                                      |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | dma_rxtx    | TX DMA --> Black Hole ### HW Gen --> RX DMA;             (RX/TX independent)   |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | dma_loop    | TX DMA --> RX DMA     ### (internal FW DMA loopback)                           |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | dma_swloop  | HW Gen --> RX DMA --> (ndp-loopback, SW) --> TX DMA --> Black Hole ### (SW DMA |
+                            |             | loopback)                                                                      |
+                            +-------------+--------------------------------------------------------------------------------+
 
     -c CHANNELS, --channels CHANNELS
                             select the range of Channels used in the test in 'min-max' format; default = all available
@@ -129,6 +132,9 @@ When using TX DMA, the scripts uses the ``ndp-generate`` tool to generate and se
 Other source of data can be one of the HW packet generators inside the GLS module (see :ref:`GLS module documentation <gls_debug>`).
 When using RX DMA, the script uses the ``ndp-read`` tool to accept packets from the FPGA.
 Else packets are dropped in the RX DMA module, which can be observed using the ``nfb-dma`` tool.
+The `dma_swloop` mode instead uses the ``ndp-loopback`` tool. This tool receives packets from RX DMA
+and sends the same packets back through TX DMA in software. RX and TX DMA are therefore measured
+together, without the FW-internal loopback that `dma_loop` uses.
 The variations of tests are set by the `-m`, `--mode` parameter (the only required one).
 One test run in the selected mode consists of multiple partial tests for different lengths of generated frames, defined by the `-s`, `--frame_size` parameter that expects three values in bytes like so: `min max step`.
 

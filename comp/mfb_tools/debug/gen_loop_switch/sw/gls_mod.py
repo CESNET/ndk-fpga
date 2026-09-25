@@ -123,7 +123,7 @@ class TestModeSpec:
     tx_sm: Optional[int] # None means it does not matter which one of the two will be used
     rx_sm: Optional[int] # None means it does not matter which one of the two will be used
     eth_loop: bool
-    ndp_read: bool
+    ndp_persistent_cmd: Optional[str] # NDP tool started once and kept running for the whole test, None = not needed
 
 
 @dataclass
@@ -341,7 +341,7 @@ def main():
                         tx_sm=1,
                         rx_sm=2,
                         eth_loop=True,
-                        ndp_read=False,
+                        ndp_persistent_cmd=None,
                     ),
         "rx":       TestModeSpec(
                         desc="HW Gen --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)",
@@ -350,7 +350,7 @@ def main():
                         tx_sm=1,
                         rx_sm=0,
                         eth_loop=True,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "tx":       TestModeSpec(
                         desc="TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)",
@@ -359,7 +359,7 @@ def main():
                         tx_sm=1, # Both (1 or 3) can be used
                         rx_sm=2,
                         eth_loop=True,
-                        ndp_read=False,
+                        ndp_persistent_cmd=None,
                     ),
         "rxtx":     TestModeSpec(
                         desc="TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)",
@@ -368,7 +368,7 @@ def main():
                         tx_sm=1, # Both (1 or 3) can be used
                         rx_sm=0, # Both (0 or 2) can be used
                         eth_loop=True,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "dma_rx":   TestModeSpec(
                         desc="HW Gen --> RX DMA     ###",
@@ -377,7 +377,7 @@ def main():
                         tx_sm=None, # Speed Meter not used
                         rx_sm=0,
                         eth_loop=False,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "dma_tx":   TestModeSpec(
                         desc="TX DMA --> Black Hole ###",
@@ -386,25 +386,34 @@ def main():
                         tx_sm=3,
                         rx_sm=None, # Speed Meter not used
                         eth_loop=False,
-                        ndp_read=False,
+                        ndp_persistent_cmd=None,
                     ),
         "dma_rxtx": TestModeSpec(
-                        desc="TX DMA --> Black Hole ### HW Gen --> RX DMA;",
+                        desc="TX DMA --> Black Hole ### HW Gen --> RX DMA;                    (RX/TX independent)",
                         mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=1, l2r_loop=0),
                         gen_rev_chan=False, # Setting this true may have positive impact on performance
                         tx_sm=3,
                         rx_sm=0,
                         eth_loop=False,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
                     ),
         "dma_loop": TestModeSpec(
-                        desc="TX DMA --> RX DMA     ### (internal DMA loopback)",
+                        desc="TX DMA --> RX DMA     ### (internal FW DMA loopback)",
                         mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=None, l2r_loop=1),
                         gen_rev_chan=False,
                         tx_sm=3,
                         rx_sm=0,
                         eth_loop=False,
-                        ndp_read=True,
+                        ndp_persistent_cmd="ndp-read",
+                    ),
+        "dma_swloop": TestModeSpec(
+                        desc="HW Gen --> RX DMA --> (ndp-loopback, SW) --> TX DMA --> Black Hole ### (SW DMA loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=None, l2r_gen=1, l2r_loop=0),
+                        gen_rev_chan=False, # Setting this true may have positive impact on performance
+                        tx_sm=3,
+                        rx_sm=0,
+                        eth_loop=False,
+                        ndp_persistent_cmd="ndp-loopback",
                     ),
     }
 
@@ -582,7 +591,7 @@ def main():
         # Select and configure the generator according to the selected mode
         if args.mode in ["eth_gen", "rx"]:
             gls_gen = gls.r2l.gen
-        elif args.mode in ["dma_rx", "dma_rxtx"]:
+        elif args.mode in ["dma_rx", "dma_rxtx", "dma_swloop"]:
             gls_gen = gls.l2r.gen
         else:
             gls_gen = None
@@ -639,11 +648,10 @@ def main():
 
     logging.info("Initial test setup completed.\n")
 
-    # Start the RX DMA reader required by the selected mode, if it needs one. Started only
-    # now, after all setup that can still fail, so a failed setup never leaves a stray NDP
-    # process running in the background, still consuming DMA queues and poisoning later
-    # measurements.
-    ndp_persistent = start_persistent_ndp("ndp-read" if sel_mode.ndp_read else None, args.device)
+    # Start the persistent NDP tool that the selected mode needs (the RX DMA reader or the SW
+    # loopback). It starts after all setup that can still fail. A failed setup would otherwise
+    # leave the tool running in the background, where it keeps the DMA queues used.
+    ndp_persistent = start_persistent_ndp(sel_mode.ndp_persistent_cmd, args.device)
 
     # ==========================================================================
     # GLS TEST START
