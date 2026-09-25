@@ -211,6 +211,10 @@ architecture FULL of TX_DMA_PCIE_TRANS_BUFFER is
     signal wr_addr_collision_detected : slv_array_t(MEM_ARRAYS -1 downto 0)(MFB_BYTES -1 downto 0);
     signal rdwr_collision_detected    : slv_array_2d_t(MEM_ARRAYS -1 downto 0)(MFB_REGIONS -1 downto 0)(MFB_BYTES -1 downto 0);
 
+    -- The two detection signals reduced to one bit each, so that a PSL assertion can check them.
+    signal wr_addr_collision : std_logic;
+    signal rdwr_collision    : std_logic;
+
 begin
 
     assert (
@@ -789,6 +793,37 @@ begin
                 end loop;
             end if;
         end process;
+
+        collision_reduce_p : process (all) is
+            variable wr_addr_collision_v : std_logic;
+            variable rdwr_collision_v    : std_logic;
+        begin
+            wr_addr_collision_v := '0';
+            rdwr_collision_v    := '0';
+
+            for mem_arr_idx in 0 to (MEM_ARRAYS -1) loop
+                wr_addr_collision_v := wr_addr_collision_v or (or wr_addr_collision_detected(mem_arr_idx));
+
+                for rgn in 0 to (MFB_REGIONS -1) loop
+                    rdwr_collision_v := rdwr_collision_v or (or rdwr_collision_detected(mem_arr_idx)(rgn));
+                end loop;
+            end loop;
+
+            wr_addr_collision <= wr_addr_collision_v;
+            rdwr_collision    <= rdwr_collision_v;
+        end process;
+
+        -- Both regions of one word address the same byte of the same memory array. The BRAM keeps
+        -- only one of the two values and the data of the other write are lost.
+        -- psl assert_wr_addr_collision :
+        --      assert always (wr_addr_collision = '0') abort (RESET) @rising_edge(CLK)
+        --      report "TX_DMA_PCIE_TRANS_BUFFER: Two regions write to one address, data are lost!";
+
+        -- A read and a write use one BRAM port in the same clock cycle. The read enable is masked
+        -- by the write in rd_en_ch_g, so this can only appear when that priority changes.
+        -- psl assert_rdwr_collision :
+        --      assert always (rdwr_collision = '0') abort (RESET) @rising_edge(CLK)
+        --      report "TX_DMA_PCIE_TRANS_BUFFER: A read and a write use one BRAM port at once!";
     end generate;
 
     -- =============================================================================================
