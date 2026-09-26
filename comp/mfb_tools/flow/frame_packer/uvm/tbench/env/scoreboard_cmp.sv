@@ -20,11 +20,12 @@ class comparer_superpacket #(
 
 endclass
 
+// Tagged by channel - MVB items of one channel have to leave in the same order as their SuperPackets
 class comparer_meta #(
     RX_CHANNELS,
     PKT_MTU,
     META_WIDTH
-) extends uvm_common::comparer_unordered #(uvm_logic_vector::sequence_item #($clog2(
+) extends uvm_common::comparer_taged #(uvm_logic_vector::sequence_item #($clog2(
     RX_CHANNELS
 ) + $clog2(
     PKT_MTU + 1

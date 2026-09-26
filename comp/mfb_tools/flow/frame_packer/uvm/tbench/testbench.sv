@@ -116,22 +116,24 @@ module testbench;
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // Properties
-    //framepacker_bus_properties #(
-    //    .MFB_REGIONS        (MFB_REGIONS),
-    //    .MFB_REGION_SIZE    (MFB_REGION_SIZE),
-    //    .MFB_BLOCK_SIZE     (MFB_BLOCK_SIZE),
-    //    .MFB_ITEM_WIDTH     (MFB_ITEM_WIDTH),
-    //    .MFB_META_WIDTH     (MFB_META_WIDTH),
-    //    .MVB_ITEMS          (MVB_ITEMS),
-    //    .MVB_ITEM_WIDTH     (MVB_ITEM_WIDTH)
-    //)
-    //PROPERTY_CHECK (
-    //    .RESET      (reset.RESET),
-    //    .mfb_wr_vif (mfb_rx),
-    //    .mfb_rd_vif (mfb_tx),
-    //    .mvb_wr_vif (mvb_rx),
-    //    .mvb_rd_vif (mvb_tx)
-    //);
+    framepacker_bus_properties #(
+        .MFB_REGIONS        (MFB_REGIONS),
+        .MFB_REGION_SIZE    (MFB_REGION_SIZE),
+        .MFB_BLOCK_SIZE     (MFB_BLOCK_SIZE),
+        .MFB_ITEM_WIDTH     (MFB_ITEM_WIDTH),
+        .MFB_META_WIDTH     (0),
+        .MVB_ITEMS          (MVB_ITEMS),
+        .MVB_RX_ITEM_WIDTH  ($clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1)),
+        .MVB_TX_ITEM_WIDTH  ($clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + 1)
+    )
+    PROPERTY_CHECK (
+        // RESET is undefined before the reset sequence starts - the properties are checked only out of reset
+        .RESET      (reset.RESET !== 1'b0),
+        .mfb_wr_vif (mfb_rx),
+        .mfb_rd_vif (mfb_tx),
+        .mvb_wr_vif (mvb_rx),
+        .mvb_rd_vif (mvb_tx)
+    );
 
     //Internal connection
     generate for (genvar i = 0; i < RX_CHANNELS; i++) begin : gen_i

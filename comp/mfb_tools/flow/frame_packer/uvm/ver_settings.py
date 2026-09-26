@@ -19,6 +19,10 @@ SETTINGS = {
         "SPKT_SIZE_MIN"      : "2**13",
         "TIMEOUT_CLK_NO"     : "2**12",
 
+        "SEQ_MIN"            : "5",
+        "SEQ_MAX"            : "8",
+        "RX_GAP_PROBABILITY" : "30",
+        "MVB_TX_STALL_CLKS"  : "0",
     },
     "one_region" : {
         "MFB_REGIONS"        : "1",
@@ -29,9 +33,6 @@ SETTINGS = {
     "two_channels" : {
         "RX_CHANNELS"        : "2",
     },
-    "sixteen_channels" : {
-        "RX_CHANNELS"        : "16",
-    },
     "thirty-two_channels" : {
         "RX_CHANNELS"        : "32",
     },
@@ -39,33 +40,43 @@ SETTINGS = {
         "FRAME_SIZE_MIN"     : "64",
         "FRAME_SIZE_MAX"     : "128",
     },
+    # Big packets are expensive to simulate - less traffic and no RX gaps
     "big_frames" : {
-        "FRAME_SIZE_MIN"     : "2**13",
-        "FRAME_SIZE_MAX"     : "2**14 - 1",
+        "FRAME_SIZE_MIN"            : "2**13",
+        "FRAME_SIZE_MAX"            : "2**14",
+        "SEQ_MIN"                   : "1",
+        "SEQ_MAX"                   : "2",
+        "RX_GAP_PROBABILITY"        : "0",
     },
     "short_timeout" : {
         "TIMEOUT_CLK_NO"     : "2**9",
     },
-    "long_timeout" : {
-        "TIMEOUT_CLK_NO"     : "2**12",
-    },
     "small_spkts" : {
         "SPKT_SIZE_MIN"     : "2**10",
     },
-    "big_spkts" : {
-        "SPKT_SIZE_MIN"     : "2**13",
+    # SuperPacket limit smaller than one MFB word - a timeout word can reach the limit on its own
+    "tiny_spkts" : {
+        "SPKT_SIZE_MIN"     : "2**7",
+    },
+    # Long TX MVB stall with many small SuperPackets - more MVB items than the DUT MVB FIFO can store
+    "mvb_stall" : {
+        "SPKT_SIZE_MIN"      : "2**9",
+        "MVB_TX_STALL_CLKS"  : "40000",
+        "SEQ_MIN"            : "40",
+        "SEQ_MAX"            : "50",
+        "RX_GAP_PROBABILITY" : "0",
     },
 
     "_combinations_" : (
-    (                                         ), # Default
-    ("one_region",                            ),
-    ("two_channels",                          ),
-    ("sixteen_channels",                      ),
-    ("four_regions",        "short_timeout"  ,),
-    (                       "long_timeout"   ,),
-    (                       "small_spkts"    ,),
-    (                       "big_spkts"      ,),
-    (                       "big_frames"     ,),
-    ("thirty-two_channels", "small_frames"   ,),
+    (                                                          ), # Default
+    ("one_region",                                             ),
+    ("two_channels",                                           ),
+    ("one_region",          "short_timeout",                   ),
+    ("four_regions",        "short_timeout",                   ),
+    ("tiny_spkts",          "small_frames",   "short_timeout", ),
+    (                       "small_spkts",                     ),
+    ("mvb_stall",           "small_frames",                    ),
+    (                       "big_frames",                      ),
+    ("thirty-two_channels", "small_frames",                    ),
     ),
 }
