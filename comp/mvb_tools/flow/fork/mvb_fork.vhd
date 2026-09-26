@@ -87,7 +87,7 @@ begin
         send_register : process (CLK)
         begin
             if rising_edge(CLK) then
-                if (RESET = '1' or dst_rdy = '1') then
+                if (RESET = '1' or (dst_rdy = '1' and RX_SRC_RDY = '1')) then
                     send_reg <= (others => '0');
                 else
                     send_reg <= send_reg or (src_rdy and TX_DST_RDY);
