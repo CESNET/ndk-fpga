@@ -203,6 +203,9 @@ VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_PORTS      $HBM_PORTS
 VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_MODULES    $HBM_MODULES
 VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_DATA_WIDTH $HBM_DATA_WIDTH
 
+# Minimal value required by FPGA_COMMON
+VhdlPkgInt -pkg ndk_fpga_top_pkg MISC_OUT_WIDTH 6
+
 VhdlPkgBool -pkg ndk_fpga_common_pkg VIRTUAL_DEBUG_ENABLE   $VIRTUAL_DEBUG_ENABLE
 VhdlPkgBool -pkg ndk_fpga_common_pkg DMA_DEBUG_ENABLE       $DMA_DEBUG_ENABLE
 VhdlPkgBool -pkg ndk_fpga_common_pkg PCIE_CORE_DEBUG_ENABLE $PCIE_CORE_DEBUG_ENABLE
