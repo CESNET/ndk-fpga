@@ -8,6 +8,10 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 
 ## [Unreleased]
 
+### Added
+- cards: Added HBM2E support on FB2CDG1 card.
+- core: Added HBM2E NoC IP templates.
+
 ### Changed
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
