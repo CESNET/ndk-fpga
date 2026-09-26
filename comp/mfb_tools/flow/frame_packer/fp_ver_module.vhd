@@ -51,7 +51,6 @@ architecture FULL of FP_VER_MOD is
     constant MAX_PKT_NUM    : natural := 30;
 
     signal pkt_cnt          : unsigned(MAX_PKT_NUM - 1 downto 0) := (others => '0');
-    signal eve_cnt_reg      : unsigned(MAX_PKT_NUM - 1 downto 0);
 
     signal cpt_fifox_do     : std_logic_vector(MAX_PKT_NUM - 1 downto 0);
     signal cpt_fifox_rd     : std_logic;
@@ -64,139 +63,9 @@ architecture FULL of FP_VER_MOD is
 
     signal output_pkt_cnt       : unsigned(30 downto 0);
 
-    signal unit_fifo_di         : std_logic_vector(MAX_PKT_NUM - 1 downto 0);
-    signal unit_fifo_do         : std_logic_vector(MAX_PKT_NUM - 1 downto 0);
-    signal unit_fifo_rd         : std_logic;
-    signal number_of_packets    : unsigned(MAX_PKT_NUM - 1 downto 0);
-
-    signal request_fifo_do      : std_logic_vector(MAX_PKT_NUM - 1 downto 0);
-    signal request_fifo_rd      : std_logic;
-    signal request_fifo_empty   : std_logic;
-
-    signal sp_pkt_cnt_prev      : unsigned(MAX_PKT_NUM - 1 downto 0);
-    signal sp_pkt_cnt           : unsigned(MAX_PKT_NUM - 1 downto 0);
-    signal req_cnt_load         : std_logic;
-
-    signal capt_fifo_wr_en      : std_logic;
-
-    signal unit_fifo_status     : std_logic_vector(log2(2048) downto 0);
-    signal request_fifo_status  : std_logic_vector(log2(2048) downto 0);
-
 begin
 
-    process (all)
-    begin
-        if rising_edge(CLK) then
-            if (RST = '1') then
-                eve_cnt_reg <= (others => '0');
-            elsif (RX_SP_EOF_SRC_RDY = '1') then
-                if (RX_SP_EOF = '0') then
-                    eve_cnt_reg     <= to_unsigned(count_ones(RX_EOF), MAX_PKT_NUM) + eve_cnt_reg;
-                else
-                    eve_cnt_reg     <= (others => '0');
-                end if;
-            end if;
-        end if;
-    end process;
-
-    unit_fifo_di    <= std_logic_vector(to_unsigned(count_ones(RX_EOF), MAX_PKT_NUM) + eve_cnt_reg);
-
-    unit_fifo_i : entity work.FIFOX
-    generic map (
-        DATA_WIDTH          => MAX_PKT_NUM,
-        ITEMS               => 2048,
-        RAM_TYPE            => "AUTO",
-        ALMOST_FULL_OFFSET  => 1,
-        ALMOST_EMPTY_OFFSET => 1,
-        FAKE_FIFO           => false
-    )
-    port map (
-        CLK    => CLK,
-        RESET  => RST,
-
-        DI     => unit_fifo_di,
-        WR     => RX_SP_EOF and RX_SP_EOF_SRC_RDY,
-        FULL   => open,
-        AFULL  => open,
-        STATUS => unit_fifo_status,
-
-        DO     => unit_fifo_do,
-        RD     => unit_fifo_rd,
-        EMPTY  => open,
-        AEMPTY => open
-    );
-
-    request_fifo_i : entity work.FIFOX
-    generic map (
-        DATA_WIDTH          => MAX_PKT_NUM,
-        ITEMS               => 2048,
-        RAM_TYPE            => "AUTO",
-        ALMOST_FULL_OFFSET  => 1,
-        ALMOST_EMPTY_OFFSET => 1,
-        FAKE_FIFO           => false
-    )
-    port map (
-        CLK    => CLK,
-        RESET  => RST,
-
-        DI     => resize(RX_PKT_NUM, MAX_PKT_NUM),
-        WR     => RX_PKT_NUM_SRC_RDY,
-        FULL   => open,
-        AFULL  => open,
-        STATUS => request_fifo_status,
-
-        DO     => request_fifo_do,
-        RD     => request_fifo_rd,
-        EMPTY  => request_fifo_empty,
-        AEMPTY => open
-    );
-
-    process (all)
-    begin
-        if (request_fifo_empty = '0' and sp_pkt_cnt = 0) then
-            req_cnt_load    <= '1';
-            request_fifo_rd <= '1';
-        else
-            req_cnt_load    <= '0';
-            request_fifo_rd <= '0';
-        end if;
-    end process;
-
-    process (all)
-    begin
-        if rising_edge(CLK) then
-            if (RST = '1') then
-                sp_pkt_cnt <= (others => '0');
-            elsif (req_cnt_load = '1') then
-                sp_pkt_cnt          <= unsigned(request_fifo_do);
-                number_of_packets   <= (others => '0');
-            else
-                if (sp_pkt_cnt /= 0) then
-                    sp_pkt_cnt          <= sp_pkt_cnt - unsigned(unit_fifo_do);
-                    number_of_packets   <= number_of_packets + unsigned(unit_fifo_do);
-                end if;
-            end if;
-        end if;
-    end process;
-
-    process (all)
-    begin
-        unit_fifo_rd    <= '0';
-        if (sp_pkt_cnt /= 0) then
-            unit_fifo_rd    <= '1';
-        end if;
-    end process;
-
-    process (all)
-    begin
-        if rising_edge(CLK) then
-            sp_pkt_cnt_prev <= sp_pkt_cnt;
-        end if;
-    end process;
-
-    capt_fifo_wr_en     <= '1' when sp_pkt_cnt = 0 and sp_pkt_cnt_prev /= 0 else '0';
-
-    --  Capture FIFO
+    -- Number of packets of each SuperPacket read from the SPKT_LNG unit
     capt_fifo_i : entity work.FIFOX
     generic map (
         DATA_WIDTH          => MAX_PKT_NUM,
@@ -210,8 +79,8 @@ begin
         CLK    => CLK,
         RESET  => RST,
 
-        DI     => std_logic_vector(number_of_packets),
-        WR     => capt_fifo_wr_en,
+        DI     => std_logic_vector(resize(unsigned(RX_PKT_NUM), MAX_PKT_NUM)),
+        WR     => RX_PKT_NUM_SRC_RDY,
         FULL   => open,
         AFULL  => open,
         STATUS => open,

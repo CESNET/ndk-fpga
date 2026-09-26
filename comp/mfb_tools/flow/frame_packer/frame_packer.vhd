@@ -19,8 +19,6 @@ use work.type_pack.all;
 -- 2*TIMEOUT_CLK_NO due to the internal arrangement. The TX_MVB_HDR_META and TX_MVB_DISCARD are
 -- included here for compatibility, but are not currently used. The depth of each channel FIFO is
 -- set by the constant value FIFO_DEPTH and is set by deafult to 512 (Best BRAM optimization for Intel).
--- Warning! There is a possible bug when sending the combination of small and large packets. In 400G
--- version this could result in sending a packet larger than USR_PKT_SIZE_MAX.
 --
 entity FRAME_PACKER is
     generic (
@@ -41,6 +39,7 @@ entity FRAME_PACKER is
         -- Maximal size in bytes of the incoming packets (also maximal size of Super-Packet).
         USR_RX_PKT_SIZE_MAX : natural := 2**14;
         -- The size of the Super-Packet (in bytes) the component is trying to reach. Should be power of 2.
+        -- SPKT_SIZE_MIN + size of the MFB word (in bytes) must not be larger than USR_RX_PKT_SIZE_MAX.
         SPKT_SIZE_MIN       : natural := 2**13;
         -- Timeout in clock cycles. Should be power of 2.
         TIMEOUT_CLK_NO      : natural := 4096;

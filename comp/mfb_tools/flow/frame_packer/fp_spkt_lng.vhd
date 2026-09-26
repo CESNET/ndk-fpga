@@ -48,9 +48,13 @@ architecture FULL of FP_SPKT_LNG is
     -- SOFs of the valid word
     signal rx_sof             : std_logic_vector(MFB_REGIONS - 1 downto 0);
     signal pkt_lng_sum        : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
+    -- Length of the last packet starting in the current word
+    signal pkt_lng_last       : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     signal length_reg_d       : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     signal length_reg_q       : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     signal spkt_wr_en         : std_logic;
+    -- The last packet of the current word starts a new SuperPacket
+    signal spkt_split         : std_logic;
 
     -- EOF counter
     signal spkt_eof_num       : unsigned(EOF_NUM_LEN - 1 downto 0);
@@ -75,6 +79,11 @@ architecture FULL of FP_SPKT_LNG is
     signal eof_cnt            : unsigned(max(1, log2(MFB_REGIONS*FIFO_DEPTH)) - 1 downto 0);
 
 begin
+
+    -- The stored SuperPacket and all but the last packet of one word have to fit into SPKT_SIZE_MAX
+    assert (SPKT_SIZE_MIN + MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE <= SPKT_SIZE_MAX)
+        report "FP_SPKT_LNG: SPKT_SIZE_MIN + size of MFB word must not be larger than SPKT_SIZE_MAX!"
+        severity failure;
 
     -- Timeout
     timeout_p : process (all)
@@ -120,18 +129,22 @@ begin
 
     -- Sum possible length and decide whether it will fit into MTU
     pkt_lng_sum_p : process (all)
-        variable pkt_lng_sum_v : u_array_t(MFB_REGIONS downto 0)(log2(SPKT_SIZE_MAX+1) - 1 downto 0);
+        variable pkt_lng_sum_v  : u_array_t(MFB_REGIONS downto 0)(log2(SPKT_SIZE_MAX+1) - 1 downto 0);
+        variable pkt_lng_last_v : unsigned(log2(SPKT_SIZE_MAX+1) - 1 downto 0);
     begin
         pkt_lng_sum_v   := (others => (others => '0'));
+        pkt_lng_last_v  := (others => '0');
         for r in 0 to MFB_REGIONS - 1 loop
             if (rx_sof(r) = '1') then
                 pkt_lng_sum_v(r + 1)   := pkt_lng_sum_v(r) + unsigned(RX_PKT_LENGTH(r));
+                pkt_lng_last_v         := unsigned(RX_PKT_LENGTH(r));
             else
                 pkt_lng_sum_v(r + 1)   := pkt_lng_sum_v(r);
             end if;
         end loop;
 
-        pkt_lng_sum <= pkt_lng_sum_v(MFB_REGIONS);
+        pkt_lng_sum  <= pkt_lng_sum_v(MFB_REGIONS);
+        pkt_lng_last <= pkt_lng_last_v;
     end process;
 
     -- Decide whether the packet will fit into SuperPacket
@@ -140,6 +153,7 @@ begin
         variable current_length_v   : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     begin
         spkt_wr_en       <= '0';
+        spkt_split       <= '0';
         new_length_v     := pkt_lng_sum + length_reg_q;
         current_length_v := pkt_lng_sum;
 
@@ -155,12 +169,20 @@ begin
         -- Compare new_length_v with the upper limit of SuperPacket
         -- In other words if new_length >= 8192
         elsif ((or (new_length_v(new_length_v'high downto log2(SPKT_SIZE_MIN)))) = '1') then
-            -- overflow - Stored values are sent and the current length is stored
-            length_reg_d    <= current_length_v;
-            if (spkt_eof_num = 0) then
-                spkt_wr_en      <= '0';
-            else
+            if (current_length_v > SPKT_SIZE_MAX) then
+                -- overflow - The packets of the current word would not fit into one SuperPacket. Stored values are
+                -- sent together with all but the last packet of the current word, the last one starts a new SuperPacket
+                spkt_split      <= '1';
                 spkt_wr_en      <= '1';
+                length_reg_d    <= pkt_lng_last;
+            else
+                -- overflow - Stored values are sent and the current length is stored
+                length_reg_d    <= current_length_v;
+                if (spkt_eof_num = 0) then
+                    spkt_wr_en      <= '0';
+                else
+                    spkt_wr_en      <= '1';
+                end if;
             end if;
         else
             -- the current packet will fit into set limits
@@ -192,7 +214,9 @@ begin
             elsif (timeout = '1') then
                 spkt_eof_num    <= (others => '0');
             elsif (spkt_wr_en = '1') then
-                if (or(rx_sof) = '1') then
+                if (spkt_split = '1') then
+                    spkt_eof_num    <= to_unsigned(1, spkt_eof_num'length);
+                elsif (or(rx_sof) = '1') then
                     spkt_eof_num    <= to_unsigned(count_ones(rx_sof), spkt_eof_num'length);
                 else
                     spkt_eof_num    <= (others => '0');
@@ -209,6 +233,9 @@ begin
         if (timeout = '1') then
             rx_fifox_length     <= length_reg_q + pkt_lng_sum;
             rx_fifox_pkt_num    <= spkt_eof_num + to_unsigned(count_ones(rx_sof), spkt_eof_num'length);
+        elsif (spkt_split = '1') then
+            rx_fifox_length     <= length_reg_q + (pkt_lng_sum - pkt_lng_last);
+            rx_fifox_pkt_num    <= spkt_eof_num + to_unsigned(count_ones(rx_sof) - 1, spkt_eof_num'length);
         else
             rx_fifox_length     <= length_reg_q;
             rx_fifox_pkt_num    <= spkt_eof_num;

@@ -78,9 +78,3 @@ The length and the channel ID are sent to the ``MVB_FIFO`` which is directly con
 References
 ~~~~~~~~~~
 For more detailed description refer to `David Beneš's master thesis <https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=267988>`_  (2023/2024)
-
-Known bugs
-~~~~~~~~~~
-
-There is a possible bug when sending the combination of small and large packets. In 400G
-version this could result in sending a packet larger than USR_PKT_SIZE_MAX.
