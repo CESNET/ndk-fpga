@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO).
 [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format is required for commit messages.
 
+## [Unreleased]
+
+### Changed
+- cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
+- cards: Raised Quartus placement effort on N5014 card.
+
+### Fixed
+- cards: Fixed DDR_PORTS derivation from MEM_PORTS on N5014 card.
+
 ## [2026.9.0] - 2026-09-30
 
 ### Added
