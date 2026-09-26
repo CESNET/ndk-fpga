@@ -205,6 +205,8 @@ architecture FULL of FRAME_PACKER is
 
     -- Merger
     signal tx_merger_meta               : std_logic_vector(MFB_REGIONS*(max(1, log2(RX_CHANNELS)) + log2(USR_RX_PKT_SIZE_MAX+ 1) ) - 1 downto 0);
+    signal tx_merger_src_rdy            : std_logic;
+    signal tx_merger_dst_rdy            : std_logic;
 
     -- MVB_FIFO
     signal mvb_hdr_full                 : std_logic;
@@ -585,9 +587,13 @@ begin
         TX_MFB_EOF     => TX_MFB_EOF,
         TX_MFB_SOF_POS => TX_MFB_SOF_POS,
         TX_MFB_EOF_POS => TX_MFB_EOF_POS,
-        TX_MFB_SRC_RDY => TX_MFB_SRC_RDY,
-        TX_MFB_DST_RDY => TX_MFB_DST_RDY
+        TX_MFB_SRC_RDY => tx_merger_src_rdy,
+        TX_MFB_DST_RDY => tx_merger_dst_rdy
     );
+
+    -- The Super-Packets are not sent when there is no space for their MVB headers
+    TX_MFB_SRC_RDY      <= tx_merger_src_rdy and (not mvb_hdr_full);
+    tx_merger_dst_rdy   <= TX_MFB_DST_RDY    and (not mvb_hdr_full);
 
     ------------------------------------------------------------
     --                       MVB FIFO                         --
