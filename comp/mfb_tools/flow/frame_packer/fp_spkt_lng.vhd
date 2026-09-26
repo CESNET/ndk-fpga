@@ -145,9 +145,16 @@ begin
 
         length_reg_d    <= length_reg_q;
 
+        if (timeout = '1') then
+            -- timeout - Stored values are sent together with the packets of the current word
+            if (rx_fifox_pkt_num = 0) then
+                spkt_wr_en  <= '0';
+            else
+                spkt_wr_en  <= '1';
+            end if;
         -- Compare new_length_v with the upper limit of SuperPacket
         -- In other words if new_length >= 8192
-        if ((or (new_length_v(new_length_v'high downto log2(SPKT_SIZE_MIN)))) = '1') then
+        elsif ((or (new_length_v(new_length_v'high downto log2(SPKT_SIZE_MIN)))) = '1') then
             -- overflow - Stored values are sent and the current length is stored
             length_reg_d    <= current_length_v;
             if (spkt_eof_num = 0) then
@@ -157,16 +164,7 @@ begin
             end if;
         else
             -- the current packet will fit into set limits
-            if (timeout = '1') then
-                if (rx_fifox_pkt_num = 0) then
-                    spkt_wr_en  <= '0';
-                else
-                    spkt_wr_en  <= '1';
-                end if;
-            else
-                length_reg_d    <= new_length_v;
-            end if;
-
+            length_reg_d    <= new_length_v;
         end if;
     end process;
 
