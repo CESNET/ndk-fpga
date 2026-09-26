@@ -383,7 +383,7 @@ begin
                             tx_sof_pos_s(r) <= sof_pos_reg(r);
                             TX_PKT_LNG(r)   <= pkt_lng_reg(r);
                         else
-                            TX_SOF(r)       <= '0';
+                            TX_SOF(r)       <= sof(r);
                             tx_sof_pos_s(r) <= sof_pos(r);
                             TX_PKT_LNG(r)   <= pkt_lng(r);
                         end if;
