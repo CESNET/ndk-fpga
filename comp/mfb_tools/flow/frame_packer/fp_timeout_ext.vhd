@@ -371,7 +371,7 @@ begin
                             tx_eof_pos_s(r) <= eof_pos(r);
                             TX_PKT_LNG(r)   <= pkt_lng(r);
                         end loop;
-                    elsif (eof_compare = '0') then
+                    elsif ((eof_compare = '0') or (new_eof_v = '0')) then
                         next_state  <= ST_PASS;
                     end if;
                 elsif (RX_OVERFLOW = '1') then
@@ -451,7 +451,8 @@ begin
     end process;
 
     -- This prevents timeout to occur when new packets arrives in timeout event
-    timeout_event   <= timeout and eof_compare;
+    -- The FSM can leave ST_TIMEOUT in the same cycle the counter expires - the timeout is valid only in ST_TIMEOUT
+    timeout_event   <= timeout and eof_compare when (state = ST_TIMEOUT) else '0';
 
     TX_TIMEOUT_EXT  <= timeout_event when RX_OVERFLOW = '0' else '0';
 
