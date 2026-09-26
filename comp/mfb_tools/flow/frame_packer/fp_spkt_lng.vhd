@@ -45,6 +45,8 @@ end entity;
 architecture FULL of FP_SPKT_LNG is
     constant EOF_NUM_LEN   : natural := max(1, log2(MFB_REGIONS*FIFO_DEPTH));
 
+    -- SOFs of the valid word
+    signal rx_sof             : std_logic_vector(MFB_REGIONS - 1 downto 0);
     signal pkt_lng_sum        : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     signal length_reg_d       : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
     signal length_reg_q       : unsigned(log2(SPKT_SIZE_MAX+ 1)  - 1 downto 0);
@@ -114,13 +116,19 @@ begin
         end if;
     end process;
 
+    rx_sof <= RX_PKT_SOF when (RX_PKT_SRC_RDY = '1') else (others => '0');
+
     -- Sum possible length and decide whether it will fit into MTU
     pkt_lng_sum_p : process (all)
         variable pkt_lng_sum_v : u_array_t(MFB_REGIONS downto 0)(log2(SPKT_SIZE_MAX+1) - 1 downto 0);
     begin
         pkt_lng_sum_v   := (others => (others => '0'));
         for r in 0 to MFB_REGIONS - 1 loop
-            pkt_lng_sum_v(r + 1)   := pkt_lng_sum_v(r) + unsigned(RX_PKT_LENGTH(r));
+            if (rx_sof(r) = '1') then
+                pkt_lng_sum_v(r + 1)   := pkt_lng_sum_v(r) + unsigned(RX_PKT_LENGTH(r));
+            else
+                pkt_lng_sum_v(r + 1)   := pkt_lng_sum_v(r);
+            end if;
         end loop;
 
         pkt_lng_sum <= pkt_lng_sum_v(MFB_REGIONS);
@@ -170,7 +178,8 @@ begin
                 length_reg_q  <= (others => '0');
             elsif (timeout = '1') then
                 length_reg_q  <= (others => '0');
-            elsif (RX_PKT_SRC_RDY = '1') then
+            else
+                -- Updated also without valid data - the SuperPacket can be closed by its length only
                 length_reg_q  <= length_reg_d;
             end if;
         end if;
@@ -185,13 +194,13 @@ begin
             elsif (timeout = '1') then
                 spkt_eof_num    <= (others => '0');
             elsif (spkt_wr_en = '1') then
-                if (or(RX_PKT_SOF) = '1') then
-                    spkt_eof_num    <= to_unsigned(count_ones(RX_PKT_SOF), spkt_eof_num'length);
+                if (or(rx_sof) = '1') then
+                    spkt_eof_num    <= to_unsigned(count_ones(rx_sof), spkt_eof_num'length);
                 else
                     spkt_eof_num    <= (others => '0');
                 end if;
-            elsif ((RX_PKT_SRC_RDY = '1') and (or(RX_PKT_SOF) = '1')) then
-                spkt_eof_num    <= spkt_eof_num + to_unsigned(count_ones(RX_PKT_SOF), spkt_eof_num'length);
+            elsif (or(rx_sof) = '1') then
+                spkt_eof_num    <= spkt_eof_num + to_unsigned(count_ones(rx_sof), spkt_eof_num'length);
             end if;
         end if;
     end process;
@@ -201,7 +210,7 @@ begin
     begin
         if (timeout = '1') then
             rx_fifox_length     <= length_reg_q + pkt_lng_sum;
-            rx_fifox_pkt_num    <= spkt_eof_num + to_unsigned(count_ones(RX_PKT_SOF), spkt_eof_num'length);
+            rx_fifox_pkt_num    <= spkt_eof_num + to_unsigned(count_ones(rx_sof), spkt_eof_num'length);
         else
             rx_fifox_length     <= length_reg_q;
             rx_fifox_pkt_num    <= spkt_eof_num;
