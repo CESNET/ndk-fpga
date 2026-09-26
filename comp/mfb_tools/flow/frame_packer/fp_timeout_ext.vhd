@@ -301,7 +301,8 @@ begin
     end process;
 
     ext_timeout_state_p : process (all)
-        variable eof_v  : std_logic;
+        variable eof_v      : std_logic;
+        variable new_eof_v  : std_logic;
     begin
         next_state      <= state;
         timeout_en      <= '0';
@@ -311,7 +312,9 @@ begin
         tx_sof_pos_s    <= (others => (others => '0'));
         tx_eof_pos_s    <= (others => (others => '0'));
 
-        eof_v   := or (eof);
+        eof_v       := or (eof);
+        -- EOF of a packet that has arrived after the last timeout event
+        new_eof_v   := or (eof and (not eof_mask));
 
         case (state) is
             when ST_PASS    =>
@@ -349,12 +352,29 @@ begin
                             tx_eof_pos_s(r) <= eof_pos(r);
                             TX_PKT_LNG(r)   <= pkt_lng(r);
                         end loop;
+                    -- New packets have arrived after the timeout event - the timeout has to be applied again
+                    elsif ((new_eof_v = '1') and (eof_compare = '1')) then
+                        next_state  <= ST_TIMEOUT;
                     end if;
                 end if;
 
             when ST_TIMEOUT =>
                 timeout_en <= '1';
-                if (RX_OVERFLOW = '1') then
+                -- Repeated timeout - SOFs and EOFs sent by the previous timeout event are masked
+                if (timeout_block = '1') then
+                    if ((RX_OVERFLOW = '1') or (timeout_event = '1')) then
+                        next_state  <= ST_PASS;
+                        for r in 0 to MFB_REGIONS - 1 loop
+                            TX_SOF(r)       <= sof(r) and (not sof_mask(r));
+                            tx_sof_pos_s(r) <= sof_pos(r);
+                            TX_EOF(r)       <= eof(r) and (not eof_mask(r));
+                            tx_eof_pos_s(r) <= eof_pos(r);
+                            TX_PKT_LNG(r)   <= pkt_lng(r);
+                        end loop;
+                    elsif (eof_compare = '0') then
+                        next_state  <= ST_PASS;
+                    end if;
+                elsif (RX_OVERFLOW = '1') then
                     next_state  <= ST_PASS;
                     for r in 0 to MFB_REGIONS - 1 loop
                         if (sof_reg(r) = '1') then
