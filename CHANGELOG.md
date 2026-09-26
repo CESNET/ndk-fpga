@@ -61,6 +61,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - build: Raised the default Quartus optimization effort level.
 - ci: Updated Verible and fixed all its style violations in UVM SystemVerilog files.
 - python: Moved pynfb/libnfb-ext dependencies to PyPi.
+- comp: FRAME_PACKER now requires SPKT_SIZE_MIN + MFB word size <= USR_RX_PKT_SIZE_MAX (checked by an assert).
 
 ### Removed
 - core: Removed AUTO_ASSIGN_TAGS=false mode from the PCIe tag manager.
@@ -81,6 +82,9 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cards: Fixed DMA_ENDPOINTS value on IA-420f card for DMA Calypte compatibility.
 - python: Fixed swallowed exceptions in rate_limiter, timestamp_limiter and speed_meter constructors.
 - ci: Fixed false-positive failure emails in app-minimal-test.
+- comp: Fixed lost SOFs, stuck packets and a timeout race in the FRAME_PACKER timeout logic.
+- comp: Fixed FRAME_PACKER SuperPackets exceeding USR_RX_PKT_SIZE_MAX and lost or wrong SuperPacket lengths.
+- comp: Fixed silent loss of FRAME_PACKER SuperPacket headers when TX MVB is stalled.
 
 ## [2026.6.0] - 2026-06-03
 
