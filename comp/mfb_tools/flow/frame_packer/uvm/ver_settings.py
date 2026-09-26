@@ -23,6 +23,7 @@ SETTINGS = {
         "SEQ_MAX"            : "8",
         "RX_GAP_PROBABILITY" : "30",
         "MVB_TX_STALL_CLKS"  : "0",
+        "TIMEOUT_DIRECTED_REPEAT" : "1",
     },
     "one_region" : {
         "MFB_REGIONS"        : "1",
@@ -40,16 +41,20 @@ SETTINGS = {
         "FRAME_SIZE_MIN"     : "64",
         "FRAME_SIZE_MAX"     : "128",
     },
-    # Big packets are expensive to simulate - less traffic and no RX gaps
+    # Big packets are expensive to simulate - less traffic, no RX gaps and no directed timeout scenario
+    # (the packets are not smaller than SPKT_SIZE_MIN, the timeout corner cases cannot occur)
     "big_frames" : {
         "FRAME_SIZE_MIN"            : "2**13",
         "FRAME_SIZE_MAX"            : "2**14",
         "SEQ_MIN"                   : "1",
         "SEQ_MAX"                   : "2",
         "RX_GAP_PROBABILITY"        : "0",
+        "TIMEOUT_DIRECTED_CHANNELS" : "0",
     },
+    # The race of new data and the timeout is tried only with the short timeout (cheap)
     "short_timeout" : {
-        "TIMEOUT_CLK_NO"     : "2**9",
+        "TIMEOUT_CLK_NO"          : "2**9",
+        "TIMEOUT_DIRECTED_REPEAT" : "9",
     },
     "small_spkts" : {
         "SPKT_SIZE_MIN"     : "2**10",

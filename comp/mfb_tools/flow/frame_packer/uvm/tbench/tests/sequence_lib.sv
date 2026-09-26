@@ -75,3 +75,42 @@ class mvb_tx_lib_stall #(
         super.body();
     endtask
 endclass
+
+
+// One MFB packet with size in the given range
+class sequence_one_packet #(
+    int unsigned ITEM_WIDTH
+) extends uvm_sequence #(uvm_logic_vector_array::sequence_item #(ITEM_WIDTH));
+    `uvm_object_param_utils(test::sequence_one_packet#(ITEM_WIDTH))
+
+    int unsigned size_min;
+    int unsigned size_max;
+
+    function new(string name = "sequence_one_packet");
+        super.new(name);
+    endfunction
+
+    task body;
+        `uvm_do_with(req, {data.size inside {[local::size_min : local::size_max]};});
+    endtask
+endclass
+
+
+// Channel of one packet
+class sequence_one_channel #(
+    int unsigned USR_RX_PKT_SIZE_MAX,
+    int unsigned RX_CHANNELS,
+    int unsigned HDR_META_WIDTH
+) extends uvm_sequence #(uvm_meta::sequence_item #(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH));
+    `uvm_object_param_utils(test::sequence_one_channel#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH))
+
+    int unsigned channel;
+
+    function new(string name = "sequence_one_channel");
+        super.new(name);
+    endfunction
+
+    task body;
+        `uvm_do_with(req, {channel == local::channel;});
+    endtask
+endclass

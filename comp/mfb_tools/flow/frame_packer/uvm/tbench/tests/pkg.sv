@@ -43,6 +43,10 @@ package test;
     parameter SEQ_MAX                 = 8;
     // Probability [%] of an RX idle gap (TIMEOUT_CLK_NO/2 .. 2*TIMEOUT_CLK_NO) between the MFB data sequences
     parameter RX_GAP_PROBABILITY      = 30;
+    // Number of channels with the directed timeout scenario at the end of the test and its repetitions per channel
+    // (each repetition except the last one tries the race of new data and the timeout, it takes 3*TIMEOUT_CLK_NO)
+    parameter TIMEOUT_DIRECTED_CHANNELS = 8;
+    parameter TIMEOUT_DIRECTED_REPEAT   = 1;
     // TX MVB DST_RDY is held low for this number of clock cycles at the beginning of the test (0 = disabled)
     parameter MVB_TX_STALL_CLKS       = 0;
 
