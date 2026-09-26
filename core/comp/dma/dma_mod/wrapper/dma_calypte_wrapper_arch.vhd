@@ -187,6 +187,15 @@ architecture CALYPTE of DMA_WRAPPER is
     signal pcie_cq_mfb_src_rdy_piped   : std_logic_vector(DMA_STREAMS-1 downto 0);
     signal pcie_cq_mfb_dst_rdy_piped   : std_logic_vector(DMA_STREAMS-1 downto 0);
 
+    signal pcie_cq_mfb_data_fifo       : slv_array_t(DMA_STREAMS-1 downto 0)(PCIE_CQ_MFB_REGIONS*PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE*PCIE_CQ_MFB_ITEM_WIDTH -1 downto 0);
+    signal pcie_cq_mfb_meta_fifo       : slv_array_t(DMA_STREAMS-1 downto 0)(PCIE_CQ_MFB_REGIONS*PCIE_CQ_META_WIDTH                                                    -1 downto 0);
+    signal pcie_cq_mfb_sof_fifo        : slv_array_t(DMA_STREAMS-1 downto 0)(PCIE_CQ_MFB_REGIONS                                                                       -1 downto 0);
+    signal pcie_cq_mfb_eof_fifo        : slv_array_t(DMA_STREAMS-1 downto 0)(PCIE_CQ_MFB_REGIONS                                                                       -1 downto 0);
+    signal pcie_cq_mfb_sof_pos_fifo    : slv_array_t(DMA_STREAMS-1 downto 0)(PCIE_CQ_MFB_REGIONS*max(1,log2(PCIE_CQ_MFB_REGION_SIZE))                                  -1 downto 0);
+    signal pcie_cq_mfb_eof_pos_fifo    : slv_array_t(DMA_STREAMS-1 downto 0)(PCIE_CQ_MFB_REGIONS*max(1,log2(PCIE_CQ_MFB_REGION_SIZE*PCIE_CQ_MFB_BLOCK_SIZE))           -1 downto 0);
+    signal pcie_cq_mfb_src_rdy_fifo    : std_logic_vector(DMA_STREAMS-1 downto 0);
+    signal pcie_cq_mfb_dst_rdy_fifo    : std_logic_vector(DMA_STREAMS-1 downto 0);
+
     --==============================================================================================
     -- Miscelaneous signals
     --==============================================================================================
@@ -805,14 +814,14 @@ begin
             PCIE_RQ_MFB_SRC_RDY => pcie_rq_mfb_src_rdy_piped(i),
             PCIE_RQ_MFB_DST_RDY => pcie_rq_mfb_dst_rdy_piped(i),
 
-            PCIE_CQ_MFB_DATA    => pcie_cq_mfb_data_piped(i),
-            PCIE_CQ_MFB_META    => pcie_cq_mfb_meta_piped(i),
-            PCIE_CQ_MFB_SOF     => pcie_cq_mfb_sof_piped(i),
-            PCIE_CQ_MFB_EOF     => pcie_cq_mfb_eof_piped(i),
-            PCIE_CQ_MFB_SOF_POS => pcie_cq_mfb_sof_pos_piped(i),
-            PCIE_CQ_MFB_EOF_POS => pcie_cq_mfb_eof_pos_piped(i),
-            PCIE_CQ_MFB_SRC_RDY => pcie_cq_mfb_src_rdy_piped(i),
-            PCIE_CQ_MFB_DST_RDY => pcie_cq_mfb_dst_rdy_piped(i),
+            PCIE_CQ_MFB_DATA    => pcie_cq_mfb_data_fifo(i),
+            PCIE_CQ_MFB_META    => pcie_cq_mfb_meta_fifo(i),
+            PCIE_CQ_MFB_SOF     => pcie_cq_mfb_sof_fifo(i),
+            PCIE_CQ_MFB_EOF     => pcie_cq_mfb_eof_fifo(i),
+            PCIE_CQ_MFB_SOF_POS => pcie_cq_mfb_sof_pos_fifo(i),
+            PCIE_CQ_MFB_EOF_POS => pcie_cq_mfb_eof_pos_fifo(i),
+            PCIE_CQ_MFB_SRC_RDY => pcie_cq_mfb_src_rdy_fifo(i),
+            PCIE_CQ_MFB_DST_RDY => pcie_cq_mfb_dst_rdy_fifo(i),
 
             MI_ADDR => mi_sync_addr(i),
             MI_DWR  => mi_sync_dwr(i),
@@ -895,5 +904,51 @@ begin
             TX_SRC_RDY => pcie_cq_mfb_src_rdy_piped(i),
             TX_DST_RDY => pcie_cq_mfb_dst_rdy_piped(i)
         );
+
+        pcie_cq_mfb_fifo_g : if (TX_GEN_EN) generate
+            pcie_cq_mfb_fifo_i : entity work.MFB_FIFOX
+            generic map (
+                REGIONS     => PCIE_CQ_MFB_REGIONS,
+                REGION_SIZE => PCIE_CQ_MFB_REGION_SIZE,
+                BLOCK_SIZE  => PCIE_CQ_MFB_BLOCK_SIZE,
+                ITEM_WIDTH  => PCIE_CQ_MFB_ITEM_WIDTH,
+
+                META_WIDTH  => PCIE_CQ_META_WIDTH,
+                FIFO_DEPTH  => 512,
+                RAM_TYPE    => "AUTO",
+                DEVICE      => DEVICE
+            )
+            port map (
+                CLK        => PCIE_USR_CLK(i),
+                RST        => s_dma_reset(i),
+
+                RX_DATA    => pcie_cq_mfb_data_piped(i),
+                RX_META    => pcie_cq_mfb_meta_piped(i),
+                RX_SOF_POS => pcie_cq_mfb_sof_pos_piped(i),
+                RX_EOF_POS => pcie_cq_mfb_eof_pos_piped(i),
+                RX_SOF     => pcie_cq_mfb_sof_piped(i),
+                RX_EOF     => pcie_cq_mfb_eof_piped(i),
+                RX_SRC_RDY => pcie_cq_mfb_src_rdy_piped(i),
+                RX_DST_RDY => pcie_cq_mfb_dst_rdy_piped(i),
+
+                TX_DATA    => pcie_cq_mfb_data_fifo(i),
+                TX_META    => pcie_cq_mfb_meta_fifo(i),
+                TX_SOF_POS => pcie_cq_mfb_sof_pos_fifo(i),
+                TX_EOF_POS => pcie_cq_mfb_eof_pos_fifo(i),
+                TX_SOF     => pcie_cq_mfb_sof_fifo(i),
+                TX_EOF     => pcie_cq_mfb_eof_fifo(i),
+                TX_SRC_RDY => pcie_cq_mfb_src_rdy_fifo(i),
+                TX_DST_RDY => pcie_cq_mfb_dst_rdy_fifo(i)
+            );
+        else generate
+            pcie_cq_mfb_data_fifo(i)     <= pcie_cq_mfb_data_piped(i);
+            pcie_cq_mfb_meta_fifo(i)     <= pcie_cq_mfb_meta_piped(i);
+            pcie_cq_mfb_sof_fifo(i)      <= pcie_cq_mfb_sof_piped(i);
+            pcie_cq_mfb_eof_fifo(i)      <= pcie_cq_mfb_eof_piped(i);
+            pcie_cq_mfb_sof_pos_fifo(i)  <= pcie_cq_mfb_sof_pos_piped(i);
+            pcie_cq_mfb_eof_pos_fifo(i)  <= pcie_cq_mfb_eof_pos_piped(i);
+            pcie_cq_mfb_src_rdy_fifo(i)  <= pcie_cq_mfb_src_rdy_piped(i);
+            pcie_cq_mfb_dst_rdy_piped(i) <= pcie_cq_mfb_dst_rdy_fifo(i);
+        end generate;
     end generate;
 end architecture;

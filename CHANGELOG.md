@@ -31,6 +31,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Added a simple version of MVB_MERGE_STREAMS_ORDERED.
 - comp: Exported PTC telemetry signals reporting why a DMA stream is stopped.
 - core: Added dma_bus_pack package with dma_route mechanism and propagated it to PTC, PCIe and DMA module.
+- core: Added 512-item MFB_FIFOX on the PCIe CQ input of the DMA Calypte wrapper to absorb bursts of posted writes carrying TX packet data into the DMA-BAR window.
 - core: Added DMA bus to the application core.
 - core: Added support for propagation of negotiated PCIe MPS/MRRS values into PTC and DMA Medusa.
 - python: Added nfb-pcie-telemetry tool.

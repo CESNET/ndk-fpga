@@ -10,6 +10,7 @@ set MI_SPLITTER_PLUS_BASE       "$OFM_PATH/comp/mi_tools/splitter_plus"
 set MI_SPLITTER_PLUS_GEN_BASE   "$OFM_PATH/comp/mi_tools/splitter_plus_gen"
 set MI_ASYNC_BASE               "$OFM_PATH/comp/mi_tools/async"
 set MFB_ASFIFOX_BASE            "$OFM_PATH/comp/mfb_tools/storage/asfifox"
+set MFB_FIFOX_BASE              "$OFM_PATH/comp/mfb_tools/storage/fifox"
 set MFB_META_INS_BASE           "$OFM_PATH/comp/mfb_tools/flow/metadata_insertor"
 set MFB_META_EXT_BASE           "$OFM_PATH/comp/mfb_tools/flow/metadata_extractor"
 set MFB_RECONFIG_BASE           "$OFM_PATH/comp/mfb_tools/flow/reconfigurator"
@@ -53,6 +54,7 @@ if { $ARCHGRP == "MEDUSA" } {
 
     lappend COMPONENTS [ list "MI_SPLITTER_PLUS_GEN"   $MI_SPLITTER_PLUS_GEN_BASE  "FULL" ]
     lappend COMPONENTS [ list "MFB_ASFIFOX"            $MFB_ASFIFOX_BASE           "FULL" ]
+    lappend COMPONENTS [ list "MFB_FIFOX"              $MFB_FIFOX_BASE             "FULL" ]
     lappend COMPONENTS [ list "METADATA_INSERTOR"      $MFB_META_INS_BASE          "FULL" ]
     lappend COMPONENTS [ list "METADATA_EXTRACTOR"     $MFB_META_EXT_BASE          "FULL" ]
     lappend COMPONENTS [ list "TSU_GEN"                $TSU_BASE                   "FULL" ]
