@@ -120,9 +120,16 @@ class model #(RX_CHANNELS, PKT_MTU, META_WIDTH,  MFB_ITEM_WIDTH) extends uvm_com
                 // verilog_lint: waive line-length
                 tr_mvb_out = uvm_logic_vector::sequence_item #($clog2(RX_CHANNELS) + $clog2(PKT_MTU+1) + META_WIDTH + 1)::type_id::create("tr_mvb_out", this);
                 tr_mvb_out.tag  = tag;
+                // The model takes SuperPacket boundaries from the DUT, so the maximal size has to be checked separately
+                if (tr_mfb_out.data.size() > PKT_MTU) begin
+                    `uvm_error(this.get_full_name(), $sformatf(
+                               "\n\tCHANNEL %0d: SuperPacket size %0d bytes exceeds USR_RX_PKT_SIZE_MAX %0d\n",
+                               channel, tr_mfb_out.data.size(), PKT_MTU));
+                end
                 tx_length = tr_mfb_out.data.size();
-                tx_meta   = 'x;
-                tx_discard = 'x;
+                // FRAME_PACKER drives constant HDR_META (all ones) and DISCARD (zero)
+                tx_meta   = '1;
+                tx_discard = 1'b0;
                 tx_channel = channel;
                 tr_mvb_out.data = {tx_length, tx_meta, tx_discard, tx_channel};
 

@@ -11,7 +11,8 @@ module framepacker_bus_properties #(
     MFB_ITEM_WIDTH,
     MFB_META_WIDTH,
     MVB_ITEMS,
-    MVB_ITEM_WIDTH
+    MVB_RX_ITEM_WIDTH,
+    MVB_TX_ITEM_WIDTH
 )
     (
         input RESET,
@@ -30,7 +31,7 @@ module framepacker_bus_properties #(
         .META_WIDTH     (MFB_META_WIDTH)
     )
     mfb_property_rd (
-        .RESET          (reset.RESET),
+        .RESET          (RESET),
         .vif            (mfb_rd_vif)
     );
     mfb_property #(
@@ -41,25 +42,25 @@ module framepacker_bus_properties #(
         .META_WIDTH     (MFB_META_WIDTH)
     )
     mfb_property_wr (
-        .RESET          (reset.RESET),
+        .RESET          (RESET),
         .vif            (mfb_wr_vif)
     );
 
     //MVB Properties
     mvb_property #(
         .ITEMS          (MVB_ITEMS),
-        .ITEM_WIDTH     (MVB_ITEM_WIDTH)
+        .ITEM_WIDTH     (MVB_TX_ITEM_WIDTH)
     )
     mvb_property_rd(
-        .RESET          (reset.RESET),
+        .RESET          (RESET),
         .vif            (mvb_rd_vif)
     );
     mvb_property  #(
         .ITEMS          (MVB_ITEMS),
-        .ITEM_WIDTH     (MVB_ITEM_WIDTH)
+        .ITEM_WIDTH     (MVB_RX_ITEM_WIDTH)
     )
     mvb_property_wr (
-        .RESET          (reset.RESET),
+        .RESET          (RESET),
         .vif            (mvb_wr_vif)
     );
 

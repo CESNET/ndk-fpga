@@ -21,7 +21,7 @@ package test;
     //MFB META is not supported
     parameter MFB_META_WIDTH          = 0;
 
-    parameter RX_CHANNELS             = 32;
+    parameter RX_CHANNELS             = 16;
     parameter HDR_META_WIDTH          = 12;
     parameter USR_RX_PKT_SIZE_MIN     = 64;
     parameter USR_RX_PKT_SIZE_MAX     = 2**14;
@@ -33,15 +33,22 @@ package test;
 
     // sequence.sv
     parameter FRAME_SIZE_MIN          = 64;
-    //TODO:  The -248 prevents to maximal size packet to occur ... This needs to be fixed
-    parameter FRAME_SIZE_MAX          = 128;
+    parameter FRAME_SIZE_MAX          = 2**14 - 1;
     //MVB interface
     parameter MVB_ITEMS               = MFB_REGIONS;
-    //parameter MVB_ITEM_WIDTH          = $clog2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + $clog2(RX_CHANNELS) + 1;
+    parameter MVB_TX_ITEM_WIDTH       = $clog2(RX_CHANNELS) + $clog2(USR_RX_PKT_SIZE_MAX+1) + HDR_META_WIDTH + 1;
 
-    //Number of sequences
-    //parameter SEQ_MIN   = 10;
-    //parameter SEQ_MAX   = 20;
+    // Number of MFB data sequences
+    parameter SEQ_MIN                 = 5;
+    parameter SEQ_MAX                 = 8;
+    // Probability [%] of an RX idle gap (TIMEOUT_CLK_NO/2 .. 2*TIMEOUT_CLK_NO) between the MFB data sequences
+    parameter RX_GAP_PROBABILITY      = 30;
+    // Number of channels with the directed timeout scenario at the end of the test and its repetitions per channel
+    // (each repetition except the last one tries the race of new data and the timeout, it takes 3*TIMEOUT_CLK_NO)
+    parameter TIMEOUT_DIRECTED_CHANNELS = 8;
+    parameter TIMEOUT_DIRECTED_REPEAT   = 1;
+    // TX MVB DST_RDY is held low for this number of clock cycles at the beginning of the test (0 = disabled)
+    parameter MVB_TX_STALL_CLKS       = 0;
 
 
     // configure space between packet
@@ -54,6 +61,7 @@ package test;
     parameter CLK_PERIOD      = 5ns;
     parameter RESET_CLKS      = 10;
 
+    `include "sequence_lib.sv"
     `include "sequence.sv"
     `include "test.sv"
     `include "speed.sv"

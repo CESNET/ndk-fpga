@@ -56,8 +56,8 @@ class sequence_simple_rand #(
 
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
     constraint channel_num_c {
-        channel_min inside {[0 : RX_CHANNELS]};
-        channel_max inside {[0 : RX_CHANNELS]};
+        channel_min inside {[0 : RX_CHANNELS-1]};
+        channel_max inside {[0 : RX_CHANNELS-1]};
         channel_min <= channel_max;
     }
 
@@ -88,7 +88,7 @@ class sequence_simple_rand_dist #(
     int unsigned transaction_count_min = 10;
     int unsigned transaction_count_max = 200;
     int unsigned channel_min = 0;
-    int unsigned channel_max = RX_CHANNELS; // 2048
+    int unsigned channel_max = RX_CHANNELS-1;
 
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
 
@@ -121,7 +121,7 @@ class sequence_simple_channel #(
     rand int unsigned channel;
 
     constraint c1 {transaction_count inside {[transaction_count_min : transaction_count_max]};}
-    constraint channel_num_c {channel inside {[0 : RX_CHANNELS]};}
+    constraint channel_num_c {channel inside {[0 : RX_CHANNELS-1]};}
 
     // Constructor - creates new instance of this class
     function new(string name = "sequence");
@@ -134,7 +134,7 @@ class sequence_simple_channel #(
         repeat(transaction_count)
         begin
             // Generate random request, which must be in interval from min length to max length
-            `uvm_do_with(req, {channel == this.channel;});
+            `uvm_do_with(req, {channel == local::channel;});
         end
     endtask
 endclass
@@ -159,8 +159,8 @@ class sequence_lib #(
     // can be useful in specific tests
     virtual function void init_sequence();
         //this.add_sequence(sequence_simple#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::get_type());
-        //this.add_sequence(sequence_simple_rand#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::get_type());
-        //this.add_sequence(sequence_simple_rand_dist#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::get_type());
+        this.add_sequence(sequence_simple_rand#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::get_type());
+        this.add_sequence(sequence_simple_rand_dist#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::get_type());
         this.add_sequence(sequence_simple_channel#(USR_RX_PKT_SIZE_MAX, RX_CHANNELS, HDR_META_WIDTH)::get_type());
     endfunction
 endclass

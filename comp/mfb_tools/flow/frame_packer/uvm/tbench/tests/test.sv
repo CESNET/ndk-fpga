@@ -22,6 +22,11 @@ class ex_test extends uvm_test;
 
     // Build phase function, e.g. the creation of test's internal objects
     function void build_phase(uvm_phase phase);
+        if (MVB_TX_STALL_CLKS != 0) begin
+            uvm_mvb::sequence_lib_tx#(MVB_ITEMS, MVB_TX_ITEM_WIDTH)::type_id::set_type_override(
+                mvb_tx_lib_stall#(MVB_ITEMS, MVB_TX_ITEM_WIDTH)::get_type());
+        end
+
         m_env = uvm_framepacker::env #(MFB_REGIONS, MFB_REGION_SIZE, MFB_BLOCK_SIZE, MFB_ITEM_WIDTH, SPACE_SIZE_MIN_RX,
                                       SPACE_SIZE_MAX_RX, SPACE_SIZE_MIN_TX, SPACE_SIZE_MAX_TX, RX_CHANNELS,
                                       USR_RX_PKT_SIZE_MAX, HDR_META_WIDTH)::type_id::create("m_env", this);
@@ -53,6 +58,10 @@ class ex_test extends uvm_test;
         while ((timeout + 0.5ms) > $time() && m_env.m_scoreboard.used() != 0) begin
             #(600ns);
         end
+
+        // Keep monitoring the outputs for a while - late output (e.g. a duplicate SuperPacket after a timeout)
+        // has no model transaction and is reported as stuck in the report phase
+        #(3*TIMEOUT_CLK_NO*CLK_PERIOD);
 
         phase.drop_objection(this, "End of rx sequence");
     endtask
