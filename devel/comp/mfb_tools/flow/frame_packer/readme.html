@@ -81,7 +81,6 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Frame Packer</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#references">References</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#known-bugs">Known bugs</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
@@ -195,9 +194,7 @@ comparison, so the super-packet size should be around this length. The timeout i
 parameter TIMEOUT_CLK_NO, e.g. in number of clock cycles. In the worst case, the latency is
 2*TIMEOUT_CLK_NO due to the internal arrangement. The TX_MVB_HDR_META and TX_MVB_DISCARD are
 included here for compatibility, but are not currently used. The depth of each channel FIFO is
-set by the constant value FIFO_DEPTH and is set by deafult to 512 (Best BRAM optimization for Intel).
-Warning! There is a possible bug when sending the combination of small and large packets. In 400G
-version this could result in sending a packet larger than USR_PKT_SIZE_MAX.</p>
+set by the constant value FIFO_DEPTH and is set by deafult to 512 (Best BRAM optimization for Intel).</p>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -250,7 +247,8 @@ version this could result in sending a packet larger than USR_PKT_SIZE_MAX.</p>
 <tr class="row-even" id="vhdl-gengeneric-frame_packer-spkt_size_min"><td><p>SPKT_SIZE_MIN</p></td>
 <td><p>natural</p></td>
 <td><p>2**13</p></td>
-<td><p>The size of the Super-Packet (in bytes) the component is trying to reach. Should be power of 2.</p></td>
+<td><p>The size of the Super-Packet (in bytes) the component is trying to reach. Should be power of 2.
+SPKT_SIZE_MIN + size of the MFB word (in bytes) must not be larger than USR_RX_PKT_SIZE_MAX.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-frame_packer-timeout_clk_no"><td><p>TIMEOUT_CLK_NO</p></td>
 <td><p>natural</p></td>
@@ -479,16 +477,6 @@ The length and the channel ID are sent to the <code class="docutils literal notr
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
 <p>For more detailed description refer to <a class="reference external" href="https://www.vut.cz/www_base/zav_prace_soubor_verejne.php?file_id=267988">David Beneš’s master thesis</a>  (2023/2024)</p>
-</section>
-<section id="known-bugs">
-<h2>Known bugs<a class="headerlink" href="#known-bugs" title="Link to this heading"></a></h2>
-<p>There is a possible bug when sending the combination of small and large packets. In 400G
-version this could result in sending a packet larger than USR_PKT_SIZE_MAX.</p>
-<p>Another bug considers incomplete resetting logic of a signal that blocks the activation of the Timeout counter in the FP_TIMEOUT_EXT component.
-This bug occures in a verification when, at the end of the run, a Superpacket is sent due to a Timeout on a channel, and then one more packet
-(smaller than the size of the MFB word) arrives on this channel. It gets stuck in the Assembly/Temporary register forever as the Timeout counter
-gets unblocked only when the register “overflows” (i.e., a packet continues over this word). The solution should be to fix the reset logic for
-the <cite>timeout_block</cite> signal.</p>
 </section>
 </section>
 
