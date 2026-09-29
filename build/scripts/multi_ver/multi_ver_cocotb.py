@@ -79,6 +79,16 @@ def run_sim(settings: dict, test_name: str, venv: str | None = None, gui=False, 
     if cocotb_testcase is not None:
         command += f" COCOTB_TESTCASE='{cocotb_testcase}'"
 
+    # Extract cocotb-specific parameters (passed as environment variables,
+    # not as VHDL generics).  Each key K with value V becomes the environment
+    # variable COCOTB_K=V visible to the cocotb test.
+    cocotb_params = settings.pop("__cocotb_params__", {})
+    cocotb_env_names = []
+    for cp_name, cp_value in cocotb_params.items():
+        env_name = f"COCOTB_{cp_name}"
+        os.environ[env_name] = cp_value
+        cocotb_env_names.append(env_name)
+
     if len(settings) > 0:
         command += " GENERICS=\""
 
@@ -88,6 +98,9 @@ def run_sim(settings: dict, test_name: str, venv: str | None = None, gui=False, 
         command += "\""
 
     system(command)
+
+    for env_name in cocotb_env_names:
+        del os.environ[env_name]
 
     return parse_results()
 

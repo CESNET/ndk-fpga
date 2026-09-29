@@ -35,9 +35,14 @@ def create_setting_from_combination(settings, combination):
             FAIL = True
             continue
         for i in settings[c].keys(): # load modified values
-            # if parameter is __coreparams__ then it is dict
+            # if parameter is a dict then merge it
             if i == "__core_params__":
                 if "__core_params__" not in s.keys():
+                    s[i] = settings[c][i]
+                else:
+                    s[i].update(settings[c][i])
+            elif i == "__cocotb_params__":
+                if "__cocotb_params__" not in s.keys():
                     s[i] = settings[c][i]
                 else:
                     s[i].update(settings[c][i])

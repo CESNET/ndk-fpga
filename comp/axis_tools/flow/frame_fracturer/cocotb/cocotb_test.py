@@ -5,9 +5,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
+import os
 from random import randint, random
 from math import log2, ceil
-from typing import Tuple
+from typing import List, Tuple
 
 import cocotb
 import logging
@@ -40,40 +41,55 @@ class testbench():
             self.axi_rx_drv.log.setLevel(logging.DEBUG)
             self.axi_tx_mon.log.setLevel(logging.DEBUG)
 
-    def model(self, tr: Axi4StreamTransaction, word_bytes: int):
-        """Model of the DUT"""
-        recv_data = tr.TDATA # the full packet
-        pkt = b"" # the fractured part of the packet
-        fracture_en = tr.FRACTURE_EN.copy()
-        fracture_offset = tr.FRACTURE_OFFSET.copy()
+    def model(self, tr: Axi4sFrfrTransaction, word_bytes: int):
+        """Model of the DUT.
+
+        Processes up to MAX_FRACTURES fracture points per word.
+        """
+        recv_data = tr.TDATA  # the full packet
+        pkt = b""  # the fractured part of the packet
+        fracture_en = [list(e) for e in tr.FRACTURE_EN]
+        fracture_offset = [list(o) for o in tr.FRACTURE_OFFSET]
 
         while len(recv_data) > word_bytes:
-            en = fracture_en.pop(0) # Remove and use the first element
-            off = fracture_offset.pop(0) + 1 # +1 because we want to include the last byte of the "old" pkt
+            en_list = fracture_en.pop(0)
+            off_list = fracture_offset.pop(0)
+            word_data = recv_data[:word_bytes]
+            consumed = 0
+
+            for en, off in zip(en_list, off_list):
+                if en:
+                    cut = off + 1  # offset is inclusive
+                    pkt += word_data[consumed:cut]
+                    tx_axi_tr = Axi4StreamTransaction()
+                    tx_axi_tr.TDATA = pkt
+                    self.expected_output.append(tx_axi_tr)
+                    self.pkts_sent += 1
+                    pkt = b""
+                    consumed = cut
+
+            # Remaining bytes in this word go to the next sub-packet.
+            pkt += word_data[consumed:word_bytes]
+            recv_data = recv_data[word_bytes:]
+
+        # Handle last word.
+        en_list = fracture_en.pop(0)
+        off_list = fracture_offset.pop(0)
+        word_data = recv_data
+        consumed = 0
+
+        for en, off in zip(en_list, off_list):
             if en:
-                pkt += recv_data[0:off]
+                cut = off + 1
+                pkt += word_data[consumed:cut]
                 tx_axi_tr = Axi4StreamTransaction()
                 tx_axi_tr.TDATA = pkt
                 self.expected_output.append(tx_axi_tr)
                 self.pkts_sent += 1
-                pkt = recv_data[off:word_bytes]
-            else:
-                pkt += recv_data[0:word_bytes]
-            recv_data = recv_data[word_bytes:]
+                pkt = b""
+                consumed = cut
 
-        # Handle last word (last offset will never be further than to the end of the pkt)
-        en = fracture_en.pop(0)
-        off = fracture_offset.pop(0) + 1
-        if en:
-            pkt += recv_data[0:off]
-            tx_axi_tr = Axi4StreamTransaction()
-            tx_axi_tr.TDATA = pkt
-            self.expected_output.append(tx_axi_tr)
-            self.pkts_sent += 1
-            pkt = recv_data[off:]
-        else:
-            pkt += recv_data[0:]
-
+        pkt += word_data[consumed:]
         tx_axi_tr = Axi4StreamTransaction()
         tx_axi_tr.TDATA = pkt
         self.expected_output.append(tx_axi_tr)
@@ -86,16 +102,47 @@ class testbench():
         await RisingEdge(self.dut.CLK)
 
 
-def gen_fracture(weight: float, maximum: int) -> Tuple[int, int]:
+def gen_fractures(
+    max_fractures: int,
+    weight: float,
+    maximum: int,
+) -> Tuple[List[int], List[int]]:
+    """Generate up to max_fractures fracture points for one word.
+
+    Returns (enables, offsets) — lists of length max_fractures.
+    Offsets are strictly increasing when both slots are enabled.
+    """
+    enables = [0] * max_fractures
+    offsets = [0] * max_fractures
+
     if maximum <= 0:
-        return 0, 0
-    offset = randint(0, maximum)
-    enable = 1 if random() < weight else 0
-    return enable, offset
+        return enables, offsets
+
+    prev_off = -1
+    for f in range(max_fractures):
+        if random() >= weight:
+            break  # no more fractures (contiguous from index 0)
+        lo = prev_off + 1
+        if f < max_fractures - 1:
+            # Leave room for at least one more fracture slot.
+            hi = maximum - (max_fractures - 1 - f)
+        else:
+            hi = maximum
+        if lo > hi:
+            break
+        offsets[f] = randint(lo, hi)
+        enables[f] = 1
+        prev_off = offsets[f]
+
+    return enables, offsets
 
 
 @cocotb.test()
-async def run_test(dut, frame_count=5000, frame_size_min=60, frame_size_max=1500, fracture_weight=0.3):
+async def run_test(dut, frame_count=None, frame_size_min=60, frame_size_max=1500, fracture_weight=0.3):
+    # Allow the multi-ver runner to override frame_count via __cocotb_params__.
+    if frame_count is None:
+        frame_count = int(os.environ.get("COCOTB_FRAME_COUNT", "3000"))
+
     dut.RESET.value = 1
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
@@ -110,29 +157,40 @@ async def run_test(dut, frame_count=5000, frame_size_min=60, frame_size_max=1500
     tb.axi_tx_drv.start((1, i % 3) for i in itertools.count())
     await ClockCycles(tb.dut.CLK, 10)
 
-    word_w = tb.dut.AXI_TDATA_WIDTH.value // 8 # in bytes
-    fracture_off_w = ceil(log2(word_w)) # Offset signal width (in bits)
+    word_w = tb.dut.AXI_TDATA_WIDTH.value // 8  # in bytes
+    max_fr = tb.dut.MAX_FRACTURES.value
+    fracture_off_w = ceil(log2(word_w))  # Offset signal width (in bits)
+    off_max = 2**fracture_off_w - 1
+
     for pkt in random_packets(frame_size_min, frame_size_max, frame_count):
-        # packet to axi transaction
+        # Packet to AXI transaction
         axi_tr = Axi4sFrfrTransaction()
         axi_tr.TDATA = pkt
-        fractures = []
+
+        en_per_word = []
+        off_per_word = []
         pkt_len = len(pkt)
+
         while pkt_len > word_w:
-            fractures.append(gen_fracture(fracture_weight, 2**fracture_off_w-1))
+            en, off = gen_fractures(max_fr, fracture_weight, off_max)
+            en_per_word.append(en)
+            off_per_word.append(off)
             pkt_len -= word_w
-        fractures.append(gen_fracture(fracture_weight, pkt_len-2)) # -2 to avoid offset pointing to the last byte of the word
-        enables, offsets = zip(*fractures)
-        axi_tr.FRACTURE_EN = list(enables)
-        axi_tr.FRACTURE_OFFSET = list(offsets)
+
+        # Last word: offset must not point past the last valid byte.
+        en, off = gen_fractures(max_fr, fracture_weight, pkt_len - 2)
+        en_per_word.append(en)
+        off_per_word.append(off)
+
+        axi_tr.FRACTURE_EN = en_per_word
+        axi_tr.FRACTURE_OFFSET = off_per_word
 
         # Send to Driver (DUT)
         tb.axi_rx_drv.append(axi_tr)
-
         # Send to Model
         tb.model(axi_tr, word_w)
 
-    await ClockCycles(dut.CLK, 1000) # Wait for at least the first packet to reach the DUT's output
+    await ClockCycles(dut.CLK, 1000)  # Wait for at least the first packet to reach the DUT's output
     last_num = 0
     while (this_num := tb.axi_tx_mon.frame_cnt) > last_num:
         last_num = this_num

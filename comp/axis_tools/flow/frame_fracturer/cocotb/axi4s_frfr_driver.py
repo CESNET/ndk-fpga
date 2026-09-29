@@ -3,6 +3,8 @@
 # Author(s): Daniel Kondys <kondys@cesnet.cz>
 #            Ondřej Schwarz <ondrejschwarz@cesnet.cz>
 
+from math import ceil, log2
+
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotb.types import Logic, LogicArray
 from axi4s_frfr_transaction import Axi4sFrfrTransaction
@@ -26,9 +28,20 @@ class Axi4sFrfrDriver(Axi4StreamMaster):
 
     async def _split_transaction(self, transaction: Axi4sFrfrTransaction):
         i: int = 0
+        off_w = ceil(log2(len(self.bus.TDATA) // 8))
 
         async for _ in super()._split_transaction(transaction):
-            self.state.FRACTURE_EN     = transaction.FRACTURE_EN[i]
-            self.state.FRACTURE_OFFSET = transaction.FRACTURE_OFFSET[i]
+            # Pack per-slot enables into a single bit vector.
+            en_packed = 0
+            for f, e in enumerate(transaction.FRACTURE_EN[i]):
+                en_packed |= (e & 1) << f
+            self.state.FRACTURE_EN = en_packed
+
+            # Pack per-slot offsets into a concatenated bit field.
+            off_packed = 0
+            for f, o in enumerate(transaction.FRACTURE_OFFSET[i]):
+                off_packed |= (o & ((1 << off_w) - 1)) << (f * off_w)
+            self.state.FRACTURE_OFFSET = off_packed
+
             i += 1
             yield

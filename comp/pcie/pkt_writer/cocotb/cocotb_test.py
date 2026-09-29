@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import itertools
+import os
 from random import randint
 from math import log2, ceil
 from typing import Tuple
@@ -24,6 +24,7 @@ from cocotbext.ofm.mvb.drivers import MVBDriver
 from cocotbext.ofm.mvb.monitors import MVBMonitor
 from cocotbext.ofm.mvb.transaction import MvbTrClassicSerializable, hdrfield, serializableheader
 from cocotbext.ofm.ver.generators import random_packets
+from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 from cocotbext.ofm.utils.hex_formatter import format_bytes
@@ -144,9 +145,12 @@ class testbench():
     def __init__(self, dut, debug=False):
         self.dut = dut
         if dut.AXI_RX_DIRECT.value:
-            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, no_default_rate_limiter=True)
+            self.axis_rx_drv = Axi4StreamMaster(dut, "RX_AXI", dut.CLK, rate_limiter_config=dict(rate_percentage=80, random_idles=True))
             self.mfb_rx_drv = None
         else:
+            # TODO: Add rate limiting to the MFB RX driver once the MFB driver's
+            # IdleGenerator support is fixed. The current ItemRateLimiter can produce illegal MFB
+            # words with SRC_RDY=1 but SOF=0/EOF=0!
             self.mfb_rx_drv = MFBDriver(dut, "RX_MFB", dut.CLK, generics_prefix="MFB", no_default_rate_limiter=True)
             self.axis_rx_drv = None
         self.mvb_rx_drv = MVBDriver(dut, "RX_MVB", dut.CLK, protocol=MvbProtocolWithAddressAndLength, rate_limiter_config=dict(rate_percentage=50, random_idles=True, max_idles=3, zero_idles_chance=80))
@@ -323,15 +327,13 @@ async def _run_test(
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
 
     tb = testbench(dut)
-    # TODO: Change MFB driver's IdleGenerator to EthernetRateLimiter
-    # MFB Drive first needs to implement support for IdleGenerator!
     await tb.reset()
     tb.dut.PCIE_MPS.value = pcie_mps
 
     cocotb.log.info("\n--- Beginning the test ---\n")
 
-    tb.mvb_tx_drv.start((i, 3) for i in itertools.count())
-    tb.mfb_tx_drv.start((i, 3) for i in itertools.count())
+    tb.mvb_tx_drv.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.3)))
+    tb.mfb_tx_drv.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.3)))
     await ClockCycles(tb.dut.CLK, 10)
 
     # Decrease max size of generated frames in case the DUT generics do not allow it
@@ -370,11 +372,12 @@ async def _run_test(
     raise tb.scoreboard.result
 
 
-# NOTE: Do not set frame_size_max > pcie_mps until the DUT suports multiple breaks per word! TODO: Remove when the DUT is fixed
 # NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
 @cocotb.test()
-async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256, pcie_mps=256):
-    assert frame_size_max <= pcie_mps, "frame_size_max must be less than or equal to PCIE_MPS for this test." # TODO: Remove when the DUT is fixed
+async def run_test(dut, frame_count=None, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
+    # Allow the multi-ver runner to override frame_count via __cocotb_params__.
+    if frame_count is None:
+        frame_count = int(os.environ.get("COCOTB_FRAME_COUNT", "3000"))
 
     await _run_test(
         dut,
@@ -383,28 +386,4 @@ async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=256
         frame_size_max=frame_size_max,
         pcie_mps=pcie_mps,
         addr_gen=lambda: randint(0, 2**dut.ADDRESS_WIDTH.value - 1)
-    )
-
-
-# NOTE: Another test variant that would avoid the unspported multiple breaks per word in the DUT.
-#       In this test, we make sure the generated addresses are page-aligned so no page-break occurs.
-#       This way, we can have packet sizes of arbitrary length.
-@cocotb.test()
-async def run_test_page_aligned_frames(dut, frame_count=2000, frame_size_min=60, frame_size_max=8192, pcie_mps=256):
-
-    page_size = dut.PAGE_SIZE.value
-    address_width = dut.ADDRESS_WIDTH.value
-    assert page_size & (page_size - 1) == 0, "PAGE_SIZE must be a power of two for the page-aligned workaround."
-
-    def _page_aligned_addr():
-        # Page-aligning the address
-        return randint(0, (2**address_width) // page_size) * page_size
-
-    await _run_test(
-        dut,
-        frame_count=frame_count,
-        frame_size_min=frame_size_min,
-        frame_size_max=frame_size_max,
-        pcie_mps=pcie_mps,
-        addr_gen=_page_aligned_addr
     )

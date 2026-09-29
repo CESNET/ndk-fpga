@@ -67,24 +67,24 @@ SETTINGS = {
         "PKT_MTU"              : "16383",
     },
 
+    # Cocotb test parameters (not VHDL generics).
+    # Passed to the test as environment variables via __cocotb_params__.
+    "transactions_1000" : {
+        "__cocotb_params__"    : {"FRAME_COUNT": "1000"},
+    },
+    "transactions_200" : {
+        "__cocotb_params__"    : {"FRAME_COUNT": "200"},
+    },
+
     "_combinations_" : (
-    (), # Works the same as '("default",),' as the "default" is applied in every combination
+    ("rx_via_mfb","pcie_mfb_4r_1b_8i","transactions_1000"),
+    ("rx_via_mfb","mtu_127","transactions_3000"),
+    ("rx_via_mfb","mtu_max","transactions_200"),
 
-    ("pcie_mfb_1r_1b_8i",),
-    ("pcie_mfb_4r_1b_4i",),
-    ("pcie_mfb_4r_1b_8i",),
+    ("pcie_mfb_1r_1b_8i","mtu_max","transactions_200"),
+    ("pcie_mfb_4r_1b_4i","mtu_127","transactions_3000"),
 
-    ("rx_via_mfb","pcie_mfb_4r_1b_8i"),
-    ("rx_via_mfb","mtu_127"),
-    ("rx_via_mfb","mtu_max"),
-
-    ("pcie_mfb_1r_1b_8i","mtu_max"),
-    ("pcie_mfb_4r_1b_4i","mtu_127"),
-
-    ("wide_rx_axi","mtu_max"),
-
-    ("wide_rx_mfb","mtu_127"),
-    ("wide_rx_mfb","pcie_mfb_4r_1b_8i","mtu_max"),
-
+    ("wide_rx_axi","mtu_max","transactions_200"),
+    ("wide_rx_mfb","mtu_127","transactions_1000"),
     ),
 }
