@@ -1,0 +1,902 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HBM Tester &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Histogramer" href="../../../debug/histogramer/readme.html" />
+    <link rel="prev" title="MEM_TESTER C Software (depreciated)" href="../../../debug/mem_tester/sw/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../debug.html">Debug Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/streaming_debug/readme.html">Streaming Debug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/mem_tester/readme.html">Memory Tester</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">HBM Tester</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-configuration">Hardware Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#principle-of-operation">Principle of Operation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#address-generation">Address Generation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-generation-and-integrity">Data Generation and Integrity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#read-after-write">Read after Write</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#traffic-control">Traffic Control</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#component-port-and-generics-description">Component port and generics description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#control-software">Control Software</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tests">Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#command-line-arguments">Command Line Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#register-map">Register Map</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-register-0x14-bitfield">Configuration Register (0x14) Bitfield</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/histogramer/readme.html">Histogramer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/latency_meter/readme.html">Latency meter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/data_logger/readme.html">Data Logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/data_logger/mem_logger/readme.html">Memory Logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../debug/jtag_op_client/readme.html">JTAG-over-protocol Client</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../debug.html">Debug Tools</a></li>
+      <li class="breadcrumb-item active">HBM Tester</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mem_tools/debug/hbm_tester/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hbm-tester">
+<span id="id1"></span><h1>HBM Tester<a class="headerlink" href="#hbm-tester" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">HBM_TESTER</span></code> component validates HBM (High Bandwidth Memory) throughput, latency and
+data integrity. It stress-tests memory controllers and physical layers using both linear
+and pseudorandom access patterns.</p>
+<p>One tester is instantiated per physical HBM module, each in the clock and reset domain of
+that module. The MI bus is bridged into the HBM clock domain by the internal <code class="docutils literal notranslate"><span class="pre">MI_ASYNC</span></code>
+component, so the tester can be controlled from the application clock domain.</p>
+<section id="hardware-configuration">
+<h2>Hardware Configuration<a class="headerlink" href="#hardware-configuration" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Clock and Reset</strong></p>
+<ul>
+<li><p>One HBM module has a single frequency and reset domain.</p></li>
+<li><p>If the design has several HBM modules, instantiate a dedicated tester for each.</p></li>
+</ul>
+</li>
+<li><p><strong>PORT_ADDR_HBIT</strong> – capacity (addressing range) of one port.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">28</span></code> for <strong>256 MB</strong>, <code class="docutils literal notranslate"><span class="pre">29</span></code> for <strong>512 MB</strong>, <code class="docutils literal notranslate"><span class="pre">30</span></code> for <strong>1 GB</strong>.</p></li>
+</ul>
+</li>
+<li><p><strong>BASE_ADDR_OFFSET</strong> – size of one port in bytes, that is the step between the base
+addresses of two neighbouring ports. It must be a multiple of <code class="docutils literal notranslate"><span class="pre">2**PORT_ADDR_HBIT</span></code>.
+The base address of a port is <code class="docutils literal notranslate"><span class="pre">PORT_ID</span> <span class="pre">*</span> <span class="pre">BASE_ADDR_OFFSET</span></code>.</p>
+<ul>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">0</span></code> when every port has its own address space, for example a NoC attached HBM.</p></li>
+<li><p>For a 256 MB port packed into one map, use <code class="docutils literal notranslate"><span class="pre">0x10000000</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>CNT_WIDTH</strong> – width of the test duration counter. The maximum duration is
+<code class="docutils literal notranslate"><span class="pre">2**CNT_WIDTH</span></code> clock cycles.</p></li>
+</ul>
+</section>
+<section id="principle-of-operation">
+<h2>Principle of Operation<a class="headerlink" href="#principle-of-operation" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">HBM_TESTER_GEN</span></code> module acts as a traffic generator and data integrity checker.</p>
+<section id="address-generation">
+<h3>Address Generation<a class="headerlink" href="#address-generation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Sequential mode</strong>: addresses increment linearly. The stride follows the burst length
+(BL4 or BL8) so that the generated traffic stays contiguous.</p></li>
+<li><p><strong>Pseudorandom mode</strong>: a Linear Feedback Shift Register (LFSR) generates the addresses.
+Useful for worst-case latency, because it stops the HBM controller from consistently
+hitting open rows.</p></li>
+</ul>
+</section>
+<section id="data-generation-and-integrity">
+<h3>Data Generation and Integrity<a class="headerlink" href="#data-generation-and-integrity" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Write path</strong>: controlled by <code class="docutils literal notranslate"><span class="pre">CS_GEN_WR_DEAD</span></code>. With <code class="docutils literal notranslate"><span class="pre">0</span></code> the word holds an
+incrementing counter in the first 8 bits and zeros in the rest. With <code class="docutils literal notranslate"><span class="pre">1</span></code> the whole
+word is the constant <code class="docutils literal notranslate"><span class="pre">0xDEADCAFE</span></code> and no counter is written.</p></li>
+<li><p><strong>Read path and verification</strong>: the tester maintains an internal expected counter and
+compares it with the incoming <code class="docutils literal notranslate"><span class="pre">RD_DATA(7</span> <span class="pre">downto</span> <span class="pre">0)</span></code>.</p></li>
+<li><p><strong>Statistics</strong>: <code class="docutils literal notranslate"><span class="pre">STAT_DATA_OK_INC</span></code> pulses when the read data matches the expected
+counter, <code class="docutils literal notranslate"><span class="pre">STAT_DATA_ERR_INC</span></code> pulses on a mismatch.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Valid checking requires a strict “write then read” sequence.</p>
+</div>
+</section>
+<section id="read-after-write">
+<h3>Read after Write<a class="headerlink" href="#read-after-write" title="Link to this heading"></a></h3>
+<p>The AXI write and read channels are not ordered against each other. A read issued right
+after a write to the same address may therefore be served first and return the old data,
+which is what the <code class="docutils literal notranslate"><span class="pre">coherency</span></code> test looks for. The effect grows with the latency of the
+memory path; on a NoC attached HBM the read wins often.</p>
+<p>To keep this from firing on its own traffic, the generator only enables the read address
+once the write response of the previous burst has arrived (<code class="docutils literal notranslate"><span class="pre">s_wr_rsp_pending</span></code> in
+<code class="docutils literal notranslate"><span class="pre">HBM_TESTER_GEN</span></code>). This applies to the R/W switching mode only and costs the full write
+response latency between each write and its read, so that mode is not a bandwidth
+measurement. Config bit <code class="docutils literal notranslate"><span class="pre">[7]</span></code> (<code class="docutils literal notranslate"><span class="pre">-w</span></code> on the command line) turns the wait off, which
+lets the test measure how often a read overtakes its write on a given memory path.</p>
+</section>
+<section id="traffic-control">
+<h3>Traffic Control<a class="headerlink" href="#traffic-control" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Write-only / Read-only</strong>: continuous streams of a single transaction type.</p></li>
+<li><p><strong>R/W switching</strong>: with <code class="docutils literal notranslate"><span class="pre">CS_GEN_RW_SWITCH</span></code> enabled the module toggles between writing
+a burst and reading an address, simulating bidirectional traffic.</p></li>
+<li><p><strong>Burst support</strong>: <strong>BL8</strong> (64B access via two 256b words) and <strong>BL4</strong> (32B access).</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The burst is counted in bus words, so these sizes only hold on a 256b bus. On a 512b
+bus the same encoding issues 128B and 64B, and a real 32B access cannot be generated
+at all.</p>
+</div>
+</section>
+</section>
+<section id="component-port-and-generics-description">
+<h2>Component port and generics description<a class="headerlink" href="#component-port-and-generics-description" title="Link to this heading"></a></h2>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-hbm_tester">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">HBM_TESTER</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-hbm_tester" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>CLOCK AND RESET</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-hbm_clk"><td><p>HBM_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-hbm_reset"><td><p>HBM_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-hbm_init_done"><td><p>HBM_INIT_DONE</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>COMMON MI32 INTERFACE (MI_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-mi_clk"><td><p>MI_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-mi_reset"><td><p>MI_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(3 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>USER HBM SIMPLE INTERFACE (HSI) PER HBM PORT (HBM_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-wr_addr"><td><p>WR_ADDR</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>WRITE ADDR/DATA SIGNALS</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-wr_data"><td><p>WR_DATA</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(USR_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-wr_data_last"><td><p>WR_DATA_LAST</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-wr_valid"><td><p>WR_VALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-wr_ready"><td><p>WR_READY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-wr_rsp_ack"><td><p>WR_RSP_ACK</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>WRITE RESPONSE SIGNALS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-wr_rsp_valid"><td><p>WR_RSP_VALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-wr_rsp_ready"><td><p>WR_RSP_READY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-rd_addr"><td><p>RD_ADDR</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>READ ADDRESS SIGNALS</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-rd_addr_valid"><td><p>RD_ADDR_VALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-rd_addr_ready"><td><p>RD_ADDR_READY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-rd_data"><td><p>RD_DATA</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(USR_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>READ DATA SIGNALS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-rd_data_last"><td><p>RD_DATA_LAST</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-rd_data_valid"><td><p>RD_DATA_VALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-rd_data_ready"><td><p>RD_DATA_READY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>AXI INTERFACE PER HBM PORT (HBM_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_awid"><td><p>AXI_AWID</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>WRITE ADDRESS SIGNALS</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_awaddr"><td><p>AXI_AWADDR</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_awlen"><td><p>AXI_AWLEN</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_awsize"><td><p>AXI_AWSIZE</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_awburst"><td><p>AXI_AWBURST</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_awprot"><td><p>AXI_AWPROT</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_awqos"><td><p>AXI_AWQOS</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(4-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_awuser"><td><p>AXI_AWUSER</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(1-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_awvalid"><td><p>AXI_AWVALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_awready"><td><p>AXI_AWREADY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_wdata"><td><p>AXI_WDATA</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>WRITE DATA SIGNALS</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_wstrb"><td><p>AXI_WSTRB</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_wuser_data"><td><p>AXI_WUSER_DATA</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_wuser_strb"><td><p>AXI_WUSER_STRB</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_DATA_WIDTH/64-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_wlast"><td><p>AXI_WLAST</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_wvalid"><td><p>AXI_WVALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_wready"><td><p>AXI_WREADY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_bid"><td><p>AXI_BID</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>WRITE RESPONSE SIGNALS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_bresp"><td><p>AXI_BRESP</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_bvalid"><td><p>AXI_BVALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_bready"><td><p>AXI_BREADY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_arid"><td><p>AXI_ARID</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>READ ADDRESS SIGNALS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_araddr"><td><p>AXI_ARADDR</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_arlen"><td><p>AXI_ARLEN</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_arsize"><td><p>AXI_ARSIZE</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_arburst"><td><p>AXI_ARBURST</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_arprot"><td><p>AXI_ARPROT</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_arqos"><td><p>AXI_ARQOS</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(4-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_aruser"><td><p>AXI_ARUSER</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(1-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_arvalid"><td><p>AXI_ARVALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_arready"><td><p>AXI_ARREADY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_rid"><td><p>AXI_RID</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>READ DATA SIGNALS</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_rdata"><td><p>AXI_RDATA</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_ruser_data"><td><p>AXI_RUSER_DATA</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_ruser_err_dbe"><td><p>AXI_RUSER_ERR_DBE</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_rresp"><td><p>AXI_RRESP</p></td>
+<td><p>slv_array_t(PORTS-1 downto 0)(AXI_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_rlast"><td><p>AXI_RLAST</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-hbm_tester-axi_rvalid"><td><p>AXI_RVALID</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-hbm_tester-axi_rready"><td><p>AXI_RREADY</p></td>
+<td><p>std_logic_vector(PORTS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+<section id="control-software">
+<h2>Control Software<a class="headerlink" href="#control-software" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">hbm_tester.py</span></code> script in the <code class="docutils literal notranslate"><span class="pre">sw</span></code> directory controls the hardware.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>The script is not self-configuring and has to be told the geometry of your build.</strong>
+It does not read the geometry of the tester from the firmware or from the Device Tree,
+it assumes 32 ports per tester instance, a 256b data bus and a 450 MHz <code class="docutils literal notranslate"><span class="pre">HBM_CLK</span></code>.
+When these defaults do not match the design, pass the correct values with <code class="docutils literal notranslate"><span class="pre">-P</span></code>,
+<code class="docutils literal notranslate"><span class="pre">-W</span></code> and <code class="docutils literal notranslate"><span class="pre">-F</span></code>, otherwise the script reports wrong numbers without any warning, or
+accesses the registers of ports that do not exist.</p>
+</div>
+<p>One <code class="docutils literal notranslate"><span class="pre">hbm_tester</span></code> object is created per Device Tree node, that is per HBM module, and the
+values given on the command line are used for all of them. A design whose modules do not
+have the same geometry is not supported by the script.</p>
+<section id="tests">
+<h3>Tests<a class="headerlink" href="#tests" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Test</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">speed</span></code></p></td>
+<td><p>Writes and reads continuously and reports the throughput of each port.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">speed-rd</span></code></p></td>
+<td><p>Same, but the generator only reads. The write counter stays at zero, so the read
+figure is what a port reaches with the whole bus to itself.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">speed-wr</span></code></p></td>
+<td><p>Same, but the generator only writes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">latency</span></code></p></td>
+<td><p>Same traffic, but reports the average read and write latency. Use <code class="docutils literal notranslate"><span class="pre">-r</span></code> for the
+worst case, it stops the controller from hitting open rows.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">integrity</span></code></p></td>
+<td><p>Writes the counter to all addresses, then reads them back and checks. Answers
+“does what I wrote come back?”.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">coherency</span></code></p></td>
+<td><p>Fills the memory with <code class="docutils literal notranslate"><span class="pre">0xDEADCAFE</span></code> first, then writes the counter to an address
+and reads that same address straight back, alternating. The read has to return the
+counter, a returned <code class="docutils literal notranslate"><span class="pre">0xFE</span></code> means it overtook its own write. Answers “does a read
+right after a write see the new data?”.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="command-line-arguments">
+<h3>Command Line Arguments<a class="headerlink" href="#command-line-arguments" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 75.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Argument</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-i,</span> <span class="pre">--index</span></code></p></td>
+<td><p>Index of the HBM tester (e.g. <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>), or <code class="docutils literal notranslate"><span class="pre">all</span></code> to run on all modules.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-d,</span> <span class="pre">--device</span></code></p></td>
+<td><p>Device index (default: <code class="docutils literal notranslate"><span class="pre">0</span></code> for <code class="docutils literal notranslate"><span class="pre">/dev/nfb0</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-t,</span> <span class="pre">--test</span></code></p></td>
+<td><p>Type of test: <code class="docutils literal notranslate"><span class="pre">speed</span></code>, <code class="docutils literal notranslate"><span class="pre">speed-rd</span></code>, <code class="docutils literal notranslate"><span class="pre">speed-wr</span></code>, <code class="docutils literal notranslate"><span class="pre">latency</span></code>, <code class="docutils literal notranslate"><span class="pre">integrity</span></code> or
+<code class="docutils literal notranslate"><span class="pre">coherency</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-r,</span> <span class="pre">--random</span></code></p></td>
+<td><p>Enable random addressing (for latency or speed tests).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-w,</span> <span class="pre">--no-wait</span></code></p></td>
+<td><p>Do not wait for the write response before reading the same address (coherency
+test).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-b,</span> <span class="pre">--bl8</span></code></p></td>
+<td><p>Use the BL8 burst mode, that is a 64B access (default: BL4, a 32B access).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-I,</span> <span class="pre">--axi-id</span></code></p></td>
+<td><p>Give each transaction its own AXI ID, the default is one ID for all of them.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-p,</span> <span class="pre">--ports</span></code></p></td>
+<td><p>Number of active ports/channels (default: all).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-P,</span> <span class="pre">--tester-ports</span></code></p></td>
+<td><p>Number of ports of <strong>one</strong> tester instance, that is <code class="docutils literal notranslate"><span class="pre">HBM_PORTS</span> <span class="pre">/</span> <span class="pre">HBM_MODULES</span></code>
+(default: <code class="docutils literal notranslate"><span class="pre">32</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-W,</span> <span class="pre">--data-width</span></code></p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">HBM_DATA_WIDTH</span></code> of the build, <code class="docutils literal notranslate"><span class="pre">256</span></code> or <code class="docutils literal notranslate"><span class="pre">512</span></code> (default: <code class="docutils literal notranslate"><span class="pre">256</span></code>). A wrong
+value scales every reported speed by the same factor.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-F,</span> <span class="pre">--freq</span></code></p></td>
+<td><p>Frequency of <code class="docutils literal notranslate"><span class="pre">HBM_CLK</span></code> in MHz (default: <code class="docutils literal notranslate"><span class="pre">450</span></code>). The counters are converted to
+seconds with it, so it scales both the speed and the latency results.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="register-map">
+<h2>Register Map<a class="headerlink" href="#register-map" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 25.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x00</span></code></p></td>
+<td><p><strong>Version</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HBM_TESTER</span></code> version.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x10</span></code></p></td>
+<td><p><strong>Port Enable</strong></p></td>
+<td><p>One-hot bitmask to enable/run specific ports.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x14</span></code></p></td>
+<td><p><strong>Config</strong></p></td>
+<td><p>Configuration register (see the bitfield below).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x18</span></code></p></td>
+<td><p><strong>Reset</strong></p></td>
+<td><p>Writing to this register resets the tester logic.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x1C</span></code></p></td>
+<td><p><strong>Duration</strong></p></td>
+<td><p>Test duration (limit defined by <code class="docutils literal notranslate"><span class="pre">CNT_WIDTH</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x20</span></code></p></td>
+<td><p><strong>Status</strong></p></td>
+<td><p>Monitoring done / stats ready of each port (one-hot address).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x200</span></code></p></td>
+<td><p><strong>Stats 0</strong></p></td>
+<td><p>Base address for counter 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x204</span></code></p></td>
+<td><p><strong>Stats 1</strong></p></td>
+<td><p>Base address for counter 1.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="configuration-register-0x14-bitfield">
+<h3>Configuration Register (0x14) Bitfield<a class="headerlink" href="#configuration-register-0x14-bitfield" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12.0%" />
+<col style="width: 20.0%" />
+<col style="width: 68.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Bits</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[0]</span></code></p></td>
+<td><p>Connection</p></td>
+<td><p>0 = user source, 1 = generator source.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[1]</span></code></p></td>
+<td><p>Addr Mode</p></td>
+<td><p>0 = sequential, 1 = pseudorandom.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[2]</span></code></p></td>
+<td><p>Dead Data</p></td>
+<td><p>0 = counter value, 1 = <code class="docutils literal notranslate"><span class="pre">0xDEADCAFE</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[3]</span></code></p></td>
+<td><p>R/W Switch</p></td>
+<td><p>Enable automatic R/W toggling.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[5:4]</span></code></p></td>
+<td><p>Run Mode</p></td>
+<td><p>00 = none, 01 = WR only, 10 = RD only, 11 = RD and WR.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[6]</span></code></p></td>
+<td><p>Burst Mode</p></td>
+<td><p>Size of one access: 0 = BL4 (32B), 1 = BL8 (64B). The number of bus words the
+access takes is derived from <code class="docutils literal notranslate"><span class="pre">HBM_DATA_WIDTH</span></code>. A bus wider than 32B cannot
+generate BL4 and issues the 64B of BL8 in both modes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[7]</span></code></p></td>
+<td><p>R/W No Wait</p></td>
+<td><p>0 = wait for the write response before reading the same address, 1 = read
+immediately. See <a class="reference internal" href="#read-after-write">Read after Write</a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[16]</span></code></p></td>
+<td><p>AXI ID Mode</p></td>
+<td><p>0 = one ID for all transactions, 1 = a new ID for each one. With one ID, AXI4
+guarantees the order of the responses within a channel. It does not guarantee
+the order between the write and the read channel, see <a class="reference internal" href="#read-after-write">Read after Write</a>. A new
+ID for each transaction needs a reorder buffer in the memory or its IP, otherwise
+the responses come back in a different order than the tester expects and the data
+integrity test reports false errors. The NoC attached HBM on ThunderFjord
+(fb2cdg1) has no reorder buffer, so leave the bit at 0 there.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[10:8]</span></code></p></td>
+<td><p>Counter 0 Mode</p></td>
+<td><p>Selects the metric for result counter 0 (see below).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[14:12]</span></code></p></td>
+<td><p>Counter 1 Mode</p></td>
+<td><p>Selects the metric for result counter 1 (see below).</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Counter modes</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">000</span></code> – read words count</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">001</span></code> – write words count</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">010</span></code> – read latency</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">011</span></code> – write latency</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">100</span></code> – data OK count</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">101</span></code> – data error count</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../../debug/mem_tester/sw/readme.html" class="btn btn-neutral float-left" title="MEM_TESTER C Software (depreciated)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../debug/histogramer/readme.html" class="btn btn-neutral float-right" title="Histogramer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

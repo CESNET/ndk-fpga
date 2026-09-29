@@ -495,132 +495,150 @@ The minimum allowed length of the packet data is 60B, if necessary, the applicat
 <td><p>8</p></td>
 <td><p>MFB parameters: width of one item in bits</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_ports"><td><p>HBM_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_modules"><td><p>HBM_MODULES</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td><p>HBM parameters: number of physical HBM modules on the chip</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_ports"><td><p>HBM_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>HBM parameters: number of HBM ports</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_addr_width"><td><p>HBM_ADDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_addr_width"><td><p>HBM_ADDR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>HBM parameters: width of AXI address signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_data_width"><td><p>HBM_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_data_width"><td><p>HBM_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>256</p></td>
 <td><p>HBM parameters: width of AXI data signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_burst_width"><td><p>HBM_BURST_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_burst_width"><td><p>HBM_BURST_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td><p>HBM parameters: width of AXI burst signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_id_width"><td><p>HBM_ID_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_id_width"><td><p>HBM_ID_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>6</p></td>
 <td><p>HBM parameters: width of AXI ID signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_len_width"><td><p>HBM_LEN_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_len_width"><td><p>HBM_LEN_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>HBM parameters: width of AXI LEN signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_size_width"><td><p>HBM_SIZE_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_size_width"><td><p>HBM_SIZE_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>3</p></td>
 <td><p>HBM parameters: width of AXI size signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_resp_width"><td><p>HBM_RESP_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_resp_width"><td><p>HBM_RESP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
 <td><p>HBM parameters: width of AXI resp signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_prot_width"><td><p>HBM_PROT_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_port_addr_hbit"><td><p>HBM_PORT_ADDR_HBIT</p></td>
+<td><p>natural</p></td>
+<td><p>28</p></td>
+<td><p>HBM parameters: highest address bit of one HBM port (its capacity).
+28 =&gt; 256 MB, 29 =&gt; 512 MB, 30 =&gt; 1 GB per port.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_base_addr_offset"><td><p>HBM_BASE_ADDR_OFFSET</p></td>
+<td><p>natural</p></td>
+<td><p>0</p></td>
+<td><p>HBM parameters: multiplier for the port ID used to place each port into its own
+AXI memory segment. Use 0 when every AXI port has its own address space
+(e.g. a NoC attached HBM).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_prot_width"><td><p>HBM_PROT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>3</p></td>
 <td><p>HBM parameters: width of AXI prot signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_qos_width"><td><p>HBM_QOS_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_qos_width"><td><p>HBM_QOS_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
 <td><p>HBM parameters: width of AXI qos signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-hbm_user_width"><td><p>HBM_USER_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-hbm_user_width"><td><p>HBM_USER_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>HBM parameters: width of AXI user signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_ports"><td><p>MEM_PORTS</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_ports"><td><p>MEM_PORTS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>MEM parameters: number of external memory ports (EMIFs)</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mem_addr_width"><td><p>MEM_ADDR_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_addr_width"><td><p>MEM_ADDR_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>27</p></td>
 <td><p>MEM parameters: width of AVMM address signal</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_burst_width"><td><p>MEM_BURST_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_burst_width"><td><p>MEM_BURST_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>7</p></td>
 <td><p>MEM parameters: width of AVMM burst count signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mem_data_width"><td><p>MEM_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_data_width"><td><p>MEM_DATA_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>512</p></td>
 <td><p>MEM parameters: width of AVMM data signals</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_refr_period_width"><td><p>MEM_REFR_PERIOD_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mem_refr_period_width"><td><p>MEM_REFR_PERIOD_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
 <td><p>MEM parameters: width of user refresh period</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mem_def_refr_period"><td><p>MEM_DEF_REFR_PERIOD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mem_def_refr_period"><td><p>MEM_DEF_REFR_PERIOD</p></td>
 <td><p>integer</p></td>
 <td><p>0</p></td>
 <td><p>MEM parameters: default refresh periods for each interface</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-amm_freq_khz"><td><p>AMM_FREQ_KHZ</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-amm_freq_khz"><td><p>AMM_FREQ_KHZ</p></td>
 <td><p>integer</p></td>
 <td><p>266660</p></td>
 <td><p>Freq of the AMM bus with EMIF</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-mi_data_width"><td><p>MI_DATA_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
 <td><p>MI parameters: width of data signals</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-mi_addr_width"><td><p>MI_ADDR_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>32</p></td>
 <td><p>MI parameters: width of address signal</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-fpga_id_width"><td><p>FPGA_ID_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-fpga_id_width"><td><p>FPGA_ID_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>64</p></td>
 <td><p>Width of FPGA ID</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-reset_width"><td><p>RESET_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-reset_width"><td><p>RESET_WIDTH</p></td>
 <td><p>integer</p></td>
 <td><p>2</p></td>
 <td><p>Width of reset signals</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-misc_top2app_width"><td><p>MISC_TOP2APP_WIDTH</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-misc_top2app_width"><td><p>MISC_TOP2APP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between Top-Level FPGA design and APP core logic</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-misc_app2top_width"><td><p>MISC_APP2TOP_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-misc_app2top_width"><td><p>MISC_APP2TOP_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
 <td><p>Width of MISC signal between APP core logic and Top-Level FPGA design</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-application_core-board"><td><p>BOARD</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-application_core-board"><td><p>BOARD</p></td>
 <td><p>string</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>Name of FPGA board</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-application_core-device"><td><p>DEVICE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-application_core-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>UNDEFINED</p></td>
 <td><p>Name of FPGA device</p></td>
