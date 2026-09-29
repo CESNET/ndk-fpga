@@ -78,7 +78,9 @@ entity FPGA_COMMON is
         QSFP_I2C_TRISTATE       : boolean := true;
         QSFP_I2C_CTRL_EN        : boolean := true;
 
-        HBM_PORTS               : natural := 1;
+        -- Number of HBM Memory modules on the chip.
+        HBM_MODULES             : natural := 0;
+        HBM_PORTS               : natural := 0;
         HBM_ADDR_WIDTH          : natural := 32;
         HBM_DATA_WIDTH          : natural := 256;
         HBM_BURST_WIDTH         : natural := 2;
@@ -86,6 +88,12 @@ entity FPGA_COMMON is
         HBM_LEN_WIDTH           : natural := 4;
         HBM_SIZE_WIDTH          : natural := 3;
         HBM_RESP_WIDTH          : natural := 2;
+        -- Highest address bit of one HBM port (its capacity).
+        -- 28 => 256 MB, 29 => 512 MB, 30 => 1 GB per port.
+        HBM_PORT_ADDR_HBIT      : natural := 28;
+        -- Multiplier for the port ID used to place each port into its own AXI memory
+        -- segment. Use 0 when every AXI port has its own address space (NoC attached HBM).
+        HBM_BASE_ADDR_OFFSET    : natural := 0;
         HBM_PROT_WIDTH          : natural := 3;
         HBM_QOS_WIDTH           : natural := 4;
         HBM_USER_WIDTH          : natural := 1;
@@ -1697,6 +1705,7 @@ begin
         DMA_MFB_REGION_SIZE   => DMA_MFB_REGION_SIZE,
         MFB_BLOCK_SIZE        => MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH        => MFB_ITEM_WIDTH,
+        HBM_MODULES           => HBM_MODULES,
         HBM_PORTS             => HBM_PORTS,
         HBM_DATA_WIDTH        => HBM_DATA_WIDTH,
         HBM_ADDR_WIDTH        => HBM_ADDR_WIDTH,
@@ -1705,6 +1714,8 @@ begin
         HBM_LEN_WIDTH         => HBM_LEN_WIDTH,
         HBM_SIZE_WIDTH        => HBM_SIZE_WIDTH,
         HBM_RESP_WIDTH        => HBM_RESP_WIDTH,
+        HBM_PORT_ADDR_HBIT    => HBM_PORT_ADDR_HBIT,
+        HBM_BASE_ADDR_OFFSET  => HBM_BASE_ADDR_OFFSET,
         HBM_PROT_WIDTH        => HBM_PROT_WIDTH,
         HBM_QOS_WIDTH         => HBM_QOS_WIDTH,
         HBM_USER_WIDTH        => HBM_USER_WIDTH,

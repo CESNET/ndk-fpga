@@ -169,8 +169,39 @@ VhdlPkgBool -pkg ndk_fpga_common_pkg DMA_GEN_LOOP_EN      $DMA_GEN_LOOP_EN
 VhdlPkgBool -pkg ndk_fpga_common_pkg TSU_ENABLE    $TSU_ENABLE
 VhdlPkgInt  -pkg ndk_fpga_common_pkg TSU_FREQUENCY $TSU_FREQUENCY
 
-VhdlPkgInt -pkg ndk_fpga_top_pkg MEM_PORTS     $MEM_PORTS
-VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_PORTS     $HBM_PORTS
+VhdlPkgInt -pkg ndk_fpga_top_pkg MEM_PORTS      $MEM_PORTS
+
+# Check if HBM_PORTS is divisible by HBM_MODULES
+
+set modules_exist [expr {[info exists HBM_MODULES] && $HBM_MODULES != 0}]
+set ports_active  [expr {[info exists HBM_PORTS]   && $HBM_PORTS   != 0}]
+
+if {$ports_active && !$modules_exist} {
+    puts "**********************************************************"
+    puts " ERROR: HBM_PORTS is set to $HBM_PORTS, but HBM_MODULES is 0 or undefined!"
+    puts " Cannot assign ports to non-existent modules."
+    puts "**********************************************************"
+    exit 1
+
+} elseif {$ports_active && $modules_exist} {
+    if {[expr {$HBM_PORTS % $HBM_MODULES}] != 0} {
+        puts "**********************************************************"
+        puts " ERROR: HBM Alignment Failure!"
+        puts " HBM_PORTS ($HBM_PORTS) must be a multiple of HBM_MODULES ($HBM_MODULES)."
+        puts "**********************************************************"
+        exit 1
+    }
+}
+
+# A card without HBM ports has no HBM modules either.
+if {!$ports_active} {
+    set HBM_MODULES 0
+}
+
+# If we get here, either ports are 0 (nothing to do) or the math is correct.
+VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_PORTS      $HBM_PORTS
+VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_MODULES    $HBM_MODULES
+VhdlPkgInt -pkg ndk_fpga_top_pkg HBM_DATA_WIDTH $HBM_DATA_WIDTH
 
 VhdlPkgBool -pkg ndk_fpga_common_pkg VIRTUAL_DEBUG_ENABLE   $VIRTUAL_DEBUG_ENABLE
 VhdlPkgBool -pkg ndk_fpga_common_pkg DMA_DEBUG_ENABLE       $DMA_DEBUG_ENABLE
@@ -180,4 +211,3 @@ VhdlPkgBool -pkg ndk_fpga_common_pkg PCIE_CTRL_DEBUG_ENABLE $PCIE_CTRL_DEBUG_ENA
 VhdlPkgBool -pkg ndk_fpga_common_pkg MEASURE_FREQUENCIES    $MEASURE_FREQUENCIES
 VhdlPkgBool -pkg ndk_fpga_common_pkg TS_DEMO_EN             $TS_DEMO_EN
 VhdlPkgBool -pkg ndk_fpga_common_pkg LL_MODE                $LL_MODE
-

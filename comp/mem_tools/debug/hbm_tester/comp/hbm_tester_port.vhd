@@ -13,21 +13,23 @@ use work.math_pack.all;
 
 entity HBM_TESTER_PORT is
     generic (
-        DEBUG           : boolean := True;
-        -- when USE_AXI_ID is false, you can disable Re-order buffer in HBM IP
-        USE_AXI_ID      : boolean := True;
-        CNT_WIDTH       : natural := 16;
-        PORT_ID         : natural := 0;
-        AXI_ADDR_WIDTH  : natural := 32;
-        AXI_DATA_WIDTH  : natural := 256;
-        AXI_BURST_WIDTH : natural := 2;
-        AXI_ID_WIDTH    : natural := 6;
-        AXI_LEN_WIDTH   : natural := 4;
-        AXI_SIZE_WIDTH  : natural := 3;
-        AXI_RESP_WIDTH  : natural := 2;
-        USR_DATA_WIDTH  : natural := 256;
-        PORT_ADDR_HBIT  : natural := AXI_ADDR_WIDTH;
-        DEVICE          : string := "AGILEX"
+        DEBUG            : boolean := True;
+        -- Size of one port in bytes, used as the base address of each port.
+        -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
+        -- own address space (e.g. a NoC attached HBM).
+        BASE_ADDR_OFFSET : natural := 0;
+        CNT_WIDTH        : natural := 16;
+        PORT_ID          : natural := 0;
+        AXI_ADDR_WIDTH   : natural := 32;
+        AXI_DATA_WIDTH   : natural := 256;
+        AXI_BURST_WIDTH  : natural := 2;
+        AXI_ID_WIDTH     : natural := 6;
+        AXI_LEN_WIDTH    : natural := 4;
+        AXI_SIZE_WIDTH   : natural := 3;
+        AXI_RESP_WIDTH   : natural := 2;
+        USR_DATA_WIDTH   : natural := 256;
+        PORT_ADDR_HBIT   : natural := AXI_ADDR_WIDTH;
+        DEVICE           : string := "AGILEX"
     );
     port (
         -- =====================================================================
@@ -123,6 +125,9 @@ entity HBM_TESTER_PORT is
         -- Generator control: 0 = stop, 1 = run
         DB_GEN_RUN        : in  std_logic;
         DB_GEN_RW_SWITCH  : in  std_logic;
+        DB_GEN_RW_NO_WAIT : in  std_logic;
+        -- AXI ID mode: 0 = one ID for all transactions, 1 = a new ID for each one
+        DB_GEN_USE_AXI_ID : in  std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
         DB_GEN_WR_DEAD    : in  std_logic;
         -- Time of monitoring in clock cycles
@@ -148,15 +153,29 @@ end entity;
 
 architecture FULL of HBM_TESTER_PORT is
 
+    -- Length of one burst in bus words. One HBM pseudo channel is 64b wide, so a BL4
+    -- burst moves 4*64b = 32B and a BL8 burst 8*64b = 64B. The data bus here is much
+    -- wider and carries the same access in fewer but wider words, which is why the
+    -- burst length has to be derived from AXI_DATA_WIDTH rather than fixed. The clamp
+    -- to one word covers a bus at least as wide as the access itself: a 512b word
+    -- already holds the whole 64B of BL8, so the 32B of BL4 cannot be expressed and
+    -- both modes end up issuing the same 64B.
+    -- The constants are passed to HBM_TESTER_GEN, so the AXI burst announced here
+    -- always covers the same number of words as the generator produces.
+    constant BL8_WORDS : natural := max(1, 64/(AXI_DATA_WIDTH/8));
+    constant BL4_WORDS : natural := max(1, 32/(AXI_DATA_WIDTH/8));
+
     signal s_reset_reg            : std_logic;
 
-    signal s_db_gen_addr_mode_reg : std_logic;
-    signal s_db_gen_connect_reg   : std_logic;
-    signal s_db_gen_bl8_mode_reg  : std_logic;
-    signal s_db_gen_run_mode_reg  : std_logic_vector(1 downto 0);
-    signal s_db_gen_run_reg       : std_logic;
-    signal s_db_gen_rw_switch_reg : std_logic;
-    signal s_db_gen_wr_dead_reg   : std_logic;
+    signal s_db_gen_addr_mode_reg  : std_logic;
+    signal s_db_gen_connect_reg    : std_logic;
+    signal s_db_gen_bl8_mode_reg   : std_logic;
+    signal s_db_gen_use_axi_id_reg : std_logic;
+    signal s_db_gen_run_mode_reg   : std_logic_vector(1 downto 0);
+    signal s_db_gen_run_reg        : std_logic;
+    signal s_db_gen_rw_switch_reg  : std_logic;
+    signal s_db_gen_rw_no_wait_reg : std_logic;
+    signal s_db_gen_wr_dead_reg    : std_logic;
 
     signal s_db_mon_time_reg      : std_logic_vector(CNT_WIDTH-1 downto 0);
     signal s_db_mon_reset_reg     : std_logic;
@@ -270,21 +289,22 @@ architecture FULL of HBM_TESTER_PORT is
     signal s_axi_rready           : std_logic;
 
     attribute keep : string;
-    attribute keep of s_reset_reg            : signal is "true";
-    attribute keep of s_db_gen_addr_mode_reg : signal is "true";
-    attribute keep of s_db_gen_connect_reg   : signal is "true";
-    attribute keep of s_db_gen_bl8_mode_reg  : signal is "true";
-    attribute keep of s_db_gen_run_mode_reg  : signal is "true";
-    attribute keep of s_db_gen_run_reg       : signal is "true";
-    attribute keep of s_db_gen_rw_switch_reg : signal is "true";
-    attribute keep of s_db_gen_wr_dead_reg   : signal is "true";
-    attribute keep of s_db_mon_time_reg      : signal is "true";
-    attribute keep of s_db_mon_reset_reg     : signal is "true";
-    attribute keep of s_db_mon_cnt0_mode_reg : signal is "true";
-    attribute keep of s_db_mon_cnt1_mode_reg : signal is "true";
-    attribute keep of s_db_mon_done_reg      : signal is "true";
-    attribute keep of s_db_stat_cnt0_reg     : signal is "true";
-    attribute keep of s_db_stat_cnt1_reg     : signal is "true";
+    attribute keep of s_reset_reg             : signal is "true";
+    attribute keep of s_db_gen_addr_mode_reg  : signal is "true";
+    attribute keep of s_db_gen_connect_reg    : signal is "true";
+    attribute keep of s_db_gen_bl8_mode_reg   : signal is "true";
+    attribute keep of s_db_gen_run_mode_reg   : signal is "true";
+    attribute keep of s_db_gen_run_reg        : signal is "true";
+    attribute keep of s_db_gen_rw_switch_reg  : signal is "true";
+    attribute keep of s_db_gen_rw_no_wait_reg : signal is "true";
+    attribute keep of s_db_gen_wr_dead_reg    : signal is "true";
+    attribute keep of s_db_mon_time_reg       : signal is "true";
+    attribute keep of s_db_mon_reset_reg      : signal is "true";
+    attribute keep of s_db_mon_cnt0_mode_reg  : signal is "true";
+    attribute keep of s_db_mon_cnt1_mode_reg  : signal is "true";
+    attribute keep of s_db_mon_done_reg       : signal is "true";
+    attribute keep of s_db_stat_cnt0_reg      : signal is "true";
+    attribute keep of s_db_stat_cnt1_reg      : signal is "true";
 
     -- attribute mark_debug : string;
     -- attribute mark_debug of s_axi_awid : signal is "true";
@@ -334,13 +354,15 @@ begin
         if (rising_edge(CLK)) then
             s_reset_reg <= RESET;
 
-            s_db_gen_connect_reg   <= DB_GEN_CONNECT;
-            s_db_gen_addr_mode_reg <= DB_GEN_ADDR_MODE;
-            s_db_gen_bl8_mode_reg  <= DB_GEN_BL8_MODE;
-            s_db_gen_run_mode_reg  <= DB_GEN_RUN_MODE;
-            s_db_gen_run_reg       <= DB_GEN_RUN;
-            s_db_gen_rw_switch_reg <= DB_GEN_RW_SWITCH;
-            s_db_gen_wr_dead_reg   <= DB_GEN_WR_DEAD;
+            s_db_gen_connect_reg    <= DB_GEN_CONNECT;
+            s_db_gen_addr_mode_reg  <= DB_GEN_ADDR_MODE;
+            s_db_gen_bl8_mode_reg   <= DB_GEN_BL8_MODE;
+            s_db_gen_run_mode_reg   <= DB_GEN_RUN_MODE;
+            s_db_gen_run_reg        <= DB_GEN_RUN;
+            s_db_gen_rw_switch_reg  <= DB_GEN_RW_SWITCH;
+            s_db_gen_rw_no_wait_reg <= DB_GEN_RW_NO_WAIT;
+            s_db_gen_use_axi_id_reg <= DB_GEN_USE_AXI_ID;
+            s_db_gen_wr_dead_reg    <= DB_GEN_WR_DEAD;
 
             s_db_mon_time_reg      <= DB_MON_TIME;
             s_db_mon_reset_reg     <= DB_MON_RESET;
@@ -356,21 +378,23 @@ begin
     -- -------------------------------------------------------------------------
     --  HMC BURST PARAMETERS
     -- -------------------------------------------------------------------------
-    -- Burst Size. This signal indicates the size of each transfer in
-    -- the burst: "101" = 32 Bytes (BL4), "110" = 64 Bytes
-    -- The 32B and 64B access refers to data corresponding to 64 bits
-    -- (one Pseudo Channel) for 4 burst cycles (32B) or 8 burst cycles (64B).
-    -- The 64B access granularity is the default for better efficiency.
+    -- Burst Size. The 32B (BL4) and 64B (BL8) access is counted on one Pseudo
+    -- Channel, which is 64 bits wide, over 4 burst cycles (32B) or 8 burst cycles
+    -- (64B) of the DRAM. The 64B granularity is the default for better efficiency,
+    -- it needs half as many commands for the same amount of data. How many AXI
+    -- beats that access takes depends on the width of the bus, so AXI_LEN comes
+    -- from the constants above. AXI_SIZE stays the full bus width, which is also
+    -- the reason a beat cannot be made shorter than one whole word.
 
     process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s_db_gen_bl8_mode_reg = '1') then
-                s_hbm_burst_size       <= std_logic_vector(to_unsigned(1, AXI_LEN_WIDTH));
-                s_hbm_wr_burst_cnt_max <= "01";
+                s_hbm_burst_size       <= std_logic_vector(to_unsigned(BL8_WORDS-1, AXI_LEN_WIDTH));
+                s_hbm_wr_burst_cnt_max <= to_unsigned(BL8_WORDS-1, 2);
             else
-                s_hbm_burst_size       <= std_logic_vector(to_unsigned(0, AXI_LEN_WIDTH));
-                s_hbm_wr_burst_cnt_max <= "00";
+                s_hbm_burst_size       <= std_logic_vector(to_unsigned(BL4_WORDS-1, AXI_LEN_WIDTH));
+                s_hbm_wr_burst_cnt_max <= to_unsigned(BL4_WORDS-1, 2);
             end if;
         end if;
     end process;
@@ -417,10 +441,14 @@ begin
 
         generator_i : entity work.HBM_TESTER_GEN
         generic map (
-            USR_DATA_WIDTH => USR_DATA_WIDTH,
-            AXI_ADDR_WIDTH => AXI_ADDR_WIDTH,
-            PORT_ADDR_HBIT => PORT_ADDR_HBIT,
-            PORT_ID        => PORT_ID
+            USR_DATA_WIDTH      => USR_DATA_WIDTH,
+            AXI_DATA_WIDTH      => AXI_DATA_WIDTH,
+            AXI_ADDR_WIDTH      => AXI_ADDR_WIDTH,
+            PORT_ADDR_HBIT      => PORT_ADDR_HBIT,
+            PORT_ID             => PORT_ID,
+            BASE_ADDR_OFFSET    => BASE_ADDR_OFFSET,
+            BL8_WORDS           => BL8_WORDS,
+            BL4_WORDS           => BL4_WORDS
         )
         port map (
             CLK               => CLK,
@@ -431,6 +459,7 @@ begin
             CS_GEN_RUN_MODE   => s_db_gen_run_mode_reg,
             CS_GEN_RUN        => s_db_gen_run_reg,
             CS_GEN_RW_SWITCH  => s_db_gen_rw_switch_reg,
+            CS_GEN_RW_NO_WAIT => s_db_gen_rw_no_wait_reg,
             CS_GEN_WR_DEAD    => s_db_gen_wr_dead_reg,
 
             STAT_DATA_OK_INC  => s_gen_data_ok_inc,
@@ -629,24 +658,23 @@ begin
         end if;
     end process;
 
-    axi_awid_on_g : if USE_AXI_ID generate
-        -- counter of write id
-        hbm_wr_id_cnt_p : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (s_reset_reg = '1') then
-                    s_hbm_wr_id_cnt <= (others => '0');
-                elsif (s_hbm_wr_valid = '1' and s_hbm_wr_ready = '1' and s_hbm_wr_burst_last = '1') then
+    -- Counter of the write ID. It runs only when the AXI ID mode is on. When the mode
+    -- is off the counter stays at zero, so every write uses the same ID and AXI keeps
+    -- the write responses in order. With the mode on the memory needs a reorder buffer.
+    hbm_wr_id_cnt_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (s_reset_reg = '1') then
+                s_hbm_wr_id_cnt <= (others => '0');
+            elsif (s_db_gen_use_axi_id_reg = '1') then
+                if (s_hbm_wr_valid = '1' and s_hbm_wr_ready = '1' and s_hbm_wr_burst_last = '1') then
                     s_hbm_wr_id_cnt <= s_hbm_wr_id_cnt + 1;
                 end if;
+            else
+                s_hbm_wr_id_cnt <= (others => '0');
             end if;
-        end process;
-    end generate;
-
-    axi_awid_off_g : if not USE_AXI_ID generate
-        -- Each trancastion has same ID!
-        s_hbm_wr_id_cnt <= (others => '0');
-    end generate;
+        end if;
+    end process;
 
     s_hbm_wr_burst_first <= '1' when (s_hbm_wr_burst_cnt = "00") else '0';
     s_hbm_wr_burst_last  <= '1' when (s_hbm_wr_burst_cnt = s_hbm_wr_burst_cnt_max) else '0';
@@ -655,8 +683,8 @@ begin
     s_axi_awid    <= std_logic_vector(s_hbm_wr_id_cnt);
     s_axi_awaddr  <= s_hbm_wr_addr;
     s_axi_awlen   <= s_hbm_burst_size;
-    s_axi_awsize  <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH));  -- MUST be 32B
-    s_axi_awburst <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
+    s_axi_awsize  <= std_logic_vector(to_unsigned(log2(AXI_DATA_WIDTH/8), AXI_SIZE_WIDTH));  -- Full bus width: WSTRB is always all-ones and address must step one whole word per beat
+    s_axi_awburst <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH));                      -- INCR mode
     s_axi_awprot  <= (others => '0');
     s_axi_awqos   <= (others => '0');
     s_axi_awuser  <= (others => '0');
@@ -683,31 +711,28 @@ begin
     s_hbm_wr_rsp_valid <= s_axi_bvalid;
     s_axi_bready       <= s_hbm_wr_rsp_ready;
 
-    axi_arid_on_g : if USE_AXI_ID generate
-        -- counter of read id
-        hbm_rd_id_cnt_p : process (CLK)
-        begin
-            if (rising_edge(CLK)) then
-                if (s_reset_reg = '1') then
-                    s_hbm_rd_id_cnt <= (others => '0');
-                elsif (s_hbm_rd_addr_valid = '1' and s_hbm_rd_addr_ready = '1') then
+    -- Counter of the read ID, the same rule as for the write ID above.
+    hbm_rd_id_cnt_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (s_reset_reg = '1') then
+                s_hbm_rd_id_cnt <= (others => '0');
+            elsif (s_db_gen_use_axi_id_reg = '1') then
+                if (s_hbm_rd_addr_valid = '1' and s_hbm_rd_addr_ready = '1') then
                     s_hbm_rd_id_cnt <= s_hbm_rd_id_cnt + 1;
                 end if;
+            else
+                s_hbm_rd_id_cnt <= (others => '0');
             end if;
-        end process;
-    end generate;
-
-    axi_arid_off_g : if not USE_AXI_ID generate
-        -- Each trancastion has same ID!
-        s_hbm_rd_id_cnt <= (others => '0');
-    end generate;
+        end if;
+    end process;
 
     -- HBM read address signals
     s_axi_arid          <= std_logic_vector(s_hbm_rd_id_cnt);
     s_axi_araddr        <= s_hbm_rd_addr;
     s_axi_arlen         <= s_hbm_burst_size;
-    s_axi_arsize        <= std_logic_vector(to_unsigned(5, AXI_SIZE_WIDTH));  -- MUST be 32B
-    s_axi_arburst       <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH)); -- INCR mode
+    s_axi_arsize        <= std_logic_vector(to_unsigned(log2(AXI_DATA_WIDTH/8), AXI_SIZE_WIDTH));  -- Full bus width: address must step one whole word per beat, matching the address generator
+    s_axi_arburst       <= std_logic_vector(to_unsigned(1, AXI_BURST_WIDTH));                      -- INCR mode
     s_axi_arprot        <= (others => '0');
     s_axi_arqos         <= (others => '0');
     s_axi_aruser        <= (others => '0');

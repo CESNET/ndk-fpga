@@ -27,6 +27,7 @@ set MEM_PORTS             0
 
 # Set HBM ports, valid values are 0, 16 or 32
 set HBM_PORTS            32
+set HBM_MODULES           2
 
 # Set number of DMA MODULES. Minimal design requires 4, otherwise 2 are fine.
 set DMA_MODULES           4

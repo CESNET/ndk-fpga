@@ -4,6 +4,7 @@ proc dts_application {base generics} {
     set eth_streams $GENERICS(ETH_STREAMS)
     set ddr_ports $GENERICS(DDR_PORTS)
     set hbm_ports $GENERICS(HBM_PORTS)
+    set hbm_modules $GENERICS(HBM_MODULES)
 
     # ETH streams + 1 port for DDR/HBM testers
     set mi_ports_raw [expr $eth_streams + 1]
@@ -14,8 +15,8 @@ proc dts_application {base generics} {
     }
     set subaddr_w [expr 0x02000000 / $mi_ports]
 
-    # 2x DDR ports + 1 HBM tester port
-    set mt_mi_ports_raw [expr 2 * $ddr_ports + 1]
+    # 2x DDR ports + N HBM tester ports
+    set mt_mi_ports_raw [expr 2 * $ddr_ports + $hbm_modules]
     # Round to nearest power of 2
     set mt_mi_ports 1
     while {$mt_mi_ports < $mt_mi_ports_raw} {
@@ -42,8 +43,10 @@ proc dts_application {base generics} {
     }
 
     if {$hbm_ports > 0} {
-        set hbm_tester_base [expr $base + $subaddr_w * $eth_streams + $mt_subaddr_w * (2 * $ddr_ports)]
-        append ret [dts_hbm_tester "hbm_tester" $hbm_tester_base]
+        for {set i 0} {$i < $hbm_modules} {incr i} {
+            set hbm_tester_base [expr $base + $subaddr_w * $eth_streams + $mt_subaddr_w * (2 * $ddr_ports) + $mt_subaddr_w * $i]
+            append ret [dts_hbm_tester "hbm_tester_$i" $hbm_tester_base]
+        }
     }
 
     append ret "};"

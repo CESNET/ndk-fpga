@@ -1455,7 +1455,12 @@ begin
         QSFP_PORTS              => ETH_PORTS,
         QSFP_I2C_PORTS          => ETH_PORTS,
 
+        HBM_MODULES             => HBM_MODULES,
         HBM_PORTS               => HBM_PORTS,
+        -- 256 MB per port: bits 33:28 select the port (bit 33 unused, 32 ports only
+        -- need 5 of the 6 allocated bits), 27:5 address within the port, 4:0 word offset.
+        HBM_PORT_ADDR_HBIT      => 28,
+        HBM_BASE_ADDR_OFFSET    => 16#10000000#,
         HBM_DATA_WIDTH          => HBM_DATA_WIDTH,
         HBM_ADDR_WIDTH          => HBM_ADDR_WIDTH,
         HBM_BURST_WIDTH         => HBM_BURST_WIDTH,

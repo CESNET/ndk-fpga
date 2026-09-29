@@ -13,10 +13,20 @@ use work.math_pack.all;
 
 entity HBM_TESTER_GEN is
     generic (
-        USR_DATA_WIDTH : natural := 256;
-        AXI_ADDR_WIDTH : natural := 32;
-        PORT_ADDR_HBIT : natural := AXI_ADDR_WIDTH;
-        PORT_ID        : natural := 0
+        USR_DATA_WIDTH      : natural := 256;
+        AXI_DATA_WIDTH      : natural := 256;
+        AXI_ADDR_WIDTH      : natural := 32;
+        PORT_ADDR_HBIT      : natural := AXI_ADDR_WIDTH;
+        PORT_ID             : natural := 0;
+        -- Size of one port in bytes, used as the base address of each port.
+        -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
+        -- own address space (e.g. a NoC attached HBM).
+        BASE_ADDR_OFFSET    : natural := 0;
+        -- Length of the BL8 (64B) and BL4 (32B) burst in bus words. Both are
+        -- computed only in HBM_TESTER_PORT, which announces the same burst on AXI.
+        -- The defaults match the default 256b data bus.
+        BL8_WORDS           : natural := 2;
+        BL4_WORDS           : natural := 1
     );
     port (
         -- =====================================================================
@@ -37,6 +47,8 @@ entity HBM_TESTER_GEN is
         --                     "00" = no requests
         CS_GEN_RUN_MODE   : in  std_logic_vector(1 downto 0);
         CS_GEN_RW_SWITCH  : in  std_logic;
+        -- '1' issues the read without waiting for the write response
+        CS_GEN_RW_NO_WAIT : in  std_logic;
         -- Generator dead data: 0 = counter value, 1 = dead cafe
         CS_GEN_WR_DEAD    : in  std_logic;
         -- Generator control: 0 = stop, 1 = run
@@ -76,8 +88,12 @@ end entity;
 
 architecture FULL of HBM_TESTER_GEN is
 
-    constant ADDR_GEN_WIDTH  : natural := PORT_ADDR_HBIT-5;
+    constant PORT_ADDR_LBIT  : natural := log2(AXI_DATA_WIDTH/8);
+    constant ADDR_GEN_WIDTH  : natural := PORT_ADDR_HBIT-PORT_ADDR_LBIT;
     constant PORT_ADDR_WIDTH : natural := AXI_ADDR_WIDTH-PORT_ADDR_HBIT;
+    -- PORT_ID*BASE_ADDR_OFFSET overflows an integer, so it is counted in unsigned
+    constant PORT_BASE_ADDR  : unsigned(AXI_ADDR_WIDTH-1 downto 0) :=
+        resize(to_unsigned(PORT_ID, AXI_ADDR_WIDTH) * BASE_ADDR_OFFSET, AXI_ADDR_WIDTH);
 
     signal s_gen_run_reg       : std_logic;
     signal s_gen_run           : std_logic;
@@ -87,6 +103,8 @@ architecture FULL of HBM_TESTER_GEN is
     signal s_gen_rw_switch_en  : std_logic;
     signal s_gen_rw_switch     : std_logic;
     signal s_sequ_addr_inc     : unsigned(1 downto 0);
+    signal s_wr_rsp_pending    : std_logic;
+    signal s_rd_addr_hold      : std_logic;
     signal s_sequ_wr_addr      : unsigned(ADDR_GEN_WIDTH-1 downto 0);
     signal s_sequ_wr_addr_en   : std_logic;
     signal s_sequ_rd_addr      : unsigned(ADDR_GEN_WIDTH-1 downto 0);
@@ -104,8 +122,13 @@ architecture FULL of HBM_TESTER_GEN is
 
 begin
 
-    s_gen_burst_max <= "01" when (CS_GEN_BL8_MODE = '1') else "00"; -- 64B access = 2 words, 32B access = 1 words
-    s_sequ_addr_inc <= "10" when (CS_GEN_BL8_MODE = '1') else "01"; -- address + 2, address + 1
+    -- Warning! - On a bus wider than 256b both modes issue the same 64B access,
+    -- because one bus word is already that large and nothing shorter can be put on
+    -- the bus. The efficiency of the short 32B access therefore cannot be measured
+    -- on such a build. The address stride follows the burst in both modes, so the
+    -- generated traffic stays contiguous whatever the length turns out to be.
+    s_gen_burst_max <= to_unsigned(BL8_WORDS-1, 2) when (CS_GEN_BL8_MODE = '1') else to_unsigned(BL4_WORDS-1, 2);
+    s_sequ_addr_inc <= to_unsigned(BL8_WORDS, 2)   when (CS_GEN_BL8_MODE = '1') else to_unsigned(BL4_WORDS, 2);
 
     -- -------------------------------------------------------------------------
     --  RUN CONTROL LOGIC
@@ -132,12 +155,14 @@ begin
     --  BURST CONTROL LOGIC
     -- -------------------------------------------------------------------------
 
-    -- counter of word in burst
+    -- Counter of the word in burst. It counts only when a write is really sent.
+    -- In the coherency test the generator stops writing during the read half, but
+    -- WR_READY stays high. Counting on WR_READY alone would shift the next burst.
     gen_burst_cnt_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s_gen_run = '1') then
-                if (WR_READY = '1') then
+                if (s_write_data_vld = '1') then
                     if (s_gen_data_last = '1') then
                         s_gen_burst_cnt <= (others => '0');
                     else
@@ -207,7 +232,24 @@ begin
         end if;
     end process;
 
-    s_sequ_rd_addr_en <= s_gen_rw_switch when (CS_GEN_RW_SWITCH = '1') else '1';
+    -- A read issued right after a write burst can overtake it, the AXI write and read
+    -- channels are not ordered against each other. Hold the read back until the write
+    -- response arrives.
+    wr_rsp_pending_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (s_gen_run = '0') then
+                s_wr_rsp_pending <= '0';
+            elsif (WR_RSP_VALID = '1') then
+                s_wr_rsp_pending <= '0';
+            elsif (s_write_data_vld = '1' and s_gen_data_last = '1') then
+                s_wr_rsp_pending <= '1';
+            end if;
+        end if;
+    end process;
+
+    s_rd_addr_hold    <= s_wr_rsp_pending and not CS_GEN_RW_NO_WAIT;
+    s_sequ_rd_addr_en <= (s_gen_rw_switch and not s_rd_addr_hold) when (CS_GEN_RW_SWITCH = '1') else '1';
 
     sequ_rd_addr_reg_p : process (CLK)
     begin
@@ -275,20 +317,20 @@ begin
     end process;
 
     wr_port_addr_g: if PORT_ADDR_WIDTH > 0 generate
-        WR_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT) <= std_logic_vector(to_unsigned(PORT_ID, PORT_ADDR_WIDTH)); -- Port Address Bits
+        WR_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT) <= std_logic_vector(PORT_BASE_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT)); -- Port Base Address Bits
     end generate;
-    WR_ADDR(PORT_ADDR_HBIT-1 downto 5) <= s_rand_wr_addr when (CS_GEN_ADDR_MODE = '1') else std_logic_vector(s_sequ_wr_addr);
-    WR_ADDR(4 downto 0)                <= (others => '0'); -- Unused Address Bits
-    WR_DATA_LAST                       <= s_gen_data_last;
-    WR_VALID                           <= s_gen_run and CS_GEN_RUN_MODE(0) and s_sequ_wr_addr_en;
-    WR_RSP_READY                       <= '1';
+    WR_ADDR(PORT_ADDR_HBIT-1 downto PORT_ADDR_LBIT) <= s_rand_wr_addr when (CS_GEN_ADDR_MODE = '1') else std_logic_vector(s_sequ_wr_addr);
+    WR_ADDR(PORT_ADDR_LBIT-1 downto 0)              <= (others => '0'); -- Unused Address Bits
+    WR_DATA_LAST                                    <= s_gen_data_last;
+    WR_VALID                                        <= s_gen_run and CS_GEN_RUN_MODE(0) and s_sequ_wr_addr_en;
+    WR_RSP_READY                                    <= '1';
 
     rd_port_addr_g: if PORT_ADDR_WIDTH > 0 generate
-        RD_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT) <= std_logic_vector(to_unsigned(PORT_ID, PORT_ADDR_WIDTH)); -- Port Address Bits
+        RD_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT) <= std_logic_vector(PORT_BASE_ADDR(AXI_ADDR_WIDTH-1 downto PORT_ADDR_HBIT)); -- Port Base Address Bits
     end generate;
-    RD_ADDR(PORT_ADDR_HBIT-1 downto 5) <= s_rand_rd_addr when (CS_GEN_ADDR_MODE = '1') else std_logic_vector(s_sequ_rd_addr);
-    RD_ADDR(4 downto 0)                <= (others => '0'); -- Unused Address Bits
-    RD_ADDR_VALID                      <= s_gen_run and CS_GEN_RUN_MODE(1) and s_sequ_rd_addr_en;
-    RD_DATA_READY                      <= '1';
+    RD_ADDR(PORT_ADDR_HBIT-1 downto PORT_ADDR_LBIT) <= s_rand_rd_addr when (CS_GEN_ADDR_MODE = '1') else std_logic_vector(s_sequ_rd_addr);
+    RD_ADDR(PORT_ADDR_LBIT-1 downto 0)              <= (others => '0'); -- Unused Address Bits
+    RD_ADDR_VALID                                   <= s_gen_run and CS_GEN_RUN_MODE(1) and s_sequ_rd_addr_en;
+    RD_DATA_READY                                   <= '1';
 
 end architecture;

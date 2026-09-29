@@ -79,6 +79,8 @@ entity APPLICATION_CORE is
         MFB_BLOCK_SIZE        : natural := 8;
         -- MFB parameters: width of one item in bits
         MFB_ITEM_WIDTH        : natural := 8;
+        -- HBM parameters: number of physical HBM modules on the chip
+        HBM_MODULES           : natural := 1;
         -- HBM parameters: number of HBM ports
         HBM_PORTS             : natural := 1;
         -- HBM parameters: width of AXI address signal
@@ -95,6 +97,13 @@ entity APPLICATION_CORE is
         HBM_SIZE_WIDTH        : natural := 3;
         -- HBM parameters: width of AXI resp signal
         HBM_RESP_WIDTH        : natural := 2;
+        -- HBM parameters: highest address bit of one HBM port (its capacity).
+        -- 28 => 256 MB, 29 => 512 MB, 30 => 1 GB per port.
+        HBM_PORT_ADDR_HBIT    : natural := 28;
+        -- HBM parameters: multiplier for the port ID used to place each port into its own
+        -- AXI memory segment. Use 0 when every AXI port has its own address space
+        -- (e.g. a NoC attached HBM).
+        HBM_BASE_ADDR_OFFSET  : natural := 0;
         -- HBM parameters: width of AXI prot signal
         HBM_PROT_WIDTH        : natural := 3;
         -- HBM parameters: width of AXI qos signal

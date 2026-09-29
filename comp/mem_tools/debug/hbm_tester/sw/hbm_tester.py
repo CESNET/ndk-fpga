@@ -25,21 +25,28 @@ class hbm_tester:
     _CONF_RAND_ADDR_EN = 0x2
     _CONF_WR_DEAD_EN   = 0x4
     _CONF_RW_SWITCH_EN = 0x8
+    _CONF_BL8_MODE     = 0x40
+    _CONF_RW_NO_WAIT   = 0x80
+    _CONF_USE_AXI_ID   = 0x10000
 
     _GEN_CONF_WR_ONLY = (0x1 + 0x0) * 0x10
     _GEN_CONF_RD_ONLY = (0x2 + 0x0) * 0x10
     _GEN_CONF_WR_RD   = (0x3 + 0x0) * 0x10
 
+    # Throughput tests, they differ only in the direction the generator drives.
+    _SPEED_TESTS = ("speed", "speed-rd", "speed-wr")
+
     _MON_CONF_SPEED_TEST   = 0x10 * 0x100 # counter0 = RD words, counter1 = WR words
     _MON_CONF_LATENCY_TEST = 0x32 * 0x100 # counter0 = RD latency, counter1 = WR latency
     _MON_CONF_DATA_TEST    = 0x54 * 0x100 # counter0 = data OK, counter1 = dat ERROR
 
-    def __init__(self, dev, index):
+    def __init__(self, dev, index, ports=32, width=256, freq=450.0):
         self.node = dev.fdt_get_compatible(self.DT_COMPATIBLE)[index]
         self.comp = dev.comp_open(self.node)
-        self.ports = 32 # TODO register
-        self.width = 256 # TODO register
-        self.clk_period = (1 / 450000000) * 1e9 # TODO register
+        self.ports = ports
+        self.width = width
+        self.clk_period = (1 / (freq * 1e6)) * 1e9
+        self.rw_no_wait = False
 
     def reset_all_counters(self):
         self.comp.write32(self._REG_RESET, self.get_ports_vector(self.ports))
@@ -50,7 +57,24 @@ class hbm_tester:
         #print("REG_TIME: %s" % hex(test_length))
         self.comp.write32(self._REG_TIME, test_length)
 
-    def set_config_reg(self, test_type, test_phase, rand_addr):
+    def check_bl_mode(self):
+        # BL4 is a 32B access, so it needs a data bus
+        # of at most 32B. On a wider bus one word already carries more than that and
+        # the tester falls back to the 64B access of BL8.
+        conf_data = self.comp.read32(self._REG_CONFIG)
+        bl4_set   = (conf_data & self._CONF_BL8_MODE) == 0
+
+        if bl4_set and self.width > 256:
+            print("WARNING: HBM_TESTER: BL4 mode cannot generate its 32B access on a %db "
+                  "data bus, the tester issues the 64B of BL8 instead." % self.width)
+
+    def get_bl_mode_string(self, bl8):
+        if bl8 is True:
+            return "BL8"
+        else:
+            return "BL4"
+
+    def set_config_reg(self, test_type, test_phase, rand_addr, bl8=False, axi_id=False):
         if rand_addr is True:
             rand_test_val = self._CONF_RAND_ADDR_EN
         else:
@@ -62,12 +86,17 @@ class hbm_tester:
             switch_rw_val = self._CONF_DISABLED
             gen_conf_val  = self._GEN_CONF_WR_RD
             mon_conf_val  = self._MON_CONF_SPEED_TEST
-        elif test_type == "speed":
+        elif test_type in self._SPEED_TESTS:
             conn_gen_val  = self._CONF_GEN_EN
             dead_wr_val   = self._CONF_DISABLED
             switch_rw_val = self._CONF_DISABLED
-            gen_conf_val  = self._GEN_CONF_WR_RD
             mon_conf_val  = self._MON_CONF_SPEED_TEST
+            if test_type == "speed-rd":
+                gen_conf_val = self._GEN_CONF_RD_ONLY
+            elif test_type == "speed-wr":
+                gen_conf_val = self._GEN_CONF_WR_ONLY
+            else:
+                gen_conf_val = self._GEN_CONF_WR_RD
         elif test_type == "latency":
             conn_gen_val  = self._CONF_GEN_EN
             dead_wr_val   = self._CONF_DISABLED
@@ -96,8 +125,15 @@ class hbm_tester:
                 gen_conf_val  = self._GEN_CONF_WR_RD
 
         conf_data = rand_test_val + dead_wr_val + switch_rw_val + gen_conf_val + mon_conf_val + conn_gen_val
+        if self.rw_no_wait:
+            conf_data += self._CONF_RW_NO_WAIT
+        if bl8:
+            conf_data += self._CONF_BL8_MODE
+        if axi_id:
+            conf_data += self._CONF_USE_AXI_ID
         #print("REG_CONFIG: %s" % hex(conf_data))
         self.comp.write32(self._REG_CONFIG, conf_data)
+        self.check_bl_mode()
 
     def get_ports_vector(self, hbm_ports):
         return int(math.pow(2, hbm_ports) - 1)
@@ -139,6 +175,9 @@ class hbm_tester:
 
         print("HBM TOTAL READ SPEED:  %.2f Gbps" % rd_speed_total)
         print("HBM TOTAL WRITE SPEED: %.2f Gbps" % wr_speed_total)
+
+        # Return speeds so they can be summed globally
+        return rd_speed_total, wr_speed_total
 
     def print_latency_result(self, hbm_ports):
         for ii in range(0, hbm_ports):
@@ -184,19 +223,27 @@ class hbm_tester:
         self.comp.write32(self._REG_RUN_TEST, 0x0)
         time.sleep(0.1)
 
+    def get_axi_id_mode_string(self, axi_id):
+        if axi_id is True:
+            return "a new ID for each transaction"
+        else:
+            return "one ID for all transactions"
+
     def get_addr_mode_string(self, rand_addr):
         if rand_addr is True:
             return "pseudorandom"
         else:
             return "sequential"
 
-    def hbm_test(self, test_type, rand_addr, hbm_ports, test_length):
+    def hbm_test(self, test_type, rand_addr, hbm_ports, test_length, bl8=False, axi_id=False):
         print("===========================")
         print("HBM TESTER by CESNET")
         print("===========================")
         print("TEST TYPE:   " + str(test_type))
         print("TEST LENGTH: " + hex(test_length))
         print("ADDR MODE:   " + str(self.get_addr_mode_string(rand_addr)))
+        print("BURST MODE:  " + str(self.get_bl_mode_string(bl8)))
+        print("AXI ID MODE: " + str(self.get_axi_id_mode_string(axi_id)))
         print("USED PORTS:  " + str(hbm_ports))
         print("===========================")
 
@@ -205,43 +252,94 @@ class hbm_tester:
             self.set_test_length(0xFFFF)
         else:
             self.set_test_length(test_length)
-        self.set_config_reg(test_type, 0, rand_addr)
+        self.set_config_reg(test_type, 0, rand_addr, bl8, axi_id)
         self.run_test(hbm_ports)
 
-        if test_type == "speed":
-            self.print_speed_result(test_length, hbm_ports)
+        # Track speeds for the return value
+        rd_speed, wr_speed = 0.0, 0.0
+
+        if test_type in self._SPEED_TESTS:
+            rd_speed, wr_speed = self.print_speed_result(test_length, hbm_ports)
         elif test_type == "latency":
             self.print_latency_result(hbm_ports)
         elif (test_type == "integrity") or (test_type == "coherency"):
             #self.print_data_result(hbm_ports)
             self.reset_all_counters()
             self.set_test_length(0xEFFF)
-            self.set_config_reg(test_type, 1, rand_addr)
+            self.set_config_reg(test_type, 1, rand_addr, bl8, axi_id)
             self.run_test(hbm_ports)
             self.print_data_result(hbm_ports)
+
+        return rd_speed, wr_speed
 
 
 if __name__ == '__main__':
     # Argument parsing
     args = argparse.ArgumentParser()
-    args.add_argument("-i", "--index", action="store", nargs='?', default='0')
-    args.add_argument("-d", "--device", action="store", nargs='?', default='0')
-    args.add_argument("-t", "--test", action="store", nargs='?', choices=['speed', 'latency', 'integrity', 'coherency'], default='speed')
+    args.add_argument("-i", "--index", action="store", default='all', help="Index of the HBM tester (e.g., 0 or 1), or 'all' to run on both.")
+    args.add_argument("-d", "--device", action="store", default='0')
+    args.add_argument("-t", "--test", action="store", choices=['speed', 'speed-rd', 'speed-wr', 'latency', 'integrity', 'coherency'], default='speed')
     args.add_argument("-r", "--random", action='store_true', help="Use random addressing (only for latency or speed test), default is sequential.")
+    args.add_argument("-w", "--no-wait", action='store_true', help="Do not wait for the write response before reading the same address (coherency test).")
+    args.add_argument("-b", "--bl8", action='store_true', help="Use the BL8 burst mode (64B access), default is BL4 (32B access).")
+    args.add_argument("-I", "--axi-id", action='store_true', help="Give each transaction its own AXI ID, default is one ID for all of them. The memory needs a reorder buffer for this.")
     args.add_argument("-p", "--ports", action="store", nargs='?', default='0', help="Number of actived ports (channels), default is all.")
+    args.add_argument("-P", "--tester-ports", type=int, default=32, help="Number of ports of one tester instance (HBM_PORTS/HBM_MODULES), default 32.")
+    args.add_argument("-W", "--data-width", type=int, choices=[256, 512], default=256, help="HBM_DATA_WIDTH of the build, default 256.")
+    args.add_argument("-F", "--freq", type=float, default=450.0, help="HBM_CLK frequency in MHz, default 450.")
     #args.add_argument("-l","--length", action="store", nargs='?', default='0xFFFFFF', help="Length of test in clock cycles (only for latency or speed test), default is 0xFFFFFF.")
     arguments = args.parse_args()
 
     # Open nfb device
     dev = nfb.open(arguments.device)
 
-    tester = hbm_tester(dev, int(arguments.index[0], 0))
+    # Count how many compatible nodes exist in the device tree
+    compatible_nodes = dev.fdt_get_compatible(hbm_tester.DT_COMPATIBLE)
+    node_count = len(compatible_nodes)
 
-    arg_ports = int(arguments.ports[0], 0)
-    if arg_ports == 0:
-        arg_ports = tester.ports
-    arg_length = 0xFFFFF # int(arguments.length[0], 0)
+    if node_count == 0:
+        print(f"Error: No '{hbm_tester.DT_COMPATIBLE}' nodes found in the device tree.")
+        exit(1)
 
-    tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length)
-    # reset config register after test
-    #tester.set_config_reg("none", 0, False)
+    # Determine which indices to test
+    indices_to_test = []
+    if arguments.index.lower() == 'all':
+        indices_to_test = list(range(node_count))
+    else:
+        idx = int(arguments.index, 0)
+        if idx >= node_count:
+            print(f"Error: Index {idx} is out of bounds. Found {node_count} testers.")
+            exit(1)
+        indices_to_test = [idx]
+
+    # Initialize variables to keep track of the grand total
+    grand_total_rd_speed = 0.0
+    grand_total_wr_speed = 0.0
+
+    # Run tests on selected instances
+    for idx in indices_to_test:
+        print(f"\n>>> Initializing HBM Tester [Index {idx}] <<<")
+        tester = hbm_tester(dev, idx, ports=arguments.tester_ports, width=arguments.data_width, freq=arguments.freq)
+        tester.rw_no_wait = arguments.no_wait
+
+        arg_ports = int(arguments.ports, 0)
+        if arg_ports == 0:
+            arg_ports = tester.ports
+
+        arg_length = 0xFFFFF
+
+        # Capture the returned speeds from each tester instance
+        rd, wr = tester.hbm_test(arguments.test, arguments.random, arg_ports, arg_length, arguments.bl8, arguments.axi_id)
+
+        if arguments.test in hbm_tester._SPEED_TESTS:
+            grand_total_rd_speed += rd
+            grand_total_wr_speed += wr
+
+    # Print the grand total if we ran a speed test on more than one tester
+    if arguments.test in hbm_tester._SPEED_TESTS and len(indices_to_test) > 1:
+        print("\n=================================================")
+        print("OVERALL HBM SPEED TOTALS (ALL TESTERS)")
+        print("=================================================")
+        print("GRAND TOTAL READ SPEED:  %.2f Gbps" % grand_total_rd_speed)
+        print("GRAND TOTAL WRITE SPEED: %.2f Gbps" % grand_total_wr_speed)
+        print("=================================================\n")

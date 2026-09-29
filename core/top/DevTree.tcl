@@ -130,7 +130,7 @@ proc dts_ndp_core_main_mi {DTS} {
     }
     if {$APP_CORE_ENABLE} {
         if { [llength [info procs dts_application]] > 0 } {
-            global MEM_PORTS HBM_PORTS
+            global MEM_PORTS HBM_PORTS HBM_MODULES
 
             if {[llength [info args dts_application]] == 3} {
                 # INFO: backward compatible variant without generics parameter
@@ -140,6 +140,7 @@ proc dts_ndp_core_main_mi {DTS} {
                     ETH_STREAMS $ETH_STREAMS
                     DDR_PORTS $MEM_PORTS
                     HBM_PORTS $HBM_PORTS
+                    HBM_MODULES $HBM_MODULES
                 "
                 append ret "app:" [dts_application $NdkCore::ADDR_USERAPP [array get GENERICS]]
             }

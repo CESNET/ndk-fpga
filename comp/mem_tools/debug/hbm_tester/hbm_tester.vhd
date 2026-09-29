@@ -14,20 +14,24 @@ use work.type_pack.all;
 
 entity HBM_TESTER is
     generic (
-        DEBUG           : boolean := True;
-        PORTS           : natural := 32;
-        BL8_MODE        : std_logic_vector(PORTS-1 downto 0) := (others => '1');
-        CNT_WIDTH       : natural := 24; -- max = 32, min 8
-        AXI_ADDR_WIDTH  : natural := 32;
-        AXI_DATA_WIDTH  : natural := 256;
-        AXI_BURST_WIDTH : natural := 2;
-        AXI_ID_WIDTH    : natural := 6;
-        AXI_LEN_WIDTH   : natural := 4;
-        AXI_SIZE_WIDTH  : natural := 3;
-        AXI_RESP_WIDTH  : natural := 2;
-        USR_DATA_WIDTH  : natural := 256;
-        PORT_ADDR_HBIT  : natural := AXI_ADDR_WIDTH;
-        DEVICE          : string := "AGILEX"
+        DEBUG            : boolean := True;
+        PORTS            : natural := 32;
+        BL8_MODE         : std_logic_vector(PORTS-1 downto 0) := (others => '1');
+        CNT_WIDTH        : natural := 24; -- max = 32, min 8
+        AXI_ADDR_WIDTH   : natural := 32;
+        AXI_DATA_WIDTH   : natural := 256;
+        AXI_BURST_WIDTH  : natural := 2;
+        AXI_ID_WIDTH     : natural := 6;
+        AXI_LEN_WIDTH    : natural := 4;
+        AXI_SIZE_WIDTH   : natural := 3;
+        AXI_RESP_WIDTH   : natural := 2;
+        USR_DATA_WIDTH   : natural := 256;
+        PORT_ADDR_HBIT   : natural := AXI_ADDR_WIDTH;
+        -- Size of one port in bytes, used as the base address of each port.
+        -- Must be a multiple of 2**PORT_ADDR_HBIT. Use 0 when every port has its
+        -- own address space (e.g. a NoC attached HBM).
+        BASE_ADDR_OFFSET : natural := 0;
+        DEVICE           : string := "AGILEX"
     );
     port (
         -- =====================================================================
@@ -35,6 +39,7 @@ entity HBM_TESTER is
         -- =====================================================================
         HBM_CLK             : in  std_logic;
         HBM_RESET           : in  std_logic;
+        HBM_INIT_DONE       : in  std_logic;
 
         -- =====================================================================
         -- COMMON MI32 INTERFACE (MI_CLK)
@@ -125,13 +130,15 @@ end entity;
 
 architecture FULL of HBM_TESTER is
 
-    signal s_gen_addr_mode : std_logic;
-    signal s_gen_connect   : std_logic;
-    signal s_gen_bl8_mode  : std_logic;
-    signal s_gen_run_mode  : std_logic_vector(1 downto 0);
-    signal s_gen_run       : std_logic_vector(PORTS-1 downto 0);
-    signal s_gen_rw_switch : std_logic;
-    signal s_gen_wr_dead   : std_logic;
+    signal s_gen_addr_mode  : std_logic;
+    signal s_gen_connect    : std_logic;
+    signal s_gen_bl8_mode   : std_logic;
+    signal s_gen_run_mode   : std_logic_vector(1 downto 0);
+    signal s_gen_run        : std_logic_vector(PORTS-1 downto 0);
+    signal s_gen_rw_switch  : std_logic;
+    signal s_gen_rw_no_wait : std_logic;
+    signal s_gen_use_axi_id : std_logic;
+    signal s_gen_wr_dead    : std_logic;
 
     signal s_mon_done      : std_logic_vector(PORTS-1 downto 0);
     signal s_mon_reset     : std_logic_vector(PORTS-1 downto 0);
@@ -150,24 +157,57 @@ architecture FULL of HBM_TESTER is
     signal s_synced_mi_ardy : std_logic;
     signal s_synced_mi_drdy : std_logic;
 
+    signal s_mi_dwr         : std_logic_vector(31 downto 0);
+    signal s_mi_addr        : std_logic_vector(31 downto 0);
+    signal s_mi_be          : std_logic_vector(3 downto 0);
+    signal s_mi_rd          : std_logic;
+    signal s_mi_wr          : std_logic;
+    signal s_mi_ardy        : std_logic;
+    signal s_mi_drd         : std_logic_vector(31 downto 0);
+    signal s_mi_drdy        : std_logic;
+
+    signal s_mi_ardy_dead   : std_logic;
+    signal s_mi_drd_dead    : std_logic_vector(31 downto 0);
+    signal s_mi_drdy_dead   : std_logic;
+
+    signal s_hbm_init_done  : std_logic;
+
 begin
+
+    -- The tester is verified only on the 256b and 512b data bus of the HBM IPs.
+    assert (AXI_DATA_WIDTH = 256) or (AXI_DATA_WIDTH = 512)
+        report "HBM_TESTER: Set AXI_DATA_WIDTH to 256 or 512, no other data bus width "
+               & "is supported."
+        severity failure;
+
+    -- The base address of the last port must fit into the address bits above
+    -- PORT_ADDR_HBIT. When PORT_ADDR_HBIT = AXI_ADDR_WIDTH there are no such bits and
+    -- no port base address is generated at all.
+    -- The first condition short-circuits log2(0) when BASE_ADDR_OFFSET = 0.
+    assert (BASE_ADDR_OFFSET = 0) or
+           ((log2(BASE_ADDR_OFFSET) >= PORT_ADDR_HBIT) and
+            (log2(PORTS) + log2(BASE_ADDR_OFFSET) <= AXI_ADDR_WIDTH))
+        report "HBM_TESTER: Set BASE_ADDR_OFFSET to at least 2**PORT_ADDR_HBIT, or lower "
+               & "PORTS so that log2(PORTS)+log2(BASE_ADDR_OFFSET) fits into AXI_ADDR_WIDTH."
+        severity failure;
 
     port_g : for i in 0 to PORTS-1 generate
         port_i : entity work.HBM_TESTER_PORT
         generic map (
-            DEBUG           => DEBUG,
-            CNT_WIDTH       => CNT_WIDTH,
-            PORT_ID         => i,
-            AXI_ADDR_WIDTH  => AXI_ADDR_WIDTH,
-            AXI_DATA_WIDTH  => AXI_DATA_WIDTH,
-            AXI_BURST_WIDTH => AXI_BURST_WIDTH,
-            AXI_ID_WIDTH    => AXI_ID_WIDTH,
-            AXI_LEN_WIDTH   => AXI_LEN_WIDTH,
-            AXI_SIZE_WIDTH  => AXI_SIZE_WIDTH,
-            AXI_RESP_WIDTH  => AXI_RESP_WIDTH,
-            USR_DATA_WIDTH  => USR_DATA_WIDTH,
-            PORT_ADDR_HBIT  => PORT_ADDR_HBIT,
-            DEVICE          => DEVICE
+            DEBUG            => DEBUG,
+            CNT_WIDTH        => CNT_WIDTH,
+            PORT_ID          => i,
+            AXI_ADDR_WIDTH   => AXI_ADDR_WIDTH,
+            AXI_DATA_WIDTH   => AXI_DATA_WIDTH,
+            AXI_BURST_WIDTH  => AXI_BURST_WIDTH,
+            AXI_ID_WIDTH     => AXI_ID_WIDTH,
+            AXI_LEN_WIDTH    => AXI_LEN_WIDTH,
+            AXI_SIZE_WIDTH   => AXI_SIZE_WIDTH,
+            AXI_RESP_WIDTH   => AXI_RESP_WIDTH,
+            USR_DATA_WIDTH   => USR_DATA_WIDTH,
+            PORT_ADDR_HBIT   => PORT_ADDR_HBIT,
+            BASE_ADDR_OFFSET => BASE_ADDR_OFFSET,
+            DEVICE           => DEVICE
         )
         port map (
             CLK               => HBM_CLK,
@@ -239,6 +279,8 @@ begin
             DB_GEN_RUN_MODE   => s_gen_run_mode,
             DB_GEN_RUN        => s_gen_run(i),
             DB_GEN_RW_SWITCH  => s_gen_rw_switch,
+            DB_GEN_RW_NO_WAIT => s_gen_rw_no_wait,
+            DB_GEN_USE_AXI_ID => s_gen_use_axi_id,
             DB_GEN_WR_DEAD    => s_gen_wr_dead,
             DB_MON_DONE       => s_mon_done(i),
             DB_MON_RESET      => s_mon_reset(i),
@@ -250,6 +292,37 @@ begin
         );
     end generate;
 
+    sync_init_i : entity work.ASYNC_OPEN_LOOP
+    generic map (
+        IN_REG  => false,
+        TWO_REG => true
+    )
+    port map (
+        ACLK     => HBM_CLK,
+        ARST     => HBM_RESET,
+        ADATAIN  => HBM_INIT_DONE,
+
+        BCLK     => MI_CLK,
+        BRST     => MI_RESET,
+        BDATAOUT => s_hbm_init_done
+    );
+
+    -- Respond only when device is ready
+    s_mi_drd_dead  <= X"DEAD2BAD";
+    s_mi_ardy_dead <= MI_RD or MI_WR;
+    s_mi_drdy_dead <= MI_RD;
+
+    s_mi_be <= MI_BE when s_hbm_init_done = '1' else "0000";
+    s_mi_rd <= MI_RD when s_hbm_init_done = '1' else '0';
+    s_mi_wr <= MI_WR when s_hbm_init_done = '1' else '0';
+
+    MI_DRD  <= s_mi_drd  when s_hbm_init_done = '1' else s_mi_drd_dead;
+    MI_DRDY <= s_mi_drdy when s_hbm_init_done = '1' else s_mi_drdy_dead;
+    MI_ARDY <= s_mi_ardy when s_hbm_init_done = '1' else s_mi_ardy_dead;
+
+    s_mi_dwr  <= MI_DWR;
+    s_mi_addr <= MI_ADDR;
+
     mi32_async_i : entity work.MI_ASYNC
     generic map (
         DEVICE => DEVICE
@@ -257,14 +330,14 @@ begin
     port map (
         CLK_M     => MI_CLK,
         RESET_M   => MI_RESET,
-        MI_M_DWR  => MI_DWR,
-        MI_M_ADDR => MI_ADDR,
-        MI_M_RD   => MI_RD,
-        MI_M_WR   => MI_WR,
-        MI_M_BE   => MI_BE,
-        MI_M_DRD  => MI_DRD,
-        MI_M_ARDY => MI_ARDY,
-        MI_M_DRDY => MI_DRDY,
+        MI_M_DWR  => s_mi_dwr,
+        MI_M_ADDR => s_mi_addr,
+        MI_M_RD   => s_mi_rd,
+        MI_M_WR   => s_mi_wr,
+        MI_M_BE   => s_mi_be,
+        MI_M_DRD  => s_mi_drd,
+        MI_M_ARDY => s_mi_ardy,
+        MI_M_DRDY => s_mi_drdy,
 
         CLK_S     => HBM_CLK,
         RESET_S   => HBM_RESET,
@@ -296,20 +369,22 @@ begin
         MI_DRD           => s_synced_mi_drd,
         MI_DRDY          => s_synced_mi_drdy,
 
-        DB_GEN_ADDR_MODE => s_gen_addr_mode,
-        DB_GEN_CONNECT   => s_gen_connect,
-        DB_GEN_BL8_MODE  => s_gen_bl8_mode,
-        DB_GEN_RUN_MODE  => s_gen_run_mode,
-        DB_GEN_RUN       => s_gen_run,
-        DB_GEN_RW_SWITCH => s_gen_rw_switch,
-        DB_GEN_WR_DEAD   => s_gen_wr_dead,
-        DB_MON_TIME      => s_mon_time,
-        DB_MON_DONE      => s_mon_done,
-        DB_MON_RESET     => s_mon_reset,
-        DB_MON_CNT0_MODE => s_mon_cnt0_mode,
-        DB_MON_CNT1_MODE => s_mon_cnt1_mode,
-        DB_STAT_CNT0     => s_mon_cnt0,
-        DB_STAT_CNT1     => s_mon_cnt1
+        DB_GEN_ADDR_MODE  => s_gen_addr_mode,
+        DB_GEN_CONNECT    => s_gen_connect,
+        DB_GEN_BL8_MODE   => s_gen_bl8_mode,
+        DB_GEN_RUN_MODE   => s_gen_run_mode,
+        DB_GEN_RUN        => s_gen_run,
+        DB_GEN_RW_SWITCH  => s_gen_rw_switch,
+        DB_GEN_RW_NO_WAIT => s_gen_rw_no_wait,
+        DB_GEN_USE_AXI_ID => s_gen_use_axi_id,
+        DB_GEN_WR_DEAD    => s_gen_wr_dead,
+        DB_MON_TIME       => s_mon_time,
+        DB_MON_DONE       => s_mon_done,
+        DB_MON_RESET      => s_mon_reset,
+        DB_MON_CNT0_MODE  => s_mon_cnt0_mode,
+        DB_MON_CNT1_MODE  => s_mon_cnt1_mode,
+        DB_STAT_CNT0      => s_mon_cnt0,
+        DB_STAT_CNT1      => s_mon_cnt1
     );
 
 end architecture;

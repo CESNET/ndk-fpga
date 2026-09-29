@@ -14,6 +14,8 @@ use work.eth_hdr_pack.all;
 
 architecture FULL of APPLICATION_CORE is
 
+    constant HBM_PORTS_PER_MODULE  : natural := HBM_PORTS / max(1, HBM_MODULES);
+
     constant APP_ST_PER_DMA_ST : natural := ETH_STREAMS/DMA_STREAMS;
     constant CORE_DMA_RX_CHAN  : natural := DMA_RX_CHANNELS/APP_ST_PER_DMA_ST;
     constant CORE_DMA_TX_CHAN  : natural := DMA_TX_CHANNELS/APP_ST_PER_DMA_ST;
@@ -135,6 +137,11 @@ architecture FULL of APPLICATION_CORE is
     signal split_mi_ardy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
     signal split_mi_drd                  : slv_array_t     (MI_PORTS-1 downto 0)(MI_DATA_WIDTH-1 downto 0);
     signal split_mi_drdy                 : std_logic_vector(MI_PORTS-1 downto 0) := (others => '0');
+
+    -- ============================================== HBM =============================================
+    signal hbm_clk_s                     : std_logic_vector(HBM_MODULES-1 downto 0);
+    signal hbm_reset_s                   : std_logic_vector(HBM_MODULES-1 downto 0);
+    signal hbm_init_done_s               : std_logic_vector(HBM_MODULES-1 downto 0);
 
 begin
 
@@ -476,9 +483,19 @@ begin
     -- =========================================================================
     -- MEMORY TESTER WARPPER
     -- =========================================================================
+    -- HBM_* are null vectors when the card has no HBM ports, so they
+    -- must not be indexed in that case.
+    hbm_present_g: if HBM_PORTS > 0 generate
+        hbm_modules_g: for i in 0 to HBM_MODULES-1 generate
+            hbm_clk_s(i)        <= HBM_CLK(HBM_PORTS_PER_MODULE*i);
+            hbm_reset_s(i)      <= HBM_RESET(HBM_PORTS_PER_MODULE*i);
+            hbm_init_done_s(i)  <= HBM_INIT_DONE(HBM_PORTS_PER_MODULE*i);
+        end generate;
+    end generate;
 
     mem_tester_wrap_i : entity work.MEM_TESTER_WRAP
     generic map (
+        HBM_MODULES           => HBM_MODULES,
         HBM_PORTS             => HBM_PORTS,
         HBM_ADDR_WIDTH        => HBM_ADDR_WIDTH,
         HBM_DATA_WIDTH        => HBM_DATA_WIDTH,
@@ -487,6 +504,8 @@ begin
         HBM_LEN_WIDTH         => HBM_LEN_WIDTH,
         HBM_SIZE_WIDTH        => HBM_SIZE_WIDTH,
         HBM_RESP_WIDTH        => HBM_RESP_WIDTH,
+        HBM_PORT_ADDR_HBIT    => HBM_PORT_ADDR_HBIT,
+        HBM_BASE_ADDR_OFFSET  => HBM_BASE_ADDR_OFFSET,
         HBM_FREQ_KHZ          => 450000, -- TODO
         DDR_PORTS             => MEM_PORTS,
         DDR_ADDR_WIDTH        => MEM_ADDR_WIDTH,
@@ -503,9 +522,9 @@ begin
         CLK                    => APP_CLK,
         RESET                  => APP_RESET(3),
 
-        HBM_CLK                => HBM_CLK(0),
-        HBM_RESET              => HBM_RESET(0),
-        HBM_INIT_DONE          => HBM_INIT_DONE(0),
+        HBM_CLK                => hbm_clk_s,
+        HBM_RESET              => hbm_reset_s,
+        HBM_INIT_DONE          => hbm_init_done_s,
         HBM_AXI_ARADDR         => HBM_AXI_ARADDR,
         HBM_AXI_ARBURST        => HBM_AXI_ARBURST,
         HBM_AXI_ARID           => HBM_AXI_ARID,

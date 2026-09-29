@@ -18,6 +18,7 @@ set DMA_TX_CHANNELS      16
 set DMA_RX_BLOCKING_MODE true
 # HBM memory settings (allowed values 32 or 0).
 set HBM_PORTS            32
+set HBM_MODULES           1
 
 # ------------------------------------------------------------------------------
 # Other parameters:

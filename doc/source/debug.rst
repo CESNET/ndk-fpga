@@ -11,6 +11,7 @@ The components are typically located in the ``comp/debug/`` directory in the OFM
 
    comp/debug/streaming_debug/readme
    comp/debug/mem_tester/readme
+   comp/mem_tools/debug/hbm_tester/readme
    comp/debug/histogramer/readme
    comp/debug/latency_meter/readme
    comp/debug/data_logger/readme
