@@ -230,6 +230,13 @@ class run_channel extends uvm_sequence;
 
         run_time_min < run_time_max;
         stop_time_min < stop_time_max;
+
+        // A channel stops several times during the test, so that the pointer update sent on each
+        // stop is checked.
+        run_time_min  >= 50us;
+        run_time_max  <= 500us;
+        stop_time_min >= 5us;
+        stop_time_max <= 50us;
     }
 
     function new (string name = "run_channel");
@@ -266,7 +273,6 @@ class run_channel extends uvm_sequence;
                 seq_update.randomize();
                 seq_update.start(null);
             end
-            //never happen because forever begin
             seq_stop.randomize();
             seq_stop.start(null);
             assert(std::randomize(stop_time) with {stop_time inside {[stop_time_min:stop_time_max]};});
