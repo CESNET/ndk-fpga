@@ -16,7 +16,10 @@ class start_channel_seq #(int unsigned POINTER_WIDTH) extends uvm_sequence;
 
     constraint c_start {
         upd_timeout > 4;
-        update_base_addr % 4 == 0;
+        // The pointer update is one 8 B write. An address that is not a multiple of 8 lets that
+        // write cross a 4 kB boundary, which a single PCIe request must not do. The driver maps
+        // the update buffer as a whole page, so only aligned addresses reach the design.
+        update_base_addr % 8 == 0;
     }
 
     function new (string name = "start_channel_seq");

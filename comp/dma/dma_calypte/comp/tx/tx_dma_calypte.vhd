@@ -507,6 +507,13 @@ begin
 
     st_sp_ctrl_mfb_dst_rdy <= not fifox_mult_full;
 
+    -- The DMA header FIFO holds as many headers as the header buffers of all channels together.
+    -- The software never keeps more headers unprocessed than those buffers hold, so the FIFO
+    -- cannot become full. A full FIFO stops the PCIe CQ bus.
+    -- psl assert_dma_hdr_fifo_full :
+    --      assert always (fifox_mult_full = '0') abort (RESET) @rising_edge(CLK)
+    --      report "TX_DMA_CALYPTE: The DMA header FIFO is full and the PCIe CQ bus is stopped!";
+
     dma_hdr_fifo_i : entity work.FIFOX_MULTI
     generic map (
         DATA_WIDTH      => 62 + log2(CHANNELS) + 64,

@@ -111,14 +111,15 @@ architecture FULL of DMA_PTR_UPDATER is
     -- Size of a PCIE RQ header and 2 pointers (HHP and HDP, that are aligned to 4 byte boundary)
     constant FIFO_DATA_W   : positive := 3*16 + PCIE_META_REQ_HDR_W;
     constant FIFO_WR_PORTS : positive := 3;
-    constant FIFO_RD_PORTS : positive := MFB_REGIONS;
+    -- One update is sent per word, always in the first region. The R-Tile in the single-width mode
+    -- accepts the start of only one transaction per clock cycle.
+    constant FIFO_RD_PORTS : positive := 1;
     constant FIFO_SIZE     : positive := 64;
 
     signal fifo_din     : std_logic_vector(3*FIFO_DATA_W -1 downto 0);
     signal fifo_din_arr : slv_array_t(FIFO_WR_PORTS-1 downto 0)(FIFO_DATA_W -1 downto 0);
     signal fifo_wr      : std_logic_vector(FIFO_WR_PORTS-1 downto 0);
     signal fifo_do      : std_logic_vector(FIFO_RD_PORTS*FIFO_DATA_W -1 downto 0);
-    signal fifo_do_arr  : slv_array_t(FIFO_RD_PORTS-1 downto 0)(FIFO_DATA_W -1 downto 0);
     signal fifo_full    : std_logic;
     signal fifo_rd      : std_logic_vector(FIFO_RD_PORTS-1 downto 0);
     signal fifo_empty   : std_logic_vector(FIFO_RD_PORTS-1 downto 0);
@@ -370,29 +371,31 @@ begin
         AEMPTY => open
     );
 
-    fifo_do_arr <= slv_array_deser(fifo_do, MFB_REGIONS);
+    intel_dev_g : if (IS_INTEL) generate
+        tx_mfb_data_arr(0)    <= (MFB_LENGTH/MFB_REGIONS -1 downto 3*16 => '0')
+                                 & fifo_do(3*16+PCIE_META_REQ_HDR_W -1 downto PCIE_META_REQ_HDR_W);
+        tx_mfb_meta_arr(0)    <= (PCIE_RQ_META_HEADER => fifo_do(PCIE_META_REQ_HDR_W -1 downto 0),
+                                  others              => '0');
+        tx_mfb_eof_pos_arr(0) <= std_logic_vector(to_unsigned(1, PCIE_RQ_MFB_EOF_POS'length/MFB_REGIONS));
+    else generate
+        tx_mfb_data_arr(0)    <= (MFB_LENGTH/MFB_REGIONS -1 downto PCIE_META_REQ_HDR_W + 3*16 => '0')
+                                 & fifo_do;
+        tx_mfb_eof_pos_arr(0) <= std_logic_vector(to_unsigned(5, PCIE_RQ_MFB_EOF_POS'length/MFB_REGIONS));
+        tx_mfb_meta_arr(0)    <= (PCIE_RQ_META_FBE => "1111", PCIE_RQ_META_LBE => "0011", others => '0');
+    end generate;
 
-    tx_mfb_data_meta_g : for rgn in 0 to (FIFO_RD_PORTS -1) generate
-        intel_dev_g : if (IS_INTEL) generate
-            tx_mfb_data_arr(rgn)    <= (MFB_LENGTH/MFB_REGIONS -1 downto 3*16 => '0')
-                                       & fifo_do_arr(rgn)(3*16+PCIE_META_REQ_HDR_W -1 downto PCIE_META_REQ_HDR_W);
-            tx_mfb_meta_arr(rgn)    <= (PCIE_RQ_META_HEADER => fifo_do_arr(rgn)(PCIE_META_REQ_HDR_W -1 downto 0),
-                                        others              => '0');
-            tx_mfb_eof_pos_arr(rgn) <= std_logic_vector(to_unsigned(1, PCIE_RQ_MFB_EOF_POS'length/MFB_REGIONS));
-        else generate
-            tx_mfb_data_arr(rgn)    <= (MFB_LENGTH/MFB_REGIONS -1 downto PCIE_META_REQ_HDR_W + 3*16 => '0')
-                                       & fifo_do_arr(rgn);
-            tx_mfb_eof_pos_arr(rgn) <= std_logic_vector(to_unsigned(5, PCIE_RQ_MFB_EOF_POS'length/MFB_REGIONS));
-            tx_mfb_meta_arr(rgn)    <= (PCIE_RQ_META_FBE => "1111", PCIE_RQ_META_LBE => "0011", others => '0');
-        end generate;
+    unused_rgn_g : for rgn in 1 to MFB_REGIONS-1 generate
+        tx_mfb_data_arr(rgn)    <= (others => '0');
+        tx_mfb_meta_arr(rgn)    <= (others => '0');
+        tx_mfb_eof_pos_arr(rgn) <= (others => '0');
     end generate;
 
     PCIE_RQ_MFB_DATA    <= slv_array_ser(tx_mfb_data_arr);
     PCIE_RQ_MFB_META    <= slv_array_ser(tx_mfb_meta_arr);
-    PCIE_RQ_MFB_SOF     <= not fifo_empty;
-    PCIE_RQ_MFB_EOF     <= not fifo_empty;
+    PCIE_RQ_MFB_SOF     <= (0 => not fifo_empty(0), others => '0');
+    PCIE_RQ_MFB_EOF     <= (0 => not fifo_empty(0), others => '0');
     PCIE_RQ_MFB_SOF_POS <= (others => '0');
     PCIE_RQ_MFB_EOF_POS <= slv_array_ser(tx_mfb_eof_pos_arr);
-    PCIE_RQ_MFB_SRC_RDY <= or (not fifo_empty);
-    fifo_rd             <= (not fifo_empty) and PCIE_RQ_MFB_DST_RDY;
+    PCIE_RQ_MFB_SRC_RDY <= not fifo_empty(0);
+    fifo_rd(0)          <= not fifo_empty(0) and PCIE_RQ_MFB_DST_RDY;
 end architecture;

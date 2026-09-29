@@ -364,7 +364,7 @@ begin
     --      report "RX_DMA_HDR_MANAGER: Complete filling of the PCIe header transaction FIFO occured!";
 
     -- psl assert_data_pcie_hdr_full :
-    --      assert always (pcie_hdr_dma_hdr_tran_fifo_full = '0') abort (RESET) @rising_edge(CLK)
+    --      assert always (pcie_hdr_data_tran_fifo_full = '0') abort (RESET) @rising_edge(CLK)
     --      report "RX_DMA_HDR_MANAGER: Complete filling of the PCIe data transaction FIFO occured!";
 
     -- psl assert_data_addr_next_fifo_full :

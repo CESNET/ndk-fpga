@@ -21,6 +21,8 @@ use work.pcie_hdr_fields_pkg.all;
 -- This component accepts buffered PCIe transactions (currently set to the
 -- length of 128 Bytes). And sends them with appropriate PCIe header. When end of a
 -- packet is processed, the DMA header is sent after that in a separate transaction.
+-- On Intel devices with two TX regions, every output word contains the start of at most one
+-- transaction, and this start is always in the first region.
 entity RX_DMA_CALYPTE_HDR_INSERTOR is
     generic (
         -- =========================================================================================
@@ -906,6 +908,8 @@ begin
         end process;
     end generate;
 
+    -- Every transaction and every DMA header starts in the first region of a word. The R-Tile in
+    -- the single-width mode accepts the start of only one transaction per clock cycle.
     tprocess_intel_2_rgn_g : if (IS_INTEL and TX_REGIONS = 2) generate
         tprocess_nst_logic_p : process (all) is
             variable rx_mfb_eof_pos_u : unsigned(RX_MFB_EOF_POS'range);
@@ -919,48 +923,24 @@ begin
                         if (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1' and RX_MFB_EOF = '0') then
                             tprocess_nst <= PKT_DROP;
                         elsif ((not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1')) and HDRM_DATA_PCIE_HDR_SRC_RDY = '1') then
-                            -- The transaction spans multiple output words
-                            if (RX_MFB_EOF = '0'
-                                -- If the EOF_POS of the input is in this range, the second region
-                                -- in the next beat is empty and can therefore fit the DMA header so
-                                -- its PCIe header has to be ready as well as the DMA header itself.
-                                or (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 64 and rx_mfb_eof_pos_u < 96 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1')
-                                -- The EOF_POS greater than or equal to 96 means that the
-                                -- transaction will span two words but the second region in the next
-                                -- beat does not contain space for a DMA header.
-                                or (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 96)
-                            ) then
+                            -- The transaction spans two output words
+                            if (RX_MFB_EOF = '0' or rx_mfb_eof_pos_u >= 64) then
                                 tprocess_nst <= TRANSACTION_SEND;
-
-                            -- The transaction fits in one word but spans over two regions, then next
-                            -- beat will contain just the DMA header.
-                            elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 32 and rx_mfb_eof_pos_u < 64) then
+                            else
                                 tprocess_nst <= DMA_HDR_SEND;
-
-                                -- The transaction fits into one region and the second region contains
-                                -- its DMA header
-                                -- elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 16) then
                             end if;
                         end if;
                     end if;
 
                 when TRANSACTION_SEND =>
-
                     if (TX_MFB_DST_RDY = '1') then
-                        -- The transaction ends in the second second region so the next beat will contain just
-                        -- the DMA header
-                        if (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 96) then
+                        if (RX_MFB_EOF = '1') then
                             tprocess_nst <= DMA_HDR_SEND;
-
-                        -- the DMA header fits in the second region of the current (i.e. second)
-                        -- beat
-                        elsif (RX_MFB_EOF = '0' or (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 96)) then
+                        else
                             tprocess_nst <= IDLE;
                         end if;
                     end if;
 
-                -- In case of 2 regions and for this state, always place the Header on the
-                -- beginning of an output word.
                 when DMA_HDR_SEND =>
                     if (TX_MFB_DST_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
                         tprocess_nst <= IDLE;
@@ -973,7 +953,6 @@ begin
             end case;
         end process;
 
-        -- For more description of a states, check the transition process, i.e. tprocess_nst_logic_p
         tshift_logic_p : process (all) is
             variable rx_mfb_eof_pos_u : unsigned(RX_MFB_EOF_POS'range);
         begin
@@ -986,22 +965,13 @@ begin
 
             case tprocess_pst is
                 when IDLE =>
-                    -- Valid data with their PCIe header
+                    -- The transaction fits into one output word
                     if (RX_MFB_SRC_RDY = '1' and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
-                        and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))) then
-                        -- If the current transaction fits into one word,
-                        if (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 32 and rx_mfb_eof_pos_u < 64) then
-                            RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
-                            HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-
-                        -- If the transaction fits into one regions, the second contains DMA header
-                        -- so it itself and its PCIe header as to be ready on top of that
-                        elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 32 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
-                            RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
-                            HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-                            HDRM_DMA_PCIE_HDR_DST_RDY  <= TX_MFB_DST_RDY;
-                            HDRM_DMA_HDR_DST_RDY       <= TX_MFB_DST_RDY;
-                        end if;
+                        and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))
+                        and RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 64
+                    ) then
+                        RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
+                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
                     end if;
 
                     if (HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_PKT_DROP = '1') then
@@ -1012,16 +982,8 @@ begin
                     end if;
 
                 when TRANSACTION_SEND =>
-                    if (RX_MFB_EOF = '0' or (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 96)) then
-                        RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
-                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-
-                    elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 96) then
-                        RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
-                        HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
-                        HDRM_DMA_PCIE_HDR_DST_RDY  <= TX_MFB_DST_RDY;
-                        HDRM_DMA_HDR_DST_RDY       <= TX_MFB_DST_RDY;
-                    end if;
+                    RX_MFB_DST_RDY             <= TX_MFB_DST_RDY;
+                    HDRM_DATA_PCIE_HDR_DST_RDY <= TX_MFB_DST_RDY;
 
                 when DMA_HDR_SEND =>
                     if (HDRM_DMA_PCIE_HDR_SRC_RDY = '1' and HDRM_DMA_HDR_SRC_RDY = '1') then
@@ -1039,9 +1001,7 @@ begin
         end process;
 
         TX_MFB_EOF_POS     <= slv_array_ser(tx_mfb_eof_pos_arr);
-        -- DMA header that as the only one can sometimes start in the second region has its FBE
-        -- and LBE bits permanently tied to 1
-        tx_mfb_meta_arr(1) <= (PCIE_RQ_META_HEADER => HDRM_DMA_PCIE_HDR, others => '0');
+        tx_mfb_meta_arr(1) <= (others => '0');
 
         tout_logic_p : process (all) is
             variable rx_mfb_eof_pos_u   : unsigned(RX_MFB_EOF_POS'range);
@@ -1057,7 +1017,7 @@ begin
             TX_MFB_EOF            <= (others => '0');
             TX_MFB_SOF_POS        <= (others => '0');
             tx_mfb_eof_pos_arr(0) <= (others => '0');
-            tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(5, maximum(1, log2(TX_REGION_SIZE*TX_BLOCK_SIZE))));
+            tx_mfb_eof_pos_arr(1) <= (others => '0');
             TX_MFB_SRC_RDY        <= '0';
 
             rx_mfb_eof_pos_u   := unsigned(RX_MFB_EOF_POS);
@@ -1068,10 +1028,10 @@ begin
                 when IDLE =>
                     high_shift_val_nst <= INIT_SHIFT;
                     if (RX_MFB_SRC_RDY = '1' and HDRM_DATA_PCIE_HDR_SRC_RDY = '1'
-                        -- Maybe this is obsolete since when the packet should be dropped, no
-                        -- HDRM_DATA_PCIE_HDR_SRC_RDY will be valid anyways
                         and (not (HDRM_PKT_DROP = '1' and HDRM_DMA_HDR_SRC_RDY = '1'))
                     ) then
+                        -- The last transaction of a packet can be shorter than 128 bytes, so its
+                        -- PCIe header gets the real length and byte enables.
                         if (RX_MFB_EOF = '1') then
                             data_pcie_hdr_corr(I_RQ_HDR_DW_CNT) := std_logic_vector(resize(rx_mfb_eof_pos_u(rx_mfb_eof_pos_u'high downto 2), I_RQ_HDR_DW_CNT_W) + 1);
 
@@ -1093,64 +1053,35 @@ begin
                             else
                                 data_pcie_hdr_corr(I_RQ_HDR_LBE) := "0000";
                             end if;
+                        end if;
 
-                            tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= data_pcie_hdr_corr;
+                        tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= data_pcie_hdr_corr;
+                        TX_MFB_SOF(0)                           <= '1';
+                        TX_MFB_SRC_RDY                          <= '1';
 
-                            if (rx_mfb_eof_pos_u < 32 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then
-                                TX_MFB_DATA           <= (TX_MFB_DATA'high downto 64 + (TX_MFB_DATA'length / 2) => '0')
-                                                         & HDRM_DMA_HDR_DATA
-                                                         & bshifter_data_out(TX_MFB_DATA'length/2 -1 downto 0);
-                                TX_MFB_SOF            <= "11";
-                                TX_MFB_EOF            <= "11";
-                                tx_mfb_eof_pos_arr(0) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
-                                TX_MFB_SRC_RDY        <= '1';
-
-                            elsif (rx_mfb_eof_pos_u >= 32 and rx_mfb_eof_pos_u < 64) then
-                                TX_MFB_SOF(0)         <= '1';
-                                TX_MFB_EOF            <= "10";
-                                tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2) + 4);
-                                TX_MFB_SRC_RDY        <= '1';
-
-                            elsif ((rx_mfb_eof_pos_u >= 64 and rx_mfb_eof_pos_u < 96 and HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1')
-                                   or rx_mfb_eof_pos_u >= 96
-                               ) then
-                                high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
-                                TX_MFB_SOF(0)      <= '1';
-                                TX_MFB_SRC_RDY     <= '1';
-                            end if;
+                        if (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 32) then
+                            TX_MFB_EOF(0)         <= '1';
+                            tx_mfb_eof_pos_arr(0) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
+                        elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 64) then
+                            TX_MFB_EOF(1)         <= '1';
+                            tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
                         else
-                            high_shift_val_nst                      <= INIT_SHIFT + SHIFT_INC;
-                            tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= HDRM_DATA_PCIE_HDR;
-                            TX_MFB_SOF(0)                           <= '1';
-                            TX_MFB_SRC_RDY                          <= '1';
+                            high_shift_val_nst <= INIT_SHIFT + SHIFT_INC;
                         end if;
                     end if;
 
                 when TRANSACTION_SEND =>
-                    high_shift_val_nst <= high_shift_val_pst + SHIFT_INC;
+                    high_shift_val_nst <= INIT_SHIFT;
                     TX_MFB_SRC_RDY     <= '1';
 
                     if (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u < 96) then
-                        -- prepare shift counter for the next transaction
-                        high_shift_val_nst    <= INIT_SHIFT;
-                        TX_MFB_DATA           <= (TX_MFB_DATA'high downto 64 + (TX_MFB_DATA'length / 2) => '0')
-                                                 & HDRM_DMA_HDR_DATA
-                                                 & bshifter_data_out(TX_MFB_DATA'length/2 -1 downto 0);
-                        TX_MFB_SOF            <= "10";
-                        TX_MFB_EOF            <= "11";
+                        TX_MFB_EOF(0)         <= '1';
                         tx_mfb_eof_pos_arr(0) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
-                        tx_mfb_eof_pos_arr(1) <= std_logic_vector(to_unsigned(1, TX_EOF_POS_RGN_LEN));
-
-                    elsif (RX_MFB_EOF = '1' and rx_mfb_eof_pos_u >= 96) then
-                        -- prepare shift counter for the next transaction
-                        high_shift_val_nst    <= INIT_SHIFT;
-                        TX_MFB_EOF            <= "10";
+                    elsif (RX_MFB_EOF = '1') then
+                        TX_MFB_EOF(1)         <= '1';
                         tx_mfb_eof_pos_arr(1) <= std_logic_vector(rx_mfb_eof_pos_u(TX_EOF_POS_RGN_LEN-1 + 2 downto 2));
-
-                    elsif (RX_MFB_EOF = '0') then
-                        -- prepare shift counter for the next transaction
-                        high_shift_val_nst    <= INIT_SHIFT;
-                        TX_MFB_EOF            <= "10";
+                    else
+                        TX_MFB_EOF(1)         <= '1';
                         tx_mfb_eof_pos_arr(1) <= (others => '1');
                     end if;
 
@@ -1158,8 +1089,8 @@ begin
                     high_shift_val_nst                      <= INIT_SHIFT;
                     TX_MFB_DATA                             <= (TX_MFB_DATA'high downto 64 => '0') & HDRM_DMA_HDR_DATA;
                     tx_mfb_meta_arr(0)(PCIE_RQ_META_HEADER) <= HDRM_DMA_PCIE_HDR;
-                    TX_MFB_SOF                              <= std_logic_vector(to_unsigned(1, TX_MFB_SOF'length));
-                    TX_MFB_EOF                              <= std_logic_vector(to_unsigned(1, TX_MFB_EOF'length));
+                    TX_MFB_SOF(0)                           <= '1';
+                    TX_MFB_EOF(0)                           <= '1';
                     tx_mfb_eof_pos_arr(0)                   <= std_logic_vector(to_unsigned(1, TX_EOF_POS_RGN_LEN));
 
                     if (HDRM_DMA_HDR_SRC_RDY = '1' and HDRM_DMA_PCIE_HDR_SRC_RDY = '1') then

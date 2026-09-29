@@ -172,6 +172,7 @@ module testbench;
     );
 
     tx_dma_calypte_property #(
+        .DEVICE                  (DEVICE),
         .USR_MFB_REGIONS         (USR_MFB_REGIONS),
         .USR_MFB_REGION_SIZE     (USR_MFB_REGION_SIZE),
         .USR_MFB_BLOCK_SIZE      (USR_MFB_BLOCK_SIZE),

@@ -41,8 +41,10 @@ class start_channel extends uvm_sequence;
         data_base_addr % 128 == 0;
         // Packet header size
         hdr_base_addr  % 8   == 0;
-        // Update buffer address
-        update_base_addr % 4 == 0;
+        // The pointer update is one 8 B write. An address that is not a multiple of 8 lets that
+        // write cross a 4 kB boundary, which a single PCIe request must not do. The driver maps
+        // the update buffer as a whole page, so only aligned addresses reach the design.
+        update_base_addr % 8 == 0;
 
         //Random 32-bit address
         data_base_addr  [64-1:32] dist { 0 :/ 1, [0:$] :/ 1 };
@@ -228,6 +230,13 @@ class run_channel extends uvm_sequence;
 
         run_time_min < run_time_max;
         stop_time_min < stop_time_max;
+
+        // A channel stops several times during the test, so that the pointer update sent on each
+        // stop is checked.
+        run_time_min  >= 50us;
+        run_time_max  <= 500us;
+        stop_time_min >= 5us;
+        stop_time_max <= 50us;
     }
 
     function new (string name = "run_channel");
@@ -264,7 +273,6 @@ class run_channel extends uvm_sequence;
                 seq_update.randomize();
                 seq_update.start(null);
             end
-            //never happen because forever begin
             seq_stop.randomize();
             seq_stop.start(null);
             assert(std::randomize(stop_time) with {stop_time inside {[stop_time_min:stop_time_max]};});

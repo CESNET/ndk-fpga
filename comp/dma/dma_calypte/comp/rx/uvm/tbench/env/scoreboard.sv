@@ -270,6 +270,9 @@ class scoreboard #(
         m_ptr_upd_tr_compared = m_upd_cmp.compared;
         m_ptr_upd_tr_errors   = m_upd_cmp.errors;
 
+        str = {str, $sformatf("\n\tCompared pointer updates : %0d, errors : %0d\n", m_ptr_upd_tr_compared,
+                              m_ptr_upd_tr_errors)};
+
         //-----------------------------------------------------------------------
         // Counter statistics (latency and throughput on each interface)
         //-----------------------------------------------------------------------

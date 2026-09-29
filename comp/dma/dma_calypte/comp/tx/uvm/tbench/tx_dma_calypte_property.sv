@@ -9,6 +9,8 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 
 module tx_dma_calypte_property #(
+    string       DEVICE,
+
     int unsigned USR_MFB_REGIONS,
     int unsigned USR_MFB_REGION_SIZE,
     int unsigned USR_MFB_BLOCK_SIZE,
@@ -32,6 +34,9 @@ module tx_dma_calypte_property #(
     mvb_if chan_start_req_mvb,
     mvb_if rt_upd_mvb
 );
+
+    // On Intel devices, every transaction starts in the first region.
+    localparam bit IS_INTEL_DEV = (DEVICE == "STRATIX10" || DEVICE == "AGILEX");
 
     string module_name = "";
     logic START = 1'b1;
@@ -90,22 +95,14 @@ module tx_dma_calypte_property #(
         .vif   (ptr_upd_mfb)
     );
 
-    generate if (PCIE_CQ_MFB_REGIONS > 1) begin : sof_eof_rule_2reg_g
-        property ptr_upd_sof_after_eof;
-            @(posedge ptr_upd_mfb.CLK) disable iff(RESET)
-            ptr_upd_mfb.SRC_RDY |->
-                (( ~(ptr_upd_mfb.EOF[PCIE_CQ_MFB_REGIONS-2:0]) & ptr_upd_mfb.SOF[PCIE_CQ_MFB_REGIONS-1:1]) == 0);
-        endproperty
-
-        // Check when SOF is not on first position then previous packet have to end in region right before.
-        assert property (ptr_upd_sof_after_eof)
-            else begin
-                `uvm_error(module_name,
-                           $sformatf({"\n\tPointer Update interface: If SOF is set on different region ",
-                                      "that 0 then the region before has to have EOF set\n\tSOF 0b%b\n\tEOF 0b%b"},
-                                     ptr_upd_mfb.SOF, ptr_upd_mfb.EOF));
-            end
-    end endgenerate
+    pcie_rq_mfb_property #(
+        .REGIONS               (PCIE_CQ_MFB_REGIONS),
+        .SOF_FIRST_REGION_ONLY (IS_INTEL_DEV),
+        .IF_NAME               ("Pointer Update interface")
+    ) ptr_upd_mfb_frame_property_i (
+        .RESET (RESET),
+        .vif   (ptr_upd_mfb)
+    );
 
     mvb_property #(
         .ITEMS      (1),
