@@ -605,9 +605,10 @@ following table:</p>
 <td><p>Read pointer for headers (up to 16 bits)</p></td>
 </tr>
 <tr class="row-even"><td><p>0x20</p></td>
-<td><p>-Reserved-</p></td>
-<td><p>N/A</p></td>
-<td><p>-</p></td>
+<td><p>Update timeout</p></td>
+<td><p>R/W</p></td>
+<td><p>Number of clock cycles after which a pointer update is sent again while a channel is
+stopping. Set to 0 to send the update only once.</p></td>
 </tr>
 <tr class="row-odd"><td><p>0x24</p></td>
 <td><p>-Reserved-</p></td>
@@ -665,14 +666,14 @@ following table:</p>
 <td><p>-</p></td>
 </tr>
 <tr class="row-even"><td><p>0x50</p></td>
-<td><p>-Reserved-</p></td>
-<td><p>N/A</p></td>
-<td><p>-</p></td>
+<td><p>Update buffer base address (lower part)</p></td>
+<td><p>R/W</p></td>
+<td><p>Bits 31:0 of the host address where HDP and HHP are written</p></td>
 </tr>
 <tr class="row-odd"><td><p>0x54</p></td>
-<td><p>-Reserved-</p></td>
-<td><p>N/A</p></td>
-<td><p>-</p></td>
+<td><p>Update buffer base address (upper part)</p></td>
+<td><p>R/W</p></td>
+<td><p>Bits 63:32 of the host address where HDP and HHP are written</p></td>
 </tr>
 <tr class="row-even"><td><p>0x58</p></td>
 <td><p>Data pointer mask (DPM)</p></td>
@@ -746,12 +747,20 @@ to its register and the counter is put to reset.</p>
 </dl>
 </div></blockquote>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The update buffer base address must be a multiple of 8. The controller writes HDP and HHP
+together as one 8 B PCIe write. A single PCIe request must not cross a 4 kB boundary, and an
+address that is not a multiple of 8 can place the write across such a boundary.</p>
+</div>
 <section id="start-sequence">
 <h3>Start sequence<a class="headerlink" href="#start-sequence" title="Link to this heading"></a></h3>
 <p>The <em>Control</em> and <em>Status</em> registers are the most important ones in terms of ensuring the channel’s
 activity. When a start of a channel is requested, some registers need to be initialized from the MI
 bus:</p>
 <ol class="arabic simple">
+<li><p>The Update buffer base address registers need to be set to the host address that receives HDP
+and HHP.</p></li>
 <li><p>The SDP and SHP pointer registers need to be initialized to 0.</p></li>
 <li><p>A write of value <code class="docutils literal notranslate"><span class="pre">0b1</span></code> to the Control register is issued. This immediately starts the required
 channel that responds by setting the Status register to <code class="docutils literal notranslate"><span class="pre">1b1</span></code>. The controller is now ready to
