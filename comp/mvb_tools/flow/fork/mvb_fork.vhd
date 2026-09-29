@@ -46,19 +46,16 @@ architecture ARCH of MVB_FORK is
 
     constant DATA_WIDTH : integer := ITEMS*ITEM_WIDTH;
 
+    signal in_data : std_logic_vector(ITEMS*ITEM_WIDTH-1 downto 0);
+    signal in_vld  : std_logic_vector(ITEMS-1 downto 0);
 begin
-
-    -- Data forking
-    base_fork_gen: for i in 1 to OUTPUT_PORTS generate
-        TX_DATA(i*DATA_WIDTH-1 downto (i-1)*DATA_WIDTH) <= RX_DATA;
-        TX_VLD(i*ITEMS-1 downto (i-1)*ITEMS)            <= RX_VLD;
-    end generate;
-
 
     -- Control forking
     no_dst_rdy_gen: if not USE_DST_RDY generate
         RX_DST_RDY <= '1';
         TX_SRC_RDY <= (others => RX_SRC_RDY);
+        in_data    <= RX_DATA;
+        in_vld     <= RX_VLD;
     end generate;
 
     logic_fork_gen: if USE_DST_RDY and VERSION = "logic" generate
@@ -73,27 +70,44 @@ begin
             end process;
             TX_SRC_RDY(i) <= and_reduce(ready_base);
         end generate;
+
+        in_data <= RX_DATA;
+        in_vld  <= RX_VLD;
     end generate;
 
     register_fork_generate: if USE_DST_RDY and VERSION = "register" generate
-        signal dst_rdy  : std_logic;
-        signal send_reg : std_logic_vector(OUTPUT_PORTS-1 downto 0);
-        signal src_rdy  : std_logic_vector(OUTPUT_PORTS-1 downto 0);
+        signal in_src_rdy : std_logic;
+        signal in_accept  : std_logic;
+        signal send_reg   : std_logic_vector(OUTPUT_PORTS-1 downto 0);
     begin
-        RX_DST_RDY <= dst_rdy;
-        TX_SRC_RDY <= src_rdy;
-        dst_rdy    <= and_reduce(TX_DST_RDY or send_reg);
-        src_rdy    <= (OUTPUT_PORTS-1 downto 0 => RX_SRC_RDY) and not send_reg;
-        send_register : process (CLK)
+        RX_DST_RDY <= in_accept;
+
+        in_accept <= '1' when in_src_rdy = '0' or and_reduce(TX_DST_RDY or send_reg) = '1' else '0';
+        in_reg : process (CLK)
         begin
-            if rising_edge(CLK) then
-                if (RESET = '1' or dst_rdy = '1') then
-                    send_reg <= (others => '0');
+            if (rising_edge(CLK)) then
+                if (in_accept = '1') then
+                    in_data    <= RX_DATA;
+                    in_vld     <= RX_VLD;
+                    send_reg   <= (others => '0');
                 else
-                    send_reg <= send_reg or (src_rdy and TX_DST_RDY);
+                    send_reg <= send_reg or TX_DST_RDY;
                 end if;
             end if;
         end process;
+
+        in_src_rdy_reg : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    in_src_rdy <= '0';
+                elsif (in_accept = '1') then
+                    in_src_rdy <= RX_SRC_RDY;
+                end if;
+            end if;
+        end process;
+
+        TX_SRC_RDY <= (OUTPUT_PORTS-1 downto 0 => in_src_rdy) and not send_reg;
     end generate;
 
     simple_fork_gen: if USE_DST_RDY and VERSION = "simple" generate
@@ -102,6 +116,14 @@ begin
         fork_ready <= RX_SRC_RDY and and_reduce(TX_DST_RDY);
         RX_DST_RDY <= fork_ready;
         TX_SRC_RDY <= (others => fork_ready);
+
+        in_data <= RX_DATA;
+        in_vld  <= RX_VLD;
     end generate;
 
+    -- Data forking
+    base_fork_gen: for i in 1 to OUTPUT_PORTS generate
+        TX_DATA(i*DATA_WIDTH-1 downto (i-1)*DATA_WIDTH) <= in_data;
+        TX_VLD(i*ITEMS-1 downto (i-1)*ITEMS)            <= in_vld;
+    end generate;
 end architecture;
