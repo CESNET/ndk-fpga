@@ -8,7 +8,9 @@ from cocotb.triggers import Timer
 import nfb.libnetcope
 import nfb.libnfb
 
-e = cocotb.task.bridge
+from .ext.python.exception_bridge import bridge
+
+e = bridge
 
 NDP_RX_CALYPTE_BLOCK_SIZE = 128
 NDP_TX_CALYPTE_BLOCK_SIZE = 32

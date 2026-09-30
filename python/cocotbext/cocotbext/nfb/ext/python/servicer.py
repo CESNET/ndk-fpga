@@ -8,6 +8,8 @@ import cocotb
 
 import nfb.ext.python as ext
 
+from .exception_bridge import install_exception_bridge
+
 
 class Servicer(ext.AbstractNfb):
     class NdpQueue(ext.AbstractNdpQueue):
@@ -56,6 +58,7 @@ class Servicer(ext.AbstractNfb):
     def __init__(self, device, dtb, *args, **kwargs):
         self._log = logging.getLogger(__name__)
         self._device = device
+        install_exception_bridge()
         super().__init__(dtb)
 
     def queue_open(self, index, dir, flags):

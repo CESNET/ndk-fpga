@@ -10,6 +10,7 @@ from cocotb.triggers import Timer
 
 from cocotbext.ndk_core import NFBDevice
 
+from cocotbext.nfb.ext.python import bridge
 import cocotbext.ofm.utils.sim.modelsim as ms
 import cocotb.utils
 
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 # Shortcuts
-e = cocotb.task.bridge
+e = bridge
 st = cocotb.utils.get_sim_time
 
 

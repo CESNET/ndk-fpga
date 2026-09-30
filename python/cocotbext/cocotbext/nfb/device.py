@@ -13,10 +13,9 @@ from ..ofm.utils import RAM
 from .queue import QueueManager
 
 from .ext.python import Servicer as NfbPythonServicer
+from .ext.python.exception_bridge import bridge
 
-import cocotb
-
-e = cocotb.task.bridge
+e = bridge
 
 
 class NfbDevice:
