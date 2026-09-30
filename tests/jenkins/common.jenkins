@@ -339,9 +339,9 @@ def fetchCocotbCompsVer(include = "", exclude = "") {
     return comps_ver
 }
 
-def fetchCocotbCompsMultiVer(include = "", exclude = "") {
+def fetchCocotbCompsVerAndMultiVer(include = "", exclude = "") {
     def comps_ver = fetchCocotbCompsVer(include, exclude)
-    def comps_multiver = []
+    def comps_all = []
 
     comps_ver.each { comp ->
         def name = comp[0]
@@ -352,25 +352,19 @@ def fetchCocotbCompsMultiVer(include = "", exclude = "") {
 
             if (settings_paths.length() > 0) {
                 settings_paths = settings_paths.readLines()
+                def relative_path = "../${settings_paths[0]}"
+                comps_all.add([name, path, relative_path])
 
-                settings_paths.each { settings_path ->
-                    def relative_path = "..$settings_path"
-
-                    if (settings_paths.size() > 1) {
-                        dir_name = settings_path.split("/")[-2]
-                        comps_multiver.add(["$name - $dir_name", path, relative_path])
-                    } else {
-                        comps_multiver.add([name, path, relative_path])
-                    }
-                }
+            } else {
+                comps_all.add(comp)
             }
         }
     }
 
-    return comps_multiver
+    return comps_all
 }
 
-def commonPrekladCocotbVerRun(COMPONENTS) {
+def commonPrekladCocotbRun(COMPONENTS, ofm_path = pwd()) {
 
     // Clean old builds from Jenkins history
     cleanBuilds()
@@ -390,24 +384,33 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
     // run verification of every component
     for(c in COMPONENTS) {
         // parse
-        def name = c[0]
-        def path = c[1]
+        // [name, path, settings] runs as MULTIVER, [name, path] as basic VER
+        def name     = c[0]
+        def path     = c[1]
+        def settings = (c.size() > 2) ? c[2] : null
+        def multiver = (settings != null)
 
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
             timeout(time: 4, unit: 'HOURS') {
-                stage("cocotb (VER): $name") {
+                stage(multiver ? "cocotb (MULTIVER): $name" : "cocotb (VER): $name") {
                     dir("$path") {
                         try {
                             def command = ""
 
-                            // activate virtual environment if present
-                            if (fileExists('pyproject.toml')) {
-                                command += "make cocotb-venv\nsource venv-$name/bin/activate\n"
+                            if (multiver) {
+                                // run multi ver script for cocotb
+                                command = "python3 $ofm_path/build/scripts/multi_ver/multi_ver_cocotb.py $settings"
+                            } else {
+                                // activate virtual environment if present
+                                if (fileExists('pyproject.toml')) {
+                                    command += "make cocotb-venv\nsource venv-$name/bin/activate\n"
+                                }
+
+                                // run verification
+                                command += "make TARGET=cocotb SIM_FLAGS=\"-c -do quit\""
                             }
 
-                            // run verification
-                            command += "make TARGET=cocotb SIM_FLAGS=\"-c -do quit\""
                             sh "${print_info}"
                             sh "$command"
 
@@ -419,17 +422,19 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
                             failed.add("$name")
                         }
 
-                        // get test results
-                        junit allowEmptyResults: true, testResults: "results.xml"
+                        if (!multiver) {
+                            // get test results
+                            junit allowEmptyResults: true, testResults: "results.xml"
 
-                        try {
-                            sh "test -f results.xml"
-                        } catch (err) {
-                            echo "Error detected, no tests performed (results missing)!"
-                            propagateUserInterupt(err)
-                            currentBuild.result = 'FAILURE'
-                            currentStage.result = 'FAILURE'
-                            failed.add("$name")
+                            try {
+                                sh "test -f results.xml"
+                            } catch (err) {
+                                echo "Error detected, no tests performed (results missing)!"
+                                propagateUserInterupt(err)
+                                currentBuild.result = 'FAILURE'
+                                currentStage.result = 'FAILURE'
+                                failed.add("$name")
+                            }
                         }
                     }
                 }
@@ -439,95 +444,15 @@ def commonPrekladCocotbVerRun(COMPONENTS) {
             currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
             failed.add("$name")
         } finally { // collect interesting files
-            archiveArtifacts "$path/transcript" // verification log
+            if (multiver) {
+                archiveArtifacts artifacts: "$path/results*", allowEmptyArchive: true // per-combination results and logs
+            } else {
+                archiveArtifacts artifacts: "$path/transcript", allowEmptyArchive: true // verification log
+            }
             if(currentBuild.result == "FAILURE") {
-                archiveArtifacts "$path/vsim.wlf" // generated waveform, use vsim -view vsim.wlf
+                archiveArtifacts artifacts: "$path/vsim.wlf", allowEmptyArchive: true // generated waveform, use vsim -view vsim.wlf
             }
         }
-    }
-
-    // send out emails if failure is detected
-    if(currentBuild.result == "FAILURE") {
-        println "FAILED on components: ${failed}."
-        emailext \
-            recipientProviders: [culprits(), developers()],
-            to: 'ondrejschwarz@cesnet.cz',
-            subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
-            body: """\
-                The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
-
-                For more details see ${env.BUILD_URL}.
-
-                Yours sincerely
-                Jenkins\
-            """.stripIndent(),
-            attachLog: true,
-            compressLog: true
-    }
-}
-
-def commonPrekladCocotbMultiVerRun(COMPONENTS, ofm_path = pwd()) {
-
-    // Clean old builds from Jenkins history
-    cleanBuilds()
-
-    // clean artifacts possibly left by previous builds
-    sh "git clean -df"
-
-    // every midnight check for new commits and run pipeline if they exist
-    properties([pipelineTriggers([pollSCM('H H(0-2) * * *')])])
-
-    // get info about the server and name of the last commit
-    def print_info = "hostname;"
-        print_info += "git --no-pager log -n 1;"
-
-    def failed = []
-
-    try {
-        // run verification of every component
-        for(c in COMPONENTS) {
-            // parse
-            def name     = c[0]
-            def path     = c[1]
-            def settings = c[2]
-
-            def multi_ver = "$ofm_path/build/scripts/multi_ver/multi_ver_cocotb.py"
-
-            // exec vsim
-            try { // try-catch is a hack to continue even after the first failed verification
-                timeout(time: 4, unit: 'HOURS') {
-                    stage("cocotb (MULTIVER): $name") {
-                        dir("$path") {
-                            try {
-                                // run multi ver script for cocotb
-                                def command = "python3 $multi_ver $settings"
-                                sh "${print_info}"
-                                sh "$command"
-
-                            } catch (err) {
-                                propagateUserInterupt(err)
-                                echo "Error detected, firmware build failed!"
-                                currentBuild.result = 'FAILURE'
-                                currentStage.result = 'FAILURE'
-                                failed.add("$name")
-                            }
-                        }
-                    }
-                }
-            } catch(err) {
-                propagateUserInterupt(err)
-                currentBuild.result = 'FAILURE' // still propagate failure status to Jenkins
-                failed.add("$name")
-            } finally { // collect interesting files
-                archiveArtifacts "$path/transcript" // verification log
-                if(currentBuild.result == "FAILURE") {
-                    archiveArtifacts "$path/vsim.wlf" // generated waveform, use vsim -view vsim.wlf
-                }
-            }
-        }
-    } catch(err) {
-        echo "Error:"
-        echo err.toString()
     }
 
     // send out emails if failure is detected
