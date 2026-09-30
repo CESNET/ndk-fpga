@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVB Hash Table Simple &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="MVB TCAM" href="../tcam/readme.html" />
+    <link rel="prev" title="MVB FIFO" href="../fifo/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../flow/channel_router/readme.html">MVB Channel Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/discard/readme.html">MVB DISCARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_items/readme.html">MVB Merge Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams/readme.html">MVB Merge Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/demux/readme.html">MVB DEMUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mux/readme.html">MVB MUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/shakedown/readme.html">MVB Shakedown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/reordering/readme.html">MVB Reordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/operation/readme.html">MVB Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lookup_table/readme.html">MVB Lookup Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifox/readme.html">MVB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifox/readme.html">MVB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Hash Table Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tcam/readme.html">MVB TCAM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mvb.html">MVB Components</a></li>
+      <li class="breadcrumb-item active">MVB Hash Table Simple</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mvb_tools/storage/mvb_hash_table_simple/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mvb-hash-table-simple">
+<span id="id1"></span><h1>MVB Hash Table Simple<a class="headerlink" href="#mvb-hash-table-simple" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_hash_table_simple">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_HASH_TABLE_SIMPLE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_hash_table_simple" title="Link to this definition"></a></dt>
+<dd><p>A hash-based key/value lookup table for the MVB bus. For every valid RX
+item, the MVB_KEY_WIDTH-bit key is hashed by two independent hash
+functions (a Toeplitz hash and a simple XOR hash, both keyed by the same
+SW-configurable HASH_KEY), each indexing its own table implemented in a
+separate <code class="docutils literal notranslate"><span class="pre">SDP_MEMX</span></code> memory (per MVB item, so 2*MVB_ITEMS
+memories in total). Three clock cycles later, TX_MVB_DATA/TX_MVB_MATCH
+report whether either table held a matching entry for that key (the
+stored key is compared against the original lookup key to reject hash
+collisions) and, if so, its stored data. TX_MVB_VLD simply follows
+RX_MVB_VLD (delayed); it does <strong>not</strong> indicate a match - always check
+TX_MVB_MATCH for that. When neither table matches, TX_MVB_DATA is
+undefined (defaults to the XOR table’s read data regardless of validity).</p>
+<p>Table entries are written through the MI bus (see the WARNING below);
+MVB lookups are used only for reading. Every MI_WR/MI_RD access, and the
+whole “clear tables” sweep, stalls RX_MVB_DST_RDY for its duration - do
+not expect full MVB throughput while configuring the table over MI.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TABLE_CAPACITY should be a power of two: HASH_WIDTH = log2(TABLE_CAPACITY)
+is used directly as the address width of the hash functions and of the
+underlying memories, without any additional range check.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There is no hash-collision detection on writes. A table address holds
+exactly one entry, a write to 0x0C unconditionally overwrites whatever
+is already stored there, and MI_RD never returns the actual table
+content (only the configuration constants below) - so software has no
+way to check what currently occupies an address before overwriting it.
+The two independent tables (Toeplitz/XOR) exist to give software an
+alternate slot for a colliding key, but choosing between them and
+tracking which keys occupy which slots is entirely software’s
+responsibility; the hardware provides no support for it. This only
+affects writes - a lookup for a key that collides with a different
+key’s stored entry is still handled safely (the stored-key comparison
+makes it report TX_MVB_MATCH = ‘0’, never wrong data).</p>
+</div>
+<section id="mi-register-map">
+<h2>MI register map<a class="headerlink" href="#mi-register-map" title="Link to this heading"></a></h2>
+<p>Only the low 8 bits of MI_ADDR are decoded. All registers are MI_WIDTH
+(commonly 32) bits wide.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Address</p></th>
+<th class="head"><p>Write (MI_WR)</p></th>
+<th class="head"><p>Read (MI_RD)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0x00</p></td>
+<td><p>Command register, see below. Takes effect immediately (1
+CLK).</p></td>
+<td><p>Constant MVB_ITEMS.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x04</p></td>
+<td><p>Table write address register (bits HASH_WIDTH-1 downto 0
+of MI_DWR).</p></td>
+<td><p>Constant MVB_KEY_WIDTH.</p></td>
+</tr>
+<tr class="row-even"><td><p>0x08</p></td>
+<td><p>Shifts MI_DWR into the entry-data shift register, see the
+NOTE below.</p></td>
+<td><p>Constant DATA_OUT_WIDTH.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x0C</p></td>
+<td><p>Commits the entry-data shift register to the table
+selected by the command register, at the address set at
+0x04. MI_DWR is ignored; only the write access itself (to
+this address) matters.</p></td>
+<td><p>Constant HASH_WIDTH (=
+log2(TABLE_CAPACITY)).</p></td>
+</tr>
+<tr class="row-even"><td><p>0x10</p></td>
+<td><p>Shifts MI_DWR into the hash-key register (shared by both
+hash functions).</p></td>
+<td><p>Constant HASH_KEY_WIDTH.</p></td>
+</tr>
+<tr class="row-odd"><td><p>0x14</p></td>
+<td><p>(no effect)</p></td>
+<td><p>Constant TABLE_CAPACITY.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An entry only actually changes in the table at the 0x0C commit; the
+0x04/0x08 writes before it only prepare the new value and don’t affect
+the table yet. So an MVB lookup can never see a half-written entry -
+only the complete old one or the complete new one.</p>
+<p>MVB lookups are blocked for the one cycle of every individual MI
+access (0x04, 0x08, or 0x0C), same as for the table-clearing sweep -
+not just during the sweep. Between separate MI accesses, though, any
+gap (a cycle with no MI_WR/MI_RD) lets lookups proceed as normal, so
+they can still interleave with an in-progress multi-step entry update.
+That’s fine for the table content itself (as explained above), but if
+your application additionally needs no lookups to happen at all for
+the whole duration of an entry update, you need to arrange that
+yourself; this component only blocks lookups access by access, not for
+the whole sequence.</p>
+</div>
+<p>Command register (bits of the value written to address 0x00):</p>
+<ul class="simple">
+<li><p>bit 0 - select the Toeplitz table for the next 0x0C commit (0 = Toeplitz, 1 = XOR).</p></li>
+<li><p>bit 1 - start clearing (zeroing) both tables; self-clears when the sweep
+finishes. While set, MI_ARDY stays deasserted for approximately
+TABLE_CAPACITY clock cycles (a couple of cycles more in practice) and no
+new MI request is accepted.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A stored entry is <code class="docutils literal notranslate"><span class="pre">MVB_KEY_WIDTH</span> <span class="pre">+</span> <span class="pre">DATA_OUT_WIDTH</span> <span class="pre">+</span> <span class="pre">1</span></code> bits wide
+(LSB to MSB: 1 valid bit, then DATA_OUT_WIDTH data bits, then the
+MVB_KEY_WIDTH key), and is loaded into the entry-data shift register
+with one or more writes to 0x08 (<code class="docutils literal notranslate"><span class="pre">ceil(entry_width</span> <span class="pre">/</span> <span class="pre">MI_WIDTH)</span></code>
+writes, MI_WIDTH bits each). Each write shifts the new MI_DWR word in
+at the <em>top</em>, so the <strong>first</strong> 0x08 write must carry the
+<strong>least-significant</strong> MI_WIDTH-bit chunk of the entry (bits 0 and up,
+i.e. the valid bit and low data bits) and the <strong>last</strong> write the
+most-significant chunk (the key). The same shift-in convention (first
+write = low bits) applies to the multi-word hash-key register at 0x10;
+there the chunk boundaries only line up cleanly when HASH_KEY_WIDTH is
+itself a multiple of MI_WIDTH (unlike the entry-data register, which is
+rounded up to a whole number of MI_WIDTH chunks internally).</p>
+</div>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-table_capacity"><td><p>TABLE_CAPACITY</p></td>
+<td><p>natural</p></td>
+<td><p>256</p></td>
+<td><p>Number of entries in each of the two hash tables.
+Should be a power of two, see the WARNING above.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_hash_table_simple-mvb_items"><td><p>MVB_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td><p>Number of MVB items transferred in one word.
+Determines the number of instantiated SDP_MEMX memories (2*MVB_ITEMS).</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-mvb_key_width"><td><p>MVB_KEY_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Width of the MVB lookup key, in bits.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_hash_table_simple-data_out_width"><td><p>DATA_OUT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td><p>Width of the data value stored per table entry, in bits.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-mi_width"><td><p>MI_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Width of the MI bus, in bits (typically 32, i.e. MI32).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_hash_table_simple-hash_key_width"><td><p>HASH_KEY_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Width of the shared hash-key register (see the MI register map above), in bits.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_hash_table_simple-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“STRATIX10”</p></td>
+<td><p>Target FPGA device, passed through to the underlying SDP_MEMX memories.
+“7SERIES”, “ULTRASCALE”, “VERSAL”, “ARRIA10”, “STRATIX10”, “AGILEX”</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-rst"><td><p>RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>PORTS OF INPUT MVB BUS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_key"><td><p>RX_MVB_KEY</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*MVB_KEY_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Deasserted (regardless of TX_MVB_DST_RDY) while any MI access or
+table-clear sweep is in progress, see above.</p></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PORTS OF OUTPUT MVB BUS</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_data"><td><p>TX_MVB_DATA</p></td>
+<td><p>std_logic_vector(MVB_ITEMS*DATA_OUT_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Valid only where TX_MVB_MATCH = ‘1’.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_match"><td><p>TX_MVB_MATCH</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Set when a valid entry with a matching key was found in either table.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_vld"><td><p>TX_MVB_VLD</p></td>
+<td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_src_rdy"><td><p>TX_MVB_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-tx_mvb_dst_rdy"><td><p>TX_MVB_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>PORTS OF MI BUS</p></td>
+<td><p>=====</p></td>
+<td><p>Used both to configure the hash key and write table entries, and
+to read back the component’s configuration constants. See the MI
+register map above.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(MI_WIDTH/8-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Not used (present for MI bus interface compatibility only).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_hash_table_simple-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(MI_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_hash_table_simple-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../fifo/readme.html" class="btn btn-neutral float-left" title="MVB FIFO" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tcam/readme.html" class="btn btn-neutral float-right" title="MVB TCAM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

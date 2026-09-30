@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger/readme.html">MFB Merger Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../merger/readme.html#mfb-merger-flat">MFB Merger Flat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger/readme.html#id1">MFB Merger</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger Simple</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#using-masking-en-parameter">Using MASKING_EN parameter</a></li>
@@ -95,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../reconfigurator/readme.html">MFB Reconfigurator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html">MFB Splitter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html#id1">MFB Splitter Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../splitter/readme.html#mfb-splitter-flat">MFB Splitter Flat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html">MFB Splitter Simple</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../splitter_simple/readme.html#id1">MFB Splitter Simple Gen</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../timestamp_limiter/readme.html">Timestamp Limiter</a></li>
@@ -416,6 +418,17 @@ bytes other than 0 in a bus word which would break a protocol.</p>
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MFB_MERGER_SIMPLE_GEN</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mfb_merger_simple_gen" title="Link to this definition"></a></dt>
 <dd><p>This is a generic implementation of the MFB Merger when the number of input interfaces can
 be set to arbitrary large number.</p>
+<p>The Merger holds one prefetched word per input and switches the words of the selected
+input to the output with a single round-robin arbiter, a single multiplexer and one
+output register (latency is 2 clock cycles, independent of MERGER_INPUTS).
+The selected input can change only on a packet boundary (or with the help of masking,
+see the MASKING_EN generic). The Merger tries to switch to the next input (in the
+round-robin order) when:</p>
+<ul class="simple">
+<li><p>the selected input has had data for CNT_MAX clock cycles while another input
+was waiting (prevents starvation), or</p></li>
+<li><p>the selected input has no valid data (and another input does).</p></li>
+</ul>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -428,7 +441,7 @@ be set to arbitrary large number.</p>
 <tr class="row-even" id="vhdl-gengeneric-mfb_merger_simple_gen-merger_inputs"><td><p>MERGER_INPUTS</p></td>
 <td><p>natural</p></td>
 <td><p>2</p></td>
-<td><p>number of independent input MFB interfaces, should be the power of two</p></td>
+<td><p>number of independent input MFB interfaces, any positive number</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_merger_simple_gen-mfb_regions"><td><p>MFB_REGIONS</p></td>
 <td><p>natural</p></td>

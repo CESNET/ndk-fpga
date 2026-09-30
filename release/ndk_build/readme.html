@@ -500,6 +500,7 @@ Common used files are DevTree.dts/dtb/vhd and user_const.vhd.</p>
 <li><p>PROJ_ONLY <em>{false, true}</em>: Only the project file will be created. Neither synthesis nor implementation will be run.</p></li>
 <li><p>SYNTH_ONLY <em>{false, true}</em>: Only the synthesis will be run, the implementation will be skipped.</p></li>
 <li><p>PHASE_SAVE <em>{true, false}</em>: Do not generate programming files and archives after implementation.</p></li>
+<li><p>POWER_ANALYSIS_EN <em>{true, false}</em>: Run power analysis (<code class="docutils literal notranslate"><span class="pre">report_power</span></code> in Vivado / PowerPlay Power Analyzer in Quartus) after implementation. Disabling it can speed up the build.</p></li>
 <li><p>DEVICE <em>{ULTRASCALE, VIRTEX7, STRATIX10, AGILEX}</em>: Sets the FPGA family. In the <a class="reference internal" href="#comp-target">comp target</a> is mapped to specific FPGA.</p></li>
 <li><p>FPGA <em>{xcvu7p-flvb2104-2-i, 1SD280PT2F55E1VG, …}</em>: Sets the FPGA part directly.</p></li>
 <li><dl class="simple">

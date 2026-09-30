@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MVB ASFIFO BRAM Xilinx &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="MVB FIFO" href="../fifo/readme.html" />
+    <link rel="prev" title="MVB ASFIFOX" href="../asfifox/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mvb.html">MVB Components</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../flow/channel_router/readme.html">MVB Channel Router</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/discard/readme.html">MVB DISCARD</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/item_collision_resolver/readme.html">MVB Item Collision Resolver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_items/readme.html">MVB Merge Items</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams/readme.html">MVB Merge Streams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/demux/readme.html">MVB DEMUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mux/readme.html">MVB MUX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/shakedown/readme.html">MVB Shakedown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/reordering/readme.html">MVB Reordering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/operation/readme.html">MVB Operation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../lookup_table/readme.html">MVB Lookup Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifox/readme.html">MVB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifox/readme.html">MVB ASFIFOX</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MVB ASFIFO BRAM Xilinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tcam/readme.html">MVB TCAM</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mvb.html">MVB Components</a></li>
+      <li class="breadcrumb-item active">MVB ASFIFO BRAM Xilinx</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mvb_tools/storage/asfifo_bram_xilinx/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mvb-asfifo-bram-xilinx">
+<span id="id1"></span><h1>MVB ASFIFO BRAM Xilinx<a class="headerlink" href="#mvb-asfifo-bram-xilinx" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-mvb_asfifo_bram_xilinx">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_ASFIFO_BRAM_XILINX</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_asfifo_bram_xilinx" title="Link to this definition"></a></dt>
+<dd><p>Asynchronous FIFO for the MVB bus with independent RX (write) and TX (read)
+clock domains, built directly on Xilinx block-RAM FIFO primitives
+(FIFO18E1/FIFO36E1 or FIFO18E2/FIFO36E2, selected by the DEVICE generic).
+The MVB item validity (RX_VLD/TX_VLD) is stored in the same memory as the
+data, so both cross the clock-domain boundary together atomically.</p>
+<p>The component is always operated in First-Word-Fall-Through mode with a
+registered output, i.e. the oldest stored word is presented on TX_DATA/TX_VLD
+together with TX_SRC_RDY as soon as it is stored, without needing a
+preceding dummy transfer to first shift it into the output register (as a
+standard, non-FWFT FIFO would require). TX_DST_RDY is only used to accept
+the current word and advance to the next one, never to make the current
+word visible in the first place.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The FIFO memory is reset only by <strong>RX_RESET</strong>. TX_RESET is accepted by
+the entity for interface symmetry but is <strong>not connected to the
+underlying FIFO primitives on any supported device</strong> and has no effect.
+Do not rely on TX_RESET to clear the FIFO content or the TX-side
+interface.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Because of the underlying BRAM FIFO primitive behavior (see Xilinx
+UG473), status flags react to the opposite side’s activity only after
+a delay of a few clock cycles: RX_DST_RDY/AFULL are deasserted a few
+RX_CLK cycles after a word is actually read out on the TX side, and
+TX_SRC_RDY/AEMPTY are asserted a few TX_CLK cycles after a word is
+actually written on the RX side.</p>
+</div>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“7SERIES”</p></td>
+<td><p>Target FPGA device.
+“VIRTEX6”, “7SERIES”, “ULTRASCALE”, “VERSAL”</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-item_width"><td><p>ITEM_WIDTH</p></td>
+<td><p>integer</p></td>
+<td><p>8</p></td>
+<td><p>Width of one MVB item in bits.
+Any positive value.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-regions"><td><p>REGIONS</p></td>
+<td><p>integer</p></td>
+<td><p>4</p></td>
+<td><p>Number of MVB items transferred in one word.
+Any positive value.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-fifo_items"><td><p>FIFO_ITEMS</p></td>
+<td><p>integer</p></td>
+<td><p>512</p></td>
+<td><p>FIFO depth in number of words. Recommended values are 512, 1024,
+2048, 4096 or 8192 (the last one uses BRAM less efficiently); any
+other value is internally rounded up to the nearest one of these,
+wasting block RAM capacity, so set this generic directly to one
+of the recommended values. Values above 8192 are not supported
+and fail at elaboration.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-almost_full_offset"><td><p>ALMOST_FULL_OFFSET</p></td>
+<td><p>integer</p></td>
+<td><p>128</p></td>
+<td><p>Number of free words (write/RX side) at or below which AFULL is asserted.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-almost_empty_offset"><td><p>ALMOST_EMPTY_OFFSET</p></td>
+<td><p>integer</p></td>
+<td><p>128</p></td>
+<td><p>Number of stored words (read/TX side) at or below which AEMPTY is asserted.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-precise_full"><td><p>PRECISE_FULL</p></td>
+<td><p>boolean</p></td>
+<td><p>true</p></td>
+<td><p>Precision of the FULL signal (write interface) assertion.</p>
+<ul class="simple">
+<li><p>true = the full FIFO_ITEMS depth is usable, but timing on RX_SRC_RDY/RX_DST_RDY is worse for wide words.</p></li>
+<li><p>false = the FIFO is effectively 4 items shallower (account for this when setting ALMOST_FULL_OFFSET), but timing is better.</p></li>
+</ul>
+<p>Only makes a difference when the stored word (REGIONS*ITEM_WIDTH+REGIONS
+bits, i.e. data plus the packed validity bits) together with
+FIFO_ITEMS requires more than one cascaded Xilinx BRAM (word x depth
+product exceeds a single 36 Kb block). Applies on all supported devices.</p>
+</td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mvb_asfifo_bram_xilinx-fast_empty"><td><p>FAST_EMPTY</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Timing speed of the EMPTY signal (read interface) assertion.</p>
+<ul class="simple">
+<li><p>false = standard ORing of internal flags (a few LUTs only), worse timing on TX_DST_RDY/TX_SRC_RDY for wide words.</p></li>
+<li><p>true = uses extra resources (mainly registers), but improves timing.</p></li>
+</ul>
+<p>Only makes a difference when more than two Xilinx BRAMs are
+cascaded (a stricter condition than PRECISE_FULL above). Applies
+on all supported devices. The matching FAST_EMPTY_DEPTH generic of
+the underlying <code class="docutils literal notranslate"><span class="pre">ASFIFO_BRAM_XILINX</span></code> core is not exposed by this
+wrapper (stays at its default of 1), which is only valid when
+TX_CLK is at least as fast as RX_CLK.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX INTERFACE (write side, RX_CLK domain)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-rx_clk"><td><p>RX_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-rx_reset"><td><p>RX_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Resets the whole FIFO (both RX and TX sides), see the WARNING above.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-rx_data"><td><p>RX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-rx_vld"><td><p>RX_VLD</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-rx_src_rdy"><td><p>RX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-rx_dst_rdy"><td><p>RX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-afull"><td><p>AFULL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Almost-full flag, see ALMOST_FULL_OFFSET and the timing WARNING above.</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TX INTERFACE (read side, TX_CLK domain - independent of RX_CLK)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-tx_clk"><td><p>TX_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-tx_reset"><td><p>TX_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Has no effect, see the WARNING above.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-tx_data"><td><p>TX_DATA</p></td>
+<td><p>std_logic_vector(REGIONS*ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-tx_vld"><td><p>TX_VLD</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-tx_src_rdy"><td><p>TX_SRC_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-tx_dst_rdy"><td><p>TX_DST_RDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_asfifo_bram_xilinx-aempty"><td><p>AEMPTY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Almost-empty flag, see ALMOST_EMPTY_OFFSET and the timing WARNING above.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../asfifox/readme.html" class="btn btn-neutral float-left" title="MVB ASFIFOX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../fifo/readme.html" class="btn btn-neutral float-right" title="MVB FIFO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

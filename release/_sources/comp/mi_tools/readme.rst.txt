@@ -38,6 +38,17 @@ Through the ``ADDR`` port a slave component recieves addresses of target recipie
 
 These addresses are only valid when a request is being sent, either read or write. If neither of these is active, address can be arbitrary. When multiple slave components are connected to the MI, they must have a defined disjointed address space and incomming requests must be distributed by address decoders (like the *MI_SPLITTER_PLUS_GEN*). That means the slave component recieves only requests that are meant for it and no final address checking is necessary.
 
+.. _mi_addr_alignment:
+
+.. NOTE::
+    Registers are conventionally placed at addresses aligned to the data width (``DATA_WIDTH/8`` bytes apart), so that each register's own base address has its lowest ``log2(DATA_WIDTH/8)`` bits equal to ``0`` -- for the common 32-bit MI32 case, the lowest 2 bits.
+
+.. NOTE::
+    This mirrors PCIe, whose basic addressing/transfer unit is likewise a 32-bit Double Word (DW). A PCIe TLP header does not even carry the lowest 2 address bits -- they are implicitly ``0`` -- and byte-level access within a DWORD is expressed only through byte-enable signals. Accordingly, the :ref:`MTC module <mtc>`, which translates PCIe memory requests into MI requests, always generates MI transactions with ``ADDR`` aligned to the MI data width and uses ``BE`` to select the valid byte(s) within that word.
+
+.. WARNING::
+    The base address assigned to each slave component must be aligned to the size of its address space, see the note in the :ref:`MI bus interconnect <ndk_mi>` chapter for details and an example.
+
 ``DWR`` carries data to be written into the slave component stated by the address. These data are only valid when a write request is issued (``WR`` is asserted). Please note that the written data can be recieved by slave components in different order, then in which they were sent, as each path to the slave component might have different latency. But data sent to one component will be recieved in order.
 
 ``MWR`` is used for the optional transfer of metadata (user-defined) from the master to the slave component. Metadata port is valid with each request (``WR`` or ``RD`` is asserted).

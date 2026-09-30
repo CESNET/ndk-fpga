@@ -140,7 +140,9 @@
 <h2>Basic description<a class="headerlink" href="#basic-description" title="Link to this heading"></a></h2>
 <p>This module accepts request instructions to read data from a memory device over the PCIe.
 The user provides the Address and Length of the requested data on the RX_USR interface.
-They also provide an ID, which will identify the read data received on the TX_USR interface, which may arrive out of order.</p>
+They also provide an ID, which will identify the read data received on the TX_USR interface.
+The read data can be output in the same order as the requests were received when RESP_IN_ORDER=True.
+When RESP_IN_ORDER=False, completed packets are output immediately regardless of request order.</p>
 <p>This module’s non-user interfaces (PCIE_UP, PCIE_DOWN) are compatible with the PTC module.
 The transactions it receives from the PTC module may come in parts and mixed with parts from other read data.
 However, the parts of one request will arrive in order.
@@ -149,13 +151,6 @@ This module pieces these parts together and marks them with the ID from the requ
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>To ensure correct function, DO NOT reuse IDs until appropriate response is received!
 </pre></div>
 </div>
-<p>Must still be tested in scenarios where:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li><p>requests generate multiple completions (FIP: Fixing In Process) and</p></li>
-<li><p>completions arrive out-of-order (in-order per same tag).</p></li>
-</ol>
-</div></blockquote>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -170,30 +165,63 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>=====</p></td>
 <td><p>=====</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-mfb_regions"><td><p>MFB_REGIONS</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-regions"><td><p>REGIONS</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td><p>Number of MFB Regions in a word, cannot handle more than 1.</p></td>
+<td><p>USER side.
+Number of MFB Regions in a word, cannot handle more than 1.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-mfb_region_size"><td><p>MFB_REGION_SIZE</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-region_size"><td><p>REGION_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-mfb_block_size"><td><p>MFB_BLOCK_SIZE</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-block_size"><td><p>BLOCK_SIZE</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-mfb_item_width"><td><p>MFB_ITEM_WIDTH</p></td>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-item_width"><td><p>ITEM_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>8</p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p>=====</p></td>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-pcie_up_regions"><td><p>PCIE_UP_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>PCIE side.
+Number of DMA headers (MVB Items) in an upstream word.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-pcie_down_regions"><td><p>PCIE_DOWN_REGIONS</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td><p>Number of DMA headers and packets in a downstream word.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-pcie_down_region_size"><td><p>PCIE_DOWN_REGION_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>1</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-pcie_down_block_size"><td><p>PCIE_DOWN_BLOCK_SIZE</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-pcie_down_item_width"><td><p>PCIE_DOWN_ITEM_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
 <td><p>Other parameters</p></td>
 <td><p>=====</p></td>
 <td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-fake_reader"><td><p>FAKE_READER</p></td>
+<td><p>boolean</p></td>
+<td><p>False</p></td>
+<td><p>Instatniate “fake” PCIe pkt reader when True.
+Fake variant just generates empty packets of given length while forwarding pkt IDs (in-order only).</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-pkt_mtu"><td><p>PKT_MTU</p></td>
 <td><p>natural</p></td>
@@ -219,6 +247,21 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>natural</p></td>
 <td><p>4096</p></td>
 <td><p>Size of a RAM page (in bytes).</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-resp_in_order"><td><p>RESP_IN_ORDER</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>When True, packets are output in the same order as the original requests.
+May lead to higher latency due to the reordering process.
+When False, completed packets are output immediately regardless of request order.
+Automatically True with FAKE_READER=True - unable to do out-of-order.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-pcie_pkt_reader-fwft"><td><p>FWFT</p></td>
+<td><p>boolean</p></td>
+<td><p>True</p></td>
+<td><p>Enable FWFT (First Word Fall Through): the USER_RESP interface will contain valid data
+ASAP, regardless DST_RDY. Disable only when you know the consumer can wait for valid
+data with DST_DRY=1.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-pcie_pkt_reader-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
@@ -257,22 +300,22 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-user_req_mvb_id"><td><p>USER_REQ_MVB_ID</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*ID_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-user_req_mvb_address"><td><p>USER_REQ_MVB_ADDRESS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*DMA_REQUEST_GLOBAL_W-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*DMA_REQUEST_GLOBAL_W-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-user_req_mvb_length"><td><p>USER_REQ_MVB_LENGTH</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*log2(PKT_MTU+1)-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*log2(PKT_MTU+1)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-user_req_mvb_vld"><td><p>USER_REQ_MVB_VLD</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -292,32 +335,32 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-user_resp_mfb_data"><td><p>USER_RESP_MFB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Requested data.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-user_resp_mfb_id"><td><p>USER_RESP_MFB_ID</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*ID_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*ID_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>ID number that identifies the requested data, valid with SOF.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-user_resp_mfb_sof"><td><p>USER_RESP_MFB_SOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-user_resp_mfb_eof"><td><p>USER_RESP_MFB_EOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-user_resp_mfb_sof_pos"><td><p>USER_RESP_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-user_resp_mfb_eof_pos"><td><p>USER_RESP_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
@@ -337,12 +380,12 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>=====</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-pcie_up_mvb_data"><td><p>PCIE_UP_MVB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*DMA_UPHDR_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_UP_REGIONS*DMA_UPHDR_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td><p>Contains DMA Upstream header</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-pcie_up_mvb_vld"><td><p>PCIE_UP_MVB_VLD</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_UP_REGIONS-1 downto 0)</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
@@ -362,12 +405,12 @@ This module pieces these parts together and marks them with the ID from the requ
 <td><p>=====</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mvb_data"><td><p>PCIE_DOWN_MVB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*DMA_DOWNHDR_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS*DMA_DOWNHDR_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td><p>Contains DMA Downstream header</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mvb_vld"><td><p>PCIE_DOWN_MVB_VLD</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
@@ -382,27 +425,27 @@ This module pieces these parts together and marks them with the ID from the requ
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mfb_data"><td><p>PCIE_DOWN_MFB_DATA</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS*PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE*PCIE_DOWN_ITEM_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mfb_sof"><td><p>PCIE_DOWN_MFB_SOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mfb_eof"><td><p>PCIE_DOWN_MFB_EOF</p></td>
-<td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mfb_sof_pos"><td><p>PCIE_DOWN_MFB_SOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS*max(1,log2(PCIE_DOWN_REGION_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-pcie_pkt_reader-pcie_down_mfb_eof_pos"><td><p>PCIE_DOWN_MFB_EOF_POS</p></td>
-<td><p>std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0)</p></td>
+<td><p>std_logic_vector(PCIE_DOWN_REGIONS*max(1,log2(PCIE_DOWN_REGION_SIZE*PCIE_DOWN_BLOCK_SIZE))-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>

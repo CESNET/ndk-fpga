@@ -60,7 +60,10 @@
 <li class="toctree-l1"><a class="reference internal" href="app-minimal.html">Minimal NDK application</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Top-Level Simulation using cocotb</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#how-to-run">How to run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-run">How to run</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#selecting-a-dma-engine-pcie-configuration">Selecting a DMA Engine / PCIe Configuration</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a></li>
 </ul>
 </li>
@@ -143,9 +146,16 @@
 <p>NDK-FPGA also includes a top-level simulation for running tests on the whole firmware of FPGA cards. It is implemented using
 <strong>Python</strong> and the <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> framework. Some parts of <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> were also modified and extended by us to better fit our use cases, creating
 the <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code> package. If you want to discover more about <code class="docutils literal notranslate"><span class="pre">cocotbext-ndk</span></code>, refer to <a class="reference internal" href="cocotbext.html#cocotbext-ndk"><span class="std std-ref">its chapter</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This simulates an entire card’s firmware end-to-end (<code class="docutils literal notranslate"><span class="pre">dut</span></code> is the card’s top-level entity, tests go
+through <code class="docutils literal notranslate"><span class="pre">NFBDevice</span></code> and the <code class="docutils literal notranslate"><span class="pre">CARD</span></code>/<code class="docutils literal notranslate"><span class="pre">DMA_TYPE</span></code>/<code class="docutils literal notranslate"><span class="pre">PCIE_CONF</span></code> selection below). To test a single VHDL
+component in isolation instead, see <a class="reference internal" href="basic_cocotb_test.html"><span class="doc">Getting Started with cocotb</span></a>.</p>
+</div>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
-<p><strong>Python version 3.11</strong> and higher, <strong>Intel Quartus Prime Pro</strong> or <strong>AMD Vivado</strong>, and <strong>Questa Sim</strong> are required.</p>
+<p><strong>Python version 3.11</strong> and higher, <strong>Intel Quartus Prime Pro</strong> or <strong>AMD Vivado</strong>, and a VHDL simulator are required.
+Either <strong>Questa Sim</strong> or the open-source <strong>NVC</strong> simulator can be used.</p>
 <p>Cloning <cite>ndk-fpga</cite> from GitHub with all its dependencies is also required. You can achieve this using the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/CESNET/ndk-fpga.git
 </pre></div>
@@ -174,11 +184,34 @@ Selection of the simulated card is performed with the environment variable <stro
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span><span class="nv">CARD</span><span class="o">=</span>n6010
 </pre></div>
 </div>
+<p>By default, the simulation runs with <strong>Questa Sim</strong>. To use the open-source <strong>NVC</strong> simulator instead, set the
+<strong>TARGET</strong> variable to <code class="docutils literal notranslate"><span class="pre">nvc-sim</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span><span class="nv">CARD</span><span class="o">=</span>n6010<span class="w"> </span><span class="nv">TARGET</span><span class="o">=</span>nvc-sim
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Source files used to run the simulation of all cards can be found in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/apps/minimal/build</span></code>. To find out which
 cards are supported, refer to <strong>NFBDevice</strong> in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
 </div>
+<section id="selecting-a-dma-engine-pcie-configuration">
+<h3>Selecting a DMA Engine / PCIe Configuration<a class="headerlink" href="#selecting-a-dma-engine-pcie-configuration" title="Link to this heading"></a></h3>
+<p>Some cards support more than one DMA engine or PCIe configuration (for example, a card may support both <strong>DMA Calypte</strong>
+and <strong>DMA Medusa</strong>, selected by a different PCIe endpoint mode/width), and each card simulates whatever its own
+configuration files pick as the default. To exercise a non-default combination, override the corresponding variables
+on the command line; they are forwarded to the per-card <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> in <code class="docutils literal notranslate"><span class="pre">ndk-fpga/apps/minimal/build/&lt;CARD&gt;/</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span><span class="nv">CARD</span><span class="o">=</span>fb2cghh<span class="w"> </span><span class="nv">DMA_TYPE</span><span class="o">=</span><span class="m">4</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The valid <code class="docutils literal notranslate"><span class="pre">(CARD,</span> <span class="pre">DMA_TYPE,</span> <span class="pre">PCIE_CONF)</span></code> combinations are not centrally documented. Check the card’s
+<code class="docutils literal notranslate"><span class="pre">cards/&lt;vendor&gt;/&lt;card&gt;/config/card_conf.tcl</span></code> (look for a comment table mapping <code class="docutils literal notranslate"><span class="pre">PCIE_CONF</span></code> values to DMA
+engines) and <code class="docutils literal notranslate"><span class="pre">apps/minimal/tests/cocotb/top-level-sim.jenkinsfile</span></code> (the <code class="docutils literal notranslate"><span class="pre">EXTRA_COMBINATIONS</span></code> list), which
+documents the non-default combinations covered by CI. Some cards must be also simulated with the
+<code class="docutils literal notranslate"><span class="pre">BMC_ENABLE=0</span></code> option.</p>
+</div>
+</section>
 </section>
 <section id="architecture">
 <h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>

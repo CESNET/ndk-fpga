@@ -486,7 +486,7 @@ credits to send the transaction. If not, an exception is raised.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Use the credit interface components only for R-TILE.</p>
-<p>For implementation of conditional switching between P-TILE and R-TILE, check out <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+<p>For implementation of conditional switching between P-TILE and R-TILE, check out <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py</span></code>.</p>
 </div>
 </section>
 <section id="cocotbext-ofm-axi4stream">
@@ -508,7 +508,7 @@ during initialization so a whole packet is returned as an <code class="docutils 
 <p>Variant of <code class="docutils literal notranslate"><span class="pre">Axi4StreamTransaction</span></code> that includes selector <code class="docutils literal notranslate"><span class="pre">SEL</span></code> for use with AXIS Splitter component.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py</span></code>.</p>
 </div>
 </section>
 <section id="cocotbext-ofm-lbus">
@@ -520,7 +520,7 @@ during initialization so a whole packet is returned as an <code class="docutils 
 <p>Reads a whole packet from the slave side of the bus and returns it as a list of integer values of the read bytes.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py</span></code>.</p>
 </div>
 </section>
 <section id="cocotbext-ofm-lii">
@@ -550,7 +550,7 @@ during initialization so a whole packet is returned as an <code class="docutils 
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+<p>For example use of drivers and monitors, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py</span></code>.</p>
 </div>
 </section>
 <section id="cocotbext-ofm-mfb">
@@ -676,7 +676,7 @@ also generates one (see the <code class="docutils literal notranslate"><span cla
 <p>Stores data, metadata, and the number of dwords of a packet.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For example use of requesters and completers, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/core/cocotb/ndk_core/nfbdevice.py</span></code>.</p>
+<p>For example use of requesters and completers, see <code class="docutils literal notranslate"><span class="pre">ndk-fpga/python/cocotbext/cocotbext/ndk_core/nfbdevice.py</span></code>.</p>
 </div>
 <p class="rubric">Axi4SCompleter.Axi4SCompleter</p>
 <p>Handles outbound request transactions and their completions for the PCIe AXI4-Stream bus. Request transactions are created by the <code class="docutils literal notranslate"><span class="pre">read</span></code>

@@ -4,8 +4,3 @@ MVB FIFOX
 =========
 
 .. vhdl:autoentity:: MVB_FIFOX
-
-General subcomponents
----------------------
-
-* :ref:`fifox`

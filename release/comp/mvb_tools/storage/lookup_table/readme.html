@@ -78,12 +78,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html">SHAKEDOWN</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/merge_n_to_m/readme.html#merge-n-to-m">MERGE_N_TO_M</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/shakedown/readme.html">MVB Shakedown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../flow/reordering/readme.html">MVB Reordering</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/operation/readme.html">MVB Operation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/merge_streams_ordered/readme.html">MVB Merge Streams Ordered</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/mvb2mfb/readme.html">MVB2MFB</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../flow/gate/readme.html">MVB Gate</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">MVB Lookup Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../fifox/readme.html">MVB FIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifox/readme.html">MVB ASFIFOX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../asfifo_bram_xilinx/readme.html">MVB ASFIFO BRAM Xilinx</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../fifo/readme.html">MVB FIFO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mvb_hash_table_simple/readme.html">MVB Hash Table Simple</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tcam/readme.html">MVB TCAM</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
@@ -157,13 +163,50 @@
 <dl class="vhdl autoentity">
 <dt class="sig sig-object vhdl" id="vhdl-entity-mvb_lookup_table">
 <span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">MVB_LOOKUP_TABLE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-mvb_lookup_table" title="Link to this definition"></a></dt>
-<dd><p>Component MVB_LOOKUP_TABLE allows to read values from the lookup table using
-the MVB bus. The input MVB transaction must contain the address of an entry
-in the lookup table. This MVB transaction will be transferred to the output
-in a few clock cycles, where it will additionally contain the value of the
-item read from the lookup table. This component allows the lookup table to be
-implemented using LUTRAM, BRAM and a register (LUT_DEPTH=1 only). The contents
-of the lookup table can be configured through a simple SW interface.</p>
+<dd><p>MVB Lookup Table: for every valid MVB item on the RX side, looks up the
+table entry addressed by RX_MVB_LUT_ADDR and presents it on the
+corresponding TX_MVB_LUT_DATA item, together with the (registered)
+RX_MVB_LUT_ADDR and RX_MVB_METADATA of that item. This is the top-level
+(recommended) entity: it picks one of the three available implementations
+(a single register, <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_LUTRAM</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>) based on LUT_ARCH/LUT_DEPTH. RX-to-TX latency
+depends on which of these is selected and on OUTPUT_REG, see the
+OUTPUT_REG generic below for the exact cycle counts.</p>
+<p>The table content is configured through a synchronous SW_* register-file
+style port (address + byte-enabled data, not the CESNET MI bus) - see the
+port descriptions below. This component does <strong>not</strong> reset or initialize
+the table content on RESET; all LUT_DEPTH entries must be written through
+the SW_* interface before the first RX lookup that relies on them,
+otherwise reads of not-yet-written entries return undefined data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SW_WRITE never stalls or backpressures RX_MVB lookups - RX_MVB_DST_RDY
+only follows TX_MVB_DST_RDY, regardless of SW_* activity. Unlike some
+sibling components, there is also no atomicity guarantee here, not even
+for a single entry: each SW_WRITE goes straight into the table as soon
+as it happens, with no staging step that only commits a complete entry
+at once. So if LUT_WIDTH &gt; SW_WIDTH, an entry needs several SW_WRITEs
+(one per slice, see above) to fully update, and an RX_MVB lookup
+running in between can see that <em>one</em> entry half-written - part old
+slices, part new.</p>
+<p>The same applies, entry by entry, when updating several entries in a
+row. If your application needs lookups to only ever see a fully
+consistent entry (or a consistent snapshot across several entries), you
+need to arrange that yourself, e.g. by pausing RX_MVB lookups for the
+duration of an update; this component does not do it for you.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>LUT_WIDTH must be an integer multiple of SW_WIDTH. Any other ratio is
+not correctly supported: depending on LUT_DEPTH/LUT_ARCH it causes the
+topmost bits of an entry to be silently unreachable through SW_DOUT
+(single register and <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>), aliased writes
+(single register), or an elaboration-time width mismatch
+(<code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>). <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_LUTRAM</span></code> handles the
+entry width itself correctly, but the shared SW_SLICE port is always
+sized for the exact-multiple case, so higher slices can still be
+unreachable there too.</p>
+</div>
 <span class="sig-name descname">Generics</span><table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Generic</p></th>
@@ -176,42 +219,66 @@ of the lookup table can be configured through a simple SW interface.</p>
 <tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-mvb_items"><td><p>MVB_ITEMS</p></td>
 <td><p>natural</p></td>
 <td><p>4</p></td>
-<td></td>
+<td><p>Number of MVB items transferred in one word.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-lut_depth"><td><p>LUT_DEPTH</p></td>
 <td><p>natural</p></td>
 <td><p>128</p></td>
-<td></td>
+<td><p>Number of entries in the lookup table.
+Any positive value; LUT_DEPTH = 1 is implemented directly as a
+single shared register regardless of LUT_ARCH.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-lut_width"><td><p>LUT_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
-<td></td>
+<td><p>Width of one lookup table entry in bits.
+Should be a multiple of SW_WIDTH, see the WARNING above.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-lut_arch"><td><p>LUT_ARCH</p></td>
 <td><p>string</p></td>
 <td><p>“AUTO”</p></td>
-<td></td>
+<td><p>Select the memory implementation used when LUT_DEPTH &gt; 1:</p>
+<ul class="simple">
+<li><p>“LUT”  - <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_LUTRAM</span></code>, effective for a shallow table (approx. LUT_DEPTH &lt;= 64).</p></li>
+<li><p>“BRAM” - <code class="docutils literal notranslate"><span class="pre">MVB_LOOKUP_TABLE_BRAM</span></code>, effective for a deep table (approx. LUT_DEPTH &gt; 64); consumes MVB_ITEMS+1 block RAMs.</p></li>
+<li><p>“AUTO” - chosen automatically from LUT_DEPTH using the same approx. 64-entry threshold as above.</p></li>
+</ul>
+</td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-sw_width"><td><p>SW_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>32</p></td>
-<td></td>
+<td><p>Data width of the SW_* configuration port in bits.
+Must be a multiple of 8: SW_BE has one bit per byte of SW_DIN
+(SW_WIDTH/8, integer division), so a non-multiple silently loses
+byte-enable coverage over the trailing, incomplete byte.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-meta_width"><td><p>META_WIDTH</p></td>
 <td><p>natural</p></td>
 <td><p>1</p></td>
-<td></td>
+<td><p>Width of the RX_MVB_METADATA/TX_MVB_METADATA side-channel in bits.
+Any non-negative value; the metadata is only delayed together with
+the MVB transaction, it does not influence the lookup itself.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-gengeneric-mvb_lookup_table-output_reg"><td><p>OUTPUT_REG</p></td>
 <td><p>boolean</p></td>
 <td><p>True</p></td>
-<td></td>
+<td><p>Adds an output register stage on the TX_MVB_* path (and, for the
+BRAM implementation, also on the internal RAM output). Improves
+timing at the cost of extra registers and one additional CLK
+cycle of RX-to-TX latency:</p>
+<ul class="simple">
+<li><p>Single register (LUT_DEPTH = 1) or LUT_ARCH = “LUT”: 0 CLK cycles
+when false, 1 CLK cycle when true.</p></li>
+<li><p>LUT_ARCH = “BRAM”: 1 CLK cycle when false, 2 CLK cycles when true.</p></li>
+</ul>
+</td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mvb_lookup_table-device"><td><p>DEVICE</p></td>
 <td><p>string</p></td>
 <td><p>“AGILEX”</p></td>
-<td></td>
+<td><p>Target FPGA device, passed through to the underlying memory
+implementation.</p></td>
 </tr>
 </tbody>
 </table>
@@ -234,35 +301,45 @@ of the lookup table can be configured through a simple SW interface.</p>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_lut_addr"><td><p>RX_MVB_LUT_ADDR</p></td>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>RX MVB INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>Lookup request: RX_MVB_LUT_ADDR addresses the entry to look up.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_lut_addr"><td><p>RX_MVB_LUT_ADDR</p></td>
 <td><p>slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_metadata"><td><p>RX_MVB_METADATA</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_metadata"><td><p>RX_MVB_METADATA</p></td>
 <td><p>slv_array_t(MVB_ITEMS-1 downto 0)(META_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_vld"><td><p>RX_MVB_VLD</p></td>
 <td><p>std_logic_vector(MVB_ITEMS-1 downto 0)</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_src_rdy"><td><p>RX_MVB_SRC_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-rx_mvb_dst_rdy"><td><p>RX_MVB_DST_RDY</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>
 </tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>TX MVB INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>Lookup result, RX-to-TX latency cycles later (see OUTPUT_REG above).</p></td>
+</tr>
 <tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_lut_data"><td><p>TX_MVB_LUT_DATA</p></td>
 <td><p>slv_array_t(MVB_ITEMS-1 downto 0)(LUT_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Lookup table entry addressed by the corresponding (registered) TX_MVB_LUT_ADDR.</p></td>
 </tr>
 <tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-tx_mvb_lut_addr"><td><p>TX_MVB_LUT_ADDR</p></td>
 <td><p>slv_array_t(MVB_ITEMS-1 downto 0)(max(log2(LUT_DEPTH),1)-1 downto 0)</p></td>
@@ -289,42 +366,56 @@ of the lookup table can be configured through a simple SW interface.</p>
 <td><p>in</p></td>
 <td></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_addr"><td><p>SW_ADDR</p></td>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>SW CONFIGURATION INTERFACE</p></td>
+<td><p>=====</p></td>
+<td><p>Synchronous register-file style port used to read/write the lookup
+table content. Not the CESNET MI bus; intended to be driven
+through an external MI (or other software-accessible bus) adapter.
+One access addresses a single LUT entry (SW_ADDR). If LUT_WIDTH is
+wider than SW_WIDTH, each access only reaches one SW_WIDTH-wide
+slice of that entry, chosen by SW_SLICE. Writing a whole entry
+therefore means repeating SW_WRITE at the same SW_ADDR once per
+slice, SW_SLICE = 0 to LUT_WIDTH/SW_WIDTH-1.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_addr"><td><p>SW_ADDR</p></td>
 <td><p>std_logic_vector(max(log2(LUT_DEPTH),1)-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Address of the accessed lookup table entry.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_slice"><td><p>SW_SLICE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_slice"><td><p>SW_SLICE</p></td>
 <td><p>std_logic_vector(max(log2(LUT_WIDTH/SW_WIDTH),1)-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Selects which SW_WIDTH-wide slice of the addressed entry is
+accessed, when LUT_WIDTH &gt; SW_WIDTH. Unused (any value valid) when
+LUT_WIDTH = SW_WIDTH (the only other case the WARNING above allows).</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_din"><td><p>SW_DIN</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_din"><td><p>SW_DIN</p></td>
 <td><p>std_logic_vector(SW_WIDTH-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Data to write; valid when SW_WRITE = ‘1’.</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_be"><td><p>SW_BE</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_be"><td><p>SW_BE</p></td>
 <td><p>std_logic_vector(SW_WIDTH/8-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Byte-enable for SW_DIN; only enabled bytes are written.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_write"><td><p>SW_WRITE</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_write"><td><p>SW_WRITE</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Write request for the (SW_ADDR, SW_SLICE) location, takes effect immediately (1 CLK).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_read"><td><p>SW_READ</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_read"><td><p>SW_READ</p></td>
 <td><p>std_logic</p></td>
 <td><p>in</p></td>
-<td></td>
+<td><p>Read request for the (SW_ADDR, SW_SLICE) location; the result appears on SW_DOUT one CLK later.</p></td>
 </tr>
-<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_dout"><td><p>SW_DOUT</p></td>
+<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_dout"><td><p>SW_DOUT</p></td>
 <td><p>std_logic_vector(SW_WIDTH-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td></td>
+<td><p>Read data, valid when SW_DOUT_VLD = ‘1’ (registered, one CLK after SW_READ).</p></td>
 </tr>
-<tr class="row-even" id="vhdl-portsignal-mvb_lookup_table-sw_dout_vld"><td><p>SW_DOUT_VLD</p></td>
+<tr class="row-odd" id="vhdl-portsignal-mvb_lookup_table-sw_dout_vld"><td><p>SW_DOUT_VLD</p></td>
 <td><p>std_logic</p></td>
 <td><p>out</p></td>
 <td></td>

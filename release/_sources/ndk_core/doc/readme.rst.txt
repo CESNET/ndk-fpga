@@ -37,3 +37,4 @@ The NDK top level architecture consists of several building blocks:
    pcie
    mem
    tsu
+   dma_bus

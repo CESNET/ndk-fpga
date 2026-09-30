@@ -1,0 +1,466 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AXI-AVMM DDR Bridge &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AXI-AVMM DDR Bridge</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mem_tools/convertors/axi2avmm_ddr_bridge/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="axi-avmm-ddr-bridge">
+<span id="axi2avmm-ddr-bridge"></span><h1>AXI-AVMM DDR Bridge<a class="headerlink" href="#axi-avmm-ddr-bridge" title="Link to this heading"></a></h1>
+<p>Converts an Avalon-MM slave interface into an AXI4 master interface, so an NDK
+memory master can talk to a DDR or HBM controller. The Avalon-MM side is word
+addressed and the AXI side is byte addressed; the bridge multiplies the word
+address by the word size in bytes and passes the data straight through, so both
+sides must use the same data width.</p>
+<p>Avalon-MM defines the address and the burst count only on the first beat of a
+burst. The bridge latches both when a burst starts and uses the latched copies
+for the rest of it, which is what lets the AXI address phase outlive the Avalon
+burst that produced it.</p>
+<p>The component is verified by a cocotb testbench in the <code class="docutils literal notranslate"><span class="pre">cocotb</span></code> directory,
+which drives the Avalon-MM side, terminates the AXI side with a slave memory and
+watches both with a passive AXI4 protocol checker. Run it with <code class="docutils literal notranslate"><span class="pre">make</span></code> for
+QuestaSim or <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">TARGET=nvc-sim</span></code> for NVC.</p>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-axi2avmm_bridge">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">AXI2AVMM_BRIDGE</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-axi2avmm_bridge" title="Link to this definition"></a></dt>
+<dd><span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-axi2avmm_bridge-amm_burst_count_width"><td><p>AMM_BURST_COUNT_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi2avmm_bridge-amm_addr_width"><td><p>AMM_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>26</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axi2avmm_bridge-amm_data_width"><td><p>AMM_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi2avmm_bridge-axi_addr_width"><td><p>AXI_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axi2avmm_bridge-axi_data_width"><td><p>AXI_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi2avmm_bridge-axi_id_width"><td><p>AXI_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>4</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axi2avmm_bridge-axi_burst_width"><td><p>AXI_BURST_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi2avmm_bridge-axi_size_width"><td><p>AXI_SIZE_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>3</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axi2avmm_bridge-axi_resp_width"><td><p>AXI_RESP_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>2</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi2avmm_bridge-axi_len_width"><td><p>AXI_LEN_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>8</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axi2avmm_bridge-use_axi_id"><td><p>USE_AXI_ID</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Use multiple AXI ID. When set to TRUE multiple AXI IDs are issued and
+slave (e.g. HBM controller) must support reordering buffer so responses
+are sent in requests order. Set to false if reordering buffer in slave
+is not used or available.
+TODO: Add optional reordering buffer to AXI2AVMM_BRIDGE</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi2avmm_bridge-await_bvalid"><td><p>AWAIT_BVALID</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Wait for write response before issuing next transaction
+Used in EM2AVMM wrapper for HBM</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-mem_clk"><td><p>MEM_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-mem_rst"><td><p>MEM_RST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-amm_address"><td><p>AMM_ADDRESS</p></td>
+<td><p>std_logic_vector(AMM_ADDR_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-amm_burst_count"><td><p>AMM_BURST_COUNT</p></td>
+<td><p>std_logic_vector(AMM_BURST_COUNT_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-amm_write_data"><td><p>AMM_WRITE_DATA</p></td>
+<td><p>std_logic_vector(AMM_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-amm_write"><td><p>AMM_WRITE</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-amm_read"><td><p>AMM_READ</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-amm_ready"><td><p>AMM_READY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-amm_read_data"><td><p>AMM_READ_DATA</p></td>
+<td><p>std_logic_vector(AMM_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-amm_read_data_valid"><td><p>AMM_READ_DATA_VALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awid"><td><p>DDR_S_AXI_AWID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Address Write Channel</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awaddr"><td><p>DDR_S_AXI_AWADDR</p></td>
+<td><p>std_logic_vector(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awlen"><td><p>DDR_S_AXI_AWLEN</p></td>
+<td><p>std_logic_vector(AXI_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awsize"><td><p>DDR_S_AXI_AWSIZE</p></td>
+<td><p>std_logic_vector(AXI_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awburst"><td><p>DDR_S_AXI_AWBURST</p></td>
+<td><p>std_logic_vector(AXI_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awvalid"><td><p>DDR_S_AXI_AWVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_awready"><td><p>DDR_S_AXI_AWREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_wdata"><td><p>DDR_S_AXI_WDATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Write Channel</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_wstrb"><td><p>DDR_S_AXI_WSTRB</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH/8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_wlast"><td><p>DDR_S_AXI_WLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_wvalid"><td><p>DDR_S_AXI_WVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_wready"><td><p>DDR_S_AXI_WREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_bready"><td><p>DDR_S_AXI_BREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Write response Channel</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_bid"><td><p>DDR_S_AXI_BID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_bresp"><td><p>DDR_S_AXI_BRESP</p></td>
+<td><p>std_logic_vector(AXI_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_bvalid"><td><p>DDR_S_AXI_BVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_arid"><td><p>DDR_S_AXI_ARID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Address Read Channel</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_araddr"><td><p>DDR_S_AXI_ARADDR</p></td>
+<td><p>std_logic_vector(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_arlen"><td><p>DDR_S_AXI_ARLEN</p></td>
+<td><p>std_logic_vector(AXI_LEN_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_arsize"><td><p>DDR_S_AXI_ARSIZE</p></td>
+<td><p>std_logic_vector(AXI_SIZE_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_arburst"><td><p>DDR_S_AXI_ARBURST</p></td>
+<td><p>std_logic_vector(AXI_BURST_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_arvalid"><td><p>DDR_S_AXI_ARVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_arready"><td><p>DDR_S_AXI_ARREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_rready"><td><p>DDR_S_AXI_RREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Read Channel</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_rvalid"><td><p>DDR_S_AXI_RVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_rlast"><td><p>DDR_S_AXI_RLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_rresp"><td><p>DDR_S_AXI_RRESP</p></td>
+<td><p>std_logic_vector(AXI_RESP_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_rid"><td><p>DDR_S_AXI_RID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi2avmm_bridge-ddr_s_axi_rdata"><td><p>DDR_S_AXI_RDATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

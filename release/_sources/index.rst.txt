@@ -91,6 +91,7 @@ it also provides converters:
     comp/mi_tools/readme
     comp/mvb_tools/readme
     comp/mfb_tools/readme
+    dma_bus
 
 .. toctree::
     :caption: cocotb Verifications
