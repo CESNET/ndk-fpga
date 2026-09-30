@@ -7,6 +7,8 @@ instructions on how to adapt existing projects using older versions of this repo
 
 ## Unreleased / Current `devel`
 
+## 2026.9.0
+
 ### Stop using `combo_user_const`; put application constants into the new `ndk_app_pkg`
 
 **What changed:** `combo_user_const` is obsolete. Generated constants were split
