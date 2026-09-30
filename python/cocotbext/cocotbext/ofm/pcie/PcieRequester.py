@@ -42,6 +42,7 @@ class PcieRequester(ABC):
         self._rcb = rcb  # Read Completion Boundary in bytes
         self._cpl_dly = cpl_dly
         self._cpl_split_mode = cpl_split_mode
+        self.verbosity = 1
 
         if self._cpl_split_mode == self.SPLIT_RAND:
             # Per-tag queues: dict[tag, Queue]
@@ -86,7 +87,7 @@ class PcieRequester(ABC):
         Completions are split at queue time to allow interleaving between tags.
         """
         d = self._ram.r(addr, length)
-        self._log.debug(f"Read from address: {addr:#010x} length: {length:3} data: {d.hex()}")
+        self._log.debug(f"Read from address: {addr:#010x} length: {length:3}" + (f" data: {d.hex()}" if self.verbosity > 0 else ""))
 
         # Split into partial completions and queue them
         self._queue_completions(hdr, d, addr)
@@ -182,7 +183,7 @@ class PcieRequester(ABC):
     def handle_wr_request(self, data, addr):
         """Writes the given data to RAM at the specified address."""
         self._ram.w(addr, data)
-        self._log.debug(f"Write to address: {addr:#010x} length: {len(data):3} data: {data.hex()}")
+        self._log.debug(f"Write to address: {addr:#010x} length: {len(data):3}" + (f" data: {data.hex()}" if self.verbosity > 0 else ""))
 
     @abstractmethod
     def hdr_req2compl(self, rq_hdr, byte_count=None, lower_address=None, is_last=True, payload_bytes=None):

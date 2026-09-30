@@ -36,11 +36,11 @@ class AvstCreditorStatesRX(Enum):
 
 class AvstTransactionTypes(Enum):
     # Posted transactions (P): does not require a response
-    Posted = 2
+    Posted = 0
     # Non-posted transactions (NP): requires a completion
     NonPosted = 1
     # Completions (CPL): response to non-posted transactions
-    Completion = 0
+    Completion = 2
 
 
 @dataclass
@@ -345,17 +345,17 @@ class AvstCreditRequester(BusDriver):
             for queue in [self._rc_queue, self._cq_queue]:
                 while not queue.empty():
                     priority, trans_type, transaction = queue.get_nowait()
+                    hdr, data, tr_type, *_ = transaction
 
                     hcrdt = self._header_creditor.get_credits(trans_type.value)
                     dcrdt = self._data_creditor.get_credits(trans_type.value)
 
-                    if (hcrdt > self._min_hcrdt) and (dcrdt > self._min_dcrdt):
-                        hdr, data, tr_type, *_ = transaction
+                    hcrdt_consumed = 1
+                    dcrdt_consumed = ceildiv(self._bytes_per_credit, len(data))
 
-                        self._header_creditor.update_credits(trans_type.value, 1)
-
-                        consumed_data_credits = ceildiv(self._bytes_per_credit, len(data))
-                        self._data_creditor.update_credits(trans_type.value, consumed_data_credits)
+                    if (hcrdt >= max(hcrdt_consumed, self._min_hcrdt)) and (dcrdt >= max(dcrdt_consumed, self._min_dcrdt)):
+                        self._header_creditor.update_credits(trans_type.value, hcrdt_consumed)
+                        self._data_creditor.update_credits(trans_type.value, dcrdt_consumed)
 
                         # Forward the original 3-tuple to AvstPcieDriverMaster
                         self._driver.append(transaction)
@@ -389,25 +389,26 @@ class AvstCreditReceiver(ProxyMonitor):
         pcie_trans_type = header.req_t
 
         if pcie_trans_type in ptt.MWr:
-            index = ct.Posted.value
+            cr_type = ct.Posted
         elif pcie_trans_type in ptt.MRd:
-            index = ct.NonPosted.value
+            cr_type = ct.NonPosted
         elif pcie_trans_type in ptt.CplD:
-            index = ct.Completion.value
+            cr_type = ct.Completion
         else:
             raise NotImplementedError(f"Pcie transaction of type {pcie_trans_type} is not supported.")
 
+        index = cr_type.value
         hcrdt = self._header_creditor.get_credits(index)
         dcrdt = self._data_creditor.get_credits(index)
 
-        if hcrdt < self._min_hcrdt or dcrdt < self._min_dcrdt:
-            trans_type_str = ["Completion", "Non-posted", "Posted"][index]
-            raise RuntimeWarning(f"Transaction of type {trans_type_str} was received even though credits are too low ({hcrdt=}, {dcrdt=}).")
+        hcrdt_consumed = 1
+        dcrdt_consumed = ceildiv(self._bytes_per_credit, len(data))
+
+        if (hcrdt < max(hcrdt_consumed, self._min_hcrdt)) or (dcrdt < max(dcrdt_consumed, self._min_dcrdt)):
+            raise RuntimeWarning(f"Transaction of type {cr_type.name} was received even though credits are too low ({hcrdt=}, {dcrdt=}, {hcrdt_consumed=}, {dcrdt_consumed=}).")
 
         # giving credits back to creditor
-        self._header_creditor.update_credits(index, 1)
-
-        consumed_credits = ceildiv(self._bytes_per_credit, len(data))
-        self._data_creditor.update_credits(index, consumed_credits)
+        self._header_creditor.update_credits(index, hcrdt_consumed)
+        self._data_creditor.update_credits(index, dcrdt_consumed)
 
         self._recv(transaction)
