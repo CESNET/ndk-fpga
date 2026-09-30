@@ -532,7 +532,9 @@ async def run_test(dut):
     async def check_hist(index, expected_band, label):
         for ep in range(tb.endpoints):
             base = tb.stream_base(ep, 0)
-            first = (base + 1 + tb.pcie_buses * (5 + tb.pcie_regions)
+            # One bus takes 6 + regions channels, the histogram bands follow
+            # the driven BRAKE channels.
+            first = (base + 1 + tb.pcie_buses * (6 + tb.pcie_regions)
                      + tb.pcie_driven_brakes + index * tb.hist_bands)
 
             bands = [await tb.read_counter(first + i) for i in range(tb.hist_bands)]
