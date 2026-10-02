@@ -15,41 +15,73 @@ set_location_assignment PIN_AF4 -to QSFP0_RX_P[0]
 set_location_assignment PIN_AE7 -to QSFP0_RX_P[1]
 set_location_assignment PIN_AD4 -to QSFP0_RX_P[2]
 set_location_assignment PIN_AC7 -to QSFP0_RX_P[3]
+set_location_assignment PIN_AF5 -to QSFP0_RX_N[0]
+set_location_assignment PIN_AE8 -to QSFP0_RX_N[1]
+set_location_assignment PIN_AD5 -to QSFP0_RX_N[2]
+set_location_assignment PIN_AC8 -to QSFP0_RX_N[3]
 
 set_location_assignment PIN_AL1 -to QSFP0_TX_P[0]
 set_location_assignment PIN_AJ1 -to QSFP0_TX_P[1]
 set_location_assignment PIN_AG1 -to QSFP0_TX_P[2]
 set_location_assignment PIN_AE1 -to QSFP0_TX_P[3]
+set_location_assignment PIN_AL2 -to QSFP0_TX_N[0]
+set_location_assignment PIN_AJ2 -to QSFP0_TX_N[1]
+set_location_assignment PIN_AG2 -to QSFP0_TX_N[2]
+set_location_assignment PIN_AE2 -to QSFP0_TX_N[3]
 
 set_location_assignment PIN_AP4 -to QSFP1_RX_P[0]
 set_location_assignment PIN_AN7 -to QSFP1_RX_P[1]
 set_location_assignment PIN_AM4 -to QSFP1_RX_P[2]
 set_location_assignment PIN_AL7 -to QSFP1_RX_P[3]
+set_location_assignment PIN_AP5 -to QSFP1_RX_N[0]
+set_location_assignment PIN_AN8 -to QSFP1_RX_N[1]
+set_location_assignment PIN_AM5 -to QSFP1_RX_N[2]
+set_location_assignment PIN_AL8 -to QSFP1_RX_N[3]
 
 set_location_assignment PIN_BA1 -to QSFP1_TX_P[0]
 set_location_assignment PIN_AY4 -to QSFP1_TX_P[1]
 set_location_assignment PIN_AW1 -to QSFP1_TX_P[2]
 set_location_assignment PIN_AV4 -to QSFP1_TX_P[3]
+set_location_assignment PIN_BA2 -to QSFP1_TX_N[0]
+set_location_assignment PIN_AY5 -to QSFP1_TX_N[1]
+set_location_assignment PIN_AW2 -to QSFP1_TX_N[2]
+set_location_assignment PIN_AV5 -to QSFP1_TX_N[3]
 
 set_location_assignment PIN_AY10 -to QSFP2_RX_P[0]
 set_location_assignment PIN_AW7  -to QSFP2_RX_P[1]
 set_location_assignment PIN_AU7  -to QSFP2_RX_P[2]
 set_location_assignment PIN_AR7  -to QSFP2_RX_P[3]
+set_location_assignment PIN_AY11 -to QSFP2_RX_N[0]
+set_location_assignment PIN_AW8  -to QSFP2_RX_N[1]
+set_location_assignment PIN_AU8  -to QSFP2_RX_N[2]
+set_location_assignment PIN_AR8  -to QSFP2_RX_N[3]
 
 set_location_assignment PIN_BE1  -to QSFP2_TX_P[0]
 set_location_assignment PIN_BD4  -to QSFP2_TX_P[1]
 set_location_assignment PIN_BC1  -to QSFP2_TX_P[2]
 set_location_assignment PIN_BB4  -to QSFP2_TX_P[3]
+set_location_assignment PIN_BE2  -to QSFP2_TX_N[0]
+set_location_assignment PIN_BD5  -to QSFP2_TX_N[1]
+set_location_assignment PIN_BC2  -to QSFP2_TX_N[2]
+set_location_assignment PIN_BB5  -to QSFP2_TX_N[3]
 
 set_location_assignment PIN_BK10 -to QSFP3_RX_P[0]
 set_location_assignment PIN_BH10 -to QSFP3_RX_P[1]
 set_location_assignment PIN_BF10 -to QSFP3_RX_P[2]
 set_location_assignment PIN_BE7  -to QSFP3_RX_P[3]
+set_location_assignment PIN_BK11 -to QSFP3_RX_N[0]
+set_location_assignment PIN_BH11 -to QSFP3_RX_N[1]
+set_location_assignment PIN_BF11 -to QSFP3_RX_N[2]
+set_location_assignment PIN_BE8  -to QSFP3_RX_N[3]
 
 set_location_assignment PIN_BL7  -to QSFP3_TX_P[0]
 set_location_assignment PIN_BJ7  -to QSFP3_TX_P[1]
 set_location_assignment PIN_BG7  -to QSFP3_TX_P[2]
 set_location_assignment PIN_BK4  -to QSFP3_TX_P[3]
+set_location_assignment PIN_BL8  -to QSFP3_TX_N[0]
+set_location_assignment PIN_BJ8  -to QSFP3_TX_N[1]
+set_location_assignment PIN_BG8  -to QSFP3_TX_N[2]
+set_location_assignment PIN_BK5  -to QSFP3_TX_N[3]
 
 #set_location_assignment PIN_AU15 -to QSFP_MODPRS_N[0]
 #set_location_assignment PIN_AU16 -to QSFP_MODPRS_N[1]
@@ -103,6 +135,14 @@ set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_TX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_RX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP3_TX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP3_RX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP0_TX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP0_RX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_TX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_RX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_TX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP2_RX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP3_TX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP3_RX_N
 
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to CLV0_TX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to CLV0_RX_P
