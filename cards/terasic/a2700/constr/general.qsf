@@ -58,9 +58,7 @@ set_location_assignment PIN_J41 -to AG_SYSCLK1_P
 #https://community.intel.com/t5/Intel-Quartus-Prime-Software/Stratix-10-HPS-DDR4-EMIF-placement-error/m-p/1601633
 #set_location_assignment PIN_LB60 -to AG_SYSCLK1_P
 
-set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK0_P
 set_instance_assignment -name IO_STANDARD "TRUE DIFFERENTIAL SIGNALING" -to AG_SYSCLK1_P
-set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to AG_SYSCLK0_P
 set_instance_assignment -name INPUT_TERMINATION DIFFERENTIAL -to AG_SYSCLK1_P
 
 

@@ -21,8 +21,6 @@ port (
     -- =========================================================================
     --  GENERAL CLOCKS AND PLL STATUS SIGNALS
     -- =========================================================================
-    -- External differential clocks (programmable via Ext. PLL)
-    AG_SYSCLK0_P     : in    std_logic; -- N/A MHz
     -- SI5397A Oscillator - 50 MHz
     AG_SYSCLK1_P     : in    std_logic;
 
