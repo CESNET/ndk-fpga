@@ -4,6 +4,19 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+# Enable CII on the given core of the R-Tile PCIe IP.
+# Quartus 26.1 enables CII with <core>_enable_cii_user_hwtcl.
+# In Quartus 26.1 <core>_enable_cii_hwtcl is read-only and always 0.
+# Older Quartus versions have only <core>_enable_cii_hwtcl.
+proc set_rtile_pcie_cii_en {core} {
+    set pname_user ${core}_enable_cii_user_hwtcl
+    if {[lsearch -exact [get_instance_parameters intel_rtile_pcie_ast_0] $pname_user] != -1} {
+        set_instance_parameter_value intel_rtile_pcie_ast_0 $pname_user {1}
+    } else {
+        set_instance_parameter_value intel_rtile_pcie_ast_0 ${core}_enable_cii_hwtcl {1}
+    }
+}
+
 proc do_rtile_pcie_gen5_2x8 {pci_vendor_id pci_device_id usr_clkfreq} {
     set_instance_parameter_value intel_rtile_pcie_ast_0 core16_pf0_pci_type0_device_id_hwtcl $pci_device_id
     set_instance_parameter_value intel_rtile_pcie_ast_0 core16_pf0_pci_type0_vendor_id_user_hwtcl $pci_vendor_id
@@ -19,7 +32,7 @@ proc do_rtile_pcie_gen5_2x8 {pci_vendor_id pci_device_id usr_clkfreq} {
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_1_k_cii_addr_size1_attr_user_hwtcl} {48}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_1_k_cii_pf_en1_attr_user_hwtcl} {1}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_cii_range_1_k_cii_start_addr1_attr_user_hwtcl} {112}
-    set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_enable_cii_hwtcl} {1}
+    set_rtile_pcie_cii_en core8
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_pf0_bar0_address_width_user_hwtcl} {26}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_pf0_bar0_type_user_hwtcl} {64-bit non-prefetchable memory}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core8_pf0_bar2_address_width_user_hwtcl} {24}
@@ -71,7 +84,7 @@ proc do_rtile_pcie_common {} {
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_1_k_cii_addr_size1_attr_user_hwtcl} {48}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_1_k_cii_pf_en1_attr_user_hwtcl} {1}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_cii_range_1_k_cii_start_addr1_attr_user_hwtcl} {112}
-    set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_enable_cii_hwtcl} {1}
+    set_rtile_pcie_cii_en core16
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_pf0_bar0_address_width_user_hwtcl} {26}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_pf0_bar0_type_user_hwtcl} {64-bit non-prefetchable memory}
     set_instance_parameter_value intel_rtile_pcie_ast_0 {core16_pf0_bar2_address_width_user_hwtcl} {24}
