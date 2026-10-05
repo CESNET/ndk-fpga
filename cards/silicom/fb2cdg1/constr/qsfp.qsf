@@ -75,3 +75,13 @@ set_location_assignment PIN_DT11 -to QSFP1_TX_N[3]
 set_location_assignment PIN_DU8  -to QSFP1_TX_N[2]
 set_location_assignment PIN_DY11 -to QSFP1_TX_N[1]
 set_location_assignment PIN_EA8  -to QSFP1_TX_N[0]
+
+# Pin IO Standards (required by the Quartus 26.1 assembler)
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP0_RX_P[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP0_RX_N[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP0_TX_P[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP0_TX_N[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_RX_P[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_RX_N[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_TX_P[*]
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP1_TX_N[*]
