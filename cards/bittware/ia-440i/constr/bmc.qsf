@@ -25,6 +25,20 @@ set_instance_assignment -name FAST_INPUT_REGISTER ON -to FPGA_IG_SPI_MOSI
 
 set_location_assignment PIN_CH24 -to BMC_IF_PRESENT_N
 
+# Quartus 26.1 requires an explicit I/O standard on every user pin (CW 25207).
+# 1.2 V is the default standard that the fitter uses for these pins.
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_EG_SPI_SCK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_EG_SPI_MISO
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_EG_SPI_MOSI
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_EG_SPI_PCS0
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC_TO_FPGA_IRQ
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_IG_SPI_SCK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_IG_SPI_MISO
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_IG_SPI_MOSI
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_IG_SPI_PCS0
+set_instance_assignment -name IO_STANDARD "1.2 V" -to FPGA_TO_BMC_IRQ
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC_IF_PRESENT_N
+
 # BMC_GPIO0 and BMC_GPIO1 are RESERVED for future use
 # BMC_GPIO0 - General purpose output from the FPGA to the BMC
 # BMC_GPIO1 - General purpose input from the BMC to the FPGA
@@ -33,3 +47,4 @@ set_location_assignment PIN_CH24 -to BMC_IF_PRESENT_N
 
 # Reset from the BMC - independent from the BMC interface
 set_location_assignment PIN_CL23 -to BMC_RST_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to BMC_RST_N
