@@ -24,31 +24,31 @@ set_location_assignment PIN_AF18 -to "REFCLK_R9C2(n)"
 
 
 
-set_location_assignment PIN_AH42 -to REFCLK_L8C1
-set_location_assignment PIN_AG41 -to "REFCLK_L8C1(n)"
+#set_location_assignment PIN_AH42 -to REFCLK_L8C1
+#set_location_assignment PIN_AG41 -to "REFCLK_L8C1(n)"
 
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9A1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9A2
-set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_L8C1
+#set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_L8C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_powerdown_mode=false" -to REFCLK_R9C2
 
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9A1
-set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_L8C1
+#set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_L8C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9A2
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_input_freq=156250000" -to REFCLK_R9C2
 
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9A1
-set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_L8C1
+#set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_L8C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9C1
 
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_R9A1
-set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_L8C1
+#set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_L8C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_3p3v=disable_3p3v_tol" -to REFCLK_R9C1
 
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_R9A1
-set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_L8C1
+#set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_L8C1
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=enable_term" -to REFCLK_R9C1
 
 set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_hysteresis=disable_hyst" -to REFCLK_R9A2
@@ -62,7 +62,7 @@ set_instance_assignment -name HSSI_PARAMETER "refclk_divider_enable_termination=
 
 set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9A1
 set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9A2
-set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_L8C1
+#set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_L8C1
 set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9C1
 set_instance_assignment -name IO_STANDARD "DIFFERENTIAL LVPECL" -to REFCLK_R9C2
 
