@@ -34,10 +34,7 @@ NDK Firmware Support
 Boot Instructions
 ^^^^^^^^^^^^^^^^^
 
-- First, build the NDK firmware. Note that the first build will fail—this is expected.
-- After the first failed implementation, run the ``<NDK-FPGA_root_directory>/cards/prodesign/pd-falcon/src/ip/htile_pcie_fix.sh`` script to fix the generated H-Tile IP core.
-- The next build should complete successfully.
-- Once the NDK firmware build is complete, a bitstream file will be generated.
+- First, build the NDK firmware. The build generates a bitstream file.
 - To load the firmware, attach the USB-Blaster II Download Cable via the Edge Debug Board to the card.
 - Create an image for the QSPF flash according to the FPGA Card User Guide.
 - Load the created image onto the FPGA card following the instructions in the FPGA Card User Guide.
