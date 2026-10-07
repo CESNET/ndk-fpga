@@ -18,7 +18,9 @@
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Silicom fb2CDg1@AGM39D-2" href="../fb2cdg1/readme.html" />
+    <link rel="prev" title="Silicom N6010" href="../n6010/readme.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -88,12 +90,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tests/verible/readme.html">Verible Tools</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Silicom N5014</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ndk-firmware-support">NDK firmware support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hbm">HBM</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#measured-hbm-performance">Measured HBM performance</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
@@ -187,17 +197,95 @@
 </dl>
 </li>
 </ul>
+</section>
+<section id="hbm">
+<h2>HBM<a class="headerlink" href="#hbm" title="Link to this heading"></a></h2>
+<p>The FPGA contains two HBM2 stacks (top and bottom). The NDK firmware connects each stack
+through one HBM IP instance with 16 AXI ports, one port per pseudo-channel.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Number of HBM ports is set by <code class="docutils literal notranslate"><span class="pre">HBM_PORTS</span></code> in <code class="docutils literal notranslate"><span class="pre">card_conf.tcl</span></code> (or overridden in <code class="docutils literal notranslate"><span class="pre">app_conf.tcl</span></code>):</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code>: HBM disabled (card default).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">16</span></code>: top stack only.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">32</span></code>: both stacks (NDK-APP-Minimal default).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>AXI interface of each port:</dt><dd><ul>
+<li><p>Data width: 256 bits.</p></li>
+<li><p>Address width: 28 bits, i.e. 256 MB per port; each port has its own address space (8 GB in total with 32 ports).</p></li>
+<li><p>Burst: pseudo-BL8, one burst transfers 64 bytes (two 256-bit words).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Ordering: the HBM controller has the re-order buffer (ROB) enabled, so read responses
+come back in the AXI order even when the controller serves the requests out of order.
+Issuing reads with a unique AXI ID per transaction lets the controller reorder them, which
+greatly increases the read performance (see the table below).</p></li>
+<li><dl class="simple">
+<dt>Clocks:</dt><dd><ul>
+<li><p>User (AXI) clock: 300 MHz, the <code class="docutils literal notranslate"><span class="pre">clk_usr_x3</span></code> clock from FPGA_COMMON (<code class="docutils literal notranslate"><span class="pre">MISC_OUT(4)</span></code>).</p></li>
+<li><p>HBM memory clock: 800 MHz.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Reset: each stack has its own <code class="docutils literal notranslate"><span class="pre">HBM_RESET</span></code> controller. After the first successful calibration with a locked user clock, it resets the HBM controller once more and waits until the calibration succeeds again.</p></li>
+<li><p>Theoretical throughput with 32 ports: 32 x 300 MHz x 256 b = 2457.6 Gbps in each direction (read and write have separate AXI channels).</p></li>
+</ul>
+<section id="measured-hbm-performance">
+<h3>Measured HBM performance<a class="headerlink" href="#measured-hbm-performance" title="Link to this heading"></a></h3>
+<p>Measured with the HBM tester on all 32 ports (NDK-APP-Minimal, 300 MHz, September 2026).
+Percentages are relative to the theoretical maximum of one direction (2457.6 Gbps).</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Test</p></th>
+<th class="head"><p>Addressing</p></th>
+<th class="head"><p>One AXI ID for all</p></th>
+<th class="head"><p>New AXI ID per transaction</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Read only</p></td>
+<td><p>sequential</p></td>
+<td><p>1088 Gbps (44.3 %)</p></td>
+<td><p>2376 Gbps (96.7 %)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Read only</p></td>
+<td><p>random</p></td>
+<td><p>499 Gbps (20.3 %)</p></td>
+<td><p>2274 Gbps (92.5 %)</p></td>
+</tr>
+<tr class="row-even"><td><p>Write only</p></td>
+<td><p>sequential</p></td>
+<td><p>2349 Gbps (95.6 %)</p></td>
+<td><p>2350 Gbps (95.6 %)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Write only</p></td>
+<td><p>random</p></td>
+<td><p>2326 Gbps (94.7 %)</p></td>
+<td><p>2326 Gbps (94.7 %)</p></td>
+</tr>
+</tbody>
+</table>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>To build the NDK firmware for this card, you must have the Intel Quartus Prime Pro and PACSign tool installed, including a valid license.</p>
 </div>
 </section>
 </section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../n6010/readme.html" class="btn btn-neutral float-left" title="Silicom N6010" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../fb2cdg1/readme.html" class="btn btn-neutral float-right" title="Silicom fb2CDg1@AGM39D-2" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
