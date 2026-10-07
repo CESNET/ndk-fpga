@@ -355,7 +355,7 @@ begin
     whole_frame_logic_g : for r in 0 to REGIONS-1 generate
         -- Indicates that the frame starts and ends in the same word
         whole_frame(r) <= '1' when (sof_reg(r) = '1' and eof_reg(r) = '1') and
-                                   (u_array_sof_pos(r) < u_array_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE))) else
+                                   (u_array_sof_pos(r) <= u_array_eof_pos(r)(EOF_POS_WIDTH-1 downto log2(BLOCK_SIZE))) else
  '0';
     end generate;
 
