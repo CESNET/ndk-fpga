@@ -1988,12 +1988,16 @@ architecture FULL of FPGA is
     constant PCIE_CLKS       : natural := 2;
     constant PCIE_CONS       : natural := 1;
     constant MISC_IN_WIDTH   : natural := 4;
-    constant MISC_OUT_WIDTH  : natural := 4;
     constant ETH_LANES       : natural := 4;
     constant STATUS_LEDS     : natural := 4; -- fake leds
 
     -- DDR4 + HBM
-    constant DDR_PORTS       : integer := 2;
+    -- The card has two DDR4 channels, but they are only instantiated when
+    -- MEM_PORTS says so. This constant sizes the AVMM signals towards
+    -- FPGA_COMMON, so it has to follow MEM_PORTS: otherwise the application
+    -- builds memory testers for channels that are not there, and their MI
+    -- registers sit on a clock that is tied low and never answer.
+    constant DDR_PORTS       : integer := MEM_PORTS;
     constant MEM_ADDR_WIDTH  : natural := 28;
     constant MEM_DATA_WIDTH  : natural := 512;
     constant MEM_BURST_WIDTH : natural := 7;
@@ -2057,9 +2061,9 @@ architecture FULL of FPGA is
     signal hbm_axi_awlen          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0);
     signal hbm_axi_awsize         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0);
     signal hbm_axi_awburst        : slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0);
-    signal hbm_axi_awprot         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0);
-    signal hbm_axi_awqos          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0);
-    signal hbm_axi_awuser         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0);
+    signal hbm_axi_awprot         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0) := (others => (others => '0'));
+    signal hbm_axi_awqos          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0) := (others => (others => '1'));
+    signal hbm_axi_awuser         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0) := (others => (others => '1'));
     signal hbm_axi_awvalid        : std_logic_vector(HBM_PORTS-1 downto 0);
     signal hbm_axi_awready        : std_logic_vector(HBM_PORTS-1 downto 0);
     signal hbm_axi_wdata          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_DATA_WIDTH-1 downto 0);
@@ -2076,9 +2080,9 @@ architecture FULL of FPGA is
     signal hbm_axi_arlen          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_LEN_WIDTH-1 downto 0);
     signal hbm_axi_arsize         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_SIZE_WIDTH-1 downto 0);
     signal hbm_axi_arburst        : slv_array_t(HBM_PORTS-1 downto 0)(HBM_BURST_WIDTH-1 downto 0);
-    signal hbm_axi_arprot         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0);
-    signal hbm_axi_arqos          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0);
-    signal hbm_axi_aruser         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0);
+    signal hbm_axi_arprot         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_PROT_WIDTH-1 downto 0) := (others => (others => '0'));
+    signal hbm_axi_arqos          : slv_array_t(HBM_PORTS-1 downto 0)(HBM_QOS_WIDTH-1 downto 0) := (others => (others => '1'));
+    signal hbm_axi_aruser         : slv_array_t(HBM_PORTS-1 downto 0)(HBM_USER_WIDTH-1 downto 0) := (others => (others => '1'));
     signal hbm_axi_arvalid        : std_logic_vector(HBM_PORTS-1 downto 0);
     signal hbm_axi_arready        : std_logic_vector(HBM_PORTS-1 downto 0);
     signal hbm_axi_rid            : slv_array_t(HBM_PORTS-1 downto 0)(HBM_ID_WIDTH-1 downto 0);
@@ -2092,6 +2096,7 @@ architecture FULL of FPGA is
     signal hbm_rst_req           : std_logic_vector(1 downto 0);
     signal hbm_wmcrst_n          : std_logic_vector(1 downto 0);
     signal hbm_core_clk_locked   : std_logic_vector(1 downto 0);
+    signal hbm_core_clk_locked_resynced : std_logic_vector(1 downto 0);
 
     signal common_misc_out      : std_logic_vector(MISC_OUT_WIDTH-1 downto 0);
 
@@ -2332,7 +2337,6 @@ begin
             amm_readdatavalid_0       => mem_avmm_readdatavalid (0)
         );
     else generate
-        emif_rst_done(0)           <= '0';
         DDR4_CH0_CK_P(0 downto 0)  <= (others=>'X');
         DDR4_CH0_CK_N(0 downto 0)  <= (others=>'X');
         DDR4_CH0_A(16 downto 0)    <= (others=>'X');
@@ -2348,14 +2352,6 @@ begin
         DDR4_CH0_DQS_N(8 downto 0) <= (others=>'Z');
         DDR4_CH0_DQ                <= (others=>'Z');
         DDR4_CH0_DBI_N(8 downto 0) <= (others=>'Z');
-        emif_cal_success(0)        <= '0';
-        emif_cal_fail(0)           <= '0';
-        mem_rst_n(0)               <= '0';
-        mem_clk(0)                 <= '0';
-        emif_ecc_usr_int(0)        <= '0';
-        mem_avmm_ready(0)          <= '1';
-        mem_avmm_readdata(0)       <= (others=>'1');
-        mem_avmm_readdatavalid (0) <= mem_avmm_read(0);
     end generate;
 
     ddr4_1_enable_g : if MEM_PORTS >= 2 generate
@@ -2400,7 +2396,6 @@ begin
             amm_readdatavalid_0       => mem_avmm_readdatavalid (1)
         );
     else generate
-        emif_rst_done(0)           <= '0';
         DDR4_CH1_CK_P(0 downto 0)  <= (others=>'X');
         DDR4_CH1_CK_N(0 downto 0)  <= (others=>'X');
         DDR4_CH1_A(16 downto 0)    <= (others=>'X');
@@ -2416,14 +2411,6 @@ begin
         DDR4_CH1_DQS_N(8 downto 0) <= (others=>'Z');
         DDR4_CH1_DQ                <= (others=>'Z');
         DDR4_CH1_DBI_N(8 downto 0) <= (others=>'Z');
-        emif_cal_success(1)        <= '0';
-        emif_cal_fail(1)           <= '0';
-        mem_rst_n(1)               <= '0';
-        mem_clk(1)                 <= '0';
-        emif_ecc_usr_int(1)        <= '0';
-        mem_avmm_ready(1)          <= '1';
-        mem_avmm_readdata(1)       <= (others=>'1');
-        mem_avmm_readdatavalid (1) <= mem_avmm_read(1);
     end generate;
 
     -- =========================================================================
@@ -2431,17 +2418,26 @@ begin
     -- =========================================================================
 
     -- HBM reset
-    hbm_rst_req <= (others => '0'); -- not rst request
-    hbm_wmcrst_n <= not hbm_rst_req;
-    hbm_core_clk_locked <= (others => (not common_misc_out(3)));
+    hbm_core_clk_locked <= (others => (not common_misc_out(5)));
 
     -- HBM TOP
     hbm_top_g: if HBM_PORTS > 0 generate
+        hbm_top_reset_controller_i : entity work.HBM_RESET
+        port map(
+            CORE_CLK        => common_misc_out(4),
+            PLL_LOCKED      => hbm_core_clk_locked(0),
+            HBM_CAL_SUCCESS => hbm_init_done(0),
+
+            HBM_RST_REQ     => hbm_rst_req(0),
+            HBM_WMCRST_N    => hbm_wmcrst_n(0),
+            CORE_CLK_LOCKED => hbm_core_clk_locked_resynced(0)
+        );
+
         hbm_top_i : component hbm_top
         port map (
             pll_ref_clk                                       => HBM_TOP_REF_CLK,
-            ext_core_clk                                      => common_misc_out(2),
-            ext_core_clk_locked                               => hbm_core_clk_locked(0),
+            ext_core_clk                                      => common_misc_out(4),
+            ext_core_clk_locked                               => hbm_core_clk_locked_resynced(0),
             wmcrst_n_in                                       => hbm_wmcrst_n(0),
             hbm_only_reset_in                                 => hbm_rst_req(0),
             local_cal_success                                 => hbm_init_done(0),
@@ -3067,11 +3063,22 @@ begin
 
     -- HBM BOTTOM
     hbm_bottom_g : if HBM_PORTS > 16 generate
+        hbm_bottom_reset_controller_i : entity work.HBM_RESET
+        port map(
+            CORE_CLK        => common_misc_out(4),
+            PLL_LOCKED      => hbm_core_clk_locked(1),
+            HBM_CAL_SUCCESS => hbm_init_done(HBM_TOP_PORTS),
+
+            HBM_RST_REQ     => hbm_rst_req(1),
+            HBM_WMCRST_N    => hbm_wmcrst_n(1),
+            CORE_CLK_LOCKED => hbm_core_clk_locked_resynced(1)
+        );
+
         hbm_bottom_i : component hbm_bottom
         port map (
             pll_ref_clk                                       => HBM_BOTTOM_REF_CLK,
-            ext_core_clk                                      => common_misc_out(2),
-            ext_core_clk_locked                               => hbm_core_clk_locked(1),
+            ext_core_clk                                      => common_misc_out(4),
+            ext_core_clk_locked                               => hbm_core_clk_locked_resynced(1),
             wmcrst_n_in                                       => hbm_wmcrst_n(1),
             hbm_only_reset_in                                 => hbm_rst_req(1),
             local_cal_success                                 => hbm_init_done(HBM_TOP_PORTS),

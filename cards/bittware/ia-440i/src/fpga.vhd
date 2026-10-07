@@ -222,7 +222,6 @@ architecture FULL of FPGA is
     constant PCIE_CLKS       : natural := 2;
     constant PCIE_CONS       : natural := 1;
     constant MISC_IN_WIDTH   : natural := 4;
-    constant MISC_OUT_WIDTH  : natural := 4;
     constant ETH_LANES       : natural := 8;
     constant STATUS_LEDS     : natural := 2; -- fake, this board has only 1 status LED
 

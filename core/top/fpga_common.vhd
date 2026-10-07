@@ -918,6 +918,8 @@ begin
     MISC_OUT(1) <= rst_usr_x1(0);
     MISC_OUT(2) <= clk_usr_x2;  -- 200 MHz
     MISC_OUT(3) <= rst_usr_x2(0);
+    MISC_OUT(4) <= clk_usr_x3;  -- 300 MHz
+    MISC_OUT(5) <= rst_usr_x3(0);
 
     eth_streams_g: for i in 0 to ETH_PORTS-1 generate
         constant ETH_PPS : natural := ETH_STREAMS/ETH_PORTS;

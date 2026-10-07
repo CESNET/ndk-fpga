@@ -18,7 +18,7 @@ proc do_adjust_hbm_ip {device family ipname filename adjust_proc} {
 	set_project_property DEVICE_FAMILY $family
 	set_project_property HIDE_FROM_IP_CATALOG {true}
 
-	set_instance_parameter_value hbm_0 {PHY_BACKPRESSURE_LATENCY} {CYCLE_2}
+	set_instance_parameter_value hbm_0 {PHY_BACKPRESSURE_LATENCY} {CYCLE_0}
 	set_instance_parameter_value hbm_0 {PHY_CH1_EN} {1}
 	set_instance_parameter_value hbm_0 {PHY_CH2_EN} {1}
 	set_instance_parameter_value hbm_0 {PHY_CH3_EN} {1}
@@ -26,7 +26,7 @@ proc do_adjust_hbm_ip {device family ipname filename adjust_proc} {
 	set_instance_parameter_value hbm_0 {PHY_CH5_EN} {1}
 	set_instance_parameter_value hbm_0 {PHY_CH6_EN} {1}
 	set_instance_parameter_value hbm_0 {PHY_CH7_EN} {1}
-	set_instance_parameter_value hbm_0 {PHY_CORE_CLK_FREQ_MHZ} {200.0}
+	set_instance_parameter_value hbm_0 {PHY_CORE_CLK_FREQ_MHZ} {300.0}
 	set_instance_parameter_value hbm_0 {PHY_DEFAULT_REF_CLK_FREQ} {0}
 	set_instance_parameter_value hbm_0 {PHY_HBM_LOCATION} {TOP}
 	set_instance_parameter_value hbm_0 {PHY_HBM_USER_PLL_REF_CLK_IO_STD_ENUM} {LVDS_ONCHIP_TERMINATION}
