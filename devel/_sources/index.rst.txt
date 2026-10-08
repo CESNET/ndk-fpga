@@ -46,6 +46,7 @@ Other example applications will be added in the future, stay tuned!
     :caption: Applications
 
     app-minimal
+    ndk_apps/dram_pkt_capture/readme
     top_level_simulation
 
 --------

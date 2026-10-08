@@ -1,0 +1,576 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRAM FIFO &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Top-level simulation" href="../../tests/cocotb/readme.html" />
+    <link rel="prev" title="DRAM Packet Capture application" href="../../readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../readme.html">DRAM Packet Capture application</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#architecture">Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#memory-interface">Memory interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#the-application-mi-offsets">The application MI offsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#build">Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../readme.html#throughput-measurement">Throughput measurement</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../../readme.html#supported-cards">Supported cards</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">DRAM FIFO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#structure">Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metaword-format">Metaword format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#write-path">Write path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#read-path">Read path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ring-accounting-and-flow-control">Ring accounting and flow control</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#avmm-arbitration">AVMM arbitration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sizing-constraints">Sizing constraints</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#simulation">Simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../tests/cocotb/readme.html">Top-level simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n5014/readme.html">Silicom N5014</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../readme.html">DRAM Packet Capture application</a></li>
+      <li class="breadcrumb-item active">DRAM FIFO</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/ndk_apps/dram_pkt_capture/comp/dram_fifo/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dram-fifo">
+<span id="id1"></span><h1>DRAM FIFO<a class="headerlink" href="#dram-fifo" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-dram_fifo">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">DRAM_FIFO</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-dram_fifo" title="Link to this definition"></a></dt>
+<dd><p>FIFO logic built around an external DDR memory using the Avalon Memory-Mapped (AVMM) interface.
+Data is written to memory one beat at a time. The first beat of each N packets
+is the packet length metadata beat, followed by the packet payload beats.
+Write addresses increment manually after each accepted beat.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-dram_fifo-ddr_addr_width"><td><p>DDR_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>27</p></td>
+<td><p>Width of AVMM_ADDRESS. Set by the card’s memory controller.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-dram_fifo-ddr_burst_width"><td><p>DDR_BURST_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>7</p></td>
+<td><p>Width of AVMM_BURSTCOUNT. Transactions are single-beat, so the output
+is tied to 1.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dram_fifo-ddr_data_width"><td><p>DDR_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Width of the AVMM data path, and therefore of one ring item.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-dram_fifo-axi_data_width"><td><p>AXI_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>512</p></td>
+<td><p>Width of both AXI-Stream ports.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dram_fifo-fifo_items"><td><p>FIFO_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>2 ** 13</p></td>
+<td><p>Depth in DDR words. Must not exceed the memory behind the AVMM port.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-dram_fifo-pkt_mtu"><td><p>PKT_MTU</p></td>
+<td><p>natural</p></td>
+<td><p>2 ** 12</p></td>
+<td><p>Largest packet in bytes (4 KB). Sets LEN_WIDTH = log2(PKT_MTU+1) and
+the width of TX_PKT_LEN. A frame larger than this has its stored
+length wrapped, which corrupts every later packet in the metaword.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dram_fifo-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>Target device string, passed to the FIFO primitives.</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-dram_fifo-fifo_buff_in_items"><td><p>FIFO_BUFF_IN_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>2**16</p></td>
+<td><p>Depth of the on-chip write buffer. An assert checks that at least one
+MTU packet fits.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-dram_fifo-fifo_buff_out_items"><td><p>FIFO_BUFF_OUT_ITEMS</p></td>
+<td><p>natural</p></td>
+<td><p>2**12</p></td>
+<td><p>Depth of the read prefetch buffer. An assert checks that at least one
+MTU packet fits.</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>FIFO interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Write interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-rx_axi_data"><td><p>RX_AXI_DATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-rx_axi_keep"><td><p>RX_AXI_KEEP</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH/8 - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-rx_axi_last"><td><p>RX_AXI_LAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-rx_axi_valid"><td><p>RX_AXI_VALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-rx_axi_ready"><td><p>RX_AXI_READY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>Read interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-tx_axi_data"><td><p>TX_AXI_DATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-tx_axi_keep"><td><p>TX_AXI_KEEP</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH/8 - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-tx_axi_last"><td><p>TX_AXI_LAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-tx_axi_valid"><td><p>TX_AXI_VALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-tx_axi_ready"><td><p>TX_AXI_READY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-tx_pkt_len"><td><p>TX_PKT_LEN</p></td>
+<td><p>std_logic_vector(log2(PKT_MTU+1)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Packet length output, valid with first payload beat (TX_AXI_VALID=1 and SOF)</p></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>DRAM interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-avmm_address"><td><p>AVMM_ADDRESS</p></td>
+<td><p>std_logic_vector(DDR_ADDR_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td><p>Request interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-avmm_burstcount"><td><p>AVMM_BURSTCOUNT</p></td>
+<td><p>std_logic_vector(DDR_BURST_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-avmm_write"><td><p>AVMM_WRITE</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-avmm_writedata"><td><p>AVMM_WRITEDATA</p></td>
+<td><p>std_logic_vector(DDR_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-avmm_read"><td><p>AVMM_READ</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-avmm_ready"><td><p>AVMM_READY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-avmm_readdata"><td><p>AVMM_READDATA</p></td>
+<td><p>std_logic_vector(DDR_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td><p>Response interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-avmm_readdatavalid"><td><p>AVMM_READDATAVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-dram_fifo-ddr_full"><td><p>DDR_FULL</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td><p>Low when another word of FIFO_ITEMS b can be written.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-dram_fifo-ddr_read_en"><td><p>DDR_READ_EN</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Set by user - when high reading via the AVMM_* interface is enabled</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>See <a class="reference internal" href="../../readme.html#ndk-app-dram-pkt-capture"><span class="std std-ref">the DRAM Packet Capture application</span></a> for
+how this component is used and sized.</p>
+<section id="structure">
+<h2>Structure<a class="headerlink" href="#structure" title="Link to this heading"></a></h2>
+<p>The write side is three stages:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AXIS_PACKET_LEN</span></code> measures each incoming packet and emits its length.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fifo_buffer_in</span></code> (<code class="docutils literal notranslate"><span class="pre">AXIS_FIFO</span></code>, <code class="docutils literal notranslate"><span class="pre">FIFO_BUFF_IN_ITEMS</span></code> deep) holds the
+payload beats while the length is being packed.</p></li>
+<li><p>a shift register packs up to <code class="docutils literal notranslate"><span class="pre">META_LEN_COUNT</span></code> lengths into one metaword,
+which is pushed into <code class="docutils literal notranslate"><span class="pre">meta_fifo</span></code> (<code class="docutils literal notranslate"><span class="pre">FIFOX</span></code>, 1024 entries).</p></li>
+</ul>
+<p>The read side is two stages: <code class="docutils literal notranslate"><span class="pre">fifo_buffer_out</span></code> (<code class="docutils literal notranslate"><span class="pre">FIFOX</span></code>,
+<code class="docutils literal notranslate"><span class="pre">FIFO_BUFF_OUT_ITEMS</span></code> deep) prefetches DDR words, and a two-state formatting
+FSM turns them back into AXI-Stream packets.</p>
+</section>
+<section id="metaword-format">
+<h2>Metaword format<a class="headerlink" href="#metaword-format" title="Link to this heading"></a></h2>
+<p>The structure of a metaword depends entirely on  <code class="docutils literal notranslate"><span class="pre">PKT_MTU</span></code>.
+The following example uses <code class="docutils literal notranslate"><span class="pre">PKT_MTU</span> <span class="pre">=</span> <span class="pre">4096</span> <span class="pre">B</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+---------+--------+---------+-----+--------+</span>
+<span class="o">|</span> <span class="n">PADDING</span> <span class="o">|</span> <span class="n">COUNT</span>  <span class="o">|</span>  <span class="n">P</span><span class="p">[</span><span class="mi">37</span><span class="p">]</span>  <span class="o">|</span> <span class="o">...</span> <span class="o">|</span>  <span class="n">P</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span>
+<span class="o">|</span>   <span class="mi">12</span><span class="n">b</span>   <span class="o">|</span>   <span class="mi">6</span><span class="n">b</span>   <span class="o">|</span>   <span class="mi">13</span><span class="n">b</span>   <span class="o">|</span>     <span class="o">|</span>  <span class="mi">13</span><span class="n">b</span>   <span class="o">|</span>
+<span class="o">+---------+--------+---------+-----+--------+</span>
+ <span class="n">MSB</span>                                     <span class="n">LSB</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The field widths are derived, not fixed.</p>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 42.0%" />
+<col style="width: 28.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Constant</p></th>
+<th class="head"><p>Derivation</p></th>
+<th class="head"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LEN_WIDTH</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">log2(PKT_MTU</span> <span class="pre">+</span> <span class="pre">1)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">13</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">META_COUNT_BITS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">log2(DDR_DATA_WIDTH</span> <span class="pre">/</span> <span class="pre">LEN_WIDTH</span> <span class="pre">+</span> <span class="pre">1)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">6</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">META_LEN_COUNT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(DDR_DATA_WIDTH</span> <span class="pre">-</span> <span class="pre">META_COUNT_BITS)</span> <span class="pre">/</span> <span class="pre">LEN_WIDTH</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">38</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">META_UNUSED_BITS</span></code></p></td>
+<td><p>remainder</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">12</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">COUNT</span></code> says how many of the length slots are valid, so a partial metaword is
+legal — which is what makes the flush below safe.</p>
+</section>
+<section id="write-path">
+<h2>Write path<a class="headerlink" href="#write-path" title="Link to this heading"></a></h2>
+<p>A packet is written to DDR only when both halves are ready: <code class="docutils literal notranslate"><span class="pre">fifo_buffer_in</span></code>
+holds at least one complete packet <em>and</em> <code class="docutils literal notranslate"><span class="pre">meta_fifo</span></code> holds a metaword
+describing it.</p>
+<p>Each burst to memory is the metaword beat first, then that group’s payload
+beats. <code class="docutils literal notranslate"><span class="pre">metaword_sent</span></code> selects between <code class="docutils literal notranslate"><span class="pre">meta_fifo_do</span></code> and <code class="docutils literal notranslate"><span class="pre">fifo_tdata</span></code> on
+<code class="docutils literal notranslate"><span class="pre">AVMM_WRITEDATA</span></code>, and the payload FIFO is popped only during payload beats.</p>
+<section id="metaword-flush">
+<h3>Metaword flush<a class="headerlink" href="#metaword-flush" title="Link to this heading"></a></h3>
+<p>A metaword is normally emitted once all 38 slots are filled. Waiting for a 38th
+packet that may never arrive would strand the previous 37 in on-chip memory, so
+<code class="docutils literal notranslate"><span class="pre">flush_timer</span></code> counts cycles since the last new length and forces out a partial
+word after <code class="docutils literal notranslate"><span class="pre">FLUSH_TIMEOUT</span></code> (<code class="docutils literal notranslate"><span class="pre">1024</span></code>) idle cycles.</p>
+</section>
+</section>
+<section id="read-path">
+<h2>Read path<a class="headerlink" href="#read-path" title="Link to this heading"></a></h2>
+<p>Prefetching is <em>credit-based</em>. <code class="docutils literal notranslate"><span class="pre">out_fifo_credits</span></code> starts at
+<code class="docutils literal notranslate"><span class="pre">FIFO_BUFF_OUT_ITEMS</span></code>, decrements when a read is issued and increments when a
+beat is popped.</p>
+<p>A read is issued only when all three hold:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">diff</span> <span class="pre">&gt;</span> <span class="pre">outstanding_read_cnt</span></code> — there is unread data in DDR not already
+requested.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">out_fifo_credits</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> — there is somewhere to put the result.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DDR_READ_EN</span> <span class="pre">=</span> <span class="pre">'1'</span></code>.</p></li>
+</ul>
+<p>The formatting FSM has two states:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">FMT_META</span></code></dt><dd><p>Pops a metaword, extracts <code class="docutils literal notranslate"><span class="pre">COUNT</span></code> and the length array, loads the first
+length, and moves to <code class="docutils literal notranslate"><span class="pre">FMT_PAYLOAD</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">FMT_PAYLOAD</span></code></dt><dd><p>Emits payload beats. While more than one beat remains, <code class="docutils literal notranslate"><span class="pre">TX_AXI_KEEP</span></code> is
+all ones. On the final beat <code class="docutils literal notranslate"><span class="pre">TX_AXI_LAST</span></code> asserts and <code class="docutils literal notranslate"><span class="pre">ones_mask()</span></code>
+builds a partial <code class="docutils literal notranslate"><span class="pre">TX_AXI_KEEP</span></code> from the bytes left. State advances only on
+an AXI handshake. When the last packet of the group completes it returns to
+<code class="docutils literal notranslate"><span class="pre">FMT_META</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="ring-accounting-and-flow-control">
+<h2>Ring accounting and flow control<a class="headerlink" href="#ring-accounting-and-flow-control" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">write_ptr</span></code> and <code class="docutils literal notranslate"><span class="pre">read_ptr</span></code> are one bit wider than the address space. The
+extra bit is a wrap flag, so <code class="docutils literal notranslate"><span class="pre">diff</span> <span class="pre">=</span> <span class="pre">write_ptr</span> <span class="pre">-</span> <span class="pre">read_ptr</span></code> distinguishes full
+from empty:</p>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="n">can_write</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="w"> </span><span class="k">when</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">FIFO_ITEMS</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span>
+<span class="n">can_read</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="w"> </span><span class="k">when</span><span class="w"> </span><span class="n">diff</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="sc">&#39;0&#39;</span><span class="p">;</span>
+<span class="n">DDR_FULL</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">can_write</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Pointers advance on accepted AVMM transactions (<code class="docutils literal notranslate"><span class="pre">AVMM_WRITE</span> <span class="pre">and</span> <span class="pre">AVMM_READY</span></code>),
+not on request assertion. Both pointers are cleared only by <code class="docutils literal notranslate"><span class="pre">RESET</span></code>;
+<code class="docutils literal notranslate"><span class="pre">DDR_READ_EN</span></code> and <code class="docutils literal notranslate"><span class="pre">DDR_FULL</span></code> never move them, so data left in the ring is
+read out before anything written later.</p>
+</section>
+<section id="avmm-arbitration">
+<h2>AVMM arbitration<a class="headerlink" href="#avmm-arbitration" title="Link to this heading"></a></h2>
+<p>One AVMM port serves both directions, so writes and reads are arbitrated:</p>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="n">grant_write</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">lock_is_write</span><span class="w">     </span><span class="k">when</span><span class="w"> </span><span class="n">req_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">write_wants</span><span class="p">;</span>
+<span class="n">grant_read</span><span class="w">  </span><span class="o">&lt;=</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">lock_is_write</span><span class="w"> </span><span class="k">when</span><span class="w"> </span><span class="n">req_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;1&#39;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">read_wants</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">write_wants</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><strong>Writes win.</strong> A read is granted only when no write is pending, which maximizes RX throughput.</p>
+<p><code class="docutils literal notranslate"><span class="pre">req_lock</span></code> holds a grant until the memory accepts it. Without it, a request
+could switch direction mid-transaction while <code class="docutils literal notranslate"><span class="pre">AVMM_READY</span></code> was still low (AVMM protocol violation), and
+the address would change under an in-flight request.</p>
+</section>
+<section id="sizing-constraints">
+<h2>Sizing constraints<a class="headerlink" href="#sizing-constraints" title="Link to this heading"></a></h2>
+<p>Two elaboration-time assertions enforce that both buffers hold at least one
+full MTU packet:</p>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span><span class="w"> </span><span class="n">FIFO_BUFF_IN_ITEMS</span><span class="w">  </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="o">/</span><span class="p">(</span><span class="n">AXI_DATA_WIDTH</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span>
+<span class="k">assert</span><span class="w"> </span><span class="n">FIFO_BUFF_OUT_ITEMS</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">PKT_MTU</span><span class="o">/</span><span class="p">(</span><span class="n">AXI_DATA_WIDTH</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">FIFO_ITEMS</span></code> must not exceed the memory actually behind the AVMM port. The
+address is truncated, so an oversized ring aliases onto itself and
+overwrites unread data. In this application the depth is derived from
+<code class="docutils literal notranslate"><span class="pre">MEM_TARGET</span></code>; see <a class="reference internal" href="../../readme.html#dram-pkt-capture-mem-interface"><span class="std std-ref">Memory interface</span></a>.</p>
+</div>
+</section>
+<section id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Link to this heading"></a></h2>
+<p>The component has its own cocotb testbench in <code class="docutils literal notranslate"><span class="pre">cocotb/</span></code>, which drives the AXI
+ports directly and answers the AVMM port with a memory model, so no card or
+application core is involved.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>apps/dram_pkt_capture/comp/dram_fifo/cocotb
+make
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">run_test</span></code> sends 10000 random frames of 100–4096 B with <code class="docutils literal notranslate"><span class="pre">DDR_READ_EN</span></code> tied
+high, and checks that what comes out of the read port matches what went in.
+Generics are left at their entity defaults, so <code class="docutils literal notranslate"><span class="pre">PKT_MTU</span></code> is <code class="docutils literal notranslate"><span class="pre">4096</span></code> — exactly
+the largest frame the test generates.</p>
+<p>For the whole capture path end to end, see <a class="reference internal" href="../../tests/cocotb/readme.html#dram-pkt-capture-tls"><span class="std std-ref">Top-level simulation</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../readme.html" class="btn btn-neutral float-left" title="DRAM Packet Capture application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../tests/cocotb/readme.html" class="btn btn-neutral float-right" title="Top-level simulation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

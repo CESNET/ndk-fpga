@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRAM Packet Capture application &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="DRAM FIFO" href="comp/dram_fifo/readme.html" />
+    <link rel="prev" title="Minimal NDK application" href="../../app-minimal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DRAM Packet Capture application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rx-direction-ethernet-to-dma">RX direction (Ethernet to DMA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tx-direction-dma-to-ethernet">TX direction (DMA to Ethernet)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flow-control">Flow control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-app-status-register-block">The app_status register block</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edge-cases">Edge cases</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#memory-interface">Memory interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#memory-target-selection">Memory target selection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-application-mi-offsets">The application MI offsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build">Build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#throughput-measurement">Throughput measurement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-cards">Supported cards</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="comp/dram_fifo/readme.html">DRAM FIFO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tests/cocotb/readme.html">Top-level simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../comp/mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/n5014/readme.html">Silicom N5014</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">DRAM Packet Capture application</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/ndk_apps/dram_pkt_capture/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dram-packet-capture-application">
+<span id="ndk-app-dram-pkt-capture"></span><h1>DRAM Packet Capture application<a class="headerlink" href="#dram-packet-capture-application" title="Link to this heading"></a></h1>
+<p>The DRAM Packet Capture application buffers incoming network packets in external
+DDR memory before forwarding them to the host over DMA. It decouples the capture
+rate from the rate at which software can drain packets.</p>
+<p>The application contains one independent APP
+subcore per Ethernet stream. The Ethernet and DMA streams use the
+<a class="reference internal" href="../../comp/mfb_tools/readme.html#mfb-bus"><span class="std std-ref">MFB buses</span></a> and <a class="reference internal" href="../../comp/mvb_tools/readme.html#mvb-bus"><span class="std std-ref">MVB buses</span></a>.</p>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<p>Each APP subcore contains one independent capture pipeline. Capture is gated by
+a software-controlled enable bit, so the datapath only accepts packets when the
+host has armed it.</p>
+<section id="rx-direction-ethernet-to-dma">
+<h3>RX direction (Ethernet to DMA)<a class="headerlink" href="#rx-direction-ethernet-to-dma" title="Link to this heading"></a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is a simplified diagram of one subcore.
+Check each bullet point for full explanation of each block.</p>
+</div>
+<a class="reference internal image-reference" href="../../_images/architecture.drawio.svg"><img alt="Block diagram of the DRAM Packet Capture RX path" class="align-center" src="../../_images/architecture.drawio.svg" style="width: 100%;" />
+</a>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<ul>
+<li><p><strong>MFB DISCARDER</strong> discards incoming traffic based on <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> (accesable via MI).
+The Ethernet MVB headers are consumed here and do not travel further downstream.
+They are reconstructed downstream instead to avoid extra metadata entering the DRAM.</p></li>
+<li><p><strong>MFB SPEED METER MI</strong> is used to measure throughput on the write side of each subcore.
+A second instance measures the read (drain) side. Both are reachable over MI at fixed
+offsets from the subcore base — <code class="docutils literal notranslate"><span class="pre">0x1000</span></code> for the RX (write) meter and <code class="docutils literal notranslate"><span class="pre">0x2000</span></code> for the TX (drain)
+meter — and appear in the Device Tree as the <code class="docutils literal notranslate"><span class="pre">rx_speed_meter</span></code> and <code class="docutils literal notranslate"><span class="pre">tx_speed_meter</span></code>
+subnodes of the app core, with compatible string <code class="docutils literal notranslate"><span class="pre">cesnet,ofm,speed_meter</span></code>.
+Example usage can be seen in <code class="docutils literal notranslate"><span class="pre">scripts/len_throughput_test.py</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>That compatible string is not unique to this application: every
+<a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">Gen Loop Switch</span></a> instance carries four meters using the same
+string, and GLS is enabled by default. Resolving a meter by its global index can
+therefore silently return the wrong one — look the meters up as subnodes of the
+<code class="docutils literal notranslate"><span class="pre">cesnet,dram_pkt_capture,app_core</span></code> node instead.</p>
+</div>
+</li>
+<li><p><strong>MFB2AXI</strong> and <strong>AXI2MFB</strong> convert between the NDK’s MFB bus and the AXI-Stream
+interface that <a class="reference internal" href="comp/dram_fifo/readme.html#dram-fifo"><span class="std std-ref">DRAM FIFO</span></a> uses on both its write and read ports.</p></li>
+<li><p><a class="reference internal" href="comp/dram_fifo/readme.html#dram-fifo"><span class="std std-ref">DRAM FIFO</span></a> stores data beats in an internal FIFO, until a metaword
+is created. The metaword alongside with the corresponding data is captured in an
+external DDR4 memory over the
+<a class="reference internal" href="#dram-pkt-capture-mem-interface"><span class="std std-ref">memory interface</span></a>.</p></li>
+<li><p><strong>MVB CHANNEL ROUTER MI</strong> is used in sync with other logic inside of the subcore to recreate the MVB bus signals based on
+packet length provided by DRAM FIFO</p>
+<p>The MVB header carrying the packet length and target DMA channel is generated
+from <code class="docutils literal notranslate"><span class="pre">TX_PKT_LEN</span></code> on the first payload beat leaving the DRAM FIFO, and is held
+until the DMA accepts it.</p>
+</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">STREAMING_DEBUG_PROBE_MFB</span></code> probes are inserted before <code class="docutils literal notranslate"><span class="pre">MFB2AXI</span></code> and after
+<code class="docutils literal notranslate"><span class="pre">AXI2MFB</span></code>, both reachable through the debug master at MI offset <code class="docutils literal notranslate"><span class="pre">0x3000</span></code>.</p>
+</section>
+<section id="tx-direction-dma-to-ethernet">
+<h3>TX direction (DMA to Ethernet)<a class="headerlink" href="#tx-direction-dma-to-ethernet" title="Link to this heading"></a></h3>
+<p>The TX path is a straight pass-through with no DRAM buffering: a debug probe, a
+<code class="docutils literal notranslate"><span class="pre">METADATA_INSERTOR</span></code> that attaches the Ethernet TX header, and an <code class="docutils literal notranslate"><span class="pre">MFB_PIPE</span></code>.</p>
+</section>
+<section id="flow-control">
+<h3>Flow control<a class="headerlink" href="#flow-control" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">DDR_FULL</span></code> is asserted when the ring cannot accept another write. The subcore
+uses it to clear <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> automatically, so capture stops cleanly
+rather than corrupting the ring. Reading is gated separately by <code class="docutils literal notranslate"><span class="pre">DDR_READ_EN</span></code>.</p>
+<p>Because <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> is cleared by hardware on <code class="docutils literal notranslate"><span class="pre">dram_full</span></code>, reading it
+back is the reliable way to tell whether capture is still running rather than
+assuming the last write still holds.</p>
+<p>The register map is defined once, in <code class="docutils literal notranslate"><span class="pre">scripts/dram_pkt_capture_regs.py</span></code>. The
+scripts and the top-level cocotb test import it from there; use it the same way
+in your own tools:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nfb</span>
+<span class="kn">from</span> <span class="nn">dram_pkt_capture_regs</span> <span class="kn">import</span> <span class="n">AppStatus</span>
+
+<span class="n">dev</span> <span class="o">=</span> <span class="n">nfb</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+<span class="n">st</span> <span class="o">=</span> <span class="n">AppStatus</span><span class="p">(</span><span class="n">dev</span><span class="o">=</span><span class="n">dev</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>    <span class="c1"># app core 0</span>
+<span class="n">st</span><span class="o">.</span><span class="n">set_capture_enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">st</span><span class="o">.</span><span class="n">capture_enable</span><span class="p">:</span>            <span class="c1"># cleared by hardware on dram_full</span>
+    <span class="k">pass</span>
+<span class="n">st</span><span class="o">.</span><span class="n">set_read_enable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>            <span class="c1"># drain the DRAM towards DMA</span>
+</pre></div>
+</div>
+<p>Run it from <code class="docutils literal notranslate"><span class="pre">scripts/</span></code>, or add that directory to <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code>.</p>
+<p>The same registers can be poked from the command line with <code class="docutils literal notranslate"><span class="pre">nfb-bus</span></code>, using the
+addresses reported by <code class="docutils literal notranslate"><span class="pre">nfb-bus</span> <span class="pre">-l</span></code> for the <code class="docutils literal notranslate"><span class="pre">app_status</span></code> node of the core you
+want.</p>
+</section>
+<section id="the-app-status-register-block">
+<h3>The app_status register block<a class="headerlink" href="#the-app-status-register-block" title="Link to this heading"></a></h3>
+<p>Device tree compatible string: <code class="docutils literal notranslate"><span class="pre">cesnet,dram_pkt_capture,app_status</span></code>.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12.0%" />
+<col style="width: 10.0%" />
+<col style="width: 18.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Bit</p></th>
+<th class="head"><p>Access</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x00</span></code></p></td>
+<td><p>0</p></td>
+<td><p>RO</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dram_full</span></code> — the DRAM ring buffer is full.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x04</span></code></p></td>
+<td><p>0</p></td>
+<td><p>RW</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> — admit packets into the DRAM FIFO. Cleared by
+hardware when <code class="docutils literal notranslate"><span class="pre">dram_full</span></code> is asserted.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x08</span></code></p></td>
+<td><p>0</p></td>
+<td><p>RW</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">read_enable</span></code> — drain packets from the DRAM FIFO towards DMA.</p></td>
+</tr>
+</tbody>
+</table>
+<p>A typical capture cycle is: set <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code>, wait for <code class="docutils literal notranslate"><span class="pre">dram_full</span></code> (or
+stop manually), clear <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code>, then set <code class="docutils literal notranslate"><span class="pre">read_enable</span></code> to drain the
+buffer to the host.</p>
+<p>You can test flow control with the following script: <code class="docutils literal notranslate"><span class="pre">scripts/throughput_test.py</span></code></p>
+</section>
+<section id="edge-cases">
+<h3>Edge cases<a class="headerlink" href="#edge-cases" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Capture and read enabled at the same time.</strong> This is allowed, but the
+DRAM FIFO gives writes priority on the shared memory port: a read is issued
+only in cycles with no pending write. Under heavy incoming traffic the drain
+slows down or stops until the traffic eases or <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> is cleared.</p></li>
+<li><p><strong>Packets already on chip when</strong> <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> <strong>is cleared.</strong> Clearing
+it only makes the discarder drop new packets. Packets that already passed the
+discarder are still written to DRAM and can be read out. Their lengths are
+stored in a shared metaword that is written only when it is full or after
+<code class="docutils literal notranslate"><span class="pre">FLUSH_TIMEOUT</span></code> (1024) cycles without a new packet, so the last few packets
+reach DRAM, and become readable, with that delay.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> <strong>does not re-arm itself.</strong> After <code class="docutils literal notranslate"><span class="pre">dram_full</span></code> clears it,
+it stays <code class="docutils literal notranslate"><span class="pre">0</span></code> even once reading has freed space. Software must set it again.
+A write of <code class="docutils literal notranslate"><span class="pre">1</span></code> while <code class="docutils literal notranslate"><span class="pre">dram_full</span></code> is still asserted is overridden in the
+next cycle, so read the register back to confirm capture is running.</p></li>
+<li><p><strong>Starting a new capture before the buffer is drained.</strong> The ring pointers
+are cleared only by reset. Neither <code class="docutils literal notranslate"><span class="pre">capture_enable</span></code> nor <code class="docutils literal notranslate"><span class="pre">read_enable</span></code>
+touches them. The ring is a FIFO, so the remaining packets from the previous
+capture are read out first, followed by the new ones. To start with an empty
+buffer, drain it completely (or reset the design) before enabling capture.</p></li>
+</ul>
+</section>
+</section>
+<section id="memory-interface">
+<span id="dram-pkt-capture-mem-interface"></span><h2>Memory interface<a class="headerlink" href="#memory-interface" title="Link to this heading"></a></h2>
+<p>Each subcore uses <code class="docutils literal notranslate"><span class="pre">MEM_PORTS_USED</span></code> Avalon-MM ports (default <code class="docutils literal notranslate"><span class="pre">2</span></code>) of
+<code class="docutils literal notranslate"><span class="pre">MEM_DATA_WIDTH</span></code> bits each (default <code class="docutils literal notranslate"><span class="pre">256</span></code>). The two ports are ganged into a
+single <code class="docutils literal notranslate"><span class="pre">INT_DATA_WIDTH</span></code> = 512-bit interface, with reads and writes issued to
+both ports in lockstep, an <code class="docutils literal notranslate"><span class="pre">accepted</span></code> register pairs up the two <code class="docutils literal notranslate"><span class="pre">ardy</span></code>
+responses so a transfer only advances once both ports have taken it.</p>
+<p>On the <a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html#card-n6010"><span class="std std-ref">n6010</span></a> with <code class="docutils literal notranslate"><span class="pre">MEM_PORTS</span> <span class="pre">=</span> <span class="pre">4</span></code>, this gives two
+subcores with two DDR4 channels each.</p>
+<section id="memory-target-selection">
+<h3>Memory target selection<a class="headerlink" href="#memory-target-selection" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">application_core.vhd</span></code> selects where the AVMM traffic goes:</p>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="k">type</span><span class="w">     </span><span class="n">mem_target_t</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="p">(</span><span class="n">MEM_TGT_BRAM</span><span class="p">,</span><span class="w"> </span><span class="n">MEM_TGT_EXT_DDR</span><span class="p">);</span>
+<span class="k">constant</span><span class="w"> </span><span class="n">MEM_TARGET</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">mem_target_t</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">MEM_TGT_EXT_DDR</span><span class="p">;</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">MEM_TGT_BRAM</span></code></dt><dd><p>Instantiates <code class="docutils literal notranslate"><span class="pre">AVMM_BRAM</span></code> as an on-chip memory model. <strong>Required for
+simulation</strong> — the card’s DDR4 controllers are not bound in simulation.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">MEM_TGT_EXT_DDR</span></code></dt><dd><p>Connects to the card’s external memory controllers. <strong>Required for a
+bitstream.</strong></p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This constant is edited by hand and must be switched when moving between
+simulation and synthesis. Building a bitstream with <code class="docutils literal notranslate"><span class="pre">MEM_TGT_BRAM</span></code> gives a
+design with no external memory. Running the top-level simulation with
+<code class="docutils literal notranslate"><span class="pre">MEM_TGT_EXT_DDR</span></code> leaves the AVMM interface connected to unbound components
+and the simulation will not work.</p>
+</div>
+<p>The ring depth follows <code class="docutils literal notranslate"><span class="pre">MEM_TARGET</span></code> automatically, so switching target is the
+only edit needed:</p>
+<div class="highlight-vhdl notranslate"><div class="highlight"><pre><span></span><span class="k">constant</span><span class="w"> </span><span class="n">BRAM_ADDR_WIDTH</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">natural</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">13</span><span class="p">;</span>
+<span class="k">constant</span><span class="w"> </span><span class="n">RING_ADDR_WIDTH</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kt">natural</span><span class="w"> </span><span class="o">:=</span>
+<span class="w">    </span><span class="n">tsel</span><span class="p">(</span><span class="n">MEM_TARGET</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MEM_TGT_BRAM</span><span class="p">,</span><span class="w"> </span><span class="n">BRAM_ADDR_WIDTH</span><span class="p">,</span><span class="w"> </span><span class="n">MEM_ADDR_WIDTH</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">RING_ADDR_WIDTH</span></code> is passed to the subcore and sets <code class="docutils literal notranslate"><span class="pre">DRAM_FIFO</span></code>’s
+<code class="docutils literal notranslate"><span class="pre">FIFO_ITEMS</span></code> to <code class="docutils literal notranslate"><span class="pre">2**RING_ADDR_WIDTH</span></code>. It is deliberately separate from
+<code class="docutils literal notranslate"><span class="pre">MEM_ADDR_WIDTH</span></code>, which stays at the card’s value (<code class="docutils literal notranslate"><span class="pre">27</span></code> on the n6010) as the
+width of the AVMM address bus. In the BRAM configuration <code class="docutils literal notranslate"><span class="pre">BRAM_ADDR_WIDTH</span></code>
+alone drives the <code class="docutils literal notranslate"><span class="pre">AVMM_BRAM</span></code> depth, the <code class="docutils literal notranslate"><span class="pre">resize()</span></code> at its address port and
+the ring depth, so resizing the simulation memory is a one-line change.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ring must never be deeper than the memory behind it. The AVMM address is
+truncated with <code class="docutils literal notranslate"><span class="pre">resize()</span></code> at the BRAM port, so an oversized ring aliases
+onto itself and silently overwrites unread data. The symptom is complete loss
+of packet framing, which looks like an RTL bug but is not. The derivation
+above prevents this as long as <code class="docutils literal notranslate"><span class="pre">BRAM_ADDR_WIDTH</span></code> matches the memory model.</p>
+</div>
+</section>
+</section>
+<section id="the-application-mi-offsets">
+<h2>The application MI offsets<a class="headerlink" href="#the-application-mi-offsets" title="Link to this heading"></a></h2>
+<p>The application MI space is split between the APP subcores. Each subcore gets a
+sub-window whose width is derived from the number of Ethernet streams rounded up
+to a power of two. Within it, the layout is fixed:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Block</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x0000</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MVB_CHANNEL_ROUTER_MI</span></code> — DMA channel assignment on the drain side</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x1000</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MFB_SPEED_METER_MI</span></code> — RX (capture side) throughput counters</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x2000</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MFB_SPEED_METER_MI</span></code> — TX (drain side) throughput counters</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x3000</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">STREAMING_DEBUG_MASTER</span></code> — three debug probes</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x4000</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">app_status</span></code> — capture control and status</p></td>
+</tr>
+</tbody>
+</table>
+<p>The full map is described by the DevTree and can be listed from the card with
+<code class="docutils literal notranslate"><span class="pre">nfb-bus</span> <span class="pre">-l</span></code>, application nodes appear under
+<code class="docutils literal notranslate"><span class="pre">/firmware/mi_pci0_bar0/application/*</span></code>.</p>
+</section>
+<section id="build">
+<h2>Build<a class="headerlink" href="#build" title="Link to this heading"></a></h2>
+<p>Only the <a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html#card-n6010"><span class="std std-ref">n6010</span></a> build target is provided:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>apps/dram_pkt_capture/build/n6010
+make<span class="w"> </span>100g2
+</pre></div>
+</div>
+<p>The entire application can be simulated. See <a class="reference internal" href="tests/cocotb/readme.html#dram-pkt-capture-tls"><span class="std std-ref">Top-level simulation</span></a>.</p>
+</section>
+<section id="throughput-measurement">
+<h2>Throughput measurement<a class="headerlink" href="#throughput-measurement" title="Link to this heading"></a></h2>
+<p>Two scripts read the speed meters over MI on a running card:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These scripts need the <code class="docutils literal notranslate"><span class="pre">nfb</span></code> and <code class="docutils literal notranslate"><span class="pre">ofm</span></code> Python packages.</p>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">scripts/throughput_test.py</span></code></dt><dd><p>Samples RX and TX throughput continuously and prints a live figure, with
+interactive control of the capture and read enable bits.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">scripts/len_throughput_test.py</span></code></dt><dd><p>Sweeps the transmitted packet length and records throughput per length,
+producing a CSV and a plot.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When using this script the -s, –frame-size argument MAX cannot exceed 16316 B,
+otherwise GLS stops creating traffic.</p>
+</div>
+</dd>
+</dl>
+<p>The graph below was measured under these conditions:</p>
+<ul class="simple">
+<li><p><strong>Traffic source:</strong> the Gen Loop Switch generator of the measured core. Frames
+go out through the Ethernet TX MAC and come back through PMA local loopback,
+so the offered load is the 100 Gb/s line rate for the given frame length.</p></li>
+<li><p><strong>One core at a time:</strong> only core 0 (one 100G port) was measured. The other
+core received no traffic.</p></li>
+<li><p><strong>Write only:</strong> <code class="docutils literal notranslate"><span class="pre">read_enable</span></code> was <code class="docutils literal notranslate"><span class="pre">0</span></code> while measuring, so the memory port
+served only writes. Between lengths the DRAM was drained with
+<code class="docutils literal notranslate"><span class="pre">read_enable</span> <span class="pre">=</span> <span class="pre">1</span></code> so every length started with an empty buffer.</p></li>
+<li><p><strong>Measured value:</strong> the RX (capture side) speed meter, averaged over 4
+windows of 84 ms. Windows without traffic, e.g. the one in which
+<code class="docutils literal notranslate"><span class="pre">dram_full</span></code> stopped capture, are left out.</p></li>
+<li><p><strong>Frame length</strong> on the X axis includes the 4 B FCS. The sweep runs from
+64 B to 2048 B. The last labelled tick is 1518 B.</p></li>
+</ul>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../../_images/throughput.svg"><img alt="Capture (DRAM write) throughput against frame length" src="../../_images/throughput.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Capture (DRAM write) throughput against frame length on the
+<a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html#card-n6010"><span class="std std-ref">n6010</span></a>, measured with <code class="docutils literal notranslate"><span class="pre">len_throughput_test.py</span></code>.
+Drain (read) throughput is not shown.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Two properties of the design shape the curve:</p>
+<p><strong>Single-word DDR accesses.</strong> Every DDR transaction carries one 512-bit word
+(two 256-bit memory ports side by side). <code class="docutils literal notranslate"><span class="pre">AVMM_BURSTCOUNT</span></code> is fixed to <code class="docutils literal notranslate"><span class="pre">1</span></code>.
+The memory controller therefore receives a separate command for every word and
+cannot use longer bursts. This is the most likely reason the write side levels
+off at about 87 Gb/s for large frames, below the 102 Gb/s the application clock
+allows (200 MHz × 512 b).</p>
+<p><strong>Word-aligned packets.</strong> Every packet starts at the beginning of a new 64 B
+word, so a packet of <em>L</em> bytes occupies <code class="docutils literal notranslate"><span class="pre">ceil(L/64)</span></code> words in DRAM and on the
+internal bus. When <em>L</em> is just above a multiple of 64 B, the last word is
+mostly empty and throughput drops. For example, an 80 B frame takes two words
+(128 B), so only 62.5 % of the bandwidth carries payload. 1040 B and 1488 B
+frames waste 48 B of their last word as well. These are the dips in the graph.</p>
+<p><strong>Drain (read) throughput</strong> is not part of the graph and has its own limit.
+Reads are single words as well, and each memory port allows at most 16 reads
+in flight: <code class="docutils literal notranslate"><span class="pre">MAX_OUTSTANDING</span></code> in <code class="docutils literal notranslate"><span class="pre">app_subcore.vhd</span></code> and the fixed depth of
+the <code class="docutils literal notranslate"><span class="pre">MI_ASYNC</span></code> clock-domain crossing. A read holds its slot for the whole
+round trip into the memory clock domain, through the memory controller and
+back, so the drain rate is at most <code class="docutils literal notranslate"><span class="pre">16</span> <span class="pre">/</span> <span class="pre">round-trip</span> <span class="pre">latency</span></code> words per
+clock. Once the round trip exceeds 16 cycles, the drain is slower than
+capture.</p>
+</section>
+<section id="supported-cards">
+<h2>Supported cards<a class="headerlink" href="#supported-cards" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../../ndk_cards/silicom/n6010/readme.html#card-n6010"><span class="std std-ref">n6010</span></a></p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Content:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comp/dram_fifo/readme.html">DRAM FIFO</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tests/cocotb/readme.html">Top-level simulation</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../../app-minimal.html" class="btn btn-neutral float-left" title="Minimal NDK application" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comp/dram_fifo/readme.html" class="btn btn-neutral float-right" title="DRAM FIFO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
