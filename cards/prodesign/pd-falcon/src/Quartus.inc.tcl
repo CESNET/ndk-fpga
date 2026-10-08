@@ -16,6 +16,8 @@ source $CORE_BASE/Quartus.inc.tcl
 # The description of usage of this array is provided in the Parametrization section
 # of the NDK-CORE repository.
 set CARD_ARCHGRP(CORE_BASE)          $CORE_BASE
+set CARD_ARCHGRP(IP_BUILD_DIR)       $CARD_BASE/src/ip
+set CARD_ARCHGRP(FPGA)               "1SM21BEU2F55E2VG"
 set CARD_ARCHGRP(PCIE_ENDPOINT_MODE) $PCIE_ENDPOINT_MODE
 set CARD_ARCHGRP(NET_MOD_ARCH)       $NET_MOD_ARCH
 # Second dimension because of addition of an element of another array, just for clarity.
@@ -35,6 +37,7 @@ lappend HIERARCHY(COMPONENTS) \
 # Design parameters
 set SYNTH_FLAGS(MODULE)              "FPGA"
 set SYNTH_FLAGS(FPGA)                "1SM21BEU2F55E2VG"
+set SYNTH_FLAGS(SCRIPT_AFTER_IP_GEN) "$CARD_BASE/src/ip/htile_pcie_fix.sh"
 
 # QSF constraints for specific parts of the design
 set SYNTH_FLAGS(CONSTR) ""

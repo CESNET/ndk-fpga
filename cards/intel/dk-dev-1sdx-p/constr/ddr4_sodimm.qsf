@@ -9,7 +9,6 @@
 # ==============================================================================
 
 set_location_assignment PIN_BF19 -to CLK_133M_DIMM_1_P
-####set_location_assignment PIN_BG19 -to CLK_133M_DIMM_1_N
 set_location_assignment PIN_BH21 -to DDR4_DIMM_CH0_RZQ
 
 set_location_assignment PIN_N33 -to DDR4_DIMM_CH0_EVENT_N
@@ -164,7 +163,6 @@ set_location_assignment PIN_BP15 -to DDR4_DIMM_CH0_DQ[24]
 set_location_assignment PIN_BP16 -to DDR4_DIMM_CH0_DQ[25]
 
 set_location_assignment PIN_BH37 -to CLK_133M_DIMM_0_P
-####set_location_assignment PIN_BJ36 -to CLK_133M_DIMM_0_N
 set_location_assignment PIN_BF35 -to DDR4_DIMM_CH1_RZQ
 
 set_location_assignment PIN_P34 -to DDR4_DIMM_CH1_EVENT_N
@@ -333,9 +331,7 @@ set_instance_assignment -name IO_STANDARD "LVDS" -to CLK_133M_DIMM_1_P
 set_instance_assignment -name IO_STANDARD "LVDS" -to CLK_133M_DIMM_0_P
 
 #set_instance_assignment -name IO_STANDARD "1.2 V" -to CLK_133M_DIMM_1_P
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to CLK_133M_DIMM_1_N
 #set_instance_assignment -name IO_STANDARD "1.2 V" -to CLK_133M_DIMM_0_P
-#set_instance_assignment -name IO_STANDARD "1.2 V" -to CLK_133M_DIMM_0_N
 
 set_instance_assignment -name IO_STANDARD "SSTL-12" -to DDR4_DIMM_CH0_CK_P[1]
 set_instance_assignment -name IO_STANDARD "SSTL-12" -to DDR4_DIMM_CH0_CK_N[1]

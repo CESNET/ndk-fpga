@@ -32,10 +32,12 @@ set QSFP_I2C_ADDR(0) "0xA0"
 # ------------------------------------------------------------------------------
 
 if {!(($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 4 && $PCIE_ENDPOINT_MODE == 0) ||
+      ($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 0) ||
       ($PCIE_ENDPOINTS == 2 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 1)) } {
     error "Incompatible PCIe configuration: PCIE_ENDPOINTS = $PCIE_ENDPOINTS, PCIE_GEN = $PCIE_GEN, PCIE_ENDPOINT_MODE = $PCIE_ENDPOINT_MODE!
 Allowed PCIe configurations:
 - 1xGen4x16  -- PCIE_GEN=4, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0 (for DMA Calypte)
+- 1xGen5x16  -- PCIE_GEN=5, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0
 - 1xGen5x8x8 -- PCIE_GEN=5, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1 (for DMA Medusa)"
 }
 
@@ -43,10 +45,6 @@ Allowed PCIe configurations:
 if {!($DDR4_PORTS == 0 || $DDR4_PORTS == 4) } {
     error "Unsupported number of DDR4_PORTS: Select either 0 or 4"
 }
-
-# Enable/add PCIe Gen5 x16 for experiments only!
-#($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 5 && $PCIE_ENDPOINT_MODE == 0) ||
-#- 1xGen5x16  -- PCIE_GEN=5, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0"
 
 # ------------------------------------------------------------------------------
 # Other parameters:

@@ -8,7 +8,6 @@ derive_clock_uncertainty
 
 create_clock -name {altera_reserved_tck} -period 41.667 [get_ports { altera_reserved_tck }]
 
-create_clock -name {AG_SYSCLK0} -period 10.000 [get_ports { AG_SYSCLK0_P }]
 # create_clock -name {AG_SYSCLK1} -period 10.000 [get_ports { AG_SYSCLK1_P }]
 create_clock -name {AG_SYSCLK1} -period 20.000 [get_ports { AG_SYSCLK1_P }]
 

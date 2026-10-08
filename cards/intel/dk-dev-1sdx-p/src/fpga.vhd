@@ -71,7 +71,6 @@ port (
 
     -- EMIF DIMM0 interface
     CLK_133M_DIMM_1_P       : in    std_logic;  -- DIMM1 CLK = CH0 CLK
-    CLK_133M_DIMM_1_N       : in    std_logic;
     DDR4_DIMM_CH0_CK_P      : out   std_logic_vector(2-1 downto 0);
     DDR4_DIMM_CH0_CK_N      : out   std_logic_vector(2-1 downto 0);
     DDR4_DIMM_CH0_A         : out   std_logic_vector(18-1 downto 0);
@@ -96,7 +95,6 @@ port (
 
     -- EMIF DIMM1 interface
     CLK_133M_DIMM_0_P       : in    std_logic;
-    CLK_133M_DIMM_0_N       : in    std_logic;
     DDR4_DIMM_CH1_CK_P      : out   std_logic_vector(2-1 downto 0);
     DDR4_DIMM_CH1_CK_N      : out   std_logic_vector(2-1 downto 0);
     DDR4_DIMM_CH1_A         : out   std_logic_vector(18-1 downto 0);

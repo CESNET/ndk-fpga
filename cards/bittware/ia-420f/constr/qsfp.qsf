@@ -62,3 +62,5 @@ set_instance_assignment -name HSSI_PARAMETER "refclk_divider_use_as_bti_clock=tr
 
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_TX_P
 set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_RX_P
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_TX_N
+set_instance_assignment -name IO_STANDARD "HSSI DIFFERENTIAL I/O" -to QSFP_RX_N

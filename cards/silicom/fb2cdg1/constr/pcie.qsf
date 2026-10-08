@@ -9,7 +9,7 @@
 
 set_location_assignment PIN_BY59   -to PCIE_CLK0_P
 set_location_assignment PIN_BU60   -to PCIE_CLK1_P
-set_location_assignment IOBANK_14C -to PCIE_PERST_N
+set_location_assignment PIN_AP53   -to PCIE_PERST_N
 
 
 set_instance_assignment -name IO_STANDARD HCSL -to PCIE_CLK0_P
@@ -84,5 +84,9 @@ set_location_assignment PIN_BY69 -to PCIE_RX_P[2]
 set_location_assignment PIN_CD69 -to PCIE_RX_P[1]
 set_location_assignment PIN_CH69 -to PCIE_RX_P[0]
 
+# Quartus 26.1 requires an explicit I/O standard on both pins of each
+# transceiver pair (CW 25207).
 set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE_RX_P
 set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE_TX_P
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE_RX_N
+set_instance_assignment -name IO_STANDARD "HIGH SPEED DIFFERENTIAL I/O" -to PCIE_TX_N

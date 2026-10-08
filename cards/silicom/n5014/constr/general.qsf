@@ -75,6 +75,7 @@ set_instance_assignment -name IO_STANDARD "1.8 V" -to SPI_SCLK
 set_instance_assignment -name IO_STANDARD "1.8 V" -to SPI_CS_L
 set_instance_assignment -name IO_STANDARD "1.8 V" -to SPI_MOSI
 set_instance_assignment -name IO_STANDARD "1.8 V" -to SPI_MISO
+set_instance_assignment -name IO_STANDARD "1.8 V" -to BMC_NINIT_DONE
 
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to SPI_SCLK
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to SPI_CS_L
