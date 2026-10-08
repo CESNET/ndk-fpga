@@ -1,0 +1,13 @@
+library 'liberouter'
+
+stagesFirmware(
+    dir: 'apps/dram_pkt_capture/build/n6010',
+    target: '100g2',
+    tool: 'quartus',
+    project: 'n6010-dram-pkt-capture-pcie1xgen4x16-100g2',
+    pollscm: 'H H(0-11) * * 6',
+    rpms: false,
+    rename: false,
+    artifacts: 'n6010-dram-pkt-capture-pcie1xgen4x16-100g2',
+    lastBuilds: 2,
+)
