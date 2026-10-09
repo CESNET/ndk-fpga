@@ -26,11 +26,6 @@ set SIM_FLAGS(DEBUG) true
 #set SIM_FLAGS(UVM_TEST) "test::speed"
 set SIM_FLAGS(UVM_VERBOSITY) UVM_NONE
 
-if {[file exists "./generics.fdo"]} {
-    source "./generics.fdo"
-} else {
-    puts "Could not source generics.fdo."
-}
 
 # Global include file for compilation
 source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
