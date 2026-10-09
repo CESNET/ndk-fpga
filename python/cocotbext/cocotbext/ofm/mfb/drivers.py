@@ -74,6 +74,7 @@ class MFBDriver(ModularBusDriver):
 
     async def _split_transaction(self, transaction: MfbTransaction | IdleTransaction):
         word_is_full  : bool = False
+        word_has_data : bool = False
         word_overflow : bool = False
         region_offset : int  = 0
         byte_offset   : int  = 0
@@ -92,6 +93,7 @@ class MFBDriver(ModularBusDriver):
                         if region_offset >= self._regions:
                             region_offset = 0
                             yield
+                            word_has_data = False
 
                         # set the byte offset to the start of the new region
                         byte_offset = region_offset * self._region_bytes
@@ -116,6 +118,7 @@ class MFBDriver(ModularBusDriver):
 
                     # set DATA
                     self.state.DATA[byte_offset:byte_offset + len(data)] = data
+                    word_has_data = True
 
                     # count the items
                     self._staged_items += (len(data) * 8) // self._item_width
@@ -152,6 +155,7 @@ class MFBDriver(ModularBusDriver):
                         byte_offset = 0
                         region_offset = 0
                         yield
+                        word_has_data = False
 
             elif isinstance(transaction, IdleTransaction):
                 if self._no_inner_idles:
@@ -177,11 +181,17 @@ class MFBDriver(ModularBusDriver):
 
                     word_is_full = byte_offset >= self._word_bytes
 
-                    # when the word is full, send it to the bus
-                    if byte_offset >= self._word_bytes:
+                    if word_is_full:
                         byte_offset = 0
                         region_offset = 0
-                        yield
+
+                        if word_has_data:
+                            # send the word with the end of the previous frame to the bus
+                            yield
+                            word_has_data = False
+                        else:
+                            # a word without frame data is an idle cycle with SRC_RDY low
+                            await self._clk_re
 
             # if the word is not yet full, get the next transaction
             if not word_is_full:
