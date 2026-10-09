@@ -39,9 +39,9 @@ class scoreboard #(
     endfunction
 
     function int unsigned success();
-        int unsigned ret = 0;
-        ret |= data_cmp.success();
-        ret |= meta_cmp.success();
+        int unsigned ret = 1;
+        ret &= data_cmp.success();
+        ret &= meta_cmp.success();
         return ret;
     endfunction
 

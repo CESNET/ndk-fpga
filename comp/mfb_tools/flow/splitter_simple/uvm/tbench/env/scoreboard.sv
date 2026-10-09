@@ -119,11 +119,11 @@ class scoreboard #(ITEM_WIDTH, META_WIDTH, CHANNELS) extends uvm_scoreboard;
     endfunction
 
     function int unsigned success();
-        int unsigned ret = 0;
+        int unsigned ret = 1;
 
         for (int unsigned it = 0; it < CHANNELS; it++) begin
-            ret |= compare_data[it].success();
-            ret |= compare_meta[it].success();
+            ret &= compare_data[it].success();
+            ret &= compare_meta[it].success();
         end
         return ret;
     endfunction
