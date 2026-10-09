@@ -35,6 +35,7 @@ def COMPONENTS_MULTIVER = [\
     ['MERGE'                    , 'comp/mvb_tools/flow/merge/ver'                    , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
     ['SPLIT'                    , 'comp/mvb_tools/flow/split/ver'                    , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
     ['UVM_DISCARD'              , 'comp/mvb_tools/flow/discard/uvm'                  , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
+    ['UVM_MVB2MFB'              , 'comp/mvb_tools/flow/mvb2mfb/uvm'                  , 'top_level.fdo'      , 'tbench/tests/pkg.sv' , 'ver_settings.py'       ],\
     ['CHANNEL_ROUTER'           , 'comp/mvb_tools/flow/channel_router/ver'           , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
     ['FIFO'                     , 'comp/mvb_tools/storage/fifo/ver'                  , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
     ['ASFIFO_BRAM_X'            , 'comp/mvb_tools/storage/asfifo_bram_xilinx/ver'    , 'top_level.fdo'      , 'tbench/test_pkg.sv'  , 'ver_settings.py'       ],\
