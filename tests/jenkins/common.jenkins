@@ -424,7 +424,11 @@ def commonPrekladCocotbRun(COMPONENTS, ofm_path = pwd()) {
 
                         if (!multiver) {
                             // get test results
-                            junit allowEmptyResults: true, testResults: "results.xml"
+                            // junit sets the build result to UNSTABLE when a test fails
+                            def test_summary = junit allowEmptyResults: true, testResults: "results.xml"
+                            if (test_summary.failCount > 0) {
+                                failed.add("$name")
+                            }
 
                             try {
                                 sh "test -f results.xml"
@@ -456,11 +460,11 @@ def commonPrekladCocotbRun(COMPONENTS, ofm_path = pwd()) {
     }
 
     // send out emails if failure is detected
-    if(currentBuild.result == "FAILURE") {
+    if(currentBuild.result in ["FAILURE", "UNSTABLE"]) {
         println "FAILED on components: ${failed}."
         emailext \
             recipientProviders: [culprits(), developers()],
-            to: 'ondrejschwarz@cesnet.cz',
+            to: 'ondrejschwarz@cesnet.cz,cabal@cesnet.cz',
             subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
             body: """\
                 The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
