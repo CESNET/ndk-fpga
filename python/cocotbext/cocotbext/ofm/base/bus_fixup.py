@@ -285,21 +285,20 @@ if cocotb.__version__ >= "2.0.0":
             if isinstance(val, LogicArray):
                 val = str(val)
 
-            if self._array_idx is not None:
-                full_val = self._handle.value
-                full_val[self._array_idx] = val
-
-                # so multiple drivers can read value edited by other drivers
-                self._handle.set(Immediate(full_val))
-            else:
-                self._handle.set(Immediate(val))
+            # so multiple drivers can read value edited by other drivers
+            self.set(Immediate(val))
 
         def set(self, value):
             if self._array_idx is None:
                 self._handle.set(value)
                 return
 
-            # Update only this slice
+            # Write just the element, other elements may have pending writes
+            if isinstance(self._handle, ArrayObject):
+                self._handle[self._array_idx].set(value)
+                return
+
+            # Update only this bit
             full_val = self._handle.value
             if isinstance(value, (Deposit, Immediate)):
                 full_val[self._array_idx] = value.value
