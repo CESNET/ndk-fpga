@@ -66,6 +66,8 @@ if cocotb.__version__ >= "2.0.0":
     from cocotb.simulator import register_value_change_callback, VALUE_CHANGE, RISING, FALLING
 
     class _EdgeProxyBase(_EdgeBase):
+        # Shared by all edge kinds: one simulator callback per signal path
+        # serves every trigger waiting on that path.
         _instances = {}
         _cbhdls = {}
         _can_fire = set()
@@ -97,86 +99,65 @@ if cocotb.__version__ >= "2.0.0":
 
             return self
 
+        def _prime_common(self) -> None:
+            cls = type(self)
+
+            cls._can_fire.add(self)
+
+            self._last_val = self.signal.value
+
+            if cls._cbhdls[self._path] is None:
+                cls._cbhdls[self._path] = register_value_change_callback(
+                    self.signal._handle, cls._distribute_callback, VALUE_CHANGE, self
+                )
+                if cls._cbhdls[self._path] is None:
+                    raise RuntimeError(f"Unable set up {self!s} Trigger")
+
+        @classmethod
+        def _distribute_callback(cls, trigger: "_EdgeProxyBase"):
+            path = trigger._path
+            instances = cls._instances[path]
+
+            # The simulator callback is one-shot
+            cls._cbhdls[path] = None
+
+            for instance in instances:
+                instance._do_callback()
+
+            # Keep the callback alive while any trigger still waits, e.g. a
+            # FallingEdge when only a RisingEdge has fired
+            if cls._cbhdls[path] is None:
+                for instance in instances:
+                    if instance in cls._can_fire:
+                        instance._prime_common()
+                        break
+
+        def _do_callback(self) -> None:
+            cls = type(self)
+            current = self.signal.value
+
+            if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
+                # A fired trigger waits no more, until primed again
+                cls._can_fire.discard(self)
+                self._last_val = current
+                self._fire()
+                return
+
+            self._last_val = current
+
         if hasattr(_EdgeBase, "_react"):
             def _prime(self) -> None:
-                cls = type(self)
+                self._prime_common()
 
-                cls._can_fire.add(self)
-
-                self._last_val = self.signal.value
-
-                if cls._cbhdls[self._path] is None:
-                    cls._cbhdls[self._path] = register_value_change_callback(
-                        self.signal._handle, cls._distribute_callback, VALUE_CHANGE, self
-                    )
-                    if cls._cbhdls[self._path] is None:
-                        raise RuntimeError(f"Unable set up {self!s} Trigger")
-
-            @classmethod
-            def _distribute_callback(cls, trigger: "_EdgeProxyBase"):
-                is_primed = False
-                path = trigger._path
-                instances = cls._instances[path]
-
-                cls._cbhdls[path] = None
-
-                for instance in instances:
-                    is_primed |= instance._do_callback()
-
-                if not is_primed:
-                    trigger._prime()
-
-            def _do_callback(self) -> bool:
-                cls = type(self)
-                did_callback = False
-                current = self.signal.value
-
-                if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
-                    self._react()
-                    did_callback = True
-
-                self._last_val = current
-                return did_callback
+            def _fire(self) -> None:
+                self._react()
         else:
             def _prime(self, callback: Callable) -> None:
-                cls = type(self)
+                self._callback = callback
+                self._prime_common()
 
-                cls._can_fire.add(self)
-
-                self._last_val = self.signal.value
-
-                if cls._cbhdls[self._path] is None:
-                    cls._cbhdls[self._path] = register_value_change_callback(
-                        self.signal._handle, lambda trigger: cls._distribute_callback(trigger, callback), VALUE_CHANGE, self
-                    )
-                    if cls._cbhdls[self._path] is None:
-                        raise RuntimeError(f"Unable set up {self!s} Trigger")
-
-            @classmethod
-            def _distribute_callback(cls, trigger: "_EdgeProxyBase", callback: Callable):
-                is_primed = False
-                path = trigger._path
-                instances = cls._instances[path]
-
-                cls._cbhdls[path] = None
-
-                for instance in instances:
-                    is_primed |= instance._do_callback(callback)
-
-                if not is_primed:
-                    trigger._prime(callback)
-
-            def _do_callback(self, callback: Callable) -> bool:
-                cls = type(self)
-                did_callback = False
-                current = self.signal.value
-
-                if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
-                    callback(self)
-                    did_callback = True
-
-                self._last_val = current
-                return did_callback
+            def _fire(self) -> None:
+                self._callback(self)
 
         def _unprime(self):
             self._can_fire.discard(self)
