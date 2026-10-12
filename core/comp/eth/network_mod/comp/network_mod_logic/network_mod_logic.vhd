@@ -543,8 +543,6 @@ begin
             MFB_REG_SIZE     => USER_REGION_SIZE,
             MFB_BLOCK_SIZE   => BLOCK_SIZE,
             MFB_ITEM_WIDTH   => ITEM_WIDTH,
-            INPUT_FIFO_SIZE  => 512,
-            MID_MFB_FIFOS_EN => not LL_MODE,
             RX_PAYLOAD_EN    => (others => true),
             IN_PIPE_EN       => not LL_MODE,
             OUT_PIPE_EN      => not LL_MODE,
