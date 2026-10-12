@@ -19,6 +19,19 @@ def propagateUserInterupt(err) {
     }
 }
 
+// Runs body with a time limit. An exceeded limit fails the component and does not end the whole job.
+def componentTimeout(hours, Closure body) {
+    def start = System.currentTimeMillis()
+    try {
+        timeout(time: hours, unit: 'HOURS') { body() }
+    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException err) {
+        if (System.currentTimeMillis() - start < hours * 3600 * 1000) {
+            throw err // user abort
+        }
+        error("Timeout of $hours hours has been exceeded")
+    }
+}
+
 // Jenkins configuration for multiple modules
 def commonPrekladVerRun(COMPONENTS) {
 
@@ -48,7 +61,7 @@ def commonPrekladVerRun(COMPONENTS) {
         def script = c[2]
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
-            timeout(time: 4, unit: 'HOURS') {
+            componentTimeout(4) {
                 stage("$name") {
                     dir("$path") {
                         def command = "vsim -c -do \"do $script; quit -f\" | grep -E \"(Verification finished successfully)|(VERIFICATION SUCCESS)\"\n"
@@ -146,7 +159,7 @@ def commonPrekladMultiVerRun(COMPONENTS, ofm_path = pwd()) {
         def coverage_reporter = "$ofm_path/python/coverage_reporter/coverage_reporter.py"
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
-            timeout(time: time_val, unit: 'HOURS') {
+            componentTimeout(time_val) {
                 stage("$name") {
                     dir("$path") {
                         def command = "python3 $multi_ver $fdo $pkg $settings -p \"$name\""
@@ -250,7 +263,7 @@ def commonPrekladHarpRun(COMPONENTS, ofm_path = pwd()) {
 
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
-            timeout(time: 4, unit: 'HOURS') {
+            componentTimeout(4) {
                 stage("$name") {
                     dir("$path") {
                         def command = "harp multiver"
@@ -392,7 +405,7 @@ def commonPrekladCocotbRun(COMPONENTS, ofm_path = pwd()) {
 
         // exec vsim
         try { // try-catch is a hack to continue even after the first failed verification
-            timeout(time: 4, unit: 'HOURS') {
+            componentTimeout(4) {
                 stage(multiver ? "cocotb (MULTIVER): $name" : "cocotb (VER): $name") {
                     dir("$path") {
                         try {
@@ -424,7 +437,11 @@ def commonPrekladCocotbRun(COMPONENTS, ofm_path = pwd()) {
 
                         if (!multiver) {
                             // get test results
-                            junit allowEmptyResults: true, testResults: "results.xml"
+                            // junit sets the build result to UNSTABLE when a test fails
+                            def test_summary = junit allowEmptyResults: true, testResults: "results.xml"
+                            if (test_summary.failCount > 0) {
+                                failed.add("$name")
+                            }
 
                             try {
                                 sh "test -f results.xml"
@@ -456,11 +473,11 @@ def commonPrekladCocotbRun(COMPONENTS, ofm_path = pwd()) {
     }
 
     // send out emails if failure is detected
-    if(currentBuild.result == "FAILURE") {
+    if(currentBuild.result in ["FAILURE", "UNSTABLE"]) {
         println "FAILED on components: ${failed}."
         emailext \
             recipientProviders: [culprits(), developers()],
-            to: 'ondrejschwarz@cesnet.cz',
+            to: 'ondrejschwarz@cesnet.cz,cabal@cesnet.cz',
             subject: "[Jenkins] ${currentBuild.currentResult} ${env.JOB_NAME} #${currentBuild.number}",
             body: """\
                 The build of the repository ${env.JOB_NAME} #${currentBuild.number} ends up with status ${currentBuild.currentResult} on components: ${failed}. You can find build log in the attachments.
