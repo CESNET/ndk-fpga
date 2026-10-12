@@ -56,6 +56,8 @@ entity CROSSBARX_CROSSBAR is
 
         CLK             : in  std_logic;
         CLK2            : in  std_logic;
+        -- Synchronous to CLK. When USE_CLK2 is set, RESET must stay active for at least as many
+        -- CLK cycles as the latency from RX_UINSTR_SRC_RDY to DST_BUF_WR_EN.
         RESET           : in  std_logic;
 
         -- =================================
@@ -112,6 +114,13 @@ architecture FULL of CROSSBARX_CROSSBAR is
 
     -- data transfer clock
     signal d_clk : std_logic;
+    -- reset of the data transmission path
+    signal d_rst : std_logic;
+
+    -- CLK phase detection
+    signal clk_tgl_reg         : std_logic := '0';
+    signal delayed_clk_tgl_reg : std_logic;
+    signal clk_tgl_d_reg       : std_logic := '0';
 
     -- control asynch register
     signal uinstr_src_word_reg  : slv_array_2d_t(2-1 downto 0)(SRC_BUF_ROWS-1 downto 0)(log2(SRC_BUF_COLS)-1 downto 0);
@@ -129,7 +138,7 @@ architecture FULL of CROSSBARX_CROSSBAR is
     signal delayed_uinstr_vld_reg       : slv_array_t   (2-1 downto 0)(DST_BUF_ROWS-1 downto 0);
 
     -- control plan select register
-    signal plan_sel_reg  : std_logic_vector(0 downto 0);
+    signal plan_sel_reg  : std_logic_vector(0 downto 0) := "0";
     signal plan_sel_regi : integer := 0;
 
     --------
@@ -141,7 +150,7 @@ architecture FULL of CROSSBARX_CROSSBAR is
     signal s_1_src_block_reg : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(SRC_BUF_ROWS)-1 downto 0);
     signal s_1_dst_be_reg    : slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
     signal s_1_dst_word_reg  : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
-    signal s_1_vld_reg       : std_logic_vector(DST_BUF_ROWS-1 downto 0);
+    signal s_1_vld_reg       : std_logic_vector(DST_BUF_ROWS-1 downto 0) := (others => '0');
 
     -- step 0 - wait for Source buffer read response
     -- The last (+1) item is only used for asynch connection when RD_LATENCY==0.
@@ -149,14 +158,14 @@ architecture FULL of CROSSBARX_CROSSBAR is
     signal s0_src_block_reg : slv_array_2d_t(RD_LATENCY+1-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(SRC_BUF_ROWS)-1 downto 0);
     signal s0_dst_be_reg    : slv_array_2d_t(RD_LATENCY+1-1 downto 0)(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
     signal s0_dst_word_reg  : slv_array_2d_t(RD_LATENCY+1-1 downto 0)(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
-    signal s0_vld_reg       : slv_array_t   (RD_LATENCY+1-1 downto 0)(DST_BUF_ROWS-1 downto 0);
+    signal s0_vld_reg       : slv_array_t   (RD_LATENCY+1-1 downto 0)(DST_BUF_ROWS-1 downto 0) := (others => (others => '0'));
 
     -- step 1 - Source buffer read data save
     signal s1_rot_sel_reg   : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(ROW_ITEMS)-1 downto 0);
     signal s1_src_block_reg : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(SRC_BUF_ROWS)-1 downto 0);
     signal s1_dst_be_reg    : slv_array_t(DST_BUF_ROWS-1 downto 0)(ROW_ITEMS-1 downto 0);
     signal s1_dst_word_reg  : slv_array_t(DST_BUF_ROWS-1 downto 0)(log2(DST_BUF_COLS)-1 downto 0);
-    signal s1_vld_reg       : std_logic_vector(DST_BUF_ROWS-1 downto 0);
+    signal s1_vld_reg       : std_logic_vector(DST_BUF_ROWS-1 downto 0) := (others => '0');
     signal s1_data_reg      : slv_array_t(SRC_BUF_ROWS-1 downto 0)(ROW_WIDTH-1 downto 0);
 
     -- step 2 - Source buffer blocks rotation
@@ -189,10 +198,15 @@ architecture FULL of CROSSBARX_CROSSBAR is
 begin
 
     -- data transfer clock select
+    -- With USE_CLK2, the data transmission path has no reset. RESET is used only on CLK.
+    -- Only zeros enter the path while RESET is active, and the path never stalls.
+    -- So all its valid registers are cleared before RESET ends.
     use_clk2_gen : if (USE_CLK2) generate
         d_clk <= CLK2;
+        d_rst <= '0';
     else generate
         d_clk <= CLK;
+        d_rst <= RESET;
     end generate;
 
     -- signals read on d_clk must be reassigned to compensate the 'delta' delay from d_clk in ModelSim simulation
@@ -220,17 +234,26 @@ begin
         end if;
     end process;
 
+    -- CLK phase detection, clk_tgl_reg inverts in every CLK cycle
+    clk_tgl_reg_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            clk_tgl_reg <= not clk_tgl_reg;
+        end if;
+    end process;
+
+    delayed_clk_tgl_reg <= clk_tgl_reg;
+
     -- control plan select register
+    -- Plan 0 is read on the d_clk edge in the middle of the CLK period.
+    -- Plan 1 is read on the d_clk edge that is aligned with the CLK edge.
+    -- When USE_CLK2==false only plan 0 is used.
     plan_sel_reg_pr : process (d_clk)
     begin
         if (rising_edge(d_clk)) then
-            -- when USE_CLK2==false only plan0 is used
+            clk_tgl_d_reg <= delayed_clk_tgl_reg;
             if (USE_CLK2) then
-                plan_sel_reg(0) <= not plan_sel_reg(0);
-            end if;
-
-            if (RESET = '1') then
-                plan_sel_reg(0) <= '0';
+                plan_sel_reg(0) <= delayed_clk_tgl_reg xor clk_tgl_d_reg;
             end if;
         end if;
     end process;
@@ -255,7 +278,7 @@ begin
                 SRC_BUF_RD_ADDR(i) <= delayed_uinstr_src_word_reg(plan_sel_regi)(i);
             end loop;
 
-            if (RESET = '1') then
+            if (d_rst = '1') then
                 s_1_vld_reg <= (others => '0');
             end if;
         end if;
@@ -283,7 +306,7 @@ begin
                     s0_vld_reg      (i) <= s0_vld_reg      (i+1);
                 end loop;
 
-                if (RESET = '1') then
+                if (d_rst = '1') then
                     s0_vld_reg <= (others => (others => '0'));
                 end if;
             end if;
@@ -314,7 +337,7 @@ begin
                 s1_data_reg(i) <= SRC_BUF_RD_DATA(i);
             end loop;
 
-            if (RESET = '1') then
+            if (d_rst = '1') then
                 s1_vld_reg <= (others => '0');
             end if;
         end if;
@@ -339,7 +362,7 @@ begin
         )
         port map (
             CLK   => d_clk,
-            RESET => RESET,
+            RESET => d_rst,
 
             RX_DATA     => slv_array_ser(s1_data_reg,SRC_BUF_ROWS,ROW_WIDTH),
             RX_SEL      => s1_src_block_reg(i),
@@ -381,7 +404,7 @@ begin
         )
         port map (
             CLK         => d_clk,
-            RESET       => RESET,
+            RESET       => d_rst,
 
             RX_DATA     => s2_data_reg(i),
             RX_SEL      => s2_rot_sel_reg(i),
@@ -402,5 +425,37 @@ begin
 
     end generate;
 
+    -- ----------------------------------------------------------------------------
+    -- DEBUG LOGIC
+    -- ----------------------------------------------------------------------------
+
+    -- pragma synthesis_off
+    reset_len_check_gen : if (USE_CLK2) generate
+        -- latency of the data transmission path in d_clk cycles
+        constant D_PATH_LATENCY : natural := 1+RD_LATENCY+1
+                                            +DATA_MUX_LATENCY+tsel(DATA_MUX_OUTPUT_REG_EN,1,0)
+                                            +DATA_ROTATION_LATENCY+tsel(DATA_ROTATION_OUTPUT_REG_EN,1,0);
+        -- uinstr_vld_reg needs 1 CLK cycle. The data transmission path needs the rest.
+        constant RESET_MIN_LEN  : natural := 1+div_roundup(D_PATH_LATENCY,2);
+
+        signal reset_len : natural := 0;
+    begin
+        reset_len_pr : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    if (reset_len < RESET_MIN_LEN) then
+                        reset_len <= reset_len + 1;
+                    end if;
+                else
+                    assert (reset_len = 0 or reset_len >= RESET_MIN_LEN)
+                        report "CROSSBARX_CROSSBAR: Keep RESET active for at least " & integer'image(RESET_MIN_LEN) & " CLK cycles when USE_CLK2 is set."
+                        severity failure;
+                    reset_len <= 0;
+                end if;
+            end if;
+        end process;
+    end generate;
+    -- pragma synthesis_on
 
 end architecture;

@@ -130,6 +130,8 @@ entity CROSSBARX is
         CLK                : in  std_logic;
         -- Only used when USE_CLK2==True and USE_CLK_ARB==False
         CLK2               : in  std_logic := '0';
+        -- Synchronous to CLK. When USE_CLK2==True and USE_CLK_ARB==False, RESET must stay active
+        -- for at least 3+(RD_LATENCY+DATA_MUX_LAT+DATA_ROT_LAT+1)/2 CLK cycles.
         RESET              : in  std_logic;
 
         -- Only used when USE_CLK_ARB==True
