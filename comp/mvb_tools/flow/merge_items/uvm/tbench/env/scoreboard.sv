@@ -36,10 +36,10 @@ class scoreboard #(RX0_ITEM_WIDTH, RX1_ITEM_WIDTH, TX_ITEM_WIDTH) extends uvm_sc
     endfunction
 
     function int unsigned success();
-        int unsigned ret = 0;
-        ret |= cmp .success();
-        ret |= cmp0.success();
-        ret |= cmp1.success();
+        int unsigned ret = 1;
+        ret &= cmp .success();
+        ret &= cmp0.success();
+        ret &= cmp1.success();
         return ret;
     endfunction
 

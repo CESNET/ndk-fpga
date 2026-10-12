@@ -298,13 +298,13 @@ class scoreboard #(
         int unsigned ret = 1;
 
         for(int it = 0; it < ETH_STREAMS; it++) begin
-            ret |= eth_mvb_cmp[it].success();
-            ret |= eth_mfb_cmp[it].success();
+            ret &= eth_mvb_cmp[it].success();
+            ret &= eth_mfb_cmp[it].success();
         end
 
         for(int it = 0; it < DMA_STREAMS; it++) begin
-            ret |= dma_mvb_cmp[it].success();
-            ret |= dma_mfb_cmp[it].success();
+            ret &= dma_mvb_cmp[it].success();
+            ret &= dma_mfb_cmp[it].success();
         end
         ret &= (errors == 0);
 

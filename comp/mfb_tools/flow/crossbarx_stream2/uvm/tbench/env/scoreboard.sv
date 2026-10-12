@@ -33,9 +33,9 @@ class scoreboard #(RX_MFB_ITEM_W, RX_MVB_ITEM_W, USERMETA_W, MOD_W) extends uvm_
     endfunction
 
     function int unsigned success();
-        int unsigned ret = 0;
-        ret |= data_cmp.success();
-        ret |= meta_cmp.success();
+        int unsigned ret = 1;
+        ret &= data_cmp.success();
+        ret &= meta_cmp.success();
         return ret;
     endfunction
 

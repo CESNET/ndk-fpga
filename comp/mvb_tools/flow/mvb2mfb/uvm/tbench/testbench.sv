@@ -9,17 +9,7 @@ import uvm_pkg::*;
 `include "uvm_macros.svh"
 import test::*;
 
-module testbench #(
-    int unsigned MVB_ITEMS,
-    int unsigned MVB_ITEM_WIDTH_RAW,
-    int unsigned MFB_REGIONS,
-    int unsigned MFB_REGION_SIZE,
-    int unsigned MFB_BLOCK_SIZE,
-    int unsigned MFB_ITEM_WIDTH,
-    int unsigned MFB_ALIGNMENT,
-    int unsigned MFB_META_WIDTH,
-    string DEVICE
-);
+module testbench;
 
     localparam int unsigned MVB_ITEM_WIDTH = MVB_ITEM_WIDTH_RAW+MFB_META_WIDTH;
 

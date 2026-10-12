@@ -35,9 +35,9 @@ class scoreboard #(HEADER_SIZE, MFB_ITEM_WIDTH, MVB_ITEM_WIDTH, VERBOSITY) exten
     endfunction
 
     function int unsigned success();
-        int unsigned ret = 0;
-        ret |= data_cmp.success();
-        ret |= meta_cmp.success();
+        int unsigned ret = 1;
+        ret &= data_cmp.success();
+        ret &= meta_cmp.success();
         return ret;
     endfunction
 
