@@ -59,7 +59,7 @@ def do_fix():
 
 # cocotb 2.0-only defines
 if cocotb.__version__ >= "2.0.0":
-    from cocotb.types import Logic, LogicArray
+    from cocotb.types import Array, Logic, LogicArray
     from cocotb.handle import LogicObject, ArrayObject, Immediate, Deposit
     from cocotb.triggers import GPITrigger
     from cocotb._gpi_triggers import _EdgeBase
@@ -253,6 +253,8 @@ if cocotb.__version__ >= "2.0.0":
             self._array_idx = array_idx
 
         def __len__(self):
+            if self._array_idx is None and isinstance(self._handle, ArrayObject):
+                return len(self._handle)
             return len(self.value)
 
         def __getitem__(self, index: int):
@@ -270,10 +272,12 @@ if cocotb.__version__ >= "2.0.0":
 
         @property
         def value(self):
+            val = self._handle.value
             if self._array_idx is not None:
-                return LogicArray(str(self._handle.value[self._array_idx]))
-            else:
-                return LogicArray(str(self._handle.value))
+                val = val[self._array_idx]
+            if isinstance(val, Array):
+                return val
+            return LogicArray(str(val))
 
         @value.setter
         def value(self, val):
