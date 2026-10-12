@@ -29,3 +29,22 @@ MFB Merger Simple GEN
 ---------------------
 
 .. vhdl:autoentity:: MFB_MERGER_SIMPLE_GEN
+
+Using IN_FIFO_DEPTH and STORED_EOF_EN parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With ``IN_FIFO_DEPTH > 0``, each RX input has an MFB FIFO with this depth in words.
+
+With ``STORED_EOF_EN = True``, the merger starts a packet only when the EOF of this packet is
+already in the input FIFO. A started packet then needs no data that are not stored yet.
+The merger counts the EOFs in each input FIFO itself.
+
+Use this mode when the RX inputs depend on each other. An example is a source that sends
+packets to two mergers through one splitter. A merger that waits in the middle of a packet
+can stop this source. The source can then stop the other merger.
+
+The merger masks a SOF only when another RX input has data to send. Without such data, the
+merger waits and then sends the held word without a change.
+
+``STORED_EOF_EN = True`` requires ``MASKING_EN = True``. Each input FIFO must hold a packet of
+``PKT_SIZE_MAX`` items, so that a full FIFO always contains an EOF.
