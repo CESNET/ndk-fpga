@@ -65,6 +65,23 @@ class Bus():
             p = self._w.cocotb2path(h, sl)
             self._w.add_wave(p, **(kwargs | dict(groups=groups, label=s)))
 
+    def _add_transfer(self, terms, item=None, **kwargs):
+        """Adds a "transfer" virtual function, high while all present terms
+        are. Terms are (handle, slice) pairs, a None handle is left out."""
+        terms = [t for t in terms if t[0] is not None]
+        if not terms:
+            return
+
+        parts = [self._prefix, 'transfer']
+        if self._index is not None:
+            parts += [str(i) for i in (self._index if isinstance(self._index, list) else [self._index])]
+        if item is not None:
+            parts.append(str(item))
+
+        expr = " and ".join(self._w.cocotb2path(h, sl) for h, sl in terms)
+        name = self._w.cmd(f"virtual function {{{expr}}} {'__'.join(parts)}")
+        self._w.add_wave(name, **(kwargs | dict(label='transfer', color='yellow')))
+
     def _get_groups(self, **kwargs):
         groups = kwargs.get("groups", []).copy()
         if self._label is not None:
@@ -96,8 +113,7 @@ class MvbBus(Bus):
         for v in range(len(vld)):
             groups = self._get_groups(**kwargs)
             groups.append(v)
-            ho = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr)} and {self._w.cocotb2path(dr)} and {self._w.cocotb2path(vld[v])}}} handover")
-            self._w.add_wave(ho, **(kwargs | dict(groups=groups, label='handover', color='yellow')))
+            self._add_transfer([(sr, ()), (dr, ()), (vld[v], ())], item=v if len(vld) > 1 else None, **(kwargs | dict(groups=groups)))
             for name, ran in self._ITEMS:
                 bus = [(o, range(ran.start + off * v, ran.stop + off * v))]
                 self._w.add_wave(f"{name}", **(kwargs | dict(groups=groups, bus=bus)))
@@ -117,8 +133,7 @@ class MfbBus(Bus):
         sr, srs = self._get_handle_slice('SRC_RDY')
         dr, drs = self._get_handle_slice('DST_RDY')
 
-        name = self._w.cmd(f"virtual function {{{self._w.cocotb2path(sr, srs)} and {self._w.cocotb2path(dr, drs)}}} transfer")
-        self._w.add_wave(name, **(kwargs | dict(groups=groups, label='transfer', color='yellow')))
+        self._add_transfer([(sr, srs), (dr, drs)], **(kwargs | dict(groups=groups)))
 
     def clear(self):
         self._sum_pkts = 0
