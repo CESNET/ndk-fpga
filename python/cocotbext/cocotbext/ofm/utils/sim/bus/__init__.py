@@ -8,6 +8,8 @@ import cocotb
 import cocotb.triggers
 import cocotb.utils
 
+from cocotb.types import Array
+
 from .. import modelsim as ms
 
 from cocotbext.ofm.mfb.monitors import MFBMonitor
@@ -77,6 +79,12 @@ class MvbBus(Bus):
     _ITEMS = []
 
     def add_wave(self, **kwargs):
+        # VLD defines the item dimension, one bit per item. An array of
+        # vectors means an array of buses, whose index must be given.
+        vld = self._get_handle('VLD')
+        if vld is not None and isinstance(vld.value, Array):
+            raise ValueError(f"{type(self).__name__}: {self._prefix}{self._sep}VLD is an array of buses, pass the bus index")
+
         super().add_wave(**kwargs)
         o = self._get_handle('DATA')
         sr = self._get_handle('SRC_RDY')
