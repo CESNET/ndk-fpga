@@ -259,7 +259,11 @@ if cocotb.__version__ >= "2.0.0":
 
         def __getitem__(self, index: int):
             if self._array_idx is not None:
-                return SignalProxy(self._handle[self._array_idx])[index]
+                if isinstance(self._handle, ArrayObject):
+                    return SignalProxy(self._handle[self._array_idx])[index]
+                if index != 0:
+                    raise IndexError(f"{self._path} is a single bit, index {index} is out of range")
+                return LogicProxy(self._handle, self._array_idx)
             if isinstance(self._handle, ArrayObject):
                 return SignalProxy(self._handle, index)
             return LogicProxy(self._handle, index)
