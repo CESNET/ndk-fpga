@@ -256,6 +256,8 @@ if cocotb.__version__ >= "2.0.0":
             return len(self.value)
 
         def __getitem__(self, index: int):
+            if self._array_idx is not None:
+                return SignalProxy(self._handle[self._array_idx])[index]
             if isinstance(self._handle, ArrayObject):
                 return SignalProxy(self._handle, index)
             return LogicProxy(self._handle, index)
