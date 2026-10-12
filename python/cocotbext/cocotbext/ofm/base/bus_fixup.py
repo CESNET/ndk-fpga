@@ -83,7 +83,9 @@ if cocotb.__version__ >= "2.0.0":
             GPITrigger.__init__(self)
 
             self.signal = signal
-            self._last_val = int(self.signal.value)
+            # Kept as Logic: int() resolves U/X by COCOTB_RESOLVE_X (or raises
+            # when unset), which would distort edges on undriven signals
+            self._last_val = self.signal.value
 
             if self._path not in cls._instances.keys():
                 cls._instances[self._path] = list()
@@ -101,7 +103,7 @@ if cocotb.__version__ >= "2.0.0":
 
                 cls._can_fire.add(self)
 
-                self._last_val = int(self.signal.value)
+                self._last_val = self.signal.value
 
                 if cls._cbhdls[self._path] is None:
                     cls._cbhdls[self._path] = register_value_change_callback(
@@ -127,7 +129,7 @@ if cocotb.__version__ >= "2.0.0":
             def _do_callback(self) -> bool:
                 cls = type(self)
                 did_callback = False
-                current = int(self.signal.value)
+                current = self.signal.value
 
                 if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
                     self._react()
@@ -141,7 +143,7 @@ if cocotb.__version__ >= "2.0.0":
 
                 cls._can_fire.add(self)
 
-                self._last_val = int(self.signal.value)
+                self._last_val = self.signal.value
 
                 if cls._cbhdls[self._path] is None:
                     cls._cbhdls[self._path] = register_value_change_callback(
@@ -167,7 +169,7 @@ if cocotb.__version__ >= "2.0.0":
             def _do_callback(self, callback: Callable) -> bool:
                 cls = type(self)
                 did_callback = False
-                current = int(self.signal.value)
+                current = self.signal.value
 
                 if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
                     callback(self)
@@ -192,7 +194,8 @@ if cocotb.__version__ >= "2.0.0":
             return signal.rising_edge
 
         def _is_edge_event(self, last_value, current_value) -> bool:
-            return last_value == 0 and current_value == 1
+            # Same as native RisingEdge: any change to '1', including X -> 1
+            return last_value != current_value and current_value == Logic("1")
 
     class FallingEdgeProxy(_EdgeProxyBase):
         _edge_type = FALLING
@@ -207,7 +210,8 @@ if cocotb.__version__ >= "2.0.0":
             return signal.falling_edge
 
         def _is_edge_event(self, last_value, current_value) -> bool:
-            return last_value == 1 and current_value == 0
+            # Same as native FallingEdge: any change to '0', including X -> 0
+            return last_value != current_value and current_value == Logic("0")
 
     class LogicProxy(LogicObject):
         _instances = {}
