@@ -1,0 +1,197 @@
+package require -exact qsys 21.3
+
+array set PARAMS $IP_PARAMS_L
+source $PARAMS(IP_COMMON_TCL)
+
+# create the system "noc_initiator"
+proc do_create_noc_initiator {device family ipname filename} {
+	# create the system
+	create_system $ipname
+	set_project_property BOARD {}
+	set_project_property DEVICE $device
+	set_project_property DEVICE_FAMILY $family
+	set_project_property HIDE_FROM_IP_CATALOG {true}
+	set_use_testbench_naming_pattern 0 {}
+
+	# add HDL parameters
+
+	# add the components
+	add_instance intel_noc_initiator_0 intel_noc_initiator
+	set_instance_parameter_value intel_noc_initiator_0 {AXI4_DATA_MODE} {AXI4_DATA_MODE_256}
+	set_instance_parameter_value intel_noc_initiator_0 {AXI4_HANDSHAKE} {AXI4_HANDSHAKE_STANDARD}
+	set_instance_parameter_value intel_noc_initiator_0 {DFD_FIFO_BYPASS} {0}
+	set_instance_parameter_value intel_noc_initiator_0 {INDEPENDENT_WIDE_INTERFACE_CLOCK} {1}
+	set_instance_parameter_value intel_noc_initiator_0 {INDIVIDUAL_AXI_CLKRESET} {1}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU0_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU0_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU0_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU10_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU10_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU10_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU11_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU11_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU11_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU12_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU12_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU12_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU13_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU13_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU13_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU14_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU14_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU14_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU15_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU15_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU15_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU16_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU16_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU16_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU17_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU17_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU17_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU18_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU18_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU18_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU19_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU19_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU19_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU1_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU1_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU1_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU20_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU20_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU20_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU21_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU21_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU21_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU22_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU22_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU22_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU2_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU2_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU2_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU3_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU3_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU3_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU4_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU4_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU4_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU5_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU5_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU5_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU6_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU6_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU6_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU7_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU7_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU7_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU8_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU8_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU8_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU9_PEND_TRANS_RD_VAL} {128}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU9_PEND_TRANS_WR_VAL} {64}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_INIU9_THROTTLE_MODE} {NOC_INIU_THROTTLE_MODE_STATIC_BW_100}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_QOS_MODE} {NOC_QOS_MODE_SOCKET}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_QOS_READ_PRIORITY} {0}
+	set_instance_parameter_value intel_noc_initiator_0 {NOC_QOS_WRITE_PRIORITY} {0}
+	set_instance_parameter_value intel_noc_initiator_0 {NUM_AXI4LITE_IF} {0}
+	set_instance_parameter_value intel_noc_initiator_0 {NUM_AXI4_IF} {16}
+	set_instance_property intel_noc_initiator_0 AUTO_EXPORT true
+
+	# add wirelevel expressions
+
+	# preserve ports for debug
+
+	# add the exports
+	set_interface_property i0_axi4noc EXPORT_OF intel_noc_initiator_0.i0_axi4noc
+	set_interface_property i1_axi4noc EXPORT_OF intel_noc_initiator_0.i1_axi4noc
+	set_interface_property i2_axi4noc EXPORT_OF intel_noc_initiator_0.i2_axi4noc
+	set_interface_property i3_axi4noc EXPORT_OF intel_noc_initiator_0.i3_axi4noc
+	set_interface_property i4_axi4noc EXPORT_OF intel_noc_initiator_0.i4_axi4noc
+	set_interface_property i5_axi4noc EXPORT_OF intel_noc_initiator_0.i5_axi4noc
+	set_interface_property i6_axi4noc EXPORT_OF intel_noc_initiator_0.i6_axi4noc
+	set_interface_property i7_axi4noc EXPORT_OF intel_noc_initiator_0.i7_axi4noc
+	set_interface_property i8_axi4noc EXPORT_OF intel_noc_initiator_0.i8_axi4noc
+	set_interface_property i9_axi4noc EXPORT_OF intel_noc_initiator_0.i9_axi4noc
+	set_interface_property i10_axi4noc EXPORT_OF intel_noc_initiator_0.i10_axi4noc
+	set_interface_property i11_axi4noc EXPORT_OF intel_noc_initiator_0.i11_axi4noc
+	set_interface_property i12_axi4noc EXPORT_OF intel_noc_initiator_0.i12_axi4noc
+	set_interface_property i13_axi4noc EXPORT_OF intel_noc_initiator_0.i13_axi4noc
+	set_interface_property i14_axi4noc EXPORT_OF intel_noc_initiator_0.i14_axi4noc
+	set_interface_property i15_axi4noc EXPORT_OF intel_noc_initiator_0.i15_axi4noc
+	set_interface_property s0_axi4 EXPORT_OF intel_noc_initiator_0.s0_axi4
+	set_interface_property s1_axi4 EXPORT_OF intel_noc_initiator_0.s1_axi4
+	set_interface_property s2_axi4 EXPORT_OF intel_noc_initiator_0.s2_axi4
+	set_interface_property s3_axi4 EXPORT_OF intel_noc_initiator_0.s3_axi4
+	set_interface_property s4_axi4 EXPORT_OF intel_noc_initiator_0.s4_axi4
+	set_interface_property s5_axi4 EXPORT_OF intel_noc_initiator_0.s5_axi4
+	set_interface_property s6_axi4 EXPORT_OF intel_noc_initiator_0.s6_axi4
+	set_interface_property s7_axi4 EXPORT_OF intel_noc_initiator_0.s7_axi4
+	set_interface_property s8_axi4 EXPORT_OF intel_noc_initiator_0.s8_axi4
+	set_interface_property s9_axi4 EXPORT_OF intel_noc_initiator_0.s9_axi4
+	set_interface_property s10_axi4 EXPORT_OF intel_noc_initiator_0.s10_axi4
+	set_interface_property s11_axi4 EXPORT_OF intel_noc_initiator_0.s11_axi4
+	set_interface_property s12_axi4 EXPORT_OF intel_noc_initiator_0.s12_axi4
+	set_interface_property s13_axi4 EXPORT_OF intel_noc_initiator_0.s13_axi4
+	set_interface_property s14_axi4 EXPORT_OF intel_noc_initiator_0.s14_axi4
+	set_interface_property s15_axi4 EXPORT_OF intel_noc_initiator_0.s15_axi4
+	set_interface_property s0_axi4_aclk EXPORT_OF intel_noc_initiator_0.s0_axi4_aclk
+	set_interface_property s0_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s0_axi4_aresetn
+	set_interface_property s1_axi4_aclk EXPORT_OF intel_noc_initiator_0.s1_axi4_aclk
+	set_interface_property s1_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s1_axi4_aresetn
+	set_interface_property s2_axi4_aclk EXPORT_OF intel_noc_initiator_0.s2_axi4_aclk
+	set_interface_property s2_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s2_axi4_aresetn
+	set_interface_property s3_axi4_aclk EXPORT_OF intel_noc_initiator_0.s3_axi4_aclk
+	set_interface_property s3_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s3_axi4_aresetn
+	set_interface_property s4_axi4_aclk EXPORT_OF intel_noc_initiator_0.s4_axi4_aclk
+	set_interface_property s4_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s4_axi4_aresetn
+	set_interface_property s5_axi4_aclk EXPORT_OF intel_noc_initiator_0.s5_axi4_aclk
+	set_interface_property s5_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s5_axi4_aresetn
+	set_interface_property s6_axi4_aclk EXPORT_OF intel_noc_initiator_0.s6_axi4_aclk
+	set_interface_property s6_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s6_axi4_aresetn
+	set_interface_property s7_axi4_aclk EXPORT_OF intel_noc_initiator_0.s7_axi4_aclk
+	set_interface_property s7_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s7_axi4_aresetn
+	set_interface_property s8_axi4_aclk EXPORT_OF intel_noc_initiator_0.s8_axi4_aclk
+	set_interface_property s8_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s8_axi4_aresetn
+	set_interface_property s9_axi4_aclk EXPORT_OF intel_noc_initiator_0.s9_axi4_aclk
+	set_interface_property s9_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s9_axi4_aresetn
+	set_interface_property s10_axi4_aclk EXPORT_OF intel_noc_initiator_0.s10_axi4_aclk
+	set_interface_property s10_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s10_axi4_aresetn
+	set_interface_property s11_axi4_aclk EXPORT_OF intel_noc_initiator_0.s11_axi4_aclk
+	set_interface_property s11_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s11_axi4_aresetn
+	set_interface_property s12_axi4_aclk EXPORT_OF intel_noc_initiator_0.s12_axi4_aclk
+	set_interface_property s12_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s12_axi4_aresetn
+	set_interface_property s13_axi4_aclk EXPORT_OF intel_noc_initiator_0.s13_axi4_aclk
+	set_interface_property s13_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s13_axi4_aresetn
+	set_interface_property s14_axi4_aclk EXPORT_OF intel_noc_initiator_0.s14_axi4_aclk
+	set_interface_property s14_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s14_axi4_aresetn
+	set_interface_property s15_axi4_aclk EXPORT_OF intel_noc_initiator_0.s15_axi4_aclk
+	set_interface_property s15_axi4_aresetn EXPORT_OF intel_noc_initiator_0.s15_axi4_aresetn
+
+	# set values for exposed HDL parameters
+
+	# set the the module properties
+	set_module_property BONUS_DATA {<?xml version="1.0" encoding="UTF-8"?>
+<bonusData>
+ <element __value="intel_noc_initiator_0">
+  <datum __value="_sortIndex" value="0" type="int" />
+ </element>
+</bonusData>
+}
+	set_module_property FILE {$filename}
+	set_module_property GENERATION_ID {0x00000000}
+	set_module_property NAME {$ipname}
+
+	# save the system
+	sync_sysinfo_parameters
+	save_system $ipname
+}
+
+proc do_set_exported_interface_sysinfo_parameters {} {
+}
+
+# create all the systems, from bottom up
+do_create_noc_initiator $PARAMS(IP_DEVICE) $PARAMS(IP_DEVICE_FAMILY) $PARAMS(IP_COMP_NAME) [get_ip_filename $PARAMS(IP_COMP_NAME)]
+
+# set system info parameters on exported interface, from bottom up
+do_set_exported_interface_sysinfo_parameters
