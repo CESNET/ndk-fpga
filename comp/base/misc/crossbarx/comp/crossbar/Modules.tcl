@@ -18,3 +18,6 @@ set COMPONENTS [list \
 
 # Source files for implemented component
 set MOD "$MOD $ENTITY_BASE/crossbar.vhd"
+
+lappend SRCS(CONSTR_QUARTUS) [list "$ENTITY_BASE/crossbar.sdc" SDC_ENTITY_FILE CROSSBARX_CROSSBAR]
+lappend SRCS(CONSTR_VIVADO) [list "$ENTITY_BASE/crossbar.tcl" SCOPED_TO_REF CROSSBARX_CROSSBAR PROCESSING_ORDER LATE]
