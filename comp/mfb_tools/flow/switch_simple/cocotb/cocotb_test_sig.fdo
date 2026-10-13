@@ -1,0 +1,14 @@
+# cocotb_test_sig.fdo : Include file with signals
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /mfb_switch_simple/*
+add_wave -group {MERGER0} -noupdate -hex /mfb_switch_simple/en_g/output_g(0)/merge_i/*
+add_wave -group {MERGER1} -noupdate -hex /mfb_switch_simple/en_g/output_g(1)/merge_i/*
+
+config wave -signalnamewidth 1

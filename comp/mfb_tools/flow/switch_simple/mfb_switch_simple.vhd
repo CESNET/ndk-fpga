@@ -12,22 +12,33 @@ library work;
 use work.type_pack.all;
 use work.math_pack.all;
 
+-- The MFB_SWITCH_SIMPLE component sends each packet from one of the RX inputs
+-- to the TX output that RX_MFB_SEL selects. Each TX output has one
+-- MFB_MERGER_SIMPLE_GEN with an input FIFO for each RX input. The merger starts
+-- a packet only when the EOF of this packet is already in the FIFO. So a started
+-- packet never waits for an RX input that waits for another TX output.
+-- PKT_SIZE_MAX sets the size of the longest packet. Each FIFO must hold this packet.
+--
 entity MFB_SWITCH_SIMPLE is
     generic (
-        PORTS       : natural := 2;
-        REGIONS     : natural := 4;
-        REGION_SIZE : natural := 8;
-        BLOCK_SIZE  : natural := 8;
-        ITEM_WIDTH  : natural := 8;
-        META_WIDTH  : natural := 1;
-        FIFO_DEPTH  : natural := 512;
+        PORTS        : natural := 2;
+        REGIONS      : natural := 4;
+        REGION_SIZE  : natural := 8;
+        BLOCK_SIZE   : natural := 8;
+        ITEM_WIDTH   : natural := 8;
+        META_WIDTH   : natural := 1;
+        -- Depth of the FIFO for each pair of an RX input and a TX output in words.
+        FIFO_DEPTH   : natural := 512;
+        -- Maximum size of a packet in MFB items.
+        PKT_SIZE_MAX : natural := 2**14;
         -- Enable masking SOF and EOF due to switch to the other input.
-        MASKING_EN  : boolean := True;
+        -- The switch requires True.
+        MASKING_EN   : boolean := True;
         -- Maximum amount of clock periods with destination ready before
         -- it tries to switch to the other input.
-        CNT_MAX     : integer := 64;
+        CNT_MAX      : integer := 64;
         -- FPGA device name: ULTRASCALE, STRATIX10, AGILEX, ...
-        DEVICE      : string := "AGILEX"
+        DEVICE       : string := "AGILEX"
     );
     port (
         -- =====================================================================
@@ -65,7 +76,7 @@ end entity;
 
 architecture FULL of MFB_SWITCH_SIMPLE is
 
-    constant SW_PATHS : natural := 2**PORTS;
+    constant SW_PATHS : natural := PORTS*PORTS;
 
     signal sw_mfb_meta_arr    : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*META_WIDTH-1 downto 0);
     signal sw_mfb_data_arr    : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
@@ -75,15 +86,6 @@ architecture FULL of MFB_SWITCH_SIMPLE is
     signal sw_mfb_eof_pos_arr : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*log2(REGION_SIZE*BLOCK_SIZE)-1 downto 0);
     signal sw_mfb_src_rdy_arr : std_logic_vector(SW_PATHS-1 downto 0);
     signal sw_mfb_dst_rdy_arr : std_logic_vector(SW_PATHS-1 downto 0);
-
-    signal fo_mfb_meta_arr    : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*META_WIDTH-1 downto 0);
-    signal fo_mfb_data_arr    : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    signal fo_mfb_sof_arr     : slv_array_t(SW_PATHS-1 downto 0)(REGIONS-1 downto 0);
-    signal fo_mfb_eof_arr     : slv_array_t(SW_PATHS-1 downto 0)(REGIONS-1 downto 0);
-    signal fo_mfb_sof_pos_arr : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*max(1, log2(REGION_SIZE))-1 downto 0);
-    signal fo_mfb_eof_pos_arr : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*log2(REGION_SIZE*BLOCK_SIZE)-1 downto 0);
-    signal fo_mfb_src_rdy_arr : std_logic_vector(SW_PATHS-1 downto 0);
-    signal fo_mfb_dst_rdy_arr : std_logic_vector(SW_PATHS-1 downto 0);
 
     signal mx_mfb_meta_arr    : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*META_WIDTH-1 downto 0);
     signal mx_mfb_data_arr    : slv_array_t(SW_PATHS-1 downto 0)(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
@@ -134,52 +136,16 @@ begin
             );
         end generate;
 
-        fifo_g : for ii in 0 to SW_PATHS-1 generate
-            fifo_i : entity work.MFB_FIFOX
-            generic map (
-                REGIONS     => REGIONS,
-                REGION_SIZE => REGION_SIZE,
-                BLOCK_SIZE  => BLOCK_SIZE,
-                ITEM_WIDTH  => ITEM_WIDTH,
-                META_WIDTH  => META_WIDTH,
-                FIFO_DEPTH  => FIFO_DEPTH,
-                RAM_TYPE    => "AUTO",
-                DEVICE      => DEVICE
-            )
-            port map (
-                CLK         => CLK,
-                RST         => RESET,
-
-                RX_DATA     => sw_mfb_data_arr(ii),
-                RX_META     => sw_mfb_meta_arr(ii),
-                RX_SOF_POS  => sw_mfb_sof_pos_arr(ii),
-                RX_EOF_POS  => sw_mfb_eof_pos_arr(ii),
-                RX_SOF      => sw_mfb_sof_arr(ii),
-                RX_EOF      => sw_mfb_eof_arr(ii),
-                RX_SRC_RDY  => sw_mfb_src_rdy_arr(ii),
-                RX_DST_RDY  => sw_mfb_dst_rdy_arr(ii),
-
-                TX_DATA     => fo_mfb_data_arr(ii),
-                TX_META     => fo_mfb_meta_arr(ii),
-                TX_SOF_POS  => fo_mfb_sof_pos_arr(ii),
-                TX_EOF_POS  => fo_mfb_eof_pos_arr(ii),
-                TX_SOF      => fo_mfb_sof_arr(ii),
-                TX_EOF      => fo_mfb_eof_arr(ii),
-                TX_SRC_RDY  => fo_mfb_src_rdy_arr(ii),
-                TX_DST_RDY  => fo_mfb_dst_rdy_arr(ii)
-            );
-        end generate;
-
         matrix_g : for ii in 0 to PORTS-1 generate
             matrix_g2 : for jj in 0 to PORTS-1 generate
-                mx_mfb_data_arr(ii*PORTS+jj)    <= fo_mfb_data_arr(jj*PORTS+ii);
-                mx_mfb_meta_arr(ii*PORTS+jj)    <= fo_mfb_meta_arr(jj*PORTS+ii);
-                mx_mfb_sof_pos_arr(ii*PORTS+jj) <= fo_mfb_sof_pos_arr(jj*PORTS+ii);
-                mx_mfb_eof_pos_arr(ii*PORTS+jj) <= fo_mfb_eof_pos_arr(jj*PORTS+ii);
-                mx_mfb_sof_arr(ii*PORTS+jj)     <= fo_mfb_sof_arr(jj*PORTS+ii);
-                mx_mfb_eof_arr(ii*PORTS+jj)     <= fo_mfb_eof_arr(jj*PORTS+ii);
-                mx_mfb_src_rdy_arr(ii*PORTS+jj) <= fo_mfb_src_rdy_arr(jj*PORTS+ii);
-                fo_mfb_dst_rdy_arr(jj*PORTS+ii) <= mx_mfb_dst_rdy_arr(ii*PORTS+jj);
+                mx_mfb_data_arr(ii*PORTS+jj)    <= sw_mfb_data_arr(jj*PORTS+ii);
+                mx_mfb_meta_arr(ii*PORTS+jj)    <= sw_mfb_meta_arr(jj*PORTS+ii);
+                mx_mfb_sof_pos_arr(ii*PORTS+jj) <= sw_mfb_sof_pos_arr(jj*PORTS+ii);
+                mx_mfb_eof_pos_arr(ii*PORTS+jj) <= sw_mfb_eof_pos_arr(jj*PORTS+ii);
+                mx_mfb_sof_arr(ii*PORTS+jj)     <= sw_mfb_sof_arr(jj*PORTS+ii);
+                mx_mfb_eof_arr(ii*PORTS+jj)     <= sw_mfb_eof_arr(jj*PORTS+ii);
+                mx_mfb_src_rdy_arr(ii*PORTS+jj) <= sw_mfb_src_rdy_arr(jj*PORTS+ii);
+                sw_mfb_dst_rdy_arr(jj*PORTS+ii) <= mx_mfb_dst_rdy_arr(ii*PORTS+jj);
             end generate;
         end generate;
 
@@ -193,7 +159,11 @@ begin
                 MFB_ITEM_WIDTH  => ITEM_WIDTH,
                 MFB_META_WIDTH  => META_WIDTH,
                 MASKING_EN      => MASKING_EN,
-                CNT_MAX         => CNT_MAX
+                CNT_MAX         => CNT_MAX,
+                IN_FIFO_DEPTH   => FIFO_DEPTH,
+                STORED_EOF_EN   => True,
+                PKT_SIZE_MAX    => PKT_SIZE_MAX,
+                DEVICE          => DEVICE
             )
             port map (
                 CLK            => CLK,
