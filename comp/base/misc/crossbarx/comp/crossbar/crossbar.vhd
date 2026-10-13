@@ -187,6 +187,24 @@ architecture FULL of CROSSBARX_CROSSBAR is
 
     -- ----------------------------------------------------------------------------
 
+    -- With USE_CLK2, each plan has its own uinstr registers, because constraints for plan 0 and plan 1 are different.
+    -- Quartus
+    attribute dont_merge : boolean;
+    attribute dont_merge of uinstr_src_word_reg  : signal is USE_CLK2;
+    attribute dont_merge of uinstr_rot_sel_reg   : signal is USE_CLK2;
+    attribute dont_merge of uinstr_src_block_reg : signal is USE_CLK2;
+    attribute dont_merge of uinstr_dst_be_reg    : signal is USE_CLK2;
+    attribute dont_merge of uinstr_dst_word_reg  : signal is USE_CLK2;
+    attribute dont_merge of uinstr_vld_reg       : signal is USE_CLK2;
+    -- Vivado
+    attribute dont_touch : string;
+    attribute dont_touch of uinstr_src_word_reg  : signal is tsel(USE_CLK2, "true", "false");
+    attribute dont_touch of uinstr_rot_sel_reg   : signal is tsel(USE_CLK2, "true", "false");
+    attribute dont_touch of uinstr_src_block_reg : signal is tsel(USE_CLK2, "true", "false");
+    attribute dont_touch of uinstr_dst_be_reg    : signal is tsel(USE_CLK2, "true", "false");
+    attribute dont_touch of uinstr_dst_word_reg  : signal is tsel(USE_CLK2, "true", "false");
+    attribute dont_touch of uinstr_vld_reg       : signal is tsel(USE_CLK2, "true", "false");
+
     -- Setting maximum fanout for select signal register of data multiplexers for better routing
     -- Quartus
     attribute maxfan : integer;
