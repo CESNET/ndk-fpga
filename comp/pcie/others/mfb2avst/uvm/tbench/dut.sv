@@ -28,11 +28,12 @@ module dut (
     endgenerate
 
     PCIE_MFB2AVST #(
-        .REGIONS     (MFB_REGIONS),
-        .REGION_SIZE (MFB_REGION_SIZE),
-        .BLOCK_SIZE  (MFB_BLOCK_SIZE),
-        .ITEM_WIDTH  (MFB_ITEM_WIDTH),
-        .META_WIDTH  (META_WIDTH)
+        .REGIONS       (MFB_REGIONS),
+        .REGION_SIZE   (MFB_REGION_SIZE),
+        .BLOCK_SIZE    (MFB_BLOCK_SIZE),
+        .ITEM_WIDTH    (MFB_ITEM_WIDTH),
+        .META_WIDTH    (META_WIDTH),
+        .READY_LATENCY (READY_LATENCY)
     ) VHDL_DUT_U (
         .CLK            (CLK),
         .RST            (RST),
