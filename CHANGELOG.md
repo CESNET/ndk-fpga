@@ -18,6 +18,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 
 ### Fixed
 - cards: Fixed DDR_PORTS derivation from MEM_PORTS on N5014 card.
+- comp: Fixed CNT_MULTI_MEMX adding a pending increment to another channel's value when a reset was requested without a read.
 
 ## [2026.9.0] - 2026-09-30
 

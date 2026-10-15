@@ -250,8 +250,9 @@ begin
             put_away_reg     <= cnt_inc_reg;
             put_away_reg_vld <= cnt_inc_reg_vld;
 
-            -- If there is read on the incremented Channel
-            if (RD_VLD = '1') then
+            -- If there is read or reset, the MEMX read port is not used for the increment in inc_reg
+            -- (it reads RD_CH or the next increment from the FIFO, while inc_reg is held on reset)
+            if (RD_VLD = '1' or RST_VLD = '1') then
                 -- Remember value about to be incremented
                 put_away_reg_ch  <= inc_reg_ch;
                 put_away_reg     <= cnt_data;

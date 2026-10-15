@@ -43,9 +43,13 @@ architecture BEHAVIORAL of TESTBENCH is
     constant INC_WIDTH            : natural := 8;
     constant INC_FIFO_SIZE        : natural := 64;
 
-    constant INC_CHANCE : natural := 60;
-    constant RST_CHANCE : natural := 50;
-    constant RD_CHANCE  : natural := 40;
+    constant INC_CHANCE      : natural := 60;
+    constant RST_CHANCE      : natural := 50;
+    constant RD_CHANCE       : natural := 40;
+    -- Reset-only strobes (RST_VLD='1', RD_VLD='0'), as issued by DMA SW managers on MI write of 0.
+    -- Applied only to "dead" channels (upper half, never incremented), so the
+    -- reference model stays exact: any non-zero value / wrong total is corruption.
+    constant PURE_RST_CHANCE : natural := 20;
 
     -- Signals declaration -----------------------------------------------------
 
@@ -73,6 +77,7 @@ architecture BEHAVIORAL of TESTBENCH is
     signal          final_ch : unsigned(1+log2(CHANNELS)-1 downto 0);
 
     signal rst_vld_reg  : std_logic;
+    signal rd_vld_reg   : std_logic;
     signal rst_ch_reg   : std_logic_vector(log2(CHANNELS)-1 downto 0);
 
     signal cntr     : u_array_t(CHANNELS-1 downto 0)(CNT_WIDTH-1 downto 0);
@@ -134,6 +139,11 @@ begin
             clk <= '0';
             wait for C_CLK_PER / 2;
         end loop;
+        for i in 0 to CHANNELS-1 loop
+            if (cntr(i) /= cntr_ref(i)) then
+                report "MISMATCH ch " & integer'image(i) & ": dut=" & integer'image(to_integer(cntr(i))) & " ref=" & integer'image(to_integer(cntr_ref(i)));
+            end if;
+        end loop;
         assert (cntr = cntr_ref)
             report "ERROR: Incorrect counter value!"
             severity failure;
@@ -164,11 +174,13 @@ begin
             inc_val <= val;
 
             random_vector_proc(seed0,seed1,ch);
-            inc_ch <= ch;
+            ch(ch'high) := '0';
+            inc_ch      <= ch;
             random_vector_proc(seed0,seed1,ch);
-            rst_ch <= ch;
+            ch(ch'high) := '0';
+            rst_ch      <= ch;
             -- random_vector_proc(seed0,seed1,CH );
-            rd_ch  <= ch;
+            rd_ch       <= ch;
 
             inc_vld <= '0';
             rst_vld <= '0';
@@ -187,9 +199,19 @@ begin
             if (x < RD_CHANCE) then
                 rd_vld  <= '1';
             end if;
+            randint(seed0,seed1,0,99,x);
+            if (x < PURE_RST_CHANCE) then
+                random_vector_proc(seed0,seed1,ch);
+                ch(ch'high) := '1';
+                rst_ch      <= ch;
+                rd_ch       <= ch;
+                rst_vld     <= '1';
+                rd_vld      <= '0';
+            end if;
 
             rst_vld_reg <= rst_vld;
             rst_ch_reg  <= rst_ch;
+            rd_vld_reg  <= rd_vld;
 
             final_ch <= (others => '0');
 
@@ -212,7 +234,7 @@ begin
                 cntr_ref(to_integer(unsigned(inc_ch))) <= cntr_ref(to_integer(unsigned(inc_ch)))+unsigned(inc_val);
             end if;
 
-            if (rst_vld_reg = '1') then
+            if (rst_vld_reg = '1' and rd_vld_reg = '1') then
                 cntr(to_integer(unsigned(rst_ch_reg))) <= cntr(to_integer(unsigned(rst_ch_reg)))+unsigned(rd_val);
             end if;
 
