@@ -94,10 +94,16 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     constant MFB_REGION_WIDTH    : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
     constant MFB_EOF_POS_WIDTH   : natural := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
     constant WORD_CNT_W          : natural := TRANS_SIZE_WIDTH - (log2(MFB_REGIONS) + MFB_EOF_POS_WIDTH);
-    constant MVB_ITEM_PLUS_WIDTH : natural := MVB_ITEM_WIDTH + 8 + TRANS_SIZE_WIDTH + 1 + 1;
-    -- On R-Tile for performance reasons, tx_stN_sop_i pulses can only be sent on segments 0 and/or 2 (st0 and/or st2).
-    -- See Intel UG-20316 section 4.4.1.4. => ONE_PKT_PER_WORD = True on R-Tile...
-    constant ONE_PKT_PER_WORD    : boolean := ((DEVICE = "STRATIX10") and (ENDPOINT_TYPE = "H_TILE")) or ((DEVICE = "AGILEX") and (ENDPOINT_TYPE = "R_TILE"));
+    constant MVB_ITEM_PLUS_WIDTH : natural := MVB_ITEM_WIDTH + 8 + TRANS_SIZE_WIDTH + 1 + 1 + 1;
+    -- On H-Tile, a new PCIe transaction can start only in the first region of the MFB word.
+    constant ONE_PKT_PER_WORD    : boolean := (DEVICE = "STRATIX10") and (ENDPOINT_TYPE = "H_TILE");
+    -- One MFB region is one segment of the R-Tile TX interface in the double-width mode.
+    -- A TLP can start only in segments st0 and st2 (1x16, MFB_REGIONS=4) or st0 and st1 (2x8, MFB_REGIONS=2).
+    -- See the R-Tile Avalon-ST IP for PCIe User Guide (683501), Tables 59 and 60.
+    constant RTILE_DEVICE        : boolean := (DEVICE = "AGILEX") and (ENDPOINT_TYPE = "R_TILE");
+    constant RTILE_SOF_STEP      : natural := max(1, MFB_REGIONS/2);
+    -- Maximum length in dwords of a TLP that starts in region RTILE_SOF_STEP and ends in the same word.
+    constant RTILE_HALF_LEN      : natural := RTILE_SOF_STEP*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
     constant INTEL_DEVICE        : boolean := (DEVICE = "STRATIX10") or (DEVICE = "AGILEX");
     constant PTILE_RTILE_DEVICE  : boolean := (DEVICE = "STRATIX10" or DEVICE = "AGILEX") and (ENDPOINT_TYPE = "P_TILE" or ENDPOINT_TYPE = "R_TILE");
     constant FIFO_DEPTH          : natural := tsel(INTEL_DEVICE,32,16);
@@ -128,6 +134,7 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     signal s_fifo_mvb_payload        : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_fifo_mvb_payload_size   : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
     signal s_fifo_mvb_type           : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_fifo_mvb_half_fit       : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_fifo_mvb_accept         : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal s_hdr_mux_sel             : uns_array_t(MFB_REGIONS downto 0)(log2(MFB_REGIONS+1)-1 downto 0);
@@ -136,10 +143,12 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     signal s_hdr_payload_muxed       : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_hdr_payload_size_muxed  : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
     signal s_hdr_type_muxed          : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_hdr_half_fit_muxed      : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_hdr_vld_muxed           : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal s_payload_len             : uns_array_t(MVB_ITEMS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
     signal s_total_len               : uns_array_t(MVB_ITEMS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_half_fit                : std_logic_vector(MVB_ITEMS-1 downto 0);
 
     signal s_word_cnt_reg            : unsigned(WORD_CNT_W-1 downto 0);
     signal s_word_cnt_reg_en         : std_logic;
@@ -159,6 +168,7 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     signal s_eof_vld                 : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal s_plan_en                 : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_plan_len_ok             : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_plan_wait               : std_logic_vector(MFB_REGIONS downto 0);
     signal s_need_set_eof            : std_logic_vector(MFB_REGIONS downto 0);
 
@@ -229,10 +239,12 @@ begin
                         (s_payload_len(r) + 1) when PTILE_RTILE_DEVICE else                                                        -- read transaction with just separated header (1 invalid dword is still added to MFB, as it is impossible to create a 0 length transactions with SOF_POS/EOF_POS signals)
                         (s_payload_len(r) + 3) when INTEL_DEVICE and s_rx_mvb_type_reg(r) = '0' else                               -- 96-bit header
                         (s_payload_len(r) + 4);                                                                                    -- 128-bit header
+        -- The transaction fits into the regions from RTILE_SOF_STEP to the end of the word.
+        s_half_fit(r)    <= '1' when (s_total_len(r) <= RTILE_HALF_LEN) else '0';
     end generate;
 
     rx_mvb_arr_g : for i in 0 to MVB_ITEMS-1 generate
-        s_rx_mvb_data_plus_arr(i) <= s_rx_mvb_data_arr(i) & s_rx_mvb_be_arr_fixed(i) & s_rx_mvb_payload_reg(i) & std_logic_vector(s_total_len(i)) & s_rx_mvb_type_reg(i);
+        s_rx_mvb_data_plus_arr(i) <= s_rx_mvb_data_arr(i) & s_rx_mvb_be_arr_fixed(i) & s_rx_mvb_payload_reg(i) & std_logic_vector(s_total_len(i)) & s_rx_mvb_type_reg(i) & s_half_fit(i);
         s_rx_mvb_vld(i)           <= s_rx_mvb_vld_reg(i) and s_rx_mvb_src_rdy_reg;
     end generate;
 
@@ -263,11 +275,12 @@ begin
     s_fifo_mvb_data_plus_arr <= slv_array_downto_deser(s_fifo_mvb_data_plus,MFB_REGIONS,MVB_ITEM_PLUS_WIDTH);
 
     unpack_data_plus_arr_g : for i in 0 to MFB_REGIONS-1 generate
-        s_fifo_mvb_data_arr(i)     <= s_fifo_mvb_data_plus_arr(i)(MVB_ITEM_PLUS_WIDTH-1 downto TRANS_SIZE_WIDTH+1+1+8);
-        s_fifo_mvb_be(i)           <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1+8-1 downto TRANS_SIZE_WIDTH+1+1);
-        s_fifo_mvb_payload(i)      <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1);
-        s_fifo_mvb_payload_size(i) <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1-1 downto 1);
-        s_fifo_mvb_type(i)         <= s_fifo_mvb_data_plus_arr(i)(0);
+        s_fifo_mvb_data_arr(i)     <= s_fifo_mvb_data_plus_arr(i)(MVB_ITEM_PLUS_WIDTH-1 downto TRANS_SIZE_WIDTH+1+1+1+8);
+        s_fifo_mvb_be(i)           <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1+1+8-1 downto TRANS_SIZE_WIDTH+1+1+1);
+        s_fifo_mvb_payload(i)      <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1);
+        s_fifo_mvb_payload_size(i) <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1-1 downto 1+1);
+        s_fifo_mvb_type(i)         <= s_fifo_mvb_data_plus_arr(i)(1);
+        s_fifo_mvb_half_fit(i)     <= s_fifo_mvb_data_plus_arr(i)(0);
     end generate;
 
     -- header multiplexors
@@ -276,6 +289,7 @@ begin
     s_hdr_payload_muxed(0)      <= s_fifo_mvb_payload(0);
     s_hdr_payload_size_muxed(0) <= s_fifo_mvb_payload_size(0);
     s_hdr_type_muxed(0)         <= s_fifo_mvb_type(0);
+    s_hdr_half_fit_muxed(0)     <= s_fifo_mvb_half_fit(0);
     s_hdr_vld_muxed(0)          <= s_fifo_mvb_vld(0);
     hdr_mux_g : for r in 1 to MFB_REGIONS-1 generate
         s_hdr_data_muxed_arr(r)     <= s_fifo_mvb_data_arr(to_integer(s_hdr_mux_sel(r)));
@@ -283,6 +297,7 @@ begin
         s_hdr_payload_muxed(r)      <= s_fifo_mvb_payload(to_integer(s_hdr_mux_sel(r)));
         s_hdr_payload_size_muxed(r) <= s_fifo_mvb_payload_size(to_integer(s_hdr_mux_sel(r)));
         s_hdr_type_muxed(r)         <= s_fifo_mvb_type(to_integer(s_hdr_mux_sel(r)));
+        s_hdr_half_fit_muxed(r)     <= s_fifo_mvb_half_fit(to_integer(s_hdr_mux_sel(r)));
         s_hdr_vld_muxed(r)          <= s_fifo_mvb_vld(to_integer(s_hdr_mux_sel(r)));
     end generate;
 
@@ -364,12 +379,16 @@ begin
         s_eof_vld(r)       <= (s_eof_ok(r) and s_need_set_eof(r)) or (s_plan_en(r) and s_whole_pkt(r));
 
         -- planned packet
-        s_plan_en(r)        <= s_hdr_vld_muxed(r) and not s_need_set_eof(r) and not s_plan_wait(r);
-        -- stop planing in next region of current word, first valid data must be
-        -- in first byte of the MFB bus word
-        -- (logic DEPRECATED - could never be '1', now constant '0')
-        -- s_plan_wait(r+1) <= '0'; -- not (s_plan_en(r) or s_need_set_eof(r));
-        s_plan_wait(r+1)    <= '1' when (ONE_PKT_PER_WORD = True) else '0';
+        s_plan_en(r)        <= s_hdr_vld_muxed(r) and not s_need_set_eof(r) and not s_plan_wait(r) and s_plan_len_ok(r);
+        -- On R-Tile, a TLP that starts after region 0 must end in the same word.
+        s_plan_len_ok(r)    <= s_hdr_half_fit_muxed(r) when (RTILE_DEVICE = True) and (r /= 0) else '1';
+        -- s_plan_wait(r+1) blocks the start of a TLP in region r+1. On H-Tile, a TLP
+        -- starts only in region 0. On R-Tile, it starts only in multiples of RTILE_SOF_STEP.
+        -- A TLP starts only when the previous TLP has ended (s_need_set_eof = '0').
+        -- This also meets the R-Tile rule that the previous TLP ends in a lower region.
+        s_plan_wait(r+1)    <= '1' when (ONE_PKT_PER_WORD = True) else
+                               '1' when (RTILE_DEVICE = True) and (((r+1) mod RTILE_SOF_STEP) /= 0) else
+                               '0';
         -- select next header only when you accepted previous header
         s_hdr_mux_sel(r+1)  <= (s_hdr_mux_sel(r) + 1) when (s_plan_en(r) = '1') else s_hdr_mux_sel(r);
         -- control of creating EOF signal
