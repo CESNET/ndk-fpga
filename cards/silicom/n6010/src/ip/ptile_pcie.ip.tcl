@@ -60,6 +60,7 @@ proc do_adjust_ptile_pcie_ip {device family ipname filename adjust_proc} {
 
 	# common IP core parameters
 	set_instance_parameter_value intel_pcie_ptile_ast_0 {standard_interface_selection_hwtcl} {0}
+	set_instance_parameter_value intel_pcie_ptile_ast_0 {g4_pld_clkfreq_user_hwtcl} {500MHz}
 
 	# configuration-specific parameters
 	$adjust_proc
