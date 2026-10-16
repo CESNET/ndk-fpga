@@ -203,6 +203,14 @@ architecture FULL of PCIE_TRANSACTION_CTRL is
     signal tagm_tag_compl_len      : std_logic_vector(MVB_DOWN_ITEMS*(DMA_REQUEST_LENGTH'high-DMA_REQUEST_LENGTH'low+1)-1 downto 0);
     signal tagm_tag_release        : std_logic_vector(MVB_DOWN_ITEMS               -1 downto 0);
     signal tagm_tag_vld            : std_logic_vector(MVB_DOWN_ITEMS               -1 downto 0);
+
+    signal hip_cpl_low_addr        : slv_array_t(MVB_DOWN_ITEMS-1 downto 0)(12-1 downto 0);
+    signal hip_cpl_complete        : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
+    signal hip_cpl_dw_cnt          : slv_array_t(MVB_DOWN_ITEMS-1 downto 0)(11-1 downto 0);
+    signal hip_cpl_low_addr_reg    : std_logic_vector(MVB_DOWN_ITEMS*PCIE_LOW_ADDR_WIDTH-1 downto 0);
+    signal hip_cpl_len_reg         : std_logic_vector(MVB_DOWN_ITEMS*DMA_REQUEST_LEN_WIDTH-1 downto 0);
+    signal hip_cpl_last_reg        : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
+    signal hip_cpl_vld_reg         : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
     signal tagm_dma_down_tag       : std_logic_vector(MVB_DOWN_ITEMS*DMA_TAG_WIDTH -1 downto 0);
     signal tagm_dma_down_id        : std_logic_vector(MVB_DOWN_ITEMS*DMA_ID_WIDTH  -1 downto 0);
 
@@ -814,6 +822,7 @@ begin
 
         CHECK_CPL_CREDITS          => not DISABLE_STFIFO,
         EXTRA_WORDS                => DOWN_FIFO_ITEMS,
+        HIP_CPL_UNITS              => HIP_CPL_UNITS,
 
         DEVICE                     => DEVICE
     )
@@ -838,6 +847,11 @@ begin
         TAG_RELEASE             => tagm_tag_release,
         TAG_VLD                 => tagm_tag_vld,
 
+        HIP_CPL_LOW_ADDR        => hip_cpl_low_addr_reg,
+        HIP_CPL_LEN             => hip_cpl_len_reg,
+        HIP_CPL_LAST            => hip_cpl_last_reg,
+        HIP_CPL_VLD             => hip_cpl_vld_reg,
+
         DMA_DOWN_HDR_TAG        => tagm_dma_down_tag,
         DMA_DOWN_HDR_ID         => tagm_dma_down_id,
 
@@ -847,8 +861,53 @@ begin
         TELEM_TAG_SHORTAGE      => TELEM_TAG_SHORTAGE,
         TELEM_TAG_NOT_READY     => TELEM_TAG_NOT_READY,
         TELEM_CPLH_SHORTAGE     => TELEM_CPLH_SHORTAGE,
-        TELEM_CPLH_FREE         => TELEM_STFIFO_FREE
+        TELEM_CPLH_FREE         => TELEM_STFIFO_FREE,
+        TELEM_HIP_CPL_SHORTAGE  => TELEM_HIP_CPL_SHORTAGE
     );
+
+    ---------------------------------------------------------------------------
+    -- Completions that leave the PCIe Hard IP
+    ---------------------------------------------------------------------------
+    -- The headers are taken at the input of the DOWN storage FIFO. They release
+    -- the units of the Hard IP completion buffer in the Tag Manager.
+
+    -- The response of the longest read request must fit in the whole buffer.
+    assert (HIP_CPL_UNITS = 0 or HIP_CPL_UNITS >= MRRS/16+1)
+        report "PCIE_TRANSACTION_CTRL: Set HIP_CPL_UNITS to at least MRRS/16+1 units, or to 0 to disable the check."
+        severity failure;
+
+    hip_cpl_deparse_g : for i in 0 to MVB_DOWN_ITEMS-1 generate
+        hip_cpl_hdr_deparser_i : entity work.PCIE_RC_HDR_DEPARSER
+        generic map (
+            DEVICE         => DEVICE
+        )
+        port map (
+            OUT_LOW_ADDR   => hip_cpl_low_addr(i),
+            OUT_COMPLETE   => hip_cpl_complete(i),
+            OUT_DW_CNT     => hip_cpl_dw_cnt(i),
+            OUT_TAG        => open,
+            OUT_BYTE_CNT   => open,
+            OUT_ATTRIBUTES => open,
+            OUT_COMP_ST    => open,
+
+            IN_HEADER      => down_mvb_stfifo_in_data(PCIE_DOWNHDR_WIDTH*(i+1)-1 downto PCIE_DOWNHDR_WIDTH*i)
+        );
+    end generate;
+
+    hip_cpl_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to MVB_DOWN_ITEMS-1 loop
+                hip_cpl_low_addr_reg((i+1)*PCIE_LOW_ADDR_WIDTH-1 downto i*PCIE_LOW_ADDR_WIDTH)          <= hip_cpl_low_addr(i)(PCIE_LOW_ADDR_WIDTH-1 downto 0);
+                hip_cpl_len_reg((i+1)*DMA_REQUEST_LEN_WIDTH-1 downto i*DMA_REQUEST_LEN_WIDTH)           <= std_logic_vector(resize(unsigned(hip_cpl_dw_cnt(i)),DMA_REQUEST_LEN_WIDTH));
+                hip_cpl_last_reg(i)                                                                     <= hip_cpl_complete(i);
+                hip_cpl_vld_reg(i)                                                                      <= down_mvb_stfifo_in_vld(i) and down_mvb_stfifo_in_src_rdy and down_mvb_stfifo_in_dst_rdy;
+            end loop;
+            if (rst_local(2) = '1') then
+                hip_cpl_vld_reg <= (others => '0');
+            end if;
+        end if;
+    end process;
 
     pcie_tag_status_asfifo_i : entity work.ASFIFOX
     generic map (

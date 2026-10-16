@@ -113,6 +113,9 @@ entity PCIE_TRANSACTION_CTRL_WRAPPER is
 
         -- DOWNSTREAM completion storage FIFO size
         DOWN_FIFO_ITEMS   : integer := 512;
+        -- Size of the completion buffer of the PCIe Hard IP in units of 64 bytes,
+        -- 0 disables the check (see PCIE_TRANSACTION_CTRL)
+        HIP_CPL_UNITS     : natural := 0;
 
         -- Width of UP AXI signal RQ_TUSER (defined in PCIe specification)
         -- UltraScale+ -> 137; Virtex7 -> 60;
@@ -350,6 +353,7 @@ begin
         MFB_DOWN_ITEM_WIDTH  => MFB_DOWN_ITEM_WIDTH,
 
         DOWN_FIFO_ITEMS      => DOWN_FIFO_ITEMS,
+        HIP_CPL_UNITS        => HIP_CPL_UNITS,
 
         ENDPOINT_TYPE        => ENDPOINT_TYPE,
         DEVICE               => DEVICE

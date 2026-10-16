@@ -60,6 +60,10 @@ entity PCIE_CTRL is
         PTC_DISABLE         : boolean := false;
         -- Enable CQ/CC interface for DMA-BAR, DMA_PORTS must be 1
         DMA_BAR_ENABLE      : boolean := false;
+        -- Size of the completion buffer of the PCIe Hard IP in units of 64 bytes.
+        -- The PTC sends a read request only when its response fits in it.
+        -- 0 disables this check.
+        PTC_HIP_CPL_UNITS   : natural := 0;
         -- Maximum payload size (in bytes) used by the MTC for its completions
         MTC_PCIE_MPS        : natural := 256;
         -- Largest Max Payload Size (in bytes) the PTC is built for
@@ -483,6 +487,7 @@ begin
             MFB_DOWN_ITEM_WIDTH  => RC_MFB_ITEM_WIDTH,
 
             DOWN_FIFO_ITEMS      => 1024,
+            HIP_CPL_UNITS        => PTC_HIP_CPL_UNITS,
             MPS                  => PCIE_MPS_MAX/4,
             MRRS                 => PCIE_MRRS_MAX/4,
 
@@ -551,13 +556,14 @@ begin
 
             PCIE_TAG_STATUS     => PCIE_TAG_STATUS,
 
-            TELEM_TAG_SHORTAGE  => TELEM_PTC_BRAKE(0),
-            TELEM_TAG_NOT_READY => TELEM_PTC_BRAKE(1),
-            TELEM_CPLH_SHORTAGE => TELEM_PTC_BRAKE(2),
-            TELEM_DOWN_MFB_HOLD => TELEM_PTC_BRAKE(4),
-            TELEM_DOWN_MVB_HOLD => TELEM_PTC_BRAKE(5),
-            TELEM_STFIFO_FREE   => TELEM_STFIFO_FREE,
-            TELEM_TAG_FREE      => TELEM_TAG_FREE,
+            TELEM_TAG_SHORTAGE     => TELEM_PTC_BRAKE(0),
+            TELEM_TAG_NOT_READY    => TELEM_PTC_BRAKE(1),
+            TELEM_CPLH_SHORTAGE    => TELEM_PTC_BRAKE(2),
+            TELEM_HIP_CPL_SHORTAGE => TELEM_PTC_BRAKE(3),
+            TELEM_DOWN_MFB_HOLD    => TELEM_PTC_BRAKE(4),
+            TELEM_DOWN_MVB_HOLD    => TELEM_PTC_BRAKE(5),
+            TELEM_STFIFO_FREE      => TELEM_STFIFO_FREE,
+            TELEM_TAG_FREE         => TELEM_TAG_FREE,
 
             DBG_MI_DWR         => mi_sync_dbg_dwr  (DBG_MI_PORTS-1),
             DBG_MI_ADDR        => mi_sync_dbg_addr (DBG_MI_PORTS-1),
@@ -569,8 +575,6 @@ begin
             DBG_MI_DRDY        => mi_sync_dbg_drdy (DBG_MI_PORTS-1)
         );
 
-        -- This PTC does not watch the Completion Header buffer of the Hard IP.
-        TELEM_PTC_BRAKE(3) <= '0';
     else generate
         -- Without the PTC there is nothing to report.
         PCIE_TAG_STATUS    <= (others => '0');

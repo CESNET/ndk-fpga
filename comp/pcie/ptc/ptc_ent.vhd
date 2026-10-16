@@ -115,6 +115,11 @@ entity PCIE_TRANSACTION_CTRL is
 
         -- DOWNSTREAM completion storage FIFO size
         DOWN_FIFO_ITEMS   : integer := 512;
+        -- Size of the completion buffer of the PCIe Hard IP in units of 64 bytes.
+        -- An UP read request is sent only when its whole response fits in the free
+        -- units. A unit is released when the completion enters the PTC. 0 disables
+        -- this check.
+        HIP_CPL_UNITS     : natural := 0;
 
         -- Width of UP AXI signal RQ_TUSER (defined in PCIe specification)
         -- UltraScale+ -> 137; Virtex7 -> 60;
@@ -273,28 +278,32 @@ entity PCIE_TRANSACTION_CTRL is
 
         -- The UP stream is stopped because the pool of free PCIe tags is
         -- smaller than the number of tags this cycle asks for
-        TELEM_TAG_SHORTAGE  : out std_logic;
+        TELEM_TAG_SHORTAGE     : out std_logic;
         -- The UP stream is stopped by the tag FIFO even though the pool is deep
         -- enough. A released tag counts as free as soon as it is written, but it
         -- reaches the read ports of that FIFO only a few cycles later.
-        TELEM_TAG_NOT_READY : out std_logic;
+        TELEM_TAG_NOT_READY    : out std_logic;
         -- The UP stream is stopped because the free space left in the DOWN storage
         -- FIFO no longer covers the completions of the next group of requests.
         -- The FIFO itself is not full yet when this happens. The space is only
         -- reserved ahead.
-        TELEM_CPLH_SHORTAGE : out std_logic;
+        TELEM_CPLH_SHORTAGE    : out std_logic;
+        -- The UP stream is stopped because the free units of the Hard IP completion
+        -- buffer do not cover the response of the next group of requests
+        -- (see HIP_CPL_UNITS)
+        TELEM_HIP_CPL_SHORTAGE : out std_logic;
         -- The number of free words of the DOWN storage FIFO
-        TELEM_STFIFO_FREE   : out std_logic_vector(16-1 downto 0);
+        TELEM_STFIFO_FREE      : out std_logic_vector(16-1 downto 0);
         -- The number of free PCIe tags. PCIE_TAG_STATUS carries the same value,
         -- but resynchronised to CLK_DMA, which is of no use to anything that
         -- has to react before the tags run out.
-        TELEM_TAG_FREE      : out std_logic_vector(11-1 downto 0);
+        TELEM_TAG_FREE         : out std_logic_vector(11-1 downto 0);
         -- The DOWN stream is held before the split between the DMA ports. It is
         -- the aggregate over all of them and it lags by two CLK cycles, like the
         -- signals above.
-        TELEM_DOWN_MFB_HOLD : out std_logic;
+        TELEM_DOWN_MFB_HOLD    : out std_logic;
         -- The same for the MVB that carries the DOWN headers.
-        TELEM_DOWN_MVB_HOLD : out std_logic;
+        TELEM_DOWN_MVB_HOLD    : out std_logic;
 
         -- ========================================================================
         -- DEBUG PORTS
