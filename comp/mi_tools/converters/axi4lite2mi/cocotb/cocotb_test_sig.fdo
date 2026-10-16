@@ -1,0 +1,21 @@
+# cocotb_test_sig.fdo: Waveform signal setup of the AXI4LITE2MI cocotb test
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author(s): Vlastimil Kosar <kosar@dyna-nic.com>, 2026
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -noupdate /AXI4LITE2MI/CLK
+add_wave -noupdate /AXI4LITE2MI/RESET
+add_wave -group {AXI WRITE} -noupdate -hex /AXI4LITE2MI/AXI_AW*
+add_wave -group {AXI WRITE} -noupdate -hex /AXI4LITE2MI/AXI_W*
+add_wave -group {AXI WRITE} -noupdate -hex /AXI4LITE2MI/AXI_B*
+add_wave -group {AXI READ} -noupdate -hex /AXI4LITE2MI/AXI_AR*
+add_wave -group {AXI READ} -noupdate -hex /AXI4LITE2MI/AXI_R*
+add_wave -group {MI} -noupdate -hex /AXI4LITE2MI/MI_*
+add_wave -group {FSM} -noupdate /AXI4LITE2MI/current_state
+add_wave -group {FSM} -noupdate /AXI4LITE2MI/next_state
+
+config wave -signalnamewidth 1
