@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AXI4LITE2MI &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="MFB Tools" href="../../../../mfb.html" />
+    <link rel="prev" title="MI2AXI4" href="../mi2axi4/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_apps/dram_pkt_capture/readme.html">DRAM Packet Capture application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ctrls.html">Controllers &amp; TSU</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../../mi.html">MI Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../async/readme.html">MI ASYNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipe/readme.html">MI Pipe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../indirect_access/readme.html">MI indirect access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reconf/readme.html">MI Reconfigurator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../splitter_plus_gen/readme.html">MI Splitter Plus Gen</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mi2avmm/readme.html">MI2AVMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mi2axi4/readme.html">MI2AXI4</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">AXI4LITE2MI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#specification">Specification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supported-axi4-lite-signals">Supported AXI4-Lite signals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fsm-description">FSM description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#timing">Timing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#verification">Verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/n5014/readme.html">Silicom N5014</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../mi.html">MI Tools</a></li>
+      <li class="breadcrumb-item active">AXI4LITE2MI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/comp/mi_tools/converters/axi4lite2mi/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="axi4lite2mi">
+<span id="id1"></span><h1>AXI4LITE2MI<a class="headerlink" href="#axi4lite2mi" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-axi4lite2mi">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">AXI4LITE2MI</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-axi4lite2mi" title="Link to this definition"></a></dt>
+<dd><p>This component converts AXI4-Lite interface (slave) to MI interface (master).</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-axi4lite2mi-data_width"><td><p>DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Data word width in bits, must be 32</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi4lite2mi-addr_width"><td><p>ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Address word width in bits</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-axi4lite2mi-addr_mask"><td><p>ADDR_MASK</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>(others =&gt; ‘1’)</p></td>
+<td><p>Address mask vector</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-axi4lite2mi-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“AGILEX”</p></td>
+<td><p>Target device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>AXI4-Lite interface (slave)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_awaddr"><td><p>AXI_AWADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_awvalid"><td><p>AXI_AWVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_awready"><td><p>AXI_AWREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_wdata"><td><p>AXI_WDATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_wstrb"><td><p>AXI_WSTRB</p></td>
+<td><p>std_logic_vector(DATA_WIDTH / 8 - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_wvalid"><td><p>AXI_WVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_wready"><td><p>AXI_WREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_bresp"><td><p>AXI_BRESP</p></td>
+<td><p>std_logic_vector(1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_bvalid"><td><p>AXI_BVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_bready"><td><p>AXI_BREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_araddr"><td><p>AXI_ARADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_arvalid"><td><p>AXI_ARVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_arready"><td><p>AXI_ARREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_rdata"><td><p>AXI_RDATA</p></td>
+<td><p>std_logic_vector(DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_rresp"><td><p>AXI_RRESP</p></td>
+<td><p>std_logic_vector(1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-axi_rvalid"><td><p>AXI_RVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-axi_rready"><td><p>AXI_RREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI interface (master)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector((DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-axi4lite2mi-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-axi4lite2mi-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>Read <a class="reference internal" href="../../readme.html#mi-bus"><span class="std std-ref">MI bus specification</span></a> for more information on the MI bus.
+Refer to the <a class="reference external" href="https://developer.arm.com/documentation/ihi0022/latest">AMBA AXI Protocol Specification</a> for more information on the AXI4-Lite interface.</p>
+<p>The component allows an AXI4-Lite master (e.g., an embedded processor or a vendor IP core with an AXI4-Lite management port) to access firmware components connected to the MI bus.
+It is an AXI4-Lite slave on one side and an MI master on the other side.
+It is the counterpart of the <a class="reference internal" href="../mi2axi4/readme.html#mi2axi4"><span class="std std-ref">MI2AXI4</span></a> converter.</p>
+<section id="specification">
+<h2>Specification<a class="headerlink" href="#specification" title="Link to this heading"></a></h2>
+<p>Both interfaces use common clock and reset signals.
+<code class="docutils literal notranslate"><span class="pre">RESET</span></code> is synchronous and active high; it resets only the FSM state, the data/address registers are not reset.</p>
+<p>The component processes transactions strictly one at a time (no pipelining, no outstanding transactions).
+A new AXI request is accepted only when the previous one has been fully completed, including its AXI response.
+Every AXI read is translated to exactly one MI read request and every AXI write to exactly one MI write request.</p>
+<p><strong>Arbitration</strong> – When both <code class="docutils literal notranslate"><span class="pre">AXI_ARVALID</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code> are asserted in the same cycle while the component is idle, the read is served first.
+A master issuing reads back-to-back can therefore delay writes.</p>
+<p><strong>Address</strong> – The AXI address (<code class="docutils literal notranslate"><span class="pre">AXI_ARADDR</span></code> or <code class="docutils literal notranslate"><span class="pre">AXI_AWADDR</span></code>) is masked with the <code class="docutils literal notranslate"><span class="pre">ADDR_MASK</span></code> generic (bitwise AND), registered and then presented on <code class="docutils literal notranslate"><span class="pre">MI_ADDR</span></code>.
+No other modification is performed (the address is not aligned by the component), so the byte address issued by the AXI master is passed to the MI bus as is.
+Follow the <a class="reference internal" href="../../readme.html#mi-addr-alignment"><span class="std std-ref">MI address alignment convention</span></a> and use addresses aligned to <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH/8</span></code> bytes.</p>
+<p><strong>Write data and byte enable</strong> – <code class="docutils literal notranslate"><span class="pre">AXI_WDATA</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_WSTRB</span></code> are registered and presented on <code class="docutils literal notranslate"><span class="pre">MI_DWR</span></code> and <code class="docutils literal notranslate"><span class="pre">MI_BE</span></code>, respectively.
+For MI read requests, <code class="docutils literal notranslate"><span class="pre">MI_BE</span></code> is set to all ones (the whole data word is read), as AXI4-Lite has no byte strobes for reads.</p>
+<p><strong>Read data</strong> – <code class="docutils literal notranslate"><span class="pre">MI_DRD</span></code> is registered when <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> is asserted and returned on <code class="docutils literal notranslate"><span class="pre">AXI_RDATA</span></code>.</p>
+<p><strong>Responses</strong> – <code class="docutils literal notranslate"><span class="pre">AXI_BRESP</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_RRESP</span></code> are always <code class="docutils literal notranslate"><span class="pre">&quot;00&quot;</span></code> (OKAY).
+The MI bus provides no means of signalling an error, so <code class="docutils literal notranslate"><span class="pre">SLVERR</span></code>/<code class="docutils literal notranslate"><span class="pre">DECERR</span></code> responses are never generated.</p>
+<p><strong>Write channel ordering</strong> – <code class="docutils literal notranslate"><span class="pre">AXI_WREADY</span></code> is asserted only after the write address has been accepted.
+The master may assert <code class="docutils literal notranslate"><span class="pre">AXI_WVALID</span></code> before, together with, or after <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code>, as permitted by the AXI specification; the write data are simply held by the master until the address handshake completes.</p>
+<p><strong>Combinational paths</strong> – In the idle state <code class="docutils literal notranslate"><span class="pre">AXI_ARREADY</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_AWREADY</span></code> depend combinationally on <code class="docutils literal notranslate"><span class="pre">AXI_ARVALID</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code> (this is allowed by the AXI specification).
+There is no combinational path from the MI inputs to the AXI outputs or from the AXI inputs to the MI outputs.</p>
+</section>
+<section id="supported-axi4-lite-signals">
+<h2>Supported AXI4-Lite signals<a class="headerlink" href="#supported-axi4-lite-signals" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Channel</p></th>
+<th class="head"><p>Signals</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Write address (AW)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AXI_AWADDR</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_AWREADY</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Write data (W)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AXI_WDATA</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_WSTRB</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_WVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_WREADY</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Write response (B)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AXI_BRESP</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_BVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_BREADY</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Read address (AR)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AXI_ARADDR</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_ARVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_ARREADY</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Read data (R)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">AXI_RDATA</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_RRESP</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_RVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">AXI_RREADY</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The protection signals <code class="docutils literal notranslate"><span class="pre">AXI_AWPROT</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_ARPROT</span></code> are not present; leave them unconnected on the master side.
+The optional MI metadata port (<code class="docutils literal notranslate"><span class="pre">MI_MWR</span></code>) is not present either.</p>
+</section>
+<section id="fsm-description">
+<h2>FSM description<a class="headerlink" href="#fsm-description" title="Link to this heading"></a></h2>
+<p>The whole conversion is controlled by a single FSM with the following states:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18.0%" />
+<col style="width: 52.0%" />
+<col style="width: 30.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>State</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Next state</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ST_IDLE</span></code></p></td>
+<td><p>No transaction in progress. If <code class="docutils literal notranslate"><span class="pre">AXI_ARVALID</span></code> is asserted, <code class="docutils literal notranslate"><span class="pre">AXI_ARREADY</span></code> is asserted in the same cycle, the masked read address is registered and the byte enables are set to all ones.
+Otherwise, if <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code> is asserted, <code class="docutils literal notranslate"><span class="pre">AXI_AWREADY</span></code> is asserted and the masked write address is registered.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_READ</span></code> on <code class="docutils literal notranslate"><span class="pre">AXI_ARVALID</span></code>, else <code class="docutils literal notranslate"><span class="pre">ST_WRITE</span></code> on <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ST_READ</span></code></p></td>
+<td><p>MI read request is issued (<code class="docutils literal notranslate"><span class="pre">MI_RD</span></code> = 1, <code class="docutils literal notranslate"><span class="pre">MI_ADDR</span></code> = registered read address, <code class="docutils literal notranslate"><span class="pre">MI_BE</span></code> = all ones) and held until the MI slave asserts <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> is asserted together with <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>, <code class="docutils literal notranslate"><span class="pre">MI_DRD</span></code> is registered immediately.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_READ_RESP</span></code> on <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code> and <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code>; <code class="docutils literal notranslate"><span class="pre">ST_READ_ARDY</span></code> on <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code> only</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ST_READ_ARDY</span></code></p></td>
+<td><p>MI read request has been accepted (<code class="docutils literal notranslate"><span class="pre">MI_RD</span></code> = 0); waiting for the read data. <code class="docutils literal notranslate"><span class="pre">MI_DRD</span></code> is registered when <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> is asserted.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_READ_RESP</span></code> on <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ST_READ_RESP</span></code></p></td>
+<td><p>Registered read data are presented on the R channel (<code class="docutils literal notranslate"><span class="pre">AXI_RVALID</span></code> = 1, <code class="docutils literal notranslate"><span class="pre">AXI_RRESP</span></code> = OKAY) until the master accepts them.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_IDLE</span></code> on <code class="docutils literal notranslate"><span class="pre">AXI_RREADY</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ST_WRITE</span></code></p></td>
+<td><p>Write address has been accepted. <code class="docutils literal notranslate"><span class="pre">AXI_WREADY</span></code> is asserted; <code class="docutils literal notranslate"><span class="pre">AXI_WDATA</span></code> and <code class="docutils literal notranslate"><span class="pre">AXI_WSTRB</span></code> are registered when <code class="docutils literal notranslate"><span class="pre">AXI_WVALID</span></code> is asserted.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_WRITE_DATA</span></code> on <code class="docutils literal notranslate"><span class="pre">AXI_WVALID</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ST_WRITE_DATA</span></code></p></td>
+<td><p>MI write request is issued (<code class="docutils literal notranslate"><span class="pre">MI_WR</span></code> = 1, <code class="docutils literal notranslate"><span class="pre">MI_ADDR</span></code> = registered write address, <code class="docutils literal notranslate"><span class="pre">MI_DWR</span></code>/<code class="docutils literal notranslate"><span class="pre">MI_BE</span></code> = registered data/strobes) and held until the MI slave asserts <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_WRITE_RESP</span></code> on <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ST_WRITE_RESP</span></code></p></td>
+<td><p>Write response is presented on the B channel (<code class="docutils literal notranslate"><span class="pre">AXI_BVALID</span></code> = 1, <code class="docutils literal notranslate"><span class="pre">AXI_BRESP</span></code> = OKAY) until the master accepts it.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ST_IDLE</span></code> on <code class="docutils literal notranslate"><span class="pre">AXI_BREADY</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The FSM stays in its current state whenever the condition for leaving it is not met.
+The state transitions can be summarized as follows:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>             AXI_ARVALID
+   +---------------------------&gt; ST_READ ---------------------+
+   |                                |                         | MI_ARDY &amp;
+   |                                | MI_ARDY &amp;               | MI_DRDY
+   |                                | !MI_DRDY                |
+   |                                v                         v
+   |                          ST_READ_ARDY ------------&gt; ST_READ_RESP
+   |                                          MI_DRDY         |
+   |                                                          | AXI_RREADY
+ST_IDLE &lt;-----------------------------------------------------+
+ |   ^
+ |   +----------------------------------------------------+
+ |                                                        | AXI_BREADY
+ | !AXI_ARVALID &amp; AXI_AWVALID                             |
+ v                                                        |
+ST_WRITE ------------&gt; ST_WRITE_DATA ------------&gt; ST_WRITE_RESP
+         AXI_WVALID                   MI_ARDY
+</pre></div>
+</div>
+</section>
+<section id="timing">
+<h2>Timing<a class="headerlink" href="#timing" title="Link to this heading"></a></h2>
+<p>Assuming the MI slave responds immediately (<code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code> and <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> asserted in the first cycle of the request) and the AXI master is always ready to accept responses (<code class="docutils literal notranslate"><span class="pre">AXI_RREADY</span></code>/<code class="docutils literal notranslate"><span class="pre">AXI_BREADY</span></code> held high), the transactions take:</p>
+<ul class="simple">
+<li><p><strong>Read</strong>: 3 clock cycles – AR handshake (<code class="docutils literal notranslate"><span class="pre">ST_IDLE</span></code>), MI read request (<code class="docutils literal notranslate"><span class="pre">ST_READ</span></code>), R handshake (<code class="docutils literal notranslate"><span class="pre">ST_READ_RESP</span></code>).
+<code class="docutils literal notranslate"><span class="pre">AXI_RVALID</span></code> is asserted two cycles after the AR handshake.</p></li>
+<li><p><strong>Write</strong>: 4 clock cycles – AW handshake (<code class="docutils literal notranslate"><span class="pre">ST_IDLE</span></code>), W handshake (<code class="docutils literal notranslate"><span class="pre">ST_WRITE</span></code>), MI write request (<code class="docutils literal notranslate"><span class="pre">ST_WRITE_DATA</span></code>), B handshake (<code class="docutils literal notranslate"><span class="pre">ST_WRITE_RESP</span></code>).
+<code class="docutils literal notranslate"><span class="pre">AXI_BVALID</span></code> is asserted three cycles after the AW handshake.</p></li>
+</ul>
+<p>Every cycle of <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>/<code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> latency on the MI side and every cycle of <code class="docutils literal notranslate"><span class="pre">AXI_WVALID</span></code>/<code class="docutils literal notranslate"><span class="pre">AXI_RREADY</span></code>/<code class="docutils literal notranslate"><span class="pre">AXI_BREADY</span></code> delay on the AXI side extends the transaction accordingly.
+Hence, the maximum throughput is one read per 3 cycles or one write per 4 cycles.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The component has no timeout. If the MI slave never asserts <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code> (or <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> for a read), for example because the address is not mapped to any MI component, the FSM waits forever and the AXI master is blocked.
+Make sure that the whole AXI address range reachable through this component is mapped on the MI side (e.g., by an MI splitter with a default/catch-all port).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">DATA_WIDTH</span></code> generic must be set to 32.
+The <code class="docutils literal notranslate"><span class="pre">DEVICE</span></code> generic is currently unused and has no effect.</p>
+</div>
+</section>
+<section id="verification">
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading"></a></h2>
+<p>The component is verified with cocotb in the <code class="docutils literal notranslate"><span class="pre">cocotb/</span></code> directory.
+The AXI4-Lite port is driven by <code class="docutils literal notranslate"><span class="pre">AxiLiteMaster</span></code> from <a class="reference external" href="https://github.com/alexforencich/cocotbext-axi">cocotbext-axi</a>, the MI port is terminated by an MI slave memory model with configurable <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code> backpressure and <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> latency, including <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> in the same cycle as <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>.
+Two independent observers check the DUT: an AXI4-Lite checker on the slave port (handshake rules, one transaction at a time, read priority, <code class="docutils literal notranslate"><span class="pre">WREADY</span></code> only after the address handshake, OKAY responses) and the MI slave model on the master port (request held until <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>, <code class="docutils literal notranslate"><span class="pre">MI_BE</span></code> all ones for reads, no new request while a read response is pending).
+At the end of every test, a scoreboard compares each AXI beat with its MI request, the returned read data and the final content of the MI memory.</p>
+<p>The tests cover a randomized mix of concurrent reads and writes in several backpressure scenarios, write-and-read-back of partial and unaligned accesses, read priority, the order of the AW and W channels, MI read latency and <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code> stalls, response backpressure, the latency and throughput listed in the Timing section, the full address range, reset during traffic and an idle bus.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cocotb
+make<span class="w"> </span>cocotb-venv
+<span class="nb">source</span><span class="w"> </span>venv-AXI4LITE2MI/bin/activate
+make
+</pre></div>
+</div>
+<p>The number of random transactions per scenario is set by the <code class="docutils literal notranslate"><span class="pre">COCOTB_TRANSACTIONS</span></code> environment variable (default 2000).
+<code class="docutils literal notranslate"><span class="pre">ver_settings.py</span></code> lists further generic combinations for <code class="docutils literal notranslate"><span class="pre">build/scripts/multi_ver/multi_ver_cocotb.py</span></code>; the tests read <code class="docutils literal notranslate"><span class="pre">ADDR_WIDTH</span></code> and <code class="docutils literal notranslate"><span class="pre">ADDR_MASK</span></code> from the DUT, so any configuration is checked against its own address mapping.</p>
+<p>An older directed VHDL testbench is located in the <code class="docutils literal notranslate"><span class="pre">sim/</span></code> directory (<code class="docutils literal notranslate"><span class="pre">sim/testbench.vhd</span></code>).
+It covers reads with <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code> asserted together with <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>, reads with delayed <code class="docutils literal notranslate"><span class="pre">MI_DRDY</span></code>, reads with delayed <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>, and writes with <code class="docutils literal notranslate"><span class="pre">AXI_WVALID</span></code> asserted after or together with <code class="docutils literal notranslate"><span class="pre">AXI_AWVALID</span></code> and with immediate or delayed <code class="docutils literal notranslate"><span class="pre">MI_ARDY</span></code>.
+The testbench is not self-checking; the results have to be inspected in the waveform.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../mi2axi4/readme.html" class="btn btn-neutral float-left" title="MI2AXI4" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../../../mfb.html" class="btn btn-neutral float-right" title="MFB Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
