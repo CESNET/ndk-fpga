@@ -302,7 +302,19 @@ begin
     ts_ok_g : for r in 0 to MFB_REGIONS-1 generate
         ts_ok(r) <= '1' when (stored_time_diff_fixed(r) >= unsigned(fm_tx_ts(r))) else '0';
     end generate;
-    fm_tx_sof_to_read <= (fm_tx_sof_unmasked and fm_tx_src_rdy_unmasked) and ts_ok;
+    -- Read SOFs strictly in order: a Region with a pending (unread) SOF blocks all following Regions,
+    -- otherwise the Frame Masker would discard the pending packet when a following Region is read
+    process (all)
+        variable blocked : std_logic;
+    begin
+        blocked := '0';
+        for r in 0 to MFB_REGIONS-1 loop
+            fm_tx_sof_to_read(r) <= fm_tx_sof_unmasked(r) and fm_tx_src_rdy_unmasked and ts_ok(r) and not blocked;
+            if ((fm_tx_sof_unmasked(r) and fm_tx_src_rdy_unmasked and not ts_ok(r)) = '1') then
+                blocked := '1';
+            end if;
+        end loop;
+    end process;
     fm_tx_mask        <= fm_tx_sof_to_read;
 
     fm_tx_dst_rdy <= mfb_dst_rdy_mid_reg;
