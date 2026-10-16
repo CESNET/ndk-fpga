@@ -45,6 +45,8 @@ package test;
     parameter UP_ASFIFO_ITEMS       = 512;
     parameter DOWN_ASFIFO_ITEMS     = 512;
     parameter DOWN_FIFO_ITEMS       = 512;
+    // Size of the Hard IP completion buffer in units of 64 bytes, 0 disables the check
+    parameter HIP_CPL_UNITS         = 0;
 
     parameter DEVICE                = "STRATIX10"; // "VIRTEX6", "7SERIES", "ULTRASCALE", "STRATIX10"
     // Connected PCIe endpoint type ("H_TILE" or "P_TILE" or "R_TILE") (only relevant on Intel FPGAs)

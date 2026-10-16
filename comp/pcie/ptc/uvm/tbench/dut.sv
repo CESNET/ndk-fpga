@@ -213,6 +213,7 @@ module dut (
         .UP_ASFIFO_ITEMS      (UP_ASFIFO_ITEMS)     ,
         .DOWN_ASFIFO_ITEMS    (DOWN_ASFIFO_ITEMS)   ,
         .DOWN_FIFO_ITEMS      (DOWN_FIFO_ITEMS)     ,
+        .HIP_CPL_UNITS        (HIP_CPL_UNITS)       ,
         .RQ_TUSER_WIDTH       (uvm_pcie_axi::tuser_width_get(RQ_AXI_ITEMS, uvm_pcie_axi::AXI_RQ)),
         .RC_TUSER_WIDTH       (uvm_pcie_axi::tuser_width_get(RC_AXI_ITEMS, uvm_pcie_axi::AXI_RC)),
         .DEVICE               (DEVICE)              ,
