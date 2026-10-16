@@ -25,6 +25,13 @@ class sequence_simple_rx #(
     int unsigned transaction_count_min = 10;
     rand int unsigned transaction_count;
 
+    // probability [0:100] of SRC_RDY drop when the word is not accepted
+    // (0 - SRC_RDY stays high until DST_RDY is high)
+    int unsigned src_rdy_drop_probability = 10;
+    // length limits of SRC_RDY drop in number of clock cycles
+    int unsigned src_rdy_drop_len_min = 1;
+    int unsigned src_rdy_drop_len_max = 4;
+
     constraint tr_cnt_cons {transaction_count inside {[transaction_count_min:transaction_count_max]};}
     // ------------------------------------------------------------------------
     // Constructor
@@ -37,6 +44,9 @@ class sequence_simple_rx #(
     task body;
         int unsigned it;
         uvm_common::sequence_cfg state;
+        // Word withdrawn by SRC_RDY drop, it is sent again after the drop
+        sequence_item #(ITEMS, ITEM_WIDTH) held;
+        int unsigned drop_len;
 
         if(!uvm_config_db#(uvm_common::sequence_cfg)::get(m_sequencer, "", "state", state)) begin
             state = null;
@@ -44,6 +54,7 @@ class sequence_simple_rx #(
 
         // Generate transaction_count transactions
         req = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("req");
+        held = sequence_item #(ITEMS, ITEM_WIDTH)::type_id::create("held");
 
         it = 0;
         while (it < transaction_count && (state == null || state.next())) begin
@@ -57,6 +68,24 @@ class sequence_simple_rx #(
 
 
             while (rsp.src_rdy && !rsp.dst_rdy) begin
+                if ($urandom_range(99) < src_rdy_drop_probability) begin
+                    // SRC_RDY drop, the withdrawn word is sent again after drop_len clock cycles
+                    held.copy(req);
+                    drop_len = $urandom_range(src_rdy_drop_len_max, src_rdy_drop_len_min);
+                    if (drop_len == 0) begin
+                        drop_len = 1;
+                    end
+                    repeat (drop_len) begin
+                        start_item(req);
+                        if (!req.randomize() with {src_rdy == 1'b0;}) begin
+                            `uvm_fatal("sequence:", "Failed to randomize sequence.")
+                        end
+                        finish_item(req);
+                        get_response(rsp);
+                    end
+                    req.copy(held);
+                end
+
                 start_item(req);
                 finish_item(req);
 
