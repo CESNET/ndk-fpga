@@ -39,5 +39,6 @@ if {$ARCHGRP == "USP" || $ARCHGRP == "USP_PCIE4C" || $ARCHGRP == "USP_PCIE4"} {
     lappend COMPONENTS [ list "SV_AVST_CRDT"               "$OFM_PATH/comp/uvm/avst_crdt"               "FULL"]
 
     lappend MOD "$ENTITY_BASE/tbench/pcie_intel_r_tile/pkg.sv"
+    lappend MOD "$ENTITY_BASE/tbench/rtile_tx_property.sv"
     lappend MOD "$ENTITY_BASE/tbench/testbench_intel_r_tile.sv"
 }

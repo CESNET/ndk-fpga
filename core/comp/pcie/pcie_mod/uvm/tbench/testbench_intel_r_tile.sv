@@ -92,8 +92,15 @@ module testbench;
         end
     endgenerate
 
-    for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin
+    for (genvar pcie_e = 0; pcie_e < PCIE_ENDPOINTS; pcie_e++) begin : gen_pcie_e
         assign pcie_user_reset[pcie_e].RESET = pcie_user_reset_logic[pcie_e];
+
+        rtile_tx_property #(
+            .REGIONS (CC_MFB_REGIONS)
+        ) rtile_tx_property_i (
+            .RESET (pcie_user_reset_logic[pcie_e]),
+            .vif   (avst_up[pcie_e])
+        );
     end
     for (genvar pcie_clks = 0; pcie_clks < PCIE_CONS*PCIE_CLKS; pcie_clks++) begin
         assign pcie_sysclk_p_logic[pcie_clks] = PCIE_SYSCLK_P;
