@@ -55,27 +55,36 @@ class monitor#(
             return;
         end
 
-        assert (
-            // If frame is not valid then dont care
-            (|t.valid)  == 1'b0 ||
-            // There cannot be error when there is one region
-            (REGIONS == 1)      ||
-            // When STRADDLING is off then packet can start only in first region
-            (STRADDLING == 1'b0 && (|t.sop[REGIONS-1:1]) == 0) ||
-            // When STRADDLING is on then packet can start in region only when previous packet end in previous region
-            // or in first region
-            (STRADDLING == 1'b1 && (|(t.sop[REGIONS-1:1] & ~t.eop[REGIONS-2:0])) == 0)
-        ) else begin
-            string msg;
+        // A TLP can start only when no other TLP is open. Regions with VALID low
+        // are allowed between two TLPs. STRADDLING describes the DOWN direction,
+        // which the verification drives. On the UP side, the DUT selects the
+        // regions, so only the first rule is checked there.
+        begin
+            logic tlp_open = (data.size() != 0);
 
-            msg = $sformatf(
-                "\n\tWrong position of SOP.\n\tSTRADDLING %0d SOP 'b%b EOP 'b%b VALID 'b%b",
-                STRADDLING,
-                t.sop,
-                t.eop,
-                t.valid
-            );
-            `uvm_error(this.get_full_name(), msg);
+            for (int unsigned it = 0; it < REGIONS; it++) begin
+                if (t.valid[it] == 1'b1) begin
+                    if (t.sop[it] == 1'b1 && (tlp_open || (DIR == AVST_DOWN && STRADDLING == 1'b0 && it != 0))) begin
+                        string msg;
+
+                        msg = $sformatf(
+                            "\n\tWrong position of SOP in region %0d.\n\tSTRADDLING %0d SOP 'b%b EOP 'b%b VALID 'b%b",
+                            it,
+                            STRADDLING,
+                            t.sop,
+                            t.eop,
+                            t.valid
+                        );
+                        `uvm_error(this.get_full_name(), msg);
+                    end
+                    if (t.sop[it] == 1'b1) begin
+                        tlp_open = 1'b1;
+                    end
+                    if (t.eop[it] == 1'b1) begin
+                        tlp_open = 1'b0;
+                    end
+                end
+            end
         end
 
         for (int unsigned it = 0; it < REGIONS; it++) begin
