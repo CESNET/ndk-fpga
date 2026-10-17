@@ -724,6 +724,10 @@ architecture RTILE of PCIE_CORE is
 
 begin
 
+    assert ((ENDPOINT_MODE = 1 and PCIE_GEN = 5) or (ENDPOINT_MODE = 0 and (PCIE_GEN = 4 or PCIE_GEN = 5)))
+        report "PCIE_CORE: R-Tile supports only Gen5 x8x8, Gen5 x16 and Gen4 x16. Set ENDPOINT_MODE and PCIE_GEN to one of them."
+        severity failure;
+
     -- assert ENDPOINT_MODE=1 report "Intel R-Tile Wrapper: Only ENDPOINT_MODE=1 is now implemented!"
     --    severity failure;
 
