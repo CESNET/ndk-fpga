@@ -88,6 +88,7 @@ class env #(
     uvm_pcie_top::scoreboard #(
             CQ_MFB_REGIONS, PCIE_ENDPOINTS, DMA_PORTS, ITEM_WIDTH, DMA_BAR_ENABLE, PCIE_ENDPOINT_TYPE
     ) m_scoreboard;
+    cpl_buffer m_cpl_buffer[PCIE_ENDPOINTS];
 
     // Constructor of environment.
     function new(string name, uvm_component parent);
@@ -123,6 +124,8 @@ class env #(
             uvm_config_db #(uvm_pcie::config_item)::set(this, {"m_pcie_", i_string}, "m_config", m_pcie_cfg);
             m_pcie_env[pcie] = uvm_pcie::root::type_id::create({"m_pcie_", i_string},this);
             m_pcie_dev[pcie] = uvm_pcie::dev::type_id::create({"m_pcie_", i_string, "_dev"}, this);
+            m_cpl_buffer[pcie] = cpl_buffer::type_id::create({"m_cpl_buffer_", i_string}, this);
+            void'(uvm_config_db #(int unsigned)::get(this, "", "hip_cpl_units", m_cpl_buffer[pcie].units_max));
 
             // PCIE RESET
             pcie_reset_cfg                = new();
@@ -240,6 +243,8 @@ class env #(
             m_pcie_env[pcie].analysis_port_cc.connect(m_scoreboard.pcie_cc[pcie]);
 
             m_pcie_env[pcie].analysis_port_rq.connect(m_pcie_dev[pcie].port_pcie);
+            m_pcie_env[pcie].analysis_port_rq.connect(m_cpl_buffer[pcie].port_rq);
+            m_pcie_env[pcie].analysis_port_rc.connect(m_cpl_buffer[pcie].port_rc);
             m_pcie_env[pcie].analysis_port_cc.connect(m_pcie_dev[pcie].port_pcie);
             uvm_config_db#(uvm_pcie::pcie_info#(TAG_WIDTH))::set(
                 m_pcie_env[pcie].m_sequencer_cq,

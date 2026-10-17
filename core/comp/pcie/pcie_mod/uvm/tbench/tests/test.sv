@@ -22,6 +22,7 @@ class ex_test extends uvm_test;
     endfunction
 
     function void build_phase(uvm_phase phase);
+        uvm_config_db #(int unsigned)::set(this, "m_env", "hip_cpl_units", HIP_CPL_UNITS);
         m_env = uvm_pcie_top::env #(RQ_MFB_REGIONS, RQ_MFB_REGION_SIZE, RQ_MFB_BLOCK_SIZE,
                                     RC_MFB_REGIONS, RC_MFB_REGION_SIZE, RC_MFB_BLOCK_SIZE,
                                     CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
