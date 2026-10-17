@@ -63,6 +63,8 @@ package test;
     parameter PCIE_ENDPOINT_TYPE = "DUMMY";
     // Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8
     parameter PCIE_ENDPOINT_MODE = 0;
+    // PCIe generation of the R-Tile IP core: 4 or 5
+    parameter PCIE_GEN           = 4;
     // Number of PCIe endpoints
     parameter PCIE_ENDPOINTS     = 1;
     // Number of PCIe clocks per PCIe connector

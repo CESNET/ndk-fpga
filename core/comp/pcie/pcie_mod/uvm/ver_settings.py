@@ -27,6 +27,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 0,
         "PCIE_ENDPOINTS"       : 1,
         "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 4,
 
         "DEVICE"               : "\\\"AGILEX\\\"" ,
         "PCIE_ENDPOINT_TYPE"   : "\\\"P_TILE\\\""    ,
@@ -104,6 +105,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 0,
         "PCIE_ENDPOINTS"       : 1,
         "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 5,
         "DMA_PORTS"            : 4,
 
         "DEVICE"               : "\\\"AGILEX\\\"",
@@ -130,6 +132,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 1,
         "PCIE_ENDPOINTS"       : 2,
         "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 5,
         "DMA_PORTS"            : 2,
 
         "DEVICE"               : "\\\"AGILEX\\\"",
@@ -156,6 +159,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 1,
         "PCIE_ENDPOINTS"       : 4,
         "PCIE_CONS"            : 2,
+        "PCIE_GEN"             : 5,
         "DMA_PORTS"            : 1,
 
         "DEVICE"               : "\\\"AGILEX\\\"",

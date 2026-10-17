@@ -292,6 +292,8 @@ module dut (
         .PCIE_ENDPOINT_TYPE (PCIE_ENDPOINT_TYPE),
         // PCIe Endpoint (EP) mode: 0=x16, 1=x8x8, 2=x8
         .PCIE_ENDPOINT_MODE (PCIE_ENDPOINT_MODE),
+        // PCIe generation of the R-Tile IP core
+        .PCIE_GEN           (PCIE_GEN),
         // Number of PCIe endpoints
         .PCIE_ENDPOINTS     (PCIE_ENDPOINTS),
         // Number of PCIe clocks per PCIe connector
