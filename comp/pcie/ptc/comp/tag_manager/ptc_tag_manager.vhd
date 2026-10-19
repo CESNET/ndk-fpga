@@ -49,6 +49,10 @@ entity PTC_TAG_MANAGER is
         CHECK_CPL_CREDITS   : boolean := true;
         -- Available space in receiving buffer (in data words) (added to base 64 words available in PCIe core)
         EXTRA_WORDS         : integer := 512;
+        -- Size of the completion buffer of the PCIe Hard IP in units of 64 bytes.
+        -- An UP read request is sent only when its whole response fits in the free
+        -- units. 0 disables this check.
+        HIP_CPL_UNITS       : natural := 0;
 
         -- Target device
         -- "VIRTEX6", "7SERIES", "ULTRASCALE"
@@ -103,6 +107,17 @@ entity PTC_TAG_MANAGER is
         -- PCIe tag valid bit
         TAG_VLD             : in  std_logic_vector(MVB_DOWN_ITEMS               -1 downto 0);
 
+        -- Received completions. They release the units of the Hard IP completion
+        -- buffer (see HIP_CPL_UNITS).
+        -- Lower bits of the address of the first byte of the completion
+        HIP_CPL_LOW_ADDR    : in  std_logic_vector(MVB_DOWN_ITEMS*PCIE_LOW_ADDR_WIDTH-1 downto 0) := (others => '0');
+        -- Length of the completion in DWORDS
+        HIP_CPL_LEN         : in  std_logic_vector(MVB_DOWN_ITEMS*(DMA_REQUEST_LENGTH'high-DMA_REQUEST_LENGTH'low+1)-1 downto 0) := (others => '0');
+        -- The completion is the last one of its read request
+        HIP_CPL_LAST        : in  std_logic_vector(MVB_DOWN_ITEMS-1 downto 0) := (others => '0');
+        -- Valid bit for each completion
+        HIP_CPL_VLD         : in  std_logic_vector(MVB_DOWN_ITEMS-1 downto 0) := (others => '0');
+
         -- DMA DOWN HDR output has delay 2 CLK after TAG input is set
 
         -- DMA tag corresponding to given PCIe tag
@@ -130,15 +145,18 @@ entity PTC_TAG_MANAGER is
 
         -- The UP stream is stopped because the pool of free PCIe tags is
         -- smaller than the number of tags this cycle asks for
-        TELEM_TAG_SHORTAGE  : out std_logic;
+        TELEM_TAG_SHORTAGE     : out std_logic;
         -- The UP stream is stopped by the tag FIFO even though the pool is deep
         -- enough. A released tag counts as free as soon as it is written, but it
         -- reaches the read ports of that FIFO only a few cycles later.
-        TELEM_TAG_NOT_READY : out std_logic;
+        TELEM_TAG_NOT_READY    : out std_logic;
         -- The UP stream is stopped because the completion buffer has no free space
-        TELEM_CPLH_SHORTAGE : out std_logic;
+        TELEM_CPLH_SHORTAGE    : out std_logic;
         -- The number of free words of the completion buffer, saturated to 16 bits
-        TELEM_CPLH_FREE     : out std_logic_vector(16-1 downto 0)
+        TELEM_CPLH_FREE        : out std_logic_vector(16-1 downto 0);
+        -- The UP stream is stopped because the free units of the Hard IP completion
+        -- buffer do not cover the response of the next group of requests
+        TELEM_HIP_CPL_SHORTAGE : out std_logic
     );
 end entity;
 
@@ -237,6 +255,12 @@ architecture FULL of PTC_TAG_MANAGER is
     constant A_WORDS_WIDTH      : integer := log2(AVAILABLE_WORDS+1);
 
     constant MFB_DOWN_WORD_SIZE         : integer := MFB_DOWN_REGIONS*MFB_DOWN_REG_SIZE;
+
+    -- Units of the Hard IP completion buffer, see HIP_CPL_UNITS. One unit is one
+    -- Read Completion Boundary block of 64 bytes, so it holds at most one completion.
+    constant HIP_CPL_CHECK              : boolean := (HIP_CPL_UNITS > 0);
+    constant HIP_UNIT_DW_WIDTH          : integer := log2(64/4);
+    constant HIP_FREE_WIDTH             : integer := max(8,log2(HIP_CPL_UNITS+1));
     constant MFB_DOWN_WORD_SIZE_WIDTH   : integer := log2(MFB_DOWN_WORD_SIZE);
     constant MFB_DOWN_WORD_SIZE_B_WIDTH : integer := MFB_DOWN_WORD_SIZE_WIDTH+2;
 
@@ -260,6 +284,9 @@ architecture FULL of PTC_TAG_MANAGER is
 
     constant WORDS_COUNT_WIDTH      : integer := log2(2**DMA_LEN_WIDTH*2-MFB_DOWN_REG_SIZE-MFB_DOWN_REGIONS)+1;
     constant WORDS_COUNT_SUM_WIDTH  : integer := log2(2**WORDS_COUNT_WIDTH*MVB_UP_ITEMS);
+    -- Width of the number of Hard IP units of one request and of one group of requests
+    constant HIP_UNITS_WIDTH        : integer := DMA_LEN_WIDTH+1;
+    constant HIP_UNITS_SUM_WIDTH    : integer := log2(2**HIP_UNITS_WIDTH*MVB_UP_ITEMS);
     -- Width of the len+addr add and round_up in s1_reg_pr (see words_u there). The
     -- rounded-up value is always an exact multiple of 2**MFB_DOWN_WORD_SIZE_WIDTH whose
     -- shifted-down value is words_u itself, so it fits in this width by the same sizing
@@ -338,6 +365,8 @@ architecture FULL of PTC_TAG_MANAGER is
     -- register instead of sitting behind the summation and the increment.
     signal s1_max_words_sum_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     signal s1_max_words_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
+    -- Sum of the Hard IP units of the reads in the group
+    signal s1_hip_units_sum_reg : unsigned(HIP_UNITS_SUM_WIDTH-1 downto 0);
 
     -- additional signals for max words counting
     signal s_len_u                : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_LEN_WIDTH-1 downto 0);
@@ -360,6 +389,7 @@ architecture FULL of PTC_TAG_MANAGER is
     -- maximum number of words in responses sum
     signal s2_max_words_sum_num_reg     : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
     signal s2_max_words_sum_num_res_reg : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);
+    signal s2_hip_units_sum_reg         : unsigned(HIP_UNITS_SUM_WIDTH-1 downto 0);
     -- '1' when the group currently held in the s2 register really debits the budget
     signal s2_debit_vld                 : std_logic;
     -- Number of UP items in the s2 register that ask for a PCIe Tag. Reading the Tag FIFO
@@ -387,6 +417,9 @@ architecture FULL of PTC_TAG_MANAGER is
     -- to sit directly in series with s2_reg_en, which fans out into the whole tag
     -- shakedown network and into the DMA up-merger FIFO write path.
     signal enough_free_cplh : std_logic;
+    -- Free units of the Hard IP completion buffer, see free_hip_reg_pr
+    signal free_hip_reg     : unsigned(HIP_FREE_WIDTH-1 downto 0);
+    signal enough_free_hip  : std_logic;
 
     -- auto-assigned tags from PCIe tag FIFOX Multi distributed to instructions in the s2 register
     signal auto_assigned_tags : slv_array_t(MVB_UP_ITEMS-1 downto 0)(INTERNAL_PCIE_TAG_WIDTH-1 downto 0);
@@ -439,6 +472,7 @@ architecture FULL of PTC_TAG_MANAGER is
     signal pcie_tag_status_dly  : unsigned(11-1 downto 0);
     signal auto_assign_rdy_dly  : std_logic;
     signal enough_free_cplh_dly : std_logic;
+    signal enough_free_hip_dly  : std_logic;
     signal cplh_free            : std_logic_vector(16-1 downto 0);
     signal cplh_free_dly        : std_logic_vector(16-1 downto 0);
     signal tag_demand           : unsigned(11-1 downto 0);
@@ -499,6 +533,16 @@ architecture FULL of PTC_TAG_MANAGER is
 
     -- the sum of recently freed reserved words
     signal freed_words_reg : unsigned(A_WORDS_WIDTH-1 downto 0);
+
+    -- Hard IP units released by the completions on the HIP_CPL_* interface
+    signal hip_cpl_low_addr_reg : slv_array_t(MVB_DOWN_ITEMS-1 downto 0)(PCIE_LOW_ADDR_WIDTH-1 downto 0);
+    signal hip_cpl_len_reg      : slv_array_t(MVB_DOWN_ITEMS-1 downto 0)(DMA_LEN_WIDTH-1 downto 0);
+    signal hip_cpl_last_reg     : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
+    signal hip_cpl_vld_reg      : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
+    signal hip_rel_data_reg     : std_logic_vector(MVB_DOWN_ITEMS*HIP_FREE_WIDTH-1 downto 0);
+    signal hip_rel_vld_reg      : std_logic_vector(MVB_DOWN_ITEMS-1 downto 0);
+    signal hip_rel_sum          : std_logic_vector(HIP_FREE_WIDTH-1 downto 0);
+    signal freed_hip_reg        : unsigned(HIP_FREE_WIDTH-1 downto 0);
 
     -- register for RCB_SIZE (for better timing)
     signal rcb_size_reg : std_logic;
@@ -587,6 +631,7 @@ begin
         variable addr_u          : u_array_t(MVB_UP_ITEMS-1 downto 0)(DMA_ADDR_WIDTH-1 downto 0);       -- dword address of transaction as unsigned
         variable words_u         : u_array_t(MVB_UP_ITEMS-1 downto 0)(WORDS_COUNT_WIDTH-1 downto 0);    -- complete number of words to reserve for the transaction
         variable words_sum       : unsigned(WORDS_COUNT_SUM_WIDTH-1 downto 0);                          -- sum of words to reserve for the whole group
+        variable hip_units_u     : u_array_t(MVB_UP_ITEMS-1 downto 0)(HIP_UNITS_WIDTH-1 downto 0);      -- Hard IP units to reserve for the transaction
         variable l               : line;                                                                -- debug print line
     begin
         if (rising_edge(CLK)) then
@@ -626,6 +671,9 @@ begin
 
                     -- save result
                     s1_max_words_num_reg(i) <= words_u(i);
+
+                    -- Hard IP units covered by the response, from the 64 B block of the first byte to the block of the last byte
+                    hip_units_u(i) := enlarge_right(round_up(resize(len_u(i),HIP_UNITS_WIDTH+HIP_UNIT_DW_WIDTH)+resize(resize(addr_u(i),HIP_UNIT_DW_WIDTH),HIP_UNITS_WIDTH+HIP_UNIT_DW_WIDTH),HIP_UNIT_DW_WIDTH),-HIP_UNIT_DW_WIDTH)(HIP_UNITS_WIDTH-1 downto 0);
                 end loop;
 
                 -- Balanced-tree sum (see masked_sum) instead of a ripple accumulation of
@@ -637,18 +685,21 @@ begin
                 -- There was a case when the precise counting of credits led to overflow
                 -- I was not able to find out why, so this is just a simple dirty hack.
                 s1_max_words_res_reg <= words_sum+1;
+                s1_hip_units_sum_reg <= masked_sum(hip_units_u,s0_vld and s0_read,HIP_UNITS_SUM_WIDTH);
             elsif (s2_reg_en = '1') then
                 -- The sums cover exactly the items marked by s1_reg_vld, so they must be
                 -- cleared along with it (an empty group sums to zero, hence reserve 1).
                 s1_reg_vld           <= (others => '0');
                 s1_max_words_sum_reg <= (others => '0');
                 s1_max_words_res_reg <= to_unsigned(1,WORDS_COUNT_SUM_WIDTH);
+                s1_hip_units_sum_reg <= (others => '0');
             end if;
 
             if (RESET = '1') then
                 s1_reg_vld           <= (others => '0');
                 s1_max_words_sum_reg <= (others => '0');
                 s1_max_words_res_reg <= to_unsigned(1,WORDS_COUNT_SUM_WIDTH);
+                s1_hip_units_sum_reg <= (others => '0');
             end if;
         end if;
     end process;
@@ -671,6 +722,7 @@ begin
 
                 s2_max_words_sum_num_reg     <= s1_max_words_sum_reg;
                 s2_max_words_sum_num_res_reg <= s1_max_words_res_reg;
+                s2_hip_units_sum_reg         <= s1_hip_units_sum_reg;
                 s2_read_cnt_reg              <= to_unsigned(count_ones(s1_reg_vld and s1_read_reg),log2(MVB_UP_ITEMS+1));
             end if;
 
@@ -687,7 +739,7 @@ begin
     -- retimed into that process uses exactly the same condition.
     s2_debit_vld <= '1' when (or s2_reg_vld) = '1' and (or s2_read_reg) = '1' else '0';
 
-    s2_reg_en <= '1' when s3_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1' and ((or s2_reg_vld) = '0' or enough_free_cplh = '1') else '0';
+    s2_reg_en <= '1' when s3_reg_en = '1' and MVB_UP_HDR_OUT_DST_RDY = '1' and ((or s2_reg_vld) = '0' or (enough_free_cplh = '1' and enough_free_hip = '1')) else '0';
 
     -- step 3 - reg3, Tag/ID saving FIFO input, free words counting, sending HDR OUT
 
@@ -753,12 +805,46 @@ begin
         end if;
     end process;
 
+    -- Free units of the Hard IP completion buffer, built like free_cplh_reg_pr.
+    -- enough_free_hip compares the next value of free_hip_reg with the units of
+    -- the group that is in the s2 register in the next cycle.
+    free_hip_reg_pr : process (CLK)
+        variable v_next_released : unsigned(HIP_FREE_WIDTH-1 downto 0);
+        variable v_next_debited  : unsigned(HIP_FREE_WIDTH-1 downto 0);
+    begin
+        if (rising_edge(CLK)) then
+            v_next_released := free_hip_reg+freed_hip_reg;
+            v_next_debited  := v_next_released-resize(s2_hip_units_sum_reg,HIP_FREE_WIDTH);
+
+            if (s2_reg_en = '1' and s2_debit_vld = '1') then
+                free_hip_reg <= v_next_debited;
+            else
+                free_hip_reg <= v_next_released;
+            end if;
+
+            if (HIP_CPL_CHECK = false) then
+                enough_free_hip <= '1';
+            elsif (s2_reg_en = '1' and s2_debit_vld = '1') then
+                enough_free_hip <= '1' when v_next_debited >= s1_hip_units_sum_reg else '0';
+            elsif (s2_reg_en = '1') then
+                enough_free_hip <= '1' when v_next_released >= s1_hip_units_sum_reg else '0';
+            else
+                enough_free_hip <= '1' when v_next_released >= s2_hip_units_sum_reg else '0';
+            end if;
+
+            if (RESET = '1') then
+                free_hip_reg    <= to_unsigned(HIP_CPL_UNITS,HIP_FREE_WIDTH);
+                enough_free_hip <= '1';
+            end if;
+        end if;
+    end process;
+
     -- in DMA FIFO input register
     s3_reg_pr : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (s3_reg_en = '1') then
-                s3_reg_vld           <= s2_read_vld and enough_free_cplh and MVB_UP_HDR_OUT_DST_RDY;
+                s3_reg_vld           <= s2_read_vld and enough_free_cplh and enough_free_hip and MVB_UP_HDR_OUT_DST_RDY;
                 s3_tag_reg           <= s2_tag_reg;
                 s3_id_reg            <= s2_id_reg;
                 s3_max_words_num_reg <= s2_max_words_num_reg;
@@ -805,7 +891,7 @@ begin
         end loop;
     end process;
 
-    MVB_UP_HDR_OUT_SRC_RDY <= '1' when (or s2_reg_vld) = '1' and s3_reg_en = '1' and enough_free_cplh = '1' else '0';
+    MVB_UP_HDR_OUT_SRC_RDY <= '1' when (or s2_reg_vld) = '1' and s3_reg_en = '1' and enough_free_cplh = '1' and enough_free_hip = '1' else '0';
 
     -- -------------------------------------------------------------------------
 
@@ -956,6 +1042,7 @@ begin
             pcie_tag_status_dly  <= pcie_tag_status_reg;
             auto_assign_rdy_dly  <= auto_assign_rdy;
             enough_free_cplh_dly <= enough_free_cplh;
+            enough_free_hip_dly  <= enough_free_hip;
             cplh_free_dly        <= cplh_free;
         end if;
     end process;
@@ -971,11 +1058,12 @@ begin
     telem_out_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            PCIE_TAG_STATUS     <= std_logic_vector(pcie_tag_status_dly);
-            TELEM_TAG_SHORTAGE  <= tag_shortage;
-            TELEM_TAG_NOT_READY <= tag_not_ready;
-            TELEM_CPLH_SHORTAGE <= not enough_free_cplh_dly;
-            TELEM_CPLH_FREE     <= cplh_free_dly;
+            PCIE_TAG_STATUS        <= std_logic_vector(pcie_tag_status_dly);
+            TELEM_TAG_SHORTAGE     <= tag_shortage;
+            TELEM_TAG_NOT_READY    <= tag_not_ready;
+            TELEM_CPLH_SHORTAGE    <= not enough_free_cplh_dly;
+            TELEM_CPLH_FREE        <= cplh_free_dly;
+            TELEM_HIP_CPL_SHORTAGE <= not enough_free_hip_dly;
         end if;
     end process;
 
@@ -1215,6 +1303,78 @@ begin
     begin
         if (rising_edge(CLK)) then
             freed_words_reg <= unsigned(pta_out_data);
+        end if;
+    end process;
+
+    -- -------------------------------------------------------------------------
+
+    -- -------------------------------------------------------------------------
+    -- Released Hard IP units
+    -- -------------------------------------------------------------------------
+
+    hip_cpl_in_reg_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to MVB_DOWN_ITEMS-1 loop
+                hip_cpl_low_addr_reg(i) <= HIP_CPL_LOW_ADDR((i+1)*PCIE_LOW_ADDR_WIDTH-1 downto i*PCIE_LOW_ADDR_WIDTH);
+                hip_cpl_len_reg(i)      <= HIP_CPL_LEN((i+1)*DMA_LEN_WIDTH-1 downto i*DMA_LEN_WIDTH);
+            end loop;
+            hip_cpl_last_reg <= HIP_CPL_LAST;
+            hip_cpl_vld_reg  <= HIP_CPL_VLD;
+            if (RESET = '1') then
+                hip_cpl_vld_reg <= (others => '0');
+            end if;
+        end if;
+    end process;
+
+    -- The last completion of a request releases every unit that it touches. An
+    -- earlier completion releases only the units that it fills completely. The
+    -- next completion starts in its partly filled last unit.
+    hip_rel_reg_pr : process (CLK)
+        variable rel_wide  : unsigned(HIP_FREE_WIDTH+HIP_UNIT_DW_WIDTH-1 downto 0);
+        variable rel_units : unsigned(HIP_FREE_WIDTH-1 downto 0);
+    begin
+        if (rising_edge(CLK)) then
+            for i in 0 to MVB_DOWN_ITEMS-1 loop
+                -- Bits 5:2 of the low address are the DWORD offset within the 64 B unit.
+                rel_wide := resize(unsigned(hip_cpl_len_reg(i)),rel_wide'length)+resize(unsigned(hip_cpl_low_addr_reg(i)(HIP_UNIT_DW_WIDTH+2-1 downto 2)),rel_wide'length);
+                if (hip_cpl_last_reg(i) = '1') then
+                    rel_units := enlarge_right(round_up(rel_wide,HIP_UNIT_DW_WIDTH),-HIP_UNIT_DW_WIDTH)(HIP_FREE_WIDTH-1 downto 0);
+                else
+                    rel_units := enlarge_right(round_down(rel_wide,HIP_UNIT_DW_WIDTH),-HIP_UNIT_DW_WIDTH)(HIP_FREE_WIDTH-1 downto 0);
+                end if;
+                hip_rel_data_reg((i+1)*HIP_FREE_WIDTH-1 downto i*HIP_FREE_WIDTH) <= std_logic_vector(rel_units);
+            end loop;
+            hip_rel_vld_reg <= hip_cpl_vld_reg;
+            if (RESET = '1' or HIP_CPL_CHECK = false) then
+                hip_rel_vld_reg <= (others => '0');
+            end if;
+        end if;
+    end process;
+
+    hip_rel_sum_adder_i : entity work.PIPE_TREE_ADDER
+    generic map (
+        ITEMS      => MVB_DOWN_ITEMS,
+        DATA_WIDTH => HIP_FREE_WIDTH,
+        LATENCY    => log2(MVB_DOWN_ITEMS)/log2(4) -- create 4-input adders
+    )
+    port map (
+        CLK        => CLK,
+        RESET      => RESET,
+
+        IN_DATA    => hip_rel_data_reg,
+        IN_VLD     => hip_rel_vld_reg,
+
+        OUT_DATA   => hip_rel_sum
+    );
+
+    freed_hip_reg_pr : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            freed_hip_reg <= unsigned(hip_rel_sum);
+            if (RESET = '1') then
+                freed_hip_reg <= (others => '0');
+            end if;
         end if;
     end process;
 

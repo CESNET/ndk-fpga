@@ -27,6 +27,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 0,
         "PCIE_ENDPOINTS"       : 1,
         "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 4,
 
         "DEVICE"               : "\\\"AGILEX\\\"" ,
         "PCIE_ENDPOINT_TYPE"   : "\\\"P_TILE\\\""    ,
@@ -104,6 +105,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 0,
         "PCIE_ENDPOINTS"       : 1,
         "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 5,
         "DMA_PORTS"            : 4,
 
         "DEVICE"               : "\\\"AGILEX\\\"",
@@ -130,6 +132,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 1,
         "PCIE_ENDPOINTS"       : 2,
         "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 5,
         "DMA_PORTS"            : 2,
 
         "DEVICE"               : "\\\"AGILEX\\\"",
@@ -156,6 +159,7 @@ SETTINGS = {
         "PCIE_ENDPOINT_MODE"   : 1,
         "PCIE_ENDPOINTS"       : 4,
         "PCIE_CONS"            : 2,
+        "PCIE_GEN"             : 5,
         "DMA_PORTS"            : 1,
 
         "DEVICE"               : "\\\"AGILEX\\\"",
@@ -201,21 +205,21 @@ SETTINGS = {
     },
 
     "_combinations_" : {
-        "P_TILE_512"           : ("intel_p_tile_512",              ),
-        "P_TILE_512"           : ("intel_p_tile_512", "straddling_on"),
-        "P_TILE_256_BIF"       : ("intel_p_tile_256_bif",          ),
-        "R_TILE_1024"          : ("intel_r_tile_1024",             ),
-        "R_TILE_1024"          : ("intel_r_tile_1024", "straddling_on"),
-        "R_TILE_512_BIF"       : ("intel_r_tile_512_bif",          ),
-        "R_TILE_512_BIF_2CONS" : ("intel_r_tile_512_bif_2cons",    ),
-        "USP_512"              : ("xilinx_usp_512",                ),
-        "USP_512"              : ("xilinx_usp_512", "straddling_on", ),
-        "USP_512_DMA_2"        : ("xilinx_usp_512", "dma_ports_2", ),
+        "P_TILE_512"               : ("intel_p_tile_512",              ),
+        "P_TILE_512_STRADDLING"    : ("intel_p_tile_512", "straddling_on"),
+        "P_TILE_256_BIF"           : ("intel_p_tile_256_bif",          ),
+        "R_TILE_1024"              : ("intel_r_tile_1024",             ),
+        "R_TILE_1024_STRADDLING"   : ("intel_r_tile_1024", "straddling_on"),
+        "R_TILE_512_BIF"           : ("intel_r_tile_512_bif",          ),
+        "R_TILE_512_BIF_2CONS"     : ("intel_r_tile_512_bif_2cons",    ),
+        "USP_512"                  : ("xilinx_usp_512",                ),
+        "USP_512_STRADDLING"       : ("xilinx_usp_512", "straddling_on", ),
+        "USP_512_DMA_2"            : ("xilinx_usp_512", "dma_ports_2", ),
 
-        "P_TILE_512_CQ"  : ("intel_p_tile_512" , "dma_ports_1", "bar_enable"),
-        "P_TILE_512_CQ"  : ("intel_p_tile_512" , "dma_ports_1", "bar_enable", "straddling_on"),
-        "R_TILE_1024_CQ" : ("intel_r_tile_1024", "dma_ports_1", "bar_enable"),
-        "USP_512_CQ"     : ("xilinx_usp_512"   , "dma_ports_1", "bar_enable"),
+        "P_TILE_512_CQ"            : ("intel_p_tile_512" , "dma_ports_1", "bar_enable"),
+        "P_TILE_512_CQ_STRADDLING" : ("intel_p_tile_512" , "dma_ports_1", "bar_enable", "straddling_on"),
+        "R_TILE_1024_CQ"           : ("intel_r_tile_1024", "dma_ports_1", "bar_enable"),
+        "USP_512_CQ"               : ("xilinx_usp_512"   , "dma_ports_1", "bar_enable"),
 
     },
 }

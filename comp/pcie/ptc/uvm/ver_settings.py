@@ -25,6 +25,7 @@ SETTINGS = {
         "TR_MIN"               : "100"                  ,
         "TR_MAX"               : "300"                  ,
         "ONLY_READ"            : "0"                    ,
+        "HIP_CPL_UNITS"        : "0"                    ,
     },
     "s10_256_port" : {
         "DMA_PORTS"            : "1"                 ,
@@ -134,6 +135,9 @@ SETTINGS = {
     "rcb_128" : {
         "RCB_SIZE"                  : "1'b1"         ,
     },
+    "hip_cpl_small" : { # The Hard IP completion buffer check stops the reads often
+        "HIP_CPL_UNITS"             : "40"           ,
+    },
     "_combinations_" : (
     (), # Works the same as '("default",),' as the "default" is applied in every combination
     ("s10_256_port"        ,                                   ),
@@ -147,6 +151,10 @@ SETTINGS = {
     (                        "2_ports", "rcb_128",             ),
     ("s10_256_port"        , "2_ports", "rcb_128",             ),
     ("agilex_4p_gen5x16"   , "2_ports", "rcb_128",             ),
+    ("agilex_4p_gen5x16"   , "hip_cpl_small",                  ),
+    ("agilex_1_port_500mhz", "hip_cpl_small",                  ),
+    ("agilex_1_port_500mhz", "2_ports", "rcb_128", "hip_cpl_small",),
+    ("s10_256_port"        , "hip_cpl_small",                  ),
     ("agilex_1_port_300mhz", "2_ports", "rcb_128",             ),
     ("agilex_1_port_500mhz", "2_ports", "rcb_128",             ),
     ("ultrascale_1_port"   , "2_ports", "rcb_128",             ),

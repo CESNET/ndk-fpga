@@ -18,7 +18,13 @@ entity PCIE_MFB2AVST is
         REGION_SIZE        : natural := 1;  -- not to be changed
         BLOCK_SIZE         : natural := 8;  -- not to be changed
         ITEM_WIDTH         : natural := 32; -- not to be changed
-        META_WIDTH         : natural := 8
+        META_WIDTH         : natural := 8;
+        -- Number of cycles between TX_AVST_READY and the TX_AVST_VALID of
+        -- the word that this READY allows. A TLP stopped by TX_AVST_READY
+        -- continues READY_LATENCY cycles after TX_AVST_READY returns.
+        -- The R-Tile TX interface requires 1. P-Tile and H-Tile use 3.
+        -- TX_AVST has idle cycles inside a TLP only when RX_MFB has them.
+        READY_LATENCY      : natural := 3
     );
     port (
         CLK            : in  std_logic;
@@ -47,10 +53,14 @@ architecture BEHAV of PCIE_MFB2AVST is
     constant META_SIGNAL_WIDTH : natural := REGIONS*META_WIDTH;
     constant DATA_WIDTH        : natural := REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH;
     constant AVST_EMPTY_WIDTH  : natural := REGIONS*log2(REGION_SIZE*BLOCK_SIZE);
+    -- With READY_LATENCY 1, the data is not registered, so the latency
+    -- consists only of the TX_AVST_READY register.
+    constant DATA_REG          : boolean := (READY_LATENCY >= 2);
+    constant READY_REGS        : natural := tsel(DATA_REG, READY_LATENCY-1, READY_LATENCY);
 
     signal avst_empty_arr   : slv_array_t(REGIONS-1 downto 0)(log2(REGION_SIZE*BLOCK_SIZE)-1 downto 0);
     signal mfb_eof_pos_arr  : slv_array_t(REGIONS-1 downto 0)(log2(REGION_SIZE*BLOCK_SIZE)-1 downto 0);
-    signal ready_delay_reg1 : std_logic;
+    signal ready_delay_reg  : std_logic_vector(READY_REGS-1 downto 0);
     signal mfb_dst_rdy      : std_logic;
     signal avst_empty       : std_logic_vector(AVST_EMPTY_WIDTH-1 downto 0);
     signal mfb_src_rdy      : std_logic;
@@ -69,56 +79,66 @@ begin
 
     avst_empty <= slv_array_ser(avst_empty_arr, REGIONS, log2(REGION_SIZE*BLOCK_SIZE));
 
-    -- ===================================================================
-    -- once delayed data and twice delayed src_rdy makes ready_latency = 3
-    -- ===================================================================
-    data_delay_reg_p : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            TX_AVST_DATA  <= RX_MFB_DATA;
-            TX_AVST_META  <= RX_MFB_META;
-            avst_sop      <= RX_MFB_SOF;
-            avst_eop      <= RX_MFB_EOF;
-            TX_AVST_EMPTY <= avst_empty;
-        end if;
-    end process;
+    assert (READY_LATENCY >= 1)
+        report "PCIE_MFB2AVST: READY_LATENCY must be at least 1!"
+        severity failure;
 
-    ready_delay1_reg_p : process (CLK)
+    -- ===================================================================
+    -- RX_MFB_DST_RDY is TX_AVST_READY delayed by READY_REGS registers.
+    -- When DATA_REG is true, the data goes through one register.
+    -- ===================================================================
+    ready_delay_reg_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
             if (RST = '1') then
-                ready_delay_reg1 <= '0';
+                ready_delay_reg <= (others => '0');
             else
-                ready_delay_reg1 <= TX_AVST_READY;
+                ready_delay_reg(0) <= TX_AVST_READY;
+                for i in 1 to READY_REGS-1 loop
+                    ready_delay_reg(i) <= ready_delay_reg(i-1);
+                end loop;
             end if;
         end if;
     end process;
 
-    ready_delay2_reg_p : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            if (RST = '1') then
-                mfb_dst_rdy <= '0';
-            else
-                mfb_dst_rdy <= ready_delay_reg1;
+    mfb_dst_rdy <= ready_delay_reg(READY_REGS-1);
+
+    data_reg_g : if DATA_REG generate
+        data_delay_reg_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                TX_AVST_DATA  <= RX_MFB_DATA;
+                TX_AVST_META  <= RX_MFB_META;
+                avst_sop      <= RX_MFB_SOF;
+                avst_eop      <= RX_MFB_EOF;
+                TX_AVST_EMPTY <= avst_empty;
             end if;
-        end if;
-    end process;
+        end process;
+
+        src_rdy_delay_reg_p : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RST = '1') then
+                    mfb_src_rdy <= '0';
+                else
+                    mfb_src_rdy <= RX_MFB_SRC_RDY and mfb_dst_rdy;
+                end if;
+            end if;
+        end process;
+    end generate;
+
+    data_noreg_g : if not DATA_REG generate
+        TX_AVST_DATA  <= RX_MFB_DATA;
+        TX_AVST_META  <= RX_MFB_META;
+        avst_sop      <= RX_MFB_SOF;
+        avst_eop      <= RX_MFB_EOF;
+        TX_AVST_EMPTY <= avst_empty;
+        mfb_src_rdy   <= RX_MFB_SRC_RDY and mfb_dst_rdy;
+    end generate;
 
     -- ======================
     --  logic for avst valid
     -- ======================
-    src_rdy_delay_reg_p : process (CLK)
-    begin
-        if (rising_edge(CLK)) then
-            if (RST = '1') then
-                mfb_src_rdy <= '0';
-            else
-                mfb_src_rdy <= RX_MFB_SRC_RDY and mfb_dst_rdy;
-            end if;
-        end if;
-    end process;
-
     packet_cont : process (CLK)
     begin
         if (rising_edge(CLK)) then

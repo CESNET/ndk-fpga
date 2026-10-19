@@ -295,7 +295,23 @@ architecture FULL of PCIE is
         return pcie_mfb_regions;
     end function;
 
+    -- Size of the completion buffer of the PCIe Hard IP in units of 64 bytes.
+    -- A unit holds one completion, because a completion does not cross a Read
+    -- Completion Boundary of 64 B. Each value is the smaller of the header buffer
+    -- depth and the data buffer size divided by 64 B. Both are in the Completion
+    -- Buffer Size table of the user guide of the tile. 0 disables the check.
+    function ptc_hip_cpl_units_f return natural is
+    begin
+        if (PCIE_ENDPOINT_TYPE = "R_TILE") then
+            return tsel(PCIE_ENDPOINT_MODE = 1, 1008, 1444);
+        elsif (PCIE_ENDPOINT_TYPE = "P_TILE") then
+            return tsel(PCIE_ENDPOINT_MODE = 1, 361, 722);
+        end if;
+        return 0;
+    end function;
+
     constant DMA_PORTS_PER_EP    : natural := DMA_PORTS/PCIE_ENDPOINTS;
+    constant PTC_HIP_CPL_UNITS   : natural := ptc_hip_cpl_units_f;
     constant CORE_RQ_MFB_REGIONS : natural := core_regions_f(RQ_MFB_REGIONS);
     constant CORE_RC_MFB_REGIONS : natural := core_regions_f(RC_MFB_REGIONS);
     constant RESET_WIDTH         : natural := 6;
@@ -619,6 +635,7 @@ begin
             DBG_ENABLE          => PCIE_CTRL_DBG_ENABLE,
             PTC_DISABLE         => PTC_DISABLE,
             DMA_BAR_ENABLE      => DMA_BAR_ENABLE,
+            PTC_HIP_CPL_UNITS   => PTC_HIP_CPL_UNITS,
             MTC_PCIE_MPS        => MTC_PCIE_MPS,
             PCIE_MPS_MAX        => PCIE_MPS_MAX,
             PCIE_MRRS_MAX       => PCIE_MRRS_MAX,

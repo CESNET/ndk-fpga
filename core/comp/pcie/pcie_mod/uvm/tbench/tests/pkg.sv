@@ -63,6 +63,12 @@ package test;
     parameter PCIE_ENDPOINT_TYPE = "DUMMY";
     // Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8
     parameter PCIE_ENDPOINT_MODE = 0;
+    // PCIe generation of the R-Tile IP core: 4 or 5
+    parameter PCIE_GEN           = 4;
+    // Size of the Hard IP completion buffer in units of 64 bytes, the same as in
+    // pcie_top.vhd. 0 disables the check.
+    parameter HIP_CPL_UNITS = (PCIE_ENDPOINT_TYPE == "R_TILE") ? ((PCIE_ENDPOINT_MODE == 1) ? 1008 : 1444) :
+                              (PCIE_ENDPOINT_TYPE == "P_TILE") ? ((PCIE_ENDPOINT_MODE == 1) ? 361 : 722) : 0;
     // Number of PCIe endpoints
     parameter PCIE_ENDPOINTS     = 1;
     // Number of PCIe clocks per PCIe connector

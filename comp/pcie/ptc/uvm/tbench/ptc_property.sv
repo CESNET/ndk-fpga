@@ -10,7 +10,8 @@ import uvm_pkg::*;
 module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MFB_UP_ITEM_WIDTH,
                       DMA_MVB_UP_ITEMS, MFB_UP_REGIONS, PCIE_UP_META_WIDTH,
                       MFB_DOWN_REGIONS, MFB_DOWN_REG_SIZE, MFB_DOWN_BLOCK_SIZE, MFB_DOWN_ITEM_WIDTH,
-                      PCIE_DOWN_META_WIDTH, DMA_MFB_DOWN_REGIONS, DMA_MVB_DOWN_ITEMS, DMA_PORTS, DEVICE)
+                      PCIE_DOWN_META_WIDTH, DMA_MFB_DOWN_REGIONS, DMA_MVB_DOWN_ITEMS, DMA_PORTS, DEVICE,
+                      ENDPOINT_TYPE)
     (
         input RESET,
         input RESET_DMA,
@@ -153,5 +154,76 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
                 `uvm_error(module_name, "\n\tMVB interface: MFB SOF is not same as MVB VLD.");
             end
     end
+
+    // =========================================================================
+    // R-Tile TX interface rules
+    // =========================================================================
+    // One region of the RQ MFB bus is one segment of the R-Tile TX interface.
+    // A TLP can start only in segments st0 and st2 (4 regions) or st0 and st1
+    // (2 regions). A TLP starts in a higher segment only when the previous TLP
+    // ends in a lower segment. See the R-Tile Avalon-ST IP for PCIe User Guide
+    // (683501), Tables 59 and 60.
+    generate
+        if (DEVICE == "AGILEX" && ENDPOINT_TYPE == "R_TILE") begin : gen_rtile_tx_rules
+            localparam int unsigned SOF_STEP = (MFB_UP_REGIONS > 1) ? MFB_UP_REGIONS/2 : 1;
+
+            for (genvar r = 1; r < MFB_UP_REGIONS; r++) begin : gen_rtile_region
+                if ((r % SOF_STEP) != 0) begin : gen_no_sof
+                    property rq_no_sof;
+                        @(posedge rq_mfb_vif.CLK)
+                        disable iff(RESET || START)
+                        (rq_mfb_vif.SRC_RDY && rq_mfb_vif.DST_RDY) |-> (rq_mfb_vif.SOF[r] === 1'b0);
+                    endproperty
+
+                    assert property (rq_no_sof)
+                        else begin
+                            `uvm_error(module_name, $sformatf(
+                                "\n\tRQ MFB interface: SOF in region %0d, R-Tile does not allow a TLP start here.", r));
+                        end
+                end else begin : gen_sof_after_eof
+                    property rq_sof_after_eof;
+                        @(posedge rq_mfb_vif.CLK)
+                        disable iff(RESET || START)
+                        (rq_mfb_vif.SRC_RDY && rq_mfb_vif.DST_RDY && rq_mfb_vif.SOF[r]) |-> (|rq_mfb_vif.EOF[r-1:0]);
+                    endproperty
+
+                    assert property (rq_sof_after_eof)
+                        else begin
+                            `uvm_error(module_name, $sformatf(
+                                "\n\tRQ MFB interface: SOF in region %0d without EOF in a lower region.", r));
+                        end
+
+                    // A TLP that starts in this region ends in the same word.
+                    property rq_eof_in_word;
+                        @(posedge rq_mfb_vif.CLK)
+                        disable iff(RESET || START)
+                        (rq_mfb_vif.SRC_RDY && rq_mfb_vif.DST_RDY && rq_mfb_vif.SOF[r])
+                            |-> (|rq_mfb_vif.EOF[MFB_UP_REGIONS-1:r]);
+                    endproperty
+
+                    assert property (rq_eof_in_word)
+                        else begin
+                            `uvm_error(module_name, $sformatf(
+                                "\n\tRQ MFB interface: TLP that starts in region %0d does not end in the word.", r));
+                        end
+                end
+            end
+
+            // Number of RQ MFB words with the given number of SOF
+            int unsigned sof_per_word[MFB_UP_REGIONS+1];
+
+            always @(posedge rq_mfb_vif.CLK) begin
+                if (RESET !== 1'b1 && rq_mfb_vif.SRC_RDY === 1'b1 && rq_mfb_vif.DST_RDY === 1'b1) begin
+                    sof_per_word[$countones(rq_mfb_vif.SOF)]++;
+                end
+            end
+
+            final begin
+                for (int unsigned i = 0; i <= MFB_UP_REGIONS; i++) begin
+                    $display("RQ MFB STATS: words with %0d SOF: %0d", i, sof_per_word[i]);
+                end
+            end
+        end
+    endgenerate
 
 endmodule

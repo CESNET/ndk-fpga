@@ -17,6 +17,7 @@ lappend PACKAGES "$PKG_BASE/type_pack.vhd"
 
 # list of sub-components
 lappend COMPONENTS [ list "DMA_PACKAGE"     "$OFM_PATH/comp/base/pkg" "DMA_PKG" ]
+lappend COMPONENTS [ list "PCIE_HDR_GEN"        "$OFM_PATH/comp/pcie/others/hdr_gen"         "FULL" ]
 lappend COMPONENTS [ list "ASYNC_RESET"         "$OFM_PATH/comp/base/async/reset"            "FULL" ]
 lappend COMPONENTS [ list "MVB_SFIFOX"          "$MVB_TOOLS_BASE/storage/fifox"              "FULL" ]
 lappend COMPONENTS [ list "MVB_ASFIFOX"         "$MVB_TOOLS_BASE/storage/asfifox"            "FULL" ]

@@ -18,6 +18,10 @@ package uvm_pcie_top;
     `include "model_mtc.sv"
     `include "model_base.sv"
     `include "scoreboard.sv"
+
+    `uvm_analysis_imp_decl(_rq)
+    `uvm_analysis_imp_decl(_rc)
+    `include "cpl_buffer.sv"
     `include "env.sv"
 
 endpackage

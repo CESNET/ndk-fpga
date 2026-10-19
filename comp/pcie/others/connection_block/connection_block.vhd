@@ -137,6 +137,8 @@ architecture FULL of PCIE_CONNECTION_BLOCK is
     -- latency for R-Tile is ignored
     constant AVST2MFB_AVST_RDY_LAT  : natural := tsel((ENDPOINT_TYPE = "H_TILE"),20,30);
     constant DOWN_USE_DST_RDY       : boolean := True;  -- TODO (ENDPOINT_TYPE/="R_TILE");
+    -- R-Tile TX interface requires that a stopped TLP continues 1 cycle after tx_st_ready returns
+    constant MFB2AVST_READY_LAT     : natural := tsel(IS_RTILE_DEVICE, 1, 3);
     -- Optimalization parameters
     constant MFB_MERGER_CNT_MAX     : natural := 4;
     constant PIPE_TYPE              : string  := "REG"; -- "SHREG" or "REG"
@@ -848,6 +850,9 @@ begin
 
     up1_pipe_tlp_vld <= up1_pipe_mfb_src_rdy and up1_pipe_mfb_sof;
 
+    -- TODO: CB_RTILE_CRDT_UP stops the whole MFB word. A word can hold the end
+    -- of one TLP and the start of a TLP without credits. Then the first TLP gets
+    -- idle cycles, which the R-Tile TX interface does not allow inside a TLP.
     crdt_up_ptc_i : entity work.CB_RTILE_CRDT_UP
     generic map (
         REGIONS     => MFB_REGIONS,
@@ -958,11 +963,12 @@ begin
     -- conversion MFB2AVST
     mfb2avst_i : entity work.PCIE_MFB2AVST
     generic map (
-        REGIONS     => MFB_REGIONS,
-        REGION_SIZE => MFB_REGION_SIZE,
-        BLOCK_SIZE  => MFB_BLOCK_SIZE,
-        ITEM_WIDTH  => MFB_ITEM_WIDTH,
-        META_WIDTH  => MFB_UP_META_WIDTH
+        REGIONS       => MFB_REGIONS,
+        REGION_SIZE   => MFB_REGION_SIZE,
+        BLOCK_SIZE    => MFB_BLOCK_SIZE,
+        ITEM_WIDTH    => MFB_ITEM_WIDTH,
+        META_WIDTH    => MFB_UP_META_WIDTH,
+        READY_LATENCY => MFB2AVST_READY_LAT
     )
     port map (
         CLK            => CLK,

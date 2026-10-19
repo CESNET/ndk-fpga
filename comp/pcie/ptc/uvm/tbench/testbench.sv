@@ -246,7 +246,8 @@ module testbench;
         .DMA_MFB_DOWN_REGIONS (DMA_MFB_DOWN_REGIONS),
         .DMA_MVB_DOWN_ITEMS   (DMA_MVB_DOWN_ITEMS),
         .DMA_PORTS            (DMA_PORTS),
-        .DEVICE               (DEVICE)
+        .DEVICE               (DEVICE),
+        .ENDPOINT_TYPE        (ENDPOINT_TYPE)
     )
     PROPERTY_CHECK (
         .RESET        (RST.RESET),
