@@ -140,6 +140,13 @@ proc SetupDesign {synth_flags} {
 
     set_param messaging.defaultLimit 3000
 
+    # setup IP repos for blocks designs
+    if { [info exists SYNTH_FLAGS(IP_REPO_PATHS)] } {
+        puts "Using IP REPO path: $SYNTH_FLAGS(IP_REPO_PATHS)"
+        set_property  ip_repo_paths  $SYNTH_FLAGS(IP_REPO_PATHS) [current_project]
+        update_ip_catalog
+    }
+
     # Apply user settings
     foreach i $SYNTH_FLAGS(SETUP_FLAGS) {
         if { $i == "USE_XPM_LIBRARIES" } {
@@ -537,14 +544,40 @@ proc SaveDesign {synth_flags} {
     set ROOTNAME [pwd]/$SYNTH_FLAGS(OUTPUT)
     if {[list_property [get_runs impl_1] STEPS.WRITE_*.TCL.PRE] eq "STEPS.WRITE_DEVICE_IMAGE.TCL.PRE"} {
         write_device_image -force $ROOTNAME.pdi
+        if {$SYNTH_FLAGS(BITSTREAM) == "COMBINE_DBMC"} {
+            write_hw_platform -fixed -force -file ./FPGA.xsa
+        }
     } else {
         write_bitstream -force $ROOTNAME.bit
     }
 
     close_project
 
+    # Create combined pdi file with design & DBMC
+    if { [info exists SYNTH_FLAGS(BITSTREAM)] && $SYNTH_FLAGS(BITSTREAM) == "COMBINE_DBMC"} {
+        nb_run_combine_dbmc SYNTH_FLAGS
+    }
+
     # INFO: Create archive AFTER close_project - random issues with insufficient memory
     nb_nfw_archive_create SYNTH_FLAGS
+}
+
+proc nb_run_combine_dbmc {synth_flags} {
+    global env
+    upvar 1 $synth_flags SYNTH_FLAGS
+
+    file copy -force $SYNTH_FLAGS(OUTPUT).pdi fpga.pdi
+    exec cp -f $SYNTH_FLAGS(COMBINE_DBMC_SCRIPT_DIR)/combine_pdi.bif ./
+    exec cp -rf $SYNTH_FLAGS(DBMC_DIR) ./
+    puts "Run build DBMC ..."
+    if {[catch {exec ./dbmc/build.sh --debug --xsa ./FPGA.xsa --make} msg]} {
+        puts stderr "Building DBMC failed:\n$msg"
+    }
+    exec ./dbmc/build.sh --install
+    puts "Run create combined PDI for firmware & DBMC..."
+    if {[catch {exec bootgen -arch versal -image ./combine_pdi.bif -w -o ./combined.pdi} msg]} {
+        puts stderr "Combining the firmware & DBMC failed:\n$msg"
+    }
 }
 
 proc nb_nfw_archive_create {synth_flags} {
@@ -561,7 +594,11 @@ proc nb_nfw_archive_create {synth_flags} {
     if {[file exists $SYNTH_FLAGS(OUTPUT).bit]} {
         lappend SYNTH_FLAGS(NFW_FILES) [list $SYNTH_FLAGS(OUTPUT).bit $SYNTH_FLAGS(FPGA).bit]
     } else {
-        lappend SYNTH_FLAGS(NFW_FILES) [list $SYNTH_FLAGS(OUTPUT).pdi $SYNTH_FLAGS(FPGA).pdi]
+        if { [info exists SYNTH_FLAGS(BITSTREAM)] && $SYNTH_FLAGS(BITSTREAM) == "COMBINE_DBMC"} {
+            lappend SYNTH_FLAGS(NFW_FILES) [list combined.pdi $SYNTH_FLAGS(FPGA).pdi]
+        } else {
+            lappend SYNTH_FLAGS(NFW_FILES) [list $SYNTH_FLAGS(OUTPUT).pdi $SYNTH_FLAGS(FPGA).pdi]
+        }
     }
 
     # Copy each file from SYNTH_FLAGS(NFW_FILES) list to temporary directory
