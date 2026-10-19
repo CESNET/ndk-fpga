@@ -86,7 +86,7 @@ def align_request(bus_width: int, addr: int, data_len: int, *, byte_enable: Opti
     start_offset = addr % bus_width
     end_offset = -(addr + data_len) % bus_width
 
-    byte_enable = LogicArray(("0" * start_offset) + byte_enable.binstr + ("0" * end_offset)) if byte_enable is not None else None
+    byte_enable = LogicArray(("0" * start_offset) + byte_enable.binstr[::-1] + ("0" * end_offset)) if byte_enable is not None else None
     addr = addr - start_offset
 
     return start_offset, end_offset, addr, byte_enable
