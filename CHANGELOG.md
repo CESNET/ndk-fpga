@@ -51,6 +51,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Fixed AXIS_ETH_PARSER returning headers of other packets after a packet whose header offset was after the packet end.
 - comp: Fixed AXIS_ETH_PARSER reporting a header cut by the end of the packet as valid.
 - comp: Fixed AXIS_MERGER inferring a latch, which could stop all streams until the next packet of the selected stream.
+- comp: Fixed MVB_MERGE_STREAMS_ORDERED comparing invalid SEL VLD with already read items when SEL SRC_RDY fell before the word was accepted.
 
 ## [2026.9.0] - 2026-09-30
 
