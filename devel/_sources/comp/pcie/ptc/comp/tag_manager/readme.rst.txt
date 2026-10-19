@@ -12,6 +12,20 @@ For downstream read responses, the mapping is done the other way around based on
 The Tag Manager is also responsible for freeing of the PCIe Tags, checking of their availability and of the availability of storage space in the downstream MVB+MFB Storage FIFO.
 (The MVB+MFB Storage FIFO must be kept from overflowing to prevent fall of DST_RDY on the downstream IP core interface.)
 
+Hard IP completion buffer
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When ``HIP_CPL_UNITS`` is not 0, the Tag Manager also checks the completion buffer of the PCIe Hard IP.
+One unit is a Read Completion Boundary block of 64 B, and it holds at most one completion.
+A read request reserves ``ceil((addr mod 64 + length) / 64)`` units, with the address and the length in bytes.
+The request is sent only when this reservation fits in the free units.
+
+The ``HIP_CPL_*`` interface releases the units as the completions arrive from the Hard IP.
+The last completion of a request releases ``ceil((offset + length) / 64)`` units.
+An earlier completion releases ``floor((offset + length) / 64)`` units.
+``offset`` is the start address of the completion within its 64 B block.
+The releases of one request therefore add up to its reservation.
+
 Block diagram
 ^^^^^^^^^^^^^
 

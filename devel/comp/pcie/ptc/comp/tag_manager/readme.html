@@ -75,6 +75,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../pkt_writer/readme.html">PCIe Packet Writer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../readme.html">PTC (PCIe Transaction Controller)</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">PTC Tag Manager</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hard-ip-completion-buffer">Hard IP completion buffer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#block-diagram">Block diagram</a></li>
 </ul>
 </li>
@@ -161,6 +162,18 @@ The Tag Manager dynamically assigns a free PCIe Tag to each upstream read reques
 For downstream read responses, the mapping is done the other way around based on the previously stored information.
 The Tag Manager is also responsible for freeing of the PCIe Tags, checking of their availability and of the availability of storage space in the downstream MVB+MFB Storage FIFO.
 (The MVB+MFB Storage FIFO must be kept from overflowing to prevent fall of DST_RDY on the downstream IP core interface.)</p>
+<section id="hard-ip-completion-buffer">
+<h2>Hard IP completion buffer<a class="headerlink" href="#hard-ip-completion-buffer" title="Link to this heading"></a></h2>
+<p>When <code class="docutils literal notranslate"><span class="pre">HIP_CPL_UNITS</span></code> is not 0, the Tag Manager also checks the completion buffer of the PCIe Hard IP.
+One unit is a Read Completion Boundary block of 64 B, and it holds at most one completion.
+A read request reserves <code class="docutils literal notranslate"><span class="pre">ceil((addr</span> <span class="pre">mod</span> <span class="pre">64</span> <span class="pre">+</span> <span class="pre">length)</span> <span class="pre">/</span> <span class="pre">64)</span></code> units, with the address and the length in bytes.
+The request is sent only when this reservation fits in the free units.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">HIP_CPL_*</span></code> interface releases the units as the completions arrive from the Hard IP.
+The last completion of a request releases <code class="docutils literal notranslate"><span class="pre">ceil((offset</span> <span class="pre">+</span> <span class="pre">length)</span> <span class="pre">/</span> <span class="pre">64)</span></code> units.
+An earlier completion releases <code class="docutils literal notranslate"><span class="pre">floor((offset</span> <span class="pre">+</span> <span class="pre">length)</span> <span class="pre">/</span> <span class="pre">64)</span></code> units.
+<code class="docutils literal notranslate"><span class="pre">offset</span></code> is the start address of the completion within its 64 B block.
+The releases of one request therefore add up to its reservation.</p>
+</section>
 <section id="block-diagram">
 <h2>Block diagram<a class="headerlink" href="#block-diagram" title="Link to this heading"></a></h2>
 <p>The core part of the unit is the Tag mapping memory, which stores the corresponding DMA Tag and Unit ID for each possible PCIe Tag.

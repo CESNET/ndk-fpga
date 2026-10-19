@@ -134,6 +134,37 @@ There are these changes which may occur:
       :width: 30 %
       :alt:
 
+Transactions per MFB word on the IP core interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The PCIe IP core sets the regions of the MFB word in which a new PCIe transaction can start.
+
+.. list-table::
+   :header-rows: 1
+
+   * - IP core
+     - Regions with a start of a transaction
+     - Transactions per MFB word
+   * - Intel H-Tile
+     - region 0
+     - 1
+   * - Intel P-Tile
+     - any region
+     - up to MFB_REGIONS
+   * - Intel R-Tile, Gen5 x16 (4 regions)
+     - regions 0 and 2
+     - up to 2
+   * - Intel R-Tile, Gen5 x8x8 (2 regions per port)
+     - regions 0 and 1
+     - up to 2
+
+On R-Tile, one MFB region is one 256-bit segment of the TX interface in the double-width mode.
+A transaction starts in region 1 or 2 only when the previous transaction ends in a lower region.
+The PTC starts a transaction in region 1 or 2 only when the transaction also ends in the same MFB word.
+See the *R-Tile Avalon Streaming IP for PCI Express User Guide* (683501), Tables 59 and 60.
+The single-width mode (Gen4 x16) accepts a start of only one transaction per clock cycle.
+The PTC does not support this mode.
+
 References
 ^^^^^^^^^^
 
