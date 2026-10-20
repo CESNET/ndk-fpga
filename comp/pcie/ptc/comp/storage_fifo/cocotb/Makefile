@@ -10,8 +10,8 @@ TARGET=cocotb
 # `make` alone uses PTC_STORAGE_FIFO's own entity defaults, which already match
 # the real R-Tile x16 instantiation (MFB_REGIONS=4, MFB_REG_SIZE=1,
 # MFB_BLOCK_SIZE=4, MFB_ITEM_WIDTH=32, MVB_ITEMS=4, MAIN_FIFO_ITEMS=512).
-# A smaller MAIN_FIFO_ITEMS (to hit FIFO full/empty corners faster) can be set
-# by hand, e.g.: make GENERICS="-gMAIN_FIFO_ITEMS=16".
+# A smaller MAIN_FIFO_ITEMS (to hit FIFO empty corners and the space limit in
+# cocotb_test.py faster) can be set by hand, e.g.: make GENERICS="-gMAIN_FIFO_ITEMS=16".
 .PHONY: all
 all: comp
 

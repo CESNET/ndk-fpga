@@ -24,6 +24,9 @@
 #    SRC_RDY, so an MFB EOF is never seen without its paired MVB header. The RX
 #    drivers therefore use NO idle generators; input rate stress comes from the
 #    MVB driver's word-packing and from independent TX backpressure.
+#  - The DUT input does not support backpressure, so RX_MVB_DST_RDY must stay
+#    '1'. A new pair is sent only when the DUT has space for it (see
+#    testbench.wait_for_space).
 #  - Frames are aligned to an MFB region boundary (region_size*block_size*
 #    item_width/8). MFB_COMPACTOR reorders whole regions, so region-aligned
 #    frames keep SOF/EOF on region starts and yield a byte-exact in-order
@@ -100,6 +103,14 @@ class testbench():
         self.mfb_throughput_probe.add_log_interval(0, None)
         self.mfb_throughput_probe.set_log_period(10)
 
+        # Space in the DUT storage FIFOs: MVB items and MFB words.
+        self.mvb_space = dut.MVB_ITEMS.value * dut.MAIN_FIFO_ITEMS.value
+        self.mfb_space = dut.MAIN_FIFO_ITEMS.value
+        self.mfb_word_bytes = (mfb_params["regions"] * mfb_params["region_size"]
+                               * mfb_params["block_size"] * mfb_params["item_width"] // 8)
+        # Item i is the sum of MFB words that are reserved by the first i sent pairs.
+        self.mfb_words_sum = [0]
+
         self.pkts_sent = 0
         self.mvb_expected_output = []
         self.mfb_expected_output = []
@@ -119,6 +130,19 @@ class testbench():
         self.mvb_expected_output.append(mvb_transaction)
         self.mfb_expected_output.append(mfb_transaction)
         self.pkts_sent += 1
+
+    async def wait_for_space(self, mfb_words):
+        """Wait until the DUT has space for one more pair.
+
+        Each pair reserves one MVB item and mfb_words MFB words.
+        The space is free again when the pair is read on the TX side.
+        """
+        while True:
+            mvb_used = self.pkts_sent - self.mvb_stream_out.item_cnt
+            mfb_used = self.mfb_words_sum[-1] - self.mfb_words_sum[self.mfb_stream_out.frame_cnt]
+            if mvb_used < self.mvb_space and mfb_used + mfb_words <= self.mfb_space:
+                return
+            await RisingEdge(self.dut.CLK)
 
     async def reset(self):
         # Some DUT registers have no reset. They get a defined value only when
@@ -150,6 +174,11 @@ async def _drive_pairs(tb, packets_mvb, packets_mfb):
 
         mfb_tr = MfbTransaction()
         mfb_tr.data = mfb_packet
+
+        # The frame can start in any region of a word, so it can take one word more.
+        mfb_words = -(-len(mfb_packet) // tb.mfb_word_bytes) + 1
+        await tb.wait_for_space(mfb_words)
+        tb.mfb_words_sum.append(tb.mfb_words_sum[-1] + mfb_words)
 
         tb.model(mvb_tr, mfb_tr)
         cocotb.log.debug(f"generated pair: MVB={mvb_tr}, MFB len={len(mfb_packet)}")
