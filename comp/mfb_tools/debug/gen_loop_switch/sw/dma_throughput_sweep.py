@@ -20,6 +20,7 @@ Two-step workflow:
 import argparse
 import csv
 import datetime
+import json
 import re
 import socket
 import subprocess
@@ -247,6 +248,7 @@ class RunParams:
     buffer_count: Optional[int]
     buffer_size: Optional[int]
     eth_rate: Optional[int]
+    pcie_telemetry_time: Optional[float] # None = PCIe telemetry is not recorded
 
     def chart_config(self) -> Dict[str, object]:
         """The settings shown in the chart subtitle, keyed exactly like the metadata
@@ -308,13 +310,29 @@ def configure_dma_buffers(device: str, buffer_count: Optional[int], buffer_size:
         raise RuntimeError(f"'nfb-dma' buffer configuration failed (exit code {result.returncode})")
 
 
-def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams, workdir: Path) -> Path:
-    """Invoke gls_mod.py for a single mode and return the path to its report CSV."""
+def find_single_file(workdir: Path, pattern: str) -> Path:
+    """Return the only file in workdir that matches the pattern."""
+    matches = list(workdir.glob(pattern))
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"Expected exactly one {pattern} from gls_mod.py in {workdir}, found {len(matches)}"
+        )
+    return matches[0]
+
+
+def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams,
+                 workdir: Path) -> Tuple[Path, Optional[Path]]:
+    """Invoke gls_mod.py for a single mode.
+
+    Returns the path to its report CSV and the path to its PCIe telemetry file. The second
+    path is None when the PCIe telemetry is not recorded.
+    """
     workdir.mkdir(parents=True, exist_ok=True)
-    # Remove what a previous sweep left here, so the report CSV and the NDP logs read
-    # afterwards can only describe this run.
-    for old_file in list(workdir.glob("report_*.csv")) + list(workdir.glob("ndp-*.log")):
-        old_file.unlink()
+    # Remove what a previous sweep left here, so the report CSV, the PCIe telemetry and
+    # the NDP logs read afterwards can only describe this run.
+    for pattern in ("report_*.csv", "ndp-*.log", "pcie_telemetry_*"):
+        for old_file in workdir.glob(pattern):
+            old_file.unlink()
 
     cmd = [
         sys.executable, str(gls_mod_path),
@@ -332,6 +350,8 @@ def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams, workdir: Path
         cmd += ["-i", params.index]
     if params.ext_loop:
         cmd += ["-e"]
+    if params.pcie_telemetry_time is not None:
+        cmd += ["-T", "--pcie_telemetry_time", str(params.pcie_telemetry_time)]
 
     print(f"\n==== Running gls_mod.py mode '{mode}' ({MODE_LABELS[mode]}) ====")
     print("$ " + " ".join(cmd))
@@ -339,12 +359,11 @@ def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams, workdir: Path
     if result.returncode != 0:
         raise RuntimeError(f"gls_mod.py failed for mode '{mode}' (exit code {result.returncode})")
 
-    reports = list(workdir.glob("report_*.csv"))
-    if len(reports) != 1:
-        raise RuntimeError(
-            f"Expected exactly one report_*.csv from gls_mod.py in {workdir}, found {len(reports)}"
-        )
-    return reports[0]
+    report = find_single_file(workdir, "report_*.csv")
+    telemetry = None
+    if params.pcie_telemetry_time is not None:
+        telemetry = find_single_file(workdir, "pcie_telemetry_*.jsonl")
+    return report, telemetry
 
 
 def load_mode_report(csv_path: Path, mode: str) -> "pd.DataFrame":
@@ -353,6 +372,21 @@ def load_mode_report(csv_path: Path, mode: str) -> "pd.DataFrame":
     df = df.rename(columns={"Length": "length", "TX APP speed": "tx_bps", "RX APP speed": "rx_bps"})
     df["mode"] = mode
     return add_frame_rate_columns(df[["mode", "length", "tx_bps", "rx_bps"]])
+
+
+def load_mode_telemetry(jsonl_path: Path, mode: str) -> "pd.DataFrame":
+    """Load the PCIe telemetry of one mode as one row per frame length.
+
+    The row holds the flat summary that gls_mod.py stored for that frame length. The
+    columns are named like "ep0 PTC -> PCIe (RQ) used %".
+    """
+    rows = []
+    with open(jsonl_path) as f:
+        for line in f:
+            if line.strip():
+                record = json.loads(line)
+                rows.append({"mode": mode, "length": record["length"], **record["summary"]})
+    return pd.DataFrame(rows)
 
 
 def add_frame_rate_columns(df: "pd.DataFrame") -> "pd.DataFrame":
@@ -382,6 +416,7 @@ def write_results_csv(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, o
         "buffer_count": params.buffer_count if params.buffer_count is not None else "default",
         "buffer_size": params.buffer_size if params.buffer_size is not None else "default",
         "eth_rate": params.eth_rate if params.eth_rate is not None else "",
+        "pcie_telemetry_time": params.pcie_telemetry_time if params.pcie_telemetry_time is not None else "",
         "hostname": socket.gethostname().partition(".")[0],
         "run_time_iso": datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
     }
@@ -550,6 +585,56 @@ def plot_run(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, out_path: 
                 format_config_subtitle(params.chart_config()), out_path)
 
 
+# Columns of the PCIe telemetry summary that the telemetry charts show. Each pattern
+# captures the endpoint prefix and the name of the curve.
+TELEMETRY_BUS_USED = re.compile(r"^(.*ep\d+) (.+) used %$")
+TELEMETRY_STOP = re.compile(r"^(.*ep\d+) stop (.+) %$")
+
+
+def plot_telemetry(df: "pd.DataFrame", mode: str, meta: FwMetadata, params: RunParams,
+                   out_path: Path) -> None:
+    """Plot the PCIe telemetry of one mode against the frame length.
+
+    Each PCIe endpoint has one row of two panels. The left panel shows how much of each
+    bus was used. The right panel shows why the PCIe transfer stopped. Both are shares in %.
+    """
+    rows = df[df["mode"] == mode].sort_values("length")
+    endpoints: Dict[str, Dict[str, List[Tuple[str, str]]]] = {}
+    for column in rows.columns:
+        for kind, pattern in (("used", TELEMETRY_BUS_USED), ("stop", TELEMETRY_STOP)):
+            match = pattern.match(column)
+            if match:
+                panels = endpoints.setdefault(match.group(1), {"used": [], "stop": []})
+                panels[kind].append((column, match.group(2)))
+    if rows.empty or not endpoints:
+        return
+
+    panel_titles = {"used": "bus used", "stop": "why the PCIe transfer stopped"}
+    fig, axes = plt.subplots(len(endpoints), 2, figsize=(14, 6.5 * len(endpoints)),
+                             facecolor=CHART_STYLE["surface"], squeeze=False)
+    for row, (endpoint, panels) in enumerate(endpoints.items()):
+        for col, kind in enumerate(("used", "stop")):
+            ax = axes[row][col]
+            prepare_axes(ax)
+            for index, (column, label) in enumerate(panels[kind]):
+                ax.plot(rows["length"], rows[column],
+                        color=CATEGORICAL_PALETTE[index % len(CATEGORICAL_PALETTE)],
+                        linewidth=2, label=label,
+                        marker=point_marker(len(rows)), markersize=5)
+            ax.set_title(f"{endpoint}: {panel_titles[kind]}", color=CHART_STYLE["ink_primary"],
+                         fontsize=12, loc="left")
+            ax.set_xlabel("Frame length [B]")
+            ax.set_ylabel("Share of clock cycles [%]")
+            ax.set_ylim(0, max(ax.get_ylim()[1] * 1.05, 1))
+            if panels[kind]:
+                # Below the panel, because the curves can be anywhere between 0 and 100 %.
+                ax.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.12),
+                          ncol=2, fontsize=8)
+
+    save_figure(fig, f"PCIe telemetry — {MODE_LABELS[mode]} — {meta.label}",
+                format_config_subtitle(params.chart_config()), out_path)
+
+
 def cmd_run(args: argparse.Namespace) -> None:
     """Sweep every selected mode on the currently loaded FW, then save CSV and plots."""
     gls_mod_path = Path(__file__).parent / "gls_mod.py"
@@ -580,7 +665,16 @@ def cmd_run(args: argparse.Namespace) -> None:
         buffer_count=args.buffer_count,
         buffer_size=args.buffer_size,
         eth_rate=args.eth_rate,
+        pcie_telemetry_time=args.pcie_telemetry,
     )
+    if params.pcie_telemetry_time is not None and params.pcie_telemetry_time <= 0:
+        sys.exit("ERROR: --pcie-telemetry needs a time greater than 0 seconds")
+    if params.pcie_telemetry_time is not None:
+        # gls_mod.py runs with the same Python, so fail now and not after the first mode
+        try:
+            import ofm.comp.pcie.telemetry  # noqa: F401
+        except ImportError as e:
+            sys.exit(f"ERROR: --pcie-telemetry needs the ofm package of this repository (python/ofm): {e}")
     if params.size_step < 1 or not (64 <= params.size_min <= params.size_max <= 1518):
         sys.exit(f"ERROR: invalid frame size sweep '{params.size_min} {params.size_max} "
                  f"{params.size_step}' — expected 64 <= MIN <= MAX <= 1518 and STEP >= 1")
@@ -589,6 +683,8 @@ def cmd_run(args: argparse.Namespace) -> None:
     print(f"Frame sizes: {params.size_min}-{params.size_max} step {params.size_step} "
           f"({points_per_mode} points per mode, {len(modes)} modes)")
     print("This can take a while, roughly 1.5-2 s per point per mode.")
+    if params.pcie_telemetry_time is not None:
+        print(f"PCIe telemetry adds about {params.pcie_telemetry_time} s per point per mode.")
 
     meta = read_fw_metadata(device)
     if not meta.build_revision and not args.fw_label:
@@ -606,10 +702,13 @@ def cmd_run(args: argparse.Namespace) -> None:
     raw_dir = run_dir / "raw"
 
     frames = []
+    telemetry_frames = []
     try:
         for mode in modes:
-            csv_path = run_gls_mode(gls_mod_path, mode, params, raw_dir / mode)
+            csv_path, telemetry_path = run_gls_mode(gls_mod_path, mode, params, raw_dir / mode)
             frames.append(load_mode_report(csv_path, mode))
+            if telemetry_path is not None:
+                telemetry_frames.append(load_mode_telemetry(telemetry_path, mode))
     except KeyboardInterrupt:
         sys.exit("\nInterrupted, partial results (if any) were not saved.")
 
@@ -625,6 +724,19 @@ def cmd_run(args: argparse.Namespace) -> None:
         plot_path = run_dir / f"throughput_{meta.fw_id}.png"
         plot_run(df, meta, params, plot_path)
         print(f"Saved plot: {plot_path}")
+
+    if telemetry_frames:
+        telemetry_df = pd.concat(telemetry_frames, ignore_index=True)
+        telemetry_csv = run_dir / f"pcie_telemetry_{meta.fw_id}.csv"
+        write_results_csv(telemetry_df, meta, params, telemetry_csv)
+        print(f"Saved PCIe telemetry summary: {telemetry_csv} "
+              f"(full reports: {raw_dir}/<mode>/pcie_telemetry_*.txt)")
+        if not args.skip_plots:
+            for mode in modes:
+                plot_path = run_dir / f"pcie_telemetry_{mode}_{meta.fw_id}.png"
+                plot_telemetry(telemetry_df, mode, meta, params, plot_path)
+                if plot_path.exists():
+                    print(f"Saved plot: {plot_path}")
 
     print(f"\nDone. To compare against another FW build, run this again with a different "
           f"FW loaded, then:\n  {Path(sys.argv[0]).name} compare {run_dir} <other_run_dir>")
@@ -785,6 +897,12 @@ def main() -> None:
                        help="physical Ethernet line rate in Gbps (e.g. 100 or 400). If set, every\n"
                             "chart shows the theoretical throughput limit for this rate;\n"
                             "default: none, no limit curve")
+    p_run.add_argument("--pcie-telemetry", type=float, nargs="?", const=0.5, default=None,
+                       metavar="SECONDS",
+                       help="record the PCIe telemetry once for each frame length, in the middle of\n"
+                            "its measurement (passed through to gls_mod.py as -T). SECONDS is the\n"
+                            "length of one telemetry measurement; default when given: 0.5.\n"
+                            "Saves a summary CSV and one chart per mode; default: not recorded")
     p_run.add_argument("--fw-label", help="override the auto-detected FW label/id (use if the Device Tree has no build-revision)")
     p_run.add_argument("-o", "--outdir", default="dma_throughput_results", help="output directory; default: ./dma_throughput_results")
     p_run.add_argument("--skip-plots", action="store_true", help="only produce the consolidated CSV, no PNG plots")
