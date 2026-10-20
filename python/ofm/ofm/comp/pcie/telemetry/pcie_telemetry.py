@@ -7,7 +7,7 @@
 import argparse
 import json
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import nfb
 from tabulate import tabulate
@@ -306,6 +306,22 @@ class PcieTelemetry(nfb.BaseComp):
 
         return result
 
+    def measure(self, interval: float) -> Tuple[Dict, Optional[float]]:
+        """Measures the telemetry over an interval and returns it with its length in seconds.
+
+        An interval of 0 or less returns the totals since the last clear. The
+        returned length is None then.
+        """
+        if interval <= 0:
+            return self.read(), None
+        self.clear_flags()
+        self.clear_marks()
+        first = self.read()
+        start = time.time()
+        time.sleep(interval)
+        second = self.read()
+        return _diff(second, first), time.time() - start
+
 
 def _diff(new: Dict, old: Optional[Dict]) -> Dict:
     """Subtracts two readings so that the result covers only the interval."""
@@ -335,10 +351,76 @@ def _name(names: tuple, index: int, kind: str) -> str:
     return f"{kind} {index}"
 
 
-def _pct(part: int, whole: int) -> str:
+def _share(part: int, whole: int) -> Optional[float]:
+    """Returns the part as a percentage of the whole, or None when the whole is zero."""
     if whole == 0:
+        return None
+    return 100.0 * part / whole
+
+
+def _pct(part: int, whole: int) -> str:
+    return _fmt_pct(_share(part, whole))
+
+
+def _fmt_pct(value: Optional[float]) -> str:
+    if value is None:
         return "   -  "
-    return f"{100.0 * part / whole:6.2f}"
+    return f"{value:6.2f}"
+
+
+def _bus_metrics(bus: Dict, ep: Dict, cfg: Dict,
+                 seconds: Optional[float]) -> Dict[str, Optional[float]]:
+    """Computes the values of one bus that the report and the summary show.
+
+    A value is None when it does not apply to the bus or cannot be computed.
+    """
+    cycles = ep["pcie_cycles"] if bus["pcie_clk"] else ep["dma_cycles"]
+    data_bytes = bus["items"] * cfg["item_bytes"]
+    # Where the headers have an MVB bus of their own, every request
+    # has an item there, so that is the whole transaction count. The
+    # MFB carries only the requests that have payload.
+    requests = bus["mvb"] if bus["has_mvb"] else bus["transactions"]
+
+    metrics: Dict[str, Optional[float]] = {
+        "used": _share(sum(bus["regions"]), cycles * len(bus["regions"])),
+        "words": _share(bus["words"], cycles),
+        "mfb_stall": _share(bus["backpressure"], cycles),
+        "mvb_stall": None,
+        "gbps": None,
+        "mpps": None,
+        "read": None,
+        "avg_bytes": None,
+    }
+    if bus["has_mvb"]:
+        metrics["mvb_stall"] = _share(bus["mvb_backpressure"], cycles)
+    if seconds:
+        metrics["gbps"] = data_bytes * 8 / seconds / 1e9
+        metrics["mpps"] = requests / seconds / 1e6
+    # Only the bus towards the PTC carries both kinds of request, so
+    # only there is the difference between the two counts the number of
+    # reads. Every completion has payload, so on the other buses the
+    # same subtraction would always give zero.
+    if bus["dma_up"]:
+        metrics["read"] = _share(max(requests - bus["transactions"], 0), requests)
+    if bus["transactions"]:
+        metrics["avg_bytes"] = data_bytes / bus["transactions"]
+    return metrics
+
+
+def _brakes(ep: Dict) -> List[Tuple[str, str, int]]:
+    """Lists the reasons why the PCIe transfer stopped as (stream, name, cycles).
+
+    The number of reasons comes from the firmware, so a reason added there
+    is reported even before it is named here. The last reason is not a
+    counter of its own. The stalled cycles of the RQ bus already say how
+    long the PCIe endpoint did not take data.
+    """
+    brakes = [_BRAKE_NAMES[index] + (value,) if index < len(_BRAKE_NAMES)
+              else ("UP", f"reason {index}", value)
+              for index, value in enumerate(ep["brakes"])]
+    brakes.append(("UP", "PCIe endpoint not ready",
+                   ep["buses"]["PTC -> PCIe (RQ)"]["backpressure"]))
+    return brakes
 
 
 def format_report(data: Dict, seconds: Optional[float] = None) -> str:
@@ -391,51 +473,20 @@ def format_report(data: Dict, seconds: Optional[float] = None) -> str:
         rows = []
         for name, bus in ep["buses"].items():
             cycles = pcie_cycles if bus["pcie_clk"] else dma_cycles
-            regions = len(bus["regions"])
-
-            used = sum(bus["regions"])
-            capacity = cycles * regions
-            data_bytes = bus["items"] * cfg["item_bytes"]
+            metrics = _bus_metrics(bus, ep, cfg, seconds)
             per_region = " ".join(f"{100.0 * r / cycles:.1f}" if cycles else "-"
                                   for r in bus["regions"])
-            # Where the headers have an MVB bus of their own, every request
-            # has an item there, so that is the whole transaction count. The
-            # MFB carries only the requests that have payload.
-            requests = bus["mvb"] if bus["has_mvb"] else bus["transactions"]
-
-            gbps = ""
-            mpps = ""
-            if seconds:
-                gbps = f"{data_bytes * 8 / seconds / 1e9:.2f}"
-                mpps = f"{requests / seconds / 1e6:.3f}"
-
-            # Only the bus towards the PTC carries both kinds of request, so
-            # only there is the difference between the two counts the number of
-            # reads. Every completion has payload, so on the other buses the
-            # same subtraction would always give zero.
-            read = "   -  "
-            if bus["dma_up"]:
-                read = _pct(max(requests - bus["transactions"], 0), requests)
-
-            avg = "-"
-            if bus["transactions"]:
-                avg = f"{data_bytes / bus['transactions']:.0f}"
-
-            mvb_stalled = "   -  "
-            if bus["has_mvb"]:
-                mvb_stalled = _pct(bus["mvb_backpressure"], cycles)
-
             rows.append([
                 name,
-                _pct(used, capacity),
-                _pct(bus["words"], cycles),
-                _pct(bus["backpressure"], cycles),
-                mvb_stalled,
+                _fmt_pct(metrics["used"]),
+                _fmt_pct(metrics["words"]),
+                _fmt_pct(metrics["mfb_stall"]),
+                _fmt_pct(metrics["mvb_stall"]),
                 per_region,
-                gbps,
-                mpps,
-                read,
-                avg,
+                "" if metrics["gbps"] is None else f"{metrics['gbps']:.2f}",
+                "" if metrics["mpps"] is None else f"{metrics['mpps']:.3f}",
+                _fmt_pct(metrics["read"]),
+                "-" if metrics["avg_bytes"] is None else f"{metrics['avg_bytes']:.0f}",
             ])
 
         lines.append("")
@@ -444,15 +495,7 @@ def format_report(data: Dict, seconds: Optional[float] = None) -> str:
             "Used per region %", "Gbps", "Mpps", "RD %", "Avg B",
         ], tablefmt="simple", disable_numparse=True))
 
-        # The number of reasons comes from the firmware, so a reason added there
-        # is reported even before it is named here. The last reason is not a
-        # counter of its own. The stalled cycles of the RQ bus already say how
-        # long the PCIe endpoint did not take data.
-        brakes = [_BRAKE_NAMES[index] + (value,) if index < len(_BRAKE_NAMES)
-                  else ("UP", f"reason {index}", value)
-                  for index, value in enumerate(ep["brakes"])]
-        brakes.append(("UP", "PCIe endpoint not ready",
-                       ep["buses"]["PTC -> PCIe (RQ)"]["backpressure"]))
+        brakes = _brakes(ep)
 
         # One column per stream, which keeps the block short.
         up = [(label, value) for stream, label, value in brakes if stream == "UP"]
@@ -496,6 +539,61 @@ def format_report(data: Dict, seconds: Optional[float] = None) -> str:
     return "\n".join(lines)
 
 
+# Names of the bus values in the summary, with their unit.
+_SUMMARY_BUS_KEYS = (
+    ("used", "used %"),
+    ("words", "words %"),
+    ("mfb_stall", "MFB stall %"),
+    ("mvb_stall", "MVB stall %"),
+    ("gbps", "Gbps"),
+    ("mpps", "Mpps"),
+    ("read", "RD %"),
+    ("avg_bytes", "avg B"),
+)
+
+
+def summarize(data: Dict, seconds: Optional[float] = None) -> Dict[str, float]:
+    """Returns the main values of one reading as a flat dictionary of numbers.
+
+    It has the same values as the report, without the link settings. Scripts
+    use it to store one row per measurement, for example in a CSV file. Each
+    key starts with the endpoint, for example "ep0 PTC -> PCIe (RQ) used %".
+    A value that does not apply to a bus is left out.
+    """
+    cfg = data["config"]
+    summary: Dict[str, float] = {
+        "lost deltas": int(data["status"]["lost_deltas"]),
+        "readout overrun": int(data["status"]["readout_overrun"]),
+    }
+
+    for ep in data["endpoints"]:
+        prefix = f"ep{ep['index']}"
+        summary[f"{prefix} tags free lowest"] = ep["tags_free_min"]
+        summary[f"{prefix} storage FIFO free lowest"] = ep["stfifo_free_min"]
+
+        for name, bus in ep["buses"].items():
+            metrics = _bus_metrics(bus, ep, cfg, seconds)
+            for key, label in _SUMMARY_BUS_KEYS:
+                value = metrics[key]
+                if value is not None:
+                    summary[f"{prefix} {name} {label}"] = value
+
+        for stream, label, value in _brakes(ep):
+            share = _share(value, ep["pcie_cycles"])
+            if share is not None:
+                summary[f"{prefix} stop {stream}: {label} %"] = share
+
+        for index, bands in enumerate(ep["hists"]):
+            title = _name(tuple(name for name, _ in _HIST_NAMES), index, "resource")
+            for band, value in enumerate(bands):
+                share = _share(value, ep["pcie_cycles"])
+                if share is not None:
+                    band_name = _name(_BAND_NAMES, band, "band")
+                    summary[f"{prefix} low {title} {band_name} %"] = share
+
+    return summary
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="nfb-pcie-telemetry",
@@ -522,19 +620,8 @@ def main():
         print("Counters cleared.")
         return
 
-    def measure():
-        if args.interval <= 0:
-            return telemetry.read(), None
-        telemetry.clear_flags()
-        telemetry.clear_marks()
-        first = telemetry.read()
-        start = time.time()
-        time.sleep(args.interval)
-        second = telemetry.read()
-        return _diff(second, first), time.time() - start
-
     while True:
-        data, seconds = measure()
+        data, seconds = telemetry.measure(args.interval)
         if args.json:
             print(json.dumps({"seconds": seconds, "data": data}, indent=4))
         else:
