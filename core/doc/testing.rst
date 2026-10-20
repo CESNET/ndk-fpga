@@ -78,7 +78,7 @@ See the test modes and other options by running the script with the ``-h`` optio
 .. code-block:: text
 
     $ python gls_mod.py -h
-    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
+    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME]
 
             Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -126,6 +126,10 @@ See the test modes and other options by running the script with the ``-h`` optio
                             set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000
     -r {1,2}, --rate_layer {1,2}
                             measure the rate at ISO/OSI layer: 1 or 2; default: 2
+    -T, --pcie_telemetry  record the PCIe telemetry once for each frame length, in the middle of its measurement;
+                            the data goes to pcie_telemetry_<report name>.jsonl and .txt in the current directory
+    --pcie_telemetry_time PCIE_TELEMETRY_TIME
+                            set the length [s] of the PCIe telemetry measurement; default: 0.5
 
 When launched, the script performs a test or a continuous series of tests that generates data (in SW or using a generator in the design), sets datapaths, and measures throughput.
 When using TX DMA, the scripts uses the ``ndp-generate`` tool to generate and send packets via DMA into the FPGA FW.
@@ -278,3 +282,42 @@ started, in a log file named after the tool (``ndp-read.log``, ``ndp-loopback.lo
 ``ndp-generate.log``). ``gls_mod.py`` writes them next to its own ``report_*.csv``. A curve with
 unexpected values can then be checked against the output of the tool. The next run of the same
 mode rewrites the logs, so copy the files you need to keep.
+
+PCIe telemetry for each frame length
+""""""""""""""""""""""""""""""""""""
+
+Both scripts can also record the PCIe telemetry. The PCIe telemetry is a firmware component
+that counts how the PCIe buses are used and why the PCIe transfers stop (see the
+``PCIE_TELEMETRY`` documentation and the ``nfb-pcie-telemetry`` tool). The firmware must
+contain this component. The telemetry also needs the ``ofm`` Python package of this repository
+(``python/ofm``). Without the telemetry options the scripts run with an older ``ofm`` package too.
+
+``gls_mod.py -T`` measures the telemetry once for each frame length. The measurement starts
+after half of the speed measurements of that frame length are done. The traffic keeps running
+during the telemetry measurement, so the telemetry describes the same steady traffic as the
+speed values. ``--pcie_telemetry_time`` sets the length of one telemetry measurement (default
+0.5 s). This time is added to the test time of every frame length. The results go to two files
+next to the report CSV:
+
+.. list-table::
+    :header-rows: 1
+
+    * - File
+      - Content
+    * - ``pcie_telemetry_<report name>.jsonl``
+      - One JSON object per line, one line per frame length. It holds the frame length, the raw
+        data of each telemetry component and a flat summary of the main values.
+    * - ``pcie_telemetry_<report name>.txt``
+      - The same report that ``nfb-pcie-telemetry`` prints, once for each frame length.
+
+``dma_throughput_sweep.py run --pcie-telemetry [SECONDS]`` passes the option to
+``gls_mod.py``. SECONDS sets the length of one telemetry measurement (default 0.5 s). The script
+then saves the summaries of all modes into ``pcie_telemetry_<fw_id>.csv``, one row per mode and
+frame length. For each mode it also saves the chart ``pcie_telemetry_<mode>_<fw_id>.png``. The
+chart has one row of panels for each PCIe endpoint. The left panel shows how much of each bus
+was used. The right panel shows why the PCIe transfer stopped. The full text reports stay in
+``raw/<mode>/``.
+
+.. code-block:: bash
+
+    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --pcie-telemetry -o results/

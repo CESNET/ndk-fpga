@@ -10,6 +10,7 @@ frame lengths. It tags each run with the FW build identity and plots the results
 shows both the bit rate in Gbps and the frame rate in Mpps. The `compare` subcommand overlays
 several such runs (e.g. two FW versions) on common charts. Before the sweep it can also set the
 kernel DMA buffer count and size (via `nfb-dma`, requires sudo) and records that setting in the
-results for comparability. See the
+results for comparability. With `--pcie-telemetry` (`-T` in `gls_mod.py`) both scripts also
+record the PCIe telemetry once for each frame length, in the middle of its measurement. See the
 [GLS module tutorial](https://cesnet.github.io/ndk-fpga/devel/ndk_core/doc/testing.html#automated-dma-throughput-sweeps-and-fw-comparison)
 or run it with `-h`.
