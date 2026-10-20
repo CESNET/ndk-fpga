@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import re
+import json
 import subprocess
 import time
 import os
@@ -15,13 +16,17 @@ import socket
 import datetime
 import logging
 import argparse
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from dataclasses import dataclass
 from tabulate import tabulate
 
 import nfb
 from ofm.comp.mfb_tools.debug.gen_loop_switch import GenLoopSwitch
 from ofm.utils.units import convert_units
+
+if TYPE_CHECKING:
+    # The PCIe telemetry is imported only with -T, so the script also runs with an older ofm package.
+    from ofm.comp.pcie.telemetry import PcieTelemetry
 
 
 class GracefulExiter():
@@ -120,6 +125,54 @@ def stop_process(p: subprocess.Popen | None, timeout: float = 0.5) -> None:
         p.wait(timeout=timeout) # reap the process (wait for child processs' exit status)
 
 
+def open_pcie_telemetry(device: nfb.Nfb) -> List["PcieTelemetry"]:
+    """Open every PCIe telemetry component that the firmware has."""
+    try:
+        from ofm.comp.pcie.telemetry import PcieTelemetry
+    except ImportError as e:
+        raise RuntimeError(f"ERROR: PCIe telemetry needs the ofm package of this repository (python/ofm): {e}")
+    count = len(device.fdt_get_compatible(PcieTelemetry.DT_COMPATIBLE))
+    if count == 0:
+        raise RuntimeError("ERROR: PCIe telemetry is enabled, but the firmware has no PCIe telemetry component!")
+    return [PcieTelemetry(dev=device, index=i) for i in range(count)]
+
+
+def record_pcie_telemetry(
+    telemetries: List["PcieTelemetry"],
+    interval: float,
+    length: int,
+    jsonl_path: str,
+    txt_path: str,
+) -> None:
+    """Measure the PCIe telemetry once and add the result to both telemetry files.
+
+    The JSON Lines file gets one line per frame length. The line holds the raw data of
+    each telemetry component and a flat summary of the main values (see summarize()).
+    The text file gets the same report that the nfb-pcie-telemetry tool prints.
+    """
+    from ofm.comp.pcie.telemetry import format_report, summarize
+
+    record = {"length": length, "summary": {}, "components": []}
+    reports = []
+    for index, telemetry in enumerate(telemetries):
+        data, seconds = telemetry.measure(interval)
+        # The keys of a single component stay short, as the summary of the tool has them.
+        prefix = f"telemetry{index} " if len(telemetries) > 1 else ""
+        for key, value in summarize(data, seconds).items():
+            record["summary"][prefix + key] = value
+        record["components"].append({"index": index, "seconds": seconds, "data": data})
+        reports.append(f"--- PCIe telemetry component {index} ---\n" + format_report(data, seconds))
+        if data["status"]["lost_deltas"] or data["status"]["readout_overrun"]:
+            logging.warning(f"PCIe telemetry component {index} lost some counter updates, its values are not exact.")
+
+    with open(jsonl_path, "a") as f:
+        f.write(json.dumps(record) + "\n")
+    with open(txt_path, "a") as f:
+        f.write(f"===== Frame length {length} B =====\n")
+        f.write("\n\n".join(reports) + "\n\n")
+    print(f"PCIe telemetry recorded over {interval:.2f} s.")
+
+
 @dataclass
 class GlsMuxConfig:
     r2l_gen: Optional[int]
@@ -163,6 +216,8 @@ def run_test(
     report_name: str,
     device : int,
     exiter : GracefulExiter,
+    pcie_telemetry : List["PcieTelemetry"],
+    pcie_telemetry_time : float,
 ) -> None:
 
     demo_path = "/tmp/demo_gui.txt"
@@ -178,6 +233,16 @@ def run_test(
         row = ["Length", "TX APP speed", "RX APP speed"]
         writer.writerow(row)
 
+    # PCIe telemetry is measured once per frame length, in the middle of the speed
+    # measurements of that length. The traffic is then running at a steady rate.
+    if pcie_telemetry:
+        telemetry_jsonl = "./pcie_telemetry_" + report_name + ".jsonl"
+        telemetry_txt = "./pcie_telemetry_" + report_name + ".txt"
+        open(telemetry_jsonl, "w").close()
+        open(telemetry_txt, "w").close()
+        logging.info(f"PCIe telemetry goes to {telemetry_jsonl} and {telemetry_txt}")
+    # The number of speed measurements made before the telemetry is measured.
+    telemetry_after = (len(gls_internals) * cycles) // 2
     if mode in ["tx", "rxtx", "dma_tx", "dma_rxtx", "dma_loop"]:
         use_ndp_gen = True
     else:
@@ -227,6 +292,7 @@ def run_test(
             time.sleep(0.5)
             tx_total_speed = 0
             rx_total_speed = 0
+            measurements_done = 0
 
             for i, g in enumerate(gls_internals):
                 print("Data Stream: " + str(i))
@@ -234,6 +300,11 @@ def run_test(
                 rx_app_speed = 0
 
                 for _ in range(cycles):
+                    if pcie_telemetry and measurements_done == telemetry_after:
+                        record_pcie_telemetry(pcie_telemetry, pcie_telemetry_time, length,
+                                              telemetry_jsonl, telemetry_txt)
+                    measurements_done += 1
+
                     if g.tx_sm is not None:
                         g.tx_sm.clear_data()
                         tx_speed = g.tx_sm.measure(f=gls_clk_freq)[0]
@@ -456,6 +527,9 @@ def main():
         "cycles"    : "set the number of test cycles that are averaged for each frame length, default: 4",
         "frequency" : "set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000",
         "layer"     : "measure the rate at ISO/OSI layer: 1 or 2; default: 2",
+        "telemetry" : "record the PCIe telemetry once for each frame length, in the middle of its measurement;\n"
+                      "the data goes to pcie_telemetry_<report name>.jsonl and .txt in the current directory",
+        "tel_time"  : "set the length [s] of the PCIe telemetry measurement; default: 0.5",
     }
 
     gls_desc = """
@@ -480,6 +554,8 @@ def main():
     arg_parser.add_argument("-C", "--test_cycles", type=int, default=4, help=help_dict["cycles"])
     arg_parser.add_argument("-f", "--frequency", type=int, default=200_000_000, help=help_dict["frequency"])
     arg_parser.add_argument("-r", "--rate_layer", type=int, default=2, choices=[1, 2], help=help_dict["layer"])
+    arg_parser.add_argument("-T", "--pcie_telemetry", action="store_true", help=help_dict["telemetry"])
+    arg_parser.add_argument("--pcie_telemetry_time", type=float, default=0.5, help=help_dict["tel_time"])
     args = arg_parser.parse_args()
 
     device = nfb.open(args.device)
@@ -657,6 +733,13 @@ def main():
             )
         )
 
+    pcie_telemetry = []
+    if args.pcie_telemetry:
+        if args.pcie_telemetry_time <= 0:
+            raise ValueError("ERROR: The PCIe telemetry time must be greater than 0!")
+        pcie_telemetry = open_pcie_telemetry(device)
+        logging.info(f"PCIe telemetry: {len(pcie_telemetry)} component(s), measured for {args.pcie_telemetry_time} s")
+
     # Reset Ethernet stats and enable MACs (and potentionally PMA loopback)
     for e in device.eth:
         e.stats_reset()
@@ -704,6 +787,8 @@ def main():
                 report_name=report_name,
                 device=args.device,
                 exiter=exiter,
+                pcie_telemetry=pcie_telemetry,
+                pcie_telemetry_time=args.pcie_telemetry_time,
             )
             logging.info("Test finished.\n")
             if not args.repeat or exiter.exit():
