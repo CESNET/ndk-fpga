@@ -29,8 +29,15 @@ class sequence_rx_base #(
     uvm_logic_vector::sequence_item #(META_WIDTH)      meta;
     sequencer_rx #(ITEM_WIDTH, META_WIDTH)                                           hl_sqr;
     uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)  gen;
-    typedef enum {state_last, state_next, state_reset} state_t;
+    // Word withdrawn by SRC_RDY drop, it is sent again after the drop
+    uvm_mfb::sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH)  held;
+    // state_last   - previous word was not accepted, send it again
+    // state_next   - send next generated word (gen)
+    // state_drop   - SRC_RDY is low, withdrawn word is waiting in held.
+    //                After the drop the word is restored to req and sent again in state_last.
+    typedef enum {state_last, state_next, state_drop} state_t;
     state_t state;
+    local int unsigned drop_cnt;
 
     typedef enum {
             state_packet_none,
@@ -127,6 +134,14 @@ class sequence_rx_base #(
         end
     endtask
 
+    // Decide if SRC_RDY of word which was not accepted falls to zero.
+    function bit src_rdy_drop();
+        if (cfg.src_rdy_rule == config_sequence::MFB_SRC_RDY_STRICT || cfg.src_rdy_drop_probability == 0) begin
+            return 1'b0;
+        end
+        return ($urandom_range(99) < cfg.src_rdy_drop_probability);
+    endfunction
+
     task send_frame();
         // If reset then send empty frame
         if (p_sequencer.reset_sync.has_been_reset()) begin
@@ -140,15 +155,32 @@ class sequence_rx_base #(
             state = state_next;
             get_response(rsp);
         end else begin
-            // get next item
+            // get next item, gen is still waiting to be sent in other states
             if (state == state_next) begin
                 create_sequence_item();
             end
 
             //GET response
             get_response(rsp);
-            if (rsp.src_rdy == 1'b1 && rsp.dst_rdy == 1'b0) begin
-                state = state_last;
+            if (state == state_drop) begin
+                if (drop_cnt == 0) begin
+                    // End of the drop, send the withdrawn word again
+                    req.copy(held);
+                    state = state_last;
+                end else begin
+                    drop_cnt--;
+                end
+            end else if (rsp.src_rdy == 1'b1 && rsp.dst_rdy == 1'b0) begin
+                if (src_rdy_drop()) begin
+                    // Withdraw the word, it is sent again after drop_cnt clock cycles.
+                    // The current clock cycle is the first one of the drop.
+                    held.copy(req);
+                    drop_cnt = $urandom_range(cfg.src_rdy_drop_len_max, cfg.src_rdy_drop_len_min);
+                    drop_cnt = (drop_cnt > 0) ? drop_cnt - 1 : 0;
+                    state = state_drop;
+                end else begin
+                    state = state_last;
+                end
             end else begin
                 state = state_next;
             end
@@ -156,9 +188,11 @@ class sequence_rx_base #(
 
         //SEND FRAME
         start_item(req);
-        if (state != state_last) begin
-            req.copy(gen);
-        end
+        case (state)
+            state_next : req.copy(gen);
+            state_drop : tr_init(req);
+            state_last : ; // send same word (or restored withdrawn word) again
+        endcase
         finish_item(req);
     endtask
 
@@ -178,6 +212,9 @@ class sequence_rx_base #(
         gen = uvm_mfb::sequence_item #(
                 REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
         )::type_id::create("gen");
+        held = uvm_mfb::sequence_item #(
+                REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH
+        )::type_id::create("held");
 
         //send empty frame to get first response
         send_empty_frame();
@@ -186,7 +223,7 @@ class sequence_rx_base #(
         gen.src_rdy = 0;
         state = state_next;
 
-        while (hl_transactions > 0 || data != null || state == state_last || gen.src_rdy == 1) begin
+        while (hl_transactions > 0 || data != null || state != state_next || gen.src_rdy == 1) begin
             send_frame();
         end
         //Get last response

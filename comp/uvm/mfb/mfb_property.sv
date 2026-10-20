@@ -13,12 +13,15 @@ import uvm_pkg::*;
 
 `include "mfb_pcie_property.sv"
 
+// SRC_RDY_STRICT - set to 1 if SRC_RDY has to stay high until DST_RDY is high.
+//                  Default 0 allows SRC_RDY drop when DST_RDY is low.
 module mfb_property #(
     int unsigned REGIONS,
     int unsigned REGION_SIZE,
     int unsigned BLOCK_SIZE,
     int unsigned ITEM_WIDTH,
-    int unsigned META_WIDTH
+    int unsigned META_WIDTH,
+    bit          SRC_RDY_STRICT = 1'b0
 )(
     input RESET,
     mfb_if vif
@@ -141,10 +144,12 @@ module mfb_property #(
             `uvm_error(module_name, "\n\tMFB interface: SRC_RDY have to be allways valid if RESET is not set");
         end
 
-    assert property (src_rdy_high_until_dst_rdy_high)
-        else begin
-            `uvm_error(module_name, "\n\tMFB interface: SRC_RDY drops before DST_RDY was rised.");
-        end
+    if (SRC_RDY_STRICT) begin : gen_src_rdy_strict
+        assert property (src_rdy_high_until_dst_rdy_high)
+            else begin
+                `uvm_error(module_name, "\n\tMFB interface: SRC_RDY drops before DST_RDY was rised.");
+            end
+    end
 
     // SOF EOF assertion
     assert property (sof_undefined)

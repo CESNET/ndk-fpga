@@ -27,6 +27,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - core: Changed the DMA Calypte wrapper to give the test core and the PCIe MFB pipes their own copies of the reset.
 - core: Changed the DMA Calypte wrapper to include the DMA test core only when DMA_DEBUG_ENABLE is set.
 - uvm: Changed MVB RX sequences to randomly drop SRC_RDY while DST_RDY is low; the previous behaviour can be selected by `src_rdy_rule = MVB_SRC_RDY_STRICT` in the logic_vector_mvb sequence config and `SRC_RDY_STRICT` parameter of `mvb_property`.
+- uvm: Changed MFB RX sequences to randomly drop SRC_RDY while DST_RDY is low; the previous behaviour can be selected by `src_rdy_rule = MFB_SRC_RDY_STRICT` in the logic_vector_array_mfb sequence config and `SRC_RDY_STRICT` parameter of `mfb_property`.
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
 - core: Moved the PCIe adapter, reset, configuration and Device Tree blocks of the AMD PCIE_CORE into axi_common_i (see UPGRADE.md).

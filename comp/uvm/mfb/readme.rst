@@ -51,3 +51,30 @@ logic                                         dst_rdy
 ===================================================================   =
 
 This is low level protocol if you generate data in sequence please be carefull if you dont breaking mfb protocols rules.
+
+
+SRC_RDY rule
+---------------------------
+
+When the word is not accepted (``DST_RDY`` is low), the RX sequences of :ref:`logic_vector_array_mfb<logic_vector_array_mfb_env>`
+either hold the word or drop ``SRC_RDY`` to zero and send the word again later. The behaviour is selected by
+``src_rdy_rule`` in the sequence configuration of the :ref:`logic_vector_array_mfb<logic_vector_array_mfb_env>` environment.
+
+There are asserts to check correct settings and functionality of interface (module ``mfb_property``).
+By default ``SRC_RDY`` can fall while ``DST_RDY`` is low. Set parameter ``SRC_RDY_STRICT`` to 1 to check
+that ``SRC_RDY`` stays high until ``DST_RDY`` is high. Use it on interfaces where the component (the producer of
+``SRC_RDY``) must keep the strict rule.
+
+.. code-block:: systemverilog
+
+    mfb_property #(
+        .REGIONS        (REGIONS    ),
+        .REGION_SIZE    (REGION_SIZE),
+        .BLOCK_SIZE     (BLOCK_SIZE ),
+        .ITEM_WIDTH     (ITEM_WIDTH ),
+        .META_WIDTH     (META_WIDTH ),
+        .SRC_RDY_STRICT (1'b1       )
+    ) mfb_tx_prop (
+        .RESET (RESET ),
+        .vif   (mfb_tx)
+    );

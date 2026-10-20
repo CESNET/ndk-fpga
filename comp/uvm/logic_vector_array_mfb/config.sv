@@ -27,11 +27,24 @@ class config_sequence extends uvm_object;
     typedef enum {NORMAL, PCIE, PCIE_STRADDLING} endpoin_type_t;
     endpoin_type_t endpoint_type;
 
+    // SRC_RDY behaviour when the word is not accepted (DST_RDY is low).
+    // MFB_SRC_RDY_RELAXED - SRC_RDY can fall, the withdrawn word is sent again later
+    // MFB_SRC_RDY_STRICT  - SRC_RDY must remain high until DST_RDY is high
+    //                       (use it if the component requires the strict rule)
+    typedef enum {MFB_SRC_RDY_RELAXED, MFB_SRC_RDY_STRICT} src_rdy_rule_t;
+    src_rdy_rule_t src_rdy_rule;
+    // probability [0:100] of SRC_RDY drop when the word is not accepted (only for MFB_SRC_RDY_RELAXED)
+    int unsigned src_rdy_drop_probability = 10;
+    // number of clock cycles with SRC_RDY low before the withdrawn word is sent again
+    int unsigned src_rdy_drop_len_min     = 1;
+    int unsigned src_rdy_drop_len_max     = 4;
+
     function new(string name = "uvm_logic_vector_array_mfb::config_sequence");
         super.new(name);
         state = null;
         generate_invalid = INVALID_RAND;
         endpoint_type = NORMAL;
+        src_rdy_rule  = MFB_SRC_RDY_RELAXED;
     endfunction
 
     function void probability_set(int unsigned min, int unsigned max);
@@ -42,6 +55,13 @@ class config_sequence extends uvm_object;
     function void space_size_set(int unsigned min, int unsigned max);
         space_size_min = min;
         space_size_max = max;
+    endfunction
+
+    function void src_rdy_drop_set(int unsigned probability, int unsigned len_min = 1, int unsigned len_max = 4);
+        src_rdy_rule             = MFB_SRC_RDY_RELAXED;
+        src_rdy_drop_probability = probability;
+        src_rdy_drop_len_min     = len_min;
+        src_rdy_drop_len_max     = len_max;
     endfunction
 endclass
 
