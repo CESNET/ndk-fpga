@@ -10,6 +10,7 @@ The TSU modules are typically located in the ``comp/tsu/`` directory in the OFM 
    :caption: Content:
 
    comp/ctrls/sdm_client/readme
+   comp/ctrls/versal_ps_ctrl/readme
    comp/tsu/tsu_gen/readme
 
 .. Add more references here...

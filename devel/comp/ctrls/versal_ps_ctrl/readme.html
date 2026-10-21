@@ -1,0 +1,944 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VERSAL_PS_CTRL &mdash; NDK-FPGA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="TSU GEN" href="../../tsu/tsu_gen/readme.html" />
+    <link rel="prev" title="SDM CLIENT" href="../sdm_client/readme.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            NDK-FPGA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Network Development Kit:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/how_to_start.html">How to start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/terminology.html">NDK Terminology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/readme.html">NDK Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/testing.html">NDK testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/performance.html">Performance report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/configuration.html">Configuration files and parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_build/readme.html">Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/devtree.html">Device Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_core/doc/known_limitations.html">Known Limitations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../app-minimal.html">Minimal NDK application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_apps/dram_pkt_capture/readme.html">DRAM Packet Capture application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../top_level_simulation.html">Top-Level Simulation using cocotb</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reusable Modules Library</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../axi.html">AXI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../base.html">Basic Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../ctrls.html">Controllers &amp; TSU</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../sdm_client/readme.html">SDM CLIENT</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">VERSAL_PS_CTRL</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#clocks-and-resets">Clocks and resets</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#fpga-id">FPGA ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#host-software-interface-mi">Host software interface (MI)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#address-window">Address window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#bmc-mailbox">BMC mailbox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#device-tree">Device Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#verification">Verification</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tsu/tsu_gen/readme.html">TSU GEN</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mi.html">MI Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mfb.html">MFB Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mvb.html">MVB Components</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../nic.html">Network Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pcie.html">PCIe Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug.html">Debug Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ver.html">UVM Verification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bus Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mi_tools/readme.html">MI bus specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mvb_tools/readme.html">MVB Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../mfb_tools/readme.html">MFB specification</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">cocotb Verifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../basic_cocotb_test.html">Getting Started with cocotb</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotb_tips_and_tricks.html">Cocotb tips &amp; tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cocotbext.html">cocotbext-ndk</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">GitLab CI/CD Tools</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tests/verible/readme.html">Verible Tools</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Supported Cards</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/reflexces/agi-fh400g/readme.html">ReflexCES XpressSX AGI-FH400G</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/intel/dk-dev-1sdx-p/readme.html">Intel Stratix 10 DX FPGA DK</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb4cgg3/readme.html">Silicom fb4CGg3&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cghh/readme.html">Silicom fb2CGhh&#64;KU15P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n6010/readme.html">Silicom N6010</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/n5014/readme.html">Silicom N5014</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/silicom/fb2cdg1/readme.html">Silicom fb2CDg1&#64;AGM39D-2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-420f/readme.html">Bittware IA-420F</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-440i/readme.html">Bittware IA-440I</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/bittware/ia-860m/readme.html">Bittware IA-860m</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u200/readme.html">AMD Alveo U200</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/alveo-u55c/readme.html">AMD Alveo U55C</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/amd/vcu118/readme.html">AMD VCU118&#64;VU9P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/prodesign/pd-falcon/readme.html">PRO DESIGN Falcon</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/terasic/a2700/readme.html">Terasic A2700</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/iwave/g35p/readme.html">iWave G35P</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../ndk_cards/napatech/nt200a02/readme.html">Napatech NT200A02</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">NDK-FPGA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../ctrls.html">Controllers &amp; TSU</a></li>
+      <li class="breadcrumb-item active">VERSAL_PS_CTRL</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/comp/ctrls/versal_ps_ctrl/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="versal-ps-ctrl">
+<span id="id1"></span><h1>VERSAL_PS_CTRL<a class="headerlink" href="#versal-ps-ctrl" title="Link to this heading"></a></h1>
+<dl class="vhdl autoentity">
+<dt class="sig sig-object vhdl" id="vhdl-entity-versal_ps_ctrl">
+<span class="k"><span class="pre">ENTITY</span> </span><span class="sig-name descname"><span class="pre">VERSAL_PS_CTRL</span></span><span class="k"> <span class="pre">IS</span></span><a class="headerlink" href="#vhdl-entity-versal_ps_ctrl" title="Link to this definition"></a></dt>
+<dd><p>Gives the FPGA design and the host software access to the Processing System (PS) of AMD Versal devices:
+FPGA ID (device DNA), a 2 KB window into the PS address space and the BMC mailbox.</p>
+<span class="sig-name descname">Generics</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Generic</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even" id="vhdl-gengeneric-versal_ps_ctrl-axi_data_width"><td><p>AXI_DATA_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>AXI data word width in bits, must be 32</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-versal_ps_ctrl-axi_addr_width"><td><p>AXI_ADDR_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>49</p></td>
+<td><p>Address width in bits, depends on PS port to which is the component
+connected.
+E.g. Use 49 if accessing via Slave AXI LPD PS interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-versal_ps_ctrl-axi_id_width"><td><p>AXI_ID_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>6</p></td>
+<td><p>ID width, depends on PS port to which is the component connected.
+E.g. Use 6 if accessing via Slave AXI LPD PS interface</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-versal_ps_ctrl-axi_aruser_width"><td><p>AXI_ARUSER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>10</p></td>
+<td><p>ARUSER width, depends on PS port to which is the component connected.
+Used for System Management ID (SMID)
+E.g. Use 10 if accessing via Slave AXI LPD PS interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-versal_ps_ctrl-axi_awuser_width"><td><p>AXI_AWUSER_WIDTH</p></td>
+<td><p>natural</p></td>
+<td><p>10</p></td>
+<td><p>AWUSER width, depends on PS port to which is the component connected.
+Used for System Management ID (SMID)
+E.g. Use 10 if accessing via Slave AXI LPD PS interface</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-versal_ps_ctrl-read_smid"><td><p>READ_SMID</p></td>
+<td><p>std_logic_vector(AXI_ARUSER_WIDTH - 1 downto 0)</p></td>
+<td><p>std_logic_vector(to_unsigned(1, AXI_ARUSER_WIDTH))</p></td>
+<td><p>Read/Write SMID. It’s OK for them to be the same. SMID value must be
+unique in the PL design, it identifies the master. Note, that there
+are rules for its value. E.g. on Slave AXI LPD PS interface the
+highest bit must be zero to indicate PL master. See Versal
+documentation for details.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-versal_ps_ctrl-write_smid"><td><p>WRITE_SMID</p></td>
+<td><p>std_logic_vector(AXI_AWUSER_WIDTH - 1 downto 0)</p></td>
+<td><p>std_logic_vector(to_unsigned(1, AXI_AWUSER_WIDTH))</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-versal_ps_ctrl-axi_addr_width_int"><td><p>AXI_ADDR_WIDTH_INT</p></td>
+<td><p>natural</p></td>
+<td><p>32</p></td>
+<td><p>Internal address width in bits 32 or 64
+Use 64 if accessing via NOC, 32 otherwise</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-versal_ps_ctrl-device"><td><p>DEVICE</p></td>
+<td><p>string</p></td>
+<td><p>“VERSAL”</p></td>
+<td><p>Target device</p></td>
+</tr>
+</tbody>
+</table>
+<span class="sig-name descname">Ports</span><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Port</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>Clock and Reset</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-clk"><td><p>CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock of the MI interface and of the FPGA_ID interface</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-reset"><td><p>RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_clk"><td><p>AXI_LITE_CLK</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td><p>Clock of the AXI4-Lite interface from PS, of the AXI4 interface and of the internal logic</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_reset"><td><p>AXI_LITE_RESET</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>=====</p></td>
+<td><p>MI interface (slave)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-mi_dwr"><td><p>MI_DWR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-mi_addr"><td><p>MI_ADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-mi_rd"><td><p>MI_RD</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-mi_wr"><td><p>MI_WR</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-mi_be"><td><p>MI_BE</p></td>
+<td><p>std_logic_vector(3 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-mi_drd"><td><p>MI_DRD</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-mi_ardy"><td><p>MI_ARDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-mi_drdy"><td><p>MI_DRDY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>AXI4-Lite interface from PS (slave)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_awaddr"><td><p>AXI_LITE_AWADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_awvalid"><td><p>AXI_LITE_AWVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_awready"><td><p>AXI_LITE_AWREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_wdata"><td><p>AXI_LITE_WDATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_wstrb"><td><p>AXI_LITE_WSTRB</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH / 8 - 1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_wvalid"><td><p>AXI_LITE_WVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_wready"><td><p>AXI_LITE_WREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_bresp"><td><p>AXI_LITE_BRESP</p></td>
+<td><p>std_logic_vector(1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_bvalid"><td><p>AXI_LITE_BVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_bready"><td><p>AXI_LITE_BREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_araddr"><td><p>AXI_LITE_ARADDR</p></td>
+<td><p>std_logic_vector(31 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_arvalid"><td><p>AXI_LITE_ARVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_arready"><td><p>AXI_LITE_ARREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_rdata"><td><p>AXI_LITE_RDATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_rresp"><td><p>AXI_LITE_RRESP</p></td>
+<td><p>std_logic_vector(1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_rvalid"><td><p>AXI_LITE_RVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_lite_rready"><td><p>AXI_LITE_RREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>AXI4 interface (master)</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_awid"><td><p>AXI_AWID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_awaddr"><td><p>AXI_AWADDR</p></td>
+<td><p>std_logic_vector(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_awuser"><td><p>AXI_AWUSER</p></td>
+<td><p>std_logic_vector(AXI_AWUSER_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_awlen"><td><p>AXI_AWLEN</p></td>
+<td><p>std_logic_vector(8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_awsize"><td><p>AXI_AWSIZE</p></td>
+<td><p>std_logic_vector(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_awburst"><td><p>AXI_AWBURST</p></td>
+<td><p>std_logic_vector(2-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_awprot"><td><p>AXI_AWPROT</p></td>
+<td><p>std_logic_vector(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_awcache"><td><p>AXI_AWCACHE</p></td>
+<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_awlock"><td><p>AXI_AWLOCK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_awqos"><td><p>AXI_AWQOS</p></td>
+<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_awvalid"><td><p>AXI_AWVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_awready"><td><p>AXI_AWREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_wdata"><td><p>AXI_WDATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_wstrb"><td><p>AXI_WSTRB</p></td>
+<td><p>std_logic_vector((AXI_DATA_WIDTH/8)-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_wlast"><td><p>AXI_WLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_wvalid"><td><p>AXI_WVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_wready"><td><p>AXI_WREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_bid"><td><p>AXI_BID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_bresp"><td><p>AXI_BRESP</p></td>
+<td><p>std_logic_vector(2-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_bvalid"><td><p>AXI_BVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_bready"><td><p>AXI_BREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_arid"><td><p>AXI_ARID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_araddr"><td><p>AXI_ARADDR</p></td>
+<td><p>std_logic_vector(AXI_ADDR_WIDTH-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_aruser"><td><p>AXI_ARUSER</p></td>
+<td><p>std_logic_vector(AXI_ARUSER_WIDTH - 1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_arlen"><td><p>AXI_ARLEN</p></td>
+<td><p>std_logic_vector(8-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_arsize"><td><p>AXI_ARSIZE</p></td>
+<td><p>std_logic_vector(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_arburst"><td><p>AXI_ARBURST</p></td>
+<td><p>std_logic_vector(2-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_arprot"><td><p>AXI_ARPROT</p></td>
+<td><p>std_logic_vector(3-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_arcache"><td><p>AXI_ARCACHE</p></td>
+<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_arlock"><td><p>AXI_ARLOCK</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_arqos"><td><p>AXI_ARQOS</p></td>
+<td><p>std_logic_vector(4-1 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_arvalid"><td><p>AXI_ARVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_arready"><td><p>AXI_ARREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_rid"><td><p>AXI_RID</p></td>
+<td><p>std_logic_vector(AXI_ID_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_rdata"><td><p>AXI_RDATA</p></td>
+<td><p>std_logic_vector(AXI_DATA_WIDTH-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_rresp"><td><p>AXI_RRESP</p></td>
+<td><p>std_logic_vector(2-1 downto 0)</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_rlast"><td><p>AXI_RLAST</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-axi_rvalid"><td><p>AXI_RVALID</p></td>
+<td><p>std_logic</p></td>
+<td><p>in</p></td>
+<td></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-axi_rready"><td><p>AXI_RREADY</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>=====</p></td>
+<td><p>FPGA_ID interface</p></td>
+<td><p>=====</p></td>
+<td><p>=====</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-portsignal-versal_ps_ctrl-fpga_id"><td><p>FPGA_ID</p></td>
+<td><p>std_logic_vector(127 downto 0)</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+<tr class="row-even" id="vhdl-portsignal-versal_ps_ctrl-fpga_id_vld"><td><p>FPGA_ID_VLD</p></td>
+<td><p>std_logic</p></td>
+<td><p>out</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>The component gives the FPGA design and the host software access to the Processing System (PS) of AMD Versal devices.
+It is mainly intended for booting and flashing of Versal based cards, but it provides three independent services:</p>
+<ul class="simple">
+<li><p><strong>FPGA ID</strong> – after reset, the component reads the 128-bit device DNA from the PS and provides it on the <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> output (e.g. for licensing).</p></li>
+<li><p><strong>PS address space access</strong> – the host software (MI bus) can read and write any address of the PS/NoC address space through a 2 KB window.
+This is used, for example, to access the boot flash controller.</p></li>
+<li><p><strong>BMC mailbox</strong> – four registers shared by the host software (MI bus) and the firmware running on the PS (BMC), which the PS accesses through an AXI4-Lite slave port.</p></li>
+</ul>
+<p>Read <a class="reference internal" href="../../mi_tools/readme.html#mi-bus"><span class="std std-ref">MI bus specification</span></a> for more information on the MI bus.</p>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>       CLK domain  :  AXI_LITE_CLK domain
+                   :
+MI (slave) ---&gt; MI_ASYNC ----------------&gt; +--------------------+
+                   :                       |  VERSAL_PS_ACCESS  |  AXI4 (S1)  +-------------------+
+AXI_LITE (slave) --:--&gt; AXI4LITE2MI -----&gt; |  registers,        |------------&gt;|                   |
+from PS            :          (MI_PS)      |  2 KB window       |             |                   |
+                   :                       +--------------------+             | VERSAL_AXI_SWITCH |---&gt; AXI4 (master)
+                   :                                 ^ ENABLE                 |                   |     to PS
+                   :                                 |           AXI4 (S0)    |                   |
+                   :       VERSAL_FPGA_ID -----------|-----------------------&gt;|                   |
+                   :            |                    |                        +-------------------+
+                   :            | FPGA_ID, VLD       | VLD                              ^ SEL = VLD
+FPGA_ID,     &lt;-- SYNC_FPGA_ID &lt;-+--------------------+----------------------------------+
+FPGA_ID_VLD        :
+</pre></div>
+</div>
+<p>The component consists of the following subcomponents:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">VERSAL_FPGA_ID</span></code> – reads the device DNA after reset through its own AXI4 master (<a class="reference internal" href="../../mi_tools/converters/mi2axi4/readme.html#mi2axi4"><span class="std std-ref">MI2AXI4</span></a>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VERSAL_PS_ACCESS</span></code> – the register block and the address window for the host software.
+It contains an <a class="reference internal" href="../../mi_tools/splitter_plus_gen/readme.html#mi-splitter-plus-gen"><span class="std std-ref">MI_SPLITTER_PLUS_GEN</span></a> (registers / window) and an <a class="reference internal" href="../../mi_tools/converters/mi2axi4/readme.html#mi2axi4"><span class="std std-ref">MI2AXI4</span></a> for the window accesses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VERSAL_AXI_SWITCH</span></code> – a simple multiplexer of the two AXI4 masters.
+It does not track transactions; the masters must not be active at the same time, which is ensured by the switching rule below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SYNC_FPGA_ID</span></code> – transfers the FPGA ID from <code class="docutils literal notranslate"><span class="pre">AXI_LITE_CLK</span></code> to <code class="docutils literal notranslate"><span class="pre">CLK</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AXI4LITE2MI</span></code> – converts the AXI4-Lite slave port used by the PS to the internal MI bus of the BMC mailbox registers.</p></li>
+<li><p><a class="reference internal" href="../../mi_tools/async/readme.html#mi-async"><span class="std std-ref">MI_ASYNC</span></a> – transfers the MI bus of the host software from <code class="docutils literal notranslate"><span class="pre">CLK</span></code> to <code class="docutils literal notranslate"><span class="pre">AXI_LITE_CLK</span></code>.</p></li>
+</ul>
+<section id="clocks-and-resets">
+<h3>Clocks and resets<a class="headerlink" href="#clocks-and-resets" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CLK</span></code> / <code class="docutils literal notranslate"><span class="pre">RESET</span></code> – clock domain of the MI slave port and of the <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> / <code class="docutils literal notranslate"><span class="pre">FPGA_ID_VLD</span></code> outputs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AXI_LITE_CLK</span></code> / <code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code> – clock domain of both AXI interfaces to the PS and of all internal logic.</p></li>
+</ul>
+<p>Both resets are active high.
+The two clock domains are independent; the component contains the clock domain crossings.</p>
+</section>
+</section>
+<section id="fpga-id">
+<h2>FPGA ID<a class="headerlink" href="#fpga-id" title="Link to this heading"></a></h2>
+<p>After <code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code> is released, <code class="docutils literal notranslate"><span class="pre">VERSAL_FPGA_ID</span></code> reads four 32-bit words of the device DNA from the PMC eFUSE cache (base address <code class="docutils literal notranslate"><span class="pre">0xF125_0000</span></code>) of the PS:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>PS address</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> bits</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0xF125_0020</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FPGA_ID(31</span> <span class="pre">downto</span> <span class="pre">0)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0xF125_0024</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FPGA_ID(63</span> <span class="pre">downto</span> <span class="pre">32)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0xF125_0028</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FPGA_ID(95</span> <span class="pre">downto</span> <span class="pre">64)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0xF125_002C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">FPGA_ID(127</span> <span class="pre">downto</span> <span class="pre">96)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>When the last word is read, the internal FPGA ID valid flag is set and stays set until the next <code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code>.
+The ID is read only once after each reset.</p>
+<p>The flag also controls the rest of the component:</p>
+<ul class="simple">
+<li><p>Until it is set, the AXI4 master port is connected to <code class="docutils literal notranslate"><span class="pre">VERSAL_FPGA_ID</span></code> and accesses to the address window wait (<code class="docutils literal notranslate"><span class="pre">BUSY</span></code> is reported, see below).</p></li>
+<li><p>Once it is set, the AXI4 master port is switched to <code class="docutils literal notranslate"><span class="pre">VERSAL_PS_ACCESS</span></code> permanently.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">SYNC_FPGA_ID</span></code> transfers the ID to the <code class="docutils literal notranslate"><span class="pre">CLK</span></code> domain.
+<code class="docutils literal notranslate"><span class="pre">FPGA_ID_VLD</span></code> goes high a few <code class="docutils literal notranslate"><span class="pre">CLK</span></code> cycles after <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> has settled in the <code class="docutils literal notranslate"><span class="pre">CLK</span></code> domain, so <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> is stable while <code class="docutils literal notranslate"><span class="pre">FPGA_ID_VLD</span></code> is asserted.
+The exception is <code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code>: it clears the ID, and <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> changes to 0 a few <code class="docutils literal notranslate"><span class="pre">CLK</span></code> cycles before <code class="docutils literal notranslate"><span class="pre">FPGA_ID_VLD</span></code> falls, because the valid flag has the longer synchronizer.
+Capture <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> on the rising edge of <code class="docutils literal notranslate"><span class="pre">FPGA_ID_VLD</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The AXI read responses (<code class="docutils literal notranslate"><span class="pre">RRESP</span></code>) are not checked.
+If the PS returns an error for the DNA reads (e.g. the PS port has no access to the eFUSE cache), <code class="docutils literal notranslate"><span class="pre">FPGA_ID_VLD</span></code> is asserted anyway and <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> contains the returned data.</p>
+</div>
+</section>
+<section id="host-software-interface-mi">
+<h2>Host software interface (MI)<a class="headerlink" href="#host-software-interface-mi" title="Link to this heading"></a></h2>
+<p>The MI slave port occupies 4 KB (<code class="docutils literal notranslate"><span class="pre">0x1000</span></code> bytes) of the MI address space.
+Only the lowest 12 address bits are decoded: <code class="docutils literal notranslate"><span class="pre">MI_ADDR(11)</span></code> selects between the register block and the address window, <code class="docutils literal notranslate"><span class="pre">MI_ADDR(10</span> <span class="pre">downto</span> <span class="pre">0)</span></code> select the register or the offset in the window.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14.0%" />
+<col style="width: 22.0%" />
+<col style="width: 8.0%" />
+<col style="width: 56.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Access</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x000</span></code></p></td>
+<td><p>STATUS</p></td>
+<td><p>R</p></td>
+<td><p>Bit 0: <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>.
+Bit 1: <code class="docutils literal notranslate"><span class="pre">ADDR64</span></code> – the PS address is 64 bits wide (<code class="docutils literal notranslate"><span class="pre">AXI_ADDR_WIDTH_INT</span> <span class="pre">=</span> <span class="pre">64</span></code>) and UPPER_ADDR is used.
+Other bits read as 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x004</span></code></p></td>
+<td><p>UPPER_ADDR</p></td>
+<td><p>R/W</p></td>
+<td><p>Bits 63:32 of the PS address of the window (used only when <code class="docutils literal notranslate"><span class="pre">ADDR64</span></code> = 1).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x008</span></code></p></td>
+<td><p>LOWER_ADDR</p></td>
+<td><p>R/W</p></td>
+<td><p>Bits 31:0 of the PS address of the window.
+Only bits 31:11 are used, the window is aligned to 2 KB; bits 10:0 are stored but ignored.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x00C</span></code></p></td>
+<td><p>BMC_STATUS</p></td>
+<td><p>R/W</p></td>
+<td><p>BMC mailbox register, see <a class="reference internal" href="#bmc-mailbox">BMC mailbox</a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x010</span></code></p></td>
+<td><p>BMC_CONTROL</p></td>
+<td><p>R/W</p></td>
+<td><p>BMC mailbox register.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x014</span></code></p></td>
+<td><p>BMC_ERASE_START</p></td>
+<td><p>R/W</p></td>
+<td><p>BMC mailbox register.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x018</span></code></p></td>
+<td><p>BMC_ERASE_SIZE</p></td>
+<td><p>R/W</p></td>
+<td><p>BMC mailbox register.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0x01C</span></code> – <code class="docutils literal notranslate"><span class="pre">0x7FC</span></code></p></td>
+<td><p>–</p></td>
+<td><p>R</p></td>
+<td><p>Reserved, reads as 0.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0x800</span></code> – <code class="docutils literal notranslate"><span class="pre">0xFFF</span></code></p></td>
+<td><p>Address window</p></td>
+<td><p>R/W</p></td>
+<td><p>2 KB window into the PS address space, see <a class="reference internal" href="#address-window">Address window</a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Writes to the registers ignore <code class="docutils literal notranslate"><span class="pre">MI_BE</span></code>; the whole 32-bit word is always written.
+The registers decode <code class="docutils literal notranslate"><span class="pre">MI_ADDR(10</span> <span class="pre">downto</span> <span class="pre">0)</span></code> including the two lowest bits, so only word aligned addresses access them.
+UPPER_ADDR and LOWER_ADDR are cleared by <code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code>.
+The BMC mailbox registers are not reset (they are cleared only at configuration).</p>
+<section id="address-window">
+<h3>Address window<a class="headerlink" href="#address-window" title="Link to this heading"></a></h3>
+<p>An MI access to offset <code class="docutils literal notranslate"><span class="pre">0x800</span> <span class="pre">+</span> <span class="pre">N</span></code> (<code class="docutils literal notranslate"><span class="pre">N</span></code> = <code class="docutils literal notranslate"><span class="pre">0x000</span></code> – <code class="docutils literal notranslate"><span class="pre">0x7FC</span></code>) is translated to a single AXI4 access of the PS address:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">AXI_ADDR_WIDTH_INT</span> <span class="pre">=</span> <span class="pre">32</span></code>: <code class="docutils literal notranslate"><span class="pre">LOWER_ADDR(31</span> <span class="pre">downto</span> <span class="pre">11)</span> <span class="pre">&amp;</span> <span class="pre">N(10</span> <span class="pre">downto</span> <span class="pre">0)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AXI_ADDR_WIDTH_INT</span> <span class="pre">=</span> <span class="pre">64</span></code>: <code class="docutils literal notranslate"><span class="pre">UPPER_ADDR</span> <span class="pre">&amp;</span> <span class="pre">LOWER_ADDR(31</span> <span class="pre">downto</span> <span class="pre">11)</span> <span class="pre">&amp;</span> <span class="pre">N(10</span> <span class="pre">downto</span> <span class="pre">0)</span></code></p></li>
+</ul>
+<p>The two lowest address bits are always zero (word access).
+For example, with LOWER_ADDR = <code class="docutils literal notranslate"><span class="pre">0x8000_1234</span></code>, an MI write to offset <code class="docutils literal notranslate"><span class="pre">0x810</span></code> writes PS address <code class="docutils literal notranslate"><span class="pre">0x8000_1010</span></code> and offset <code class="docutils literal notranslate"><span class="pre">0xFFC</span></code> maps to <code class="docutils literal notranslate"><span class="pre">0x8000_17FC</span></code>.</p>
+<p>Properties of the AXI4 accesses (on the AXI4 master port):</p>
+<ul class="simple">
+<li><p>Single-beat 32-bit transfers: <code class="docutils literal notranslate"><span class="pre">AxLEN</span></code> = 0, <code class="docutils literal notranslate"><span class="pre">AxSIZE</span></code> = 4 bytes, <code class="docutils literal notranslate"><span class="pre">AxBURST</span></code> = INCR, <code class="docutils literal notranslate"><span class="pre">WLAST</span></code> = 1.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WSTRB</span></code> is taken from <code class="docutils literal notranslate"><span class="pre">MI_BE</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AxID</span></code> = 0, <code class="docutils literal notranslate"><span class="pre">AxPROT</span></code> = <code class="docutils literal notranslate"><span class="pre">&quot;000&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">AxCACHE</span></code> = <code class="docutils literal notranslate"><span class="pre">&quot;0000&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">AxLOCK</span></code> = 0, <code class="docutils literal notranslate"><span class="pre">AxQOS</span></code> = <code class="docutils literal notranslate"><span class="pre">&quot;0000&quot;</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AWUSER</span></code> = <code class="docutils literal notranslate"><span class="pre">WRITE_SMID</span></code> and <code class="docutils literal notranslate"><span class="pre">ARUSER</span></code> = <code class="docutils literal notranslate"><span class="pre">READ_SMID</span></code> (System Management ID of the PL master).</p></li>
+<li><p>One transaction at a time; an MI read is answered only after the AXI read data arrive.</p></li>
+<li><p>The AXI responses (<code class="docutils literal notranslate"><span class="pre">BRESP</span></code>, <code class="docutils literal notranslate"><span class="pre">RRESP</span></code>) are not checked; an access that ends with an AXI error is completed on MI normally (a read returns the AXI read data as they are).</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> bit is set while the FPGA ID has not been read yet, while a window write accepted on the MI bus has not been issued on the AXI write address channel yet, or while a window read has not been completed.
+<code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code> drops the pending window accesses and clears this state.
+The address of a window access is composed when it is issued on the AXI bus, from the current values of UPPER_ADDR and LOWER_ADDR.
+Therefore, software must wait for <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> = 0 before it changes UPPER_ADDR or LOWER_ADDR; otherwise, a pending access can be issued to the new address.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The address window and its registers are shared by all users of the component.
+All software accesses must be serialized (locked) by the software; mixing accesses from multiple processes can lead to data corruption.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There is no timeout. If the PS port does not respond to an AXI access, the window access never completes and the MI bus stays blocked.
+<code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code> recovers from this state: <a class="reference internal" href="../../mi_tools/async/readme.html#mi-async"><span class="std std-ref">MI_ASYNC</span></a> answers a pending MI read with <code class="docutils literal notranslate"><span class="pre">0xDEADFEED</span></code> and the component starts again by reading the FPGA ID.</p>
+</div>
+</section>
+</section>
+<section id="bmc-mailbox">
+<h2>BMC mailbox<a class="headerlink" href="#bmc-mailbox" title="Link to this heading"></a></h2>
+<p>The four BMC registers are accessible both from the host software (MI, offsets <code class="docutils literal notranslate"><span class="pre">0x00C</span></code> – <code class="docutils literal notranslate"><span class="pre">0x018</span></code>) and from the PS through the AXI4-Lite slave port:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 20.0%" />
+<col style="width: 20.0%" />
+<col style="width: 35.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Register</p></th>
+<th class="head"><p>MI offset</p></th>
+<th class="head"><p>PS offset</p></th>
+<th class="head"><p>Simultaneous writes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BMC_STATUS</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x00C</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x000</span></code></p></td>
+<td><p>PS write wins</p></td>
+</tr>
+<tr class="row-odd"><td><p>BMC_CONTROL</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x010</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x004</span></code></p></td>
+<td><p>MI write wins</p></td>
+</tr>
+<tr class="row-even"><td><p>BMC_ERASE_START</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x014</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x008</span></code></p></td>
+<td><p>MI write wins</p></td>
+</tr>
+<tr class="row-odd"><td><p>BMC_ERASE_SIZE</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x018</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0x00C</span></code></p></td>
+<td><p>MI write wins</p></td>
+</tr>
+</tbody>
+</table>
+<p>The meaning of the register contents is defined by the communication protocol between the software driver and the BMC firmware; the hardware only stores the values.
+The protocol must avoid simultaneous writes to the same register from both sides, otherwise one of the writes is lost.</p>
+<p>On the PS side, only <code class="docutils literal notranslate"><span class="pre">AXI_LITE_xxADDR(10</span> <span class="pre">downto</span> <span class="pre">0)</span></code> are decoded, so the four registers repeat every 2 KB.
+The PS must use 32-bit accesses to word aligned addresses.
+<code class="docutils literal notranslate"><span class="pre">AXI4LITE2MI</span></code> passes the AXI address unchanged and the two lowest bits are decoded too, so an access to an unaligned address (e.g. a byte write to offset <code class="docutils literal notranslate"><span class="pre">0x005</span></code>) does not reach any register.
+<code class="docutils literal notranslate"><span class="pre">AXI_LITE_WSTRB</span></code> is ignored; a write always stores the whole <code class="docutils literal notranslate"><span class="pre">AXI_LITE_WDATA</span></code> word.
+Other offsets read as 0 and writes to them are ignored.
+All AXI4-Lite responses are OKAY.
+The AXI4-Lite port has no protection signals (<code class="docutils literal notranslate"><span class="pre">AxPROT</span></code>) and processes one transaction at a time, reads before writes.</p>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
+<p>The widths of the AXI4 master port depend on the PS port the component is connected to.
+For the PS Slave AXI LPD interface (the defaults), use <code class="docutils literal notranslate"><span class="pre">AXI_ADDR_WIDTH</span></code> = 49, <code class="docutils literal notranslate"><span class="pre">AXI_ID_WIDTH</span></code> = 6 and <code class="docutils literal notranslate"><span class="pre">AXI_ARUSER_WIDTH</span></code> = <code class="docutils literal notranslate"><span class="pre">AXI_AWUSER_WIDTH</span></code> = 10.</p>
+<p><code class="docutils literal notranslate"><span class="pre">READ_SMID</span></code> and <code class="docutils literal notranslate"><span class="pre">WRITE_SMID</span></code> set the System Management ID of the component as a PS master.
+The value must be unique among the PL masters of the design; the two values may be the same.
+On the Slave AXI LPD interface, the highest SMID bit must be 0 to indicate a PL master; the component checks this with an assertion when the USER width is 10.
+See the Versal documentation for the SMID rules of other ports.</p>
+<p><code class="docutils literal notranslate"><span class="pre">AXI_ADDR_WIDTH_INT</span></code> selects the internal PS address width: 32 for access through the LPD/FPD interfaces, 64 for access through the NoC.
+The internal address is zero-extended or truncated to <code class="docutils literal notranslate"><span class="pre">AXI_ADDR_WIDTH</span></code> on the AXI4 master port.</p>
+<p><code class="docutils literal notranslate"><span class="pre">AXI_DATA_WIDTH</span></code> must be 32.</p>
+</section>
+<section id="device-tree">
+<h2>Device Tree<a class="headerlink" href="#device-tree" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">DevTree.tcl</span></code> provides the procedure <code class="docutils literal notranslate"><span class="pre">dts_boot_controller</span> <span class="pre">{base</span> <span class="pre">type}</span></code>, which generates the node:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>boot_controller {
+    compatible = &quot;dynanic,versal_ps_bridge&quot;;
+    reg = &lt;base 0x1000&gt;;
+};
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">type</span></code> argument is currently not used.</p>
+</section>
+<section id="verification">
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading"></a></h2>
+<p>The component is verified with cocotb in the <code class="docutils literal notranslate"><span class="pre">cocotb/</span></code> directory.
+The host software drives the MI port, the BMC firmware the AXI4-Lite port (<code class="docutils literal notranslate"><span class="pre">AxiLiteMaster</span></code> from <a class="reference external" href="https://github.com/alexforencich/cocotbext-axi">cocotbext-axi</a>), and a PS model terminates the AXI4 master port with configurable ready rates, response latency and error responses.
+The PS model checks the AXI4 protocol of the master port (handshake stability, single-beat transfers, the fixed sideband values, SMIDs in <code class="docutils literal notranslate"><span class="pre">AxUSER</span></code> and one transaction at a time).
+A cycle accurate model of the register block observes the host and PS writes at the inputs of the registers, including simultaneous writes, and every read is compared end to end with the value delivered on the external ports.
+The window accesses are compared with the expected AXI transactions, <code class="docutils literal notranslate"><span class="pre">BUSY</span></code> is checked against the window accesses still pending, and <code class="docutils literal notranslate"><span class="pre">FPGA_ID</span></code> against the DNA words returned by the PS.</p>
+<p>The tests cover concurrent host and BMC traffic in several PS timing, error and clock ratio scenarios, the FPGA ID sequence and its resets, window accesses before the FPGA ID is read, the register map, the window address translation, strobes, error responses, <code class="docutils literal notranslate"><span class="pre">BUSY</span></code>, the BMC mailbox with its aliases and simultaneous writes, and the recovery by <code class="docutils literal notranslate"><span class="pre">AXI_LITE_RESET</span></code>.
+<code class="docutils literal notranslate"><span class="pre">ver_settings.py</span></code> adds the 64-bit internal address, other AXI address, ID and USER widths.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cocotb
+make<span class="w"> </span>cocotb-venv
+<span class="nb">source</span><span class="w"> </span>venv-VERSAL_PS_CTRL/bin/activate
+make
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../sdm_client/readme.html" class="btn btn-neutral float-left" title="SDM CLIENT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../tsu/tsu_gen/readme.html" class="btn btn-neutral float-right" title="TSU GEN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, CESNET z.s.p.o..</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
