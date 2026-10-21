@@ -1,0 +1,28 @@
+# cocotb_test_sig.fdo: Waveform signal setup of the VERSAL_PS_CTRL cocotb test
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author(s): Vlastimil Kosar <kosar@dyna-nic.com>, 2026
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -noupdate /VERSAL_PS_CTRL/CLK
+add_wave -noupdate /VERSAL_PS_CTRL/RESET
+add_wave -noupdate /VERSAL_PS_CTRL/AXI_LITE_CLK
+add_wave -noupdate /VERSAL_PS_CTRL/AXI_LITE_RESET
+add_wave -group {MI} -noupdate -hex /VERSAL_PS_CTRL/MI_*
+add_wave -group {AXI4-Lite (PS)} -noupdate -hex /VERSAL_PS_CTRL/AXI_LITE_*
+add_wave -group {AXI4 WRITE} -noupdate -hex /VERSAL_PS_CTRL/AXI_AW*
+add_wave -group {AXI4 WRITE} -noupdate -hex /VERSAL_PS_CTRL/AXI_W*
+add_wave -group {AXI4 WRITE} -noupdate -hex /VERSAL_PS_CTRL/AXI_B*
+add_wave -group {AXI4 READ} -noupdate -hex /VERSAL_PS_CTRL/AXI_AR*
+add_wave -group {AXI4 READ} -noupdate -hex /VERSAL_PS_CTRL/AXI_R*
+add_wave -group {FPGA ID} -noupdate -hex /VERSAL_PS_CTRL/FPGA_ID*
+add_wave -group {FPGA ID} -noupdate /VERSAL_PS_CTRL/versal_fpga_id_i/fsm_pst
+add_wave -group {PS ACCESS} -noupdate -hex /VERSAL_PS_CTRL/versal_ps_access_i/busy
+add_wave -group {PS ACCESS} -noupdate -hex /VERSAL_PS_CTRL/versal_ps_access_i/axi_beat_reg
+add_wave -group {PS ACCESS} -noupdate -hex /VERSAL_PS_CTRL/versal_ps_access_i/mi_beat_reg
+add_wave -group {PS ACCESS} -noupdate -hex /VERSAL_PS_CTRL/versal_ps_access_i/*_reg
+
+config wave -signalnamewidth 1

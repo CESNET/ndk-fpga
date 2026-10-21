@@ -1,0 +1,58 @@
+# signals.fdo: Include file with signals
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author: Vlastimil Kosar <kosar@dyna-nic.com>, 2024
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+proc blk_VERSAL_FPGA_ID { } {
+
+    global VERSAL_FPGA_ID_PATH
+
+    add_wave "-noupdate -hex -label AXI_AWID"    $VERSAL_FPGA_ID_PATH/AXI_AWID
+    add_wave "-noupdate -hex -label AXI_AWADDR"  $VERSAL_FPGA_ID_PATH/AXI_AWADDR
+    add_wave "-noupdate -hex -label AXI_AWLEN"   $VERSAL_FPGA_ID_PATH/AXI_AWLEN
+    add_wave "-noupdate -hex -label AXI_AWSIZE"  $VERSAL_FPGA_ID_PATH/AXI_AWSIZE
+    add_wave "-noupdate -hex -label AXI_AWBURST" $VERSAL_FPGA_ID_PATH/AXI_AWBURST
+    add_wave "-noupdate -hex -label AXI_AWPROT"  $VERSAL_FPGA_ID_PATH/AXI_AWPROT
+    add_wave "-noupdate -hex -label AXI_AWVALID" $VERSAL_FPGA_ID_PATH/AXI_AWVALID
+    add_wave "-noupdate -hex -label AXI_AWREADY" $VERSAL_FPGA_ID_PATH/AXI_AWREADY
+    add_wave "-noupdate -hex -label AXI_WDATA"   $VERSAL_FPGA_ID_PATH/AXI_WDATA
+    add_wave "-noupdate -hex -label AXI_WSTRB"   $VERSAL_FPGA_ID_PATH/AXI_WSTRB
+    add_wave "-noupdate -hex -label AXI_WLAST"   $VERSAL_FPGA_ID_PATH/AXI_WLAST
+    add_wave "-noupdate -hex -label AXI_WVALID"  $VERSAL_FPGA_ID_PATH/AXI_WVALID
+    add_wave "-noupdate -hex -label AXI_WREADY"  $VERSAL_FPGA_ID_PATH/AXI_WREADY
+    add_wave "-noupdate -hex -label AXI_BID"     $VERSAL_FPGA_ID_PATH/AXI_BID
+    add_wave "-noupdate -hex -label AXI_BRESP"   $VERSAL_FPGA_ID_PATH/AXI_BRESP
+    add_wave "-noupdate -hex -label AXI_BVALID"  $VERSAL_FPGA_ID_PATH/AXI_BVALID
+    add_wave "-noupdate -hex -label AXI_BREADY"  $VERSAL_FPGA_ID_PATH/AXI_BREADY
+    add_wave "-noupdate -hex -label AXI_ARID"    $VERSAL_FPGA_ID_PATH/AXI_ARID
+    add_wave "-noupdate -hex -label AXI_ARADDR"  $VERSAL_FPGA_ID_PATH/AXI_ARADDR
+    add_wave "-noupdate -hex -label AXI_ARLEN"   $VERSAL_FPGA_ID_PATH/AXI_ARLEN
+    add_wave "-noupdate -hex -label AXI_ARSIZE"  $VERSAL_FPGA_ID_PATH/AXI_ARSIZE
+    add_wave "-noupdate -hex -label AXI_ARBURST" $VERSAL_FPGA_ID_PATH/AXI_ARBURST
+    add_wave "-noupdate -hex -label AXI_ARPROT"  $VERSAL_FPGA_ID_PATH/AXI_ARPROT
+    add_wave "-noupdate -hex -label AXI_ARVALID" $VERSAL_FPGA_ID_PATH/AXI_ARVALID
+    add_wave "-noupdate -hex -label AXI_ARREADY" $VERSAL_FPGA_ID_PATH/AXI_ARREADY
+    add_wave "-noupdate -hex -label AXI_RID"     $VERSAL_FPGA_ID_PATH/AXI_RID
+    add_wave "-noupdate -hex -label AXI_RDATA"   $VERSAL_FPGA_ID_PATH/AXI_RDATA
+    add_wave "-noupdate -hex -label AXI_RRESP"   $VERSAL_FPGA_ID_PATH/AXI_RRESP
+    add_wave "-noupdate -hex -label AXI_RLAST"   $VERSAL_FPGA_ID_PATH/AXI_RLAST
+    add_wave "-noupdate -hex -label AXI_RVALID"  $VERSAL_FPGA_ID_PATH/AXI_RVALID
+    add_wave "-noupdate -hex -label AXI_RREADY"  $VERSAL_FPGA_ID_PATH/AXI_RREADY
+
+
+    add_wave "-noupdate -hex -label mi_addr" $VERSAL_FPGA_ID_PATH/mi_addr
+    add_wave "-noupdate -hex -label mi_drd"  $VERSAL_FPGA_ID_PATH/mi_drd
+    add_wave "-noupdate -hex -label mi_rd"   $VERSAL_FPGA_ID_PATH/mi_rd
+    add_wave "-noupdate -hex -label mi_ardy" $VERSAL_FPGA_ID_PATH/mi_ardy
+    add_wave "-noupdate -hex -label mi_drdy" $VERSAL_FPGA_ID_PATH/mi_drdy
+
+    add_wave "-noupdate -hex -label fsm_pst"  $VERSAL_FPGA_ID_PATH/fsm_pst
+    add_wave "-noupdate -hex -label fsm_nst"  $VERSAL_FPGA_ID_PATH/fsm_nst
+
+    add_wave "-noupdate -hex -label word_cnt" $VERSAL_FPGA_ID_PATH/word_cnt
+    add_wave "-noupdate -hex -label word_we"  $VERSAL_FPGA_ID_PATH/word_we
+
+    add_wave "-noupdate -hex -label FPGA_ID"     $VERSAL_FPGA_ID_PATH/FPGA_ID
+    add_wave "-noupdate -hex -label FPGA_ID_VLD" $VERSAL_FPGA_ID_PATH/FPGA_ID_VLD
+}

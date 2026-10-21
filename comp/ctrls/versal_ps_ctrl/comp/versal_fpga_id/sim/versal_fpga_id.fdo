@@ -1,0 +1,32 @@
+# versal_fpga_id.fdo: Simulation script
+# Copyright (C) DynaNIC Semiconductors, Ltd.
+# Author: Vlastimil Kosar <kosar@dyna-nic.com>, 2024
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# For whole design testing
+set FIRMWARE_BASE    "../../../../../.."
+set VERSAL_FPGA_ID_BASE       ".."
+
+set TB_FILE          "$VERSAL_FPGA_ID_BASE/sim/testbench.vhd"
+set SIG_FILE         "$VERSAL_FPGA_ID_BASE/sim/versal_fpga_id_sig.fdo"
+
+# Modules definition
+set COMPONENTS [list \
+                  [list "VERSAL_FPGA_ID" $VERSAL_FPGA_ID_BASE   "FULL"] \
+               ]
+
+set SIM_FLAGS(DEBUG) true
+set SIM_FLAGS(VOPT_ARGS) "+acc"
+
+# Global include file for compilation
+source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
+
+# Suppress warnings from arithm library
+puts "Std Arith Warnings - Disabled"
+set StdArithNoWarnings 1
+set NumericStdNoWarnings 1
+
+# File with signals
+nb_sim_run 20000ns
+wave zoomrange 0 205ns

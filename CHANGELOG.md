@@ -11,6 +11,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 ### Added
 - cards: Added HBM2E support on FB2CDG1 card.
 - comp: Added converter AXI4LITE2MI for conversion from AXI4-Lite to MI.
+- comp: Added PS access controller VERSAL_PS_CTRL for Versal FPGAs
 - core: Added HBM2E NoC IP templates.
 
 ### Changed
