@@ -60,6 +60,48 @@ async def run_test_base(dut, pkt_count=4000, truncate_chance=0):
 
 
 @cocotb.test()
+async def run_test_phdr_zero(dut, pkt_count=200):
+    """Test with packets that have a pseudoheader sum of 0xFFFF, random packet sizes 60-1518B.
+
+    In these packets, both the pseudoheader checksum and the L4 data checksum are 0x0000.
+    The test checks that the DUT reports such packets as correct.
+
+    Args:
+        dut: Device Under Test
+        pkt_count: Number of packets to send (default: 200)
+    """
+    cocotb.log.info("Starting MFB_CHECKSUM_L3L4 pseudoheader zero test")
+
+    # Start clock generator
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
+
+    # Initialize testbench
+    tb = Testbench(dut, debug=False)
+
+    # Run reset
+    await tb.reset()
+    cocotb.log.info("Reset completed")
+
+    # Start backpressure (randomized DST_RDY)
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
+
+    # Generate and send packets
+    for _ in range(pkt_count):
+        await tb.generate_and_send_phdr_zero_packet(min_len=60, max_len=1518)
+
+    # Wait for all packets to be processed
+    while tb.mvb_tx_monitor.item_cnt < pkt_count:
+        await ClockCycles(dut.CLK, 10)
+
+    cocotb.log.info(f"Test completed: {tb.mvb_tx_monitor.item_cnt}/{pkt_count} packets processed")
+
+    # Check scoreboard results
+    if tb.scoreboard_errors:
+        raise AssertionError(f"Scoreboard comparison failed with {len(tb.scoreboard_errors)} errors")
+    cocotb.log.info(f"Scoreboard comparison passed: {tb.scoreboard_comparisons} transactions compared")
+
+
+@cocotb.test()
 async def run_test_corrupted_extreme(dut, pkt_count=5000, truncate_chance=0.9, log_comparisons=False):
     """Test with extreme truncated (corrupted) packets, 90% truncation rate.
 

@@ -356,8 +356,10 @@ begin
         --   fraw = xraw[15:0] + xraw[16]       -- fold carry back
         mrg_mvb_csum_fraw_arr(ii) <= (mrg_mvb_csum_xraw_arr(ii)(16-1 downto 0) + mrg_mvb_csum_xraw_arr(ii)(16));
 
-        -- Check validity: for a correct packet, fraw == 0xFFFF (all ones).
-        mrg_mvb_csum_ok(ii) <= '1' when (unsigned(mrg_mvb_csum_fraw_arr(ii)) = X"FFFF") else '0';
+        -- Check validity: for a correct packet, fraw is a 1's complement zero (0xFFFF or 0x0000).
+        -- The value 0x0000 occurs only when raw and ph are both 0x0000.
+        -- This happens when the 1's complement sum of the pseudoheader is 0xFFFF.
+        mrg_mvb_csum_ok(ii) <= '1' when (mrg_mvb_csum_fraw_arr(ii) = X"FFFF" or mrg_mvb_csum_fraw_arr(ii) = X"0000") else '0';
 
         -- Step 3: Compute the new checksum.
         --   ~fraw + ~old_csum                  -- negate fraw to recover the sum, subtract old checksum
