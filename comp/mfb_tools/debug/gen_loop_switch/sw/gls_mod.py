@@ -62,7 +62,11 @@ def read_log_tail(path: str, lines: int = 5) -> str:
         return ""
 
 
-def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen | None:
+# The NDP tools poll the DMA queues without sleeping and print no statistics while they run.
+NDP_PERF_ARGS = "-P -I 0"
+
+
+def start_persistent_ndp(ndp_cmd: str | None, device: str, ndp_args: str) -> subprocess.Popen | None:
     """Start an NDP tool that must keep running for the whole test, e.g. "ndp-read".
 
     Returns None if the mode does not need one. The tool's stdout and stderr go into a log
@@ -74,7 +78,7 @@ def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen |
     if not ndp_cmd:
         return None
 
-    pname = f"{ndp_cmd} -d {device}"
+    pname = f"{ndp_cmd} -d {device} {ndp_args}".rstrip()
     log_path = ndp_log_path(ndp_cmd)
     # The child process gets its own handle on the log file, so it can be closed here.
     with open(log_path, "w") as log:
@@ -254,6 +258,7 @@ def run_test(
     pcie_telemetry_time : float,
     loss_eths : List[nfb.eth.Eth],
     loss_rx_queues : List[nfb.libnfb.NdpQueueRx],
+    ndp_args : str,
 ) -> None:
 
     demo_path = "/tmp/demo_gui.txt"
@@ -309,7 +314,7 @@ def run_test(
 
             # Start generating traffic
             if use_ndp_gen:
-                gen_cmd = f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}"
+                gen_cmd = f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range} {ndp_args}".rstrip()
                 with open(gen_log_path, "a") as log:
                     log.write(f"\n=== {gen_cmd} ===\n")
                     log.flush() # header must reach the file before the child writes to it
@@ -591,6 +596,8 @@ def main():
         "rev_chan"  : "the generator sends consecutive frames to channels with bit-reversed numbers\n"
                       "(0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;\n"
                       "needs the full channel range of each GLS, otherwise it is turned off",
+        "ndp_sleep" : "run the NDP tools without -P and -I 0: they sleep when the DMA queues are idle\n"
+                      "and print their statistics every second; default: -P -I 0",
     }
 
     gls_desc = """
@@ -618,6 +625,7 @@ def main():
     arg_parser.add_argument("-T", "--pcie_telemetry", action="store_true", help=help_dict["telemetry"])
     arg_parser.add_argument("--pcie_telemetry_time", type=float, default=0.5, help=help_dict["tel_time"])
     arg_parser.add_argument("--gen_rev_chan", action="store_true", help=help_dict["rev_chan"])
+    arg_parser.add_argument("--ndp_sleep", action="store_true", help=help_dict["ndp_sleep"])
     args = arg_parser.parse_args()
 
     device = nfb.open(args.device)
@@ -829,7 +837,8 @@ def main():
     # Start the persistent NDP tool that the selected mode needs (the RX DMA reader or the SW
     # loopback). It starts after all setup that can still fail. A failed setup would otherwise
     # leave the tool running in the background, where it keeps the DMA queues used.
-    ndp_persistent = start_persistent_ndp(sel_mode.ndp_persistent_cmd, args.device)
+    ndp_args = "" if args.ndp_sleep else NDP_PERF_ARGS
+    ndp_persistent = start_persistent_ndp(sel_mode.ndp_persistent_cmd, args.device, ndp_args)
 
     # ==========================================================================
     # GLS TEST START
@@ -863,6 +872,7 @@ def main():
                 # In the modes over the Ethernet loopback the RX path can lose frames.
                 loss_eths=list(device.eth) if sel_mode.eth_loop else [],
                 loss_rx_queues=list(rx_queues) if sel_mode.eth_loop else [],
+                ndp_args=ndp_args,
             )
             logging.info("Test finished.\n")
             if not args.repeat or exiter.exit():

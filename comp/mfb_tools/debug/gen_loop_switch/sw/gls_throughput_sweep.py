@@ -269,6 +269,7 @@ class RunParams:
     eth_rate: Optional[int]
     pcie_telemetry_time: Optional[float] # None = PCIe telemetry is not recorded
     gen_rev_chan: bool
+    ndp_sleep: bool
 
     def chart_config(self) -> Dict[str, object]:
         """The settings shown in the chart subtitle, keyed exactly like the metadata
@@ -283,6 +284,7 @@ class RunParams:
             "buffer_size": self.buffer_size,
             "eth_rate": self.eth_rate,
             "gen_rev_chan": "on" if self.gen_rev_chan else "off",
+            "ndp_perf": "off" if self.ndp_sleep else "on",
         }
 
 
@@ -375,6 +377,8 @@ def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams,
         cmd += ["-T", "--pcie_telemetry_time", str(params.pcie_telemetry_time)]
     if params.gen_rev_chan:
         cmd += ["--gen_rev_chan"]
+    if params.ndp_sleep:
+        cmd += ["--ndp_sleep"]
 
     print(f"\n==== Running gls_mod.py mode '{mode}' ({MODE_LABELS[mode]}) ====")
     print("$ " + " ".join(cmd))
@@ -462,6 +466,7 @@ def write_results_csv(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, o
         "eth_rate": params.eth_rate if params.eth_rate is not None else "",
         "pcie_telemetry_time": params.pcie_telemetry_time if params.pcie_telemetry_time is not None else "",
         "gen_rev_chan": "on" if params.gen_rev_chan else "off",
+        "ndp_perf": "off" if params.ndp_sleep else "on",
         "hostname": socket.gethostname().partition(".")[0],
         "run_time_iso": datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
     }
@@ -579,6 +584,9 @@ def format_config_subtitle(config: Mapping[str, object]) -> str:
     gen_rev_chan = config.get("gen_rev_chan")
     if gen_rev_chan not in (None, ""):
         parts.append(f"bit-reversed channels: {gen_rev_chan}")
+    ndp_perf = config.get("ndp_perf")
+    if ndp_perf not in (None, ""):
+        parts.append(f"NDP -P -I 0: {ndp_perf}")
     return "   ".join(parts)
 
 
@@ -764,6 +772,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         eth_rate=args.eth_rate,
         pcie_telemetry_time=args.pcie_telemetry,
         gen_rev_chan=args.gen_rev_chan,
+        ndp_sleep=args.ndp_sleep,
     )
     if params.pcie_telemetry_time is not None and params.pcie_telemetry_time <= 0:
         sys.exit("ERROR: --pcie-telemetry needs a time greater than 0 seconds")
@@ -850,7 +859,7 @@ def cmd_run(args: argparse.Namespace) -> None:
 
 COMPARABILITY_KEYS = ["card_name", "hostname", "suite", "size_min", "size_max", "size_step",
                       "channels", "cycles", "frequency", "rate_layer",
-                      "buffer_count", "buffer_size", "eth_rate", "gen_rev_chan"]
+                      "buffer_count", "buffer_size", "eth_rate", "gen_rev_chan", "ndp_perf"]
 
 
 def resolve_results_csv(path_arg: str) -> Path:
@@ -868,8 +877,10 @@ def resolve_results_csv(path_arg: str) -> Path:
 def check_comparability(all_meta: List[Dict[str, str]], labels: List[str]) -> None:
     """Warn about settings that differ between runs, since throughput is only
     comparable across FW builds when the card, host and sweep settings all match."""
-    # Runs without these fields measured the DMA suite with sequential channels.
-    all_meta = [{**m, "suite": m.get("suite") or "dma", "gen_rev_chan": m.get("gen_rev_chan") or "off"}
+    # Runs without these fields measured the DMA suite with sequential channels, and their NDP
+    # tools ran without -P and -I 0.
+    all_meta = [{**m, "suite": m.get("suite") or "dma", "gen_rev_chan": m.get("gen_rev_chan") or "off",
+                 "ndp_perf": m.get("ndp_perf") or "off"}
                 for m in all_meta]
     for key in COMPARABILITY_KEYS:
         values = {m.get(key, "") for m in all_meta}
@@ -1016,6 +1027,9 @@ def main() -> None:
                        help="the generator sends consecutive frames to channels with bit-reversed\n"
                             "numbers, so they alternate between the DMA endpoints (passed through\n"
                             "to gls_mod.py as --gen_rev_chan); default: off, sequential channels")
+    p_run.add_argument("--ndp-sleep", action="store_true",
+                       help="run the NDP tools without -P and -I 0, as the runs before this option\n"
+                            "did (passed through to gls_mod.py as --ndp_sleep); default: -P -I 0")
     p_run.add_argument("--fw-label", help="override the auto-detected FW label/id (use if the Device Tree has no build-revision)")
     p_run.add_argument("-o", "--outdir", default="gls_throughput_results", help="output directory; default: ./gls_throughput_results")
     p_run.add_argument("--skip-plots", action="store_true", help="only produce the consolidated CSV, no PNG plots")
