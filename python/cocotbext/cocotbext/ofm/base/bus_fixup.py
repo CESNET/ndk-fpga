@@ -59,13 +59,15 @@ def do_fix():
 
 # cocotb 2.0-only defines
 if cocotb.__version__ >= "2.0.0":
-    from cocotb.types import Logic, LogicArray
+    from cocotb.types import Array, Logic, LogicArray
     from cocotb.handle import LogicObject, ArrayObject, Immediate, Deposit
     from cocotb.triggers import GPITrigger
     from cocotb._gpi_triggers import _EdgeBase
     from cocotb.simulator import register_value_change_callback, VALUE_CHANGE, RISING, FALLING
 
     class _EdgeProxyBase(_EdgeBase):
+        # Shared by all edge kinds: one simulator callback per signal path
+        # serves every trigger waiting on that path.
         _instances = {}
         _cbhdls = {}
         _can_fire = set()
@@ -83,7 +85,9 @@ if cocotb.__version__ >= "2.0.0":
             GPITrigger.__init__(self)
 
             self.signal = signal
-            self._last_val = int(self.signal.value)
+            # Kept as Logic: int() resolves U/X by COCOTB_RESOLVE_X (or raises
+            # when unset), which would distort edges on undriven signals
+            self._last_val = self.signal.value
 
             if self._path not in cls._instances.keys():
                 cls._instances[self._path] = list()
@@ -95,86 +99,65 @@ if cocotb.__version__ >= "2.0.0":
 
             return self
 
+        def _prime_common(self) -> None:
+            cls = type(self)
+
+            cls._can_fire.add(self)
+
+            self._last_val = self.signal.value
+
+            if cls._cbhdls[self._path] is None:
+                cls._cbhdls[self._path] = register_value_change_callback(
+                    self.signal._handle, cls._distribute_callback, VALUE_CHANGE, self
+                )
+                if cls._cbhdls[self._path] is None:
+                    raise RuntimeError(f"Unable set up {self!s} Trigger")
+
+        @classmethod
+        def _distribute_callback(cls, trigger: "_EdgeProxyBase"):
+            path = trigger._path
+            instances = cls._instances[path]
+
+            # The simulator callback is one-shot
+            cls._cbhdls[path] = None
+
+            for instance in instances:
+                instance._do_callback()
+
+            # Keep the callback alive while any trigger still waits, e.g. a
+            # FallingEdge when only a RisingEdge has fired
+            if cls._cbhdls[path] is None:
+                for instance in instances:
+                    if instance in cls._can_fire:
+                        instance._prime_common()
+                        break
+
+        def _do_callback(self) -> None:
+            cls = type(self)
+            current = self.signal.value
+
+            if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
+                # A fired trigger waits no more, until primed again
+                cls._can_fire.discard(self)
+                self._last_val = current
+                self._fire()
+                return
+
+            self._last_val = current
+
         if hasattr(_EdgeBase, "_react"):
             def _prime(self) -> None:
-                cls = type(self)
+                self._prime_common()
 
-                cls._can_fire.add(self)
-
-                self._last_val = int(self.signal.value)
-
-                if cls._cbhdls[self._path] is None:
-                    cls._cbhdls[self._path] = register_value_change_callback(
-                        self.signal._handle, cls._distribute_callback, VALUE_CHANGE, self
-                    )
-                    if cls._cbhdls[self._path] is None:
-                        raise RuntimeError(f"Unable set up {self!s} Trigger")
-
-            @classmethod
-            def _distribute_callback(cls, trigger: "_EdgeProxyBase"):
-                is_primed = False
-                path = trigger._path
-                instances = cls._instances[path]
-
-                cls._cbhdls[path] = None
-
-                for instance in instances:
-                    is_primed |= instance._do_callback()
-
-                if not is_primed:
-                    trigger._prime()
-
-            def _do_callback(self) -> bool:
-                cls = type(self)
-                did_callback = False
-                current = int(self.signal.value)
-
-                if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
-                    self._react()
-                    did_callback = True
-
-                self._last_val = current
-                return did_callback
+            def _fire(self) -> None:
+                self._react()
         else:
             def _prime(self, callback: Callable) -> None:
-                cls = type(self)
+                self._callback = callback
+                self._prime_common()
 
-                cls._can_fire.add(self)
-
-                self._last_val = int(self.signal.value)
-
-                if cls._cbhdls[self._path] is None:
-                    cls._cbhdls[self._path] = register_value_change_callback(
-                        self.signal._handle, lambda trigger: cls._distribute_callback(trigger, callback), VALUE_CHANGE, self
-                    )
-                    if cls._cbhdls[self._path] is None:
-                        raise RuntimeError(f"Unable set up {self!s} Trigger")
-
-            @classmethod
-            def _distribute_callback(cls, trigger: "_EdgeProxyBase", callback: Callable):
-                is_primed = False
-                path = trigger._path
-                instances = cls._instances[path]
-
-                cls._cbhdls[path] = None
-
-                for instance in instances:
-                    is_primed |= instance._do_callback(callback)
-
-                if not is_primed:
-                    trigger._prime(callback)
-
-            def _do_callback(self, callback: Callable) -> bool:
-                cls = type(self)
-                did_callback = False
-                current = int(self.signal.value)
-
-                if self._is_edge_event(self._last_val, current) and self in cls._can_fire:
-                    callback(self)
-                    did_callback = True
-
-                self._last_val = current
-                return did_callback
+            def _fire(self) -> None:
+                self._callback(self)
 
         def _unprime(self):
             self._can_fire.discard(self)
@@ -192,7 +175,8 @@ if cocotb.__version__ >= "2.0.0":
             return signal.rising_edge
 
         def _is_edge_event(self, last_value, current_value) -> bool:
-            return last_value == 0 and current_value == 1
+            # Same as native RisingEdge: any change to '1', including X -> 1
+            return last_value != current_value and current_value == Logic("1")
 
     class FallingEdgeProxy(_EdgeProxyBase):
         _edge_type = FALLING
@@ -207,7 +191,8 @@ if cocotb.__version__ >= "2.0.0":
             return signal.falling_edge
 
         def _is_edge_event(self, last_value, current_value) -> bool:
-            return last_value == 1 and current_value == 0
+            # Same as native FallingEdge: any change to '0', including X -> 0
+            return last_value != current_value and current_value == Logic("0")
 
     class LogicProxy(LogicObject):
         _instances = {}
@@ -268,9 +253,17 @@ if cocotb.__version__ >= "2.0.0":
             self._array_idx = array_idx
 
         def __len__(self):
+            if self._array_idx is None and isinstance(self._handle, ArrayObject):
+                return len(self._handle)
             return len(self.value)
 
         def __getitem__(self, index: int):
+            if self._array_idx is not None:
+                if isinstance(self._handle, ArrayObject):
+                    return SignalProxy(self._handle[self._array_idx])[index]
+                if index != 0:
+                    raise IndexError(f"{self._path} is a single bit, index {index} is out of range")
+                return LogicProxy(self._handle, self._array_idx)
             if isinstance(self._handle, ArrayObject):
                 return SignalProxy(self._handle, index)
             return LogicProxy(self._handle, index)
@@ -283,10 +276,12 @@ if cocotb.__version__ >= "2.0.0":
 
         @property
         def value(self):
+            val = self._handle.value
             if self._array_idx is not None:
-                return LogicArray(str(self._handle.value[self._array_idx]))
-            else:
-                return LogicArray(str(self._handle.value))
+                val = val[self._array_idx]
+            if isinstance(val, Array):
+                return val
+            return LogicArray(str(val))
 
         @value.setter
         def value(self, val):
@@ -294,21 +289,20 @@ if cocotb.__version__ >= "2.0.0":
             if isinstance(val, LogicArray):
                 val = str(val)
 
-            if self._array_idx is not None:
-                full_val = self._handle.value
-                full_val[self._array_idx] = val
-
-                # so multiple drivers can read value edited by other drivers
-                self._handle.set(Immediate(full_val))
-            else:
-                self._handle.set(Immediate(val))
+            # so multiple drivers can read value edited by other drivers
+            self.set(Immediate(val))
 
         def set(self, value):
             if self._array_idx is None:
                 self._handle.set(value)
                 return
 
-            # Update only this slice
+            # Write just the element, other elements may have pending writes
+            if isinstance(self._handle, ArrayObject):
+                self._handle[self._array_idx].set(value)
+                return
+
+            # Update only this bit
             full_val = self._handle.value
             if isinstance(value, (Deposit, Immediate)):
                 full_val[self._array_idx] = value.value
