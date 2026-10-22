@@ -6,27 +6,20 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import argparse
+import os
+import sys
 from os import system
 from importlib.machinery import SourceFileLoader
+
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "multi_ver"))
+from multi_ver_utils import create_setting_from_combination  # noqa: E402
 
 FAIL = False
 
 
-# Modify setting variable
-def create_setting_from_combination(settings, combination):
-    global FAIL
-    s = settings["default"].copy()
-    for c in combination:
-        if c not in settings.keys():
-            print("ERROR: Combination \"{}\" contains unknown setting name \"{}\"!".format(combination, c))
-            FAIL = True
-            continue
-        for i in settings[c].keys(): # load modified values
-            if i not in s.keys():
-                print("ERROR: Parameter \"{}\" is present in setting \"{}\" but not in setting \"default\". This might cause unexpected behaviour in the following runs!".format(i, c))
-                FAIL = True
-            s[i] = settings[c][i]
-    return s
+# Add the setting of the tool, if the settings file defines it
+def add_tool_setting(combination, tool):
+    return list(combination) + ([tool] if tool in SETTINGS else [])
 
 
 # Modify package file according to setting
@@ -102,6 +95,12 @@ else:
     COMBINATIONS = tuple([(x,) for x in SETTINGS.keys()])
 #print(COMBINATIONS)
 
+# Check all combinations before the first synthesis starts
+for c0 in COMBINATIONS:
+    create_setting_from_combination(SETTINGS, c0)
+    for tool in ("quartus", "vivado"):
+        create_setting_from_combination(SETTINGS, add_tool_setting(c0, tool))
+
 ##########
 # Get path to the directory of the given Makefile
 if "/" in args.makefile:
@@ -120,7 +119,7 @@ if args.setting is None:
 
         # Run Synthesis'
         if args.quartus:
-            c = list(c0) + ["quartus"]
+            c = add_tool_setting(c0, "quartus")
             SETTING = create_setting_from_combination(SETTINGS, c)
 
             apply_setting(args.entity_file, SETTING, PKG_MOD_SED)
@@ -131,7 +130,7 @@ if args.setting is None:
                 print("Run FAILED (" + " ".join(c) + ")")
                 FAIL = True
         if args.vivado:
-            c = list(c0) + ["vivado"]
+            c = add_tool_setting(c0, "vivado")
             SETTING = create_setting_from_combination(SETTINGS, c)
 
             apply_setting(args.entity_file, SETTING, PKG_MOD_SED)
@@ -181,7 +180,7 @@ else:
     ##########
 
     if args.quartus:
-        c = args.setting + ["quartus"]
+        c = add_tool_setting(args.setting, "quartus")
         SETTING = create_setting_from_combination(SETTINGS, c)
 
         apply_setting(args.entity_file, SETTING, PKG_MOD_SED)
@@ -193,7 +192,7 @@ else:
                 print("Run FAILED (" + " ".join(c) + ")")
                 FAIL = True
     if args.vivado:
-        c = args.setting + ["vivado"]
+        c = add_tool_setting(args.setting, "vivado")
         SETTING = create_setting_from_combination(SETTINGS, c)
 
         apply_setting(args.entity_file, SETTING, PKG_MOD_SED)
