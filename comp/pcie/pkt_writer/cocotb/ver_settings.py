@@ -72,6 +72,9 @@ SETTINGS = {
     "transactions_1000" : {
         "__cocotb_params__"    : {"FRAME_COUNT": "1000"},
     },
+    "transactions_3000" : {
+        "__cocotb_params__"    : {"FRAME_COUNT": "3000"},
+    },
     "transactions_200" : {
         "__cocotb_params__"    : {"FRAME_COUNT": "200"},
     },
