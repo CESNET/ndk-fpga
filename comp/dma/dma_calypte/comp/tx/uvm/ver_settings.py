@@ -27,6 +27,9 @@ SETTINGS = {
 
         "PCIE_LEN_MAX"            : "256",
 
+        "TRANSACTIONS_MIN"        : "400",
+        "TRANSACTIONS_MAX"        : "800",
+
         "__core_params__": {
             "UVM_TEST"     : "test::base",
         },

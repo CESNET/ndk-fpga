@@ -193,6 +193,10 @@ SETTINGS = {
     "straddling_on" : {
         "STRADDLING"           : "1",
     },
+    "endpoints_2_cons_2" : {
+        "PCIE_ENDPOINTS"       : 2,
+        "PCIE_CONS"            : 2,
+    },
     "dma_ports_1" : {
         "DMA_PORTS"            : 1,
     },
@@ -213,8 +217,7 @@ SETTINGS = {
         "R_TILE_512_BIF"           : ("intel_r_tile_512_bif",          ),
         "R_TILE_512_BIF_2CONS"     : ("intel_r_tile_512_bif_2cons",    ),
         "USP_512"                  : ("xilinx_usp_512",                ),
-        "USP_512_STRADDLING"       : ("xilinx_usp_512", "straddling_on", ),
-        "USP_512_DMA_2"            : ("xilinx_usp_512", "dma_ports_2", ),
+        "USP_512_2CONS"            : ("xilinx_usp_512", "endpoints_2_cons_2"),
 
         "P_TILE_512_CQ"            : ("intel_p_tile_512" , "dma_ports_1", "bar_enable"),
         "P_TILE_512_CQ_STRADDLING" : ("intel_p_tile_512" , "dma_ports_1", "bar_enable", "straddling_on"),

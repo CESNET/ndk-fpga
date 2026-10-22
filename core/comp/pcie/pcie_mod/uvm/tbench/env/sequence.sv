@@ -4,6 +4,23 @@
 
 // SPDX-License-Identifier: BSD-3-Clause
 
+// The "state" object of the DMA RQ and PCIe CQ sequence libraries.
+// A library ends after its running sequence when stop is set.
+class sequence_stop_cfg extends uvm_common::sequence_cfg;
+    `uvm_object_utils(uvm_pcie_top::sequence_stop_cfg)
+
+    int unsigned stop;
+
+    function new(string name = "sequence_stop_cfg");
+        super.new(name);
+        stop = 0;
+    endfunction
+
+    virtual function int unsigned stopped();
+        return stop;
+    endfunction
+endclass
+
 class sequence_base #(
     int unsigned RC_MFB_REGIONS,
     int unsigned RC_MFB_REGION_SIZE,
@@ -32,6 +49,7 @@ class sequence_base #(
                                                        ITEM_WIDTH,  DMA_PORTS, PCIE_ENDPOINTS))
 
     protected int unsigned stop;
+    protected sequence_stop_cfg m_stop_cfg;
     protected logic [DMA_PORTS-1:0] rx_stop[PCIE_ENDPOINTS];
     protected logic tx_stop;
 
@@ -75,15 +93,21 @@ class sequence_base #(
                                  CQ_MFB_REGIONS, CQ_MFB_REGION_SIZE, CQ_MFB_BLOCK_SIZE,
                                  ITEM_WIDTH, DMA_PORTS, PCIE_ENDPOINTS) p_sequencer);
 
+        m_stop_cfg = sequence_stop_cfg::type_id::create("m_stop_cfg");
+
         for (int unsigned pcie = 0; pcie < PCIE_ENDPOINTS; pcie++) begin
              string pcie_string;
              pcie_string.itoa(pcie);
+             uvm_config_db #(uvm_common::sequence_cfg)::set(p_sequencer.m_pcie_cq[pcie], "", "state", m_stop_cfg);
 
              for (int dma = 0; dma < DMA_PORTS; dma++) begin
                 string dma_string = {pcie_string, $sformatf("_%0d", dma)};
                 //RQ
                 dma_rq[pcie][dma] = uvm_dma::sequence_dma_rq_lib#(DMA_PORTS)::type_id::create(
                     "dma_rq", p_sequencer.m_dma_rq[pcie][dma]
+                );
+                uvm_config_db #(uvm_common::sequence_cfg)::set(
+                    p_sequencer.m_dma_rq[pcie][dma], "", "state", m_stop_cfg
                 );
                 dma_rq[pcie][dma].init_sequence();
                 dma_rq[pcie][dma].min_random_count = 100;
@@ -191,6 +215,7 @@ class sequence_base #(
     task body();
         //Run RESET
         stop = 0;
+        m_stop_cfg.stop = 0;
         tx_stop = 0;
 
         fork
@@ -220,8 +245,9 @@ class sequence_base #(
         //#(50ms);
         #(1ms);
         stop = 1;
+        m_stop_cfg.stop = 1;
         for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
-            wait (rx_stop[it] == 0);
+            wait (&rx_stop[it]);
         end
     endtask
 endclass

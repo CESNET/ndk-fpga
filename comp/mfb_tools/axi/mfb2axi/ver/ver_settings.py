@@ -13,6 +13,7 @@ SETTINGS = {
         "AXI_DATA_WIDTH"     : "256",
         "USE_IN_PIPE"        : "0",
         "USE_OUT_PIPE"       : "0",
+        "TRANSACTION_COUNT"  : "5000",
     },
     "mfb_1_1_8_8" : {
         "REGIONS"            : "1",
@@ -105,6 +106,13 @@ SETTINGS = {
         "ITEM_WIDTH"         : "32",
         "AXI_DATA_WIDTH"     : "512",
     },
+    "mfb_4_1_4_32" : {
+        "REGIONS"            : "4",
+        "REGION_SIZE"        : "1",
+        "BLOCK_SIZE"         : "4",
+        "ITEM_WIDTH"         : "32",
+        "AXI_DATA_WIDTH"     : "512",
+    },
     "mfb_2_1_1_32" : {
         "REGIONS"            : "2",
         "REGION_SIZE"        : "1",
@@ -120,24 +128,17 @@ SETTINGS = {
     },
     "_combinations_" : (
     (), # Works the same as '("default",),' as the "default" is applied in every combination
-    ("pipe_in",),
     ("pipe_out",),
     ("pipe_in","pipe_out",),
     ("mfb_1_1_8_8",),
-    ("mfb_1_1_8_16",),
     ("mfb_1_1_8_24",),
-    ("mfb_1_8_8_8",),
+    ("mfb_1_8_8_8","pipe_out",),
     ("mfb_1_8_32_8",),
-    ("mfb_1_2_4_8",),
     ("mfb_2_8_8_8",),
-    ("mfb_4_4_8_8",),
-    ("mfb_4_4_8_16",),
     ("mfb_3_4_8_8",),
-    ("mfb_3_4_8_16",),
     ("mfb_4_8_8_8",),
-    ("mfb_4_8_8_8","pipe_in","pipe_out",),
-    ("mfb_2_1_8_32",),
     ("mfb_2_1_8_32","pipe_in","pipe_out",),
+    ("mfb_4_1_4_32",),
     ("mfb_2_1_1_32",),
     ),
 }

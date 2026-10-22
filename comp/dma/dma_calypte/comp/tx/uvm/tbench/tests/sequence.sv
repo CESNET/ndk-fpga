@@ -70,8 +70,8 @@ class virt_seq #(
         uvm_common::sequence_cfg_transactions seq_cfg;
 
         seq_cfg = new();
-        seq_cfg.transactions_min = 3000;
-        seq_cfg.transactions_max = 7000;
+        seq_cfg.transactions_min = TRANSACTIONS_MIN;
+        seq_cfg.transactions_max = TRANSACTIONS_MAX;
         assert(seq_cfg.randomize());
         #(200ns);
 

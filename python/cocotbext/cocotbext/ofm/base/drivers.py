@@ -247,12 +247,16 @@ if cocotb.__version__ >= "2.0.0":
             """Return how many items were sent in the last bus word; subclasses override."""
             return 1
 
+        def _get_idle_items(self) -> int:
+            """Return how many items one idle bus word represents; subclasses override."""
+            return 1
+
         async def _main_loop(self):
             """Main driving loop: consume transactions and drive them onto the bus."""
             async for transaction in self._transactions:
                 if isinstance(transaction, IdleTransaction):
                     await self._handle_idle_transaction()
-                    self._idle_gen.put(transaction, items=1, end=True)
+                    self._idle_gen.put(transaction, items=self._get_idle_items(), end=True)
                     continue
 
                 sent_items = 0

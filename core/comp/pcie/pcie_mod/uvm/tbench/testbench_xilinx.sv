@@ -129,6 +129,19 @@ module testbench;
                             .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
                             .CLK         (CLK)
                         );
+        end else if (PCIE_ENDPOINTS == 2) begin : gen_PCIE_ENDPOINTS_2
+            bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[0].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
+                            .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
+                            .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
+                            .CLK         (CLK)
+                        );
+            bind PCIE_TRANSACTION_CTRL : DUT_U.VHDL_DUT_U.pcie_ctrl_g[1].pcie_ctrl_i.ptc_g.ptc_i
+                probe_inf #(MVB_UP_ITEMS * (1 + PCIE_TAG_WIDTH + sv_dma_bus_pack::DMA_UPHDR_WIDTH)) probe_tag (
+                            .event_signal({tagm_mvb_out_src_rdy & tagm_mvb_out_dst_rdy}),
+                            .event_data  ({tagm_mvb_out, tagm_mvb_out_tag, tagm_mvb_out_vld}),
+                            .CLK         (CLK)
+                        );
         end else begin : gen_line_74
             $error(
                 "\nERROR: Unsupported combination (due to bug in questasim. Questasim cannot operate with array path in bind)\n"

@@ -42,6 +42,10 @@ package test;
 
     parameter CLK_PERIOD              = 4ns;
 
+    // Number of packets that all channels send together
+    parameter TRANSACTIONS_MIN        = 3000;
+    parameter TRANSACTIONS_MAX        = 7000;
+
     `include "sequence.sv"
     `include "base.sv"
     `include "speed.sv"

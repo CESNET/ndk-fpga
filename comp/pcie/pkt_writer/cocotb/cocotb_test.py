@@ -361,9 +361,9 @@ async def _run_test(
         # Send to Model
         tb.model(instr=mvb_instr, meta=(pcie_mps, tb.dut.PAGE_SIZE.value), packet=mfb_pkt)
 
-    await ClockCycles(dut.CLK, 1000) # Wait for at least the first packet to reach the DUT's output
-    last_num = 0
-    while (this_num := tb.mfb_tx_mon.frame_cnt) > last_num:
+    # Wait until all expected frames are received or no new frame arrives for 5000 cycles
+    last_num = -1
+    while (this_num := tb.mfb_tx_mon.frame_cnt) > last_num and this_num < tb.model_sent:
         last_num = this_num
         cocotb.log.info(f"Number of transactions processed: {tb.mfb_tx_mon.frame_cnt}")
         await ClockCycles(dut.CLK, 5000)
