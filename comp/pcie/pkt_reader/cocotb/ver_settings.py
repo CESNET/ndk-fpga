@@ -80,27 +80,28 @@ SETTINGS = {
         "ITEM_WIDTH"            : "8",
     },
 
+    # Cocotb test parameters (not VHDL generics).
+    # Passed to the test as environment variables via __cocotb_params__.
+    "frames_1000" : {
+        "__cocotb_params__"     : {"FRAME_COUNT": "1000"},
+    },
+    "frames_2000" : {
+        "__cocotb_params__"     : {"FRAME_COUNT": "2000"},
+    },
+
     "_combinations_" : (
-    (), # Works the same as '("default",),' as the "default" is applied in every combination
+    # PCIe down MFB of P-Tile and R-Tile (default), UltraScale+ (4r_1b_4i) and R-Tile Gen5 (4r_1b_8i)
+    ("frames_2000",),
+    ("pcie_down_4r_1b_4i","frames_2000"),
+    ("pcie_down_4r_1b_8i","user_mfb_1r_1b_16i","frames_1000"),
+    ("pcie_down_1r_1b_8i","user_mfb_1r_1b_16i","mtu_max","frames_1000"),
+    ("pcie_down_4r_1b_4i","mtu_127","no_fwft","frames_1000"),
 
-    ("pcie_down_1r_1b_8i",),
-    ("pcie_down_4r_1b_4i",),
-    ("pcie_down_4r_1b_8i","user_mfb_1r_1b_16i"),
-    ("mtu_127",),
-    ("mtu_max",),
+    ("resp_out_of_order","pcie_down_4r_1b_8i","frames_1000"),
+    ("resp_out_of_order","mtu_127","frames_1000"),
+    ("resp_out_of_order","mtu_max","no_fwft","frames_1000"),
 
-    ("resp_out_of_order",),
-    ("resp_out_of_order","pcie_down_4r_1b_8i"),
-    ("resp_out_of_order","mtu_127"),
-    ("resp_out_of_order","mtu_max","no_fwft"),
-
-    ("pcie_down_1r_1b_8i","user_mfb_1r_1b_16i","mtu_max"),
-    ("pcie_down_4r_1b_4i","mtu_127","no_fwft"),
-
-    ("pcie_down_4r_1b_4i","resp_out_of_order","mtu_max"),
-
-    ("fake_reader"),
-    ("fake_reader","user_mfb_1r_1b_256i","mtu_max"),
-
+    ("fake_reader","frames_1000"),
+    ("fake_reader","user_mfb_1r_1b_256i","mtu_max","frames_1000"),
     ),
 }
