@@ -37,6 +37,8 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
     protected bit [REGIONS-1 : 0] eof;
     protected bit [REGIONS*SOF_POS_WIDTH-1 : 0] sof_pos;
     protected bit [REGIONS*EOF_POS_WIDTH-1 : 0] eof_pos;
+    protected bit [REGIONS*SOF_POS_WIDTH-1 : 0] word_sof_pos; // SOF_POS and EOF_POS of the current word
+    protected bit [REGIONS*EOF_POS_WIDTH-1 : 0] word_eof_pos;
     protected bit src_rdy;
 
     // Source ready delay parameters for whole invalid words
@@ -54,6 +56,13 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
     rand integer ifg; // in blocks
     int ifgLow = 0;
     int ifgHigh = WORD_BLOCKS + WORD_BLOCKS - 1;
+
+    // SRC_RDY drop while DST_RDY is low (only for srcRdyRule == MFB_SRC_RDY_RELAXED).
+    src_rdy_rule_t srcRdyRule = MFB_SRC_RDY_RELAXED;
+    int srcRdyDropEnable_wt = 10;  // Enable/Disable SRC_RDY drop weights, evaluated in each cycle when the word is not accepted.
+    int srcRdyDropDisable_wt = 90;
+    int srcRdyDropLow = 1;         // Length limits of SRC_RDY drop in number of cycles, the same word is sent again after the drop.
+    int srcRdyDropHigh = 4;
 
     // Operation mode for invalid data items and words.
     localparam MODE_NOCHANGE = 0;   // Values of invalid data items and values are retained from previous cycles.
@@ -114,6 +123,48 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
         end
     endfunction
 
+    // Randomly withdraw the not accepted word (SRC_RDY falls while DST_RDY is low)
+    // and send the same word again after the drop.
+    task srcRdyDrop();
+        item held_data[ITEMS];
+        meta_item held_meta[REGIONS];
+        bit [REGIONS-1 : 0] held_sof;
+        bit [REGIONS-1 : 0] held_eof;
+        bit drop;
+        int unsigned len;
+
+        if(srcRdyRule == MFB_SRC_RDY_STRICT)
+            return;
+        SRC_RDY_DROP_RANDOMIZE : assert(std::randomize(drop, len) with {
+            drop dist {1'b1 := srcRdyDropEnable_wt, 1'b0 := srcRdyDropDisable_wt};
+            len inside { [srcRdyDropLow:srcRdyDropHigh] };
+        });
+        if(!drop)
+            return;
+        held_data = data;
+        held_meta = meta;
+        held_sof = sof;
+        held_eof = eof;
+        repeat(len) begin
+            fillEmptyWord();
+            vif.cb.SRC_RDY <= 1'b0;
+            @(vif.cb);
+        end
+        data = held_data;
+        meta = held_meta;
+        sof = held_sof;
+        eof = held_eof;
+        vif.cb.DATA <= { << item {data} };
+        vif.cb.META <= { << meta_item {meta} };
+        vif.cb.SOF <= sof;
+        vif.cb.EOF <= eof;
+        if(SOF_POS_WIDTH)
+            vif.cb.SOF_POS <= word_sof_pos;
+        if(EOF_POS_WIDTH)
+            vif.cb.EOF_POS <= word_eof_pos;
+        vif.cb.SRC_RDY <= 1'b1;
+    endtask
+
     task moveWord();
         if(src_rdy) begin
             vif.cb.DATA <= { << item {data} };
@@ -121,9 +172,12 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
             vif.cb.SOF <= sof;
             vif.cb.EOF <= eof;
             vif.cb.SRC_RDY <= src_rdy;
-            do
+            forever begin
                 @(vif.cb);
-            while(!vif.cb.DST_RDY);
+                if(vif.cb.DST_RDY)
+                    break;
+                srcRdyDrop();
+            end
             vif.cb.SRC_RDY <= 0;
             IDLE_RANDOMIZE1 : assert(randomize());
             if(wordDelayEn)
@@ -211,6 +265,7 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
             tr.sof = r;
             if(SOF_POS_WIDTH) begin
                 vif.cb.SOF_POS[r*SOF_POS_WIDTH +: SOF_POS_WIDTH] <= p / BLOCK_SIZE;
+                word_sof_pos[r*SOF_POS_WIDTH +: SOF_POS_WIDTH] = p / BLOCK_SIZE;
                 tr.sof_pos = p / BLOCK_SIZE;
             end
             i = 0;
@@ -231,8 +286,10 @@ class MfbDriver #(REGIONS = 4, REGION_SIZE = 8, BLOCK_SIZE = 8, ITEM_WIDTH = 8, 
                     eof[r] = 1;
                     if (META_ALIGNMENT == 1)
                         meta[r] = tr.meta;
-                    if(EOF_POS_WIDTH)
+                    if(EOF_POS_WIDTH) begin
                         vif.cb.EOF_POS[r*EOF_POS_WIDTH +: EOF_POS_WIDTH] <= p + j - 1;
+                        word_eof_pos[r*EOF_POS_WIDTH +: EOF_POS_WIDTH] = p + j - 1;
+                    end
                     foreach(cbs[i]) cbs[i].post_tx(transaction, inst);
                     moveBlock();
                     break;

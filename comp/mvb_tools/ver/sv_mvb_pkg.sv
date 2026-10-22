@@ -21,6 +21,10 @@ package sv_mvb_pkg;
 
     import sv_common_pkg::*;
 
+    // SRC_RDY behaviour of MvbDriver when the word is not accepted (DST_RDY is low)
+    // MVB_SRC_RDY_RELAXED - SRC_RDY can fall, the withdrawn word is sent again later
+    // MVB_SRC_RDY_STRICT  - SRC_RDY must remain high until DST_RDY is high
+    typedef enum {MVB_SRC_RDY_RELAXED, MVB_SRC_RDY_STRICT} src_rdy_rule_t;
 
     `include "mvb_transaction.sv"
     `include "mvb_monitor.sv"
