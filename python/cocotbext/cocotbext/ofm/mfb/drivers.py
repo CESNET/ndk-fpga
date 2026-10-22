@@ -213,6 +213,9 @@ class MFBDriver(ModularBusDriver):
         self._staged_items = 0
         return items
 
+    def _get_idle_items(self):
+        return self._regions * self._region_items
+
     def _auto_set_optional_signals(self, transaction: MfbTransaction, sof_index: int, eof_index: int):
         """Automatically assings value to optional signals present in the transaction."""
         for name, value in asdict(transaction).items():
