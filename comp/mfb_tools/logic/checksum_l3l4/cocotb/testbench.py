@@ -18,7 +18,7 @@ from cocotbext.ofm.mvb.protocol import MvbProtocol
 from cocotb_bus.drivers import BitDriver
 from cocotbext.ofm.utils.throughput_probe import ThroughputProbe, ThroughputProbeMvbInterface
 from dataclasses import dataclass
-from scapy.all import raw, TCP, UDP, SCTP, ICMPv6EchoRequest
+from scapy.all import raw, Ether, Dot1Q, IP, IPv6, Raw, TCP, UDP, SCTP, ICMPv6EchoRequest
 
 from cocotbext.ofm.utils.scapy import ScapyPacketGenerator
 from scoreboard import MfbChecksumL3L4Result, compare_checksums
@@ -372,6 +372,96 @@ class Testbench:
 
             cocotb.log.debug(f"Truncated packet from {original_len} to {new_len} bytes")
 
+        return self.packet_to_dict(pkt, packet_bytes)
+
+    async def generate_and_send_phdr_zero_packet(self, min_len: int = 60, max_len: int = 1518) -> dict:
+        """Generate a packet with a pseudoheader sum of 0xFFFF and send it via MFB/MVB buses.
+
+        Args:
+            min_len: Minimum packet length in bytes (default: 60).
+            max_len: Maximum packet length in bytes (default: 1518).
+
+        Returns:
+            dict: Dictionary with packet data and metadata for debugging.
+        """
+        pkt_dict = self.generate_phdr_zero_packet(min_len, max_len)
+        await self.send_packet_with_metadata(pkt_dict)
+        return pkt_dict
+
+    def generate_phdr_zero_packet(self, min_len: int = 60, max_len: int = 1518) -> dict:
+        """Generate a TCP or UDP packet with a pseudoheader sum of 0xFFFF.
+
+        The 1's complement sum of the pseudoheader is 0xFFFF, so its checksum is 0x0000.
+        The checksum of the L4 data is then also 0x0000.
+        Both are 1's complement zeros, and the packet is still correct.
+        Random packets have this property only once in about 65535 cases.
+
+        The packet is IPv4 or IPv6, has 0-2 VLAN tags, and has a correct L4 checksum.
+        The last 16 bits of the destination address are chosen to get the required sum.
+
+        Args:
+            min_len: Minimum packet length in bytes (default: 60).
+            max_len: Maximum packet length in bytes (default: 1518).
+
+        Returns:
+            dict: Dictionary with packet data and metadata in test-specific format.
+        """
+        import random
+
+        ipv6_en = random.choice([True, False])
+        if ipv6_en:
+            ip_hdr_len = 40
+            src_ip = random.getrandbits(128)
+            dst_ip = random.getrandbits(128) & ~0xFFFF
+        else:
+            ip_hdr_len = 20
+            src_ip = random.getrandbits(32)
+            dst_ip = random.getrandbits(32) & ~0xFFFF
+
+        if random.choice([True, False]):
+            l4_proto, l4_layer = 6, TCP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535))
+        else:
+            l4_proto, l4_layer = 17, UDP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535))
+
+        vlan_count = random.choice([0, 1, 2])
+        hdr_len = 14 + vlan_count * 4 + ip_hdr_len + len(raw(l4_layer))
+        payload_len = random.randint(max(0, min_len - hdr_len), max_len - hdr_len)
+        l4_len = len(raw(l4_layer)) + payload_len
+
+        # The pseudoheader sum does not depend on the field order, so all words are added together.
+        words = [(src_ip >> (16 * i)) & 0xFFFF for i in range(8)]
+        words += [(dst_ip >> (16 * i)) & 0xFFFF for i in range(8)]
+        words += [l4_len, l4_proto]
+        phdr_sum = sum(words)
+        while phdr_sum >> 16:
+            phdr_sum = (phdr_sum & 0xFFFF) + (phdr_sum >> 16)
+        # Adding the 1's complement of the sum gives a sum of 0xFFFF.
+        dst_ip |= ~phdr_sum & 0xFFFF
+
+        if ipv6_en:
+            ip_layer = IPv6(src=str(ipaddress.IPv6Address(src_ip)), dst=str(ipaddress.IPv6Address(dst_ip)))
+        else:
+            ip_layer = IP(src=str(ipaddress.IPv4Address(src_ip)), dst=str(ipaddress.IPv4Address(dst_ip)))
+
+        pkt = ip_layer / l4_layer / Raw(bytes(random.getrandbits(8) for _ in range(payload_len)))
+        for _ in range(vlan_count):
+            pkt = Dot1Q(vlan=random.randint(1, 4094)) / pkt
+        pkt = Ether() / pkt
+        # Rebuild the packet from bytes to calculate all checksums.
+        pkt = pkt.__class__(raw(pkt))
+
+        return self.packet_to_dict(pkt, bytearray(raw(pkt)))
+
+    def packet_to_dict(self, pkt, packet_bytes: bytearray) -> dict:
+        """Extract metadata from a packet and convert it to format required by checksum_l3l4 test.
+
+        Args:
+            pkt: Scapy packet that provides the metadata.
+            packet_bytes: Packet bytes that are sent to the DUT. They can be truncated.
+
+        Returns:
+            dict: Dictionary with packet data and metadata in test-specific format.
+        """
         # Get L3 info (includes offset)
         l3_offset, l3_length, l3_proto_number, l3_csum_en, l3_checksum = ScapyPacketGenerator.get_l3_info(pkt)
 
