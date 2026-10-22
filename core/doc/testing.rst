@@ -256,6 +256,14 @@ already, so the reference curve equals the line rate:
 
     $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --eth-rate 100 -o results/
 
+By default the generator sends consecutive frames to sequential channel numbers, so several
+consecutive frames go to the same DMA endpoint. With ``--gen-rev-chan`` the sweep passes
+``--gen_rev_chan`` to ``gls_mod.py``. The generator then uses bit-reversed channel numbers
+(0, 16, 8, 24, ... for 32 channels), so consecutive frames alternate between the DMA endpoints.
+The bit reversal needs all channels of each GLS, so ``gls_mod.py`` turns it off when ``-c``
+selects only a part of them. The results record this setting, and ``compare`` warns when it
+differs between the compared runs.
+
 The script can also configure the kernel DMA buffer count/size (DMA Medusa only) via the
 ``nfb-dma`` tool before starting the sweep, using the ``--buffer-count`` and ``--buffer-size``
 options:
