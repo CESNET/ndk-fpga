@@ -359,10 +359,9 @@ async def run_test(dut, frame_count=None, frame_size_min=60, frame_size_max=1500
         # Move to next ID for the following packet
         next_id = (next_id + 1) & id_mask
 
-    # Wait for at least the first packet to reach the DUT's output
-    await ClockCycles(dut.CLK, 1000)
-    last_num = 0
-    while (this_num := tb.user_resp_mon.frame_cnt) > last_num:
+    # Wait until all packets are received or no new packet arrives for 5000 cycles
+    last_num = -1
+    while (this_num := tb.user_resp_mon.frame_cnt) > last_num and this_num < frame_count:
         last_num = this_num
         cocotb.log.info(f"Number of transactions processed: {tb.user_resp_mon.frame_cnt}")
         await ClockCycles(dut.CLK, 5000)
