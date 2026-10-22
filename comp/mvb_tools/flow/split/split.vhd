@@ -62,7 +62,7 @@ begin
             reg : process (CLK)
             begin
                 if rising_edge(CLK) then
-                    if (RESET = '1' or drdy = '1') then
+                    if (RESET = '1' or (RX_SRC_RDY = '1' and drdy = '1')) then
                         item_sent(i) <= '0';
                     elsif (TX_DST_RDY(i) = '1' and srdy(i) = '1') then
                         item_sent(i) <= '1';
