@@ -222,6 +222,10 @@ elif "_combinations_run_percentage_" in SETTINGS.keys():
 
 #print(COMBINATIONS)
 
+# Check all combinations before the first simulation starts
+for comb in COMBINATIONS.values():
+    create_setting_from_combination(SETTINGS, comb)
+
 ##########
 
 #Print current directory where verification is running

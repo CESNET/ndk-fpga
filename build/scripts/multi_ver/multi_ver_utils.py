@@ -27,24 +27,22 @@ def reduce_combinations(combinations, reduction_perc=100):
 
 
 # Modify setting variable
+# Raises ValueError when the combination cannot be created as written
 def create_setting_from_combination(settings, combination):
-    global FAIL
+    if isinstance(combination, str):
+        raise ValueError("Combination \"{}\" is a string, not a tuple. Add a trailing comma.".format(combination))
     # Deep copy, so the merged dicts below do not change the settings
     s = copy.deepcopy(settings["default"])
     for c in combination:
         if c not in settings.keys():
-            print("ERROR: Combination \"{}\" contains unknown setting name \"{}\"!".format(combination, c))
-            FAIL = True
-            continue
+            raise ValueError("Combination \"{}\" contains unknown setting name \"{}\"!".format(combination, c))
         for i in settings[c].keys(): # load modified values
             # if parameter is a dict then merge it
             if i in ("__core_params__", "__cocotb_params__"):
                 s.setdefault(i, {}).update(settings[c][i])
             # or it is string
             elif i not in s.keys():
-                print("ERROR: Parameter \"{}\" is present in setting \"{}\" but not in setting \"default\". This might cause unexpected behaviour in the following runs!".format(i, c))
-                FAIL = True
-                s[i] = settings[c][i]
+                raise ValueError("Parameter \"{}\" is present in setting \"{}\" but not in setting \"default\"!".format(i, c))
             else:
                 s[i] = settings[c][i]
     return s
