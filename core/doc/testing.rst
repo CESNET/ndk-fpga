@@ -223,7 +223,7 @@ When `-r`, `--repeat` option is used, the script continues to run tests until in
 Automated DMA throughput sweeps and FW comparison
 **************************************************
 
-The companion script ``dma_throughput_sweep.py`` (in the same ``./sw`` directory) automates a full
+The companion script ``gls_throughput_sweep.py`` (in the same ``./sw`` directory) automates a full
 throughput characterization by driving ``gls_mod.py`` across one suite of modes over a
 configurable range of frame lengths, and plots the results. ``--suite`` selects the suite:
 
@@ -237,8 +237,8 @@ configurable range of frame lengths, and plots the results. ``--suite`` selects 
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -o results/
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --suite eth --eth-rate 400 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --suite eth --eth-rate 400 -o results/
 
 Each run also saves the output of ``nfb-info -v`` as ``nfb_info.txt`` next to the results. It
 describes the firmware and the PCIe connection of the card.
@@ -252,7 +252,7 @@ frame length:
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -s 64 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 -s 64 -o results/
 
 Each run is tagged with the FW build identity (card name, project name/variant, and
 ``build-revision``, all read from the Device Tree) so results are grouped per FW build. Two or
@@ -260,7 +260,7 @@ more such runs (e.g. from different FW versions) can then be overlaid on common 
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
+    $ python3 gls_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
 
 The `compare` subcommand warns if the compared runs used different frame-size ranges, channel
 counts, cycles, clock frequency, rate layer, DMA buffer settings, or Ethernet rate, since those
@@ -276,7 +276,7 @@ already, so the reference curve equals the line rate:
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --eth-rate 100 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --eth-rate 100 -o results/
 
 By default the generator sends consecutive frames to sequential channel numbers, so several
 consecutive frames go to the same DMA endpoint. With ``--gen-rev-chan`` the sweep passes
@@ -292,7 +292,7 @@ options:
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --buffer-count 4096 --buffer-size 2048 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --buffer-count 4096 --buffer-size 2048 -o results/
 
 This runs ``sudo nfb-dma -d <device> -C <buffer_count> -B <buffer_size>`` once, before any
 measurement starts, and may prompt for a sudo password. The setting is global to the device and
@@ -340,7 +340,7 @@ next to the report CSV:
     * - ``pcie_telemetry_<report name>.txt``
       - The same report that ``nfb-pcie-telemetry`` prints, once for each frame length.
 
-``dma_throughput_sweep.py run --pcie-telemetry [SECONDS]`` passes the option to
+``gls_throughput_sweep.py run --pcie-telemetry [SECONDS]`` passes the option to
 ``gls_mod.py``. SECONDS sets the length of one telemetry measurement (default 0.5 s). The script
 then saves the summaries of all modes into ``pcie_telemetry_<fw_id>.csv``, one row per mode and
 frame length. For each mode it also saves the chart ``pcie_telemetry_<mode>_<fw_id>.png``. The
@@ -350,4 +350,4 @@ was used. The right panel shows why the PCIe transfer stopped. The full text rep
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --pcie-telemetry -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --pcie-telemetry -o results/

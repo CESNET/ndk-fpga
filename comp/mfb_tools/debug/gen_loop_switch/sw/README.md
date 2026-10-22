@@ -5,7 +5,7 @@
 It is used mainly for throughput measurements and analysis.
 Further information is available in the [GLS module documentation](https://cesnet.github.io/ndk-fpga/devel/comp/mfb_tools/debug/gen_loop_switch/readme.html) or [GLS module tutorial](https://cesnet.github.io/ndk-fpga/devel/ndk_core/doc/testing.html#gls-module-tutorial).
 
-`dma_throughput_sweep.py` automates `gls_mod.py` across one suite of modes and a range of
+`gls_throughput_sweep.py` automates `gls_mod.py` across one suite of modes and a range of
 frame lengths. The `dma` suite measures the DMA path alone, the `eth` suite measures the traffic
 over the Ethernet loopback together with the lost frames. It tags each run with the FW build identity and plots the results. Every chart
 shows both the bit rate in Gbps and the frame rate in Mpps. The `compare` subcommand overlays

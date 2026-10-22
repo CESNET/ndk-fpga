@@ -3,7 +3,7 @@
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Automated DMA throughput sweep and FW-to-FW comparison, built on top of gls_mod.py.
+"""Automated throughput sweep and FW-to-FW comparison, built on top of gls_mod.py.
 
 Drives gls_mod.py for one suite of modes across a range of frame lengths, tags each run
 with the FW build identity read from the Device Tree, and plots the results. Every chart
@@ -21,8 +21,8 @@ A separate "compare" mode overlays several such runs (e.g. two different FW buil
 common charts, which shows how the throughput changed between FW versions.
 
 Two-step workflow:
-    ./dma_throughput_sweep.py run     -d /dev/nfb0 -o results/
-    ./dma_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
+    ./gls_throughput_sweep.py run     -d /dev/nfb0 -o results/
+    ./gls_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
 """
 
 import argparse
@@ -945,7 +945,7 @@ def cmd_compare(args: argparse.Namespace) -> None:
             print(f"WARNING: mode '{mode}' is missing from run(s): {', '.join(missing)} "
                   f"— its comparison chart will only show the other run(s)")
 
-    outdir = Path(args.outdir) if args.outdir else Path("dma_throughput_results") / "compare"
+    outdir = Path(args.outdir) if args.outdir else Path("gls_throughput_results") / "compare"
     outdir.mkdir(parents=True, exist_ok=True)
     for mode in modes_present:
         out_path = outdir / f"compare_{mode}.png"
@@ -966,7 +966,7 @@ def main() -> None:
         "identity so results from different FW versions can be compared."
     )
     parser = argparse.ArgumentParser(
-        prog="dma_throughput_sweep.py",
+        prog="gls_throughput_sweep.py",
         description=desc,
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -1017,14 +1017,14 @@ def main() -> None:
                             "numbers, so they alternate between the DMA endpoints (passed through\n"
                             "to gls_mod.py as --gen_rev_chan); default: off, sequential channels")
     p_run.add_argument("--fw-label", help="override the auto-detected FW label/id (use if the Device Tree has no build-revision)")
-    p_run.add_argument("-o", "--outdir", default="dma_throughput_results", help="output directory; default: ./dma_throughput_results")
+    p_run.add_argument("-o", "--outdir", default="gls_throughput_results", help="output directory; default: ./gls_throughput_results")
     p_run.add_argument("--skip-plots", action="store_true", help="only produce the consolidated CSV, no PNG plots")
     p_run.set_defaults(func=cmd_run)
 
     p_cmp = sub.add_parser("compare", help="overlay two or more previous 'run' results")
     p_cmp.add_argument("runs", nargs="+", help="two or more run output directories (or results_*.csv files) produced by 'run'")
     p_cmp.add_argument("--labels", help="comma-separated legend labels, one per run (default: derived from FW metadata)")
-    p_cmp.add_argument("-o", "--outdir", default=None, help="output directory for comparison plots; default: ./dma_throughput_results/compare")
+    p_cmp.add_argument("-o", "--outdir", default=None, help="output directory for comparison plots; default: ./gls_throughput_results/compare")
     p_cmp.set_defaults(func=cmd_compare)
 
     args = parser.parse_args()
