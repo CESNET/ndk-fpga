@@ -247,7 +247,7 @@ class sequence_base #(
         stop = 1;
         m_stop_cfg.stop = 1;
         for (int unsigned it = 0; it < PCIE_ENDPOINTS; it++) begin
-            wait (rx_stop[it] == 0);
+            wait (&rx_stop[it]);
         end
     endtask
 endclass
