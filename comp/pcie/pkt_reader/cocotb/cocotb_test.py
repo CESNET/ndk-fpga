@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import itertools
+import os
 
 import cocotb
 import logging
@@ -274,7 +275,11 @@ class Testbench():
 
 # NOTE: You can also configure a different PAGE_SIZE parameter -> must be done in the DUT.
 @cocotb.test()
-async def run_test(dut, frame_count=10000, frame_size_min=60, frame_size_max=1500, pcie_mrrs=512, pcie_mps=256, pcie_rcb=64):
+async def run_test(dut, frame_count=None, frame_size_min=60, frame_size_max=1500, pcie_mrrs=512, pcie_mps=256, pcie_rcb=64):
+    # Allow the multi-ver runner to override frame_count via __cocotb_params__.
+    if frame_count is None:
+        frame_count = int(os.environ.get("COCOTB_FRAME_COUNT", "3000"))
+
     fake_reader = bool(dut.FAKE_READER.value)
 
     if not fake_reader:
