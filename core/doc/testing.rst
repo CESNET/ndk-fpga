@@ -78,7 +78,7 @@ See the test modes and other options by running the script with the ``-h`` optio
 .. code-block:: text
 
     $ python gls_mod.py -h
-    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME]
+    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME] [--gen_rev_chan]
 
             Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -90,7 +90,7 @@ See the test modes and other options by running the script with the ``-h`` optio
                             select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0
     -l, --log               enable logging to a CSV file
     -L, --log_demo          enable for demo - logs to a TXT file in /tmp directory
-    -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
+    -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
                             set the test mode; options:
 
                             +-------------+--------------------------------------------------------------------------------+
@@ -101,6 +101,9 @@ See the test modes and other options by running the script with the ``-h`` optio
                             | tx          | TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)                |
                             +-------------+--------------------------------------------------------------------------------+
                             | rxtx        | TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)                |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | swloop      | HW Gen --> TX ETH     ==> RX ETH --> RX DMA --> (ndp-loopback, SW) --> TX DMA  |
+                            |             | --> Black Hole; (ETH loopback)                                                 |
                             +-------------+--------------------------------------------------------------------------------+
                             | dma_rx      | HW Gen --> RX DMA     ###                                                      |
                             +-------------+--------------------------------------------------------------------------------+
@@ -130,6 +133,9 @@ See the test modes and other options by running the script with the ``-h`` optio
                             the data goes to pcie_telemetry_<report name>.jsonl and .txt in the current directory
     --pcie_telemetry_time PCIE_TELEMETRY_TIME
                             set the length [s] of the PCIe telemetry measurement; default: 0.5
+    --gen_rev_chan          the generator sends consecutive frames to channels with bit-reversed numbers
+                            (0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;
+                            needs the full channel range of each GLS, otherwise it is turned off
 
 When launched, the script performs a test or a continuous series of tests that generates data (in SW or using a generator in the design), sets datapaths, and measures throughput.
 When using TX DMA, the scripts uses the ``ndp-generate`` tool to generate and send packets via DMA into the FPGA FW.
@@ -139,6 +145,11 @@ Else packets are dropped in the RX DMA module, which can be observed using the `
 The `dma_swloop` mode instead uses the ``ndp-loopback`` tool. This tool receives packets from RX DMA
 and sends the same packets back through TX DMA in software. RX and TX DMA are therefore measured
 together, without the FW-internal loopback that `dma_loop` uses.
+The `swloop` mode uses ``ndp-loopback`` as well, but RX DMA receives the frames from the Ethernet
+loopback. TX DMA sends them back into the FPGA, where the GLS measures and drops them.
+In the modes over the Ethernet loopback, the report CSV also holds three counters for each frame
+length. They count the frames received by the Ethernet MACs, the frames that the MACs dropped,
+and the frames that RX DMA discarded.
 The variations of tests are set by the `-m`, `--mode` parameter (the only required one).
 One test run in the selected mode consists of multiple partial tests for different lengths of generated frames, defined by the `-s`, `--frame_size` parameter that expects three values in bytes like so: `min max step`.
 
@@ -213,13 +224,24 @@ Automated DMA throughput sweeps and FW comparison
 **************************************************
 
 The companion script ``dma_throughput_sweep.py`` (in the same ``./sw`` directory) automates a full
-DMA throughput characterization by driving ``gls_mod.py`` across the four DMA scenarios
-(`dma_rx`, `dma_tx`, `dma_rxtx`, `dma_swloop`) over a configurable range of frame lengths, and
-plots the results.
+throughput characterization by driving ``gls_mod.py`` across one suite of modes over a
+configurable range of frame lengths, and plots the results. ``--suite`` selects the suite:
+
+- ``dma`` (default): `dma_rx`, `dma_tx`, `dma_rxtx` and `dma_swloop`. They measure the DMA path
+  alone. The traffic is not limited by the Ethernet line rate, so the results show the capacity
+  of the DMA path and compare FW builds.
+- ``eth``: `rx`, `tx` and `swloop`. They measure the traffic over the Ethernet loopback, as an
+  application sees it. The traffic comes at the line rate and the FW distributes the frames to
+  the DMA channels. The results also hold the share of the frames that the RX path lost, and
+  the sweep draws it in a separate chart.
 
 .. code-block:: bash
 
     $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -o results/
+    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --suite eth --eth-rate 400 -o results/
+
+Each run also saves the output of ``nfb-info -v`` as ``nfb_info.txt`` next to the results. It
+describes the firmware and the PCIe connection of the card.
 
 Every chart has four panels: RX DMA on the left, TX DMA on the right, the bit rate in Gbps in the
 top row and the frame rate in Mpps in the bottom row. The frame rate is derived from the bit rate
