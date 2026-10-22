@@ -78,7 +78,7 @@ See the test modes and other options by running the script with the ``-h`` optio
 .. code-block:: text
 
     $ python gls_mod.py -h
-    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME] [--gen_rev_chan]
+    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME] [--gen_rev_chan] [--ndp_sleep]
 
             Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -136,11 +136,23 @@ See the test modes and other options by running the script with the ``-h`` optio
     --gen_rev_chan          the generator sends consecutive frames to channels with bit-reversed numbers
                             (0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;
                             needs the full channel range of each GLS, otherwise it is turned off
+    --ndp_sleep             run the NDP tools without -P and -I 0: they sleep when the DMA queues are idle
+                            and print their statistics every second; default: -P -I 0
 
 When launched, the script performs a test or a continuous series of tests that generates data (in SW or using a generator in the design), sets datapaths, and measures throughput.
 When using TX DMA, the scripts uses the ``ndp-generate`` tool to generate and send packets via DMA into the FPGA FW.
 Other source of data can be one of the HW packet generators inside the GLS module (see :ref:`GLS module documentation <gls_debug>`).
 When using RX DMA, the script uses the ``ndp-read`` tool to accept packets from the FPGA.
+The script starts the NDP tools with ``-P`` and ``-I 0``, so they do not print statistics while they run.
+With ``-P``, ``ndp-read`` and ``ndp-loopback`` poll the RX DMA queues without sleeping when they are empty.
+Without it, they can read fewer short frames than the FW delivers.
+``ndp-generate`` gets the same options, but ``-P`` changes nothing there: it only affects the rate limit
+of ``--speed``, which the script does not use, and the tool sleeps when the TX ring is full in both cases.
+With short frames, TX DMA modes measure the speed of ``ndp-generate`` rather than of the FW:
+the tool cannot fill the TX rings faster, with or without ``-P``.
+In the SW loopback modes, ``-P`` speeds up short frames, but can slightly lower the speed of long frames.
+Compare only results measured with the same options.
+``--ndp_sleep`` starts the tools without these options, as the earlier versions of the script did.
 Else packets are dropped in the RX DMA module, which can be observed using the ``nfb-dma`` tool.
 The `dma_swloop` mode instead uses the ``ndp-loopback`` tool. This tool receives packets from RX DMA
 and sends the same packets back through TX DMA in software. RX and TX DMA are therefore measured
