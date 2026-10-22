@@ -174,6 +174,40 @@ def record_pcie_telemetry(
 
 
 @dataclass
+class RxLossCounters:
+    """Frames received by the Ethernet MACs and the frames that the RX path lost."""
+    eth_rx_frames: Optional[int]
+    eth_rx_dropped: Optional[int]
+    rx_dma_discarded: Optional[int]
+
+
+def reset_rx_loss_counters(eths: List[nfb.eth.Eth], rx_queues: List[nfb.libnfb.NdpQueueRx]) -> None:
+    for e in eths:
+        e.rxmac.stats_reset()
+    for q in rx_queues:
+        q.stats_reset()
+
+
+def read_rx_loss_counters(eths: List[nfb.eth.Eth], rx_queues: List[nfb.libnfb.NdpQueueRx]) -> RxLossCounters:
+    """Sum the counters of all Ethernet MACs and RX DMA queues.
+
+    Each counter is the first of the given keys that the statistics contain. A counter that
+    the nfb library does not report is None.
+    """
+    def total(stats: List[dict], *keys: str) -> Optional[int]:
+        values = [next((s[k] for k in keys if k in s), None) for s in stats]
+        return None if any(v is None for v in values) else sum(values)
+
+    mac_stats = [e.rxmac.read_stats() for e in eths]
+    queue_stats = [q.read_stats() for q in rx_queues]
+    return RxLossCounters(
+        eth_rx_frames=total(mac_stats, "total"),
+        eth_rx_dropped=total(mac_stats, "dropped"),
+        rx_dma_discarded=total(queue_stats, "discarded", "dropped"),
+    )
+
+
+@dataclass
 class GlsMuxConfig:
     r2l_gen: Optional[int]
     r2l_loop: Optional[int]
@@ -218,6 +252,8 @@ def run_test(
     exiter : GracefulExiter,
     pcie_telemetry : List["PcieTelemetry"],
     pcie_telemetry_time : float,
+    loss_eths : List[nfb.eth.Eth],
+    loss_rx_queues : List[nfb.libnfb.NdpQueueRx],
 ) -> None:
 
     demo_path = "/tmp/demo_gui.txt"
@@ -230,7 +266,7 @@ def run_test(
         writer = csv.writer(f)
 
         # CSV file row
-        row = ["Length", "TX APP speed", "RX APP speed"]
+        row = ["Length", "TX APP speed", "RX APP speed", "ETH RX frames", "ETH RX dropped", "RX DMA discarded"]
         writer.writerow(row)
 
     # PCIe telemetry is measured once per frame length, in the middle of the speed
@@ -290,6 +326,9 @@ def run_test(
                     g.gen.enabled = True
 
             time.sleep(0.5)
+            # The loss counters cover the speed measurements of this frame length only.
+            if loss_eths:
+                reset_rx_loss_counters(loss_eths, loss_rx_queues)
             tx_total_speed = 0
             rx_total_speed = 0
             measurements_done = 0
@@ -353,6 +392,14 @@ def run_test(
                     demo_gui.write(str(tx_total_speed) + "\n")
                     demo_gui.write(str(rx_total_speed))
 
+            if loss_eths:
+                losses = read_rx_loss_counters(loss_eths, loss_rx_queues)
+                print(f"ETH RX frames: {losses.eth_rx_frames}, dropped by ETH RX: {losses.eth_rx_dropped}, "
+                      f"discarded by RX DMA: {losses.rx_dma_discarded}")
+                print("========================================")
+            else:
+                losses = RxLossCounters(None, None, None)
+
             # Stop generating traffic
             if ndp_gen is not None:
                 stop_process(ndp_gen)
@@ -366,6 +413,8 @@ def run_test(
             if log_en:
                 # Save row to CSV file
                 row = [str(length), str(tx_total_speed), str(rx_total_speed)]
+                row += ["" if v is None else str(v)
+                        for v in (losses.eth_rx_frames, losses.eth_rx_dropped, losses.rx_dma_discarded)]
                 writer.writerow(row) # write data to CSV file
 
     finally:
@@ -464,6 +513,15 @@ def main():
                         rx_sm=0, # Both (0 or 2) can be used
                         eth_loop=True,
                         ndp_persistent_cmd="ndp-read",
+                    ),
+        "swloop":   TestModeSpec(
+                        desc="HW Gen --> TX ETH     ==> RX ETH --> RX DMA --> (ndp-loopback, SW) --> TX DMA --> Black Hole; (ETH loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=0, l2r_gen=0, l2r_loop=0),
+                        gen_rev_chan=False,
+                        tx_sm=3,
+                        rx_sm=0,
+                        eth_loop=True,
+                        ndp_persistent_cmd="ndp-loopback",
                     ),
         "dma_rx":   TestModeSpec(
                         desc="HW Gen --> RX DMA     ###",
@@ -693,7 +751,7 @@ def main():
             raise ValueError(f"ERROR: GLS module at index {i} not available!") from exc
 
         # Select and configure the generator according to the selected mode
-        if args.mode in ["eth_gen", "rx"]:
+        if args.mode in ["eth_gen", "rx", "swloop"]:
             gls_gen = gls.r2l.gen
         elif args.mode in ["dma_rx", "dma_rxtx", "dma_swloop"]:
             gls_gen = gls.l2r.gen
@@ -802,6 +860,9 @@ def main():
                 exiter=exiter,
                 pcie_telemetry=pcie_telemetry,
                 pcie_telemetry_time=args.pcie_telemetry_time,
+                # In the modes over the Ethernet loopback the RX path can lose frames.
+                loss_eths=list(device.eth) if sel_mode.eth_loop else [],
+                loss_rx_queues=list(rx_queues) if sel_mode.eth_loop else [],
             )
             logging.info("Test finished.\n")
             if not args.repeat or exiter.exit():
