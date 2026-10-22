@@ -530,6 +530,9 @@ def main():
         "telemetry" : "record the PCIe telemetry once for each frame length, in the middle of its measurement;\n"
                       "the data goes to pcie_telemetry_<report name>.jsonl and .txt in the current directory",
         "tel_time"  : "set the length [s] of the PCIe telemetry measurement; default: 0.5",
+        "rev_chan"  : "the generator sends consecutive frames to channels with bit-reversed numbers\n"
+                      "(0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;\n"
+                      "needs the full channel range of each GLS, otherwise it is turned off",
     }
 
     gls_desc = """
@@ -556,6 +559,7 @@ def main():
     arg_parser.add_argument("-r", "--rate_layer", type=int, default=2, choices=[1, 2], help=help_dict["layer"])
     arg_parser.add_argument("-T", "--pcie_telemetry", action="store_true", help=help_dict["telemetry"])
     arg_parser.add_argument("--pcie_telemetry_time", type=float, default=0.5, help=help_dict["tel_time"])
+    arg_parser.add_argument("--gen_rev_chan", action="store_true", help=help_dict["rev_chan"])
     args = arg_parser.parse_args()
 
     device = nfb.open(args.device)
@@ -701,7 +705,16 @@ def main():
                 gls_gen.minimum_channel = sel_chan_ranges[i][0]
                 gls_gen.maximum_channel = sel_chan_ranges[i][1]
                 # gls_gen.channel_increment = ...
-                gls_gen.channel_increment_reversed = sel_mode.gen_rev_chan
+                gen_rev_chan = sel_mode.gen_rev_chan or args.gen_rev_chan
+                # The bit reversal covers all channel bits of the GLS. Over a part of its channels
+                # it would produce channels outside the selected range.
+                full_range = (0, channels_per_stream - 1)
+                pow2_channels = (channels_per_stream & (channels_per_stream - 1)) == 0
+                if gen_rev_chan and (sel_chan_ranges[i] != full_range or not pow2_channels):
+                    logging.warning(f"Bit-reversed channels turned off for GLS {i}: they need all its "
+                                    "channels and a power-of-two channel count.")
+                    gen_rev_chan = False
+                gls_gen.channel_increment_reversed = gen_rev_chan
         else:
             raise RuntimeError(f"ERROR: No selected channels overlap with the available channels of Generator at GLS {i}!")
 

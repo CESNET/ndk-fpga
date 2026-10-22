@@ -249,6 +249,7 @@ class RunParams:
     buffer_size: Optional[int]
     eth_rate: Optional[int]
     pcie_telemetry_time: Optional[float] # None = PCIe telemetry is not recorded
+    gen_rev_chan: bool
 
     def chart_config(self) -> Dict[str, object]:
         """The settings shown in the chart subtitle, keyed exactly like the metadata
@@ -262,6 +263,7 @@ class RunParams:
             "buffer_count": self.buffer_count,
             "buffer_size": self.buffer_size,
             "eth_rate": self.eth_rate,
+            "gen_rev_chan": "on" if self.gen_rev_chan else "off",
         }
 
 
@@ -352,6 +354,8 @@ def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams,
         cmd += ["-e"]
     if params.pcie_telemetry_time is not None:
         cmd += ["-T", "--pcie_telemetry_time", str(params.pcie_telemetry_time)]
+    if params.gen_rev_chan:
+        cmd += ["--gen_rev_chan"]
 
     print(f"\n==== Running gls_mod.py mode '{mode}' ({MODE_LABELS[mode]}) ====")
     print("$ " + " ".join(cmd))
@@ -417,6 +421,7 @@ def write_results_csv(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, o
         "buffer_size": params.buffer_size if params.buffer_size is not None else "default",
         "eth_rate": params.eth_rate if params.eth_rate is not None else "",
         "pcie_telemetry_time": params.pcie_telemetry_time if params.pcie_telemetry_time is not None else "",
+        "gen_rev_chan": "on" if params.gen_rev_chan else "off",
         "hostname": socket.gethostname().partition(".")[0],
         "run_time_iso": datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
     }
@@ -531,6 +536,9 @@ def format_config_subtitle(config: Mapping[str, object]) -> str:
     eth_rate = config.get("eth_rate")
     if eth_rate not in (None, ""):
         parts.append(f"eth rate: {eth_rate}G")
+    gen_rev_chan = config.get("gen_rev_chan")
+    if gen_rev_chan not in (None, ""):
+        parts.append(f"bit-reversed channels: {gen_rev_chan}")
     return "   ".join(parts)
 
 
@@ -666,6 +674,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         buffer_size=args.buffer_size,
         eth_rate=args.eth_rate,
         pcie_telemetry_time=args.pcie_telemetry,
+        gen_rev_chan=args.gen_rev_chan,
     )
     if params.pcie_telemetry_time is not None and params.pcie_telemetry_time <= 0:
         sys.exit("ERROR: --pcie-telemetry needs a time greater than 0 seconds")
@@ -748,7 +757,7 @@ def cmd_run(args: argparse.Namespace) -> None:
 
 COMPARABILITY_KEYS = ["card_name", "hostname", "size_min", "size_max", "size_step",
                       "channels", "cycles", "frequency", "rate_layer",
-                      "buffer_count", "buffer_size", "eth_rate"]
+                      "buffer_count", "buffer_size", "eth_rate", "gen_rev_chan"]
 
 
 def resolve_results_csv(path_arg: str) -> Path:
@@ -766,6 +775,8 @@ def resolve_results_csv(path_arg: str) -> Path:
 def check_comparability(all_meta: List[Dict[str, str]], labels: List[str]) -> None:
     """Warn about settings that differ between runs, since throughput is only
     comparable across FW builds when the card, host and sweep settings all match."""
+    # Runs without the gen_rev_chan field used sequential channels.
+    all_meta = [{**m, "gen_rev_chan": m.get("gen_rev_chan") or "off"} for m in all_meta]
     for key in COMPARABILITY_KEYS:
         values = {m.get(key, "") for m in all_meta}
         if len(values) > 1:
@@ -903,6 +914,10 @@ def main() -> None:
                             "its measurement (passed through to gls_mod.py as -T). SECONDS is the\n"
                             "length of one telemetry measurement; default when given: 0.5.\n"
                             "Saves a summary CSV and one chart per mode; default: not recorded")
+    p_run.add_argument("--gen-rev-chan", action="store_true",
+                       help="the generator sends consecutive frames to channels with bit-reversed\n"
+                            "numbers, so they alternate between the DMA endpoints (passed through\n"
+                            "to gls_mod.py as --gen_rev_chan); default: off, sequential channels")
     p_run.add_argument("--fw-label", help="override the auto-detected FW label/id (use if the Device Tree has no build-revision)")
     p_run.add_argument("-o", "--outdir", default="dma_throughput_results", help="output directory; default: ./dma_throughput_results")
     p_run.add_argument("--skip-plots", action="store_true", help="only produce the consolidated CSV, no PNG plots")
