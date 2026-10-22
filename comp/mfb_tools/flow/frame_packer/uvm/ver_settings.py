@@ -24,6 +24,7 @@ SETTINGS = {
         "RX_GAP_PROBABILITY" : "30",
         "MVB_TX_STALL_CLKS"  : "0",
         "TIMEOUT_DIRECTED_REPEAT" : "1",
+        "TIMEOUT_DIRECTED_CHANNELS" : "8",
     },
     "one_region" : {
         "MFB_REGIONS"        : "1",
