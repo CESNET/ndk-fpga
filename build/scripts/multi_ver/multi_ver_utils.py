@@ -3,6 +3,7 @@
 # Author(s): Jan Kubalek <xkubal11@stud.fit.vutbr.cz>
 #            Ondrej Schwarz <ondrejschwarz@cesnet.cz>
 
+import copy
 from random import randint
 
 
@@ -28,7 +29,8 @@ def reduce_combinations(combinations, reduction_perc=100):
 # Modify setting variable
 def create_setting_from_combination(settings, combination):
     global FAIL
-    s = settings["default"].copy()
+    # Deep copy, so the merged dicts below do not change the settings
+    s = copy.deepcopy(settings["default"])
     for c in combination:
         if c not in settings.keys():
             print("ERROR: Combination \"{}\" contains unknown setting name \"{}\"!".format(combination, c))
@@ -36,16 +38,8 @@ def create_setting_from_combination(settings, combination):
             continue
         for i in settings[c].keys(): # load modified values
             # if parameter is a dict then merge it
-            if i == "__core_params__":
-                if "__core_params__" not in s.keys():
-                    s[i] = settings[c][i]
-                else:
-                    s[i].update(settings[c][i])
-            elif i == "__cocotb_params__":
-                if "__cocotb_params__" not in s.keys():
-                    s[i] = settings[c][i]
-                else:
-                    s[i].update(settings[c][i])
+            if i in ("__core_params__", "__cocotb_params__"):
+                s.setdefault(i, {}).update(settings[c][i])
             # or it is string
             elif i not in s.keys():
                 print("ERROR: Parameter \"{}\" is present in setting \"{}\" but not in setting \"default\". This might cause unexpected behaviour in the following runs!".format(i, c))
