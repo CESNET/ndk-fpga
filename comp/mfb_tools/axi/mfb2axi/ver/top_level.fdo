@@ -19,9 +19,6 @@ lappend COMPONENTS [list "DUT_VER"  $DUT_VER_BASE   "FULL"]
 # Disable Code Coverage
 set CODE_COVERAGE "false"
 
-# enable signal visibility
-set SIM_FLAGS(DEBUG) "true"
-
 # Global include file for compilation
 source "$FIRMWARE_BASE/build/Modelsim.inc.fdo"
 

@@ -13,6 +13,7 @@ SETTINGS = {
         "AXI_DATA_WIDTH"     : "256",
         "USE_IN_PIPE"        : "0",
         "USE_OUT_PIPE"       : "0",
+        "TRANSACTION_COUNT"  : "5000",
     },
     "mfb_1_1_8_8" : {
         "REGIONS"            : "1",
