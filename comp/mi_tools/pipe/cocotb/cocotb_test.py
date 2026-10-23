@@ -18,11 +18,11 @@ from cocotb_bus.scoreboard import Scoreboard
 from cocotbext.ofm.mi.transaction import MiRequestTransaction, MiResponseTransaction, MiTransaction, MiTransactionType
 from cocotbext.ofm.utils.signals import filter_bytes_by_bitmask
 
-from random import choice, randint
+from random import choice, randint, randbytes
 
 
 class testbench():
-    def __init__(self, dut, debug=False):
+    def __init__(self, dut, debug=False, use_scoreboard=True):
         self.dut = dut
         self.request_stream_in = MIRequestDriverAgent(dut, "IN", dut.CLK)
         self.response_stream_out = MIMonitor(dut, "OUT", dut.CLK)
@@ -36,9 +36,10 @@ class testbench():
         # Create a scoreboard on the response_stream_out bus
         self.pkts_sent = 0
         self.expected_output = []
-        self.scoreboard = Scoreboard(dut)
-        self.scoreboard.add_interface(self.response_proxy, self.expected_output)
-        self.scoreboard.add_interface(self.request_proxy, self.expected_output)
+        if use_scoreboard:
+            self.scoreboard = Scoreboard(dut)
+            self.scoreboard.add_interface(self.response_proxy, self.expected_output)
+            self.scoreboard.add_interface(self.request_proxy, self.expected_output)
 
         if debug:
             self.request_stream_in.log.setLevel(logging.DEBUG)
@@ -130,3 +131,55 @@ async def run_test(dut, pkt_count: int = 1000, item_width_min: int = 1, item_wid
         stream_out_item_cnt = tb.response_proxy.item_cnt + tb.request_proxy.item_cnt
 
     raise tb.scoreboard.result
+
+
+def expected_words(width, addr, byte_count, byte_enable):
+    """(word address, byte enable of the bus word) for every bus word of an unaligned request."""
+    start = addr % width
+    words = []
+    for w in range(ceildiv(width, start + byte_count)):
+        mask = 0
+        for j in range(width):
+            k = w * width + j - start
+            if 0 <= k < byte_count and (byte_enable >> k) & 1:
+                mask |= 1 << j
+        words.append((addr - start + w * width, mask))
+    return words
+
+
+@cocotb.test()
+async def run_partial_byte_enable_test(dut, request_count: int = 200):
+    """Requests with partial byte enables reach the bus word by word with the enabled bytes at the right lanes."""
+    cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
+    tb = testbench(dut, debug=False, use_scoreboard=False)
+    await tb.reset()
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
+
+    observed = []
+    tb.response_stream_out.add_callback(observed.append)
+    width = tb.request_stream_in.data_width
+
+    for n in range(request_count):
+        byte_count = randint(1, 3 * width)
+        addr = randint(0, 2**(tb.request_stream_in.addr_width * 8) - 1 - 3 * width)
+        byte_enable = randint(0, 2**byte_count - 1)
+        words = expected_words(width, addr, byte_count, byte_enable)
+        start = addr % width
+        padded = randbytes(len(words) * width)
+        observed.clear()
+
+        if choice([True, False]):
+            data = padded[start:start + byte_count]
+            await tb.request_stream_in.write(addr, data, byte_enable=byte_enable)
+            aligned = bytes(start) + data + bytes(len(words) * width - start - byte_count)
+            expected = [(a, m, filter_bytes_by_bitmask(aligned[i * width:(i + 1) * width], m)) for i, (a, m) in enumerate(words)]
+            while len(observed) < len(words):
+                await ClockCycles(dut.CLK, 1)
+        else:
+            cocotb.start_soon(tb.response_stream_in.write(padded))
+            read_data = await tb.request_stream_in.read(addr, byte_count, byte_enable=byte_enable)
+            assert read_data == padded[start:start + byte_count], f"request {n}: read data differ"
+            expected = [(a, m, filter_bytes_by_bitmask(padded[i * width:(i + 1) * width], m)) for i, (a, m) in enumerate(words)]
+
+        got = [(t.addr, t.be, t.data) for t in observed]
+        assert got == expected, f"request {n} ({addr=:#x}, {byte_count=}, {byte_enable=:#x}): bus words {got}, expected {expected}"
