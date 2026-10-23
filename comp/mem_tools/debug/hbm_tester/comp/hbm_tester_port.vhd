@@ -293,6 +293,7 @@ architecture FULL of HBM_TESTER_PORT is
     attribute keep of s_db_gen_addr_mode_reg  : signal is "true";
     attribute keep of s_db_gen_connect_reg    : signal is "true";
     attribute keep of s_db_gen_bl8_mode_reg   : signal is "true";
+    attribute keep of s_db_gen_use_axi_id_reg : signal is "true";
     attribute keep of s_db_gen_run_mode_reg   : signal is "true";
     attribute keep of s_db_gen_run_reg        : signal is "true";
     attribute keep of s_db_gen_rw_switch_reg  : signal is "true";
