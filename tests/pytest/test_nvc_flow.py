@@ -74,3 +74,10 @@ def test_user_env_overrides_cocotb_defaults(bench, target, program, flag):
     env, _ = step(dry_run(bench, f"TARGET={target}", user_env), program, flag)
     assert env["PYGPI_PYTHON_BIN"] == "/opt/python"
     assert env["GPI_USERS"] == "libcustom.so"
+
+
+@pytest.mark.parametrize("selector", ["COCOTB_TEST_MODULES", "COCOTB_MODULE"])
+@pytest.mark.parametrize("target, program, flag", COCOTB_RUNS + [("cocotb", "vsim", "-do")])
+def test_test_module_selection(bench, selector, target, program, flag):
+    env, _ = step(dry_run(bench, f"TARGET={target}", f"{selector}=my_tests"), program, flag)
+    assert env["COCOTB_TEST_MODULES"] == "my_tests"
