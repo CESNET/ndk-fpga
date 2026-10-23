@@ -64,6 +64,21 @@ if cocotb.__version__ >= "2.0.0":
     from cocotb.triggers import GPITrigger
     from cocotb._gpi_triggers import _EdgeBase
     from cocotb.simulator import register_value_change_callback, VALUE_CHANGE, RISING, FALLING
+    from cocotb.utils import get_sim_time
+
+    # whole-vector values written in the current time step, keyed by the vector's path
+    _pending_writes = {}
+
+    def _write_index(handle, array_idx, value):
+        # The simulator returns the old value until the time step ends, so multiple drivers writing
+        # different indexes of one vector start from what was already written in this time step.
+        time, full_val = _pending_writes.get(handle._path, (None, None))
+        if time != get_sim_time():
+            full_val = handle.value
+
+        full_val[array_idx] = value
+        _pending_writes[handle._path] = (get_sim_time(), full_val)
+        handle.set(Immediate(full_val))
 
     class _EdgeProxyBase(_EdgeBase):
         # Shared by all edge kinds: one simulator callback per signal path
@@ -223,10 +238,7 @@ if cocotb.__version__ >= "2.0.0":
         def set(self, value):
             if isinstance(value, Deposit) or isinstance(value, Immediate):
                 value  = value.value
-
-            full_val = self._lao_handle.value
-            full_val[self._array_idx] = value
-            self._lao_handle.set(Immediate(full_val))
+            _write_index(self._lao_handle, self._array_idx, value)
 
         @cached_property
         def rising_edge(self):
@@ -302,13 +314,9 @@ if cocotb.__version__ >= "2.0.0":
                 self._handle[self._array_idx].set(value)
                 return
 
-            # Update only this bit
-            full_val = self._handle.value
             if isinstance(value, (Deposit, Immediate)):
-                full_val[self._array_idx] = value.value
-            else:
-                full_val[self._array_idx] = value
-            self._handle.set(Immediate(full_val))
+                value = value.value
+            _write_index(self._handle, self._array_idx, value)
 
         def setimmediatevalue(self, value):
             warnings.warn("Method setimmediatevalue(value) is deprecated in cocotb 2.0, use set(Immediate(value)) instead.", DeprecationWarning)
