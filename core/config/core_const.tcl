@@ -53,19 +53,30 @@ if {!$env(NET_MOD_ENABLE)} {
 # ------------------------------------------------------------------------------
 
 if { $DMA_TYPE == 4 } {
-    if {
-        !(
-          ($PCIE_GEN == 3 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 0) ||
-          ($PCIE_GEN == 3 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 2) ||
-          ($PCIE_GEN == 4 && $PCIE_ENDPOINTS == 1 && $PCIE_ENDPOINT_MODE == 0) ||
-          ($PCIE_GEN == 4 && $PCIE_ENDPOINTS == 2 && $PCIE_ENDPOINT_MODE == 1)
-        )
-    } {
+    # The PCIe configurations of DMA Calypte: the name for PCIE_CONF, then PCIE_GEN, PCIE_ENDPOINTS and
+    # PCIE_ENDPOINT_MODE.
+    set CALYPTE_PCIE_CONFS {
+        {1xGen3x16  3 1 0}
+        {1xGen4x16  4 1 0}
+        {1xGen3x8LL 3 1 2}
+        {1xGen4x8x8 4 2 1}
+    }
+
+    set calypte_pcie_conf_allowed 0
+    foreach calypte_conf $CALYPTE_PCIE_CONFS {
+        if {[lrange $calypte_conf 1 end] eq [list $PCIE_GEN $PCIE_ENDPOINTS $PCIE_ENDPOINT_MODE]} {
+            set calypte_pcie_conf_allowed 1
+        }
+    }
+
+    if {!$calypte_pcie_conf_allowed} {
         puts "-----------------------------------------------------------------------------"
         puts "ERROR: Incompatible PCIE_CONF with DMA Calypte IP (DMA_TYPE=4)!"
         puts "-----------------------------------------------------------------------------"
         puts "Try using one of the following configurations for the PCIE_CONF parameter:"
-        puts "- PCIE_CONF=1xGen3x16\n- PCIE_CONF=1xGen4x16\n- PCIE_CONF=1xGen3x8LL"
+        foreach calypte_conf $CALYPTE_PCIE_CONFS {
+            puts "- PCIE_CONF=[lindex $calypte_conf 0]"
+        }
         puts "-----------------------------------------------------------------------------"
         exit 1
     }
