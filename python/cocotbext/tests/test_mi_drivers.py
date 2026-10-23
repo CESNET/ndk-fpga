@@ -6,12 +6,13 @@
 
 import asyncio
 import logging
+from types import SimpleNamespace
 
 import pytest
 from cocotb.types import LogicArray
 
 from cocotbext.ofm.base.drivers import BusDriver
-from cocotbext.ofm.mi.drivers import MIRequestDriver
+from cocotbext.ofm.mi.drivers import MIPipelinedDriver, MIRequestDriver
 from stubs import StubSignal
 
 DATA_BYTES = 8
@@ -43,12 +44,13 @@ class Bus:
         return [(a, be) for a, be, rd in zip(self.addr.written, self.be.written, self.rd.written) if rd]
 
 
+def _bus_driver_init(self, entity, name, clock, array_idx=None, **kwargs):
+    self.bus, self._clk_re, self.log = entity, clock, logging.getLogger("test_mi_drivers")
+
+
 @pytest.fixture
 def driver(monkeypatch):
-    def bus_driver_init(self, entity, name, clock, array_idx=None, **kwargs):
-        self.bus, self._clk_re, self.log = entity, clock, logging.getLogger("test_mi_drivers")
-
-    monkeypatch.setattr(BusDriver, "__init__", bus_driver_init)
+    monkeypatch.setattr(BusDriver, "__init__", _bus_driver_init)
     return MIRequestDriver(Bus(), "IN", Edge())
 
 
@@ -63,3 +65,16 @@ def test_read_enables_the_requested_lanes_of_a_64_bit_bus(driver, addr, byte_cou
     assert driver.bus.read_requests() == requests
     start = addr % DATA_BYTES
     assert data == (WORD * len(requests))[start:start + byte_count]
+
+
+def test_pipelined_requests_follow_each_other_at_ardy(monkeypatch):
+    monkeypatch.setattr(BusDriver, "__init__", _bus_driver_init)
+    drv = MIPipelinedDriver(Bus(), "IN", Edge())
+    ops = [SimpleNamespace(write=True, addr=0x10, data=0xA5), SimpleNamespace(write=False, addr=0x18, data=0)]
+    accepted = []
+
+    asyncio.run(drv.issue(ops, accepted.append))
+
+    assert accepted == ops
+    assert drv.bus.addr.written[-2:] == [0x10, 0x18] and drv.bus.be.written[-1] == (1 << DATA_BYTES) - 1
+    assert drv.bus.wr.written[-3:] == [1, 0, 0] and drv.bus.rd.written[-3:] == [0, 1, 0]

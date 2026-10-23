@@ -92,11 +92,15 @@ architecture FULL of HBM_TESTER_MON is
     signal s_counter0_rst     : std_logic;
     signal s_counter0_max     : std_logic;
     signal s_counter0_en      : std_logic;
+    signal s_counter0_en_reg  : std_logic;
+    signal s_counter0_rst_reg : std_logic;
     signal s_counter0         : unsigned(CNT_WIDTH-1 downto 0);
 
     signal s_counter1_rst     : std_logic;
     signal s_counter1_max     : std_logic;
     signal s_counter1_en      : std_logic;
+    signal s_counter1_en_reg  : std_logic;
+    signal s_counter1_rst_reg : std_logic;
     signal s_counter1         : unsigned(CNT_WIDTH-1 downto 0);
 
 begin
@@ -191,6 +195,22 @@ begin
     end process;
 
     -- -------------------------------------------------------------------------
+    --  CONFIGURABLE COUNTERS
+    -- -------------------------------------------------------------------------
+
+    -- The DONE compare of the time counter feeds both enables, which would otherwise end at the CE of every counter
+    -- bit. The clears are registered with the enables, so each counter shows exactly its count one cycle later.
+    counter_en_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            s_counter0_en_reg  <= s_counter0_en;
+            s_counter0_rst_reg <= s_counter0_rst;
+            s_counter1_en_reg  <= s_counter1_en;
+            s_counter1_rst_reg <= s_counter1_rst;
+        end if;
+    end process;
+
+    -- -------------------------------------------------------------------------
     --  CONFIGURABLE COUNTER 0
     -- -------------------------------------------------------------------------
 
@@ -209,9 +229,9 @@ begin
     counter0_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (s_counter0_rst = '1') then
+            if (s_counter0_rst_reg = '1') then
                 s_counter0 <= (others => '0');
-            elsif (s_counter0_en = '1' and s_counter0_max = '0') then
+            elsif (s_counter0_en_reg = '1' and s_counter0_max = '0') then
                 s_counter0 <= s_counter0 + 1;
             end if;
         end if;
@@ -238,9 +258,9 @@ begin
     counter1_p : process (CLK)
     begin
         if (rising_edge(CLK)) then
-            if (s_counter1_rst = '1') then
+            if (s_counter1_rst_reg = '1') then
                 s_counter1 <= (others => '0');
-            elsif (s_counter1_en = '1' and s_counter1_max = '0') then
+            elsif (s_counter1_en_reg = '1' and s_counter1_max = '0') then
                 s_counter1 <= s_counter1 + 1;
             end if;
         end if;
