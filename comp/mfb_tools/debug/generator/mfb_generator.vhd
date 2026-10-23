@@ -74,6 +74,7 @@ architecture BEHAV of MFB_GENERATOR is
 
     constant CHANNELS           : natural := 2**CHANNELS_WIDTH;
     constant ETHER_TYPE         : std_logic_vector(15 downto 0) := X"0008"; -- IPv4 ethertype
+    constant HDR_BLOCKS         : natural := 384/(BLOCK_SIZE*ITEM_WIDTH);
 
     signal pkt_cnt              : u_array_t(REGIONS downto 0)(PKT_CNT_WIDTH-1 downto 0);
     signal pkt_cnt_reg          : unsigned(PKT_CNT_WIDTH-1 downto 0);
@@ -137,8 +138,8 @@ architecture BEHAV of MFB_GENERATOR is
 
     signal sof_pos_arr          : slv_array_t(REGIONS-1 downto 0)(max(1, log2(REGION_SIZE))-1 downto 0);
     signal sof_index            : u_array_t(REGIONS-1 downto 0)(max(1, log2(REGIONS*REGION_SIZE))-1 downto 0);
-    signal data_word_plus       : slv_array_t(REGIONS*REGION_SIZE+6-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
-    signal data_word_plus_reg   : slv_array_t(6-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal data_word_plus       : slv_array_t(REGIONS*REGION_SIZE+HDR_BLOCKS-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
+    signal data_word_plus_reg   : slv_array_t(HDR_BLOCKS-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal data_word            : slv_array_t(REGIONS*REGION_SIZE-1 downto 0)(BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
     signal data_word_ser        : std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
 
@@ -160,6 +161,10 @@ architecture BEHAV of MFB_GENERATOR is
     end function;
 
 begin
+
+    assert (BLOCK_SIZE*ITEM_WIDTH <= 384 and 384 mod (BLOCK_SIZE*ITEM_WIDTH) = 0)
+        report "ERROR: MFB Generator: The block width (" & integer'image(BLOCK_SIZE*ITEM_WIDTH) & " bits) must divide the 384-bit header!"
+        severity failure;
 
     core_arch_gen : if (not USE_PACP_ARCH) generate
 
@@ -484,13 +489,13 @@ begin
 
     process (all)
     begin
-        data_word_plus               <= (others => (others => '0'));
-        data_word_plus(6-1 downto 0) <= data_word_plus_reg;
+        data_word_plus                        <= (others => (others => '0'));
+        data_word_plus(HDR_BLOCKS-1 downto 0) <= data_word_plus_reg;
         for ii in 0 to REGIONS-1 loop
             sof_index(ii) <= resize(unsigned(sof_pos_arr(ii)), log2(REGIONS*REGION_SIZE)) + ii*REGION_SIZE;
             if (sof(ii) = '1') then
-                for jj in 0 to 5 loop
-                    data_word_plus(to_integer(sof_index(ii))+jj) <= eth_hdr_384b(ii)((jj+1)*64-1 downto jj*64);
+                for jj in 0 to HDR_BLOCKS-1 loop
+                    data_word_plus(to_integer(sof_index(ii))+jj) <= eth_hdr_384b(ii)((jj+1)*(BLOCK_SIZE*ITEM_WIDTH)-1 downto jj*(BLOCK_SIZE*ITEM_WIDTH));
                 end loop;
             end if;
         end loop;
@@ -500,7 +505,7 @@ begin
     begin
         if (rising_edge(CLK)) then
             if (dst_rdy = '1') then
-                data_word_plus_reg <= data_word_plus(REGIONS*REGION_SIZE+6-1 downto REGIONS*REGION_SIZE);
+                data_word_plus_reg <= data_word_plus(REGIONS*REGION_SIZE+HDR_BLOCKS-1 downto REGIONS*REGION_SIZE);
             end if;
         end if;
     end process;
