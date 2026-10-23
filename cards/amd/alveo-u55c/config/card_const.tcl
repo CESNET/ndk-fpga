@@ -38,14 +38,26 @@ set QSFP_I2C_ADDR(1) "0xA0"
 # Checking of parameter compatibility
 # ------------------------------------------------------------------------------
 
-if {!(($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 3 && $PCIE_ENDPOINT_MODE == 0) ||
-      ($PCIE_ENDPOINTS == 1 && $PCIE_GEN == 3 && $PCIE_ENDPOINT_MODE == 2) ||
-      ($PCIE_ENDPOINTS == 2 && $PCIE_GEN == 4 && $PCIE_ENDPOINT_MODE == 1)) } {
+# The allowed PCIe configurations: the name for PCIE_CONF, then PCIE_GEN, PCIE_ENDPOINTS and PCIE_ENDPOINT_MODE.
+set ALLOWED_PCIE_CONFS {
+    {1xGen3x16  3 1 0}
+    {1xGen3x8LL 3 1 2}
+    {1xGen4x8x8 4 2 1}
+}
+
+set pcie_conf_allowed 0
+set pcie_conf_help ""
+foreach allowed_conf $ALLOWED_PCIE_CONFS {
+    lassign $allowed_conf allowed_name allowed_gen allowed_eps allowed_mode
+    append pcie_conf_help [format "\n- %-10s -- PCIE_GEN=$allowed_gen, PCIE_ENDPOINTS=$allowed_eps, PCIE_ENDPOINT_MODE=$allowed_mode" $allowed_name]
+    if {$allowed_gen == $PCIE_GEN && $allowed_eps == $PCIE_ENDPOINTS && $allowed_mode == $PCIE_ENDPOINT_MODE} {
+        set pcie_conf_allowed 1
+    }
+}
+
+if {!$pcie_conf_allowed} {
     error "Incompatible PCIe configuration: PCIE_ENDPOINTS = $PCIE_ENDPOINTS, PCIE_GEN = $PCIE_GEN, PCIE_ENDPOINT_MODE = $PCIE_ENDPOINT_MODE!
-Allowed PCIe configurations:
-- 1xGen3x16  -- PCIE_GEN=3, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=0
-- 1xGen3x8LL -- PCIE_GEN=3, PCIE_ENDPOINTS=1, PCIE_ENDPOINT_MODE=2
-- 1xGen4x8x8 -- PCIE_GEN=4, PCIE_ENDPOINTS=2, PCIE_ENDPOINT_MODE=1"
+Allowed PCIe configurations:$pcie_conf_help"
 }
 
 
