@@ -37,10 +37,7 @@ def get_signal_value_in_bytes(signal, big_endian: bool = False) -> bytes:
     Returns:
         Signal value in bytes.
     """
-    sig_val = signal.value
-    sig_val.big_endian = big_endian
-
-    return sig_val.buff
+    return signal.value.to_bytes(byteorder='big' if big_endian else 'little')
 
 
 def filter_bytes_by_bitmask(data: bytes, byte_enable: int) -> bytes:
