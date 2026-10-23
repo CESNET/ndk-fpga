@@ -100,6 +100,8 @@ ghdl-sim: $(MOD)
 	ghdl -m --workdir=$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) --std=08 -frelaxed --ieee=synopsys --warn-no-hide $(TOP_LEVEL_ENT_LC)
 	$(COCOTB_ENV) ghdl -r -v --workdir=$(GHDL_WORK_DIR) -P$(GHDL_WORK_DIR) $(addprefix -P,$(GHDL_LIBS)) $(TOP_LEVEL_ENT_LC) --vpi=$(shell cocotb-config --lib-name-path vpi ghdl) --asserts=disable --vcd=$(OUTPUT_NAME).vcd
 
+NVC_ANALYSE_FLAGS ?= --relaxed
+
 NVC_LOAD ?=
 # Wave dumping (FST + gtkw + arrays); enable with WAVES=1.
 NVC_WAVE_FLAGS ?=
@@ -127,7 +129,7 @@ TOP_LEVEL_ENT_LC := $(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]')
 
 # Analysis and elaboration of the nvc flow, shared by nvc and nvc-elab.
 define nvc_analyse_elab
-	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
+	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a $(NVC_ANALYSE_FLAGS) $(filter %.vhd,$(MOD))
 	@nvc --work=nvcwork -H 1G -M 4G -e $(NVC_ELAB_FLAGS) $(NVC_ELAB_ARGS) $(TOP_LEVEL_ENT_LC)
 endef
 
