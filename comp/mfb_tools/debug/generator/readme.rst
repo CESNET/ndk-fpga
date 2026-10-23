@@ -19,3 +19,11 @@ Distribution examples
 - 0x070401: Distribute frames to channels 4 to 7
 - 0xff0002: Distribute frames to all even channels (0, 2, 4, ...)
 - 0x050501: Send all frames to channel number 5 only
+
+Frame length
+^^^^^^^^^^^^
+
+``CTRL_LENGTH`` may be changed only while the generation is disabled (``CTRL_EN`` is low).
+The length in the IPv4 and UDP headers and in the metadata follows ``CTRL_LENGTH`` immediately,
+whereas the frames already planned keep the old length, so a change during generation produces
+frames whose headers disagree with their size.
