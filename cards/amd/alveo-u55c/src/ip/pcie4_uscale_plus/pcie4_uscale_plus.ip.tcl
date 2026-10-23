@@ -76,11 +76,16 @@ set config_list [list \
     CONFIG.pf0_msi_enabled {false} \
 ]
 
+if {$PARAMS(PCIE_GEN) == 3} {
+    lappend config_list CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s}
+} else {
+    lappend config_list CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {16.0_GT/s}
+}
+
 if {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
     # x8_low_latency properties
     lappend config_list \
         CONFIG.pcie_blk_locn {X1Y1} \
-        CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s} \
         CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8} \
         CONFIG.axisten_if_width {256_bit} \
         CONFIG.coreclk_freq {500}
@@ -92,13 +97,10 @@ if {$PARAMS(PCIE_ENDPOINT_MODE) == 2} {
             lappend config_list CONFIG.pcie_blk_locn {X1Y0}
         }
 
-        lappend config_list \
-            CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {16.0_GT/s} \
-            CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8}
+        lappend config_list CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X8}
     } else {
         lappend config_list \
             CONFIG.pcie_blk_locn {X1Y1} \
-            CONFIG.PL_LINK_CAP_MAX_LINK_SPEED {8.0_GT/s} \
             CONFIG.PL_LINK_CAP_MAX_LINK_WIDTH {X16}
     }
 
