@@ -82,6 +82,11 @@ architecture FULL of HBM_TESTER_ADC is
 
     constant VERSION : std_logic_vector(31 downto 0) := X"20240119";
 
+    signal s_mi_dwr_reg          : std_logic_vector(31 downto 0);
+    signal s_mi_addr_reg         : std_logic_vector(31 downto 0);
+    signal s_mi_rd_reg           : std_logic;
+    signal s_mi_wr_reg           : std_logic;
+
     signal s_reg_gen_run_sel     : std_logic;
     signal s_reg_config_sel      : std_logic;
     signal s_reg_mon_reset_sel   : std_logic;
@@ -113,19 +118,35 @@ begin
 
     MI_ARDY <= MI_RD or MI_WR;
 
+    -- The request comes from the FIFO output of MI_ASYNC; registering it gives the address decoders a whole HBM_CLK period.
+    mi_req_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            s_mi_dwr_reg  <= MI_DWR;
+            s_mi_addr_reg <= MI_ADDR;
+            if (RESET = '1') then
+                s_mi_rd_reg <= '0';
+                s_mi_wr_reg <= '0';
+            else
+                s_mi_rd_reg <= MI_RD;
+                s_mi_wr_reg <= MI_WR;
+            end if;
+        end if;
+    end process;
+
     -- -------------------------------------------------------------------------
     --  MI32 WRITE CONTROL
     -- -------------------------------------------------------------------------
 
-    s_reg_gen_run_sel   <= '1' when (MI_ADDR(11 downto 0) = X"010") else '0';
-    s_reg_config_sel    <= '1' when (MI_ADDR(11 downto 0) = X"014") else '0';
-    s_reg_mon_reset_sel <= '1' when (MI_ADDR(11 downto 0) = X"018") else '0';
-    s_reg_mon_time_sel  <= '1' when (MI_ADDR(11 downto 0) = X"01C") else '0';
+    s_reg_gen_run_sel   <= '1' when (s_mi_addr_reg(11 downto 0) = X"010") else '0';
+    s_reg_config_sel    <= '1' when (s_mi_addr_reg(11 downto 0) = X"014") else '0';
+    s_reg_mon_reset_sel <= '1' when (s_mi_addr_reg(11 downto 0) = X"018") else '0';
+    s_reg_mon_time_sel  <= '1' when (s_mi_addr_reg(11 downto 0) = X"01C") else '0';
 
-    s_reg_gen_run_we   <= MI_WR and s_reg_gen_run_sel;
-    s_reg_config_we    <= MI_WR and s_reg_config_sel;
-    s_reg_mon_reset_we <= MI_WR and s_reg_mon_reset_sel;
-    s_reg_mon_time_we  <= MI_WR and s_reg_mon_time_sel;
+    s_reg_gen_run_we   <= s_mi_wr_reg and s_reg_gen_run_sel;
+    s_reg_config_we    <= s_mi_wr_reg and s_reg_config_sel;
+    s_reg_mon_reset_we <= s_mi_wr_reg and s_reg_mon_reset_sel;
+    s_reg_mon_time_we  <= s_mi_wr_reg and s_reg_mon_time_sel;
 
     -- -------------------------------------------------------------------------
     --  MI32 READ CONTROL
@@ -133,7 +154,7 @@ begin
 
     dbg_reg_common_p : process (all)
     begin
-        case (MI_ADDR(7 downto 0)) is
+        case (s_mi_addr_reg(7 downto 0)) is
             when X"00" =>
                 s_dbg_reg_common <= VERSION;
             when X"10" =>
@@ -151,12 +172,12 @@ begin
         end case;
     end process;
 
-    s_reg_stat_cnt0_muxed <= s_reg_stat_cnt0(to_integer(unsigned(MI_ADDR(8 downto 4))));
-    s_reg_stat_cnt1_muxed <= s_reg_stat_cnt1(to_integer(unsigned(MI_ADDR(8 downto 4))));
+    s_reg_stat_cnt0_muxed <= s_reg_stat_cnt0(to_integer(unsigned(s_mi_addr_reg(8 downto 4))));
+    s_reg_stat_cnt1_muxed <= s_reg_stat_cnt1(to_integer(unsigned(s_mi_addr_reg(8 downto 4))));
 
     dbg_reg_per_pcc_p : process (all)
     begin
-        case (MI_ADDR(3 downto 0)) is
+        case (s_mi_addr_reg(3 downto 0)) is
             when "0000" =>
                 s_dbg_reg_per_pcc <= s_reg_stat_cnt0_muxed;
             when "0100" =>
@@ -168,7 +189,7 @@ begin
 
     mi_drd_p : process (all)
     begin
-        case (MI_ADDR(11 downto 9)) is
+        case (s_mi_addr_reg(11 downto 9)) is
             when "000" =>
                 s_mi_drd <= s_dbg_reg_common;
             when "001" =>
@@ -191,7 +212,7 @@ begin
             if (RESET = '1') then
                 MI_DRDY <= '0';
             else
-                MI_DRDY <= MI_RD;
+                MI_DRDY <= s_mi_rd_reg;
             end if;
         end if;
     end process;
@@ -211,7 +232,7 @@ begin
             if (RESET = '1') then
                 s_reg_gen_run <= (others => '0');
             elsif (s_reg_gen_run_we = '1') then
-                s_reg_gen_run <= MI_DWR;
+                s_reg_gen_run <= s_mi_dwr_reg;
             end if;
         end if;
     end process;
@@ -229,7 +250,7 @@ begin
             if (RESET = '1') then
                 s_reg_config <= (others => '0');
             elsif (s_reg_config_we = '1') then
-                s_reg_config <= MI_DWR;
+                s_reg_config <= s_mi_dwr_reg;
             end if;
         end if;
     end process;
@@ -256,7 +277,7 @@ begin
             if (RESET = '1') then
                 s_reg_mon_reset <= (others => '0');
             elsif (s_reg_mon_reset_we = '1') then
-                s_reg_mon_reset <= MI_DWR;
+                s_reg_mon_reset <= s_mi_dwr_reg;
             end if;
         end if;
     end process;
@@ -274,7 +295,7 @@ begin
             if (RESET = '1') then
                 s_reg_mon_time <= X"0000FFFF";
             elsif (s_reg_mon_time_we = '1') then
-                s_reg_mon_time <= MI_DWR;
+                s_reg_mon_time <= s_mi_dwr_reg;
             end if;
         end if;
     end process;
