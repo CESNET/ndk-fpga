@@ -9,6 +9,7 @@ import subprocess
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
+MULTI_VER = REPO / "build" / "scripts" / "multi_ver"
 
 
 def make(directory, *args):
