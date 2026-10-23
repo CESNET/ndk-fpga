@@ -8,6 +8,7 @@ import re
 import shlex
 import shutil
 import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -19,6 +20,7 @@ pytestmark = pytest.mark.skipif(
 
 # The make target, the simulator it starts and the argument of the simulator's cocotb run.
 COCOTB_RUNS = [("nvc-sim", "nvc", "-r"), ("ghdl-sim", "ghdl", "-r")]
+NVC_TARGETS = ["nvc", "nvc-sim"]
 
 ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
 
@@ -28,6 +30,23 @@ def bench(tmp_path):
     """A bench directory for MI_PIPE, which elaborates and runs without any stimulus."""
     write_makefile(tmp_path, "mi_pipe", REPO / "comp" / "mi_tools" / "pipe")
     return tmp_path
+
+
+@pytest.fixture
+def component(tmp_path):
+    """A bench directory for a stub component with an empty source for each platform tag it is generated for."""
+    comp = tmp_path / "comp"
+    comp.mkdir()
+    (comp / "Modules.tcl").write_text('foreach tag $PLATFORM_TAGS { lappend MOD "$ENTITY_BASE/$tag.vhd" }\n')
+    for tag in ("altera", "xilinx"):
+        (comp / f"{tag}.vhd").touch()
+    write_makefile(tmp_path, "stub", comp)
+    return tmp_path
+
+
+def generated_sources(directory):
+    """Names of the VHDL sources in the source list generated for the stub component."""
+    return {Path(token).name for token in (directory / "stub.vivado.mk").read_text().split() if token.endswith(".vhd")}
 
 
 def dry_run(directory, *args):
@@ -81,3 +100,10 @@ def test_user_env_overrides_cocotb_defaults(bench, target, program, flag):
 def test_test_module_selection(bench, selector, target, program, flag):
     env, _ = step(dry_run(bench, f"TARGET={target}", f"{selector}=my_tests"), program, flag)
     assert env["COCOTB_TEST_MODULES"] == "my_tests"
+
+
+@pytest.mark.parametrize("target", NVC_TARGETS)
+@pytest.mark.parametrize("args, sources", [([], {"altera.vhd", "xilinx.vhd"}), (["NVC_PLATFORM_TAGS=xilinx"], {"xilinx.vhd"})])
+def test_platform_tags(component, target, args, sources):
+    dry_run(component, f"TARGET={target}", *args)
+    assert generated_sources(component) == sources
