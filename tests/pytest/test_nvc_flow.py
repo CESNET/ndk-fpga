@@ -179,3 +179,12 @@ def test_random_seed(elaborated):
 def test_random_seed_reaches_ghdl(bench):
     env, _ = step(dry_run(bench, "TARGET=ghdl-sim", "RANDOM_SEED=1234"), "ghdl", "-r")
     assert env["COCOTB_RANDOM_SEED"] == "1234"
+
+
+@pytest.mark.parametrize("target", ELABORATING)
+def test_analyse_flags(bench, target):
+    _, args = step(dry_run(bench, f"TARGET={target}"), "nvc", "-a")
+    assert "--relaxed" in args
+    _, args = step(dry_run(bench, f"TARGET={target}", "NVC_ANALYSE_FLAGS=--check-synthesis"), "nvc", "-a")
+    assert "--check-synthesis" in args
+    assert "--relaxed" not in args
