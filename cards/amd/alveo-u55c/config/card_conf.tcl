@@ -54,12 +54,15 @@ set pcie_conf_list [ParsePcieConf $PCIE_CONF]
 
 # PCIe Generation:
 # 3 = PCIe Gen3
+# 4 = PCIe Gen4
 set PCIE_GEN           [lindex $pcie_conf_list 1]
 # PCIe endpoints:
 # 1 = 1x PCIe x16 in one slot
+# 2 = 2x PCIe x8 in one slot (bifurcated)
 set PCIE_ENDPOINTS     [lindex $pcie_conf_list 0]
 # PCIe endpoint mode:
 # 0 = 1x16 lanes
+# 1 = 2x8 lanes (bifurcated)
 # 2 = 1x8 Low-latency (Xilinx USP only)
 set PCIE_ENDPOINT_MODE [lindex $pcie_conf_list 2]
 
