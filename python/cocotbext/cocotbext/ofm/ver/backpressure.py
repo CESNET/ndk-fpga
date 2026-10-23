@@ -10,7 +10,7 @@
 
 import random
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Iterator, Optional, Tuple
 
 from cocotb.triggers import ClockCycles
 
@@ -104,3 +104,13 @@ class BackpressureGenerator:
         if random.random() < self.cfg.low_prob:
             return 0, cycles  # ready=0 for ``cycles``
         return cycles, 0    # ready=1 for ``cycles``
+
+    def levels(self) -> Iterator[int]:
+        """Yield the ready level of every clock cycle, the ``(on, off)`` runs unrolled.
+
+        Suits consumers that take one value per cycle, e.g. the pause generators of
+        cocotbext-axi (``pause = not level``).
+        """
+        for on, off in self:
+            yield from (1,) * on
+            yield from (0,) * off
