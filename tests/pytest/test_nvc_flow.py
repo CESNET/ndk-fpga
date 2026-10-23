@@ -20,17 +20,37 @@ pytestmark = pytest.mark.skipif(
 
 # The make target, the simulator it starts and the argument of the simulator's cocotb run.
 COCOTB_RUNS = [("nvc-sim", "nvc", "-r"), ("ghdl-sim", "ghdl", "-r")]
-NVC_TARGETS = ["nvc", "nvc-sim"]
-RUNNING = ["nvc-sim"]
+NVC_TARGETS = ["nvc", "nvc-sim", "nvc-elab", "nvc-run"]
+RUNNING = ["nvc-sim", "nvc-run"]
 
 ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
+
+PASSING_TESTS = """
+from pathlib import Path
+
+import cocotb
+
+
+@cocotb.test()
+async def passes(dut):
+    Path("passed.txt").touch()
+"""
 
 
 @pytest.fixture
 def bench(tmp_path):
     """A bench directory for MI_PIPE, which elaborates and runs without any stimulus."""
     write_makefile(tmp_path, "mi_pipe", REPO / "comp" / "mi_tools" / "pipe")
+    (tmp_path / "flow_pass.py").write_text(PASSING_TESTS)
     return tmp_path
+
+
+@pytest.fixture
+def elaborated(bench):
+    """The MI_PIPE bench with its design analysed and elaborated by nvc-elab."""
+    result = make(bench, "TARGET=nvc-elab")
+    assert result.returncode == 0, result.stderr
+    return bench
 
 
 @pytest.fixture
@@ -120,3 +140,15 @@ def test_run_env(component, target, variable, in_generation):
     env, _ = step(dry_run(component, f"TARGET={target}", f"{variable}=STUB_PROBE=1"), "nvc", "-r")
     assert env["STUB_PROBE"] == "1"
     assert ("probe.vhd" in generated_sources(component)) == in_generation
+
+
+@pytest.mark.parametrize("target, steps", [("nvc-sim", ["-a", "-e", "-r"]), ("nvc-elab", ["-a", "-e"]), ("nvc-run", ["-r"])])
+def test_nvc_steps(bench, target, steps):
+    commands = dry_run(bench, f"TARGET={target}")
+    assert [flag for name, _, args in commands if name == "nvc" for flag in ("-a", "-e", "-r") if flag in args] == steps
+
+
+def test_run_on_the_elaboration(elaborated):
+    result = make(elaborated, "TARGET=nvc-run", "COCOTB_TEST_MODULES=flow_pass")
+    assert result.returncode == 0, result.stderr
+    assert (elaborated / "passed.txt").exists()

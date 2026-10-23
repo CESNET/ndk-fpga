@@ -10,11 +10,11 @@ TCLSH ?= tclsh
 
 .PHONY: simulation vhdocl cocotb clean_common
 
-GEN_MK_TARGETS += simulation vhdocl cocotb ghdl-sim nvc nvc-sim
+GEN_MK_TARGETS += simulation vhdocl cocotb ghdl-sim nvc nvc-sim nvc-elab nvc-run
 simulation: GEN_MK_ENV=SIM_SCRIPT=$(SIM_SCRIPT) SIM_FLAGS=$(SIM_FLAGS)
 
 NVC_PLATFORM_TAGS ?= altera xilinx
-nvc nvc-sim: NETCOPE_ENV+=PLATFORM_TAGS="$(NVC_PLATFORM_TAGS)"
+nvc nvc-sim nvc-elab nvc-run: NETCOPE_ENV+=PLATFORM_TAGS="$(NVC_PLATFORM_TAGS)"
 
 # INFO: NETCOPE_TEMP is generated directory
 clean_common:
@@ -110,16 +110,37 @@ NVC_ELAB_FLAGS += --no-collapse
 endif
 nvc-sim: NVC_LOAD=--load $(shell cocotb-config --lib-name-path vhpi nvc)
 nvc-sim: nvc
+nvc-run: NVC_LOAD=--load $(shell cocotb-config --lib-name-path vhpi nvc)
 
 # Extra environment variables for the nvc -r step only, e.g. LD_LIBRARY_PATH for a project, without
 # affecting the tclsh mk-file generation that also uses NETCOPE_ENV.
 NVC_RUN_ENV ?=
 
-nvc: $(MOD)
-	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
+TOP_LEVEL_ENT_LC := $(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]')
+
+# Analysis and elaboration of the nvc flow, shared by nvc and nvc-elab.
+define nvc_analyse_elab
 	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
 	@nvc --work=nvcwork -H 1G -M 4G -e $(NVC_ELAB_FLAGS) $(TOP_LEVEL_ENT_LC)
+endef
+
+# The cocotb run of the nvc flow, shared by nvc and nvc-run.
+define nvc_run
 	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
+endef
+
+nvc: $(MOD)
+	$(call nvc_analyse_elab)
+	$(call nvc_run)
+
+# Analyse and elaborate only, so that nvcwork/ is built once and reused by repeated nvc-run calls.
+nvc-elab: $(MOD)
+	$(call nvc_analyse_elab)
+
+# Run on the nvcwork/ left by nvc-elab, skipping analysis and elaboration; the cocotb Python is
+# loaded at run time, so editing it needs no rebuild.
+nvc-run: $(MOD)
+	$(call nvc_run)
 
 else
 .PHONY: $(GEN_MK_NAME)
