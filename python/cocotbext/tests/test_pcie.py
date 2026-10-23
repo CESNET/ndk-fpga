@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pytest
 
-from cocotbext.ofm.pcie import CQMfbMeta, RQMfbMeta
+from cocotbext.ofm.pcie import CQMfbMeta, CQUser, RQMfbMeta
 
 META_PACK = Path(__file__).resolve().parents[3] / "comp" / "base" / "pkg" / "pcie_meta_pack.vhd"
 
@@ -49,3 +49,11 @@ def test_serialize_roundtrip(layout):
     back = layout.deserialize(meta.serialize())
 
     assert all(getattr(back, field) == getattr(meta, field) for field, _ in layout.items)
+
+
+def test_cq_user_follows_the_512_bit_tuser_of_pg213():
+    offsets = CQUser.offsets()
+
+    assert (offsets["byte_en"], offsets["sop0"], offsets["eop0"], offsets["discontiune"]) == (16, 80, 86, 96)
+    assert (offsets["tph_present"], offsets["tph_type"], offsets["tph_sh_tag"], offsets["parity"]) == (97, 99, 103, 119)
+    assert len(CQUser()) == 183
