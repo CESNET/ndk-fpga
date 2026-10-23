@@ -13,8 +13,8 @@ TCLSH ?= tclsh
 GEN_MK_TARGETS += simulation vhdocl cocotb ghdl-sim nvc nvc-sim
 simulation: GEN_MK_ENV=SIM_SCRIPT=$(SIM_SCRIPT) SIM_FLAGS=$(SIM_FLAGS)
 
-nvc: NETCOPE_ENV+=PLATFORM_TAGS="altera xilinx"
-nvc-sim: NETCOPE_ENV+=PLATFORM_TAGS="altera xilinx"
+NVC_PLATFORM_TAGS ?= altera xilinx
+nvc nvc-sim: NETCOPE_ENV+=PLATFORM_TAGS="$(NVC_PLATFORM_TAGS)"
 
 # INFO: NETCOPE_TEMP is generated directory
 clean_common:
