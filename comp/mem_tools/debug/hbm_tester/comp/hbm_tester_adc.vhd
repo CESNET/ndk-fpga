@@ -100,6 +100,11 @@ architecture FULL of HBM_TESTER_ADC is
     signal s_reg_stat_cnt0_muxed : std_logic_vector(32-1 downto 0);
     signal s_reg_stat_cnt1_muxed : std_logic_vector(32-1 downto 0);
     signal s_dbg_reg_per_pcc     : std_logic_vector(32-1 downto 0);
+    signal s_dbg_reg_common_reg  : std_logic_vector(32-1 downto 0);
+    signal s_stat_cnt0_muxed_reg : std_logic_vector(32-1 downto 0);
+    signal s_stat_cnt1_muxed_reg : std_logic_vector(32-1 downto 0);
+    signal s_rd_addr_reg         : std_logic_vector(11 downto 0);
+    signal s_rd_reg              : std_logic;
     signal s_mi_drd              : std_logic_vector(32-1 downto 0);
 
     signal s_reg_gen_run         : std_logic_vector(32-1 downto 0);
@@ -175,13 +180,29 @@ begin
     s_reg_stat_cnt0_muxed <= s_reg_stat_cnt0(to_integer(unsigned(s_mi_addr_reg(8 downto 4))));
     s_reg_stat_cnt1_muxed <= s_reg_stat_cnt1(to_integer(unsigned(s_mi_addr_reg(8 downto 4))));
 
+    -- The counter selection out of all ports and the final select do not fit into one HBM_CLK period together.
+    mi_rd_stage_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            s_dbg_reg_common_reg  <= s_dbg_reg_common;
+            s_stat_cnt0_muxed_reg <= s_reg_stat_cnt0_muxed;
+            s_stat_cnt1_muxed_reg <= s_reg_stat_cnt1_muxed;
+            s_rd_addr_reg         <= s_mi_addr_reg(11 downto 0);
+            if (RESET = '1') then
+                s_rd_reg <= '0';
+            else
+                s_rd_reg <= s_mi_rd_reg;
+            end if;
+        end if;
+    end process;
+
     dbg_reg_per_pcc_p : process (all)
     begin
-        case (s_mi_addr_reg(3 downto 0)) is
+        case (s_rd_addr_reg(3 downto 0)) is
             when "0000" =>
-                s_dbg_reg_per_pcc <= s_reg_stat_cnt0_muxed;
+                s_dbg_reg_per_pcc <= s_stat_cnt0_muxed_reg;
             when "0100" =>
-                s_dbg_reg_per_pcc <= s_reg_stat_cnt1_muxed;
+                s_dbg_reg_per_pcc <= s_stat_cnt1_muxed_reg;
             when others =>
                 s_dbg_reg_per_pcc <= X"DEADCAFE";
         end case;
@@ -189,9 +210,9 @@ begin
 
     mi_drd_p : process (all)
     begin
-        case (s_mi_addr_reg(11 downto 9)) is
+        case (s_rd_addr_reg(11 downto 9)) is
             when "000" =>
-                s_mi_drd <= s_dbg_reg_common;
+                s_mi_drd <= s_dbg_reg_common_reg;
             when "001" =>
                 s_mi_drd <= s_dbg_reg_per_pcc;
             when others =>
@@ -212,7 +233,7 @@ begin
             if (RESET = '1') then
                 MI_DRDY <= '0';
             else
-                MI_DRDY <= s_mi_rd_reg;
+                MI_DRDY <= s_rd_reg;
             end if;
         end if;
     end process;
