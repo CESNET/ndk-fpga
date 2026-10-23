@@ -70,7 +70,7 @@ class CQUser(SerializableHeader):
             'sop_ptr0', 'sop_ptr1', 'eop0', 'eop1', 'eop_ptr0', 'eop_ptr1', 'discontiune',
             'tph_present', 'tph_type', 'tph_sh_tag', 'parity'
         ],
-        [4, 4, 4, 4, 64, 1, 1, 2, 2, 1, 1, 4, 4, 1, 2, 4, 8, 64],
+        [4, 4, 4, 4, 64, 1, 1, 2, 2, 1, 1, 4, 4, 1, 2, 4, 16, 64],
     ))
 
 
