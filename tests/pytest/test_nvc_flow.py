@@ -196,3 +196,11 @@ def test_psl(bench, target):
     assert "--psl" not in args
     _, args = step(dry_run(bench, f"TARGET={target}", "NVC_PSL=1", "NVC_ANALYSE_FLAGS=--relaxed --check-synthesis"), "nvc", "-a")
     assert {"--psl", "--check-synthesis"} <= set(args)
+
+
+@pytest.mark.parametrize("target", RUNNING)
+def test_exit_severity(bench, target):
+    _, args = step(dry_run(bench, f"TARGET={target}"), "nvc", "-r")
+    assert not [arg for arg in args if arg.startswith("--exit-severity")]
+    _, args = step(dry_run(bench, f"TARGET={target}", "NVC_EXIT_SEVERITY=error", "NVC_RUN_ARGS=--stop-time=1us"), "nvc", "-r")
+    assert {"--exit-severity=error", "--stop-time=1us"} <= set(args)
