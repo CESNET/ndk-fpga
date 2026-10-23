@@ -430,7 +430,8 @@ Options: ULTRASCALE, STRATIX10, AGILEX, …</p></td>
 <tr class="row-even" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum"><td><p>TX_MVB_L4_CSUM</p></td>
 <td><p>std_logic_vector(MFB_REGIONS*16-1 downto 0)</p></td>
 <td><p>out</p></td>
-<td><p>L4 checksum calculated value.</p></td>
+<td><p>L4 checksum calculated value.
+For UDP, the value 0x0000 is replaced by 0xFFFF (RFC 768).</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-portsignal-mfb_checksum_l3l4-tx_mvb_l4_csum_ok"><td><p>TX_MVB_L4_CSUM_OK</p></td>
 <td><p>std_logic_vector(MFB_REGIONS-1 downto 0)</p></td>
