@@ -74,6 +74,25 @@ vhdocl:
 
 COCOTB_GPI_USERS_ENV = $(shell cocotb-config --pygpi-entry-point >/dev/null 2>&1 && printf 'GPI_USERS="%s;%s"' "$$(cocotb-config --libpython)" "$$(cocotb-config --pygpi-entry-point)")
 
+# NVC_LOAD marks a cocotb run. Its results.xml is removed before the run and must exist afterwards without a
+# failure, as --exit-severity fails a run only on a VHDL or PSL abort, not on a failed test or an unimportable module.
+define clear_cocotb_results
+	@if [ -n "$(NVC_LOAD)" ]; then rm -f results.xml; fi
+endef
+
+define check_cocotb_results
+	@if [ -n "$(NVC_LOAD)" ]; then \
+		if [ ! -f results.xml ]; then \
+			echo "*** cocotb wrote no results.xml -- see the log above ***" >&2; \
+			exit 1; \
+		fi; \
+		if grep -q '<failure' results.xml; then \
+			echo "*** cocotb reported a test FAILURE -- see results.xml ***" >&2; \
+			exit 1; \
+		fi; \
+	fi
+endef
+
 COCOTB_RUN_ARGS:=
 
 ifneq ($(RANDOM_SEED),)
@@ -151,7 +170,9 @@ endef
 
 # The cocotb run of the nvc flow, shared by nvc and nvc-run.
 define nvc_run
+	$(call clear_cocotb_results)
 	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(NVC_EXIT_SEVERITY_FLAGS) $(NVC_RUN_ARGS) $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
+	$(call check_cocotb_results)
 endef
 
 nvc: $(MOD)

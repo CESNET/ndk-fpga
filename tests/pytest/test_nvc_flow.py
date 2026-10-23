@@ -37,12 +37,22 @@ async def passes(dut):
     Path("passed.txt").touch()
 """
 
+FAILING_TESTS = """
+import cocotb
+
+
+@cocotb.test()
+async def fails(dut):
+    assert False
+"""
+
 
 @pytest.fixture
 def bench(tmp_path):
     """A bench directory for MI_PIPE, which elaborates and runs without any stimulus."""
     write_makefile(tmp_path, "mi_pipe", REPO / "comp" / "mi_tools" / "pipe")
     (tmp_path / "flow_pass.py").write_text(PASSING_TESTS)
+    (tmp_path / "flow_fail.py").write_text(FAILING_TESTS)
     return tmp_path
 
 
@@ -204,3 +214,19 @@ def test_exit_severity(bench, target):
     assert not [arg for arg in args if arg.startswith("--exit-severity")]
     _, args = step(dry_run(bench, f"TARGET={target}", "NVC_EXIT_SEVERITY=error", "NVC_RUN_ARGS=--stop-time=1us"), "nvc", "-r")
     assert {"--exit-severity=error", "--stop-time=1us"} <= set(args)
+
+
+@pytest.mark.parametrize("target", ["nvc-sim", "nvc-run"])
+def test_failing_test_fails_make(elaborated, target):
+    result = make(elaborated, f"TARGET={target}", "COCOTB_TEST_MODULES=flow_fail")
+    assert result.returncode != 0
+    assert "cocotb reported a test FAILURE" in result.stderr
+
+
+@pytest.mark.parametrize("target", ["nvc-sim", "nvc-run"])
+def test_run_without_results_fails_make(elaborated, target):
+    """A results.xml left by an earlier run must not pass a run that cannot import its test module."""
+    assert make(elaborated, "TARGET=nvc-run", "COCOTB_TEST_MODULES=flow_pass").returncode == 0
+    result = make(elaborated, f"TARGET={target}", "COCOTB_TEST_MODULES=flow_missing")
+    assert result.returncode != 0
+    assert "cocotb wrote no results.xml" in result.stderr
