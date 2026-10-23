@@ -188,3 +188,11 @@ def test_analyse_flags(bench, target):
     _, args = step(dry_run(bench, f"TARGET={target}", "NVC_ANALYSE_FLAGS=--check-synthesis"), "nvc", "-a")
     assert "--check-synthesis" in args
     assert "--relaxed" not in args
+
+
+@pytest.mark.parametrize("target", ELABORATING)
+def test_psl(bench, target):
+    _, args = step(dry_run(bench, f"TARGET={target}"), "nvc", "-a")
+    assert "--psl" not in args
+    _, args = step(dry_run(bench, f"TARGET={target}", "NVC_PSL=1", "NVC_ANALYSE_FLAGS=--relaxed --check-synthesis"), "nvc", "-a")
+    assert {"--psl", "--check-synthesis"} <= set(args)
