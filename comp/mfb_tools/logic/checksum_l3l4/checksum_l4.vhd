@@ -108,8 +108,11 @@ architecture FULL of MFB_CHECKSUM_L4 is
     signal s1_ph_vector           : u_array_t(MFB_REGIONS-1 downto 0)(18*16-1 downto 0);
     signal s1_ph_vector_be        : u_array_t(MFB_REGIONS-1 downto 0)(18*16-1 downto 0);
     signal s1_ph_csum             : slv_array_t(MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal s1_ph_udp              : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal r1_ph_csum             : slv_array_t(MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal r1_ph_udp              : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal r1_ph_meta_arr         : slv_array_t(MFB_REGIONS-1 downto 0)(17-1 downto 0);
     signal r1_ph_vld              : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s1_ph_src_rdy          : std_logic;
     signal s1_ph_dst_rdy          : std_logic;
@@ -126,8 +129,10 @@ architecture FULL of MFB_CHECKSUM_L4 is
 
     signal mrg_mvb_meta           : std_logic_vector(MFB_REGIONS*33-1 downto 0);
     signal mrg_mvb_meta_arr       : slv_array_t     (MFB_REGIONS-1 downto 0)(33-1 downto 0);
-    signal mrg_mvb_ph_csum        : std_logic_vector(MFB_REGIONS*16-1 downto 0);
+    signal mrg_mvb_ph_meta        : std_logic_vector(MFB_REGIONS*17-1 downto 0);
+    signal mrg_mvb_ph_meta_arr    : slv_array_t     (MFB_REGIONS-1 downto 0)(17-1 downto 0);
     signal mrg_mvb_ph_csum_arr    : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
+    signal mrg_mvb_ph_udp         : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal mrg_mvb_csum_raw_arr   : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_orig_arr  : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
     signal mrg_mvb_csum_orbe_arr  : slv_array_t     (MFB_REGIONS-1 downto 0)(16-1 downto 0);
@@ -218,6 +223,9 @@ begin
 
             s1_ph_csum(ii) <= std_logic_vector(not tmp(15 downto 0));
         end process;
+
+        -- Protocol number 17 is UDP.
+        s1_ph_udp(ii) <= '1' when (r0_ph_l4_proto(ii) = 17) else '0';
     end generate;
 
     --------------------------------------------------------------------
@@ -229,6 +237,7 @@ begin
         if rising_edge(CLK) then
             if (s1_ph_dst_rdy = '1') then
                 r1_ph_csum <= s1_ph_csum;
+                r1_ph_udp  <= s1_ph_udp;
                 r1_ph_vld  <= r0_ph_vld;
             end if;
             if (RESET = '1') then
@@ -238,6 +247,10 @@ begin
     end process;
 
     s1_ph_src_rdy <= or r1_ph_vld;
+
+    r1_ph_meta_g: for ii in 0 to MFB_REGIONS-1 generate
+        r1_ph_meta_arr(ii) <= r1_ph_udp(ii) & r1_ph_csum(ii);
+    end generate;
 
     --------------------------------------------------------------------
     -- Checksum calculation of L4 protocol
@@ -299,7 +312,7 @@ begin
         RX0_ITEMS      => MFB_REGIONS,
         RX0_ITEM_WIDTH => 33, -- 16 bits for raw checksum + 16 bits for original checksum + 1 bit for bypass
         RX1_ITEMS      => MFB_REGIONS,
-        RX1_ITEM_WIDTH => 16, -- 16 bits for pseudoheader checksum
+        RX1_ITEM_WIDTH => 17, -- 16 bits for pseudoheader checksum + 1 bit for UDP
         RX0_FIFO_EN    => False,
         FIFO_DEPTH     => 32,
         OUTPUT_REG     => True,
@@ -314,23 +327,25 @@ begin
         RX0_SRC_RDY => cc_mvb_src_rdy,
         RX0_DST_RDY => cc_mvb_dst_rdy,
 
-        RX1_DATA    => slv_array_ser(r1_ph_csum),
+        RX1_DATA    => slv_array_ser(r1_ph_meta_arr),
         RX1_VLD     => r1_ph_vld,
         RX1_SRC_RDY => s1_ph_src_rdy,
         RX1_DST_RDY => s1_ph_dst_rdy,
 
         TX_DATA     => open,
         TX_DATA0    => mrg_mvb_meta,
-        TX_DATA1    => mrg_mvb_ph_csum,
+        TX_DATA1    => mrg_mvb_ph_meta,
         TX_VLD      => mrg_mvb_vld,
         TX_SRC_RDY  => mrg_mvb_src_rdy,
         TX_DST_RDY  => mrg_mvb_dst_rdy
     );
 
-    mrg_mvb_ph_csum_arr <= slv_array_deser(mrg_mvb_ph_csum, MFB_REGIONS);
+    mrg_mvb_ph_meta_arr <= slv_array_deser(mrg_mvb_ph_meta, MFB_REGIONS);
     mrg_mvb_meta_arr    <= slv_array_deser(mrg_mvb_meta, MFB_REGIONS);
 
     mrg_mvb_meta_g: for ii in 0 to MFB_REGIONS-1 generate
+        mrg_mvb_ph_csum_arr(ii)   <= mrg_mvb_ph_meta_arr(ii)(15 downto 0);
+        mrg_mvb_ph_udp(ii)        <= mrg_mvb_ph_meta_arr(ii)(16);
         mrg_mvb_csum_raw_arr(ii)  <= mrg_mvb_meta_arr(ii)(15 downto 0);
         mrg_mvb_csum_orig_arr(ii) <= mrg_mvb_meta_arr(ii)(31 downto 16);
         mrg_mvb_csum_bypass(ii)   <= mrg_mvb_meta_arr(ii)(32);
@@ -375,8 +390,10 @@ begin
         -- Step 5: Final end-around carry and 1's complement negation.
         mrg_mvb_csum_zarr(ii) <= not (mrg_mvb_csum_farr(ii)(16-1 downto 0) + mrg_mvb_csum_farr(ii)(16));
 
-        -- Step 6: Convert +0 (0x0000) to -0 (0xFFFF) per RFC 1071.
-        mrg_mvb_csum_arr(ii)  <= X"FFFF" when (mrg_mvb_csum_zarr(ii) = 0) else std_logic_vector(mrg_mvb_csum_zarr(ii));
+        -- Step 6: For UDP, convert +0 (0x0000) to -0 (0xFFFF) per RFC 768.
+        -- In UDP, the value 0x0000 means that the checksum is not used.
+        -- Other protocols keep 0x0000.
+        mrg_mvb_csum_arr(ii)  <= X"FFFF" when (mrg_mvb_csum_zarr(ii) = 0 and mrg_mvb_ph_udp(ii) = '1') else std_logic_vector(mrg_mvb_csum_zarr(ii));
 
         -- Convert result back to little-endian for output.
         mrg_mvb_csum_le_arr(ii) <= mrg_mvb_csum_arr(ii)(7 downto 0) & mrg_mvb_csum_arr(ii)(15 downto 8);
