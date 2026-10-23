@@ -133,7 +133,9 @@ class MIRequestDriver(BusDriver):
         assert addr >= 0
 
         be = LogicArray(2**len(dwr) - 1 if byte_enable is None else byte_enable, len(dwr))
+        self.log.debug(f"Initial write request: addr={hex(addr)}, dwr={dwr.hex()}, be={bin(be)}")
         _, _, addr, dwr, be = align_write_request(self.__data_width, addr, dwr, byte_enable=be)
+        self.log.debug(f"Aligned write request: addr={hex(addr)}, dwr={dwr.hex()}, be={bin(be)}")
 
         cycles = ceildiv(self.__data_width, len(dwr))
 
@@ -158,7 +160,9 @@ class MIRequestDriver(BusDriver):
         assert addr >= 0
 
         be = LogicArray(2**byte_count - 1 if byte_enable is None else byte_enable, byte_count)
+        self.log.debug(f"Initial read request: addr={hex(addr)}, byte_count={byte_count}, be={bin(be)}")
         start_offset, end_offset, addr, byte_count, be = align_read_request(self.__data_width, addr, byte_count, byte_enable=be)
+        self.log.debug(f"Aligned read request: addr={hex(addr)}, byte_count={byte_count}, be={bin(be)}")
 
         drd = bytearray(byte_count)
 
