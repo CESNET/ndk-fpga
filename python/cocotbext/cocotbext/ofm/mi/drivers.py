@@ -8,6 +8,7 @@ from cocotbext.ofm.base.drivers import BusDriver
 from cocotbext.ofm.utils.math import ceildiv
 from cocotbext.ofm.utils.signals import await_signal_sync, align_write_request, align_read_request
 from cocotbext.ofm.mi.transaction import MiTransactionType
+from cocotb.triggers import ClockCycles
 from cocotb.types import LogicArray, Logic
 from typing import Optional
 
@@ -179,6 +180,33 @@ class MIRequestDriver(BusDriver):
 
     async def read64(self, addr: int, byte_enable: Optional[int] = None) -> int:
         return int.from_bytes(await self.read(addr, byte_count=8, byte_enable=byte_enable), 'little')
+
+
+class MIPipelinedDriver(MIRequestDriver):
+    """MIRequestDriver that puts the next request on the bus right after ARDY instead of waiting for the read data,
+    so writes and reads reach the slave back to back; an MIMonitor or the like collects the read data."""
+
+    async def issue(self, ops, on_accept, gap=lambda: 0):
+        """Request every op (attributes `write`, `addr`, `data`) with all bytes enabled, calling `on_accept(op)` at its
+        ARDY; `gap()` gives the idle cycles before each request."""
+        bus = self.bus
+        for op in ops:
+            idle = gap()
+            if idle:
+                bus.wr.value = 0
+                bus.rd.value = 0
+                await ClockCycles(self.clock, idle)
+            bus.addr.value = op.addr
+            bus.dwr.value = op.data
+            bus.be.value = (1 << len(bus.be)) - 1
+            bus.wr.value = int(op.write)
+            bus.rd.value = int(not op.write)
+            await self._clk_re
+            while not bus.ardy.value:
+                await self._clk_re
+            on_accept(op)
+        bus.wr.value = 0
+        bus.rd.value = 0
 
 
 class MIResponseDriver(BusDriver):
