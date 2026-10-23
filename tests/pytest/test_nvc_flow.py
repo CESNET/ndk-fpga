@@ -21,6 +21,7 @@ pytestmark = pytest.mark.skipif(
 # The make target, the simulator it starts and the argument of the simulator's cocotb run.
 COCOTB_RUNS = [("nvc-sim", "nvc", "-r"), ("ghdl-sim", "ghdl", "-r")]
 NVC_TARGETS = ["nvc", "nvc-sim"]
+RUNNING = ["nvc-sim"]
 
 ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
 
@@ -34,11 +35,15 @@ def bench(tmp_path):
 
 @pytest.fixture
 def component(tmp_path):
-    """A bench directory for a stub component with an empty source for each platform tag it is generated for."""
+    """A bench directory for a stub component with an empty source for each platform tag it is generated for, and
+    one more if STUB_PROBE is in the environment of the generation."""
     comp = tmp_path / "comp"
     comp.mkdir()
-    (comp / "Modules.tcl").write_text('foreach tag $PLATFORM_TAGS { lappend MOD "$ENTITY_BASE/$tag.vhd" }\n')
-    for tag in ("altera", "xilinx"):
+    (comp / "Modules.tcl").write_text(
+        'foreach tag $PLATFORM_TAGS { lappend MOD "$ENTITY_BASE/$tag.vhd" }\n'
+        'if {[info exists ::env(STUB_PROBE)]} { lappend MOD "$ENTITY_BASE/probe.vhd" }\n'
+    )
+    for tag in ("altera", "xilinx", "probe"):
         (comp / f"{tag}.vhd").touch()
     write_makefile(tmp_path, "stub", comp)
     return tmp_path
@@ -107,3 +112,11 @@ def test_test_module_selection(bench, selector, target, program, flag):
 def test_platform_tags(component, target, args, sources):
     dry_run(component, f"TARGET={target}", *args)
     assert generated_sources(component) == sources
+
+
+@pytest.mark.parametrize("target", RUNNING)
+@pytest.mark.parametrize("variable, in_generation", [("NVC_RUN_ENV", False), ("USER_ENV", True)])
+def test_run_env(component, target, variable, in_generation):
+    env, _ = step(dry_run(component, f"TARGET={target}", f"{variable}=STUB_PROBE=1"), "nvc", "-r")
+    assert env["STUB_PROBE"] == "1"
+    assert ("probe.vhd" in generated_sources(component)) == in_generation
