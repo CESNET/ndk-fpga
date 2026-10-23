@@ -1,0 +1,12 @@
+# cocotb_test_sig.fdo: Include file with signals
+# Copyright (C) 2026 DynaNIC Semiconductors, Ltd.
+# Author(s): Vlastimil Kosar <kosar@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /RX_MAC_LITE_ADAPTER_SAXIS/*
+
+config wave -signalnamewidth 1
