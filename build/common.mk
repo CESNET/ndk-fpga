@@ -62,8 +62,9 @@ simulation: $(MOD)
 .PHONY: cocotb
 COCOTB_SIM_SCRIPT ?= $(OFM_PATH)/build/scripts/cocotb/cocotb.fdo
 COCOTB_MODULE ?= cocotb_test
+COCOTB_TEST_MODULES ?= $(COCOTB_MODULE)
 cocotb: $(MOD)
-	$(NETCOPE_ENV) SYNTHFILES=$(SYNTHFILES) COCOTB_MODULE=$(COCOTB_MODULE) vsim -64 -do $(COCOTB_SIM_SCRIPT) $(SIM_FLAGS)
+	$(NETCOPE_ENV) SYNTHFILES=$(SYNTHFILES) COCOTB_TEST_MODULES=$(COCOTB_TEST_MODULES) vsim -64 -do $(COCOTB_SIM_SCRIPT) $(SIM_FLAGS)
 
 # Automated documentation script
 vhdocl:
@@ -75,8 +76,8 @@ COCOTB_GPI_USERS_ENV = $(shell cocotb-config --pygpi-entry-point >/dev/null 2>&1
 
 # The assignments before $(NETCOPE_ENV) are defaults that USER_ENV, a part of it, can override.
 COCOTB_ENV=\
-MODULE=$(COCOTB_MODULE) \
-COCOTB_TEST_MODULES=$(COCOTB_MODULE) \
+MODULE=$(COCOTB_TEST_MODULES) \
+COCOTB_TEST_MODULES=$(COCOTB_TEST_MODULES) \
 PYGPI_PYTHON_BIN=$(shell cocotb-config --python-bin) \
 $(COCOTB_GPI_USERS_ENV) \
 TOPLEVEL=$(TOP_LEVEL_ENT_LC) \
