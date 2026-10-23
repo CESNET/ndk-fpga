@@ -82,3 +82,17 @@ class RCUser(SerializableHeader):
         ],
         [64, 4, 2, 2, 2, 2, 4, 4, 4, 4, 4, 1, 64],
     ))
+
+
+class CQMfbMeta(SerializableHeader):
+    items = list(zip(
+        ['header', 'prefix', 'bar', 'firstBe', 'lastBe', 'tph_present', 'tph_type', 'tph_st_tag'],
+        [128, 32, 3, 4, 4, 1, 2, 8],
+    ))
+
+
+class RQMfbMeta(SerializableHeader):
+    items = list(zip(
+        ['header', 'prefix', 'firstBe', 'lastBe'],
+        [128, 32, 4, 4],
+    ))
