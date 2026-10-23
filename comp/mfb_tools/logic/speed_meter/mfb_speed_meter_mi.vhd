@@ -26,6 +26,7 @@ entity MFB_SPEED_METER_MI is
         CNT_TICKS_WIDTH  : natural := 24;
         -- Set width of valid bytes counter. Optimum and MINIMUM value is:
         -- log2(((2^CNT_TICKS_WIDTH)-1)*REGIONS*REGION_SIZE*BLOCK_SIZE)
+        -- Read as two MI words (0x08 low, 0x1C high); at most 2*MI_DATA_WIDTH bits.
         CNT_BYTES_WIDTH  : natural := 32;
         -- Set width of packet counters.
         CNT_PKTS_WIDTH   : natural := 32;
@@ -78,6 +79,11 @@ architecture FULL of MFB_SPEED_METER_MI is
     signal cnt_clear_reg     : std_logic;
 
 begin
+
+    assert (CNT_BYTES_WIDTH <= 2*MI_DATA_WIDTH)
+        report "ERROR: MFB Speed Meter MI: CNT_BYTES_WIDTH (" & integer'image(CNT_BYTES_WIDTH) & ") must not exceed twice MI_DATA_WIDTH (" & integer'image(2*MI_DATA_WIDTH) & ")!"
+        severity failure;
+
     mfb_speed_meter_i : entity work.MFB_SPEED_METER
     generic map (
         REGIONS         => REGIONS,
@@ -130,10 +136,11 @@ begin
             case MI_ADDR(5-1 downto 0) is
                 when "00000" => MI_DRD <= std_logic_vector(resize(unsigned(cnt_ticks_reg), MI_DATA_WIDTH));
                 when "00100" => MI_DRD <= (0 => cnt_ticks_max_reg, others => '0');
-                when "01000" => MI_DRD <= cnt_bytes_reg;
+                when "01000" => MI_DRD <= std_logic_vector(resize(unsigned(cnt_bytes_reg), MI_DATA_WIDTH));
                 when "10000" => MI_DRD <= cnt_sofs_reg;
                 when "10100" => MI_DRD <= cnt_eofs_reg;
                 when "11000" => MI_DRD <= std_logic_vector(to_unsigned(FREQUENCY, MI_DATA_WIDTH));
+                when "11100" => MI_DRD <= std_logic_vector(resize(shift_right(unsigned(cnt_bytes_reg), MI_DATA_WIDTH), MI_DATA_WIDTH));
                 when others  => MI_DRD <= (others => '0');
             end case;
         end if;
