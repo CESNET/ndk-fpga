@@ -1,0 +1,13 @@
+[project]
+name = "cocotb-hbm_tester"
+version = "0.1.0"
+dependencies = [
+    "cocotb >= 2.0.0",
+    "cocotbext-ofm @ ${NDK_FPGA_COCOTBEXT_OFM_URL}",
+    "cocotbext-axi >= 0.1.28",
+    "setuptools",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
