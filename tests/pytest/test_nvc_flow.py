@@ -165,3 +165,17 @@ def test_elab_args(bench, target):
 def test_run_args(bench, target):
     _, args = step(dry_run(bench, f"TARGET={target}", "NVC_RUN_ARGS=--stop-time=1us"), "nvc", "-r")
     assert "--stop-time=1us" in args
+
+
+def test_random_seed(elaborated):
+    """A seed set in the bench Makefile, which make does not export to the run, reaches cocotb too."""
+    makefile = elaborated / "Makefile"
+    makefile.write_text("RANDOM_SEED=1234\n" + makefile.read_text())
+    result = make(elaborated, "TARGET=nvc-run", "COCOTB_TEST_MODULES=flow_pass")
+    assert result.returncode == 0, result.stderr
+    assert "Seeding Python random module with 1234" in result.stdout
+
+
+def test_random_seed_reaches_ghdl(bench):
+    env, _ = step(dry_run(bench, "TARGET=ghdl-sim", "RANDOM_SEED=1234"), "ghdl", "-r")
+    assert env["COCOTB_RANDOM_SEED"] == "1234"
