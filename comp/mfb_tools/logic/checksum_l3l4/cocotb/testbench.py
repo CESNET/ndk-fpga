@@ -81,6 +81,28 @@ class MVBMonitorExt(MVBMonitor):
     ]
 
 
+async def reset_dut(dut):
+    """Perform a hardware reset sequence with idle RX interfaces.
+
+    Drives the RESET signal high for 8 clock cycles, then releases it.
+    Waits for one rising edge after reset release.
+    A failed previous test can leave RX_MFB_SRC_RDY and RX_MVB_SRC_RDY at 1.
+    Both are set to 0, so the DUT does not accept data of the previous test after the reset.
+
+    Call this function before the Testbench is created.
+    The reset removes all transactions of a previous test before the Testbench monitor starts.
+
+    Args:
+        dut: The Device Under Test (cocotb handle).
+    """
+    dut.RX_MFB_SRC_RDY.value = 0
+    dut.RX_MVB_SRC_RDY.value = 0
+    dut.RESET.value = 1
+    await ClockCycles(dut.CLK, 8)
+    dut.RESET.value = 0
+    await RisingEdge(dut.CLK)
+
+
 class Testbench:
     """Testbench for MFB_CHECKSUM_L3L4 component.
 
@@ -167,17 +189,6 @@ class Testbench:
             transaction.l4_csum = 0
             transaction.l4_csum_ok = 0
 
-    async def reset(self):
-        """Perform a hardware reset sequence.
-
-        Drives the RESET signal high for 8 clock cycles, then releases it.
-        Waits for one rising edge after reset release.
-        """
-        self.dut.RESET.value = 1
-        await ClockCycles(self.dut.CLK, 8)
-        self.dut.RESET.value = 0
-        await RisingEdge(self.dut.CLK)
-
     def model(self, pkt_dict):
         """Generate expected output transaction based on input packet.
 
@@ -220,7 +231,11 @@ class Testbench:
             actual_tr: The actual MvbTxResult transaction from the DUT.
         """
         if not self.expected_output:
-            cocotb.log.warning("No expected output available for comparison")
+            msg = "Transaction received without an expected output"
+            self.scoreboard_errors.append(msg)
+            cocotb.log.error(msg)
+            if self.stop_on_error:
+                raise AssertionError(msg)
             return
 
         # Get next expected result

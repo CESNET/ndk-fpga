@@ -8,7 +8,7 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 
-from testbench import Testbench
+from testbench import Testbench, reset_dut
 
 
 @cocotb.test()
@@ -25,12 +25,12 @@ async def run_test_base(dut, pkt_count=4000, truncate_chance=0):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
     # Initialize testbench
     tb = Testbench(dut, debug=False)
-
-    # Run reset
-    await tb.reset()
-    cocotb.log.info("Reset completed")
 
     # Start backpressure (randomized DST_RDY)
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
@@ -75,12 +75,12 @@ async def run_test_phdr_zero(dut, pkt_count=200):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
     # Initialize testbench
     tb = Testbench(dut, debug=False)
-
-    # Run reset
-    await tb.reset()
-    cocotb.log.info("Reset completed")
 
     # Start backpressure (randomized DST_RDY)
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
@@ -121,13 +121,13 @@ async def run_test_corrupted_extreme(dut, pkt_count=5000, truncate_chance=0.9, l
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
     # Initialize testbench with disabled comparison logging
     tb = Testbench(dut, debug=False, log_comparisons=log_comparisons)
     tb.stop_on_error = False  # Continue test even on checksum mismatches
-
-    # Run reset
-    await tb.reset()
-    cocotb.log.info("Reset completed")
 
     # Start backpressure (randomized DST_RDY)
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
