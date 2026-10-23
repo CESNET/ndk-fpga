@@ -74,6 +74,12 @@ vhdocl:
 
 COCOTB_GPI_USERS_ENV = $(shell cocotb-config --pygpi-entry-point >/dev/null 2>&1 && printf 'GPI_USERS="%s;%s"' "$$(cocotb-config --libpython)" "$$(cocotb-config --pygpi-entry-point)")
 
+COCOTB_RUN_ARGS:=
+
+ifneq ($(RANDOM_SEED),)
+COCOTB_RUN_ARGS += COCOTB_RANDOM_SEED=$(RANDOM_SEED)
+endif
+
 # The assignments before $(NETCOPE_ENV) are defaults that USER_ENV, a part of it, can override.
 COCOTB_ENV=\
 MODULE=$(COCOTB_TEST_MODULES) \
@@ -83,6 +89,7 @@ $(COCOTB_GPI_USERS_ENV) \
 TOPLEVEL=$(TOP_LEVEL_ENT_LC) \
 TOPLEVEL_LANG=vhdl \
 $(NETCOPE_ENV) \
+$(COCOTB_RUN_ARGS) \
 COCOTB_RESOLVE_X=ZEROS
 
 GHDL_WORK_DIR?=work_ghdl
