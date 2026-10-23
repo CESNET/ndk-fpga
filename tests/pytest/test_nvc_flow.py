@@ -159,3 +159,9 @@ def test_run_on_the_elaboration(elaborated):
 def test_elab_args(bench, target):
     _, args = step(dry_run(bench, f"TARGET={target}", "NVC_ELAB_ARGS=-gDATA_WIDTH=64"), "nvc", "-e")
     assert "-gDATA_WIDTH=64" in args
+
+
+@pytest.mark.parametrize("target", RUNNING)
+def test_run_args(bench, target):
+    _, args = step(dry_run(bench, f"TARGET={target}", "NVC_RUN_ARGS=--stop-time=1us"), "nvc", "-r")
+    assert "--stop-time=1us" in args

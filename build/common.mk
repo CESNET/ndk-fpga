@@ -126,7 +126,7 @@ endef
 
 # The cocotb run of the nvc flow, shared by nvc and nvc-run.
 define nvc_run
-	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
+	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(NVC_RUN_ARGS) $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
 endef
 
 nvc: $(MOD)
