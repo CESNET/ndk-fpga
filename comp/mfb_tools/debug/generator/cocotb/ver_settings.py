@@ -35,6 +35,7 @@ SETTINGS = {
         ("core_arch",),
         ("block_32b",),
         ("block_32b", "core_arch"),
+        ("block_128b",),
         ("block_128b", "core_arch"),
     ),
 }

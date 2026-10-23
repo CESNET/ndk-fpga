@@ -105,11 +105,11 @@ async def test_headers(dut):
 
     cocotb.start_soon(apply_backpressure(dut.TX_MFB_DST_RDY, dut.CLK, BackpressureConfig(1, 6, 0.3)))
 
-    # Lengths from the minimum that holds the header up to several words.
+    # Lengths from the minimum that holds the header, which is below one region for wide blocks, up to several words.
     max_length = min(1500, 2**length_width - 1)
-    lengths = [64, 65, 100, 127, 128, 129, 255, 256, 511, max_length]
+    lengths = [HEADER_BITS // 8, 56, 64, 65, 100, 127, 128, 129, 255, 256, 511, max_length]
     random.shuffle(lengths)
-    for length in lengths + [random.randint(64, max_length) for _ in range(10)]:
+    for length in lengths + [random.randint(HEADER_BITS // 8, max_length) for _ in range(10)]:
         await run_phase(dut, scoreboard, length, 20)
 
     dut.CTRL_EN.value = 0
