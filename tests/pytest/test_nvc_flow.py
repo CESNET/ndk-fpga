@@ -21,6 +21,7 @@ pytestmark = pytest.mark.skipif(
 # The make target, the simulator it starts and the argument of the simulator's cocotb run.
 COCOTB_RUNS = [("nvc-sim", "nvc", "-r"), ("ghdl-sim", "ghdl", "-r")]
 NVC_TARGETS = ["nvc", "nvc-sim", "nvc-elab", "nvc-run"]
+ELABORATING = ["nvc-sim", "nvc-elab"]
 RUNNING = ["nvc-sim", "nvc-run"]
 
 ASSIGNMENT = re.compile(r"[A-Za-z_]\w*=")
@@ -152,3 +153,9 @@ def test_run_on_the_elaboration(elaborated):
     result = make(elaborated, "TARGET=nvc-run", "COCOTB_TEST_MODULES=flow_pass")
     assert result.returncode == 0, result.stderr
     assert (elaborated / "passed.txt").exists()
+
+
+@pytest.mark.parametrize("target", ELABORATING)
+def test_elab_args(bench, target):
+    _, args = step(dry_run(bench, f"TARGET={target}", "NVC_ELAB_ARGS=-gDATA_WIDTH=64"), "nvc", "-e")
+    assert "-gDATA_WIDTH=64" in args

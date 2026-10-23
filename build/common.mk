@@ -121,7 +121,7 @@ TOP_LEVEL_ENT_LC := $(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]')
 # Analysis and elaboration of the nvc flow, shared by nvc and nvc-elab.
 define nvc_analyse_elab
 	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
-	@nvc --work=nvcwork -H 1G -M 4G -e $(NVC_ELAB_FLAGS) $(TOP_LEVEL_ENT_LC)
+	@nvc --work=nvcwork -H 1G -M 4G -e $(NVC_ELAB_FLAGS) $(NVC_ELAB_ARGS) $(TOP_LEVEL_ENT_LC)
 endef
 
 # The cocotb run of the nvc flow, shared by nvc and nvc-run.
