@@ -8,6 +8,7 @@
 # Example 0: PCIE_CONF = "1xGen3x16"  returns: 1, 3, 0
 # Example 1: PCIE_CONF = "2xGen5x16"  returns: 2, 5, 0
 # Example 2: PCIE_CONF = "2xGen4x8x8" returns: 4, 4, 1
+# Example 3: PCIE_CONF = "1xGen4x8"   returns: 1, 4, 2
 proc ParsePcieConf {PCIE_CONF} {
     set pcie_const0 0
     set pcie_const1 0
@@ -26,7 +27,7 @@ proc ParsePcieConf {PCIE_CONF} {
     } elseif {[string compare -nocase $pcie_const2 "x8x8"] == 0} {
         set pcie_mode 1
         set pcie_eps [expr 2 * $pcie_eps]
-    } elseif {[string compare -nocase $pcie_const2 "x8LL"] == 0} {
+    } elseif {[string compare -nocase $pcie_const2 "x8LL"] == 0 || [string compare -nocase $pcie_const2 "x8"] == 0} {
         set pcie_mode 2
     } else {
         error "Parsing error PCIE_MODE in PCIE_CONF = $PCIE_CONF! Don't know what to enter? \nTry this PCIe configuration: PCIE_CONF=1xGen4x16\n"
