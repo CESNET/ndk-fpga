@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -11,7 +12,9 @@ REPO = Path(__file__).resolve().parents[2]
 
 
 def make(directory, *args):
-    return subprocess.run(["make", "-C", str(directory), *args], capture_output=True, text=True)
+    """make in directory without the SIM of the caller's environment, which would turn a TARGET=cocotb run into nvc."""
+    env = {name: value for name, value in os.environ.items() if name != "SIM"}
+    return subprocess.run(["make", "-C", str(directory), *args], capture_output=True, text=True, env=env)
 
 
 def write_makefile(directory, entity, path):

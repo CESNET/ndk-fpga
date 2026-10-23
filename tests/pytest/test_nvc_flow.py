@@ -138,6 +138,17 @@ def test_test_module_selection(bench, selector, target, program, flag):
     assert env["COCOTB_TEST_MODULES"] == "my_tests"
 
 
+@pytest.mark.parametrize("args, program, flag", [
+    (["TARGET=cocotb"], "vsim", "-do"),
+    (["TARGET=cocotb", "SIM=nvc"], "nvc", "-r"),
+    (["TARGET=nvc-sim", "SIM=nvc"], "nvc", "-r"),
+    (["TARGET=nvc-sim"], "nvc", "-r"),
+])
+def test_sim_selects_the_simulator(bench, args, program, flag):
+    """SIM=nvc turns a TARGET=cocotb run into nvc-sim, also with TARGET=cocotb on the make command line."""
+    step(dry_run(bench, *args), program, flag)
+
+
 @pytest.mark.parametrize("target", NVC_TARGETS)
 @pytest.mark.parametrize("args, sources", [([], {"altera.vhd", "xilinx.vhd"}), (["NVC_PLATFORM_TAGS=xilinx"], {"xilinx.vhd"})])
 def test_platform_tags(component, target, args, sources):

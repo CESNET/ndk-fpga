@@ -29,6 +29,13 @@ ifeq ($(TARGET),cocotb)
 include $(OFM_PATH)build/cocotb.mk
 endif
 
+# SIM=nvc, cocotb's simulator selector, runs a cocotb bench in nvc instead of Questa, also when TARGET=cocotb is a make argument.
+ifeq ($(SIM),nvc)
+ifeq ($(TARGET),cocotb)
+override TARGET := nvc-sim
+endif
+endif
+
 include $(OFM_PATH)$(SYNTH_MAKEFILE)
 
 # For lazy users
