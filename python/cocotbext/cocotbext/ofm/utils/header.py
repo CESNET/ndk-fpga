@@ -54,6 +54,15 @@ class SerializableHeader(object):
         return sum([x[1] for x in cls.items])
 
     @classmethod
+    def offsets(cls):
+        """Bit offset of every field in the serialized value, keyed by field name."""
+        ret, offset = {}, 0
+        for name, width in cls.items:
+            ret[name] = offset
+            offset += width
+        return ret
+
+    @classmethod
     def deserialize(cls, val: int):
         ret = cls()
         for i in cls.items:
