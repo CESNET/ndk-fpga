@@ -71,7 +71,7 @@ def align_request(bus_width: int, addr: int, data_len: int, *, byte_enable: Opti
         bus_width: width of the used bus in bytes.
         addr: unaligned address of the first byte.
         data_len: lenght of the data to be written or number of bytes to be read.
-        byte_enable: which bytes of the data are valid.
+        byte_enable: which bytes of the data are valid, bit i enables byte i.
 
     Returns:
         tuple of four elements:
@@ -83,7 +83,7 @@ def align_request(bus_width: int, addr: int, data_len: int, *, byte_enable: Opti
     start_offset = addr % bus_width
     end_offset = -(addr + data_len) % bus_width
 
-    byte_enable = LogicArray(("0" * start_offset) + byte_enable.binstr[::-1] + ("0" * end_offset)) if byte_enable is not None else None
+    byte_enable = LogicArray(("0" * end_offset) + str(byte_enable) + ("0" * start_offset)) if byte_enable is not None else None
     addr = addr - start_offset
 
     return start_offset, end_offset, addr, byte_enable
