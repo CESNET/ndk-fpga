@@ -24,6 +24,7 @@ Before running the FPGA firmware compilation, the target PCIe configuration can 
 - ``PCIE_CONF=2xGen4x8x8`` -- Two PCIe slots in Gen4 x8x8 (bifuracation) mode.
 - ``PCIE_CONF=2xGen5x8x8`` -- Two PCIe slots in Gen5 x8x8 (bifuracation) mode.
 - ``PCIE_CONF=1xGen3x8LL`` -- Single PCIe slot in Gen3 x8 Low-Latency mode (for Xilinx UltraScale+ only).
+- ``PCIE_CONF=1xGen4x8`` -- Single PCIe slot in Gen4 x8 mode (Alveo U55C only).
 
 The PCIe Core (PCIE_CORE)
 *************************
