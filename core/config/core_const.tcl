@@ -59,6 +59,7 @@ if { $DMA_TYPE == 4 } {
         {1xGen3x16  3 1 0}
         {1xGen4x16  4 1 0}
         {1xGen3x8LL 3 1 2}
+        {1xGen4x8   4 1 2}
         {1xGen4x8x8 4 2 1}
     }
 
