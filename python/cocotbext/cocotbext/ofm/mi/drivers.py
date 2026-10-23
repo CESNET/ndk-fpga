@@ -101,7 +101,7 @@ class MIRequestDriver(BusDriver):
         if byte_enable is None:
             byte_enable = LogicArray("1" * self.__data_width)
         else:
-            byte_enable = LogicArray(byte_enable, Range(4-1, "downto", 0))
+            byte_enable = LogicArray(byte_enable, Range(self.__data_width-1, "downto", 0))
 
         self.__be = LogicArray(byte_enable.binstr[::-1]).integer
 
