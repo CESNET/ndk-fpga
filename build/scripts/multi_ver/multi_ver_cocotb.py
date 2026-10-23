@@ -97,6 +97,9 @@ def run_sim(settings: dict, test_name: str, venv: str | None = None, gui=False, 
 
         command += "\""
 
+    # parse_results() fails a run without results.xml, but one left by an earlier run would pass it.
+    if op.exists(RESULTS_FILE):
+        os.remove(RESULTS_FILE)
     system(command)
 
     for env_name in cocotb_env_names:
