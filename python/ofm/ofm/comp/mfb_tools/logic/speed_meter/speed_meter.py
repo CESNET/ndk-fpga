@@ -28,6 +28,9 @@ class SpeedMeter(nfb.BaseComp):
     _REG_SOFS   = 0x10
     _REG_EOFS   = 0x14
     _REG_FREQ   = 0x18
+    _REG_BYTES_HIGH = 0x1C
+    # Smallest component region that contains the upper word of the byte counter
+    _SIZE_BYTES_HIGH = 0x20
 
     # STATUS REGISTER FIELDS
     _SR_DONE_FLAG = 0x00
@@ -67,9 +70,20 @@ class SpeedMeter(nfb.BaseComp):
         return self._comp.read32(self._REG_FREQ) * 1_000_000
 
     @property
+    def _has_bytes_high(self) -> bool:
+        """Tell whether the upper word of the byte counter is readable; older firmware maps less, and lightweight meters may sit 0x10 apart, so 0x1C is the next meter's."""
+        if self._lightweight:
+            return False
+        reg = self._node.get_property("reg")
+        return reg is not None and reg[-1] >= self._SIZE_BYTES_HIGH
+
+    @property
     def items(self) -> int:
         """Read the number of accumulated bytes."""
-        return self._comp.read32(self._REG_BYTES)
+        bytes_low = self._comp.read32(self._REG_BYTES)
+        if not self._has_bytes_high:
+            return bytes_low
+        return (self._comp.read32(self._REG_BYTES_HIGH) << 32) | bytes_low
 
     @property
     def ticks(self) -> int:

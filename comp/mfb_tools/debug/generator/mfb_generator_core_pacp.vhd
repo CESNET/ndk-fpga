@@ -85,6 +85,8 @@ architecture FULL of MFB_GENERATOR_CORE_PACP is
 
     -- Packet Planner output
     signal pkt_len        : slv_array_t     (REGIONS-1 downto 0)(LENGTH_WIDTH-1 downto 0);
+    signal pkt_meta       : slv_array_t     (REGIONS-1 downto 0)(LENGTH_WIDTH-1 downto 0);
+    signal gen_len_plan   : slv_array_t     (REGIONS-1 downto 0)(LENGTH_WIDTH-1 downto 0);
     signal pkt_addr       : slv_array_t     (REGIONS-1 downto 0)(log2(SPACE_SIZE)-1 downto 0);
     signal pkt_vld        : std_logic_vector(REGIONS-1 downto 0);
     signal pkt_dst_rdy    : std_logic_vector(REGIONS-1 downto 0);
@@ -134,7 +136,7 @@ begin
         STREAMS           => 1,
         PKTS              => REGIONS,
         PLANNED_PKTS      => REGIONS,
-        METADATA_WIDTH    => 0,
+        METADATA_WIDTH    => LENGTH_WIDTH,
         SPACE_SIZE        => SPACE_SIZE,
         SPACE_WORD_SIZE   => WORD_WIDTH/ITEM_WIDTH,
         PKT_SIZE          => 2**(LENGTH_WIDTH)-1,
@@ -152,11 +154,8 @@ begin
         CLK   => CLK,
         RESET => RESET,
 
-        -- Vivado 2019.1
-        -- RX_STR_PKT_META   (0) => (others => (others => '0'))     ,
-        -- Vivado 2022.1 and newer
-        RX_STR_PKT_META       => (others => (others => (others => '0'))),
-        RX_STR_PKT_LEN    (0) => GEN_LENGTH,
+        RX_STR_PKT_META   (0) => GEN_LENGTH,
+        RX_STR_PKT_LEN    (0) => gen_len_plan,
         RX_STR_PKT_VLD    (0) => GEN_VALID,
         RX_STR_PKT_SRC_RDY(0) => (or GEN_VALID) and not gen_afull,
         RX_STR_PKT_AFULL  (0) => gen_afull,
@@ -164,7 +163,7 @@ begin
         SPACE_GLB_RD_PTR      => rd_ptr,
         SPACE_GLB_WR_PTR      => wr_ptr,
 
-        TX_GLB_PKT_META       => open,
+        TX_GLB_PKT_META       => pkt_meta,
         TX_GLB_PKT_LEN        => pkt_len,
         TX_GLB_PKT_ADDR       => pkt_addr,
         TX_GLB_PKT_VLD        => pkt_vld,
@@ -173,9 +172,14 @@ begin
 
     GEN_ACCEPT <= (others => (not gen_afull));
 
+    -- A frame shorter than a region is planned one region long, because MFB allows one SOF and one EOF per region; the real length travels as planner metadata.
+    gen_len_plan_g : for i in 0 to REGIONS-1 generate
+        gen_len_plan(i) <= GEN_LENGTH(i) when unsigned(GEN_LENGTH(i)) >= REGION_ITEMS else std_logic_vector(to_unsigned(REGION_ITEMS, LENGTH_WIDTH));
+    end generate;
+
     pkt_sptr <= pkt_addr;
     pkt_eptr_gen : for i in 0 to REGIONS-1 generate
-        pkt_eptr(i) <= std_logic_vector(unsigned(pkt_sptr(i))+resize_left(unsigned(pkt_len(i)),log2(SPACE_SIZE))-1);
+        pkt_eptr(i) <= std_logic_vector(unsigned(pkt_sptr(i))+resize_left(unsigned(pkt_meta(i)),log2(SPACE_SIZE))-1);
     end generate;
 
     pkt_dst_rdy_gen : for i in 0 to REGIONS-1 generate

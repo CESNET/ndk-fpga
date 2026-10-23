@@ -159,7 +159,8 @@ begin
     latency_vld_p : process(CLK)
     begin
         if (rising_edge(CLK)) then
-            LATENCY_VLD         <= fin_out.end_event;
+            -- An end without a stored start has no latency to report; the FIFO ignores that read.
+            LATENCY_VLD         <= (fin_out.end_event and (not fifo_empty)) or zero_delay;
             LATENCY             <= (others => '0')                                          when (zero_delay = '1') else
                        std_logic_vector(unsigned(fin_out.tick_cnt) - unsigned(start_ticks)) when (tick_ovf = '0')   else
                        std_logic_vector(unsigned(fin_out.tick_cnt) + unsigned(DATA_MAX) - unsigned(start_ticks) + 1);
