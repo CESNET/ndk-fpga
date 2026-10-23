@@ -43,7 +43,7 @@ class SerializableHeader(object):
 
     def __str__(self):
         pnt = [f"{item[0]}: {getattr(self, item[0])} (0x{getattr(self, item[0]):x})" for item in self.items]
-        return '\n'.join(pnt)
+        return ', '.join(pnt)
 
     def serialize(self):
         names, widths = list(zip(*self.items)) if self.items else ([], [])
