@@ -111,11 +111,15 @@ endif
 nvc-sim: NVC_LOAD=--load $(shell cocotb-config --lib-name-path vhpi nvc)
 nvc-sim: nvc
 
+# Extra environment variables for the nvc -r step only, e.g. LD_LIBRARY_PATH for a project, without
+# affecting the tclsh mk-file generation that also uses NETCOPE_ENV.
+NVC_RUN_ENV ?=
+
 nvc: $(MOD)
 	$(eval TOP_LEVEL_ENT_LC:=$(shell echo $(TOP_LEVEL_ENT) | tr '[:upper:]' '[:lower:]'))
 	@nvc --work=nvcwork -H 1G -M 4G --std=2008 -a --relaxed $(filter %.vhd,$(MOD))
 	@nvc --work=nvcwork -H 1G -M 4G -e $(NVC_ELAB_FLAGS) $(TOP_LEVEL_ENT_LC)
-	@$(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
+	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
 
 else
 .PHONY: $(GEN_MK_NAME)
