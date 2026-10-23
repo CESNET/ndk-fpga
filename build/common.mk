@@ -109,6 +109,15 @@ ifeq ($(NVC_PSL),1)
 NVC_PSL_FLAGS += --psl
 endif
 
+# With an empty NVC_EXIT_SEVERITY, nvc keeps running after a PSL or VHDL error and cocotb still
+# reports PASS. Setting it, e.g. to "error", aborts the run so that cocotb marks it as failed too.
+NVC_EXIT_SEVERITY ?=
+# Kept out of NVC_RUN_ARGS, so that one given on the make command line does not drop --exit-severity.
+NVC_EXIT_SEVERITY_FLAGS :=
+ifneq ($(NVC_EXIT_SEVERITY),)
+NVC_EXIT_SEVERITY_FLAGS += --exit-severity=$(NVC_EXIT_SEVERITY)
+endif
+
 NVC_LOAD ?=
 # Wave dumping (FST + gtkw + arrays); enable with WAVES=1.
 NVC_WAVE_FLAGS ?=
@@ -142,7 +151,7 @@ endef
 
 # The cocotb run of the nvc flow, shared by nvc and nvc-run.
 define nvc_run
-	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(NVC_RUN_ARGS) $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
+	@$(NVC_RUN_ENV) $(COCOTB_ENV) nvc --work=nvcwork -H 1G -M 4G -r $(NVC_EXIT_SEVERITY_FLAGS) $(NVC_RUN_ARGS) $(TOP_LEVEL_ENT_LC) $(NVC_WAVE_FLAGS) --ieee-warnings=off $(NVC_LOAD)
 endef
 
 nvc: $(MOD)
