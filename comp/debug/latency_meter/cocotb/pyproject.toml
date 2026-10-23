@@ -1,0 +1,10 @@
+[project]
+name = "cocotb-latency_meter"
+version = "0.1.0"
+dependencies = [
+    "cocotb >= 2.0.0",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
