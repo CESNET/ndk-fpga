@@ -33,3 +33,10 @@ apps/*/build/*/*.log
 apps/*/build/*/*_par.*
 apps/*/build/*/*_synth.*
 apps/*/build/*/messages-*.txt
+
+# editor and scratch leftovers
+*.bak
+*.bak-*
+*.orig
+*.rej
+*~
