@@ -81,6 +81,28 @@ class MVBMonitorExt(MVBMonitor):
     ]
 
 
+async def reset_dut(dut):
+    """Perform a hardware reset sequence with idle RX interfaces.
+
+    Drives the RESET signal high for 8 clock cycles, then releases it.
+    Waits for one rising edge after reset release.
+    A failed previous test can leave RX_MFB_SRC_RDY and RX_MVB_SRC_RDY at 1.
+    Both are set to 0, so the DUT does not accept data of the previous test after the reset.
+
+    Call this function before the Testbench is created.
+    The reset removes all transactions of a previous test before the Testbench monitor starts.
+
+    Args:
+        dut: The Device Under Test (cocotb handle).
+    """
+    dut.RX_MFB_SRC_RDY.value = 0
+    dut.RX_MVB_SRC_RDY.value = 0
+    dut.RESET.value = 1
+    await ClockCycles(dut.CLK, 8)
+    dut.RESET.value = 0
+    await RisingEdge(dut.CLK)
+
+
 class Testbench:
     """Testbench for MFB_CHECKSUM_L3L4 component.
 
@@ -167,17 +189,6 @@ class Testbench:
             transaction.l4_csum = 0
             transaction.l4_csum_ok = 0
 
-    async def reset(self):
-        """Perform a hardware reset sequence.
-
-        Drives the RESET signal high for 8 clock cycles, then releases it.
-        Waits for one rising edge after reset release.
-        """
-        self.dut.RESET.value = 1
-        await ClockCycles(self.dut.CLK, 8)
-        self.dut.RESET.value = 0
-        await RisingEdge(self.dut.CLK)
-
     def model(self, pkt_dict):
         """Generate expected output transaction based on input packet.
 
@@ -220,7 +231,11 @@ class Testbench:
             actual_tr: The actual MvbTxResult transaction from the DUT.
         """
         if not self.expected_output:
-            cocotb.log.warning("No expected output available for comparison")
+            msg = "Transaction received without an expected output"
+            self.scoreboard_errors.append(msg)
+            cocotb.log.error(msg)
+            if self.stop_on_error:
+                raise AssertionError(msg)
             return
 
         # Get next expected result
@@ -438,17 +453,95 @@ class Testbench:
         # Adding the 1's complement of the sum gives a sum of 0xFFFF.
         dst_ip |= ~phdr_sum & 0xFFFF
 
+        payload = bytes(random.getrandbits(8) for _ in range(payload_len))
+        pkt = self.build_packet(ipv6_en, src_ip, dst_ip, l4_layer, payload, vlan_count)
+
+        return self.packet_to_dict(pkt, bytearray(raw(pkt)))
+
+    @staticmethod
+    def build_packet(ipv6_en: bool, src_ip: int, dst_ip: int, l4_layer, payload: bytes, vlan_count: int):
+        """Build an Ethernet packet with VLAN tags, IP, L4 header and payload, with all checksums calculated."""
+        import random
+
         if ipv6_en:
             ip_layer = IPv6(src=str(ipaddress.IPv6Address(src_ip)), dst=str(ipaddress.IPv6Address(dst_ip)))
         else:
             ip_layer = IP(src=str(ipaddress.IPv4Address(src_ip)), dst=str(ipaddress.IPv4Address(dst_ip)))
 
-        pkt = ip_layer / l4_layer / Raw(bytes(random.getrandbits(8) for _ in range(payload_len)))
+        pkt = ip_layer / l4_layer / Raw(payload)
         for _ in range(vlan_count):
             pkt = Dot1Q(vlan=random.randint(1, 4094)) / pkt
         pkt = Ether() / pkt
         # Rebuild the packet from bytes to calculate all checksums.
-        pkt = pkt.__class__(raw(pkt))
+        return pkt.__class__(raw(pkt))
+
+    async def generate_and_send_zero_csum_packet(self, min_len: int = 60, max_len: int = 1518) -> dict:
+        """Generate a packet with an L4 checksum of 0x0000 and send it via MFB/MVB buses.
+
+        Args:
+            min_len: Minimum packet length in bytes (default: 60).
+            max_len: Maximum packet length in bytes (default: 1518).
+
+        Returns:
+            dict: Dictionary with packet data and metadata for debugging.
+        """
+        pkt_dict = self.generate_zero_csum_packet(min_len, max_len)
+        await self.send_packet_with_metadata(pkt_dict)
+        return pkt_dict
+
+    def generate_zero_csum_packet(self, min_len: int = 60, max_len: int = 1518) -> dict:
+        """Generate a TCP or UDP packet with an L4 checksum of 0x0000.
+
+        The 1's complement sum of the pseudoheader and the L4 data is 0xFFFF, so the checksum is 0x0000.
+        A TCP packet carries the checksum 0x0000.
+        A UDP packet carries the checksum 0xFFFF, because 0x0000 means that the UDP checksum is not used.
+        Random packets have this property only once in about 65535 cases.
+
+        The packet is IPv4 or IPv6 and has 0-2 VLAN tags.
+        The first 16 bits of the payload are chosen to get the required sum.
+
+        Args:
+            min_len: Minimum packet length in bytes (default: 60).
+            max_len: Maximum packet length in bytes (default: 1518).
+
+        Returns:
+            dict: Dictionary with packet data and metadata in test-specific format.
+        """
+        import random
+
+        ipv6_en = random.choice([True, False])
+        if ipv6_en:
+            ip_hdr_len = 40
+            src_ip = random.getrandbits(128)
+            dst_ip = random.getrandbits(128)
+        else:
+            ip_hdr_len = 20
+            src_ip = random.getrandbits(32)
+            dst_ip = random.getrandbits(32)
+
+        udp_en = random.choice([True, False])
+        if udp_en:
+            l4_layer = UDP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535))
+        else:
+            l4_layer = TCP(sport=random.randint(1024, 65535), dport=random.randint(1, 65535))
+
+        vlan_count = random.choice([0, 1, 2])
+        hdr_len = 14 + vlan_count * 4 + ip_hdr_len + len(raw(l4_layer))
+        payload_len = random.randint(max(2, min_len - hdr_len), max_len - hdr_len)
+        payload = bytearray(random.getrandbits(8) for _ in range(payload_len))
+
+        # The packet is first built with the first payload word set to 0x0000.
+        # Its checksum is the 1's complement of the sum of all other words.
+        # Adding this checksum as the first payload word gives a sum of 0xFFFF.
+        # For UDP, the checksum 0xFFFF from the 0x0000 replacement also gives a sum of 0xFFFF.
+        payload[0:2] = b"\x00\x00"
+        pkt = self.build_packet(ipv6_en, src_ip, dst_ip, l4_layer.copy(), bytes(payload), vlan_count)
+        payload[0:2] = (pkt[UDP].chksum if udp_en else pkt[TCP].chksum).to_bytes(2, "big")
+        pkt = self.build_packet(ipv6_en, src_ip, dst_ip, l4_layer, bytes(payload), vlan_count)
+
+        expected_chksum = 0xFFFF if udp_en else 0x0000
+        actual_chksum = pkt[UDP].chksum if udp_en else pkt[TCP].chksum
+        assert actual_chksum == expected_chksum, f"Generated L4 checksum 0x{actual_chksum:04X}, expected 0x{expected_chksum:04X}"
 
         return self.packet_to_dict(pkt, bytearray(raw(pkt)))
 

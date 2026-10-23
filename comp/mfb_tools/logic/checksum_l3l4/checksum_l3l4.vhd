@@ -117,6 +117,7 @@ entity MFB_CHECKSUM_L3L4 is
         TX_MVB_L3_CSUM_EN   : out std_logic_vector(MFB_REGIONS-1 downto 0);
 
         -- L4 checksum calculated value.
+        -- For UDP, the value 0x0000 is replaced by 0xFFFF (RFC 768).
         TX_MVB_L4_CSUM      : out std_logic_vector(MFB_REGIONS*16-1 downto 0);
         -- L4 checksum comparison result (OK).
         TX_MVB_L4_CSUM_OK   : out std_logic_vector(MFB_REGIONS-1 downto 0);

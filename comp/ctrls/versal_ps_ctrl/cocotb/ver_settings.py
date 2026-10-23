@@ -11,6 +11,9 @@ SETTINGS = {
     "default" : {
         "AXI_ADDR_WIDTH_INT" : "32",
         "AXI_ADDR_WIDTH"     : "49",
+        "AXI_ID_WIDTH"       : "6",
+        "AXI_ARUSER_WIDTH"   : "10",
+        "AXI_AWUSER_WIDTH"   : "10",
     },
 
     # Access through the NoC, the upper address bits are truncated to AXI_ADDR_WIDTH

@@ -8,7 +8,7 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 from cocotbext.ofm.ver.backpressure import BackpressureGenerator, BackpressureConfig
 
-from testbench import Testbench
+from testbench import Testbench, reset_dut
 
 
 @cocotb.test()
@@ -25,12 +25,12 @@ async def run_test_base(dut, pkt_count=4000, truncate_chance=0):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
     # Initialize testbench
     tb = Testbench(dut, debug=False)
-
-    # Run reset
-    await tb.reset()
-    cocotb.log.info("Reset completed")
 
     # Start backpressure (randomized DST_RDY)
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
@@ -75,12 +75,12 @@ async def run_test_phdr_zero(dut, pkt_count=200):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
     # Initialize testbench
     tb = Testbench(dut, debug=False)
-
-    # Run reset
-    await tb.reset()
-    cocotb.log.info("Reset completed")
 
     # Start backpressure (randomized DST_RDY)
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
@@ -88,6 +88,48 @@ async def run_test_phdr_zero(dut, pkt_count=200):
     # Generate and send packets
     for _ in range(pkt_count):
         await tb.generate_and_send_phdr_zero_packet(min_len=60, max_len=1518)
+
+    # Wait for all packets to be processed
+    while tb.mvb_tx_monitor.item_cnt < pkt_count:
+        await ClockCycles(dut.CLK, 10)
+
+    cocotb.log.info(f"Test completed: {tb.mvb_tx_monitor.item_cnt}/{pkt_count} packets processed")
+
+    # Check scoreboard results
+    if tb.scoreboard_errors:
+        raise AssertionError(f"Scoreboard comparison failed with {len(tb.scoreboard_errors)} errors")
+    cocotb.log.info(f"Scoreboard comparison passed: {tb.scoreboard_comparisons} transactions compared")
+
+
+@cocotb.test()
+async def run_test_zero_csum(dut, pkt_count=200):
+    """Test with packets that have an L4 checksum of 0x0000, random packet sizes 60-1518B.
+
+    TCP packets carry the checksum 0x0000 and UDP packets carry 0xFFFF.
+    The test checks that the DUT outputs the same checksum values.
+
+    Args:
+        dut: Device Under Test
+        pkt_count: Number of packets to send (default: 200)
+    """
+    cocotb.log.info("Starting MFB_CHECKSUM_L3L4 zero checksum test")
+
+    # Start clock generator
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
+
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
+    # Initialize testbench
+    tb = Testbench(dut, debug=False)
+
+    # Start backpressure (randomized DST_RDY)
+    tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
+
+    # Generate and send packets
+    for _ in range(pkt_count):
+        await tb.generate_and_send_zero_csum_packet(min_len=60, max_len=1518)
 
     # Wait for all packets to be processed
     while tb.mvb_tx_monitor.item_cnt < pkt_count:
@@ -121,13 +163,13 @@ async def run_test_corrupted_extreme(dut, pkt_count=5000, truncate_chance=0.9, l
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
 
+    # Run reset before the Testbench monitor starts
+    await reset_dut(dut)
+    cocotb.log.info("Reset completed")
+
     # Initialize testbench with disabled comparison logging
     tb = Testbench(dut, debug=False, log_comparisons=log_comparisons)
     tb.stop_on_error = False  # Continue test even on checksum mismatches
-
-    # Run reset
-    await tb.reset()
-    cocotb.log.info("Reset completed")
 
     # Start backpressure (randomized DST_RDY)
     tb.backpressure.start(BackpressureGenerator(BackpressureConfig(1, 5, 0.5)))
