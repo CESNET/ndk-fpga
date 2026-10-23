@@ -16,6 +16,10 @@ nfb = [
 #	"libnfb-ext-python @ ${NDK_SW_PYTHON_URL}ext/libnfb_ext_python",
 ]
 
+test = [
+	"pytest",
+]
+
 nfb_grpcio = [
 	"grpcio",
 	"pylibfdt",

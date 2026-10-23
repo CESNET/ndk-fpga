@@ -8,6 +8,7 @@ from typing import Tuple, Optional
 
 
 decadic_conversions = {
+    "f": 0.000_000_000_000_001,
     "p": 0.000_000_000_001,
     "n": 0.000_000_001,
     "u": 0.000_001,

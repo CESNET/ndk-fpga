@@ -70,7 +70,7 @@ class CQUser(SerializableHeader):
             'sop_ptr0', 'sop_ptr1', 'eop0', 'eop1', 'eop_ptr0', 'eop_ptr1', 'discontiune',
             'tph_present', 'tph_type', 'tph_sh_tag', 'parity'
         ],
-        [4, 4, 4, 4, 64, 1, 1, 2, 2, 1, 1, 4, 4, 1, 2, 4, 8, 64],
+        [4, 4, 4, 4, 64, 1, 1, 2, 2, 1, 1, 4, 4, 1, 2, 4, 16, 64],
     ))
 
 
@@ -81,4 +81,18 @@ class RCUser(SerializableHeader):
             'eop', 'eop0', 'eop1', 'eop2', 'eop3', 'discontinue', 'parity'
         ],
         [64, 4, 2, 2, 2, 2, 4, 4, 4, 4, 4, 1, 64],
+    ))
+
+
+class CQMfbMeta(SerializableHeader):
+    items = list(zip(
+        ['header', 'prefix', 'bar', 'firstBe', 'lastBe', 'tph_present', 'tph_type', 'tph_st_tag'],
+        [128, 32, 3, 4, 4, 1, 2, 8],
+    ))
+
+
+class RQMfbMeta(SerializableHeader):
+    items = list(zip(
+        ['header', 'prefix', 'firstBe', 'lastBe'],
+        [128, 32, 4, 4],
     ))
