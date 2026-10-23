@@ -556,10 +556,12 @@ begin
 
     s_mid_wr_pdata <= s_mid_wr_addr & s_mid_wr_data & s_mid_wr_data_last;
 
+    -- The REG type loads its data registers from its own state, so the ready of the HBM port
+    -- reaches a few FSM flip-flops instead of the CE of every payload bit, which missed timing.
     wr_req_pipe_i : entity work.PIPE
     generic map (
         DATA_WIDTH => AXI_ADDR_WIDTH+USR_DATA_WIDTH+1,
-        USE_OUTREG => True,
+        PIPE_TYPE  => "REG",
         FAKE_PIPE  => False,
         DEVICE     => DEVICE
     ) port map (
@@ -601,7 +603,7 @@ begin
     rd_req_pipe_i : entity work.PIPE
     generic map (
         DATA_WIDTH => AXI_ADDR_WIDTH,
-        USE_OUTREG => True,
+        PIPE_TYPE  => "REG",
         FAKE_PIPE  => False,
         DEVICE     => DEVICE
     ) port map (
