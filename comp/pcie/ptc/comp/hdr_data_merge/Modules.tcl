@@ -12,6 +12,7 @@ set SUM_ONE_BASE       "$OFM_PATH/comp/base/logic/sum_one"
 set DEC_BASE           "$OFM_PATH/comp/base/logic/dec1fn"
 set FIFOX_MULTI_BASE   "$OFM_PATH/comp/base/fifo/fifox_multi"
 set MVB_SHAKEDOWN_BASE "$OFM_PATH/comp/mvb_tools/flow/shakedown"
+set MFB_FIFOX_BASE     "$OFM_PATH/comp/mfb_tools/storage/fifox"
 
 # Packages
 set PACKAGES "$PACKAGES $OFM_PATH/comp/base/pkg/math_pack.vhd"
@@ -25,6 +26,7 @@ set COMPONENTS [concat $COMPONENTS [list \
    [list "DEC1FN2B"       $DEC_BASE           "FULL" ] \
    [list "FIFOX_MULTI"    $FIFOX_MULTI_BASE   "FULL" ] \
    [list "MVB_SHAKEDOWN"  $MVB_SHAKEDOWN_BASE "FULL" ] \
+   [list "MFB_FIFOX"      $MFB_FIFOX_BASE     "FULL" ] \
 ]]
 
 # Source files for implemented component
