@@ -1159,11 +1159,14 @@ is no such start, so the flags describe everything since the last <code class="d
 <section id="python-api">
 <h3>Python API<a class="headerlink" href="#python-api" title="Link to this heading"></a></h3>
 <p>The same data is available to scripts:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.pcie.telemetry</span> <span class="kn">import</span> <span class="n">PcieTelemetry</span><span class="p">,</span> <span class="n">format_report</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.pcie.telemetry</span> <span class="kn">import</span> <span class="n">PcieTelemetry</span><span class="p">,</span> <span class="n">format_report</span><span class="p">,</span> <span class="n">summarize</span>
 
 <span class="n">telemetry</span> <span class="o">=</span> <span class="n">PcieTelemetry</span><span class="p">()</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">telemetry</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>          <span class="c1"># takes a snapshot and returns a dict</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">format_report</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>  <span class="c1"># or render it the same way the tool does</span>
+
+<span class="n">data</span><span class="p">,</span> <span class="n">seconds</span> <span class="o">=</span> <span class="n">telemetry</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># the values of a 1 s interval only</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summarize</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">seconds</span><span class="p">))</span>         <span class="c1"># the main values as a flat dict of numbers</span>
 
 <span class="n">telemetry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>                <span class="c1"># zero all counters</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">telemetry</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>          <span class="c1"># busy, lost_deltas, readout_overrun</span>

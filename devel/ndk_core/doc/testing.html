@@ -53,7 +53,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#steps-to-launch">Steps to launch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#usage">Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#end-of-test">End of test</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#automated-dma-throughput-sweeps-and-fw-comparison">Automated DMA throughput sweeps and FW comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automated-dma-throughput-sweeps-and-fw-comparison">Automated DMA throughput sweeps and FW comparison</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pcie-telemetry-for-each-frame-length">PCIe telemetry for each frame length</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -205,7 +208,7 @@ Add path before the script name if it is not in the current directory.</p>
 <h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
 <p>See the test modes and other options by running the script with the <code class="docutils literal notranslate"><span class="pre">-h</span></code> option:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ python gls_mod.py -h
-usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
+usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME] [--gen_rev_chan] [--ndp_sleep]
 
         Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -217,7 +220,7 @@ options:
                         select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0
 -l, --log               enable logging to a CSV file
 -L, --log_demo          enable for demo - logs to a TXT file in /tmp directory
--m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
+-m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
                         set the test mode; options:
 
                         +-------------+--------------------------------------------------------------------------------+
@@ -228,6 +231,9 @@ options:
                         | tx          | TX DMA --&gt; TX ETH     ==&gt; RX ETH --&gt; Black Hole; (ETH loopback)                |
                         +-------------+--------------------------------------------------------------------------------+
                         | rxtx        | TX DMA --&gt; TX ETH     ==&gt; RX ETH --&gt; RX DMA;     (ETH loopback)                |
+                        +-------------+--------------------------------------------------------------------------------+
+                        | swloop      | HW Gen --&gt; TX ETH     ==&gt; RX ETH --&gt; RX DMA --&gt; (ndp-loopback, SW) --&gt; TX DMA  |
+                        |             | --&gt; Black Hole; (ETH loopback)                                                 |
                         +-------------+--------------------------------------------------------------------------------+
                         | dma_rx      | HW Gen --&gt; RX DMA     ###                                                      |
                         +-------------+--------------------------------------------------------------------------------+
@@ -253,16 +259,40 @@ options:
                         set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000
 -r {1,2}, --rate_layer {1,2}
                         measure the rate at ISO/OSI layer: 1 or 2; default: 2
+-T, --pcie_telemetry  record the PCIe telemetry once for each frame length, in the middle of its measurement;
+                        the data goes to pcie_telemetry_&lt;report name&gt;.jsonl and .txt in the current directory
+--pcie_telemetry_time PCIE_TELEMETRY_TIME
+                        set the length [s] of the PCIe telemetry measurement; default: 0.5
+--gen_rev_chan          the generator sends consecutive frames to channels with bit-reversed numbers
+                        (0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;
+                        needs the full channel range of each GLS, otherwise it is turned off
+--ndp_sleep             run the NDP tools without -P and -I 0: they sleep when the DMA queues are idle
+                        and print their statistics every second; default: -P -I 0
 </pre></div>
 </div>
 <p>When launched, the script performs a test or a continuous series of tests that generates data (in SW or using a generator in the design), sets datapaths, and measures throughput.
 When using TX DMA, the scripts uses the <code class="docutils literal notranslate"><span class="pre">ndp-generate</span></code> tool to generate and send packets via DMA into the FPGA FW.
 Other source of data can be one of the HW packet generators inside the GLS module (see <a class="reference internal" href="../../comp/mfb_tools/debug/gen_loop_switch/readme.html#gls-debug"><span class="std std-ref">GLS module documentation</span></a>).
 When using RX DMA, the script uses the <code class="docutils literal notranslate"><span class="pre">ndp-read</span></code> tool to accept packets from the FPGA.
+The script starts the NDP tools with <code class="docutils literal notranslate"><span class="pre">-P</span></code> and <code class="docutils literal notranslate"><span class="pre">-I</span> <span class="pre">0</span></code>, so they do not print statistics while they run.
+With <code class="docutils literal notranslate"><span class="pre">-P</span></code>, <code class="docutils literal notranslate"><span class="pre">ndp-read</span></code> and <code class="docutils literal notranslate"><span class="pre">ndp-loopback</span></code> poll the RX DMA queues without sleeping when they are empty.
+Without it, they can read fewer short frames than the FW delivers.
+<code class="docutils literal notranslate"><span class="pre">ndp-generate</span></code> gets the same options, but <code class="docutils literal notranslate"><span class="pre">-P</span></code> changes nothing there: it only affects the rate limit
+of <code class="docutils literal notranslate"><span class="pre">--speed</span></code>, which the script does not use, and the tool sleeps when the TX ring is full in both cases.
+With short frames, TX DMA modes measure the speed of <code class="docutils literal notranslate"><span class="pre">ndp-generate</span></code> rather than of the FW:
+the tool cannot fill the TX rings faster, with or without <code class="docutils literal notranslate"><span class="pre">-P</span></code>.
+In the SW loopback modes, <code class="docutils literal notranslate"><span class="pre">-P</span></code> speeds up short frames, but can slightly lower the speed of long frames.
+Compare only results measured with the same options.
+<code class="docutils literal notranslate"><span class="pre">--ndp_sleep</span></code> starts the tools without these options, as the earlier versions of the script did.
 Else packets are dropped in the RX DMA module, which can be observed using the <code class="docutils literal notranslate"><span class="pre">nfb-dma</span></code> tool.
 The <cite>dma_swloop</cite> mode instead uses the <code class="docutils literal notranslate"><span class="pre">ndp-loopback</span></code> tool. This tool receives packets from RX DMA
 and sends the same packets back through TX DMA in software. RX and TX DMA are therefore measured
 together, without the FW-internal loopback that <cite>dma_loop</cite> uses.
+The <cite>swloop</cite> mode uses <code class="docutils literal notranslate"><span class="pre">ndp-loopback</span></code> as well, but RX DMA receives the frames from the Ethernet
+loopback. TX DMA sends them back into the FPGA, where the GLS measures and drops them.
+In the modes over the Ethernet loopback, the report CSV also holds three counters for each frame
+length. They count the frames received by the Ethernet MACs, the frames that the MACs dropped,
+and the frames that RX DMA discarded.
 The variations of tests are set by the <cite>-m</cite>, <cite>–mode</cite> parameter (the only required one).
 One test run in the selected mode consists of multiple partial tests for different lengths of generated frames, defined by the <cite>-s</cite>, <cite>–frame_size</cite> parameter that expects three values in bytes like so: <cite>min max step</cite>.</p>
 <p>Some tests require an available DMA controller; test mode <cite>eth_gen</cite> can be used for NDK firmware without a DMA controller.
@@ -328,25 +358,36 @@ When <cite>-r</cite>, <cite>–repeat</cite> option is used, the script continue
 </section>
 <section id="automated-dma-throughput-sweeps-and-fw-comparison">
 <h3>Automated DMA throughput sweeps and FW comparison<a class="headerlink" href="#automated-dma-throughput-sweeps-and-fw-comparison" title="Link to this heading"></a></h3>
-<p>The companion script <code class="docutils literal notranslate"><span class="pre">dma_throughput_sweep.py</span></code> (in the same <code class="docutils literal notranslate"><span class="pre">./sw</span></code> directory) automates a full
-DMA throughput characterization by driving <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code> across the four DMA scenarios
-(<cite>dma_rx</cite>, <cite>dma_tx</cite>, <cite>dma_rxtx</cite>, <cite>dma_swloop</cite>) over a configurable range of frame lengths, and
-plots the results.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>-o<span class="w"> </span>results/
+<p>The companion script <code class="docutils literal notranslate"><span class="pre">gls_throughput_sweep.py</span></code> (in the same <code class="docutils literal notranslate"><span class="pre">./sw</span></code> directory) automates a full
+throughput characterization by driving <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code> across one suite of modes over a
+configurable range of frame lengths, and plots the results. <code class="docutils literal notranslate"><span class="pre">--suite</span></code> selects the suite:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dma</span></code> (default): <cite>dma_rx</cite>, <cite>dma_tx</cite>, <cite>dma_rxtx</cite> and <cite>dma_swloop</cite>. They measure the DMA path
+alone. The traffic is not limited by the Ethernet line rate, so the results show the capacity
+of the DMA path and compare FW builds.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">eth</span></code>: <cite>rx</cite>, <cite>tx</cite> and <cite>swloop</cite>. They measure the traffic over the Ethernet loopback, as an
+application sees it. The traffic comes at the line rate and the FW distributes the frames to
+the DMA channels. The results also hold the share of the frames that the RX path lost, and
+the sweep draws it in a separate chart.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>-o<span class="w"> </span>results/
+$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--suite<span class="w"> </span>eth<span class="w"> </span>--eth-rate<span class="w"> </span><span class="m">400</span><span class="w"> </span>-o<span class="w"> </span>results/
 </pre></div>
 </div>
+<p>Each run also saves the output of <code class="docutils literal notranslate"><span class="pre">nfb-info</span> <span class="pre">-v</span></code> as <code class="docutils literal notranslate"><span class="pre">nfb_info.txt</span></code> next to the results. It
+describes the firmware and the PCIe connection of the card.</p>
 <p>Every chart has four panels: RX DMA on the left, TX DMA on the right, the bit rate in Gbps in the
 top row and the frame rate in Mpps in the bottom row. The frame rate is derived from the bit rate
 and the frame length of the same measurement point.</p>
 <p>The measured frame lengths are set by <code class="docutils literal notranslate"><span class="pre">-s</span> <span class="pre">MIN</span> <span class="pre">MAX</span> <span class="pre">STEP</span></code>. A single value measures only that one
 frame length:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>-s<span class="w"> </span><span class="m">64</span><span class="w"> </span>-o<span class="w"> </span>results/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>-s<span class="w"> </span><span class="m">64</span><span class="w"> </span>-o<span class="w"> </span>results/
 </pre></div>
 </div>
 <p>Each run is tagged with the FW build identity (card name, project name/variant, and
 <code class="docutils literal notranslate"><span class="pre">build-revision</span></code>, all read from the Device Tree) so results are grouped per FW build. Two or
 more such runs (e.g. from different FW versions) can then be overlaid on common charts:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>compare<span class="w"> </span>results/&lt;fw_id_A&gt;<span class="w"> </span>results/&lt;fw_id_B&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>compare<span class="w"> </span>results/&lt;fw_id_A&gt;<span class="w"> </span>results/&lt;fw_id_B&gt;
 </pre></div>
 </div>
 <p>The <cite>compare</cite> subcommand warns if the compared runs used different frame-size ranges, channel
@@ -359,13 +400,20 @@ that physical line rate. At rate layer 2 the reported frame length already conta
 the reference curve subtracts the remaining per-frame overhead of 20 B (8 B preamble with SFD and
 12 B minimum interframe gap). At rate layer 1 the reported frame length contains that overhead
 already, so the reference curve equals the line rate:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--eth-rate<span class="w"> </span><span class="m">100</span><span class="w"> </span>-o<span class="w"> </span>results/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--eth-rate<span class="w"> </span><span class="m">100</span><span class="w"> </span>-o<span class="w"> </span>results/
 </pre></div>
 </div>
+<p>By default the generator sends consecutive frames to sequential channel numbers, so several
+consecutive frames go to the same DMA endpoint. With <code class="docutils literal notranslate"><span class="pre">--gen-rev-chan</span></code> the sweep passes
+<code class="docutils literal notranslate"><span class="pre">--gen_rev_chan</span></code> to <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code>. The generator then uses bit-reversed channel numbers
+(0, 16, 8, 24, … for 32 channels), so consecutive frames alternate between the DMA endpoints.
+The bit reversal needs all channels of each GLS, so <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code> turns it off when <code class="docutils literal notranslate"><span class="pre">-c</span></code>
+selects only a part of them. The results record this setting, and <code class="docutils literal notranslate"><span class="pre">compare</span></code> warns when it
+differs between the compared runs.</p>
 <p>The script can also configure the kernel DMA buffer count/size (DMA Medusa only) via the
 <code class="docutils literal notranslate"><span class="pre">nfb-dma</span></code> tool before starting the sweep, using the <code class="docutils literal notranslate"><span class="pre">--buffer-count</span></code> and <code class="docutils literal notranslate"><span class="pre">--buffer-size</span></code>
 options:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>dma_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--buffer-count<span class="w"> </span><span class="m">4096</span><span class="w"> </span>--buffer-size<span class="w"> </span><span class="m">2048</span><span class="w"> </span>-o<span class="w"> </span>results/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--buffer-count<span class="w"> </span><span class="m">4096</span><span class="w"> </span>--buffer-size<span class="w"> </span><span class="m">2048</span><span class="w"> </span>-o<span class="w"> </span>results/
 </pre></div>
 </div>
 <p>This runs <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">nfb-dma</span> <span class="pre">-d</span> <span class="pre">&lt;device&gt;</span> <span class="pre">-C</span> <span class="pre">&lt;buffer_count&gt;</span> <span class="pre">-B</span> <span class="pre">&lt;buffer_size&gt;</span></code> once, before any
@@ -385,6 +433,46 @@ started, in a log file named after the tool (<code class="docutils literal notra
 <code class="docutils literal notranslate"><span class="pre">ndp-generate.log</span></code>). <code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code> writes them next to its own <code class="docutils literal notranslate"><span class="pre">report_*.csv</span></code>. A curve with
 unexpected values can then be checked against the output of the tool. The next run of the same
 mode rewrites the logs, so copy the files you need to keep.</p>
+<section id="pcie-telemetry-for-each-frame-length">
+<h4>PCIe telemetry for each frame length<a class="headerlink" href="#pcie-telemetry-for-each-frame-length" title="Link to this heading"></a></h4>
+<p>Both scripts can also record the PCIe telemetry. The PCIe telemetry is a firmware component
+that counts how the PCIe buses are used and why the PCIe transfers stop (see the
+<code class="docutils literal notranslate"><span class="pre">PCIE_TELEMETRY</span></code> documentation and the <code class="docutils literal notranslate"><span class="pre">nfb-pcie-telemetry</span></code> tool). The firmware must
+contain this component. The telemetry also needs the <code class="docutils literal notranslate"><span class="pre">ofm</span></code> Python package of this repository
+(<code class="docutils literal notranslate"><span class="pre">python/ofm</span></code>). Without the telemetry options the scripts run with an older <code class="docutils literal notranslate"><span class="pre">ofm</span></code> package too.</p>
+<p><code class="docutils literal notranslate"><span class="pre">gls_mod.py</span> <span class="pre">-T</span></code> measures the telemetry once for each frame length. The measurement starts
+after half of the speed measurements of that frame length are done. The traffic keeps running
+during the telemetry measurement, so the telemetry describes the same steady traffic as the
+speed values. <code class="docutils literal notranslate"><span class="pre">--pcie_telemetry_time</span></code> sets the length of one telemetry measurement (default
+0.5 s). This time is added to the test time of every frame length. The results go to two files
+next to the report CSV:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Content</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pcie_telemetry_&lt;report</span> <span class="pre">name&gt;.jsonl</span></code></p></td>
+<td><p>One JSON object per line, one line per frame length. It holds the frame length, the raw
+data of each telemetry component and a flat summary of the main values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pcie_telemetry_&lt;report</span> <span class="pre">name&gt;.txt</span></code></p></td>
+<td><p>The same report that <code class="docutils literal notranslate"><span class="pre">nfb-pcie-telemetry</span></code> prints, once for each frame length.</p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">gls_throughput_sweep.py</span> <span class="pre">run</span> <span class="pre">--pcie-telemetry</span> <span class="pre">[SECONDS]</span></code> passes the option to
+<code class="docutils literal notranslate"><span class="pre">gls_mod.py</span></code>. SECONDS sets the length of one telemetry measurement (default 0.5 s). The script
+then saves the summaries of all modes into <code class="docutils literal notranslate"><span class="pre">pcie_telemetry_&lt;fw_id&gt;.csv</span></code>, one row per mode and
+frame length. For each mode it also saves the chart <code class="docutils literal notranslate"><span class="pre">pcie_telemetry_&lt;mode&gt;_&lt;fw_id&gt;.png</span></code>. The
+chart has one row of panels for each PCIe endpoint. The left panel shows how much of each bus
+was used. The right panel shows why the PCIe transfer stopped. The full text reports stay in
+<code class="docutils literal notranslate"><span class="pre">raw/&lt;mode&gt;/</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python3<span class="w"> </span>gls_throughput_sweep.py<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>/dev/nfb0<span class="w"> </span>--pcie-telemetry<span class="w"> </span>-o<span class="w"> </span>results/
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 </section>

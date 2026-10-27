@@ -249,11 +249,14 @@ The same data is available to scripts:
 
 .. code-block:: python
 
-    from ofm.comp.pcie.telemetry import PcieTelemetry, format_report
+    from ofm.comp.pcie.telemetry import PcieTelemetry, format_report, summarize
 
     telemetry = PcieTelemetry()
     data = telemetry.read()          # takes a snapshot and returns a dict
     print(format_report(data, 1.0))  # or render it the same way the tool does
+
+    data, seconds = telemetry.measure(1.0)  # the values of a 1 s interval only
+    print(summarize(data, seconds))         # the main values as a flat dict of numbers
 
     telemetry.clear()                # zero all counters
     print(telemetry.status)          # busy, lost_deltas, readout_overrun
