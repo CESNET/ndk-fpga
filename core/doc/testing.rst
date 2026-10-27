@@ -78,7 +78,7 @@ See the test modes and other options by running the script with the ``-h`` optio
 .. code-block:: text
 
     $ python gls_mod.py -h
-    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}]
+    usage: gls_mod.py [-h] [-d DEVICE] [-i [INDEX]] [-l] [-L] -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop} [-c CHANNELS] [-s MIN MAX STEP] [-R] [-e] [-C TEST_CYCLES] [-f FREQUENCY] [-r {1,2}] [-T] [--pcie_telemetry_time PCIE_TELEMETRY_TIME] [--gen_rev_chan] [--ndp_sleep]
 
             Uses the GEN_LOOP_SWITCH (SW+FW) module to perform throughput measurements.
 
@@ -90,7 +90,7 @@ See the test modes and other options by running the script with the ``-h`` optio
                             select index(es) of GLS in the Device Tree, e.g.: 0,1; -1 = all available; default: 0
     -l, --log               enable logging to a CSV file
     -L, --log_demo          enable for demo - logs to a TXT file in /tmp directory
-    -m {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
+    -m {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}, --mode {eth_gen,rx,tx,rxtx,swloop,dma_rx,dma_tx,dma_rxtx,dma_loop,dma_swloop}
                             set the test mode; options:
 
                             +-------------+--------------------------------------------------------------------------------+
@@ -101,6 +101,9 @@ See the test modes and other options by running the script with the ``-h`` optio
                             | tx          | TX DMA --> TX ETH     ==> RX ETH --> Black Hole; (ETH loopback)                |
                             +-------------+--------------------------------------------------------------------------------+
                             | rxtx        | TX DMA --> TX ETH     ==> RX ETH --> RX DMA;     (ETH loopback)                |
+                            +-------------+--------------------------------------------------------------------------------+
+                            | swloop      | HW Gen --> TX ETH     ==> RX ETH --> RX DMA --> (ndp-loopback, SW) --> TX DMA  |
+                            |             | --> Black Hole; (ETH loopback)                                                 |
                             +-------------+--------------------------------------------------------------------------------+
                             | dma_rx      | HW Gen --> RX DMA     ###                                                      |
                             +-------------+--------------------------------------------------------------------------------+
@@ -126,15 +129,39 @@ See the test modes and other options by running the script with the ``-h`` optio
                             set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000
     -r {1,2}, --rate_layer {1,2}
                             measure the rate at ISO/OSI layer: 1 or 2; default: 2
+    -T, --pcie_telemetry  record the PCIe telemetry once for each frame length, in the middle of its measurement;
+                            the data goes to pcie_telemetry_<report name>.jsonl and .txt in the current directory
+    --pcie_telemetry_time PCIE_TELEMETRY_TIME
+                            set the length [s] of the PCIe telemetry measurement; default: 0.5
+    --gen_rev_chan          the generator sends consecutive frames to channels with bit-reversed numbers
+                            (0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;
+                            needs the full channel range of each GLS, otherwise it is turned off
+    --ndp_sleep             run the NDP tools without -P and -I 0: they sleep when the DMA queues are idle
+                            and print their statistics every second; default: -P -I 0
 
 When launched, the script performs a test or a continuous series of tests that generates data (in SW or using a generator in the design), sets datapaths, and measures throughput.
 When using TX DMA, the scripts uses the ``ndp-generate`` tool to generate and send packets via DMA into the FPGA FW.
 Other source of data can be one of the HW packet generators inside the GLS module (see :ref:`GLS module documentation <gls_debug>`).
 When using RX DMA, the script uses the ``ndp-read`` tool to accept packets from the FPGA.
+The script starts the NDP tools with ``-P`` and ``-I 0``, so they do not print statistics while they run.
+With ``-P``, ``ndp-read`` and ``ndp-loopback`` poll the RX DMA queues without sleeping when they are empty.
+Without it, they can read fewer short frames than the FW delivers.
+``ndp-generate`` gets the same options, but ``-P`` changes nothing there: it only affects the rate limit
+of ``--speed``, which the script does not use, and the tool sleeps when the TX ring is full in both cases.
+With short frames, TX DMA modes measure the speed of ``ndp-generate`` rather than of the FW:
+the tool cannot fill the TX rings faster, with or without ``-P``.
+In the SW loopback modes, ``-P`` speeds up short frames, but can slightly lower the speed of long frames.
+Compare only results measured with the same options.
+``--ndp_sleep`` starts the tools without these options, as the earlier versions of the script did.
 Else packets are dropped in the RX DMA module, which can be observed using the ``nfb-dma`` tool.
 The `dma_swloop` mode instead uses the ``ndp-loopback`` tool. This tool receives packets from RX DMA
 and sends the same packets back through TX DMA in software. RX and TX DMA are therefore measured
 together, without the FW-internal loopback that `dma_loop` uses.
+The `swloop` mode uses ``ndp-loopback`` as well, but RX DMA receives the frames from the Ethernet
+loopback. TX DMA sends them back into the FPGA, where the GLS measures and drops them.
+In the modes over the Ethernet loopback, the report CSV also holds three counters for each frame
+length. They count the frames received by the Ethernet MACs, the frames that the MACs dropped,
+and the frames that RX DMA discarded.
 The variations of tests are set by the `-m`, `--mode` parameter (the only required one).
 One test run in the selected mode consists of multiple partial tests for different lengths of generated frames, defined by the `-s`, `--frame_size` parameter that expects three values in bytes like so: `min max step`.
 
@@ -208,14 +235,25 @@ When `-r`, `--repeat` option is used, the script continues to run tests until in
 Automated DMA throughput sweeps and FW comparison
 **************************************************
 
-The companion script ``dma_throughput_sweep.py`` (in the same ``./sw`` directory) automates a full
-DMA throughput characterization by driving ``gls_mod.py`` across the four DMA scenarios
-(`dma_rx`, `dma_tx`, `dma_rxtx`, `dma_swloop`) over a configurable range of frame lengths, and
-plots the results.
+The companion script ``gls_throughput_sweep.py`` (in the same ``./sw`` directory) automates a full
+throughput characterization by driving ``gls_mod.py`` across one suite of modes over a
+configurable range of frame lengths, and plots the results. ``--suite`` selects the suite:
+
+- ``dma`` (default): `dma_rx`, `dma_tx`, `dma_rxtx` and `dma_swloop`. They measure the DMA path
+  alone. The traffic is not limited by the Ethernet line rate, so the results show the capacity
+  of the DMA path and compare FW builds.
+- ``eth``: `rx`, `tx` and `swloop`. They measure the traffic over the Ethernet loopback, as an
+  application sees it. The traffic comes at the line rate and the FW distributes the frames to
+  the DMA channels. The results also hold the share of the frames that the RX path lost, and
+  the sweep draws it in a separate chart.
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --suite eth --eth-rate 400 -o results/
+
+Each run also saves the output of ``nfb-info -v`` as ``nfb_info.txt`` next to the results. It
+describes the firmware and the PCIe connection of the card.
 
 Every chart has four panels: RX DMA on the left, TX DMA on the right, the bit rate in Gbps in the
 top row and the frame rate in Mpps in the bottom row. The frame rate is derived from the bit rate
@@ -226,7 +264,7 @@ frame length:
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 -s 64 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 -s 64 -o results/
 
 Each run is tagged with the FW build identity (card name, project name/variant, and
 ``build-revision``, all read from the Device Tree) so results are grouped per FW build. Two or
@@ -234,7 +272,7 @@ more such runs (e.g. from different FW versions) can then be overlaid on common 
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
+    $ python3 gls_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
 
 The `compare` subcommand warns if the compared runs used different frame-size ranges, channel
 counts, cycles, clock frequency, rate layer, DMA buffer settings, or Ethernet rate, since those
@@ -250,7 +288,15 @@ already, so the reference curve equals the line rate:
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --eth-rate 100 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --eth-rate 100 -o results/
+
+By default the generator sends consecutive frames to sequential channel numbers, so several
+consecutive frames go to the same DMA endpoint. With ``--gen-rev-chan`` the sweep passes
+``--gen_rev_chan`` to ``gls_mod.py``. The generator then uses bit-reversed channel numbers
+(0, 16, 8, 24, ... for 32 channels), so consecutive frames alternate between the DMA endpoints.
+The bit reversal needs all channels of each GLS, so ``gls_mod.py`` turns it off when ``-c``
+selects only a part of them. The results record this setting, and ``compare`` warns when it
+differs between the compared runs.
 
 The script can also configure the kernel DMA buffer count/size (DMA Medusa only) via the
 ``nfb-dma`` tool before starting the sweep, using the ``--buffer-count`` and ``--buffer-size``
@@ -258,7 +304,7 @@ options:
 
 .. code-block:: bash
 
-    $ python3 dma_throughput_sweep.py run -d /dev/nfb0 --buffer-count 4096 --buffer-size 2048 -o results/
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --buffer-count 4096 --buffer-size 2048 -o results/
 
 This runs ``sudo nfb-dma -d <device> -C <buffer_count> -B <buffer_size>`` once, before any
 measurement starts, and may prompt for a sudo password. The setting is global to the device and
@@ -278,3 +324,42 @@ started, in a log file named after the tool (``ndp-read.log``, ``ndp-loopback.lo
 ``ndp-generate.log``). ``gls_mod.py`` writes them next to its own ``report_*.csv``. A curve with
 unexpected values can then be checked against the output of the tool. The next run of the same
 mode rewrites the logs, so copy the files you need to keep.
+
+PCIe telemetry for each frame length
+""""""""""""""""""""""""""""""""""""
+
+Both scripts can also record the PCIe telemetry. The PCIe telemetry is a firmware component
+that counts how the PCIe buses are used and why the PCIe transfers stop (see the
+``PCIE_TELEMETRY`` documentation and the ``nfb-pcie-telemetry`` tool). The firmware must
+contain this component. The telemetry also needs the ``ofm`` Python package of this repository
+(``python/ofm``). Without the telemetry options the scripts run with an older ``ofm`` package too.
+
+``gls_mod.py -T`` measures the telemetry once for each frame length. The measurement starts
+after half of the speed measurements of that frame length are done. The traffic keeps running
+during the telemetry measurement, so the telemetry describes the same steady traffic as the
+speed values. ``--pcie_telemetry_time`` sets the length of one telemetry measurement (default
+0.5 s). This time is added to the test time of every frame length. The results go to two files
+next to the report CSV:
+
+.. list-table::
+    :header-rows: 1
+
+    * - File
+      - Content
+    * - ``pcie_telemetry_<report name>.jsonl``
+      - One JSON object per line, one line per frame length. It holds the frame length, the raw
+        data of each telemetry component and a flat summary of the main values.
+    * - ``pcie_telemetry_<report name>.txt``
+      - The same report that ``nfb-pcie-telemetry`` prints, once for each frame length.
+
+``gls_throughput_sweep.py run --pcie-telemetry [SECONDS]`` passes the option to
+``gls_mod.py``. SECONDS sets the length of one telemetry measurement (default 0.5 s). The script
+then saves the summaries of all modes into ``pcie_telemetry_<fw_id>.csv``, one row per mode and
+frame length. For each mode it also saves the chart ``pcie_telemetry_<mode>_<fw_id>.png``. The
+chart has one row of panels for each PCIe endpoint. The left panel shows how much of each bus
+was used. The right panel shows why the PCIe transfer stopped. The full text reports stay in
+``raw/<mode>/``.
+
+.. code-block:: bash
+
+    $ python3 gls_throughput_sweep.py run -d /dev/nfb0 --pcie-telemetry -o results/

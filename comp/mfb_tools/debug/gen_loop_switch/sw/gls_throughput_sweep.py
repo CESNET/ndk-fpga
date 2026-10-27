@@ -3,23 +3,32 @@
 # Author(s): Jakub Cabal <cabal@cesnet.cz>
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Automated DMA throughput sweep and FW-to-FW comparison, built on top of gls_mod.py.
+"""Automated throughput sweep and FW-to-FW comparison, built on top of gls_mod.py.
 
-Drives gls_mod.py for the four DMA scenarios (RX DMA only, TX DMA only, RX+TX DMA
-independent, RX+TX DMA connected through a SW loopback) across a range of frame
-lengths, tags each run with the FW build identity read from the Device Tree, and
-plots the results. Every chart shows the bit rate in Gbps and the frame rate in Mpps.
+Drives gls_mod.py for one suite of modes across a range of frame lengths, tags each run
+with the FW build identity read from the Device Tree, and plots the results. Every chart
+shows the bit rate in Gbps and the frame rate in Mpps.
+
+- The "dma" suite (default) measures the DMA path alone: RX DMA only, TX DMA only, RX+TX
+  DMA independent and RX+TX DMA connected through a SW loopback. The GLS generator is
+  directly in front of RX DMA and the Ethernet is not used.
+- The "eth" suite measures the traffic over the Ethernet loopback: RX DMA from the
+  Ethernet, TX DMA to the Ethernet and a SW loopback from RX DMA to TX DMA. The traffic
+  is limited by the line rate, the FW distributes the frames to the DMA channels, and the
+  results also hold the frames that the RX path lost.
+
 A separate "compare" mode overlays several such runs (e.g. two different FW builds) on
 common charts, which shows how the throughput changed between FW versions.
 
 Two-step workflow:
-    ./dma_throughput_sweep.py run     -d /dev/nfb0 -o results/
-    ./dma_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
+    ./gls_throughput_sweep.py run     -d /dev/nfb0 -o results/
+    ./gls_throughput_sweep.py compare results/<fw_id_A> results/<fw_id_B>
 """
 
 import argparse
 import csv
 import datetime
+import json
 import re
 import socket
 import subprocess
@@ -46,20 +55,30 @@ matplotlib.use("Agg") # headless: charts are written to files, never shown in a 
 # Shared constants
 # ==============================================================================
 
-# The four DMA scenarios this script automates, mapped onto gls_mod.py's own
-# "-m/--mode" values so measurement logic (mux config, speed meters, NDP tools)
-# lives in exactly one place.
-DMA_MODES = ["dma_rx", "dma_tx", "dma_rxtx", "dma_swloop"]
+# The suites of modes this script automates, mapped onto gls_mod.py's own "-m/--mode"
+# values so measurement logic (mux config, speed meters, NDP tools) lives in exactly one place.
+SUITES = {
+    "dma": ["dma_rx", "dma_tx", "dma_rxtx", "dma_swloop"],
+    "eth": ["rx", "tx", "swloop"],
+}
+SUITE_TITLES = {
+    "dma": "DMA throughput sweep",
+    "eth": "Throughput sweep over the Ethernet loopback",
+}
+ALL_MODES = [mode for modes in SUITES.values() for mode in modes]
 
 MODE_LABELS = {
     "dma_rx": "RX DMA only",
     "dma_tx": "TX DMA only",
     "dma_rxtx": "RX+TX DMA independent",
     "dma_swloop": "RX+TX DMA (SW loopback)",
+    "rx": "RX DMA from ETH",
+    "tx": "TX DMA to ETH",
+    "swloop": "ETH to RX DMA, SW loopback, TX DMA",
 }
 
 # Categorical palette, fixed order (not cycled) so a given mode/run always maps to
-# the same color across plots. First 4 slots reused for the 4 DMA modes; the full
+# the same color across plots. The modes of each suite start at the first slot; the full
 # 8 are available as the categorical order when "compare" overlays multiple runs.
 CATEGORICAL_PALETTE = [
     "#2a78d6",  # blue
@@ -72,7 +91,7 @@ CATEGORICAL_PALETTE = [
     "#e34948",  # red
 ]
 
-MODE_COLORS = dict(zip(DMA_MODES, CATEGORICAL_PALETTE))
+MODE_COLORS = {mode: CATEGORICAL_PALETTE[i] for modes in SUITES.values() for i, mode in enumerate(modes)}
 
 CHART_STYLE = {
     "surface": "#fcfcfb",
@@ -234,6 +253,7 @@ def read_fw_metadata(device_path: str) -> FwMetadata:
 @dataclass
 class RunParams:
     device: str
+    suite: str
     modes: List[str]
     size_min: int
     size_max: int
@@ -247,6 +267,9 @@ class RunParams:
     buffer_count: Optional[int]
     buffer_size: Optional[int]
     eth_rate: Optional[int]
+    pcie_telemetry_time: Optional[float] # None = PCIe telemetry is not recorded
+    gen_rev_chan: bool
+    ndp_sleep: bool
 
     def chart_config(self) -> Dict[str, object]:
         """The settings shown in the chart subtitle, keyed exactly like the metadata
@@ -260,6 +283,8 @@ class RunParams:
             "buffer_count": self.buffer_count,
             "buffer_size": self.buffer_size,
             "eth_rate": self.eth_rate,
+            "gen_rev_chan": "on" if self.gen_rev_chan else "off",
+            "ndp_perf": "off" if self.ndp_sleep else "on",
         }
 
 
@@ -308,13 +333,29 @@ def configure_dma_buffers(device: str, buffer_count: Optional[int], buffer_size:
         raise RuntimeError(f"'nfb-dma' buffer configuration failed (exit code {result.returncode})")
 
 
-def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams, workdir: Path) -> Path:
-    """Invoke gls_mod.py for a single mode and return the path to its report CSV."""
+def find_single_file(workdir: Path, pattern: str) -> Path:
+    """Return the only file in workdir that matches the pattern."""
+    matches = list(workdir.glob(pattern))
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"Expected exactly one {pattern} from gls_mod.py in {workdir}, found {len(matches)}"
+        )
+    return matches[0]
+
+
+def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams,
+                 workdir: Path) -> Tuple[Path, Optional[Path]]:
+    """Invoke gls_mod.py for a single mode.
+
+    Returns the path to its report CSV and the path to its PCIe telemetry file. The second
+    path is None when the PCIe telemetry is not recorded.
+    """
     workdir.mkdir(parents=True, exist_ok=True)
-    # Remove what a previous sweep left here, so the report CSV and the NDP logs read
-    # afterwards can only describe this run.
-    for old_file in list(workdir.glob("report_*.csv")) + list(workdir.glob("ndp-*.log")):
-        old_file.unlink()
+    # Remove what a previous sweep left here, so the report CSV, the PCIe telemetry and
+    # the NDP logs read afterwards can only describe this run.
+    for pattern in ("report_*.csv", "ndp-*.log", "pcie_telemetry_*"):
+        for old_file in workdir.glob(pattern):
+            old_file.unlink()
 
     cmd = [
         sys.executable, str(gls_mod_path),
@@ -332,6 +373,12 @@ def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams, workdir: Path
         cmd += ["-i", params.index]
     if params.ext_loop:
         cmd += ["-e"]
+    if params.pcie_telemetry_time is not None:
+        cmd += ["-T", "--pcie_telemetry_time", str(params.pcie_telemetry_time)]
+    if params.gen_rev_chan:
+        cmd += ["--gen_rev_chan"]
+    if params.ndp_sleep:
+        cmd += ["--ndp_sleep"]
 
     print(f"\n==== Running gls_mod.py mode '{mode}' ({MODE_LABELS[mode]}) ====")
     print("$ " + " ".join(cmd))
@@ -339,20 +386,54 @@ def run_gls_mode(gls_mod_path: Path, mode: str, params: RunParams, workdir: Path
     if result.returncode != 0:
         raise RuntimeError(f"gls_mod.py failed for mode '{mode}' (exit code {result.returncode})")
 
-    reports = list(workdir.glob("report_*.csv"))
-    if len(reports) != 1:
-        raise RuntimeError(
-            f"Expected exactly one report_*.csv from gls_mod.py in {workdir}, found {len(reports)}"
-        )
-    return reports[0]
+    report = find_single_file(workdir, "report_*.csv")
+    telemetry = None
+    if params.pcie_telemetry_time is not None:
+        telemetry = find_single_file(workdir, "pcie_telemetry_*.jsonl")
+    return report, telemetry
+
+
+# Columns of the gls_mod.py report and the short names this script uses for them.
+REPORT_COLUMNS = {
+    "Length": "length",
+    "TX APP speed": "tx_bps",
+    "RX APP speed": "rx_bps",
+    "ETH RX frames": "eth_rx_frames",
+    "ETH RX dropped": "eth_rx_dropped",
+    "RX DMA discarded": "rx_dma_discarded",
+}
+LOSS_COLUMNS = ["eth_rx_frames", "eth_rx_dropped", "rx_dma_discarded"]
 
 
 def load_mode_report(csv_path: Path, mode: str) -> "pd.DataFrame":
-    """Load one gls_mod.py report, renaming its columns to this script's short names."""
-    df = pd.read_csv(csv_path)
-    df = df.rename(columns={"Length": "length", "TX APP speed": "tx_bps", "RX APP speed": "rx_bps"})
+    """Load one gls_mod.py report, renaming its columns to this script's short names.
+
+    The loss counters are empty in the modes without the Ethernet loopback. The share of
+    lost frames is then NaN.
+    """
+    df = pd.read_csv(csv_path).rename(columns=REPORT_COLUMNS)
     df["mode"] = mode
-    return add_frame_rate_columns(df[["mode", "length", "tx_bps", "rx_bps"]])
+    for column in LOSS_COLUMNS:
+        if column not in df.columns:
+            df[column] = np.nan
+    lost = df["eth_rx_dropped"] + df["rx_dma_discarded"]
+    df["rx_loss_pct"] = 100 * lost / df["eth_rx_frames"].where(df["eth_rx_frames"] > 0)
+    return add_frame_rate_columns(df[["mode", "length", "tx_bps", "rx_bps", *LOSS_COLUMNS, "rx_loss_pct"]])
+
+
+def load_mode_telemetry(jsonl_path: Path, mode: str) -> "pd.DataFrame":
+    """Load the PCIe telemetry of one mode as one row per frame length.
+
+    The row holds the flat summary that gls_mod.py stored for that frame length. The
+    columns are named like "ep0 PTC -> PCIe (RQ) used %".
+    """
+    rows = []
+    with open(jsonl_path) as f:
+        for line in f:
+            if line.strip():
+                record = json.loads(line)
+                rows.append({"mode": mode, "length": record["length"], **record["summary"]})
+    return pd.DataFrame(rows)
 
 
 def add_frame_rate_columns(df: "pd.DataFrame") -> "pd.DataFrame":
@@ -371,6 +452,7 @@ def write_results_csv(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, o
     out_path.parent.mkdir(parents=True, exist_ok=True)
     meta_rows = {
         **meta.as_dict(),
+        "suite": params.suite,
         "modes": ",".join(params.modes),
         "size_min": params.size_min,
         "size_max": params.size_max,
@@ -382,6 +464,9 @@ def write_results_csv(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, o
         "buffer_count": params.buffer_count if params.buffer_count is not None else "default",
         "buffer_size": params.buffer_size if params.buffer_size is not None else "default",
         "eth_rate": params.eth_rate if params.eth_rate is not None else "",
+        "pcie_telemetry_time": params.pcie_telemetry_time if params.pcie_telemetry_time is not None else "",
+        "gen_rev_chan": "on" if params.gen_rev_chan else "off",
+        "ndp_perf": "off" if params.ndp_sleep else "on",
         "hostname": socket.gethostname().partition(".")[0],
         "run_time_iso": datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
     }
@@ -496,6 +581,12 @@ def format_config_subtitle(config: Mapping[str, object]) -> str:
     eth_rate = config.get("eth_rate")
     if eth_rate not in (None, ""):
         parts.append(f"eth rate: {eth_rate}G")
+    gen_rev_chan = config.get("gen_rev_chan")
+    if gen_rev_chan not in (None, ""):
+        parts.append(f"bit-reversed channels: {gen_rev_chan}")
+    ndp_perf = config.get("ndp_perf")
+    if ndp_perf not in (None, ""):
+        parts.append(f"NDP -P -I 0: {ndp_perf}")
     return "   ".join(parts)
 
 
@@ -528,14 +619,14 @@ def save_figure(fig, title: str, subtitle: str, out_path: Path) -> None:
 
 
 def plot_run(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, out_path: Path) -> None:
-    """Plot a single run: one curve per measured DMA mode, RX and TX side by side."""
+    """Plot a single run: one curve per measured mode, RX and TX side by side."""
     fig, panels = new_panel_grid()
     x_min, x_max = df["length"].min(), df["length"].max()
 
     for column, title, metric, ax in panels:
         prepare_axes(ax)
         plot_line_rate_limit(ax, x_min, x_max, params.eth_rate, params.rate_layer, metric)
-        for mode in DMA_MODES:
+        for mode in params.modes:
             mode_rows = df[df["mode"] == mode]
             if mode_rows.empty or not has_data(mode_rows[column]):
                 continue
@@ -546,7 +637,101 @@ def plot_run(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, out_path: 
             )
         finish_axes(ax, title, metric)
 
-    save_figure(fig, f"DMA throughput sweep — {meta.label}",
+    save_figure(fig, f"{SUITE_TITLES[params.suite]} — {meta.label}",
+                format_config_subtitle(params.chart_config()), out_path)
+
+
+def plot_loss(df: "pd.DataFrame", meta: FwMetadata, params: RunParams, out_path: Path) -> bool:
+    """Plot the share of frames that the RX path lost, one curve per mode that counts it.
+
+    Returns False and writes nothing when no mode has the loss counters.
+    """
+    fig, ax = plt.subplots(figsize=(14, 5.5), facecolor=CHART_STYLE["surface"])
+    prepare_axes(ax)
+    plotted = False
+    for mode in params.modes:
+        mode_rows = df[(df["mode"] == mode) & df["rx_loss_pct"].notna()]
+        if mode_rows.empty:
+            continue
+        ax.plot(mode_rows["length"], mode_rows["rx_loss_pct"],
+                color=MODE_COLORS[mode], linewidth=2, label=MODE_LABELS[mode],
+                marker=point_marker(len(mode_rows)), markersize=6)
+        plotted = True
+    if not plotted:
+        plt.close(fig)
+        return False
+    ax.set_title("Frames lost by ETH RX and RX DMA", color=CHART_STYLE["ink_primary"], fontsize=12, loc="left")
+    ax.set_xlabel("Frame length [B]")
+    ax.set_ylabel("Lost frames [% of ETH RX frames]")
+    ax.set_ylim(0, max(ax.get_ylim()[1] * 1.05, 1))
+    ax.legend(frameon=False, loc="upper right", fontsize=9)
+    save_figure(fig, f"{SUITE_TITLES[params.suite]}: RX loss — {meta.label}",
+                format_config_subtitle(params.chart_config()), out_path)
+    return True
+
+
+def save_nfb_info(device: str, out_path: Path) -> None:
+    """Save the output of "nfb-info -v". It describes the firmware and the PCIe connection."""
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        result = subprocess.run(["nfb-info", "-v", "-d", device], capture_output=True, text=True)
+    except FileNotFoundError:
+        print("WARNING: nfb-info not found, the description of the card is not saved.")
+        return
+    if result.returncode != 0:
+        print(f"WARNING: nfb-info failed (exit code {result.returncode}), the description of the card is not saved.")
+        return
+    out_path.write_text(result.stdout)
+    print(f"Saved card description: {out_path}")
+
+
+# Columns of the PCIe telemetry summary that the telemetry charts show. Each pattern
+# captures the endpoint prefix and the name of the curve.
+TELEMETRY_BUS_USED = re.compile(r"^(.*ep\d+) (.+) used %$")
+TELEMETRY_STOP = re.compile(r"^(.*ep\d+) stop (.+) %$")
+
+
+def plot_telemetry(df: "pd.DataFrame", mode: str, meta: FwMetadata, params: RunParams,
+                   out_path: Path) -> None:
+    """Plot the PCIe telemetry of one mode against the frame length.
+
+    Each PCIe endpoint has one row of two panels. The left panel shows how much of each
+    bus was used. The right panel shows why the PCIe transfer stopped. Both are shares in %.
+    """
+    rows = df[df["mode"] == mode].sort_values("length")
+    endpoints: Dict[str, Dict[str, List[Tuple[str, str]]]] = {}
+    for column in rows.columns:
+        for kind, pattern in (("used", TELEMETRY_BUS_USED), ("stop", TELEMETRY_STOP)):
+            match = pattern.match(column)
+            if match:
+                panels = endpoints.setdefault(match.group(1), {"used": [], "stop": []})
+                panels[kind].append((column, match.group(2)))
+    if rows.empty or not endpoints:
+        return
+
+    panel_titles = {"used": "bus used", "stop": "why the PCIe transfer stopped"}
+    fig, axes = plt.subplots(len(endpoints), 2, figsize=(14, 6.5 * len(endpoints)),
+                             facecolor=CHART_STYLE["surface"], squeeze=False)
+    for row, (endpoint, panels) in enumerate(endpoints.items()):
+        for col, kind in enumerate(("used", "stop")):
+            ax = axes[row][col]
+            prepare_axes(ax)
+            for index, (column, label) in enumerate(panels[kind]):
+                ax.plot(rows["length"], rows[column],
+                        color=CATEGORICAL_PALETTE[index % len(CATEGORICAL_PALETTE)],
+                        linewidth=2, label=label,
+                        marker=point_marker(len(rows)), markersize=5)
+            ax.set_title(f"{endpoint}: {panel_titles[kind]}", color=CHART_STYLE["ink_primary"],
+                         fontsize=12, loc="left")
+            ax.set_xlabel("Frame length [B]")
+            ax.set_ylabel("Share of clock cycles [%]")
+            ax.set_ylim(0, max(ax.get_ylim()[1] * 1.05, 1))
+            if panels[kind]:
+                # Below the panel, because the curves can be anywhere between 0 and 100 %.
+                ax.legend(frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.12),
+                          ncol=2, fontsize=8)
+
+    save_figure(fig, f"PCIe telemetry — {MODE_LABELS[mode]} — {meta.label}",
                 format_config_subtitle(params.chart_config()), out_path)
 
 
@@ -556,10 +741,14 @@ def cmd_run(args: argparse.Namespace) -> None:
     if not gls_mod_path.exists():
         sys.exit(f"ERROR: gls_mod.py not found next to this script ({gls_mod_path})")
 
-    modes = args.modes.split(",") if args.modes else DMA_MODES
+    modes = args.modes.split(",") if args.modes else SUITES[args.suite]
     for m in modes:
-        if m not in DMA_MODES:
-            sys.exit(f"ERROR: unknown mode '{m}', expected one of: {', '.join(DMA_MODES)}")
+        if m not in SUITES[args.suite]:
+            sys.exit(f"ERROR: mode '{m}' is not in the '{args.suite}' suite, expected one of: "
+                     f"{', '.join(SUITES[args.suite])}")
+    if args.suite == "eth" and args.gen_rev_chan:
+        print("WARNING: --gen-rev-chan has no effect in the 'eth' suite. The FW distributes the "
+              "frames from the Ethernet to the DMA channels.")
 
     device = args.device or default_device_path()
 
@@ -567,6 +756,7 @@ def cmd_run(args: argparse.Namespace) -> None:
 
     params = RunParams(
         device=device,
+        suite=args.suite,
         modes=modes,
         size_min=size_min,
         size_max=size_max,
@@ -580,7 +770,18 @@ def cmd_run(args: argparse.Namespace) -> None:
         buffer_count=args.buffer_count,
         buffer_size=args.buffer_size,
         eth_rate=args.eth_rate,
+        pcie_telemetry_time=args.pcie_telemetry,
+        gen_rev_chan=args.gen_rev_chan,
+        ndp_sleep=args.ndp_sleep,
     )
+    if params.pcie_telemetry_time is not None and params.pcie_telemetry_time <= 0:
+        sys.exit("ERROR: --pcie-telemetry needs a time greater than 0 seconds")
+    if params.pcie_telemetry_time is not None:
+        # gls_mod.py runs with the same Python, so fail now and not after the first mode
+        try:
+            import ofm.comp.pcie.telemetry  # noqa: F401
+        except ImportError as e:
+            sys.exit(f"ERROR: --pcie-telemetry needs the ofm package of this repository (python/ofm): {e}")
     if params.size_step < 1 or not (64 <= params.size_min <= params.size_max <= 1518):
         sys.exit(f"ERROR: invalid frame size sweep '{params.size_min} {params.size_max} "
                  f"{params.size_step}' — expected 64 <= MIN <= MAX <= 1518 and STEP >= 1")
@@ -589,6 +790,8 @@ def cmd_run(args: argparse.Namespace) -> None:
     print(f"Frame sizes: {params.size_min}-{params.size_max} step {params.size_step} "
           f"({points_per_mode} points per mode, {len(modes)} modes)")
     print("This can take a while, roughly 1.5-2 s per point per mode.")
+    if params.pcie_telemetry_time is not None:
+        print(f"PCIe telemetry adds about {params.pcie_telemetry_time} s per point per mode.")
 
     meta = read_fw_metadata(device)
     if not meta.build_revision and not args.fw_label:
@@ -604,12 +807,16 @@ def cmd_run(args: argparse.Namespace) -> None:
 
     run_dir = Path(args.outdir) / meta.fw_id
     raw_dir = run_dir / "raw"
+    save_nfb_info(device, run_dir / "nfb_info.txt")
 
     frames = []
+    telemetry_frames = []
     try:
         for mode in modes:
-            csv_path = run_gls_mode(gls_mod_path, mode, params, raw_dir / mode)
+            csv_path, telemetry_path = run_gls_mode(gls_mod_path, mode, params, raw_dir / mode)
             frames.append(load_mode_report(csv_path, mode))
+            if telemetry_path is not None:
+                telemetry_frames.append(load_mode_telemetry(telemetry_path, mode))
     except KeyboardInterrupt:
         sys.exit("\nInterrupted, partial results (if any) were not saved.")
 
@@ -625,6 +832,22 @@ def cmd_run(args: argparse.Namespace) -> None:
         plot_path = run_dir / f"throughput_{meta.fw_id}.png"
         plot_run(df, meta, params, plot_path)
         print(f"Saved plot: {plot_path}")
+        loss_path = run_dir / f"rx_loss_{meta.fw_id}.png"
+        if plot_loss(df, meta, params, loss_path):
+            print(f"Saved plot: {loss_path}")
+
+    if telemetry_frames:
+        telemetry_df = pd.concat(telemetry_frames, ignore_index=True)
+        telemetry_csv = run_dir / f"pcie_telemetry_{meta.fw_id}.csv"
+        write_results_csv(telemetry_df, meta, params, telemetry_csv)
+        print(f"Saved PCIe telemetry summary: {telemetry_csv} "
+              f"(full reports: {raw_dir}/<mode>/pcie_telemetry_*.txt)")
+        if not args.skip_plots:
+            for mode in modes:
+                plot_path = run_dir / f"pcie_telemetry_{mode}_{meta.fw_id}.png"
+                plot_telemetry(telemetry_df, mode, meta, params, plot_path)
+                if plot_path.exists():
+                    print(f"Saved plot: {plot_path}")
 
     print(f"\nDone. To compare against another FW build, run this again with a different "
           f"FW loaded, then:\n  {Path(sys.argv[0]).name} compare {run_dir} <other_run_dir>")
@@ -634,9 +857,9 @@ def cmd_run(args: argparse.Namespace) -> None:
 # "compare" subcommand: overlay multiple runs produced by "run"
 # ==============================================================================
 
-COMPARABILITY_KEYS = ["card_name", "hostname", "size_min", "size_max", "size_step",
+COMPARABILITY_KEYS = ["card_name", "hostname", "suite", "size_min", "size_max", "size_step",
                       "channels", "cycles", "frequency", "rate_layer",
-                      "buffer_count", "buffer_size", "eth_rate"]
+                      "buffer_count", "buffer_size", "eth_rate", "gen_rev_chan", "ndp_perf"]
 
 
 def resolve_results_csv(path_arg: str) -> Path:
@@ -654,6 +877,11 @@ def resolve_results_csv(path_arg: str) -> Path:
 def check_comparability(all_meta: List[Dict[str, str]], labels: List[str]) -> None:
     """Warn about settings that differ between runs, since throughput is only
     comparable across FW builds when the card, host and sweep settings all match."""
+    # Runs without these fields measured the DMA suite with sequential channels, and their NDP
+    # tools ran without -P and -I 0.
+    all_meta = [{**m, "suite": m.get("suite") or "dma", "gen_rev_chan": m.get("gen_rev_chan") or "off",
+                 "ndp_perf": m.get("ndp_perf") or "off"}
+                for m in all_meta]
     for key in COMPARABILITY_KEYS:
         values = {m.get(key, "") for m in all_meta}
         if len(values) > 1:
@@ -684,7 +912,7 @@ def plot_compare(runs: List[Tuple[str, "pd.DataFrame"]], mode: str,
                     marker=point_marker(len(mode_rows)), markersize=6)
         finish_axes(ax, title, metric)
 
-    save_figure(fig, f"DMA throughput comparison — {MODE_LABELS[mode]}",
+    save_figure(fig, f"Throughput comparison — {MODE_LABELS[mode]}",
                 format_config_subtitle(meta), out_path)
 
 
@@ -720,7 +948,7 @@ def cmd_compare(args: argparse.Namespace) -> None:
     modes_by_run = [set(df["mode"].unique()) for _, df in runs]
     modes_present = sorted(
         set.union(*modes_by_run),
-        key=lambda m: DMA_MODES.index(m) if m in DMA_MODES else len(DMA_MODES),
+        key=lambda m: ALL_MODES.index(m) if m in ALL_MODES else len(ALL_MODES),
     )
     for mode in modes_present:
         missing = [label for (label, _), present in zip(runs, modes_by_run) if mode not in present]
@@ -728,7 +956,7 @@ def cmd_compare(args: argparse.Namespace) -> None:
             print(f"WARNING: mode '{mode}' is missing from run(s): {', '.join(missing)} "
                   f"— its comparison chart will only show the other run(s)")
 
-    outdir = Path(args.outdir) if args.outdir else Path("dma_throughput_results") / "compare"
+    outdir = Path(args.outdir) if args.outdir else Path("gls_throughput_results") / "compare"
     outdir.mkdir(parents=True, exist_ok=True)
     for mode in modes_present:
         out_path = outdir / f"compare_{mode}.png"
@@ -742,14 +970,14 @@ def cmd_compare(args: argparse.Namespace) -> None:
 
 def main() -> None:
     desc = (
-        "Automates DMA throughput sweeps using gls_mod.py across the four DMA scenarios\n"
-        "(RX DMA only, TX DMA only, RX+TX DMA independent, RX+TX DMA via SW loopback)\n"
-        "for a range of frame lengths, then plots the results. Every chart shows the bit\n"
-        "rate in Gbps and the frame rate in Mpps. Each run is tagged with the FW build\n"
+        "Automates throughput sweeps using gls_mod.py for a range of frame lengths, then\n"
+        "plots the results. The 'dma' suite measures the DMA path alone, the 'eth' suite the\n"
+        "traffic over the Ethernet loopback together with the lost frames. Every chart shows\n"
+        "the bit rate in Gbps and the frame rate in Mpps. Each run is tagged with the FW build\n"
         "identity so results from different FW versions can be compared."
     )
     parser = argparse.ArgumentParser(
-        prog="dma_throughput_sweep.py",
+        prog="gls_throughput_sweep.py",
         description=desc,
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -758,9 +986,13 @@ def main() -> None:
     p_run = sub.add_parser("run", help="perform a throughput sweep for the current FW")
     p_run.add_argument("-d", "--device", default=None,
                        help="target device; default: the nfb library default (usually /dev/nfb0)")
+    p_run.add_argument("--suite", choices=list(SUITES), default="dma",
+                       help="dma: the DMA path alone, modes " + ",".join(SUITES["dma"]) + "\n"
+                            "eth: the traffic over the Ethernet loopback, modes " + ",".join(SUITES["eth"]) + "\n"
+                            "default: dma")
     p_run.add_argument("-m", "--modes", default=None,
-                       help="comma-separated subset of modes to run: " + ",".join(DMA_MODES) +
-                             "; default: all four")
+                       help="comma-separated subset of the modes of the selected suite;\n"
+                            "default: all modes of the suite")
     p_run.add_argument("-s", "--frame_size", nargs="+", type=int, metavar="N",
                        default=[64, 1518, 4],
                        help="frame size sweep in bytes as 'MIN MAX STEP', or a single frame\n"
@@ -785,15 +1017,28 @@ def main() -> None:
                        help="physical Ethernet line rate in Gbps (e.g. 100 or 400). If set, every\n"
                             "chart shows the theoretical throughput limit for this rate;\n"
                             "default: none, no limit curve")
+    p_run.add_argument("--pcie-telemetry", type=float, nargs="?", const=0.5, default=None,
+                       metavar="SECONDS",
+                       help="record the PCIe telemetry once for each frame length, in the middle of\n"
+                            "its measurement (passed through to gls_mod.py as -T). SECONDS is the\n"
+                            "length of one telemetry measurement; default when given: 0.5.\n"
+                            "Saves a summary CSV and one chart per mode; default: not recorded")
+    p_run.add_argument("--gen-rev-chan", action="store_true",
+                       help="the generator sends consecutive frames to channels with bit-reversed\n"
+                            "numbers, so they alternate between the DMA endpoints (passed through\n"
+                            "to gls_mod.py as --gen_rev_chan); default: off, sequential channels")
+    p_run.add_argument("--ndp-sleep", action="store_true",
+                       help="run the NDP tools without -P and -I 0, as the runs before this option\n"
+                            "did (passed through to gls_mod.py as --ndp_sleep); default: -P -I 0")
     p_run.add_argument("--fw-label", help="override the auto-detected FW label/id (use if the Device Tree has no build-revision)")
-    p_run.add_argument("-o", "--outdir", default="dma_throughput_results", help="output directory; default: ./dma_throughput_results")
+    p_run.add_argument("-o", "--outdir", default="gls_throughput_results", help="output directory; default: ./gls_throughput_results")
     p_run.add_argument("--skip-plots", action="store_true", help="only produce the consolidated CSV, no PNG plots")
     p_run.set_defaults(func=cmd_run)
 
     p_cmp = sub.add_parser("compare", help="overlay two or more previous 'run' results")
     p_cmp.add_argument("runs", nargs="+", help="two or more run output directories (or results_*.csv files) produced by 'run'")
     p_cmp.add_argument("--labels", help="comma-separated legend labels, one per run (default: derived from FW metadata)")
-    p_cmp.add_argument("-o", "--outdir", default=None, help="output directory for comparison plots; default: ./dma_throughput_results/compare")
+    p_cmp.add_argument("-o", "--outdir", default=None, help="output directory for comparison plots; default: ./gls_throughput_results/compare")
     p_cmp.set_defaults(func=cmd_compare)
 
     args = parser.parse_args()

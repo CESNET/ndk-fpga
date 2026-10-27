@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import re
+import json
 import subprocess
 import time
 import os
@@ -15,13 +16,17 @@ import socket
 import datetime
 import logging
 import argparse
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 from dataclasses import dataclass
 from tabulate import tabulate
 
 import nfb
 from ofm.comp.mfb_tools.debug.gen_loop_switch import GenLoopSwitch
 from ofm.utils.units import convert_units
+
+if TYPE_CHECKING:
+    # The PCIe telemetry is imported only with -T, so the script also runs with an older ofm package.
+    from ofm.comp.pcie.telemetry import PcieTelemetry
 
 
 class GracefulExiter():
@@ -57,7 +62,11 @@ def read_log_tail(path: str, lines: int = 5) -> str:
         return ""
 
 
-def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen | None:
+# The NDP tools poll the DMA queues without sleeping and print no statistics while they run.
+NDP_PERF_ARGS = "-P -I 0"
+
+
+def start_persistent_ndp(ndp_cmd: str | None, device: str, ndp_args: str) -> subprocess.Popen | None:
     """Start an NDP tool that must keep running for the whole test, e.g. "ndp-read".
 
     Returns None if the mode does not need one. The tool's stdout and stderr go into a log
@@ -69,7 +78,7 @@ def start_persistent_ndp(ndp_cmd: str | None, device: str) -> subprocess.Popen |
     if not ndp_cmd:
         return None
 
-    pname = f"{ndp_cmd} -d {device}"
+    pname = f"{ndp_cmd} -d {device} {ndp_args}".rstrip()
     log_path = ndp_log_path(ndp_cmd)
     # The child process gets its own handle on the log file, so it can be closed here.
     with open(log_path, "w") as log:
@@ -120,6 +129,88 @@ def stop_process(p: subprocess.Popen | None, timeout: float = 0.5) -> None:
         p.wait(timeout=timeout) # reap the process (wait for child processs' exit status)
 
 
+def open_pcie_telemetry(device: nfb.Nfb) -> List["PcieTelemetry"]:
+    """Open every PCIe telemetry component that the firmware has."""
+    try:
+        from ofm.comp.pcie.telemetry import PcieTelemetry
+    except ImportError as e:
+        raise RuntimeError(f"ERROR: PCIe telemetry needs the ofm package of this repository (python/ofm): {e}")
+    count = len(device.fdt_get_compatible(PcieTelemetry.DT_COMPATIBLE))
+    if count == 0:
+        raise RuntimeError("ERROR: PCIe telemetry is enabled, but the firmware has no PCIe telemetry component!")
+    return [PcieTelemetry(dev=device, index=i) for i in range(count)]
+
+
+def record_pcie_telemetry(
+    telemetries: List["PcieTelemetry"],
+    interval: float,
+    length: int,
+    jsonl_path: str,
+    txt_path: str,
+) -> None:
+    """Measure the PCIe telemetry once and add the result to both telemetry files.
+
+    The JSON Lines file gets one line per frame length. The line holds the raw data of
+    each telemetry component and a flat summary of the main values (see summarize()).
+    The text file gets the same report that the nfb-pcie-telemetry tool prints.
+    """
+    from ofm.comp.pcie.telemetry import format_report, summarize
+
+    record = {"length": length, "summary": {}, "components": []}
+    reports = []
+    for index, telemetry in enumerate(telemetries):
+        data, seconds = telemetry.measure(interval)
+        # The keys of a single component stay short, as the summary of the tool has them.
+        prefix = f"telemetry{index} " if len(telemetries) > 1 else ""
+        for key, value in summarize(data, seconds).items():
+            record["summary"][prefix + key] = value
+        record["components"].append({"index": index, "seconds": seconds, "data": data})
+        reports.append(f"--- PCIe telemetry component {index} ---\n" + format_report(data, seconds))
+        if data["status"]["lost_deltas"] or data["status"]["readout_overrun"]:
+            logging.warning(f"PCIe telemetry component {index} lost some counter updates, its values are not exact.")
+
+    with open(jsonl_path, "a") as f:
+        f.write(json.dumps(record) + "\n")
+    with open(txt_path, "a") as f:
+        f.write(f"===== Frame length {length} B =====\n")
+        f.write("\n\n".join(reports) + "\n\n")
+    print(f"PCIe telemetry recorded over {interval:.2f} s.")
+
+
+@dataclass
+class RxLossCounters:
+    """Frames received by the Ethernet MACs and the frames that the RX path lost."""
+    eth_rx_frames: Optional[int]
+    eth_rx_dropped: Optional[int]
+    rx_dma_discarded: Optional[int]
+
+
+def reset_rx_loss_counters(eths: List[nfb.eth.Eth], rx_queues: List[nfb.libnfb.NdpQueueRx]) -> None:
+    for e in eths:
+        e.rxmac.stats_reset()
+    for q in rx_queues:
+        q.stats_reset()
+
+
+def read_rx_loss_counters(eths: List[nfb.eth.Eth], rx_queues: List[nfb.libnfb.NdpQueueRx]) -> RxLossCounters:
+    """Sum the counters of all Ethernet MACs and RX DMA queues.
+
+    Each counter is the first of the given keys that the statistics contain. A counter that
+    the nfb library does not report is None.
+    """
+    def total(stats: List[dict], *keys: str) -> Optional[int]:
+        values = [next((s[k] for k in keys if k in s), None) for s in stats]
+        return None if any(v is None for v in values) else sum(values)
+
+    mac_stats = [e.rxmac.read_stats() for e in eths]
+    queue_stats = [q.read_stats() for q in rx_queues]
+    return RxLossCounters(
+        eth_rx_frames=total(mac_stats, "total"),
+        eth_rx_dropped=total(mac_stats, "dropped"),
+        rx_dma_discarded=total(queue_stats, "discarded", "dropped"),
+    )
+
+
 @dataclass
 class GlsMuxConfig:
     r2l_gen: Optional[int]
@@ -163,6 +254,11 @@ def run_test(
     report_name: str,
     device : int,
     exiter : GracefulExiter,
+    pcie_telemetry : List["PcieTelemetry"],
+    pcie_telemetry_time : float,
+    loss_eths : List[nfb.eth.Eth],
+    loss_rx_queues : List[nfb.libnfb.NdpQueueRx],
+    ndp_args : str,
 ) -> None:
 
     demo_path = "/tmp/demo_gui.txt"
@@ -175,9 +271,19 @@ def run_test(
         writer = csv.writer(f)
 
         # CSV file row
-        row = ["Length", "TX APP speed", "RX APP speed"]
+        row = ["Length", "TX APP speed", "RX APP speed", "ETH RX frames", "ETH RX dropped", "RX DMA discarded"]
         writer.writerow(row)
 
+    # PCIe telemetry is measured once per frame length, in the middle of the speed
+    # measurements of that length. The traffic is then running at a steady rate.
+    if pcie_telemetry:
+        telemetry_jsonl = "./pcie_telemetry_" + report_name + ".jsonl"
+        telemetry_txt = "./pcie_telemetry_" + report_name + ".txt"
+        open(telemetry_jsonl, "w").close()
+        open(telemetry_txt, "w").close()
+        logging.info(f"PCIe telemetry goes to {telemetry_jsonl} and {telemetry_txt}")
+    # The number of speed measurements made before the telemetry is measured.
+    telemetry_after = (len(gls_internals) * cycles) // 2
     if mode in ["tx", "rxtx", "dma_tx", "dma_rxtx", "dma_loop"]:
         use_ndp_gen = True
     else:
@@ -208,7 +314,7 @@ def run_test(
 
             # Start generating traffic
             if use_ndp_gen:
-                gen_cmd = f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range}"
+                gen_cmd = f"ndp-generate -d {device} -s {gen_length} -i {global_chan_range} {ndp_args}".rstrip()
                 with open(gen_log_path, "a") as log:
                     log.write(f"\n=== {gen_cmd} ===\n")
                     log.flush() # header must reach the file before the child writes to it
@@ -225,8 +331,12 @@ def run_test(
                     g.gen.enabled = True
 
             time.sleep(0.5)
+            # The loss counters cover the speed measurements of this frame length only.
+            if loss_eths:
+                reset_rx_loss_counters(loss_eths, loss_rx_queues)
             tx_total_speed = 0
             rx_total_speed = 0
+            measurements_done = 0
 
             for i, g in enumerate(gls_internals):
                 print("Data Stream: " + str(i))
@@ -234,6 +344,11 @@ def run_test(
                 rx_app_speed = 0
 
                 for _ in range(cycles):
+                    if pcie_telemetry and measurements_done == telemetry_after:
+                        record_pcie_telemetry(pcie_telemetry, pcie_telemetry_time, length,
+                                              telemetry_jsonl, telemetry_txt)
+                    measurements_done += 1
+
                     if g.tx_sm is not None:
                         g.tx_sm.clear_data()
                         tx_speed = g.tx_sm.measure(f=gls_clk_freq)[0]
@@ -282,6 +397,14 @@ def run_test(
                     demo_gui.write(str(tx_total_speed) + "\n")
                     demo_gui.write(str(rx_total_speed))
 
+            if loss_eths:
+                losses = read_rx_loss_counters(loss_eths, loss_rx_queues)
+                print(f"ETH RX frames: {losses.eth_rx_frames}, dropped by ETH RX: {losses.eth_rx_dropped}, "
+                      f"discarded by RX DMA: {losses.rx_dma_discarded}")
+                print("========================================")
+            else:
+                losses = RxLossCounters(None, None, None)
+
             # Stop generating traffic
             if ndp_gen is not None:
                 stop_process(ndp_gen)
@@ -295,6 +418,8 @@ def run_test(
             if log_en:
                 # Save row to CSV file
                 row = [str(length), str(tx_total_speed), str(rx_total_speed)]
+                row += ["" if v is None else str(v)
+                        for v in (losses.eth_rx_frames, losses.eth_rx_dropped, losses.rx_dma_discarded)]
                 writer.writerow(row) # write data to CSV file
 
     finally:
@@ -394,6 +519,15 @@ def main():
                         eth_loop=True,
                         ndp_persistent_cmd="ndp-read",
                     ),
+        "swloop":   TestModeSpec(
+                        desc="HW Gen --> TX ETH     ==> RX ETH --> RX DMA --> (ndp-loopback, SW) --> TX DMA --> Black Hole; (ETH loopback)",
+                        mux_cfg=GlsMuxConfig(r2l_gen=1, r2l_loop=0, l2r_gen=0, l2r_loop=0),
+                        gen_rev_chan=False,
+                        tx_sm=3,
+                        rx_sm=0,
+                        eth_loop=True,
+                        ndp_persistent_cmd="ndp-loopback",
+                    ),
         "dma_rx":   TestModeSpec(
                         desc="HW Gen --> RX DMA     ###",
                         mux_cfg=GlsMuxConfig(r2l_gen=None, r2l_loop=None, l2r_gen=1, l2r_loop=0),
@@ -456,6 +590,14 @@ def main():
         "cycles"    : "set the number of test cycles that are averaged for each frame length, default: 4",
         "frequency" : "set the clock frequency [Hz] at which the APP Core runs; default: 200_000_000",
         "layer"     : "measure the rate at ISO/OSI layer: 1 or 2; default: 2",
+        "telemetry" : "record the PCIe telemetry once for each frame length, in the middle of its measurement;\n"
+                      "the data goes to pcie_telemetry_<report name>.jsonl and .txt in the current directory",
+        "tel_time"  : "set the length [s] of the PCIe telemetry measurement; default: 0.5",
+        "rev_chan"  : "the generator sends consecutive frames to channels with bit-reversed numbers\n"
+                      "(0, 16, 8, 24, ... for 32 channels), so they alternate between the DMA endpoints;\n"
+                      "needs the full channel range of each GLS, otherwise it is turned off",
+        "ndp_sleep" : "run the NDP tools without -P and -I 0: they sleep when the DMA queues are idle\n"
+                      "and print their statistics every second; default: -P -I 0",
     }
 
     gls_desc = """
@@ -480,6 +622,10 @@ def main():
     arg_parser.add_argument("-C", "--test_cycles", type=int, default=4, help=help_dict["cycles"])
     arg_parser.add_argument("-f", "--frequency", type=int, default=200_000_000, help=help_dict["frequency"])
     arg_parser.add_argument("-r", "--rate_layer", type=int, default=2, choices=[1, 2], help=help_dict["layer"])
+    arg_parser.add_argument("-T", "--pcie_telemetry", action="store_true", help=help_dict["telemetry"])
+    arg_parser.add_argument("--pcie_telemetry_time", type=float, default=0.5, help=help_dict["tel_time"])
+    arg_parser.add_argument("--gen_rev_chan", action="store_true", help=help_dict["rev_chan"])
+    arg_parser.add_argument("--ndp_sleep", action="store_true", help=help_dict["ndp_sleep"])
     args = arg_parser.parse_args()
 
     device = nfb.open(args.device)
@@ -613,7 +759,7 @@ def main():
             raise ValueError(f"ERROR: GLS module at index {i} not available!") from exc
 
         # Select and configure the generator according to the selected mode
-        if args.mode in ["eth_gen", "rx"]:
+        if args.mode in ["eth_gen", "rx", "swloop"]:
             gls_gen = gls.r2l.gen
         elif args.mode in ["dma_rx", "dma_rxtx", "dma_swloop"]:
             gls_gen = gls.l2r.gen
@@ -625,7 +771,16 @@ def main():
                 gls_gen.minimum_channel = sel_chan_ranges[i][0]
                 gls_gen.maximum_channel = sel_chan_ranges[i][1]
                 # gls_gen.channel_increment = ...
-                gls_gen.channel_increment_reversed = sel_mode.gen_rev_chan
+                gen_rev_chan = sel_mode.gen_rev_chan or args.gen_rev_chan
+                # The bit reversal covers all channel bits of the GLS. Over a part of its channels
+                # it would produce channels outside the selected range.
+                full_range = (0, channels_per_stream - 1)
+                pow2_channels = (channels_per_stream & (channels_per_stream - 1)) == 0
+                if gen_rev_chan and (sel_chan_ranges[i] != full_range or not pow2_channels):
+                    logging.warning(f"Bit-reversed channels turned off for GLS {i}: they need all its "
+                                    "channels and a power-of-two channel count.")
+                    gen_rev_chan = False
+                gls_gen.channel_increment_reversed = gen_rev_chan
         else:
             raise RuntimeError(f"ERROR: No selected channels overlap with the available channels of Generator at GLS {i}!")
 
@@ -657,6 +812,13 @@ def main():
             )
         )
 
+    pcie_telemetry = []
+    if args.pcie_telemetry:
+        if args.pcie_telemetry_time <= 0:
+            raise ValueError("ERROR: The PCIe telemetry time must be greater than 0!")
+        pcie_telemetry = open_pcie_telemetry(device)
+        logging.info(f"PCIe telemetry: {len(pcie_telemetry)} component(s), measured for {args.pcie_telemetry_time} s")
+
     # Reset Ethernet stats and enable MACs (and potentionally PMA loopback)
     for e in device.eth:
         e.stats_reset()
@@ -675,7 +837,8 @@ def main():
     # Start the persistent NDP tool that the selected mode needs (the RX DMA reader or the SW
     # loopback). It starts after all setup that can still fail. A failed setup would otherwise
     # leave the tool running in the background, where it keeps the DMA queues used.
-    ndp_persistent = start_persistent_ndp(sel_mode.ndp_persistent_cmd, args.device)
+    ndp_args = "" if args.ndp_sleep else NDP_PERF_ARGS
+    ndp_persistent = start_persistent_ndp(sel_mode.ndp_persistent_cmd, args.device, ndp_args)
 
     # ==========================================================================
     # GLS TEST START
@@ -704,6 +867,12 @@ def main():
                 report_name=report_name,
                 device=args.device,
                 exiter=exiter,
+                pcie_telemetry=pcie_telemetry,
+                pcie_telemetry_time=args.pcie_telemetry_time,
+                # In the modes over the Ethernet loopback the RX path can lose frames.
+                loss_eths=list(device.eth) if sel_mode.eth_loop else [],
+                loss_rx_queues=list(rx_queues) if sel_mode.eth_loop else [],
+                ndp_args=ndp_args,
             )
             logging.info("Test finished.\n")
             if not args.repeat or exiter.exit():

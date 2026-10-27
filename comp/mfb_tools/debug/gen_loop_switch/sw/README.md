@@ -5,11 +5,13 @@
 It is used mainly for throughput measurements and analysis.
 Further information is available in the [GLS module documentation](https://cesnet.github.io/ndk-fpga/devel/comp/mfb_tools/debug/gen_loop_switch/readme.html) or [GLS module tutorial](https://cesnet.github.io/ndk-fpga/devel/ndk_core/doc/testing.html#gls-module-tutorial).
 
-`dma_throughput_sweep.py` automates `gls_mod.py` across the RX/TX DMA scenarios and a range of
-frame lengths. It tags each run with the FW build identity and plots the results. Every chart
+`gls_throughput_sweep.py` automates `gls_mod.py` across one suite of modes and a range of
+frame lengths. The `dma` suite measures the DMA path alone, the `eth` suite measures the traffic
+over the Ethernet loopback together with the lost frames. It tags each run with the FW build identity and plots the results. Every chart
 shows both the bit rate in Gbps and the frame rate in Mpps. The `compare` subcommand overlays
 several such runs (e.g. two FW versions) on common charts. Before the sweep it can also set the
 kernel DMA buffer count and size (via `nfb-dma`, requires sudo) and records that setting in the
-results for comparability. See the
+results for comparability. With `--pcie-telemetry` (`-T` in `gls_mod.py`) both scripts also
+record the PCIe telemetry once for each frame length, in the middle of its measurement. See the
 [GLS module tutorial](https://cesnet.github.io/ndk-fpga/devel/ndk_core/doc/testing.html#automated-dma-throughput-sweeps-and-fw-comparison)
 or run it with `-h`.
