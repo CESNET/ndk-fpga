@@ -363,7 +363,11 @@ def fetchCocotbCompsVerAndMultiVer(include = "", exclude = "") {
         dir ("$path") {
             def settings_paths = sh(script: "find .. -name 'ver_settings.py' | cut -c3-", returnStdout: true).trim()
 
-            if (settings_paths.length() > 0) {
+            // The bench's own settings win over the first one find happens to list, e.g. of a UVM bench nearby
+            if (fileExists('ver_settings.py')) {
+                comps_all.add([name, path, "ver_settings.py"])
+
+            } else if (settings_paths.length() > 0) {
                 settings_paths = settings_paths.readLines()
                 def relative_path = "../${settings_paths[0]}"
                 comps_all.add([name, path, relative_path])

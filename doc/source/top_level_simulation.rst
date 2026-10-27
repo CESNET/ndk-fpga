@@ -61,6 +61,14 @@ By default, the simulation runs with **Questa Sim**. To use the open-source **NV
 
     $ make CARD=n6010 TARGET=nvc-sim
 
+Setting cocotb's simulator variable **SIM** to ``nvc`` does the same for every run that would start Questa Sim with
+``TARGET=cocotb``, including those of component benches and of ``multi_ver_cocotb.py``:
+
+.. code-block:: bash
+
+    $ export SIM=nvc
+    $ make CARD=n6010
+
 .. note:: Source files used to run the simulation of all cards can be found in ``ndk-fpga/apps/minimal/build``. To find out which
     cards are supported, refer to **NFBDevice** in ``ndk-fpga/core/cocotb/ndk_core/nfbdevice.py``.
 
