@@ -94,7 +94,15 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     constant MFB_REGION_WIDTH    : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
     constant MFB_EOF_POS_WIDTH   : natural := max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE));
     constant WORD_CNT_W          : natural := TRANS_SIZE_WIDTH - (log2(MFB_REGIONS) + MFB_EOF_POS_WIDTH);
-    constant MVB_ITEM_PLUS_WIDTH : natural := MVB_ITEM_WIDTH + 8 + TRANS_SIZE_WIDTH + 1 + 1 + 1;
+    -- Fields of one item in MVB_SHAKEDOWN (offsets of the LSB).
+    constant PLUS_HALF_FIT_O     : natural := 0;
+    constant PLUS_END_REGION_O   : natural := PLUS_HALF_FIT_O + 1;
+    constant PLUS_TYPE_O         : natural := PLUS_END_REGION_O + MFB_REGIONS;
+    constant PLUS_LAST_OFFSET_O  : natural := PLUS_TYPE_O + 1;
+    constant PLUS_PAYLOAD_O      : natural := PLUS_LAST_OFFSET_O + TRANS_SIZE_WIDTH;
+    constant PLUS_BE_O           : natural := PLUS_PAYLOAD_O + 1;
+    constant PLUS_DATA_O         : natural := PLUS_BE_O + 8;
+    constant MVB_ITEM_PLUS_WIDTH : natural := PLUS_DATA_O + MVB_ITEM_WIDTH;
     -- On H-Tile, a new PCIe transaction can start only in the first region of the MFB word.
     constant ONE_PKT_PER_WORD    : boolean := (DEVICE = "STRATIX10") and (ENDPOINT_TYPE = "H_TILE");
     -- One MFB region is one segment of the R-Tile TX interface in the double-width mode.
@@ -132,7 +140,8 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     signal s_fifo_mvb_data_arr       : slv_array_t(MFB_REGIONS-1 downto 0)(MVB_ITEM_WIDTH-1 downto 0);
     signal s_fifo_mvb_be             : slv_array_t(MFB_REGIONS-1 downto 0)(8-1 downto 0);
     signal s_fifo_mvb_payload        : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal s_fifo_mvb_payload_size   : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_fifo_mvb_last_offset    : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_fifo_mvb_end_region     : slv_array_t(MFB_REGIONS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal s_fifo_mvb_type           : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_fifo_mvb_half_fit       : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_fifo_mvb_accept         : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -141,29 +150,30 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     signal s_hdr_data_muxed_arr      : slv_array_t(MFB_REGIONS-1 downto 0)(MVB_ITEM_WIDTH-1 downto 0);
     signal s_hdr_be_muxed            : slv_array_t(MFB_REGIONS-1 downto 0)(8-1 downto 0);
     signal s_hdr_payload_muxed       : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal s_hdr_payload_size_muxed  : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_hdr_last_offset_muxed   : slv_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_hdr_end_region_muxed    : slv_array_t(MFB_REGIONS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal s_hdr_type_muxed          : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_hdr_half_fit_muxed      : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_hdr_vld_muxed           : std_logic_vector(MFB_REGIONS-1 downto 0);
 
     signal s_payload_len             : uns_array_t(MVB_ITEMS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
     signal s_total_len               : uns_array_t(MVB_ITEMS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_last_offset             : uns_array_t(MVB_ITEMS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
+    signal s_end_region              : slv_array_t(MVB_ITEMS-1 downto 0)(MFB_REGIONS-1 downto 0);
     signal s_half_fit                : std_logic_vector(MVB_ITEMS-1 downto 0);
 
     signal s_word_cnt_reg            : unsigned(WORD_CNT_W-1 downto 0);
     signal s_word_cnt_reg_en         : std_logic;
     signal s_word_cnt_reg_load       : std_logic;
-    signal s_word_cnt_per_region     : uns_array_t(MFB_REGIONS+1-1 downto 0)(WORD_CNT_W-1 downto 0);
 
     signal s_whole_pkt               : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_eof_offset_new          : uns_array_t(MFB_REGIONS-1 downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
     signal s_eof_offset              : uns_array_t(MFB_REGIONS downto 0)(TRANS_SIZE_WIDTH-1 downto 0);
-    signal s_eof_offset_word         : uns_array_t(MFB_REGIONS-1 downto 0)(WORD_CNT_W-1 downto 0);
-    signal s_eof_offset_region       : uns_array_t(MFB_REGIONS-1 downto 0)(log2(MFB_REGIONS)-1 downto 0);
+    signal s_eof_regions_reg         : unsigned(TRANS_SIZE_WIDTH-MFB_EOF_POS_WIDTH-1 downto 0);
     signal s_eof_pos                 : uns_array_t(MFB_REGIONS-1 downto 0)(MFB_EOF_POS_WIDTH-1 downto 0);
 
-    signal s_eof_word_ok             : std_logic_vector(MFB_REGIONS-1 downto 0);
-    signal s_eof_region_ok           : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_eof_old_ok              : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_eof_new_ok              : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_eof_ok                  : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_eof_vld                 : std_logic_vector(MFB_REGIONS-1 downto 0);
 
@@ -233,18 +243,26 @@ begin
 
     lenght_g : for r in 0 to MVB_ITEMS-1 generate
         -- get payload lenght in dwords (32b) from header data
-        s_payload_len(r) <= unsigned(s_rx_mvb_payload_size_arr(r)) when (s_rx_mvb_payload_reg(r) = '1') else (others => '0');
+        s_payload_len(r)  <= unsigned(s_rx_mvb_payload_size_arr(r)) when (s_rx_mvb_payload_reg(r) = '1') else (others => '0');
         -- compute packet lenght from payload lenght in dwords (32b)
-        s_total_len(r)   <=      (s_payload_len(r) + 0) when PTILE_RTILE_DEVICE and s_rx_mvb_payload_reg(r) = '1' else             -- write transaction with header separated from data
-                        (s_payload_len(r) + 1) when PTILE_RTILE_DEVICE else                                                        -- read transaction with just separated header (1 invalid dword is still added to MFB, as it is impossible to create a 0 length transactions with SOF_POS/EOF_POS signals)
-                        (s_payload_len(r) + 3) when INTEL_DEVICE and s_rx_mvb_type_reg(r) = '0' else                               -- 96-bit header
-                        (s_payload_len(r) + 4);                                                                                    -- 128-bit header
+        s_total_len(r)    <=      (s_payload_len(r) + 0) when PTILE_RTILE_DEVICE and s_rx_mvb_payload_reg(r) = '1' else             -- write transaction with header separated from data
+                        (s_payload_len(r) + 1) when PTILE_RTILE_DEVICE else                                                         -- read transaction with just separated header (1 invalid dword is still added to MFB, as it is impossible to create a 0 length transactions with SOF_POS/EOF_POS signals)
+                        (s_payload_len(r) + 3) when INTEL_DEVICE and s_rx_mvb_type_reg(r) = '0' else                                -- 96-bit header
+                        (s_payload_len(r) + 4);                                                                                     -- 128-bit header
         -- The transaction fits into the regions from RTILE_SOF_STEP to the end of the word.
-        s_half_fit(r)    <= '1' when (s_total_len(r) <= RTILE_HALF_LEN) else '0';
+        s_half_fit(r)     <= '1' when (s_total_len(r) <= RTILE_HALF_LEN) else '0';
+        -- The planning logic and TX_NEXT of MVB_SHAKEDOWN form a loop that must finish in one clock cycle.
+        -- The values below are computed before MVB_SHAKEDOWN, so this loop contains only their multiplexers.
+        -- s_last_offset is the offset of the last dword from the first dword of the transaction.
+        s_last_offset(r)  <= s_total_len(r) - 1;
+        -- Bit i is '1' when the transaction ends i regions after its start region, in the same word.
+        end_region_g : for i in 0 to MFB_REGIONS-1 generate
+            s_end_region(r)(i) <= '1' when (s_last_offset(r)(TRANS_SIZE_WIDTH-1 downto MFB_EOF_POS_WIDTH) = i) else '0';
+        end generate;
     end generate;
 
     rx_mvb_arr_g : for i in 0 to MVB_ITEMS-1 generate
-        s_rx_mvb_data_plus_arr(i) <= s_rx_mvb_data_arr(i) & s_rx_mvb_be_arr_fixed(i) & s_rx_mvb_payload_reg(i) & std_logic_vector(s_total_len(i)) & s_rx_mvb_type_reg(i) & s_half_fit(i);
+        s_rx_mvb_data_plus_arr(i) <= s_rx_mvb_data_arr(i) & s_rx_mvb_be_arr_fixed(i) & s_rx_mvb_payload_reg(i) & std_logic_vector(s_last_offset(i)) & s_rx_mvb_type_reg(i) & s_end_region(i) & s_half_fit(i);
         s_rx_mvb_vld(i)           <= s_rx_mvb_vld_reg(i) and s_rx_mvb_src_rdy_reg;
     end generate;
 
@@ -275,19 +293,21 @@ begin
     s_fifo_mvb_data_plus_arr <= slv_array_downto_deser(s_fifo_mvb_data_plus,MFB_REGIONS,MVB_ITEM_PLUS_WIDTH);
 
     unpack_data_plus_arr_g : for i in 0 to MFB_REGIONS-1 generate
-        s_fifo_mvb_data_arr(i)     <= s_fifo_mvb_data_plus_arr(i)(MVB_ITEM_PLUS_WIDTH-1 downto TRANS_SIZE_WIDTH+1+1+1+8);
-        s_fifo_mvb_be(i)           <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1+1+8-1 downto TRANS_SIZE_WIDTH+1+1+1);
-        s_fifo_mvb_payload(i)      <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1);
-        s_fifo_mvb_payload_size(i) <= s_fifo_mvb_data_plus_arr(i)(TRANS_SIZE_WIDTH+1+1-1 downto 1+1);
-        s_fifo_mvb_type(i)         <= s_fifo_mvb_data_plus_arr(i)(1);
-        s_fifo_mvb_half_fit(i)     <= s_fifo_mvb_data_plus_arr(i)(0);
+        s_fifo_mvb_data_arr(i)     <= s_fifo_mvb_data_plus_arr(i)(PLUS_DATA_O+MVB_ITEM_WIDTH-1 downto PLUS_DATA_O);
+        s_fifo_mvb_be(i)           <= s_fifo_mvb_data_plus_arr(i)(PLUS_BE_O+8-1 downto PLUS_BE_O);
+        s_fifo_mvb_payload(i)      <= s_fifo_mvb_data_plus_arr(i)(PLUS_PAYLOAD_O);
+        s_fifo_mvb_last_offset(i)  <= s_fifo_mvb_data_plus_arr(i)(PLUS_LAST_OFFSET_O+TRANS_SIZE_WIDTH-1 downto PLUS_LAST_OFFSET_O);
+        s_fifo_mvb_type(i)         <= s_fifo_mvb_data_plus_arr(i)(PLUS_TYPE_O);
+        s_fifo_mvb_end_region(i)   <= s_fifo_mvb_data_plus_arr(i)(PLUS_END_REGION_O+MFB_REGIONS-1 downto PLUS_END_REGION_O);
+        s_fifo_mvb_half_fit(i)     <= s_fifo_mvb_data_plus_arr(i)(PLUS_HALF_FIT_O);
     end generate;
 
     -- header multiplexors
     s_hdr_data_muxed_arr(0)     <= s_fifo_mvb_data_arr(0);
     s_hdr_be_muxed(0)           <= s_fifo_mvb_be(0);
     s_hdr_payload_muxed(0)      <= s_fifo_mvb_payload(0);
-    s_hdr_payload_size_muxed(0) <= s_fifo_mvb_payload_size(0);
+    s_hdr_last_offset_muxed(0)  <= s_fifo_mvb_last_offset(0);
+    s_hdr_end_region_muxed(0)   <= s_fifo_mvb_end_region(0);
     s_hdr_type_muxed(0)         <= s_fifo_mvb_type(0);
     s_hdr_half_fit_muxed(0)     <= s_fifo_mvb_half_fit(0);
     s_hdr_vld_muxed(0)          <= s_fifo_mvb_vld(0);
@@ -295,7 +315,8 @@ begin
         s_hdr_data_muxed_arr(r)     <= s_fifo_mvb_data_arr(to_integer(s_hdr_mux_sel(r)));
         s_hdr_be_muxed(r)           <= s_fifo_mvb_be(to_integer(s_hdr_mux_sel(r)));
         s_hdr_payload_muxed(r)      <= s_fifo_mvb_payload(to_integer(s_hdr_mux_sel(r)));
-        s_hdr_payload_size_muxed(r) <= s_fifo_mvb_payload_size(to_integer(s_hdr_mux_sel(r)));
+        s_hdr_last_offset_muxed(r)  <= s_fifo_mvb_last_offset(to_integer(s_hdr_mux_sel(r)));
+        s_hdr_end_region_muxed(r)   <= s_fifo_mvb_end_region(to_integer(s_hdr_mux_sel(r)));
         s_hdr_type_muxed(r)         <= s_fifo_mvb_type(to_integer(s_hdr_mux_sel(r)));
         s_hdr_half_fit_muxed(r)     <= s_fifo_mvb_half_fit(to_integer(s_hdr_mux_sel(r)));
         s_hdr_vld_muxed(r)          <= s_fifo_mvb_vld(to_integer(s_hdr_mux_sel(r)));
@@ -328,12 +349,6 @@ begin
         end if;
     end process;
 
-    -- word counter per region
-    s_word_cnt_per_region(0) <= s_word_cnt_reg;
-    word_cnt_per_region_g : for r in 0 to MFB_REGIONS-1 generate
-        s_word_cnt_per_region(r+1) <= (others => '0') when (s_plan_en(r) = '1') else s_word_cnt_per_region(r);
-    end generate;
-
     -----------------------------------------------------------------------------
     -- CONTROL LOGIC
     -----------------------------------------------------------------------------
@@ -356,11 +371,14 @@ begin
     -- first header is every time on zero position
     s_hdr_mux_sel(0) <= (others => '0');
 
+    -- Number of regions from the start of the transaction in s_eof_offset(0) to its last dword
+    s_eof_regions_reg <= s_eof_offset(0)(TRANS_SIZE_WIDTH-1 downto MFB_EOF_POS_WIDTH);
+
     plan_g : for r in 0 to MFB_REGIONS-1 generate
         -- Whole packet is in one region
-        s_whole_pkt(r)      <= '1' when (unsigned(s_hdr_payload_size_muxed(r)) <= (MFB_REGION_SIZE*MFB_BLOCK_SIZE)) else '0';
+        s_whole_pkt(r)      <= s_hdr_end_region_muxed(r)(0);
         -- create new EOF offset signal from header data
-        s_eof_offset_new(r) <= unsigned(s_hdr_payload_size_muxed(r)) + (r*MFB_BLOCK_SIZE) - 1;
+        s_eof_offset_new(r) <= unsigned(s_hdr_last_offset_muxed(r)) + (r*MFB_BLOCK_SIZE);
 
         -- create signal with current EOF offset signal
         -- index are shifted by one: index 0 is EOF offset from last region of previous word,
@@ -368,14 +386,23 @@ begin
         s_eof_offset(r+1) <= s_eof_offset_new(r) when (s_plan_en(r) = '1') else s_eof_offset(r);
         s_eof_pos(r)      <= s_eof_offset_new(r)(MFB_EOF_POS_WIDTH-1 downto 0) when (s_plan_en(r) = '1') else s_eof_offset(r)(MFB_EOF_POS_WIDTH-1 downto 0);
 
-        -- unpack current EOF offset to word, region and selection part
-        s_eof_offset_word(r)   <= s_eof_offset(r)(TRANS_SIZE_WIDTH-1 downto log2(MFB_REGIONS)+MFB_EOF_POS_WIDTH);
-        s_eof_offset_region(r) <= s_eof_offset(r)(log2(MFB_REGIONS)+MFB_EOF_POS_WIDTH-1 downto MFB_EOF_POS_WIDTH);
+        -- The transaction that started in a previous word ends in region r.
+        -- s_word_cnt_reg is the number of words after the start word of this transaction.
+        s_eof_old_ok(r) <= s_need_set_eof(0) when (s_eof_regions_reg = s_word_cnt_reg*MFB_REGIONS + r) else '0';
 
-        -- checking if the position matches the EOF offset
-        s_eof_word_ok(r)   <= '1' when (s_eof_offset_word(r) = s_word_cnt_per_region(r)) else '0';
-        s_eof_region_ok(r) <= '1' when (MFB_REGIONS = 1) or (s_eof_offset_region(r) = to_unsigned(r,log2(MFB_REGIONS))) else '0';
-        s_eof_ok(r)        <= s_eof_word_ok(r) and s_eof_region_ok(r);
+        -- A transaction that started in region p of this word ends in region r.
+        -- Only one transaction is open at a time, so at most one p can match.
+        eof_new_ok_p : process (all)
+        begin
+            s_eof_new_ok(r) <= '0';
+            for p in 0 to r-1 loop
+                if (s_plan_en(p) = '1' and s_hdr_end_region_muxed(p)(r-p) = '1') then
+                    s_eof_new_ok(r) <= '1';
+                end if;
+            end loop;
+        end process;
+
+        s_eof_ok(r)        <= s_eof_old_ok(r) or s_eof_new_ok(r);
         s_eof_vld(r)       <= (s_eof_ok(r) and s_need_set_eof(r)) or (s_plan_en(r) and s_whole_pkt(r));
 
         -- planned packet
