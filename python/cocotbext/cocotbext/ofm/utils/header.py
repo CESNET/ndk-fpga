@@ -43,7 +43,7 @@ class SerializableHeader(object):
 
     def __str__(self):
         pnt = [f"{item[0]}: {getattr(self, item[0])} (0x{getattr(self, item[0]):x})" for item in self.items]
-        return '\n'.join(pnt)
+        return ', '.join(pnt)
 
     def serialize(self):
         names, widths = list(zip(*self.items)) if self.items else ([], [])
@@ -52,6 +52,15 @@ class SerializableHeader(object):
     @classmethod
     def __len__(cls):
         return sum([x[1] for x in cls.items])
+
+    @classmethod
+    def offsets(cls):
+        """Bit offset of every field in the serialized value, keyed by field name."""
+        ret, offset = {}, 0
+        for name, width in cls.items:
+            ret[name] = offset
+            offset += width
+        return ret
 
     @classmethod
     def deserialize(cls, val: int):
