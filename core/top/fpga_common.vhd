@@ -423,12 +423,11 @@ architecture FULL of FPGA_COMMON is
         end if;
 
         if (IS_USP_PCIE_EP = True) then         -- Gen3/4 mode only
-            if (PCIE_ENDPOINT_MODE = 0) then    -- x16
-                pcie_mfb_regions := 2;          -- 2x256b AXI
-            elsif (PCIE_ENDPOINT_MODE = 1) then -- x8x8
-                pcie_mfb_regions := 2;          -- 2x256b AXI
-            elsif (PCIE_ENDPOINT_MODE = 2) then -- x8
-                pcie_mfb_regions := 1;          -- 1x256b AXI
+            -- x16, x8x8 and Gen4 x8 have a 512b AXI interface, Gen3 x8 low latency has a 256b one
+            if (PCIE_ENDPOINT_MODE = 0 or PCIE_ENDPOINT_MODE = 1 or (PCIE_ENDPOINT_MODE = 2 and PCIE_GEN = 4)) then
+                pcie_mfb_regions := 2;
+            else
+                pcie_mfb_regions := 1;
             end if;
             if (PCIE_DIR = "RC") then           -- USP RC support up to 4 TLP in word
                 pcie_mfb_regions := pcie_mfb_regions*2;
