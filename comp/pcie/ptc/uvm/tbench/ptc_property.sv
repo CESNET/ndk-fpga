@@ -209,6 +209,31 @@ module ptc_property #(DMA_MFB_UP_REGIONS, MFB_UP_REG_SIZE, MFB_UP_BLOCK_SIZE, MF
                 end
             end
 
+            // A TLP has no cycle with SRC_RDY low and DST_RDY high between SOF and EOF.
+            // The R-Tile TX interface does not allow VALID low inside a TLP.
+            logic rq_tlp_open = 1'b0;
+
+            always @(posedge rq_mfb_vif.CLK) begin
+                if (RESET !== 1'b0) begin
+                    rq_tlp_open = 1'b0;
+                end else if (rq_mfb_vif.DST_RDY === 1'b1) begin
+                    if (rq_mfb_vif.SRC_RDY !== 1'b1) begin
+                        if (rq_tlp_open) begin
+                            `uvm_error(module_name, "\n\tRQ MFB interface: SRC_RDY is low inside a TLP.");
+                        end
+                    end else begin
+                        for (int unsigned r = 0; r < MFB_UP_REGIONS; r++) begin
+                            if (rq_mfb_vif.SOF[r] === 1'b1) begin
+                                rq_tlp_open = 1'b1;
+                            end
+                            if (rq_mfb_vif.EOF[r] === 1'b1) begin
+                                rq_tlp_open = 1'b0;
+                            end
+                        end
+                    end
+                end
+            end
+
             // Number of RQ MFB words with the given number of SOF
             int unsigned sof_per_word[MFB_UP_REGIONS+1];
 
