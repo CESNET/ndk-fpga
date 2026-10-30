@@ -101,8 +101,13 @@ end entity;
 
 architecture FULL of PTC_HDR_DATA_MERGE is
 
-    constant MFB_REGION_WIDTH : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
-    constant MFB_DATA_WIDTH   : natural := MFB_REGIONS*MFB_REGION_WIDTH;
+    constant MFB_REGION_WIDTH     : natural := MFB_REGION_SIZE*MFB_BLOCK_SIZE*MFB_ITEM_WIDTH;
+    constant MFB_DATA_WIDTH       : natural := MFB_REGIONS*MFB_REGION_WIDTH;
+    -- Metadata of one region in TX_FIFO: TX_MVB_DATA, TX_MVB_VLD and TX_MFB_BE.
+    constant TX_META_WIDTH        : natural := MVB_ITEM_WIDTH + 1 + 8;
+    constant TX_FIFO_DEPTH        : natural := 16;
+    -- s_dins_tx_dst_rdy is a register of not TX_FIFO_AFULL. Two more words can be written before it changes to '0'.
+    constant TX_FIFO_AFULL_OFFSET : natural := 2;
 
     signal s_hdr_mvb_data    : std_logic_vector(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
     signal s_hdr_mvb_vld     : std_logic_vector(MFB_REGIONS-1 downto 0);
@@ -117,6 +122,26 @@ architecture FULL of PTC_HDR_DATA_MERGE is
     signal s_hdr_mfb_type    : std_logic_vector(MFB_REGIONS-1 downto 0);
     signal s_hdr_mfb_src_rdy : std_logic;
     signal s_hdr_mfb_dst_rdy : std_logic;
+
+    signal s_dins_tx_mvb_data    : std_logic_vector(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
+    signal s_dins_tx_mvb_vld     : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_dins_tx_mfb_data    : std_logic_vector(MFB_DATA_WIDTH-1 downto 0);
+    signal s_dins_tx_mfb_sof_pos : std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE))-1 downto 0);
+    signal s_dins_tx_mfb_eof_pos : std_logic_vector(MFB_REGIONS*max(1,log2(MFB_REGION_SIZE*MFB_BLOCK_SIZE))-1 downto 0);
+    signal s_dins_tx_mfb_sof     : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_dins_tx_mfb_eof     : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_dins_tx_mfb_be      : std_logic_vector(MFB_REGIONS*8-1 downto 0);
+    signal s_dins_tx_mfb_src_rdy : std_logic;
+    signal s_dins_tx_dst_rdy     : std_logic;
+
+    signal s_tx_fifo_wr          : std_logic;
+    signal s_tx_fifo_rx_dst_rdy  : std_logic;
+    signal s_tx_fifo_afull       : std_logic;
+    signal s_tx_fifo_rx_meta     : slv_array_t(MFB_REGIONS-1 downto 0)(TX_META_WIDTH-1 downto 0);
+    signal s_tx_fifo_tx_meta     : std_logic_vector(MFB_REGIONS*TX_META_WIDTH-1 downto 0);
+    signal s_tx_fifo_tx_meta_arr : slv_array_t(MFB_REGIONS-1 downto 0)(TX_META_WIDTH-1 downto 0);
+    signal s_tx_fifo_sof         : std_logic_vector(MFB_REGIONS-1 downto 0);
+    signal s_tx_fifo_src_rdy     : std_logic;
 
 begin
 
@@ -198,17 +223,97 @@ begin
         RX_MFB_DATA_SRC_RDY => RX_MFB_SRC_RDY,
         RX_MFB_DATA_DST_RDY => RX_MFB_DST_RDY,
 
-        TX_MVB_DATA         => TX_MVB_DATA,
-        TX_MVB_VLD          => TX_MVB_VLD,
+        TX_MVB_DATA         => s_dins_tx_mvb_data,
+        TX_MVB_VLD          => s_dins_tx_mvb_vld,
 
-        TX_MFB_DATA         => TX_MFB_DATA,
-        TX_MFB_SOF_POS      => TX_MFB_SOF_POS,
-        TX_MFB_EOF_POS      => TX_MFB_EOF_POS,
-        TX_MFB_SOF          => TX_MFB_SOF,
-        TX_MFB_EOF          => TX_MFB_EOF,
-        TX_MFB_SRC_RDY      => TX_MFB_SRC_RDY,
-        TX_MFB_DST_RDY      => TX_MFB_DST_RDY,
-        TX_MFB_BE           => TX_MFB_BE
+        TX_MFB_DATA         => s_dins_tx_mfb_data,
+        TX_MFB_SOF_POS      => s_dins_tx_mfb_sof_pos,
+        TX_MFB_EOF_POS      => s_dins_tx_mfb_eof_pos,
+        TX_MFB_SOF          => s_dins_tx_mfb_sof,
+        TX_MFB_EOF          => s_dins_tx_mfb_eof,
+        TX_MFB_SRC_RDY      => s_dins_tx_mfb_src_rdy,
+        TX_MFB_DST_RDY      => s_dins_tx_dst_rdy,
+        TX_MFB_BE           => s_dins_tx_mfb_be
     );
+
+    -- -------------------------------------------------------------------------
+    -- TX FIFO
+    -- -------------------------------------------------------------------------
+    -- PTC_HDR_DATA_MERGE_HPAI and PTC_HDR_DATA_MERGE_DINS use their TX_MFB_DST_RDY
+    -- as the clock enable of all registers. TX_FIFO separates them from TX_MFB_DST_RDY,
+    -- so they get s_dins_tx_dst_rdy from a local register.
+
+    dins_tx_dst_rdy_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RESET = '1') then
+                s_dins_tx_dst_rdy <= '0';
+            else
+                s_dins_tx_dst_rdy <= not s_tx_fifo_afull;
+            end if;
+        end if;
+    end process;
+
+    s_tx_fifo_wr <= s_dins_tx_mfb_src_rdy and s_dins_tx_dst_rdy;
+
+    tx_fifo_meta_g : for r in 0 to MFB_REGIONS-1 generate
+        s_tx_fifo_rx_meta(r) <= s_dins_tx_mvb_data((r+1)*MVB_ITEM_WIDTH-1 downto r*MVB_ITEM_WIDTH)
+                                & s_dins_tx_mvb_vld(r) & s_dins_tx_mfb_be((r+1)*8-1 downto r*8);
+    end generate;
+
+    tx_fifo_i : entity work.MFB_FIFOX
+    generic map (
+        REGIONS             => MFB_REGIONS,
+        REGION_SIZE         => MFB_REGION_SIZE,
+        BLOCK_SIZE          => MFB_BLOCK_SIZE,
+        ITEM_WIDTH          => MFB_ITEM_WIDTH,
+        META_WIDTH          => TX_META_WIDTH,
+        FIFO_DEPTH          => TX_FIFO_DEPTH,
+        RAM_TYPE            => "AUTO",
+        DEVICE              => DEVICE,
+        ALMOST_FULL_OFFSET  => TX_FIFO_AFULL_OFFSET,
+        ALMOST_EMPTY_OFFSET => 0
+    )
+    port map (
+        CLK         => CLK,
+        RST         => RESET,
+
+        RX_DATA     => s_dins_tx_mfb_data,
+        RX_META     => slv_array_ser(s_tx_fifo_rx_meta,MFB_REGIONS,TX_META_WIDTH),
+        RX_SOF_POS  => s_dins_tx_mfb_sof_pos,
+        RX_EOF_POS  => s_dins_tx_mfb_eof_pos,
+        RX_SOF      => s_dins_tx_mfb_sof,
+        RX_EOF      => s_dins_tx_mfb_eof,
+        RX_SRC_RDY  => s_tx_fifo_wr,
+        RX_DST_RDY  => s_tx_fifo_rx_dst_rdy,
+
+        TX_DATA     => TX_MFB_DATA,
+        TX_META     => s_tx_fifo_tx_meta,
+        TX_SOF_POS  => TX_MFB_SOF_POS,
+        TX_EOF_POS  => TX_MFB_EOF_POS,
+        TX_SOF      => s_tx_fifo_sof,
+        TX_EOF      => TX_MFB_EOF,
+        TX_SRC_RDY  => s_tx_fifo_src_rdy,
+        TX_DST_RDY  => TX_MFB_DST_RDY,
+
+        FIFO_STATUS => open,
+        FIFO_AFULL  => s_tx_fifo_afull,
+        FIFO_AEMPTY => open
+    );
+
+    -- psl tx_fifo_no_overflow :
+    --      assert always ((s_tx_fifo_wr = '1') -> (s_tx_fifo_rx_dst_rdy = '1')) abort (RESET) @rising_edge(CLK)
+    --      report "PTC_HDR_DATA_MERGE: TX_FIFO_AFULL_OFFSET is too small, TX_FIFO overflows!";
+
+    -- TX_MFB_SOF and TX_MVB_VLD are '0' when TX_MFB_SRC_RDY is '0', so they are always equal.
+    TX_MFB_SOF            <= s_tx_fifo_sof and (MFB_REGIONS-1 downto 0 => s_tx_fifo_src_rdy);
+    TX_MFB_SRC_RDY        <= s_tx_fifo_src_rdy;
+    s_tx_fifo_tx_meta_arr <= slv_array_downto_deser(s_tx_fifo_tx_meta,MFB_REGIONS,TX_META_WIDTH);
+
+    tx_meta_unpack_g : for r in 0 to MFB_REGIONS-1 generate
+        TX_MVB_DATA((r+1)*MVB_ITEM_WIDTH-1 downto r*MVB_ITEM_WIDTH) <= s_tx_fifo_tx_meta_arr(r)(TX_META_WIDTH-1 downto 1+8);
+        TX_MVB_VLD(r)                                               <= s_tx_fifo_tx_meta_arr(r)(8) and s_tx_fifo_src_rdy;
+        TX_MFB_BE((r+1)*8-1 downto r*8)                             <= s_tx_fifo_tx_meta_arr(r)(8-1 downto 0);
+    end generate;
 
 end architecture;
