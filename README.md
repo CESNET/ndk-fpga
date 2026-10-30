@@ -18,7 +18,7 @@ Before you get started, there are a few requirements that you need to have.
 
 ### Requirements and supported FPGA cards
 
-- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 25.1** or the **Xilinx Vivado 2025.1** tool, depending on the target card (see the table below), including a valid license.
+- To build the FPGA firmware, you must have installed the **Intel Quartus Prime Pro 26.1** or the **Xilinx Vivado 2025.1** tool, depending on the target card (see the table below), including a valid license.
 - To run HDL verifications, we recommend using the **Questa Sim-64 2025.2** tool. Verification is based on UVM and [cocotb](https://www.cocotb.org/) (Python); Questa is the default simulator for both.
 - To control an FPGA card with an application based on the NDK framework, you also need:
     - [NDK Linux driver and SW tools](https://github.com/CESNET/ndk-sw). We recommend using the latest version; we try to maintain backward compatibility between the NDK-FPGA and NDK-SW versions, but it is not 100% guaranteed.
