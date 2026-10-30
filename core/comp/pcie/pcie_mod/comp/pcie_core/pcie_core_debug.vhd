@@ -265,6 +265,9 @@ begin
             DATA_WIDTH => MI_WIDTH,
             PORTS      => PCIE_ENDPOINTS,
             ADDR_BASE  => mi_addr_base_endpts_f,
+            -- The default mask covers only the bits that are set in the bases.
+            -- Endpoint 1 and higher would then get addresses of other endpoints.
+            ADDR_MASK  => std_logic_vector(to_unsigned(2**log2(PCIE_ENDPOINTS*ENDPT_OFFSET)-1, MI_WIDTH)),
             PIPE_OUT   => (others => false),
             DEVICE     => DEVICE
         )
@@ -292,6 +295,11 @@ begin
         );
 
         pcie_endpoints_dbg_g : for pe in 0 to PCIE_ENDPOINTS-1 generate
+            signal mi_split_addr_rel : std_logic_vector(MI_WIDTH-1 downto 0);
+        begin
+            -- The splitter below decodes only the bits of its own address bases, so it gets
+            -- addresses relative to the endpoint (ENDPT_OFFSET is not a power of two).
+            mi_split_addr_rel <= std_logic_vector(unsigned(mi_split_addr(pe)) - pe*ENDPT_OFFSET);
 
             -- ----------
             --  MI Async
@@ -304,7 +312,7 @@ begin
                 CLK_M     => MI_CLK,
                 RESET_M   => MI_RESET,
                 MI_M_DWR  => mi_split_dwr (pe),
-                MI_M_ADDR => mi_split_addr(pe),
+                MI_M_ADDR => mi_split_addr_rel,
                 MI_M_RD   => mi_split_rd  (pe),
                 MI_M_WR   => mi_split_wr  (pe),
                 MI_M_BE   => mi_split_be  (pe),
