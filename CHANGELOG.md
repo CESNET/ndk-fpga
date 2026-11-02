@@ -12,16 +12,22 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cards: Added HBM2E support on FB2CDG1 card.
 - comp: Added converter AXI4LITE2MI for conversion from AXI4-Lite to MI.
 - comp: Added PS access controller VERSAL_PS_CTRL for Versal FPGAs
+- comp: Added generic ITEM_WIDTH to AXIS_PIPE for TKEEP of non-byte items.
+- core: Added support for the Versal CPM5 PCIe endpoint (Gen3x16, Gen4x16, Gen5x8x8).
 - core: Added HBM2E NoC IP templates.
+- uvm: Added Versal CPM5 512b and 1024b interfaces to the PCIE_AXI agent and Versal combinations to the PCIE_MOD UVM verification.
 
 ### Changed
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
+- core: Moved the PCIe adapter, reset, configuration and Device Tree blocks of the AMD PCIE_CORE into axi_common_i (see UPGRADE.md).
 
 ### Fixed
 - cards: Fixed DDR_PORTS derivation from MEM_PORTS on N5014 card.
 - comp: Fixed CNT_MULTI_MEMX adding a pending increment to another channel's value when a reset was requested without a read.
 - core: Fixed TX path getting stuck and RX receiving errored frames in E-Tile 10G/25G network module after the TX PLL lock loss of the clock master channel (e.g. PMA loopback switching on channel 0).
+- core: Fixed Device Tree generation and MI access of the second PCIe endpoint with PCIE_CORE_DEBUG_ENABLE.
+- uvm: Fixed tuser positions of the 256b CQ last_be and of the is_sop/is_eop pointers without straddling in the PCIE_AXI agent.
 
 ## [2026.9.0] - 2026-09-30
 
