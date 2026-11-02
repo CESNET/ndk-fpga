@@ -7,6 +7,34 @@ instructions on how to adapt existing projects using older versions of this repo
 
 ## Unreleased / Current `devel`
 
+### AMD PCIe core: adapter, reset, configuration and Device Tree blocks moved to `axi_common_i`
+
+**What changed:** The UltraScale+ (`USP`) and Versal (`VERSAL`) architectures of
+`PCIE_CORE` share the new component `PCIE_CORE_AXI_COMMON`, instantiated as
+`axi_common_i`. The generate blocks `pcie_adapter_g`, `pcie_rst_g`, `pcie_cfg_g`
+and `dt_g` are now inside it, one level deeper in the hierarchy. The Intel
+architectures are not affected.
+
+**How to migrate:** Update constraints, simulation scripts and testbenches that
+refer to these blocks by hierarchical path, for example:
+
+**Old:**
+
+```tcl
+.../pcie_core_i/pcie_adapter_g[0].pcie_adapter_i
+```
+
+**New:**
+
+```tcl
+.../pcie_core_i/axi_common_i/pcie_adapter_g[0].pcie_adapter_i
+```
+
+Known external users: `ndk-app-nic/build/nfb-200g2ql/app_constr.xdc` (the
+`KEEP_HIERARCHY` properties use `-quiet`, so a stale path is ignored silently and
+the property is lost). The NDK testbenches (`pcie_mod` UVM, `apps/minimal` cocotb)
+are updated.
+
 ## 2026.9.0
 
 ### Stop using `combo_user_const`; put application constants into the new `ndk_app_pkg`

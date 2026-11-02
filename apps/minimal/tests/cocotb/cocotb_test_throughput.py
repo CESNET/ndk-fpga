@@ -258,7 +258,8 @@ core = NFBDevice.core_instance_from_top(cocotb.top)
 DMA_STREAMS = core.dma_i.DMA_STREAMS.value
 
 pcic = core.pcie_i.pcie_core_i
-adapter = pcic.pcie_adapter_g[0].pcie_adapter_i
+# The AMD PCIE_CORE architectures have the adapter in the axi_common_i block
+adapter = getattr(pcic, "axi_common_i", pcic).pcie_adapter_g[0].pcie_adapter_i
 
 busm = {"RX": [], "TX": []}
 for d in busm:

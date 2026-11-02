@@ -386,53 +386,53 @@ module testbench;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_phy_link_status[pcie_e][1]  = 1'b1;
 
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_DATA  = cq_axi[pcie_e].TDATA;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_DATA  = cq_axi[pcie_e].TDATA;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_USER  = cq_axi[pcie_e].TUSER;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_USER  = cq_axi[pcie_e].TUSER;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_LAST  = cq_axi[pcie_e].TLAST;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_LAST  = cq_axi[pcie_e].TLAST;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_KEEP  = cq_axi[pcie_e].TKEEP;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_KEEP  = cq_axi[pcie_e].TKEEP;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_VALID = cq_axi[pcie_e].TVALID;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_VALID = cq_axi[pcie_e].TVALID;
             // verilog_lint: waive line-length
-            assign cq_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_READY;
+            assign cq_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CQ_AXI_READY;
 
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_DATA  = rc_axi[pcie_e].TDATA;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_DATA  = rc_axi[pcie_e].TDATA;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_USER  = rc_axi[pcie_e].TUSER;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_USER  = rc_axi[pcie_e].TUSER;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_LAST  = rc_axi[pcie_e].TLAST;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_LAST  = rc_axi[pcie_e].TLAST;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_KEEP  = rc_axi[pcie_e].TKEEP;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_KEEP  = rc_axi[pcie_e].TKEEP;
             // verilog_lint: waive line-length
-            assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_VALID = rc_axi[pcie_e].TVALID;
+            assign DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_VALID = rc_axi[pcie_e].TVALID;
             // verilog_lint: waive line-length
-            assign rc_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_READY;
+            assign rc_axi[pcie_e].TREADY = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RC_AXI_READY;
 
             // verilog_lint: waive line-length
-            assign cc_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_DATA;
+            assign cc_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_DATA;
             // verilog_lint: waive line-length
-            assign cc_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_USER;
+            assign cc_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_USER;
             // verilog_lint: waive line-length
-            assign cc_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_LAST;
+            assign cc_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_LAST;
             // verilog_lint: waive line-length
-            assign cc_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_KEEP;
+            assign cc_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_KEEP;
             // verilog_lint: waive line-length
-            assign cc_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_VALID;
+            assign cc_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.CC_AXI_VALID;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_cc_axi_ready[pcie_e][0] = cc_axi[pcie_e].TREADY;
 
             // verilog_lint: waive line-length
-            assign rq_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_DATA;
+            assign rq_axi[pcie_e].TDATA  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_DATA;
             // verilog_lint: waive line-length
-            assign rq_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_USER;
+            assign rq_axi[pcie_e].TUSER  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_USER;
             // verilog_lint: waive line-length
-            assign rq_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_LAST;
+            assign rq_axi[pcie_e].TLAST  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_LAST;
             // verilog_lint: waive line-length
-            assign rq_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_KEEP;
+            assign rq_axi[pcie_e].TKEEP  = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_KEEP;
             // verilog_lint: waive line-length
-            assign rq_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_VALID;
+            assign rq_axi[pcie_e].TVALID = DUT_U.VHDL_DUT_U.pcie_core_i.axi_common_i.pcie_adapter_g[pcie_e].pcie_adapter_i.RQ_AXI_VALID;
             assign DUT_U.VHDL_DUT_U.pcie_core_i.pcie_rq_axi_ready[pcie_e][0] = rq_axi[pcie_e].TREADY;
 
             assign DUT_U.VHDL_DUT_U.pcie_core_i.cfg_rcb_status[pcie_e][0] = 1'b0;
