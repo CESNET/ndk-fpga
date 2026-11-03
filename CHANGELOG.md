@@ -54,6 +54,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Fixed MVB_MERGE_STREAMS_ORDERED comparing invalid SEL VLD with already read items when SEL SRC_RDY fell before the word was accepted.
 - comp: Fixed data duplication in MFB_FORK (register version) when RX_SRC_RDY fell or RX data changed while RX_DST_RDY was not set.
 - comp: Fixed data duplication in MVB_SPLIT when RX_SRC_RDY fell while RX_DST_RDY was not set.
+- comp: Fixed corrupted frames in MFB2AXI (REGIONS = 1, REGION_SIZE > 1, without input PIPE) when RX_SRC_RDY fell or RX data changed while RX_DST_RDY was not set.
 
 ## [2026.9.0] - 2026-09-30
 
