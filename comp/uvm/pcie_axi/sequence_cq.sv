@@ -20,7 +20,9 @@ class sequence_base_cq #(
     );
     `uvm_declare_p_sequencer(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ)));
 
-    localparam PACKET_MAX = ITEMS < 16 || STRADDLING == 0 ? 1 : 2;
+    // Number of the is_sop/is_eop slots of the interface
+    localparam SLOTS      = ITEMS < 16 ? 1 : 2;
+    localparam PACKET_MAX = ITEMS < 16 || STRADDLING == 0 ? 1 : SLOTS;
     localparam BE_INDEX   = ITEMS < 16 ? 8 : 16;
     localparam REGIONS_NUM = PACKET_MAX;
     localparam REGION_SIZE = ITEMS/PACKET_MAX;
@@ -175,7 +177,7 @@ class sequence_base_cq #(
                 //Set SOP and SOP pointer
                 gen.tuser[sof_num + SOF_INDEX] = 1'b1;
                 if (ITEMS >= 16) begin //SOP pos is only in 512 bit width interface
-                    gen.tuser[(sof_num+1)*2 + PACKET_MAX + SOF_INDEX-1 -: 2] = {region, 1'b0};
+                    gen.tuser[(sof_num+1)*2 + SLOTS + SOF_INDEX-1 -: 2] = {region, 1'b0};
                 end
 
                 //COPY HEADER
@@ -245,7 +247,7 @@ class sequence_base_cq #(
                 if (ITEMS >= 16) begin
                     //SET EOF and EOF position signal
                     gen.tuser[eof_num + EOF_INDEX] = 1'b1;
-                    gen.tuser[(eof_num+1)*4 + PACKET_MAX + EOF_INDEX-1 -: 4] = index-1;
+                    gen.tuser[(eof_num+1)*4 + SLOTS + EOF_INDEX-1 -: 4] = index-1;
                 end
 
                 eof_num++;

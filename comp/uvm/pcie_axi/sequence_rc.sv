@@ -114,12 +114,13 @@ class sequence_base_rc #(
         gen.tvalid = 0;
         gen.tlast = 0;
 
-        if (STRADDLING == 0) begin
-            gen.tuser[83:82] = 'x;
-            gen.tuser[85:84] = 'x;
-            gen.tuser[87:86] = 'x;
-            gen.tuser[91:88] = 'x;
-            gen.tuser[95:92] = 'x;
+        // Without straddling only the first is_sop/is_eop slot is used, the others are don't care
+        if (STRADDLING == 0 && ITEMS >= 16) begin
+            for (int unsigned slot = 1; slot < PACKET_MAX_STRADDLING; slot++) begin
+                gen.tuser[(slot+1)*2 + PACKET_MAX_STRADDLING + SOF_INDEX-1 -: 2] = 'x;
+                gen.tuser[slot + EOF_INDEX] = 'x;
+                gen.tuser[(slot+1)*4 + PACKET_MAX_STRADDLING + EOF_INDEX-1 -: 4] = 'x;
+            end
         end
 
         if (state == PKT_SPACE) begin
@@ -167,7 +168,7 @@ class sequence_base_rc #(
                 //Set SOP and SOP pointer
                 gen.tuser[sof_num + SOF_INDEX] = 1'b1;
                 if (ITEMS >= 16) begin //SOP pos is only in 512 bit width interface
-                    gen.tuser[(sof_num+1)*2 + PACKET_MAX + SOF_INDEX-1 -: 2] = region;
+                    gen.tuser[(sof_num+1)*2 + PACKET_MAX_STRADDLING + SOF_INDEX-1 -: 2] = region;
                 end
 
                 //COPY HEADER
@@ -228,7 +229,7 @@ class sequence_base_rc #(
                 if (ITEMS >= 16) begin
                     //SET EOF and EOF position signal
                     gen.tuser[eof_num + EOF_INDEX] = 1'b1;
-                    gen.tuser[(eof_num+1)*4 + PACKET_MAX + EOF_INDEX-1 -: 4] = index-1;
+                    gen.tuser[(eof_num+1)*4 + PACKET_MAX_STRADDLING + EOF_INDEX-1 -: 4] = index-1;
                 end else begin;
                     gen.tuser[(eof_num+1)*4 + EOF_INDEX-1 -: 4] = {index-1, 1'b1};
                 end

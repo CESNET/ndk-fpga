@@ -203,7 +203,7 @@ class monitor_CQ #(
     localparam SOF_INDEX  = 80;
     localparam EOF_INDEX  = 86;
     localparam FBE_INDEX  = 0;
-    localparam LBE_INDEX  = 8;
+    localparam LBE_INDEX  = ITEMS < 16 ? 4 : 8;
 
     protected logic [4-1:0] fbe;
     protected logic [4-1:0] lbe;
