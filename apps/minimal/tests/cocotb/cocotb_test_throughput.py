@@ -14,6 +14,7 @@ import itertools
 from cocotb.triggers import Timer, Event, First, RisingEdge
 
 from cocotbext.ndk_core import NFBDevice
+from cocotbext.nfb.ext.python import bridge
 
 import cocotbext.ofm.utils.sim.modelsim as ms
 import cocotb.utils
@@ -41,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 
 # Shortcuts
-e = cocotb.external
+e = bridge
 st = cocotb.utils.get_sim_time
 add_cursor = ms.add_cursor
 print = ms.print
