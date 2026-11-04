@@ -66,7 +66,9 @@ entity AXIS_ETH_PARSER_SNIFFER is
         -- Extracted header data (EXTRACT_BYTES bytes)
         EXTRACTED_DATA        : out std_logic_vector(EXTRACT_BYTES*8-1 downto 0);
         -- Extracted data valid
-        EXTRACTED_VALID       : out std_logic
+        EXTRACTED_VALID       : out std_logic;
+        -- All EXTRACT_BYTES bytes are inside the packet. Valid with EXTRACTED_VALID.
+        EXTRACTED_COMPLETE    : out std_logic
     );
 end entity;
 
@@ -106,6 +108,7 @@ architecture FULL of AXIS_ETH_PARSER_SNIFFER is
     signal soff_vld             : std_logic;
     signal word_ok              : std_logic;
     signal word_ok_set          : std_logic;
+    signal skip_vld_done        : std_logic;
     signal enable_flag          : std_logic;
 
     -- Extraction state machine
@@ -129,6 +132,8 @@ architecture FULL of AXIS_ETH_PARSER_SNIFFER is
     signal extracted_done_reg   : std_logic;
     signal extracted_vld        : std_logic;
     signal extracted_vld_reg    : std_logic;
+    signal extracted_cmpl_reg   : std_logic;
+    signal last_byte_vld        : std_logic;
 
     -- Bytes to extract in current cycle
     signal bytes_to_extract     : unsigned(WORD_BYTES_W-1 downto 0);
@@ -325,8 +330,40 @@ begin
             elsif (enable_flag = '1') then
                 extracted_vld_reg <= extracted_vld;
             else
-                extracted_vld_reg <= valid_word and word_ok and not word_ok_set;
+                -- Nothing is extracted, so the valid pulse does not wait for the word at START_OFFSET.
+                -- That word can be after the end of the packet.
+                extracted_vld_reg <= soff_vld and valid_word and not skip_vld_done;
             end if;
+        end if;
+    end process;
+
+    -- The valid pulse without extraction is sent only once per packet
+    process (CLK)
+    begin
+        if rising_edge(CLK) then
+            if (RESET = '1' or end_word = '1') then
+                skip_vld_done <= '0';
+            elsif (soff_vld = '1' and valid_word = '1') then
+                skip_vld_done <= '1';
+            end if;
+        end if;
+    end process;
+
+    -- In the last AXI word, the last extracted byte is valid only when RX_AXI_TKEEP marks it
+    process (all)
+        variable end_pos : natural;
+    begin
+        end_pos       := to_integer(shift_amount) + to_integer(bytes_to_extract);
+        last_byte_vld <= '1';
+        if ((RX_AXI_TLAST = '1') and (end_pos > 0)) then
+            last_byte_vld <= RX_AXI_TKEEP(end_pos-1);
+        end if;
+    end process;
+
+    process (CLK)
+    begin
+        if rising_edge(CLK) then
+            extracted_cmpl_reg <= extraction_complete and last_byte_vld;
         end if;
     end process;
 
@@ -339,8 +376,9 @@ begin
     end process;
 
     -- Drive extracted data outputs
-    EXTRACTED_META  <= extracted_meta_reg;
-    EXTRACTED_DATA  <= extracted_data_reg;
-    EXTRACTED_VALID <= extracted_vld_reg;
+    EXTRACTED_META     <= extracted_meta_reg;
+    EXTRACTED_DATA     <= extracted_data_reg;
+    EXTRACTED_VALID    <= extracted_vld_reg;
+    EXTRACTED_COMPLETE <= extracted_cmpl_reg;
 
 end architecture;

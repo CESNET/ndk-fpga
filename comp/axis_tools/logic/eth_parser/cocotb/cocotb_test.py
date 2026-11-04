@@ -8,6 +8,8 @@
 Tests:
 - run_test_base: Random gaps and moderate backpressure on both axes
 - run_test_headers_backpressure: Strong backpressure on HEADERS_READY
+- run_test_corruption: Packets cut short at a random length
+- run_test_malformed_ipv4: IPv4 headers that end after the last byte of the packet
 """
 
 from typing import Optional, Tuple
@@ -27,6 +29,7 @@ async def _run_test(
     tx_cfg: Optional[BackpressureConfig] = None,
     hdr_cfg: Optional[BackpressureConfig] = None,
     corrupt_prob: float = 0.05,
+    malform_prob: float = 0.0,
     test_name: str = ""
 ):
     """Common test runner."""
@@ -45,7 +48,8 @@ async def _run_test(
 
     for i in range(pkt_count):
         await tb.generate_and_send_packet(
-            min_len=pkt_range[0], max_len=pkt_range[1], corrupt_prob=corrupt_prob
+            min_len=pkt_range[0], max_len=pkt_range[1], corrupt_prob=corrupt_prob,
+            malform_prob=malform_prob
         )
         if (i + 1) % 500 == 0:
             cocotb.log.info(f"Sent {i + 1}/{pkt_count} packets")
@@ -101,4 +105,17 @@ async def run_test_corruption(dut, pkt_count=2000):
         hdr_cfg=BackpressureConfig(1, 5, 0.5),
         corrupt_prob=0.5,
         test_name="corruption"
+    )
+
+
+@cocotb.test()
+async def run_test_malformed_ipv4(dut, pkt_count=2000):
+    """Malformed IPv4 test: random IHL and protocol, packets cut to a short length."""
+    await _run_test(
+        dut, pkt_count=pkt_count,
+        tx_cfg=BackpressureConfig(1, 5, 0.5),
+        hdr_cfg=BackpressureConfig(1, 5, 0.5),
+        corrupt_prob=0.0,
+        malform_prob=0.5,
+        test_name="malformed_ipv4"
     )

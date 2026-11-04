@@ -85,6 +85,7 @@ architecture FULL of AXIS_ETH_PARSER_UNIT is
 
     -- Extracted data and metadata from sniffer
     signal ext_valid           : std_logic;
+    signal ext_complete        : std_logic;
     signal ext_meta            : std_logic_vector(META_WIDTH_INTERNAL-1 downto 0);
     signal ext_data            : std_logic_vector(STAGE_EXTRACT_BYTES*8-1 downto 0);
     signal ext_data_resized    : std_logic_vector(EXTRACT_DATA_WIDTH-1 downto 0);
@@ -116,25 +117,26 @@ begin
         DEVICE          => DEVICE
     )
     port map (
-        CLK               => CLK,
-        RESET             => RESET,
-        RX_AXI_TDATA      => RX_AXI_TDATA,
-        RX_AXI_TKEEP      => RX_AXI_TKEEP,
-        RX_AXI_TLAST      => RX_AXI_TLAST,
-        RX_AXI_TVALID     => RX_AXI_TVALID,
-        RX_AXI_TREADY     => RX_AXI_TREADY,
-        TX_AXI_TDATA      => TX_AXI_TDATA,
-        TX_AXI_TKEEP      => TX_AXI_TKEEP,
-        TX_AXI_TLAST      => TX_AXI_TLAST,
-        TX_AXI_TVALID     => TX_AXI_TVALID,
-        TX_AXI_TREADY     => TX_AXI_TREADY,
-        START_META        => std_logic_vector(IN_OFFSET) & std_logic_vector(IN_PROTOCOL),
-        START_OFFSET      => std_logic_vector(IN_OFFSET),
-        START_ENABLE      => in_enable,
-        START_VALID       => IN_VLD,
-        EXTRACTED_META    => ext_meta,
-        EXTRACTED_DATA    => ext_data,
-        EXTRACTED_VALID   => ext_valid
+        CLK                => CLK,
+        RESET              => RESET,
+        RX_AXI_TDATA       => RX_AXI_TDATA,
+        RX_AXI_TKEEP       => RX_AXI_TKEEP,
+        RX_AXI_TLAST       => RX_AXI_TLAST,
+        RX_AXI_TVALID      => RX_AXI_TVALID,
+        RX_AXI_TREADY      => RX_AXI_TREADY,
+        TX_AXI_TDATA       => TX_AXI_TDATA,
+        TX_AXI_TKEEP       => TX_AXI_TKEEP,
+        TX_AXI_TLAST       => TX_AXI_TLAST,
+        TX_AXI_TVALID      => TX_AXI_TVALID,
+        TX_AXI_TREADY      => TX_AXI_TREADY,
+        START_META         => std_logic_vector(IN_OFFSET) & std_logic_vector(IN_PROTOCOL),
+        START_OFFSET       => std_logic_vector(IN_OFFSET),
+        START_ENABLE       => in_enable,
+        START_VALID        => IN_VLD,
+        EXTRACTED_META     => ext_meta,
+        EXTRACTED_DATA     => ext_data,
+        EXTRACTED_VALID    => ext_valid,
+        EXTRACTED_COMPLETE => ext_complete
     );
 
     -- Split metadata into protocol and offset fields
@@ -208,12 +210,17 @@ begin
             NEXT_PROTOCOL <= (others => '0');
             NEXT_OFFSET   <= std_logic_vector(unsigned(ext_meta_offset) + to_unsigned(UDP_HDR_EXTRACT, OFFSET_WIDTH));
         end if;
+
+        -- The next protocol is unknown when the packet ends inside the header
+        if ((to_integer(unsigned(ext_meta_proto)) = PROTOCOL) and (ext_complete = '0')) then
+            NEXT_PROTOCOL <= (others => '0');
+        end if;
     end process;
 
-    -- Set valid flag when expected protocol matches actual protocol
+    -- Set valid flag when expected protocol matches actual protocol and the whole header is in the packet
     process (all)
     begin
-        if (to_integer(unsigned(ext_meta_proto)) = PROTOCOL) then
+        if ((to_integer(unsigned(ext_meta_proto)) = PROTOCOL) and (ext_complete = '1')) then
             EXTRACTED_DATA_OK <= '1';
         else
             EXTRACTED_DATA_OK <= '0';

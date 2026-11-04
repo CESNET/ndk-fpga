@@ -23,7 +23,7 @@ from cocotb.triggers import RisingEdge, ClockCycles
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster, Axi4StreamSlave
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
 from cocotb_bus.scoreboard import Scoreboard
-from scapy.all import raw
+from scapy.all import IP, raw
 
 from cocotbext.ofm.utils.scapy import ScapyPacketGenerator
 from scoreboard import AxisEthParserResult, compare_headers as _compare_headers
@@ -147,11 +147,41 @@ class Testbench:
         self.pkts_sent += 1
         return expected
 
+    @staticmethod
+    def malform_ipv4(pkt, packet_bytes: bytes, min_len: int) -> bytes:
+        """Set a random IHL and protocol in the IPv4 header and cut the packet short.
+
+        The packet then announces headers that end after the last byte of the
+        packet. The length stays at least min_len, so the packet looks like
+        a padded minimum-size frame on a real link.
+
+        Args:
+            pkt: Scapy packet that packet_bytes was built from.
+            packet_bytes: Raw packet bytes.
+            min_len: Minimum packet length after the cut.
+
+        Returns:
+            bytes: Changed packet bytes, or the original bytes when the packet has no IPv4.
+        """
+        if IP not in pkt:
+            return packet_bytes
+
+        l3_offset = len(packet_bytes) - len(raw(pkt[IP]))
+        ihl = random.randint(5, 15)
+        data = bytearray(packet_bytes)
+        data[l3_offset] = 0x40 | ihl
+        data[l3_offset + 9] = random.choice([6, 17, 1])
+
+        max_cut_len = max(min_len, min(len(data), l3_offset + ihl * 4 + 28))
+        new_len = random.randint(min_len, max_cut_len)
+        return bytes(data[:new_len])
+
     async def generate_and_send_packet(
         self,
         min_len: int = 60,
         max_len: int = 1518,
-        corrupt_prob: float = 0.0
+        corrupt_prob: float = 0.0,
+        malform_prob: float = 0.0
     ) -> dict:
         """Generate and send packet via AXI4-Stream. Optionally corrupt by truncation.
 
@@ -159,6 +189,7 @@ class Testbench:
             min_len: Min packet length (default: 60). Also used as min length after corruption.
             max_len: Max packet length (default: 1518).
             corrupt_prob: Corruption probability 0.0-1.0 (default: 0.0 = no corruption).
+            malform_prob: Probability 0.0-1.0 of a malformed IPv4 header (see malform_ipv4).
 
         Returns:
             dict: Packet info {pkt, packet_bytes, len}.
@@ -173,6 +204,9 @@ class Testbench:
                 new_len = random.randint(min_len, orig_len - 1)
                 packet_bytes = packet_bytes[:new_len]
                 cocotb.log.debug(f"Packet corrupted: {orig_len} -> {new_len} bytes")
+
+        if malform_prob > 0 and random.random() < malform_prob:
+            packet_bytes = self.malform_ipv4(pkt, packet_bytes, min_len)
 
         axi_tr = Axi4StreamTransaction(TDATA=packet_bytes)
         expected = self.generate_expected(pkt, packet_bytes)

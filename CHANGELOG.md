@@ -35,6 +35,8 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cocotb: Fixed MFBDriver not following the rate of EthernetRateLimiter and ItemRateLimiter.
 - comp: Fixed the simulation of MFB_TRANSFORMER failing on a frame when META_WIDTH is 0.
 - comp: Fixed AXIS_ETH_PARSER reading the TCP NS flag from the data offset field.
+- comp: Fixed AXIS_ETH_PARSER returning headers of other packets after a packet whose header offset was after the packet end.
+- comp: Fixed AXIS_ETH_PARSER reporting a header cut by the end of the packet as valid.
 
 ## [2026.9.0] - 2026-09-30
 
