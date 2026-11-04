@@ -43,6 +43,14 @@ set SIM_FLAGS(UVM_ENABLE) true
 set SIM_FLAGS(UVM_TEST) "test::ex_test"
 set SIM_FLAGS(UVM_VERBOSITY) "UVM_NONE"
 
+# The Versal PCIE_CORE instantiates the generic package pcie_misc_versal_template.
+# QuestaSim does not load a generic package instance in a design compiled with
+# -nodebug (vsim-3067), so the Versal configurations are compiled in debug mode
+# (vcom -lint and vopt -lint=full +acc instead of -nodebug).
+if {$PCIE_TYPE == "VERSAL"} {
+    set SIM_FLAGS(DEBUG) true
+}
+
 # Global include file for compilation
 source "$OFM_PATH/build/Modelsim.inc.fdo"
 

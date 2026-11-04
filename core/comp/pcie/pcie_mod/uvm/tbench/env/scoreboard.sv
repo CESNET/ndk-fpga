@@ -220,6 +220,10 @@ class scoreboard #(
             m_model.mi_resp_width_set(32);
         end else if (PCIE_ENDPOINT_TYPE == "R_TILE") begin
             m_model.mi_resp_width_set(64);
+        end else if (PCIE_ENDPOINT_TYPE == "VERSAL") begin
+            // The Versal testbench drives CFG_STATUS_MAX_PAYLOAD = 256B,
+            // so the MTC splits the read completions at 64 DWs
+            m_model.mi_resp_width_set(64);
         end else begin
             m_model.mi_resp_width_set(32);
         end

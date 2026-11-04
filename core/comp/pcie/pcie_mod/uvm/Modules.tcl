@@ -31,6 +31,9 @@ lappend MOD "$ENTITY_BASE/tbench/dut.sv"
 if {$ARCHGRP == "USP" || $ARCHGRP == "USP_PCIE4C" || $ARCHGRP == "USP_PCIE4"} {
     lappend COMPONENTS [ list "PCIE_AXI"   "$OFM_PATH/comp/uvm/pcie_axi"   "FULL"]
     lappend MOD "$ENTITY_BASE/tbench/testbench_xilinx.sv"
+} elseif {$ARCHGRP == "VERSAL"} {
+    lappend COMPONENTS [ list "PCIE_AXI"   "$OFM_PATH/comp/uvm/pcie_axi"   "FULL"]
+    lappend MOD "$ENTITY_BASE/tbench/testbench_xilinx_versal.sv"
 } elseif {$ARCHGRP == "P_TILE"} {
     lappend COMPONENTS [ list "PCIE_AVST"   "$OFM_PATH/comp/uvm/pcie_avst"   "FULL"]
     lappend MOD "$ENTITY_BASE/tbench/testbench_intel.sv"

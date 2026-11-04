@@ -6,7 +6,11 @@
 
 import test::*;
 
-module dut (
+module dut #(
+    // Widths of the MISC signals per PCIe endpoint (used by the Versal PCIE_CORE, see pcie_misc_versal_pkg.vhd)
+    int unsigned MISC_TOP2PCIE_WIDTH = 1,
+    int unsigned MISC_PCIE2TOP_WIDTH = 1
+) (
     input  logic [PCIE_CONS*PCIE_CLKS-1 : 0] PCIE_SYSCLK_P,
     input  logic [PCIE_CONS*PCIE_CLKS-1 : 0] PCIE_SYSCLK_N,
     output logic [PCIE_ENDPOINTS-1 : 0]      PCIE_USER_CLK,
@@ -24,7 +28,10 @@ module dut (
     mvb_if.dut_tx dma_rc_mvb[PCIE_ENDPOINTS][DMA_PORTS],
     mfb_if.dut_tx dma_cq_mfb[PCIE_ENDPOINTS][DMA_PORTS],
     mfb_if.dut_rx dma_cc_mfb[PCIE_ENDPOINTS][DMA_PORTS],
-    mi_if.dut_master config_mi[PCIE_ENDPOINTS]
+    mi_if.dut_master config_mi[PCIE_ENDPOINTS],
+    // MISC signals between the Top-Level design and the PCIe core, endpoint i at bits (i+1)*WIDTH-1 downto i*WIDTH
+    input  logic [PCIE_ENDPOINTS*MISC_TOP2PCIE_WIDTH-1 : 0] MISC_TOP2PCIE = '0,
+    output logic [PCIE_ENDPOINTS*MISC_PCIE2TOP_WIDTH-1 : 0] MISC_PCIE2TOP
     );
 
 
@@ -316,7 +323,10 @@ module dut (
         // Enable of XCV IP, for Xilinx only
         .XVC_ENABLE         (XVC_ENABLE),
         // FPGA device
-        .DEVICE             (DEVICE)
+        .DEVICE             (DEVICE),
+        // Widths of the MISC signals
+        .MISC_TOP2PCIE_WIDTH(MISC_TOP2PCIE_WIDTH),
+        .MISC_PCIE2TOP_WIDTH(MISC_PCIE2TOP_WIDTH)
 
     ) VHDL_DUT_U (
         // =====================================================================
@@ -462,8 +472,13 @@ module dut (
         .MI_WR               (mi_wr),
         .MI_DRD              (mi_drd),
         .MI_ARDY             (mi_ardy),
-        .MI_DRDY             (mi_drdy)
+        .MI_DRDY             (mi_drdy),
 
+        // =====================================================================
+        // MISC signals (Versal: connection of the PCIe IP core in the CIPS)
+        // =====================================================================
+        .MISC_TOP2PCIE       (MISC_TOP2PCIE),
+        .MISC_PCIE2TOP       (MISC_PCIE2TOP)
     );
 
 
