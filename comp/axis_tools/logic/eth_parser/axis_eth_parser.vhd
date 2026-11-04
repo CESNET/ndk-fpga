@@ -315,7 +315,7 @@ begin
                                                 fifo_data(i)(8*(11+1)-1 downto 8*11);
                         hdrs.tcp.data_offset := fifo_data(i)(8*(12+1)-1 downto 8*12+4);
                         hdrs.tcp.reserved    := fifo_data(i)(8*12+3 downto 8*12+1);
-                        hdrs.tcp.flags       := fifo_data(i)(8*12+7) &
+                        hdrs.tcp.flags       := fifo_data(i)(8*12)   &
                                                 fifo_data(i)(8*(13+1)-1 downto 8*13);
                         hdrs.tcp.window      := fifo_data(i)(8*(14+1)-1 downto 8*14) &
                                                 fifo_data(i)(8*(15+1)-1 downto 8*15);

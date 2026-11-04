@@ -34,6 +34,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cocotb: Fixed bus signals of drivers with the same bus name in different hierarchy instances resolving to the first instance.
 - cocotb: Fixed MFBDriver not following the rate of EthernetRateLimiter and ItemRateLimiter.
 - comp: Fixed the simulation of MFB_TRANSFORMER failing on a frame when META_WIDTH is 0.
+- comp: Fixed AXIS_ETH_PARSER reading the TCP NS flag from the data offset field.
 
 ## [2026.9.0] - 2026-09-30
 
