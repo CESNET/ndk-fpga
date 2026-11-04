@@ -8,15 +8,16 @@
 
 class sequence_base_rq #(
     int unsigned ITEMS,
-    int unsigned ITEM_WIDTH
+    int unsigned ITEM_WIDTH,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_common::sequence_base#(
     config_sequence,
-    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RQ))
+    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RQ, DEVICE))
 );
 
     `ndk_object_param_utils(
-        uvm_pcie_axi::sequence_base_rq#(ITEMS, ITEM_WIDTH),
-        $sformatf("uvm_pcie_axi::sequence_base_rq#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+        uvm_pcie_axi::sequence_base_rq#(ITEMS, ITEM_WIDTH, DEVICE),
+        $sformatf("uvm_pcie_axi::sequence_base_rq#(%0d,%0d,%s)",ITEMS, ITEM_WIDTH, DEVICE)
     );
 
     int unsigned transactions_min = 10;
@@ -48,17 +49,18 @@ endclass
 
 class sequence_lib_rq #(
     int unsigned ITEMS,
-    int unsigned ITEM_WIDTH
+    int unsigned ITEM_WIDTH,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_common::sequence_library#(
     config_sequence,
-    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RQ))
+    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RQ, DEVICE))
 );
 
   `ndk_object_param_utils(
-        uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH),
-        $sformatf("uvm_pcie_axi::sequence_lib_rq#(%0d,%0d)",ITEMS, ITEM_WIDTH)
+        uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH, DEVICE),
+        $sformatf("uvm_pcie_axi::sequence_lib_rq#(%0d,%0d,%s)",ITEMS, ITEM_WIDTH, DEVICE)
     )
-  `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH))
+  `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH, DEVICE))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -69,7 +71,7 @@ class sequence_lib_rq #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_pcie_axi::sequence_base_rq #(ITEMS, ITEM_WIDTH)::get_type());
+        this.add_sequence(uvm_pcie_axi::sequence_base_rq #(ITEMS, ITEM_WIDTH, DEVICE)::get_type());
     endfunction
 
     task body();

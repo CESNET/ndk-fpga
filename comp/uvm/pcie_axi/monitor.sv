@@ -6,14 +6,25 @@
 
 virtual class monitor#(
     int unsigned ITEMS,
-    direction_t DIR
+    direction_t DIR,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_pcie::monitor;
 
     // LOCAL PARAMETERS
     localparam ITEM_WIDTH = 32; //as all pcie devices
-    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR);
+    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR, DEVICE);
+    // Positions of the tuser fields
+    localparam tuser_layout_t LAYOUT = tuser_layout_get(ITEMS, DIR);
+    localparam int unsigned PACKET_MAX = LAYOUT.slots;
+    localparam int unsigned SOF_INDEX  = LAYOUT.sop;
+    localparam int unsigned SOF_PTR_W  = LAYOUT.sop_ptr_w;
+    localparam int unsigned SOF_UNIT   = LAYOUT.sop_unit;
+    localparam int unsigned EOF_INDEX  = LAYOUT.eop;
+    localparam int unsigned EOF_PTR_W  = LAYOUT.eop_ptr_w;
+    localparam int unsigned FBE_INDEX  = LAYOUT.fbe;
+    localparam int unsigned LBE_INDEX  = LAYOUT.lbe;
 
-    typedef monitor#(ITEMS, DIR) this_type;
+    typedef monitor#(ITEMS, DIR, DEVICE) this_type;
     uvm_analysis_imp#(uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH), this_type) port_axi;
 
     // protected variable
@@ -82,20 +93,17 @@ endclass
 
 class monitor_CC #(
     int unsigned ITEMS,
-    logic STRADDLING
-) extends monitor#(ITEMS, AXI_CC);
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
+) extends monitor#(ITEMS, AXI_CC, DEVICE);
     `ndk_component_param_utils(
-        uvm_pcie_axi::monitor_CC#(ITEMS, STRADDLING),
-        $sformatf("uvm_pcie_axi::monitor_CC#(%0d,%0d)",ITEMS, STRADDLING)
+        uvm_pcie_axi::monitor_CC#(ITEMS, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::monitor_CC#(%0d,%0d,%s)",ITEMS, STRADDLING, DEVICE)
     );
-
-    localparam int unsigned PACKET_MAX = 2;
-    localparam int unsigned SOF_INDEX  = 0;
-    localparam int unsigned EOF_INDEX  = 6;
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
-        assert(STRADDLING == 0 || ITEMS == 16) else begin
+        assert(STRADDLING == 0 || ITEMS >= 16) else begin
             `uvm_fatal(this.get_full_name(), $sformatf(
                        "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
@@ -130,21 +138,21 @@ class monitor_CC #(
                 sof[0]   = 0;
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it+1] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it+1] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
 
             end else begin
                 sof_vld = {1'b0, t.tuser[PACKET_MAX+SOF_INDEX-1 -: PACKET_MAX]};
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
             end
 
             eof_vld = t.tuser[PACKET_MAX+EOF_INDEX-1 -: PACKET_MAX];
             for (int unsigned it = 0; it < PACKET_MAX; it++) begin
                 //pointer right behinde array
-                eof[it] = t.tuser[(it+1)*4+PACKET_MAX+EOF_INDEX-1 -: 4] + 1;
+                eof[it] = t.tuser[(it+1)*EOF_PTR_W+PACKET_MAX+EOF_INDEX-1 -: EOF_PTR_W] + 1;
             end
 
             assert(!(data.size() > 0 && sof_vld[0] == 1 && sof[0] != 0)) else begin
@@ -177,12 +185,12 @@ class monitor_CC #(
 
             //get eof
             if (eof_num < PACKET_MAX && eof_vld[eof_num] == 1) begin
-                read_data(t.tdata, sof[sof_num]*4, eof[eof_num]);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, eof[eof_num]);
                 time_end = t.time_last();
                 send_comp();
                 eof_num++;
             end else begin
-                read_data(t.tdata, sof[sof_num]*4, ITEMS);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, ITEMS);
             end
 
             sof_num++;
@@ -192,25 +200,20 @@ endclass
 
 class monitor_CQ #(
     int unsigned ITEMS,
-    logic STRADDLING
-) extends monitor#(ITEMS, AXI_CQ);
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
+) extends monitor#(ITEMS, AXI_CQ, DEVICE);
     `ndk_component_param_utils(
-        uvm_pcie_axi::monitor_CQ#(ITEMS, STRADDLING),
-        $sformatf("uvm_pcie_axi::monitor_CQ#(%0d,%0d)",ITEMS, STRADDLING)
+        uvm_pcie_axi::monitor_CQ#(ITEMS, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::monitor_CQ#(%0d,%0d,%s)",ITEMS, STRADDLING, DEVICE)
     );
-
-    localparam PACKET_MAX = 2;
-    localparam SOF_INDEX  = 80;
-    localparam EOF_INDEX  = 86;
-    localparam FBE_INDEX  = 0;
-    localparam LBE_INDEX  = ITEMS < 16 ? 4 : 8;
 
     protected logic [4-1:0] fbe;
     protected logic [4-1:0] lbe;
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
-        assert(STRADDLING == 0 || ITEMS == 16) else begin
+        assert(STRADDLING == 0 || ITEMS >= 16) else begin
             `uvm_fatal(this.get_full_name(), $sformatf(
                        "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
@@ -251,21 +254,21 @@ class monitor_CQ #(
                 sof[0]   = 0;
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it+1] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it+1] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
 
             end else begin
                 sof_vld = {1'b0, t.tuser[PACKET_MAX+SOF_INDEX-1 -: PACKET_MAX]};
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
             end
 
             eof_vld = t.tuser[PACKET_MAX+EOF_INDEX-1 -: PACKET_MAX];
             for (int unsigned it = 0; it < PACKET_MAX; it++) begin
                 //pointer right behinde array
-                eof[it] = t.tuser[(it+1)*4+PACKET_MAX+EOF_INDEX-1 -: 4] + 1;
+                eof[it] = t.tuser[(it+1)*EOF_PTR_W+PACKET_MAX+EOF_INDEX-1 -: EOF_PTR_W] + 1;
             end
 
             assert(!(data.size() > 0 && sof_vld[0] == 1 && sof[0] != 0)) else begin
@@ -303,12 +306,12 @@ class monitor_CQ #(
 
             //get eof
             if (eof_num < PACKET_MAX && eof_vld[eof_num] == 1) begin
-                read_data(t.tdata, sof[sof_num]*4, eof[eof_num]);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, eof[eof_num]);
                 time_end = t.time_last();
                 send_req(fbe, lbe);
                 eof_num++;
             end else begin
-                read_data(t.tdata, sof[sof_num]*4, ITEMS);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, ITEMS);
             end
 
             sof_num++;
@@ -318,18 +321,13 @@ endclass
 
 class monitor_RQ #(
     int unsigned ITEMS,
-    logic STRADDLING
-) extends monitor#(ITEMS, AXI_RQ);
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
+) extends monitor#(ITEMS, AXI_RQ, DEVICE);
     `ndk_component_param_utils(
-        uvm_pcie_axi::monitor_RQ#(ITEMS, STRADDLING),
-        $sformatf("uvm_pcie_axi::monitor_RQ#(%0d,%0d)",ITEMS, STRADDLING)
+        uvm_pcie_axi::monitor_RQ#(ITEMS, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::monitor_RQ#(%0d,%0d,%s)",ITEMS, STRADDLING, DEVICE)
     );
-
-    localparam int unsigned PACKET_MAX = ITEMS < 16 ? 1 : 2;
-    localparam int unsigned SOF_INDEX  = 20;
-    localparam int unsigned EOF_INDEX  = 26;
-    localparam int unsigned FBE_INDEX  = ITEMS < 16 ? 0 : 0;
-    localparam int unsigned LBE_INDEX  = ITEMS < 16 ? 4 : 8;
 
     protected logic [4-1:0] fbe;
     protected logic [4-1:0] lbe;
@@ -337,7 +335,7 @@ class monitor_RQ #(
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
         // STRADDLING is supported only when ITES is 16
-        assert(STRADDLING == 0 || ITEMS == 16) else begin
+        assert(STRADDLING == 0 || ITEMS >= 16) else begin
             `uvm_fatal(this.get_full_name(), $sformatf(
                        "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
@@ -378,7 +376,7 @@ class monitor_RQ #(
                 sof[0]   = 0;
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it+1] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it+1] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
 
             // When packet is not transmissed then
@@ -387,14 +385,14 @@ class monitor_RQ #(
                 sof_vld = {1'b0, t.tuser[PACKET_MAX+SOF_INDEX-1 -: PACKET_MAX]};
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
             end
 
             eof_vld = t.tuser[PACKET_MAX+EOF_INDEX-1 -: PACKET_MAX];
             for (int unsigned it = 0; it < PACKET_MAX; it++) begin
                 //pointer right behinde array
-                eof[it] = t.tuser[(it+1)*4+PACKET_MAX+EOF_INDEX-1 -: 4] + 1;
+                eof[it] = t.tuser[(it+1)*EOF_PTR_W+PACKET_MAX+EOF_INDEX-1 -: EOF_PTR_W] + 1;
             end
 
             assert(!(data.size() > 0 && sof_vld[0] == 1 && sof[0] != 0)) else begin
@@ -434,12 +432,12 @@ class monitor_RQ #(
 
             //get eof
             if (eof_num < PACKET_MAX && eof_vld[eof_num] == 1) begin
-                read_data(t.tdata, sof[sof_num]*4, eof[eof_num]);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, eof[eof_num]);
                 time_end = t.time_last();
                 send_req(fbe, lbe);
                 eof_num++;
             end else begin
-                read_data(t.tdata, sof[sof_num]*4, ITEMS);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, ITEMS);
             end
 
             sof_num++;
@@ -449,20 +447,17 @@ endclass
 
 class monitor_RC #(
     int unsigned ITEMS,
-    logic STRADDLING
-) extends monitor#(ITEMS, AXI_RC);
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
+) extends monitor#(ITEMS, AXI_RC, DEVICE);
     `ndk_component_param_utils(
-        uvm_pcie_axi::monitor_RC#(ITEMS, STRADDLING),
-        $sformatf("uvm_pcie_axi::monitor_RC#(%0d,%0d)",ITEMS, STRADDLING)
+        uvm_pcie_axi::monitor_RC#(ITEMS, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::monitor_RC#(%0d,%0d,%s)",ITEMS, STRADDLING, DEVICE)
     )
-
-    localparam int unsigned PACKET_MAX = (ITEMS < 16) ? 2  : 4;
-    localparam int unsigned SOF_INDEX  = (ITEMS < 16) ? 32 : 64;
-    localparam int unsigned EOF_INDEX  = (ITEMS < 16) ? 34 : 76;
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
-        assert(STRADDLING == 0 || ITEMS == 16) else begin
+        assert(STRADDLING == 0 || ITEMS >= 16) else begin
             `uvm_fatal(this.get_full_name(), $sformatf(
                        "\n\tUnsupported combination of DATA_WIDTH(%0d) and STRADDLING(%0d)", ITEMS * 32, STRADDLING));
         end
@@ -501,21 +496,21 @@ class monitor_RC #(
                 sof[0]   = 0;
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it+1] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it+1] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
 
             end else begin
                 sof_vld = {1'b0, t.tuser[PACKET_MAX+SOF_INDEX-1 -: PACKET_MAX]};
                 //GET ALL SOF
                 for (int unsigned it = 0; it < PACKET_MAX; it++) begin
-                    sof[it] = t.tuser[(it+1)*2+PACKET_MAX+SOF_INDEX-1 -: 2];
+                    sof[it] = t.tuser[(it+1)*SOF_PTR_W+PACKET_MAX+SOF_INDEX-1 -: SOF_PTR_W];
                 end
             end
 
             eof_vld = t.tuser[PACKET_MAX+EOF_INDEX-1 -: PACKET_MAX];
             for (int unsigned it = 0; it < PACKET_MAX; it++) begin
                 //pointer right behinde array
-                eof[it] = t.tuser[(it+1)*4+PACKET_MAX+EOF_INDEX-1 -: 4] + 1;
+                eof[it] = t.tuser[(it+1)*EOF_PTR_W+PACKET_MAX+EOF_INDEX-1 -: EOF_PTR_W] + 1;
             end
 
             assert(!(data.size() > 0 && sof_vld[0] == 1 && sof[0] != 0)) else begin
@@ -551,12 +546,12 @@ class monitor_RC #(
 
             //get eof
             if (eof_num < PACKET_MAX && eof_vld[eof_num] == 1) begin
-                read_data(t.tdata, sof[sof_num]*4, eof[eof_num]);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, eof[eof_num]);
                 time_end = t.time_last();
                 send_comp();
                 eof_num++;
             end else begin
-                read_data(t.tdata, sof[sof_num]*4, ITEMS);
+                read_data(t.tdata, sof[sof_num]*SOF_UNIT, ITEMS);
             end
 
             sof_num++;
@@ -567,19 +562,19 @@ class monitor_RC #(
 endclass
 
 
-class monitor_register #(int unsigned ITEMS, direction_t DIR, logic STRADDLING);
+class monitor_register #(int unsigned ITEMS, direction_t DIR, logic STRADDLING, string DEVICE = "ULTRASCALE");
     static function uvm_object_wrapper get();
         automatic uvm_object_wrapper ret = null;
 
-        if (ITEMS == 2 || ITEMS == 4 || ITEMS == 8 || ITEMS == 16) begin
+        if (ITEMS == 2 || ITEMS == 4 || ITEMS == 8 || ITEMS == 16 || ITEMS == 32) begin
             unique case (DIR)
-                AXI_RQ: ret = monitor_RQ#(ITEMS, STRADDLING)::get_type();
-                AXI_RC: ret = monitor_RC#(ITEMS, STRADDLING)::get_type();
-                AXI_CQ: ret = monitor_CQ#(ITEMS, STRADDLING)::get_type();
-                AXI_CC: ret = monitor_CC#(ITEMS, STRADDLING)::get_type();
+                AXI_RQ: ret = monitor_RQ#(ITEMS, STRADDLING, DEVICE)::get_type();
+                AXI_RC: ret = monitor_RC#(ITEMS, STRADDLING, DEVICE)::get_type();
+                AXI_CQ: ret = monitor_CQ#(ITEMS, STRADDLING, DEVICE)::get_type();
+                AXI_CC: ret = monitor_CC#(ITEMS, STRADDLING, DEVICE)::get_type();
             endcase
         end else begin
-            $error("Unsupported number of items %0d\nSUPPORTED VALUES [2, 4, 8, 16]\n", ITEMS);
+            $error("Unsupported number of items %0d\nSUPPORTED VALUES [2, 4, 8, 16, 32]\n", ITEMS);
         end
 
         return ret;
