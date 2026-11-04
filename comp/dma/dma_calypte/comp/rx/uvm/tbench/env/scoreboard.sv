@@ -43,7 +43,7 @@ class pcie_rq_comparer #(type MODEL_ITEM) extends uvm_common::comparer_base_orde
         ret &= dut_rq.ep                 === tr_model.ep; // poisoned
         ret &= dut_rq.at                 === tr_model.at;
         ret &= dut_rq.length             === tr_model.length; //dwords
-        ret &= (dut_rq.data              ==? tr_model.data) === 1'b1;
+        `ndk_array_cmp_wildcard(ret, dut_rq.data, tr_model.data)
         ret &= dut_rq.requester_id       === tr_model.requester_id;
         ret &= dut_rq.tag                === tr_model.tag;
         ret &= dut_rq.lbe                === tr_model.lbe;

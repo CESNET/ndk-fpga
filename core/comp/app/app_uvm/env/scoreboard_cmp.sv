@@ -107,7 +107,9 @@ class scoreboard_channel_mfb_unordered #(
     endfunction
 
     virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
-        return (tr_dut.data ==? tr_model.data);
+        int unsigned ret = 1;
+        `ndk_array_cmp_wildcard(ret, tr_dut.data, tr_model.data)
+        return ret;
     endfunction
 
     virtual function string model_item2string(MODEL_ITEM tr);
@@ -138,7 +140,9 @@ class scoreboard_channel_mfb_ordered #(
     endfunction
 
     virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
-        return (tr_dut.data ==? tr_model.data);
+        int unsigned ret = 1;
+        `ndk_array_cmp_wildcard(ret, tr_dut.data, tr_model.data)
+        return ret;
     endfunction
 
     virtual function string model_item2string(MODEL_ITEM tr);
@@ -169,7 +173,9 @@ class scoreboard_channel_mfb_tagged #(
     endfunction
 
     virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
-        return (tr_dut.data ==? tr_model.data);
+        int unsigned ret = 1;
+        `ndk_array_cmp_wildcard(ret, tr_dut.data, tr_model.data)
+        return ret;
     endfunction
 
     virtual function string model_item2string(MODEL_ITEM tr);
