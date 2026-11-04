@@ -427,7 +427,9 @@ function automatic uvm_pcie::request_header hdr_cq_get(
         hdr.fmt[3-1:1] = 2'b01;
         hdr.pcie_type  = 5'b00000;
     end else begin
-        `uvm_fatal("ROOT", "\n\tUnknow pcie transaction type");
+        `uvm_fatal("ROOT", $sformatf(
+                   "\n\tUnknow pcie transaction type 0b%b\n\tCQ descriptor 'h%h 'h%h 'h%h 'h%h",
+                   req_type, data[0], data[1], data[2], data[3]));
     end
 
     hdr.ph           = 0;

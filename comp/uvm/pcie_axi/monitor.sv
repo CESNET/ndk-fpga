@@ -43,8 +43,52 @@ virtual class monitor#(
         end
     endfunction
 
+    // Report a beat with TVALID set and TREADY unknown out of the reset.
+    // Such a beat is not a handshake for the monitor nor for the CQ/RC sequences.
+    function void handshake_x_check(uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) t);
+        if (t.tvalid === 1'b1 && $isunknown(t.tready) && !reset_sync.is_reset()) begin
+            `uvm_error(this.get_full_name(), $sformatf(
+                       "\n\tTREADY is 0b%b while TVALID is set at %0t", t.tready, t.time_last()));
+        end
+    endfunction
+
+    // The header must be a memory read/write and a CQ packet must contain exactly
+    // its payload. Otherwise the monitor lost a beat (it is out of sync with the driver).
+    function void req_check();
+        logic [4-1:0]  req_type    = 'x;
+        logic [11-1:0] dword_count = 'x;
+        int unsigned   exp_size    = 0;
+        string         dws         = "";
+
+        // The request type and the dword count have the same positions
+        // in the CQ and RQ descriptors
+        if (data.size() >= 4) begin
+            req_type    = data[2][15-1:11];
+            dword_count = data[2][11-1:0];
+            exp_size    = 4;
+            if (req_type == 4'b0001) begin
+                exp_size += (dword_count != 0) ? dword_count : 1024;
+            end
+        end
+
+        if (data.size() < 4 || !(req_type inside {4'b0000, 4'b0001}) ||
+            (DIR == AXI_CQ && data.size() != exp_size)) begin
+            for (int unsigned it = 0; it < data.size() && it < 16; it++) begin
+                dws = {dws, $sformatf(" 'h%h", data[it])};
+            end
+            `uvm_fatal(this.get_full_name(), $sformatf({
+                "\n\tBroken request (start %0t, end %0t): %0d DWs,",
+                " request type 0b%b, dword count %0d",
+                "\n\tThe first DWs:%s",
+                "\n\tProbably a lost beat or a packet started during the reset"},
+                time_start, time_end, data.size(), req_type, dword_count, dws));
+        end
+    endfunction
+
     function void send_req(logic [4-1:0] fbe, logic [4-1:0] lbe);
         uvm_pcie::request_header hdr;
+
+        req_check();
 
         if (DIR == AXI_RQ) begin
             hdr = hdr_rq_get(data, fbe, lbe);
@@ -234,6 +278,7 @@ class monitor_CQ #(
             data.delete();
         end
 
+        handshake_x_check(t);
         if ($isunknown(t.tvalid) || $isunknown(t.tready)) begin
             return;
         end
@@ -477,6 +522,7 @@ class monitor_RC #(
             data.delete();
         end
 
+        handshake_x_check(t);
         if ($isunknown(t.tvalid) || $isunknown(t.tready)) begin
             return;
         end
