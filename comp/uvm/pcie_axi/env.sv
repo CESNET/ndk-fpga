@@ -78,6 +78,12 @@ class env_rx #(
 
         $cast(m_driver_axi, m_driver);
         uvm_config_db#(uvm_common::fifo#(uvm_pcie::header))::set(m_axi.m_sequencer, "" , "in_fifo", m_driver_axi.fifo);
+
+        // The CQ/RC sequences wait for the end of the reset (PCIE_USER_RESET) before they
+        // start a packet, as the monitor ignores the beats sent in the reset
+        if (get_is_active() == UVM_ACTIVE) begin
+            reset_sync.push_back(m_axi.m_sequencer.reset_sync);
+        end
     endfunction
 
     task run_phase(uvm_phase phase);

@@ -328,7 +328,8 @@ class sequence_base_rc #(
             create_sequence_item(gen);
 
             get_response(rsp);
-            while(req.tvalid == 1'b1 && rsp.tready == 1'b0) begin
+            // TREADY X/Z is not a handshake (the monitor skips such a beat too)
+        while(req.tvalid == 1'b1 && rsp.tready !== 1'b1) begin
                 send_frame();
                 get_response(rsp);
             end
@@ -339,7 +340,8 @@ class sequence_base_rc #(
 
         // PEELING LOOP - Send last block
         get_response(rsp);
-        while(req.tvalid == 1'b1 && rsp.tready == 1'b0) begin
+        // TREADY X/Z is not a handshake (the monitor skips such a beat too)
+        while(req.tvalid == 1'b1 && rsp.tready !== 1'b1) begin
             send_frame();
             get_response(rsp);
         end
