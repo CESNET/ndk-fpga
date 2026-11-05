@@ -15,6 +15,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Added generic ITEM_WIDTH to AXIS_PIPE for TKEEP of non-byte items.
 - core: Added support for the Versal CPM5 PCIe endpoint (Gen3x16, Gen4x16, Gen5x8x8).
 - comp: Added AXIS_ETH_PARSER_GEN with a configurable list of protocols, optional register stages and parsing of QinQ, MPLS, IPv6 and IPv6 extension headers.
+- comp: Added AXIS_SLR_CROSSING for AXI-Stream paths between super logic regions.
 - core: Added HBM2E NoC IP templates.
 - uvm: Added Versal CPM5 512b and 1024b interfaces to the PCIE_AXI agent and Versal combinations to the PCIE_MOD UVM verification.
 

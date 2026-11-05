@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (C) 2026 CESNET z. s. p. o.
+# Author(s): Jakub Cabal <cabal@cesnet.cz>
+
+view wave
+delete wave *
+
+add_wave -group {ALL} -noupdate -hex /axis_slr_crossing/*
+
+config wave -signalnamewidth 1
