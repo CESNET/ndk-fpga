@@ -23,6 +23,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
 - core: Moved the PCIe adapter, reset, configuration and Device Tree blocks of the AMD PCIE_CORE into axi_common_i (see UPGRADE.md).
+- cards: Changed the P-Tile PCIe user clock on N6010 and IA-420F cards to 400 MHz when DMA Calypte is used.
 - comp: Changed AXIS_ETH_PARSER to select all bytes of a header with one multiplexer to reduce the logic and shorten the critical path.
 
 ### Fixed
