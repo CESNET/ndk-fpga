@@ -171,7 +171,7 @@ if cocotb.__version__ >= "2.0.0":
 
             self._clear_signals()
             self._write_to_bus()
-            cocotb.start_soon(self._main_loop())
+            cocotb.start_soon(self._start())
 
         @property
         def item_cnt(self):
@@ -250,6 +250,12 @@ if cocotb.__version__ >= "2.0.0":
         def _get_idle_items(self) -> int:
             """Return how many items one idle bus word represents; subclasses override."""
             return 1
+
+        async def _start(self):
+            # The first word is written only after a rising edge of this clock.
+            # The driver can be created in a time step in which this clock rises.
+            await self._clk_re
+            await self._main_loop()
 
         async def _main_loop(self):
             """Main driving loop: consume transactions and drive them onto the bus."""

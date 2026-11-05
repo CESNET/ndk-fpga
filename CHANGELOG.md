@@ -30,6 +30,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - uvm: Fixed tuser positions of the 256b CQ last_be and of the is_sop/is_eop pointers without straddling in the PCIE_AXI agent.
 - build: Fixed the nvc-sim target ignoring the GENERICS variable.
 - cocotb: Fixed a write of a whole vector being lost when the bits of the vector are written in the same time step in SignalProxy of cocotbext.
+- cocotb: Fixed the loss of the first word of a ModularBusDriver that starts in a time step with a rising edge of another clock in cocotbext.
 
 ## [2026.9.0] - 2026-09-30
 
