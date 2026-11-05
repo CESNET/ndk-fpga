@@ -28,6 +28,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - core: Fixed TX path getting stuck and RX receiving errored frames in E-Tile 10G/25G network module after the TX PLL lock loss of the clock master channel (e.g. PMA loopback switching on channel 0).
 - core: Fixed Device Tree generation and MI access of the second PCIe endpoint with PCIE_CORE_DEBUG_ENABLE.
 - uvm: Fixed tuser positions of the 256b CQ last_be and of the is_sop/is_eop pointers without straddling in the PCIE_AXI agent.
+- build: Fixed the nvc-sim target ignoring the GENERICS variable.
 
 ## [2026.9.0] - 2026-09-30
 
