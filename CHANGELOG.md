@@ -29,6 +29,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - core: Fixed Device Tree generation and MI access of the second PCIe endpoint with PCIE_CORE_DEBUG_ENABLE.
 - uvm: Fixed tuser positions of the 256b CQ last_be and of the is_sop/is_eop pointers without straddling in the PCIE_AXI agent.
 - build: Fixed the nvc-sim target ignoring the GENERICS variable.
+- cocotb: Fixed a write of a whole vector being lost when the bits of the vector are written in the same time step in SignalProxy of cocotbext.
 
 ## [2026.9.0] - 2026-09-30
 

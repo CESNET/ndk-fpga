@@ -60,13 +60,13 @@ def do_fix():
 # cocotb 2.0-only defines
 if cocotb.__version__ >= "2.0.0":
     from cocotb.types import Array, Logic, LogicArray
-    from cocotb.handle import LogicObject, ArrayObject, Immediate, Deposit
+    from cocotb.handle import LogicObject, LogicArrayObject, ArrayObject, Immediate, Deposit
     from cocotb.triggers import GPITrigger
     from cocotb._gpi_triggers import _EdgeBase
     from cocotb.simulator import register_value_change_callback, VALUE_CHANGE, RISING, FALLING
     from cocotb.utils import get_sim_time
 
-    # whole-vector values written in the current time step, keyed by the vector's path
+    # whole-vector values that were written in the current time step, keyed by the vector's path
     _pending_writes = {}
 
     def _write_index(handle, array_idx, value):
@@ -79,6 +79,26 @@ if cocotb.__version__ >= "2.0.0":
         full_val[array_idx] = value
         _pending_writes[handle._path] = (get_sim_time(), full_val)
         handle.set(Immediate(full_val))
+
+    def _write_all(handle, value):
+        # A later write of one index in this time step starts from this value.
+        # A write without Immediate is applied after the immediate writes, so it is not stored.
+        handle.set(value)
+        if not isinstance(handle, LogicArrayObject) or not isinstance(value, Immediate):
+            return
+        value = value.value
+        rng = handle.value.range
+        if isinstance(value, int):
+            bits = format(value & ((1 << len(rng)) - 1), f"0{len(rng)}b")
+        elif isinstance(value, (LogicArray, str)):
+            bits = str(value)
+        else:
+            bits = None
+
+        if bits is not None and len(bits) == len(rng):
+            _pending_writes[handle._path] = (get_sim_time(), LogicArray(bits, rng))
+        else:
+            _pending_writes.pop(handle._path, None)
 
     class _EdgeProxyBase(_EdgeBase):
         # Shared by all edge kinds: one simulator callback per signal path
@@ -306,7 +326,10 @@ if cocotb.__version__ >= "2.0.0":
 
         def set(self, value):
             if self._array_idx is None:
-                self._handle.set(value)
+                if isinstance(self._handle, ArrayObject):
+                    self._handle.set(value)
+                else:
+                    _write_all(self._handle, value)
                 return
 
             # Write just the element, other elements may have pending writes
