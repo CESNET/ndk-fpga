@@ -205,7 +205,7 @@ if cocotb.__version__ >= "2.0.0":
             """
             while True:
                 while self._send_queue.empty():
-                    yield self._idle_fac.make()
+                    yield self._make_empty_queue_idle()
 
                 while not self._send_queue.empty():
                     transaction = await self._send_queue.get()
@@ -214,10 +214,18 @@ if cocotb.__version__ >= "2.0.0":
 
                     idle_count = self._idle_gen.get(transaction)
 
-                    for _ in range(idle_count):
-                        yield self._idle_fac.make()
+                    for idle_transaction in self._make_gap_idles(idle_count):
+                        yield idle_transaction
 
                     yield copy(transaction)
+
+        def _make_empty_queue_idle(self) -> IdleTransaction:
+            """Return the idle transaction that the driver sends when the send queue is empty."""
+            return self._idle_fac.make()
+
+        def _make_gap_idles(self, idle_count: int) -> list[IdleTransaction]:
+            """Return the idle transactions of a gap that the idle generator requested."""
+            return [self._idle_fac.make() for _ in range(idle_count)]
 
         async def _split_transaction(self, transaction: Transaction):
             """Stage transaction values into ``self.state``, yielding once per bus word.

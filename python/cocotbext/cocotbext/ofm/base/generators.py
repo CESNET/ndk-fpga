@@ -17,12 +17,19 @@ class IdleGenerator():
     This base IdleGenerator generates no idles.
 
     Driver uses the idle generator by calling pair of .get and .put methods.
-    The get method returns a number of idle items, which should be inserted on the bus.
-    The put method awaits real number of idle items, which were present on the bus.
+    The get method returns the size of the gap that the driver should insert before the next transaction.
+    The put method receives the number of items that were present on the bus.
 
     Some idle generators need to know more about the bus parameters and should be parametrized
     with proper configure call.
+
+    The attribute counts_items selects the unit of the value from the get method.
+    Only MFBDriver reads counts_items.
+    True: the value is the number of idle items in the gap.
+    False: the value is the number of idle transactions. The driver selects their lengths.
     """
+
+    counts_items = False
 
     def __init__(self):
         # some generators need to be fully configured before the put/get method can be called
@@ -33,7 +40,10 @@ class IdleGenerator():
 
     def get(self, transaction: Transaction, *args, **kwargs) -> int:
         """
-        return count of items (single IdleTransaction) that should be inserted on bus before next DataTransaction.
+        Return the size of the gap that the driver should insert on the bus before the next DataTransaction.
+
+        The value is the number of idle items when counts_items is True.
+        Otherwise, the value is the number of IdleTransactions.
 
         Note that driver doesn't have to follow the returned value.
         Also the handshaked bus can insert dst_rdy=0 states, which doesn't allow to transmit DataTransaction.
@@ -67,6 +77,8 @@ class EthernetRateLimiter(IdleGenerator):
 
     Ensure the driver puts transaction with "end" argument.
     """
+
+    counts_items = True
 
     def __init__(self, bitrate):
         super().__init__()
@@ -137,6 +149,10 @@ class ItemRateLimiter(IdleGenerator):
                                     When `max_idles` is set to 0, `zero_idles_chance` is automatically set to 100.
                                     Used only when `rate_percentage` is set to 0 (=IdleTransactions are generated at random).
     """
+
+    @property
+    def counts_items(self):
+        return self._rate_percentage != 0
 
     def __init__(self, rate_percentage=0, **kwargs):
         super().__init__()
