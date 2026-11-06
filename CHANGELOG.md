@@ -40,6 +40,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Fixed AXIS_ETH_PARSER reading the TCP NS flag from the data offset field.
 - comp: Fixed AXIS_ETH_PARSER returning headers of other packets after a packet whose header offset was after the packet end.
 - comp: Fixed AXIS_ETH_PARSER reporting a header cut by the end of the packet as valid.
+- comp: Fixed AXIS_MERGER inferring a latch, which could stop all streams until the next packet of the selected stream.
 
 ## [2026.9.0] - 2026-09-30
 
