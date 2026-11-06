@@ -33,6 +33,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cocotb: Fixed the loss of the first word of a ModularBusDriver that starts in a time step with a rising edge of another clock in cocotbext.
 - cocotb: Fixed bus signals of drivers with the same bus name in different hierarchy instances resolving to the first instance.
 - cocotb: Fixed MFBDriver not following the rate of EthernetRateLimiter and ItemRateLimiter.
+- comp: Fixed the simulation of MFB_TRANSFORMER failing on a frame when META_WIDTH is 0.
 
 ## [2026.9.0] - 2026-09-30
 
