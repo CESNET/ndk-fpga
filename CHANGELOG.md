@@ -31,6 +31,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - build: Fixed the nvc-sim target ignoring the GENERICS variable.
 - cocotb: Fixed a write of a whole vector being lost when the bits of the vector are written in the same time step in SignalProxy of cocotbext.
 - cocotb: Fixed the loss of the first word of a ModularBusDriver that starts in a time step with a rising edge of another clock in cocotbext.
+- cocotb: Fixed bus signals of drivers with the same bus name in different hierarchy instances resolving to the first instance.
 
 ## [2026.9.0] - 2026-09-30
 

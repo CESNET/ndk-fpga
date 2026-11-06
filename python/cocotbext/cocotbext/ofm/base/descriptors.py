@@ -46,7 +46,7 @@ class BaseDescriptor:
         self._aliases.append(alias)
 
     def resolve(self, bus):
-        cache_key = (bus.name, bus.array_idx)
+        cache_key = (bus.dut._path, bus.name, bus.array_idx)
 
         if cache_key in self._resolve_cache.keys():
             return self._resolve_cache[cache_key]
