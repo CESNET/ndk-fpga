@@ -103,6 +103,8 @@ is enabled on all AMD cards whose measurements we provide. The latency is always
 denoted for specific results. Every time the data are looped back, either in the Host for the FHF path
 or in the FPGA for the HFH path, the loopback is established with the shortest path possible (E.g., for the
 HFH to directly connect *USR_TX_MFB* to the *USR_RX_MFB* interface).
+The test core in the DMA wrapper contains an MFB loopback for the HFH path.
+The firmware contains the test core only when ``DMA_DEBUG_ENABLE`` is set to ``true``.
 
 AMD FPGA Gen3x8
 ^^^^^^^^^^^^^^^

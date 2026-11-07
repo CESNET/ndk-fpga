@@ -23,6 +23,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Changed DMA_CALYPTE to give each of its blocks its own copy of the reset.
 - comp: Changed FREQUENCY_METER to register the reset of each measured clock domain.
 - core: Changed the DMA Calypte wrapper to give the test core and the PCIe MFB pipes their own copies of the reset.
+- core: Changed the DMA Calypte wrapper to include the DMA test core only when DMA_DEBUG_ENABLE is set.
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
 - core: Moved the PCIe adapter, reset, configuration and Device Tree blocks of the AMD PCIE_CORE into axi_common_i (see UPGRADE.md).
