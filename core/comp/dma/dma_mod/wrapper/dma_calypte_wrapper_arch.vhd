@@ -28,6 +28,11 @@ architecture CALYPTE of DMA_WRAPPER is
 
     constant ST_SP_DBG_META_WIDTH : natural := 4;
 
+    constant USR_RST_TEST_CORE : natural := 0;
+    constant USR_RST_RQ_PIPE   : natural := 1;
+    constant USR_RST_CQ_PIPE   : natural := 2;
+    constant USR_RST_REPLICAS  : natural := 3;
+
     --==============================================================================================
     --  MI Async and Splitting
     --==============================================================================================
@@ -216,6 +221,7 @@ architecture CALYPTE of DMA_WRAPPER is
     signal force_reset_dbg : std_logic_vector(DMA_STREAMS-1 downto 0);
 
     signal s_dma_reset_async : std_logic_vector(DMA_STREAMS-1 downto 0);
+    signal pcie_usr_rst      : slv_array_t(PCIE_ENDPOINTS -1 downto 0)(USR_RST_REPLICAS -1 downto 0);
     signal s_dma_reset       : std_logic_vector(DMA_STREAMS-1 downto 0);
 
 begin
@@ -658,7 +664,7 @@ begin
         )
         port map (
             CLK                => PCIE_USR_CLK(i),
-            RESET              => PCIE_USR_RESET(i),
+            RESET              => pcie_usr_rst(i)(USR_RST_TEST_CORE),
 
             ST_SP_DBG_CHAN     => st_sp_dbg_chan(i),
             ST_SP_DBG_META     => st_sp_dbg_meta(i),
@@ -717,6 +723,19 @@ begin
             MI_ARDY            => mi_dmagen_ardy(i)(1),
             MI_DRD             => mi_dmagen_drd(i)(1),
             MI_DRDY            => mi_dmagen_drdy(i)(1)
+        );
+
+        -- the test core and the PCIe MFB pipes get their own copies of the reset
+        pcie_usr_rst_i : entity work.ASYNC_RESET
+        generic map (
+            TWO_REG  => true,
+            OUT_REG  => true,
+            REPLICAS => USR_RST_REPLICAS
+        )
+        port map (
+            CLK       => PCIE_USR_CLK(i),
+            ASYNC_RST => PCIE_USR_RESET(i),
+            OUT_RST   => pcie_usr_rst(i)
         );
 
         s_dma_reset_async(i) <= PCIE_USR_RESET(i) or force_reset_dbg(i);
@@ -848,7 +867,7 @@ begin
         )
         port map (
             CLK        => PCIE_USR_CLK(i),
-            RESET      => PCIE_USR_RESET(i),
+            RESET      => pcie_usr_rst(i)(USR_RST_RQ_PIPE),
 
             RX_DATA    => pcie_rq_mfb_data_piped(i),
             RX_META    => pcie_rq_mfb_meta_piped(i),
@@ -884,7 +903,7 @@ begin
         )
         port map (
             CLK        => PCIE_USR_CLK(i),
-            RESET      => PCIE_USR_RESET(i),
+            RESET      => pcie_usr_rst(i)(USR_RST_CQ_PIPE),
 
             RX_DATA    => PCIE_CQ_MFB_DATA(i),
             RX_META    => PCIE_CQ_MFB_META(i),

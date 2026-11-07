@@ -127,7 +127,23 @@ architecture FULL of FREQUENCY_METER_CORE is
     signal meas_asfifox_rd         : std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
     signal meas_asfifox_empty      : std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
 
+    -- reset of each measured clock domain with its own register
+    signal meas_rst : std_logic_vector(MEASURED_FREQUENCIES-1 downto 0);
 begin
+
+    meas_rst_g : for mf in 0 to MEASURED_FREQUENCIES-1 generate
+        meas_rst_i : entity work.ASYNC_RESET
+        generic map (
+            TWO_REG  => true,
+            OUT_REG  => true,
+            REPLICAS => 1
+        )
+        port map (
+            CLK        => MEASURED_CLK(mf),
+            ASYNC_RST  => MEASURED_RESET(mf),
+            OUT_RST(0) => meas_rst(mf)
+        );
+    end generate;
 
     -- ========================================================================
     -- Input clock domain crossings
@@ -181,7 +197,7 @@ begin
             ADATAIN  => MASTER_ENABLE,
 
             BCLK     => MEASURED_CLK    (mf),
-            BRST     => MEASURED_RESET  (mf),
+            BRST     => meas_rst        (mf),
             BDATAOUT => enable_meas_cntr(mf)
         );
 
@@ -196,7 +212,7 @@ begin
             ADATAIN  => IN_PROGRESS,
 
             BCLK     => MEASURED_CLK       (mf),
-            BRST     => MEASURED_RESET     (mf),
+            BRST     => meas_rst           (mf),
             BDATAOUT => in_progress_measclk(mf)
         );
     end generate;
@@ -273,7 +289,7 @@ begin
         port map (
             CLK        => MEASURED_CLK    (mf),
             CLK_EN     => enable_meas_cntr(mf),
-            RESET      => MEASURED_RESET  (mf),
+            RESET      => meas_rst        (mf),
             INCREMENT  => "1",
             MAX_VAL    => (others => '1'),
             RESULT     => meas_cnt_result (mf)
@@ -289,7 +305,7 @@ begin
         )
         port map (
             ACLK     => MEASURED_CLK        (mf),
-            ARST     => MEASURED_RESET      (mf),
+            ARST     => meas_rst            (mf),
             ADATAIN  => meas_cnt_result_msb (mf),
 
             BCLK     => MASTER_CLK,
@@ -343,7 +359,7 @@ begin
             begin
                 if rising_edge(MEASURED_CLK(mf)) then
                     in_progress_measclk_dly(mf)(s+1) <= in_progress_measclk_dly(mf)(s);
-                    if (MEASURED_RESET(mf) = '1') then
+                    if (meas_rst(mf) = '1') then
                         in_progress_measclk_dly(mf)(s+1) <= '0';
                     end if;
                 end if;
@@ -432,7 +448,7 @@ begin
         )
         port map (
             ACLK     => MEASURED_CLK         (mf),
-            ARST     => MEASURED_RESET       (mf),
+            ARST     => meas_rst             (mf),
             ADATAIN  => not meas_asfifox_full(mf),
 
             BCLK     => MASTER_CLK,
@@ -453,7 +469,7 @@ begin
         )
         port map (
             WR_CLK    => MEASURED_CLK      (mf),
-            WR_RST    => MEASURED_RESET    (mf),
+            WR_RST    => meas_rst          (mf),
             WR_DATA   => meas_asfifox_din  (mf),
             WR_EN     => meas_asfifox_wr   (mf),
             WR_FULL   => meas_asfifox_full (mf),

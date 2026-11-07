@@ -197,6 +197,16 @@ end entity;
 architecture FULL of DMA_CALYPTE is
     constant SW_ADDR_WIDTH : positive := 64;
 
+    -- Each block gets its own copy of the reset, so the reset has a shorter path to the registers of the block.
+    constant RST_RX          : natural := 0;
+    constant RST_TX          : natural := 1;
+    constant RST_PTR_UPDATER : natural := 2;
+    constant RST_RQ_MERGER   : natural := 3;
+    constant RST_MI_SPLITTER : natural := 4;
+    constant RST_REPLICAS    : natural := 5;
+
+    signal rst : std_logic_vector(RST_REPLICAS-1 downto 0);
+
     -- Address space mapping between the controllers
     constant MI_SPLIT_BASES : slv_array_t(2 -1 downto 0)(MI_WIDTH-1 downto 0) := (
         -- RX DMA
@@ -336,6 +346,18 @@ architecture FULL of DMA_CALYPTE is
     -- attribute mark_debug of rx_dma_rq_mfb_dst_rdy : signal is "true";
 begin
 
+    rst_i : entity work.ASYNC_RESET
+    generic map (
+        TWO_REG  => true,
+        OUT_REG  => true,
+        REPLICAS => RST_REPLICAS
+    )
+    port map (
+        CLK       => CLK,
+        ASYNC_RST => RESET,
+        OUT_RST   => rst
+    );
+
     rx_dma_calypte_g : if (RX_GEN_EN) generate
         rx_dma_calypte_i : entity work.RX_DMA_CALYPTE
         generic map (
@@ -364,7 +386,7 @@ begin
 
         port map (
             CLK   => CLK,
-            RESET => RESET,
+            RESET => rst(RST_RX),
 
             MI_ADDR => mi_split_addr(0),
             MI_DWR  => mi_split_dwr(0),
@@ -449,7 +471,7 @@ begin
         )
         port map (
             CLK   => CLK,
-            RESET => RESET,
+            RESET => rst(RST_TX),
 
             USR_TX_MFB_META_PKT_SIZE => USR_TX_MFB_META_PKT_SIZE,
             USR_TX_MFB_META_CHAN     => USR_TX_MFB_META_CHAN,
@@ -563,7 +585,7 @@ begin
     )
     port map (
         CLK                 => CLK,
-        RESET               => RESET,
+        RESET               => rst(RST_PTR_UPDATER),
 
         RX_STOP_REQ_BUFF_BA => rx_stop_req_buff_ba,
         RX_STOP_REQ_P2P_EN  => rx_stop_req_p2p_en,
@@ -615,7 +637,7 @@ begin
     )
     port map (
         CLK             => CLK,
-        RST             => RESET,
+        RST             => rst(RST_RQ_MERGER),
 
         RX_MFB0_DATA    => rx_dma_rq_mfb_data,
         RX_MFB0_META    => rx_dma_rq_mfb_meta,
@@ -661,7 +683,7 @@ begin
     )
     port map (
         CLK   => CLK,
-        RESET => RESET,
+        RESET => rst(RST_MI_SPLITTER),
 
         RX_DWR  => MI_DWR,
         RX_MWR  => (others => '0'),
