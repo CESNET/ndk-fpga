@@ -21,6 +21,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 ### Fixed
 - cards: Fixed DDR_PORTS derivation from MEM_PORTS on N5014 card.
 - comp: Fixed CNT_MULTI_MEMX adding a pending increment to another channel's value when a reset was requested without a read.
+- core: Fixed TX path getting stuck and RX receiving errored frames in E-Tile 10G/25G network module after the TX PLL lock loss of the clock master channel (e.g. PMA loopback switching on channel 0).
 
 ## [2026.9.0] - 2026-09-30
 
