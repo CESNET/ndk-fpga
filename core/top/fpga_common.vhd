@@ -276,6 +276,8 @@ entity FPGA_COMMON is
         -- Optional signal for MISC connection from NET_MOD core to Top-Level FPGA design.
         MISC_NET2TOP            : out   slv_array_t(ETH_PORTS-1 downto 0)(MISC_NET2TOP_WIDTH-1 downto 0);
         -- Optional signal for MISC connection from Top-Level FPGA design to FPGA_COMMON.
+        -- On VERSAL it carries FPGA_ID (bits 127:0) and FPGA_ID_VLD (bit 128) clocked at BOOT_MI_CLK,
+        -- e.g. from VERSAL_PS_CTRL; MISC_IN_WIDTH must be at least 129.
         MISC_IN                 : in    std_logic_vector(MISC_IN_WIDTH-1 downto 0) := (others => '0');
         -- Optional signal for MISC connection from FPGA_COMMON to Top-Level FPGA design.
         MISC_OUT                : out   std_logic_vector(MISC_OUT_WIDTH-1 downto 0)
@@ -383,7 +385,8 @@ architecture FULL of FPGA_COMMON is
     constant TS_MULT_SMART_DSP : boolean := (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL");
     constant TS_MULT_USE_DSP   : boolean := (DEVICE = "AGILEX" or DEVICE = "STRATIX10");
 
-    constant FPGA_ID_WIDTH : natural := tsel(DEVICE = "ULTRASCALE" or DEVICE = "VERSAL", 96, 64);
+    constant FPGA_ID_WIDTH : natural := tsel(DEVICE = "VERSAL", 128,
+                                        tsel(DEVICE = "ULTRASCALE", 96, 64));
 
     constant MI_DATA_WIDTH      : integer := 32;
     constant MI_ADDR_WIDTH      : integer := 32;
@@ -1301,9 +1304,22 @@ begin
         XILINX_DNA_VLD  => xilinx_dna_vld
     );
 
-    fpga_id_usp_g: if (DEVICE = "ULTRASCALE" or DEVICE = "VERSAL") generate
+    fpga_id_usp_g: if (DEVICE = "ULTRASCALE") generate
         fpga_id     <= xilinx_dna;
         fpga_id_vld <= xilinx_dna_vld;
+    end generate;
+
+    fpga_id_versal_g: if (DEVICE = "VERSAL") generate
+        assert (MISC_IN_WIDTH >= FPGA_ID_WIDTH + 1)
+            report "FPGA_COMMON: On VERSAL, MISC_IN carries FPGA_ID and FPGA_ID_VLD. Set MISC_IN_WIDTH to at least "
+                   & integer'image(FPGA_ID_WIDTH + 1) & "."
+            severity failure;
+
+        -- Guarded so that a too narrow MISC_IN reports the assert above instead of an index error
+        fpga_id_misc_in_g: if (MISC_IN_WIDTH >= FPGA_ID_WIDTH + 1) generate
+            fpga_id     <= MISC_IN(FPGA_ID_WIDTH - 1 downto 0);
+            fpga_id_vld <= MISC_IN(FPGA_ID_WIDTH);
+        end generate;
     end generate;
 
     fpga_id_intel_g: if (DEVICE = "STRATIX10" or DEVICE = "AGILEX") generate
