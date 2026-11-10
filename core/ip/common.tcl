@@ -12,6 +12,20 @@ proc get_ip_filename {ip_name {synth "QUARTUS"}} {
     }
 }
 
+# Returns the IP parameters and the content of the IP scripts as one string.
+# A generated IP is reused only when this string has not changed.
+proc get_ip_stamp {ip_params_l scripts_l} {
+    set stamp [lsort -stride 2 -index 0 $ip_params_l]
+    foreach script $scripts_l {
+        if {[file exists $script]} {
+            set fd [open $script r]
+            append stamp "\n" [read $fd]
+            close $fd
+        }
+    }
+    return $stamp
+}
+
 proc get_ip_mod_files {ip_components_l ip_params_l} {
     array set ip_params $ip_params_l
     set ip_files_l [list]
@@ -55,19 +69,36 @@ proc get_ip_mod_files {ip_components_l ip_params_l} {
             }
         }
 
-        # prevent regeneration of IP files if present (and generated correctly)
-        # (Quartus only, TODO: add similar logic for Vivado (does not use .xci files generation by default))
-        set ip_file $ip_params_mod(IP_BUILD_DIR)/[get_ip_filename $comp]
-        if {[file exists $ip_file]} {
-            if {$use_quartus && ![file exists $ip_params_mod(IP_MODIFY_BASE)/$script\_ip.qpf]} {
-                lappend ip_files_l $ip_file
-                continue
-            }
-        }
-
         # provide additional IP parameters
         set ip_params_mod(IP_COMP_NAME) $comp
         set ip_params_mod(IP_COMP_TYPE) $type
+
+        # prevent regeneration of IP files if present (and generated correctly with the same parameters and scripts)
+        # (Quartus only, TODO: add similar logic for Vivado (does not use .xci files generation by default))
+        set ip_file $ip_params_mod(IP_BUILD_DIR)/[get_ip_filename $comp]
+        if {$use_quartus} {
+            set ip_scripts_l [list "$ip_params_mod(IP_TEMPLATE_BASE)/$path/$script.ip.tcl"]
+            if {$modify == 1} {
+                lappend ip_scripts_l "$ip_params_mod(IP_MODIFY_BASE)/$script.ip.tcl"
+            }
+            set ip_stamp [get_ip_stamp [array get ip_params_mod] $ip_scripts_l]
+            set ip_stamp_file $ip_file.params
+            set ip_stamp_old ""
+            if {[file exists $ip_stamp_file]} {
+                set fd [open $ip_stamp_file r]
+                set ip_stamp_old [read $fd]
+                close $fd
+            }
+            if {[file exists $ip_file] && ![file exists $ip_params_mod(IP_MODIFY_BASE)/$script\_ip.qpf] && $ip_stamp_old eq $ip_stamp} {
+                lappend ip_files_l $ip_file
+                continue
+            }
+            # The old IP file, its generated files and its parameters are deleted, so a build that fails
+            # before the end of the generation cannot reuse them.
+            # qsys-script cannot create the IP again while the directory exists.
+            file delete $ip_file $ip_stamp_file
+            file delete -force [file rootname $ip_file]
+        }
 
         set script_type [expr {$use_quartus? "QUARTUS_TCL" : "VIVADO_TCL"}]
         # add IP template script (Quartus only)
@@ -90,6 +121,13 @@ proc get_ip_mod_files {ip_components_l ip_params_l} {
                 IP_BUILD_DIR $ip_params_mod(IP_BUILD_DIR)               \
                 VARS [list IP_PARAMS_L [array get ip_params_mod]]       \
             ]
+        }
+
+        # The last script of the IP writes its parameters to IP_STAMP_FILE after it ends without an error.
+        if {$use_quartus} {
+            set ip_last_script [lindex $ip_files_l end]
+            lappend ip_last_script IP_STAMP_FILE $ip_stamp_file IP_STAMP $ip_stamp
+            lset ip_files_l end $ip_last_script
         }
     }
 
