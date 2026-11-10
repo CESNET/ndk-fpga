@@ -1,0 +1,47 @@
+# ddr4_unused.qsf: I/O standards of the DDR4 pins without the memory controller
+# Copyright (C) 2026 DynaNIC Semiconductors, Ltd.
+# Author(s): David Beneš <benes@dyna-nic.com>
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Quartus 26.1 requires an explicit I/O standard on every user pin (CW 25207).
+# The DDR4 pins are user pins when the memory controller is not instantiated
+# (MEM_PORTS=0). Otherwise the memory controller IP sets the I/O standards.
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_REF_CLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_OCT_RZQIN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_ALERT_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_BG
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_BA
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_A
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_PAR
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_CK_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_CK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_CKE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_ODT
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_ACT_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_CS_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_RESET_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_DQS_P
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_DQS_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_DQ
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P0_DBI_N
+
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_REF_CLK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_OCT_RZQIN
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_ALERT_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_BG
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_BA
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_A
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_PAR
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_CK_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_CK
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_CKE
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_ODT
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_ACT_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_CS_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_RESET_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_DQS_P
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_DQS_N
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_DQ
+set_instance_assignment -name IO_STANDARD "1.2 V" -to DDR4_P1_DBI_N
