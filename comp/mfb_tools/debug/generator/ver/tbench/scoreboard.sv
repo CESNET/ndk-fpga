@@ -7,22 +7,55 @@
 import sv_common_pkg::*;
 import sv_mfb_pkg::*;
 
+// Model of the flow_mix function in MFB_GENERATOR
+function automatic bit [31:0] flow_mix(bit [31:0] x);
+    bit [31:0] v;
+    v = x ^ (x << 12);
+    v = v ^ (v >> 4);
+    v = (~v) + (v << 7);
+    v = v ^ (v >> 6);
+    v = v ^ (v << 8);
+    v = v + (v << 5);
+    v = v ^ (v >> 16);
+    return v;
+endfunction
+
 class ScoreboardMonitorCbs extends MonitorCbs;
     longint cnt;
     int expPktLen;
+    // Value of the flow control register (0x2C) and of the SRC IP mask (0x28)
+    bit [31:0] flowCtrl;
+    bit [31:0] srcIpMask;
 
     function new ();
         cnt = 0;
         expPktLen = 0;
+        flowCtrl = 0;
+        srcIpMask = '1;
     endfunction
 
     virtual task post_rx(Transaction transaction, string inst);
         MfbTransaction #(MFB_ITEM_WIDTH) mfbTrans;
         int pktLen;
         int error;
+        bit [31:0] idx;
+        bit [31:0] expSrcIp;
+        bit [31:0] srcIp;
         error = 0;
-        cnt = cnt + 1;
         $cast(mfbTrans, transaction);
+
+        // With per_pkt = 1 the SRC IP address is derived from the packet index.
+        // The test starts the index from 0 before each run, the same as cnt.
+        if (flowCtrl[0]) begin
+            idx = cnt >> flowCtrl[7:4];
+            expSrcIp = (flowCtrl[1] ? flow_mix(idx) : idx) & srcIpMask;
+            srcIp = {mfbTrans.data[29], mfbTrans.data[28], mfbTrans.data[27], mfbTrans.data[26]};
+            if (srcIp != expSrcIp) begin
+                $write("SRC IP address of packet %0d is 0x%08h, expected 0x%08h\n", cnt, srcIp, expSrcIp);
+                error = 1;
+            end
+        end
+        cnt = cnt + 1;
         //transaction.display();
 
         if (mfbTrans.data.size() != expPktLen)
@@ -83,6 +116,11 @@ class Scoreboard;
     task setPktLen(int length);
         this.monitorCbs.expPktLen = length;
         this.monitorCbs.cnt = 0;
+    endtask
+
+    task setFlow(bit [31:0] flow_ctrl, bit [31:0] src_ip_mask);
+        this.monitorCbs.flowCtrl = flow_ctrl;
+        this.monitorCbs.srcIpMask = src_ip_mask;
     endtask
 
     function longint getPktCounter();

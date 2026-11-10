@@ -131,6 +131,39 @@ program TEST (
         #(50*CLK_PERIOD);
     endtask
 
+    // Writes the SRC IP mask and the flow control register. The first write of the
+    // flow control register keeps per_pkt = 0, so the packet index starts from 0.
+    task setFlow(bit [31:0] flow_ctrl, bit [31:0] src_ip_mask);
+        Mi32Transaction mi32Transaction ;
+        Mi32Driver      mi32Driver      ;
+        Mi32Monitor     mi32Monitor     ;
+        mi32Transaction = new();
+        mi32Driver      = new("Mi32 Driver", null, MI32);
+        mi32Monitor     = new("Mi32 Monitor", MI32);
+
+        mi32Transaction.rw      = 1;
+        mi32Transaction.be      = '1;
+        mi32Transaction.address = 32'h28;
+        mi32Transaction.data    = src_ip_mask;
+        mi32Driver.sendTransaction(mi32Transaction);
+
+        mi32Transaction.address = 32'h2C;
+        mi32Transaction.data    = flow_ctrl & ~32'h1;
+        mi32Driver.sendTransaction(mi32Transaction);
+
+        mi32Transaction.data    = flow_ctrl;
+        mi32Driver.sendTransaction(mi32Transaction);
+
+        // sync read
+        mi32Transaction.rw      = 0;
+        mi32Transaction.address = 32'h2C;
+        mi32Monitor.executeTransaction(mi32Transaction);
+        if (mi32Transaction.data != flow_ctrl) begin
+            $write("Flow control register is 0x%08h, expected 0x%08h\n", mi32Transaction.data, flow_ctrl);
+            $stop();
+        end
+    endtask
+
     task checkPktCounter(int burst_mode_en, int burst_size);
         longint sc_pktcnt;
         bit [63:0] pktcnt;
@@ -208,9 +241,28 @@ program TEST (
         scoreboard.display();
     endtask
 
+    task testFlow(int length, bit [31:0] flow_ctrl, bit [31:0] src_ip_mask);
+        $write("\n######### Test of flows with packet length = %1d ", length);
+        $write("(flow control: 0x%08h, SRC IP mask: 0x%08h) #########\n", flow_ctrl, src_ip_mask);
+        scoreboard.setPktLen(length);
+        scoreboard.setFlow(flow_ctrl, src_ip_mask);
+        setFlow(flow_ctrl, src_ip_mask);
+        enableTestEnvironment();
+        enableGenerator(length, 0, 64);
+        wait_burst_to_finish(length, 0, 0);
+        disableGenerator();
+        disableTestEnvironment();
+        checkPktCounter(0, 0);
+        scoreboard.display();
+    endtask
+
     initial begin
         // Max burst size the burst mode is tested on
         const int max_bst_size = 10;
+        // Flow control values: per packet, random, bursts of 4 and 16 packets
+        const bit [31:0] flow_ctrls[5] = '{32'h01, 32'h03, 32'h21, 32'h23, 32'h41};
+        // One word, a shifted start and several words per packet
+        const int flow_lengths[3] = '{64, 129, 300};
 
         createEnvironment();
         resetDesign();
@@ -228,6 +280,16 @@ program TEST (
         for (int length = 64; length < 4*MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE; length=length+3) begin
             test(length, 0, 64);
         end
+
+        $write("Test of the SRC IP address flows.\n");
+        foreach (flow_ctrls[i]) begin
+            foreach (flow_lengths[j]) begin
+                testFlow(flow_lengths[j], flow_ctrls[i], 32'h3FF);
+            end
+        end
+        setFlow(32'h0, '1);
+        scoreboard.setFlow(32'h0, '1);
+
         $write("Verification finished successfully!\n");
         $stop();
     end
