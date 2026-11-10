@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MVB Channel Router &mdash; NDK-FPGA  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
@@ -179,13 +179,13 @@ The user can change the routing rules through the MI interface.</p>
 <span class="o">+----------------------------------------------------------+</span>
 <span class="o">|</span>     <span class="n">RSVD</span>     <span class="o">|</span>     <span class="n">ch_max</span>    <span class="o">|</span>    <span class="n">ch_min</span>    <span class="o">|</span>    <span class="n">incr</span>    <span class="o">|</span>
 <span class="o">+----------------------------------------------------------+</span>
-<span class="n">Controls</span> <span class="n">distribution</span> <span class="n">of</span> <span class="n">ethernet</span> <span class="n">frames</span> <span class="n">received</span> <span class="kn">from</span> <span class="nn">network</span> <span class="n">to</span> <span class="n">DMA</span> <span class="n">channels</span>
+<span class="n">Controls</span> <span class="n">distribution</span> <span class="n">of</span> <span class="n">ethernet</span> <span class="n">frames</span> <span class="n">received</span> <span class="kn">from</span><span class="w"> </span><span class="nn">network</span> <span class="n">to</span> <span class="n">DMA</span> <span class="n">channels</span>
   <span class="n">incr</span>   <span class="p">:</span> <span class="n">RR</span> <span class="n">increment</span><span class="o">.</span> <span class="mi">0</span> <span class="o">=</span> <span class="nb">round</span><span class="o">-</span><span class="n">robin</span> <span class="n">disable</span> <span class="p">(</span><span class="n">stay</span> <span class="n">on</span> <span class="n">source</span> <span class="n">channel</span><span class="p">)</span><span class="o">.</span> <span class="n">Default</span> <span class="mh">0x0</span>
   <span class="n">ch_min</span> <span class="p">:</span> <span class="n">low</span> <span class="n">DMA</span> <span class="n">channel</span> <span class="n">limit</span> <span class="k">for</span> <span class="nb">round</span><span class="o">-</span><span class="n">robin</span> <span class="n">distribution</span><span class="o">.</span> <span class="n">Default</span> <span class="mh">0x0</span>
   <span class="n">ch_max</span> <span class="p">:</span> <span class="n">high</span> <span class="n">DMA</span> <span class="n">channel</span> <span class="n">limit</span> <span class="k">for</span> <span class="nb">round</span><span class="o">-</span><span class="n">robin</span> <span class="n">distribution</span><span class="o">.</span> <span class="n">Default</span> <span class="mh">0x0</span>
 
 <span class="n">Examples</span><span class="p">:</span>
-   <span class="mh">0x000000</span><span class="p">:</span> <span class="n">Do</span> <span class="ow">not</span> <span class="n">distribute</span> <span class="n">frames</span> <span class="o">-</span> <span class="n">frame</span> <span class="kn">from</span> <span class="nn">Eth</span> <span class="n">chan</span> <span class="n">N</span> <span class="ow">is</span> <span class="n">routed</span> <span class="n">to</span> <span class="n">DMA</span> <span class="n">chan</span> <span class="n">N</span>
+   <span class="mh">0x000000</span><span class="p">:</span> <span class="n">Do</span> <span class="ow">not</span> <span class="n">distribute</span> <span class="n">frames</span> <span class="o">-</span> <span class="n">frame</span> <span class="kn">from</span><span class="w"> </span><span class="nn">Eth</span> <span class="n">chan</span> <span class="n">N</span> <span class="ow">is</span> <span class="n">routed</span> <span class="n">to</span> <span class="n">DMA</span> <span class="n">chan</span> <span class="n">N</span>
    <span class="mh">0xff0001</span><span class="p">:</span> <span class="n">Distribute</span> <span class="n">frames</span> <span class="n">to</span> <span class="nb">all</span> <span class="n">available</span> <span class="n">DMA</span> <span class="n">channels</span>
    <span class="mh">0x070401</span><span class="p">:</span> <span class="n">Distribute</span> <span class="n">frames</span> <span class="n">to</span> <span class="n">DMA</span> <span class="n">channels</span> <span class="mi">4</span> <span class="n">to</span> <span class="mi">7</span>
    <span class="mh">0xff0002</span><span class="p">:</span> <span class="n">Distribute</span> <span class="n">frames</span> <span class="n">to</span> <span class="n">even</span> <span class="n">DMA</span> <span class="n">channels</span>

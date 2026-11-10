@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Logger &mdash; NDK-FPGA  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme_overrides.css?v=b530091d" />
 
   
@@ -570,10 +570,10 @@ to save resources</p></li>
 </li>
 </ul>
 <p><strong>Example usage</strong> of <code class="docutils literal notranslate"><span class="pre">logger_stats</span></code> (for more usage see <cite>mem_logger/mem_logger.py</cite>):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.debug.data_logger.data_logger</span> <span class="kn">import</span> <span class="n">DataLogger</span>
-<span class="kn">import</span> <span class="nn">ofm.comp.debug.data_logger.logger_stats</span> <span class="k">as</span> <span class="nn">Stats</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ofm.comp.debug.data_logger.data_logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLogger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ofm.comp.debug.data_logger.logger_stats</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">Stats</span>
 
-<span class="k">def</span> <span class="nf">create_stats</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_stats</span><span class="p">():</span>
     <span class="c1"># Create DataLoggers</span>
     <span class="c1"># You can specify:</span>
     <span class="c1"># * Card device (dev=&#39;/dev/nfb1&#39;)</span>
@@ -594,7 +594,7 @@ to save resources</p></li>
     <span class="n">stats_0</span><span class="o">.</span><span class="n">add_stat</span><span class="p">(</span><span class="n">Stats</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Z&#39;</span><span class="p">))</span>
 
     <span class="c1"># FSM state statistic</span>
-    <span class="k">def</span> <span class="nf">fms_convert</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fms_convert</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
         <span class="n">states</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s1">&#39;IDLE&#39;</span><span class="p">,</span>
             <span class="o">...</span>
@@ -643,8 +643,8 @@ to save resources</p></li>
 </pre></div>
 </div>
 <p>Example usage of <code class="docutils literal notranslate"><span class="pre">graph_tools</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ofm.comp.debug.data_logger.graph_tools</span> <span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">plot_counter</span><span class="p">,</span> <span class="n">plot_value</span><span class="p">,</span> <span class="n">plot_value_2d</span>
-<span class="kn">from</span> <span class="nn">graph_tools.graph_tools</span> <span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">plot_counter</span><span class="p">,</span> <span class="n">plot_value</span><span class="p">,</span> <span class="n">plot_value_2d</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ofm.comp.debug.data_logger.graph_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">plot_counter</span><span class="p">,</span> <span class="n">plot_value</span><span class="p">,</span> <span class="n">plot_value_2d</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">graph_tools.graph_tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_data</span><span class="p">,</span> <span class="n">plot_counter</span><span class="p">,</span> <span class="n">plot_value</span><span class="p">,</span> <span class="n">plot_value_2d</span>
 
 <span class="n">stats</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">&#39;stats.npz&#39;</span><span class="p">)</span>
 

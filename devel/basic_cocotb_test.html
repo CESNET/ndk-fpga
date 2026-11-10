@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Getting Started with cocotb &mdash; NDK-FPGA  documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme_overrides.css?v=b530091d" />
 
   
@@ -203,24 +203,24 @@ card, no DMA engine). To simulate an entire card’s firmware end-to-end instead
 <span class="linenos">  5</span>
 <span class="linenos">  6</span>
 <span class="linenos">  7</span><span class="c1"># importing required modules</span>
-<span class="linenos">  8</span><span class="kn">import</span> <span class="nn">cocotb</span>
-<span class="linenos">  9</span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="linenos"> 10</span><span class="kn">from</span> <span class="nn">cocotb.clock</span> <span class="kn">import</span> <span class="n">Clock</span>
-<span class="linenos"> 11</span><span class="kn">from</span> <span class="nn">cocotb.triggers</span> <span class="kn">import</span> <span class="n">RisingEdge</span><span class="p">,</span> <span class="n">ClockCycles</span>
-<span class="linenos"> 12</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.mvb.drivers</span> <span class="kn">import</span> <span class="n">MVBDriver</span>
-<span class="linenos"> 13</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.mvb.monitors</span> <span class="kn">import</span> <span class="n">MVBMonitor</span>
-<span class="linenos"> 14</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.ver.backpressure</span> <span class="kn">import</span> <span class="n">BackpressureGenerator</span><span class="p">,</span> <span class="n">BackpressureConfig</span>
-<span class="linenos"> 15</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.ver.generators</span> <span class="kn">import</span> <span class="n">random_integers</span>
-<span class="linenos"> 16</span><span class="kn">from</span> <span class="nn">cocotb_bus.drivers</span> <span class="kn">import</span> <span class="n">BitDriver</span>
-<span class="linenos"> 17</span><span class="kn">from</span> <span class="nn">cocotb_bus.scoreboard</span> <span class="kn">import</span> <span class="n">Scoreboard</span>
-<span class="linenos"> 18</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.utils.throughput_probe</span> <span class="kn">import</span> <span class="n">ThroughputProbe</span><span class="p">,</span> <span class="n">ThroughputProbeMvbInterface</span>
-<span class="linenos"> 19</span><span class="kn">from</span> <span class="nn">cocotbext.ofm.mvb.transaction</span> <span class="kn">import</span> <span class="n">MvbTrClassic</span>
+<span class="linenos">  8</span><span class="kn">import</span><span class="w"> </span><span class="nn">cocotb</span>
+<span class="linenos">  9</span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="linenos"> 10</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotb.clock</span><span class="w"> </span><span class="kn">import</span> <span class="n">Clock</span>
+<span class="linenos"> 11</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotb.triggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RisingEdge</span><span class="p">,</span> <span class="n">ClockCycles</span>
+<span class="linenos"> 12</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotbext.ofm.mvb.drivers</span><span class="w"> </span><span class="kn">import</span> <span class="n">MVBDriver</span>
+<span class="linenos"> 13</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotbext.ofm.mvb.monitors</span><span class="w"> </span><span class="kn">import</span> <span class="n">MVBMonitor</span>
+<span class="linenos"> 14</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotbext.ofm.ver.backpressure</span><span class="w"> </span><span class="kn">import</span> <span class="n">BackpressureGenerator</span><span class="p">,</span> <span class="n">BackpressureConfig</span>
+<span class="linenos"> 15</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotbext.ofm.ver.generators</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_integers</span>
+<span class="linenos"> 16</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotb_bus.drivers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BitDriver</span>
+<span class="linenos"> 17</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotb_bus.scoreboard</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scoreboard</span>
+<span class="linenos"> 18</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotbext.ofm.utils.throughput_probe</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThroughputProbe</span><span class="p">,</span> <span class="n">ThroughputProbeMvbInterface</span>
+<span class="linenos"> 19</span><span class="kn">from</span><span class="w"> </span><span class="nn">cocotbext.ofm.mvb.transaction</span><span class="w"> </span><span class="kn">import</span> <span class="n">MvbTrClassic</span>
 <span class="linenos"> 20</span>
 <span class="linenos"> 21</span>
 <span class="linenos"> 22</span><span class="c1"># definition of the class encapsulating components of the test</span>
-<span class="linenos"> 23</span><span class="k">class</span> <span class="nc">testbench</span><span class="p">():</span>
+<span class="linenos"> 23</span><span class="k">class</span><span class="w"> </span><span class="nc">testbench</span><span class="p">():</span>
 <span class="linenos"> 24</span>    <span class="c1"># dut = device tree of the tested component</span>
-<span class="linenos"> 25</span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dut</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="linenos"> 25</span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dut</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="linenos"> 26</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span> <span class="o">=</span> <span class="n">dut</span>
 <span class="linenos"> 27</span>
 <span class="linenos"> 28</span>        <span class="c1"># setting up the input driver and connecting it to signals beginning with &quot;RX&quot;</span>
@@ -255,13 +255,13 @@ card, no DMA engine). To simulate an entire card’s firmware end-to-end instead
 <span class="linenos"> 57</span>            <span class="bp">self</span><span class="o">.</span><span class="n">stream_out</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 <span class="linenos"> 58</span>
 <span class="linenos"> 59</span>    <span class="c1"># method for adding transactions to the expected output</span>
-<span class="linenos"> 60</span>    <span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction</span><span class="p">):</span>
+<span class="linenos"> 60</span>    <span class="k">def</span><span class="w"> </span><span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transaction</span><span class="p">):</span>
 <span class="linenos"> 61</span><span class="w">        </span><span class="sd">&quot;&quot;&quot;Model the DUT based on the input transaction&quot;&quot;&quot;</span>
 <span class="linenos"> 62</span>        <span class="bp">self</span><span class="o">.</span><span class="n">expected_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">transaction</span><span class="p">)</span>
 <span class="linenos"> 63</span>        <span class="bp">self</span><span class="o">.</span><span class="n">pkts_sent</span> <span class="o">+=</span> <span class="mi">1</span>
 <span class="linenos"> 64</span>
 <span class="linenos"> 65</span>    <span class="c1"># method preforming a hardware reset</span>
-<span class="linenos"> 66</span>    <span class="k">async</span> <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="linenos"> 66</span>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="linenos"> 67</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="linenos"> 68</span>        <span class="k">await</span> <span class="n">ClockCycles</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="linenos"> 69</span>        <span class="bp">self</span><span class="o">.</span><span class="n">dut</span><span class="o">.</span><span class="n">RESET</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span>
@@ -270,7 +270,7 @@ card, no DMA engine). To simulate an entire card’s firmware end-to-end instead
 <span class="linenos"> 72</span>
 <span class="linenos"> 73</span><span class="c1"># defining a test - functions with &quot;@cocotb.test()&quot; decorator will be automatically found and run</span>
 <span class="linenos"> 74</span><span class="nd">@cocotb</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
-<span class="linenos"> 75</span><span class="k">async</span> <span class="k">def</span> <span class="nf">run_test</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="n">pkt_count</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+<span class="linenos"> 75</span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_test</span><span class="p">(</span><span class="n">dut</span><span class="p">,</span> <span class="n">pkt_count</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
 <span class="linenos"> 76</span>    <span class="c1"># start a clock generator</span>
 <span class="linenos"> 77</span>    <span class="n">cocotb</span><span class="o">.</span><span class="n">start_soon</span><span class="p">(</span><span class="n">Clock</span><span class="p">(</span><span class="n">dut</span><span class="o">.</span><span class="n">CLK</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;ns&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">())</span>
 <span class="linenos"> 78</span>
