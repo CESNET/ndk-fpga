@@ -7,7 +7,6 @@
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 
-lappend COMPONENTS [ list "BARREL_SHIFTER_GEN" "$OFM_PATH/comp/base/logic/barrel_shifter" "FULL" ]
 lappend COMPONENTS [ list "GEN_MUX" "$OFM_PATH/comp/base/logic/mux" "FULL" ]
 lappend COMPONENTS [ list "FIFOX" "$OFM_PATH/comp/base/fifo/fifox" "FULL" ]
 
