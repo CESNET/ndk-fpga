@@ -71,7 +71,26 @@
 `define ndk_rand_dist_last(MIN, MAX, DIVIDER) \
     [MIN+((MAX-MIN)/DIVIDER)*(DIVIDER-1):MAX]
 
-
-
-
+///////////////////////////////////////////////////////
+// MACRO COMPARE unpacked arrays with wildcard
+///////////////////////////////////////////////////////
+// Wildcard equality (==?) is not defined for unpacked arrays,
+// so ndk_array_cmp_wildcard compares the arrays element by element.
+// RET is AND-ed with the result (initialize it to 1'b1).
+//
+// In test foreach was qucker that ==?
+//
+// EXAMPLE:
+//      bit ret = 1'b1;
+//      `ndk_array_cmp_wildcard(ret, tr_dut.data, tr_model.data) // X/Z in tr_model.data match anything
+`define ndk_array_cmp_wildcard(RET, ARR_A, ARR_WILDCARD) \
+    begin \
+        if ($size(ARR_A) != $size(ARR_WILDCARD)) begin \
+            RET &= 1'b0; \
+        end else begin \
+            foreach (ARR_A[ndk_array_cmp_wildcard_it]) begin \
+                RET &= ((ARR_A[ndk_array_cmp_wildcard_it] ==? ARR_WILDCARD[ndk_array_cmp_wildcard_it]) === 1'b1); \
+            end \
+        end \
+    end
 

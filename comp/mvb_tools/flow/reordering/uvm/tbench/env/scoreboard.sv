@@ -24,7 +24,9 @@ class cmp #(
     endfunction
 
     virtual function int unsigned compare(MODEL_ITEM tr_model, DUT_ITEM tr_dut);
-         return ((tr_dut.data ==? tr_model.data) === 1'b1);
+        int unsigned ret = 1;
+        `ndk_array_cmp_wildcard(ret, tr_dut.data, tr_model.data)
+        return ret;
     endfunction
 
 
