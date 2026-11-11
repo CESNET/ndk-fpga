@@ -6,6 +6,7 @@
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/math_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/type_pack.vhd"
 lappend PACKAGES "$OFM_PATH/comp/base/pkg/pcie_meta_pack.vhd"
+lappend PACKAGES "$ENTITY_BASE/../rx/comp/hdr_manager/pkg/dma_hdr_pkg.vhd"
 
 set META_EXTRACTOR_BASE       "$ENTITY_BASE/comp/metadata_extractor"
 set CHAN_START_STOP_CTRL_BASE "$ENTITY_BASE/comp/chan_start_stop_ctrl"

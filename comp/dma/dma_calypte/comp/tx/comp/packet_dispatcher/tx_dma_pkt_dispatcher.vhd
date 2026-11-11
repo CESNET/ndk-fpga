@@ -65,6 +65,8 @@ entity TX_DMA_PKT_DISPATCHER is
 
         -- =========================================================================================
         -- Input interface from header buffer
+        --
+        -- The frame pointer in the DMA headers is in bytes, also for Peer-to-Peer transfers.
         -- =========================================================================================
         HDR_BUFF_CHAN_NEXT    : in std_logic_vector(log2(CHANNELS) -1 downto 0);
         HDR_BUFF_DATA_NEXT    : in std_logic_vector(DMA_HDR_WIDTH -1 downto 0);
@@ -139,28 +141,27 @@ architecture FULL of TX_DMA_PKT_DISPATCHER is
 begin
 
     -- =============================================================================================
-    -- Adjusting frame pointer in the DMA header
+    -- Frame pointer and rounded frame length of the DMA header
     -- =============================================================================================
+    fr_ptr_adj      <= unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
+    fr_ptr_adj_next <= unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_PTR));
+
     frame_ptr_adjust_p : process (all) is
     begin
         if (HDR_BUFF_DATA(DMA_P2P_EN) = "1") then
             -- The length of a packet gets rounded up to the nearest multiple of 128 since these are
             -- the units, that the neighboring RX DMA controller is communicating with (i.e. in
             -- Peer-to-Peer settings).
-            fr_ptr_adj     <= resize(unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR)), 16 - 7) & "0000000";
             fr_len_rounded <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 127) and (not to_unsigned(127, 16));
         else
             -- The length of a packet gets rounded up to the nearest multiple of 32 since these are
             -- the units, the host software is communicating with.
-            fr_ptr_adj     <= unsigned(HDR_BUFF_DATA(DMA_FRAME_PTR));
             fr_len_rounded <= (unsigned(HDR_BUFF_DATA(DMA_FRAME_LENGTH)) + 31) and (not to_unsigned(31, 16));
         end if;
 
         if (HDR_BUFF_DATA_NEXT(DMA_P2P_EN) = "1") then
-            fr_ptr_adj_next     <= resize(unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_PTR)), 16 - 7) & "0000000";
             fr_len_rounded_next <= (unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_LENGTH)) + 127) and (not to_unsigned(127, 16));
         else
-            fr_ptr_adj_next     <= unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_PTR));
             fr_len_rounded_next <= (unsigned(HDR_BUFF_DATA_NEXT(DMA_FRAME_LENGTH)) + 31) and (not to_unsigned(31, 16));
         end if;
     end process;

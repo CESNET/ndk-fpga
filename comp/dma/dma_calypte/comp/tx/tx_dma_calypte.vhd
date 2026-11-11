@@ -13,6 +13,7 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 use work.pcie_meta_pack.all;
+use work.dma_hdr_pkg.all;
 
 entity TX_DMA_CALYPTE is
     generic (
@@ -492,7 +493,17 @@ begin
 
     -- Insert data for each DMA header
     fifox_multi_data_g: for reg_idx in 0 to (PCIE_CQ_MFB_REGIONS-1) generate
-        fifox_mult_di(reg_idx)    <= st_sp_ctrl_mfb_meta_arr(reg_idx)(META_PCIE_ADDR) & st_sp_ctrl_mfb_meta_arr(reg_idx)(META_CHAN_NUM) & st_sp_ctrl_mfb_data_arr(reg_idx)(63 downto 0);
+        -- The frame pointer of a Peer-to-Peer transfer is in units of 128 bytes. It is converted to
+        -- bytes before the FIFO, so the reading side of the FIFO has no multiplexer on this field.
+        dma_hdr_ptr_adj_p : process (all) is
+            variable dma_hdr_v : std_logic_vector(64 -1 downto 0);
+        begin
+            dma_hdr_v := st_sp_ctrl_mfb_data_arr(reg_idx)(63 downto 0);
+            if (dma_hdr_v(DMA_P2P_EN) = "1") then
+                dma_hdr_v(DMA_FRAME_PTR) := std_logic_vector(resize(unsigned(dma_hdr_v(DMA_FRAME_PTR)), DMA_FRAME_PTR_W - 7)) & "0000000";
+            end if;
+            fifox_mult_di(reg_idx) <= st_sp_ctrl_mfb_meta_arr(reg_idx)(META_PCIE_ADDR) & st_sp_ctrl_mfb_meta_arr(reg_idx)(META_CHAN_NUM) & dma_hdr_v;
+        end process;
     end generate;
 
     -- Set valid for each port
