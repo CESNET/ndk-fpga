@@ -424,6 +424,8 @@ architecture ETILE of NETWORK_MOD_CORE is
     constant MI_ADDR_BASES_PHY      : natural := ETH_PORT_CHAN + tsel(TS_DEMO_EN, 1, 0);
     constant MGMT_OFF               : std_logic_vector(MI_ADDR_WIDTH_PHY-1 downto 0) := X"0004_0000";
     constant CLK_MASTER_CHANNEL     : natural := 0; -- Select clock master channel
+    -- CSR reset of the non-master channels is held for 2**(SL_RST_CNT_WIDTH-1) MI_CLK_PHY cycles
+    constant SL_RST_CNT_WIDTH       : natural := 18;
 
     function mi_addr_base_init_phy_f return slv_array_t is
         variable mi_addr_base_var : slv_array_t(MI_ADDR_BASES_PHY-1 downto 0)(MI_ADDR_WIDTH_PHY-1 downto 0);
@@ -502,6 +504,12 @@ architecture ETILE of NETWORK_MOD_CORE is
     signal etile_clk_out_vec      : std_logic_vector(ETH_PORT_CHAN-1 downto 0); -- in case of multiple IP cores, only one is chosen
     signal etile_clk_out          : std_logic;                                  -- drives i_clk_rx and i_clk_tx of one or more other IP cores
     signal etile_clk_stable       : std_logic;
+
+    -- CSR reset of the channels clocked by etile_clk_out of the clock master channel
+    signal sl_clk_unstable        : std_logic;
+    signal sl_rst_cnt             : unsigned(SL_RST_CNT_WIDTH-1 downto 0);
+    signal sl_csr_rst             : std_logic;
+    signal sl_csr_rst_n           : std_logic_vector(ETH_PORT_CHAN-1 downto 0);
 
     signal tx_avst_data      : std_logic_vector(ETH_PORT_CHAN*AVST_DATA_WIDTH -1 downto 0);
     signal tx_avst_sop       : std_logic_vector(ETH_PORT_CHAN                 -1 downto 0);
@@ -1182,7 +1190,7 @@ begin
                 o_sl_remote_fault_status         => open,
                 i_sl_clk_tx                      => (others => etile_clk_out),
                 i_sl_clk_rx                      => (others => etile_clk_out),
-                i_sl_csr_rst_n                   => (others => not RESET_ETH),
+                i_sl_csr_rst_n                   => sl_csr_rst_n,
                 i_sl_tx_rst_n                    => (others => '1'),
                 i_sl_rx_rst_n                    => (others => '1'),
                 o_sl_txfifo_pfull                => open,
@@ -1311,7 +1319,7 @@ begin
                 o_sl_remote_fault_status         => open,
                 i_sl_clk_tx                      => (others => etile_clk_out),
                 i_sl_clk_rx                      => (others => etile_clk_out),
-                i_sl_csr_rst_n                   => (others => not RESET_ETH),
+                i_sl_csr_rst_n                   => sl_csr_rst_n,
                 i_sl_tx_rst_n                    => (others => '1'),
                 i_sl_rx_rst_n                    => (others => '1'),
                 o_sl_txfifo_pfull                => open,
@@ -1359,6 +1367,49 @@ begin
     -- side effects in NETWORK_MOD: it clears the RX MAC Lite statistics and desynchronizes
     -- the TX FIFO pointers (MARK_ASFIFO in TX_MAC_LITE resets only the read side).
     -- CLK_STABLE       <= (others => etile_clk_stable);
+
+    -- Channel CSR reset -------------------------------------------------------
+    -- All channels use etile_clk_out of the clock master channel as TX and RX clock.
+    -- When the master TX PLL loses lock (e.g. PMA loopback switching), this clock glitches.
+    -- The glitch breaks the AIB (Advanced Interface Bus) of the other channels.
+    -- TX then stalls and RX receives only errored frames.
+    -- The TX and RX resets do not reset the AIB. Only the CSR reset does.
+    -- The CSR reset of the other channels is held while etile_clk_stable is low
+    -- and for 2**(SL_RST_CNT_WIDTH-1) MI_CLK_PHY cycles after that (a safety margin).
+    -- The IP reset controller then releases the TX and RX resets.
+    -- The CSR reset does not reset the PMA, so ETILE_XCVR_INIT is not repeated.
+    -- It resets the soft CSR settings of the Ethernet IP to their defaults
+    -- (e.g. RS-FEC mode, preamble passthrough). Values written by software are lost.
+    sl_clk_unstable_i : entity work.ASYNC_RESET
+    generic map (
+        TWO_REG  => false,
+        OUT_REG  => true,
+        REPLICAS => 1
+    )
+    port map (
+        CLK         => MI_CLK_PHY,
+        ASYNC_RST   => MI_RESET_PHY or (not etile_clk_stable),
+        OUT_RST(0)  => sl_clk_unstable
+    );
+
+    sl_rst_p : process (MI_CLK_PHY)
+    begin
+        if rising_edge(MI_CLK_PHY) then
+            if (sl_clk_unstable = '1') then
+                sl_rst_cnt <= (others => '0');
+                sl_csr_rst <= '1';
+            else
+                if (sl_rst_cnt(SL_RST_CNT_WIDTH-1) = '0') then
+                    sl_rst_cnt <= sl_rst_cnt + 1;
+                end if;
+                sl_csr_rst <= not sl_rst_cnt(SL_RST_CNT_WIDTH-1);
+            end if;
+        end if;
+    end process;
+
+    sl_csr_rst_n_g : for it in ETH_PORT_CHAN-1 downto 0 generate
+        sl_csr_rst_n(it) <= not RESET_ETH when (it = CLK_MASTER_CHANNEL) else not (RESET_ETH or sl_csr_rst);
+    end generate;
 
     -- TX adaption -------------------------------------------------------------
     tx_avst_data  <= slv_array_ser(tx_avst_data_arr);
