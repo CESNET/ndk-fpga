@@ -79,6 +79,9 @@ end entity;
 architecture BEHAV of MFB_GENERATOR is
 
     constant CHANNELS           : natural := 2**CHANNELS_WIDTH;
+    -- The REG pipe uses two registers per bit, the SHREG pipe uses three on Intel FPGAs.
+    -- On AMD FPGAs, the SHREG pipe maps to the cheaper SRL primitives.
+    constant PIPE_TYPE          : string := tsel(DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX", "REG", "SHREG");
     constant ETHER_TYPE         : std_logic_vector(15 downto 0) := X"0008"; -- IPv4 ethertype
     -- Number of precomputed source IP addresses, enough for the packets of two words.
     constant FLOW_VALS          : natural := 2*REGIONS;
@@ -659,7 +662,7 @@ begin
         META_WIDTH  => CHANNELS_WIDTH+LENGTH_WIDTH,
         FAKE_PIPE   => false,
         USE_DST_RDY => true,
-        -- PIPE_TYPE   => PIPE_TYPE,
+        PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
     port map (
