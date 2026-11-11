@@ -23,6 +23,7 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Changed DMA_CALYPTE to give each of its blocks its own copy of the reset.
 - comp: Changed FREQUENCY_METER to register the reset of each measured clock domain.
 - comp: Changed TX_DMA_CALYPTE to store the frame pointer of Peer-to-Peer DMA headers in bytes, which shortens the read path of the header FIFO.
+- comp: Changed TX_DMA_CALYPTE to read the DMA headers through two prefetch registers, which removes the header FIFO memory from the read address path of the transaction buffer.
 - core: Changed the DMA Calypte wrapper to give the test core and the PCIe MFB pipes their own copies of the reset.
 - core: Changed the DMA Calypte wrapper to include the DMA test core only when DMA_DEBUG_ENABLE is set.
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
