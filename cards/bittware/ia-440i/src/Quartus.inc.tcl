@@ -73,4 +73,7 @@ lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/bmc.qsf"
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/pcie.qsf"
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/qsfp.qsf"
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/ddr4.qsf"
+if {$MEM_PORTS == 0} {
+    lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/ddr4_unused.qsf"
+}
 lappend SYNTH_FLAGS(CONSTR) "$CARD_BASE/constr/timing.sdc"
