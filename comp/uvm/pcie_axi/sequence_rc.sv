@@ -6,24 +6,32 @@
 class sequence_base_rc #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH,
-    logic STRADDLING
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_common::sequence_base#(
     config_sequence,
-    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC))
+    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC, DEVICE))
 );
     `ndk_object_param_utils(
-        uvm_pcie_axi::sequence_base_rc#(ITEMS, ITEM_WIDTH, STRADDLING),
-        $sformatf("uvm_pcie_axi::sequence_base_rc#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, STRADDLING)
+        uvm_pcie_axi::sequence_base_rc#(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::sequence_base_rc#(%0d,%0d,%0d,%s)",ITEMS, ITEM_WIDTH, STRADDLING, DEVICE)
     );
-    `uvm_declare_p_sequencer(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC)));
+    `uvm_declare_p_sequencer(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC, DEVICE)));
 
-    localparam PACKET_MAX_STRADDLING = ITEMS < 16 ? 2 : 4;
+    // Positions of the tuser fields
+    localparam tuser_layout_t LAYOUT = tuser_layout_get(ITEMS, AXI_RC);
+    // Number of the is_sop/is_eop slots of the interface
+    localparam SLOTS      = LAYOUT.slots;
+    localparam PACKET_MAX_STRADDLING = SLOTS;
     localparam PACKET_MAX = STRADDLING == 0 ? 1 : PACKET_MAX_STRADDLING;
-    localparam BE_INDEX   = 0;
+    localparam BE_INDEX   = LAYOUT.be;
     localparam REGIONS_NUM = PACKET_MAX;
     localparam REGION_SIZE = ITEMS/PACKET_MAX;
-    localparam SOF_INDEX  = ITEMS < 16 ? 32 : 64;
-    localparam EOF_INDEX  = ITEMS < 16 ? 34 : 76;
+    localparam SOF_INDEX  = LAYOUT.sop;
+    localparam SOF_PTR_W  = LAYOUT.sop_ptr_w;
+    localparam SOF_UNIT   = LAYOUT.sop_unit;
+    localparam EOF_INDEX  = LAYOUT.eop;
+    localparam EOF_PTR_W  = LAYOUT.eop_ptr_w;
 
 
 
@@ -104,8 +112,9 @@ class sequence_base_rc #(
     endtask
 
     // This taks create axi transaction
-    virtual task create_sequence_item(ref uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC
-                                      )) gen);
+    virtual task create_sequence_item(
+        ref uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC, DEVICE)) gen
+    );
         int unsigned region;
         int unsigned sof_num;
         int unsigned eof_num;
@@ -114,12 +123,13 @@ class sequence_base_rc #(
         gen.tvalid = 0;
         gen.tlast = 0;
 
-        if (STRADDLING == 0) begin
-            gen.tuser[83:82] = 'x;
-            gen.tuser[85:84] = 'x;
-            gen.tuser[87:86] = 'x;
-            gen.tuser[91:88] = 'x;
-            gen.tuser[95:92] = 'x;
+        // Without straddling only the first is_sop/is_eop slot is used, the others are don't care
+        if (STRADDLING == 0 && ITEMS >= 16) begin
+            for (int unsigned slot = 1; slot < SLOTS; slot++) begin
+                gen.tuser[(slot+1)*SOF_PTR_W + SLOTS + SOF_INDEX-1 -: SOF_PTR_W] = 'x;
+                gen.tuser[slot + EOF_INDEX] = 'x;
+                gen.tuser[(slot+1)*EOF_PTR_W + SLOTS + EOF_INDEX-1 -: EOF_PTR_W] = 'x;
+            end
         end
 
         if (state == PKT_SPACE) begin
@@ -166,8 +176,8 @@ class sequence_base_rc #(
             if (state == PKT_HDR) begin
                 //Set SOP and SOP pointer
                 gen.tuser[sof_num + SOF_INDEX] = 1'b1;
-                if (ITEMS >= 16) begin //SOP pos is only in 512 bit width interface
-                    gen.tuser[(sof_num+1)*2 + PACKET_MAX + SOF_INDEX-1 -: 2] = region;
+                if (ITEMS >= 16) begin //SOP pos is only in 512b and 1024b interfaces
+                    gen.tuser[(sof_num+1)*SOF_PTR_W + SLOTS + SOF_INDEX-1 -: SOF_PTR_W] = region*REGION_SIZE/SOF_UNIT;
                 end
 
                 //COPY HEADER
@@ -228,7 +238,7 @@ class sequence_base_rc #(
                 if (ITEMS >= 16) begin
                     //SET EOF and EOF position signal
                     gen.tuser[eof_num + EOF_INDEX] = 1'b1;
-                    gen.tuser[(eof_num+1)*4 + PACKET_MAX + EOF_INDEX-1 -: 4] = index-1;
+                    gen.tuser[(eof_num+1)*EOF_PTR_W + SLOTS + EOF_INDEX-1 -: EOF_PTR_W] = index-1;
                 end else begin;
                     gen.tuser[(eof_num+1)*4 + EOF_INDEX-1 -: 4] = {index-1, 1'b1};
                 end
@@ -283,11 +293,9 @@ class sequence_base_rc #(
     endtask
 
     task body;
-        uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC)) gen;
+        uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC, DEVICE)) gen;
 
-        assert(STRADDLING == 0 && ITEMS == 16 ||
-               STRADDLING == 1 && ITEMS == 16
-        ) else begin
+        assert(ITEMS == 16 || (DEVICE == "VERSAL" && ITEMS == 32)) else begin
             `uvm_fatal(m_sequencer.get_full_name(), $sformatf(
                        "\n\tSTRADDLING IS NOT IMPLEMENTED --\n\tSTRADDLING %0d\n\tITEMS %0d", STRADDLING, ITEMS));
         end
@@ -307,7 +315,7 @@ class sequence_base_rc #(
         gen = uvm_axi::sequence_item #(
             ITEMS,
             ITEM_WIDTH,
-            tuser_width_get(ITEMS, AXI_RC)
+            tuser_width_get(ITEMS, AXI_RC, DEVICE)
         )::type_id::create("gen", m_sequencer);
         create_sequence_item(gen);
         req = gen;
@@ -315,12 +323,13 @@ class sequence_base_rc #(
 
         while(transactions > 0 || data.size() > 0) begin
             // get response and check if tready is asserted
-            gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC))::type_id::create(
+            gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC, DEVICE))::type_id::create(
                 "gen", m_sequencer);
             create_sequence_item(gen);
 
             get_response(rsp);
-            while(req.tvalid == 1'b1 && rsp.tready == 1'b0) begin
+            // TREADY X/Z is not a handshake (the monitor skips such a beat too)
+        while(req.tvalid == 1'b1 && rsp.tready !== 1'b1) begin
                 send_frame();
                 get_response(rsp);
             end
@@ -331,7 +340,8 @@ class sequence_base_rc #(
 
         // PEELING LOOP - Send last block
         get_response(rsp);
-        while(req.tvalid == 1'b1 && rsp.tready == 1'b0) begin
+        // TREADY X/Z is not a handshake (the monitor skips such a beat too)
+        while(req.tvalid == 1'b1 && rsp.tready !== 1'b1) begin
             send_frame();
             get_response(rsp);
         end
@@ -346,17 +356,18 @@ endclass
 class sequence_lib_rc #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH,
-    logic STRADDLING
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_common::sequence_library#(
     config_sequence,
-    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC))
+    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_RC, DEVICE))
 );
 
   `ndk_object_param_utils(
-        uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING),
-        $sformatf("uvm_pcie_axi::sequence_lib_rc#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, STRADDLING)
+        uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::sequence_lib_rc#(%0d,%0d,%0d,%s)",ITEMS, ITEM_WIDTH, STRADDLING, DEVICE)
     )
-  `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING))
+  `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_rc#(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -367,7 +378,7 @@ class sequence_lib_rc #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_pcie_axi::sequence_base_rc #(ITEMS, ITEM_WIDTH, STRADDLING)::get_type());
+        this.add_sequence(uvm_pcie_axi::sequence_base_rc #(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE)::get_type());
     endfunction
 endclass
 

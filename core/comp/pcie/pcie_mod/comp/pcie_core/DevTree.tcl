@@ -16,10 +16,15 @@ proc dts_pcie_core_dbg {base endpoints mode arch} {
     set endpoints_off [expr $probes_off + $events*$event_off]
     set ret ""
     for {set ep 0} {$ep < $endpoints} {incr ep} {
-        append ret "streaming_debug_$ep:" [dts_streaming_debug [expr $base + $ep*$endpoints_off] "pcie_core_debug_probe_$ep" $probes]
+        set ep_base [expr $base + $ep*$endpoints_off]
+        set probe_name "pcie_core_debug_probe_$ep"
+        append ret "streaming_debug_$ep:" [dts_streaming_debug $ep_base $probe_name $probes]
+        # Endpoint 0 keeps the original names of the event counters, tools refer to them.
+        set ep_sfx [expr {$ep > 0 ? "_$ep" : ""}]
         for {set ev 0} {$ev < $events} {incr ev} {
-            set ec_base [expr $base + $ep*$endpoints_off + $probes_off + $ev*$event_off]
-            append ret "event_$ev:" [dts_event_counter $ec_base "pcie_credits_event_counter_[lindex $event_names $ev]" $events_fifo_en]
+            set ec_base [expr $ep_base + $probes_off + $ev*$event_off]
+            set ec_name "pcie_credits_event_counter_[lindex $event_names $ev]$ep_sfx"
+            append ret "event${ep_sfx}_$ev:" [dts_event_counter $ec_base $ec_name $events_fifo_en]
         }
     }
 

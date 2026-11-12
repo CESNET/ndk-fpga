@@ -25,62 +25,46 @@ use work.type_pack.all;
 -- +----------------+----------------+------------------------------------------------------------------------------------------------+
 -- | Hard IP | Component                                                                                            | Address range   |
 -- +=========+======================================================================================================+=================+
--- |         | Streaming Debug (Master with one or two Probe(s))                                                    |   0x00 - 0x3F   |
--- +         +------------------------------------------------------------------------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 0-7      |   0x40 - 0x4F   |
--- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 8-31     |   0x50 - 0x5F   |
--- +         | Event Counter(s) - signal: PCIe credits of Posted HEADERS     +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 32-127   |   0x60 - 0x6F   |
--- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 128-255  |   0x70 - 0x7F   |
+-- |         | Streaming Debug (Master with two Probes: PAUP (RQ / AvST UP) and PADW (RC / AvST DOWN))              |   0x00 - 0x7F   |
 -- +         +------------------------------------------------------------------------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 0-7      |   0x80 - 0x8F   |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 8-31     |   0x90 - 0x9F   |
--- +         | Event Counter(s) - signal: PCIe credits of Posted DATA        +--------------------------------------+-----------------+
+-- +         | Event Counter(s) - signal: PCIe credits of Posted HEADERS     +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 32-127   |   0xA0 - 0xAF   |
 -- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 128-4095 |   0xB0 - 0xBF   |
--- +    0    +------------------------------------------------------------------------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 128-255  |   0xB0 - 0xBF   |
+-- +         +------------------------------------------------------------------------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 0-7      |   0xC0 - 0xCF   |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 8-31     |   0xD0 - 0xDF   |
--- +         | Event Counter(s) - signal: PCIe credits of Non-Posted HEADERS +--------------------------------------+-----------------+
+-- +         | Event Counter(s) - signal: PCIe credits of Posted DATA        +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 32-127   |   0xE0 - 0xEF   |
 -- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 128-255  |   0xF0 - 0xFF   |
--- +         +------------------------------------------------------------------------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 128-4095 |   0xF0 - 0xFF   |
+-- +    0    +------------------------------------------------------------------------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 0-7      |   0x100 - 0x10F |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 8-31     |   0x110 - 0x11F |
--- +         | Event Counter(s) - signal: PCIe credits of Non-Posted DATA    +--------------------------------------+-----------------+
+-- +         | Event Counter(s) - signal: PCIe credits of Non-Posted HEADERS +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 32-127   |   0x120 - 0x12F |
 -- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 128-4095 |   0x130 - 0x13F |
+-- |         |                                                               | Monitored range of credits: 128-255  |   0x130 - 0x13F |
+-- +         +------------------------------------------------------------------------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 0-7      |   0x140 - 0x14F |
+-- +         |                                                               +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 8-31     |   0x150 - 0x15F |
+-- +         | Event Counter(s) - signal: PCIe credits of Non-Posted DATA    +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 32-127   |   0x160 - 0x16F |
+-- +         |                                                               +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 128-4095 |   0x170 - 0x17F |
 -- +---------+------------------------------------------------------------------------------------------------------+-----------------+
--- |         | Streaming Debug (Master with one or two Probe(s))                                                    |   0x140 - 0x17F |
+-- |         | Streaming Debug (Master with two Probes: PAUP (RQ / AvST UP) and PADW (RC / AvST DOWN))              |   0x180 - 0x1FF |
 -- +         +------------------------------------------------------------------------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 0-7      |   0x180 - 0x18F |
--- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 8-31     |   0x190 - 0x19F |
--- +         | Event Counter(s) - signal: PCIe credits of Posted HEADERS     +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 32-127   |   0x1A0 - 0x1AF |
--- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 128-255  |   0x1B0 - 0x1BF |
--- +         +------------------------------------------------------------------------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 0-7      |   0x1C0 - 0x1CF |
--- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 8-31     |   0x1D0 - 0x1DF |
--- +         | Event Counter(s) - signal: PCIe credits of Posted DATA        +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 32-127   |   0x1E0 - 0x1EF |
--- +         |                                                               +--------------------------------------+-----------------+
--- |         |                                                               | Monitored range of credits: 128-4095 |   0x1F0 - 0x1FF |
--- +    1    +------------------------------------------------------------------------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 0-7      |   0x200 - 0x20F |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 8-31     |   0x210 - 0x21F |
--- +         | Event Counter(s) - signal: PCIe credits of Non-Posted HEADERS +--------------------------------------+-----------------+
+-- +         | Event Counter(s) - signal: PCIe credits of Posted HEADERS     +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 32-127   |   0x220 - 0x22F |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 128-255  |   0x230 - 0x23F |
@@ -88,10 +72,26 @@ use work.type_pack.all;
 -- |         |                                                               | Monitored range of credits: 0-7      |   0x240 - 0x24F |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 8-31     |   0x250 - 0x25F |
--- +         | Event Counter(s) - signal: PCIe credits of Non-Posted DATA    +--------------------------------------+-----------------+
+-- +         | Event Counter(s) - signal: PCIe credits of Posted DATA        +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 32-127   |   0x260 - 0x26F |
 -- +         |                                                               +--------------------------------------+-----------------+
 -- |         |                                                               | Monitored range of credits: 128-4095 |   0x270 - 0x27F |
+-- +    1    +------------------------------------------------------------------------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 0-7      |   0x280 - 0x28F |
+-- +         |                                                               +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 8-31     |   0x290 - 0x29F |
+-- +         | Event Counter(s) - signal: PCIe credits of Non-Posted HEADERS +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 32-127   |   0x2A0 - 0x2AF |
+-- +         |                                                               +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 128-255  |   0x2B0 - 0x2BF |
+-- +         +------------------------------------------------------------------------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 0-7      |   0x2C0 - 0x2CF |
+-- +         |                                                               +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 8-31     |   0x2D0 - 0x2DF |
+-- +         | Event Counter(s) - signal: PCIe credits of Non-Posted DATA    +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 32-127   |   0x2E0 - 0x2EF |
+-- +         |                                                               +--------------------------------------+-----------------+
+-- |         |                                                               | Monitored range of credits: 128-4095 |   0x2F0 - 0x2FF |
 -- +---------+------------------------------------------------------------------------------------------------------+-----------------+
 --
 entity PCIE_CORE_DEBUG is
@@ -265,6 +265,9 @@ begin
             DATA_WIDTH => MI_WIDTH,
             PORTS      => PCIE_ENDPOINTS,
             ADDR_BASE  => mi_addr_base_endpts_f,
+            -- The default mask covers only the bits that are set in the bases.
+            -- Endpoint 1 and higher would then get addresses of other endpoints.
+            ADDR_MASK  => std_logic_vector(to_unsigned(2**log2(PCIE_ENDPOINTS*ENDPT_OFFSET)-1, MI_WIDTH)),
             PIPE_OUT   => (others => false),
             DEVICE     => DEVICE
         )
@@ -292,6 +295,11 @@ begin
         );
 
         pcie_endpoints_dbg_g : for pe in 0 to PCIE_ENDPOINTS-1 generate
+            signal mi_split_addr_rel : std_logic_vector(MI_WIDTH-1 downto 0);
+        begin
+            -- The splitter below decodes only the bits of its own address bases, so it gets
+            -- addresses relative to the endpoint (ENDPT_OFFSET is not a power of two).
+            mi_split_addr_rel <= std_logic_vector(unsigned(mi_split_addr(pe)) - pe*ENDPT_OFFSET);
 
             -- ----------
             --  MI Async
@@ -304,7 +312,7 @@ begin
                 CLK_M     => MI_CLK,
                 RESET_M   => MI_RESET,
                 MI_M_DWR  => mi_split_dwr (pe),
-                MI_M_ADDR => mi_split_addr(pe),
+                MI_M_ADDR => mi_split_addr_rel,
                 MI_M_RD   => mi_split_rd  (pe),
                 MI_M_WR   => mi_split_wr  (pe),
                 MI_M_BE   => mi_split_be  (pe),

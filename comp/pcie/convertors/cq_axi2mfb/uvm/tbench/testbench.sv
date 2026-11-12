@@ -22,7 +22,7 @@ module testbench;
     axi_if #(
         .ITEMS       (AXI_ITEMS),
         .ITEM_WIDTH  (ITEM_WIDTH),
-        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS,   uvm_pcie_axi::AXI_CQ))
+        .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ, DEVICE))
     ) axi_cq(CLK);
     mfb_if #(
         .REGIONS     (MFB_REGIONS),
@@ -47,7 +47,7 @@ module testbench;
         uvm_config_db#(virtual axi_if #(
             .ITEMS       (AXI_ITEMS),
             .ITEM_WIDTH  (ITEM_WIDTH),
-            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS,   uvm_pcie_axi::AXI_CQ))
+            .TUSER_WIDTH (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ, DEVICE))
         ))::set(null, "", "vif_rx_axi", axi_cq);
         uvm_config_db#(virtual mfb_if #(
             .REGIONS     (MFB_REGIONS),

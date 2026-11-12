@@ -8,16 +8,34 @@
 // TODO: ADD check when return error to xilinx ip core!! => there is bug (read xilinx documentation when returning not supported request)
 // TOOD: CORECT ALL HEADER: for RQ, CC, CQ, RC. Everyohne have different
 // header.
-// TOOD: CHECK ALL DEVICE (ULTRASCALE+, VERSAL) if they have same
-// tuser width
 
 typedef enum {AXI_RQ, AXI_RC, AXI_CQ, AXI_CC} direction_t;
 
-//COUNT USER WIDTH
-function automatic int unsigned tuser_width_get(int unsigned ITEMS, direction_t dir);
+// Width of the tuser signal of the PCIe IP core AXI interfaces.
+// DEVICE "ULTRASCALE": UltraScale+ PCIe4 (PG213), 256b (ITEMS 8 and less) and 512b (ITEMS 16).
+// DEVICE "VERSAL":     Versal CPM5 (PG346), 512b (ITEMS 16, Gen3x16) and 1024b (ITEMS 32, Gen4x16 and Gen5x8x8).
+function automatic int unsigned tuser_width_get(int unsigned ITEMS, direction_t dir, string DEVICE = "ULTRASCALE");
     automatic int unsigned ret = 0;
 
-    if (ITEMS == 2 || ITEMS == 4 || ITEMS == 8) begin
+    if (DEVICE == "VERSAL") begin
+        if (ITEMS == 16) begin
+            unique case (dir)
+                AXI_RQ: ret = 183;
+                AXI_RC: ret = 161;
+                AXI_CQ: ret = 231;
+                AXI_CC: ret = 81;
+            endcase
+        end else if (ITEMS == 32) begin
+            unique case (dir)
+                AXI_RQ: ret = 373;
+                AXI_RC: ret = 337;
+                AXI_CQ: ret = 465;
+                AXI_CC: ret = 165;
+            endcase
+        end else begin
+            $error("Unsupported number of items %0d for DEVICE VERSAL\nSUPPORTED VALUES [16, 32]\n", ITEMS);
+        end
+    end else if (ITEMS == 2 || ITEMS == 4 || ITEMS == 8) begin
         unique case (dir)
             AXI_RQ: ret = 85;
             AXI_RC: ret = 75;
@@ -33,6 +51,52 @@ function automatic int unsigned tuser_width_get(int unsigned ITEMS, direction_t 
         endcase
     end else begin
         $error("Unsupported number of items %0d\nSUPPORTED VALUES [2, 4, 8, 16]\n", ITEMS);
+    end
+
+    return ret;
+endfunction
+
+
+// Positions of the tuser fields used by the agent. The 512b fields are at the same
+// positions on UltraScale+ (PG213) and on Versal CPM5 (PG346), Versal only adds fields
+// above them. The 1024b layout is the Versal CPM5 one. The 256b values are used only
+// without straddling.
+typedef struct {
+    int unsigned slots;     // number of the is_sop/is_eop slots (TLPs starting/ending in a word)
+    int unsigned be;        // byte_en, 4 bits per dword
+    int unsigned fbe;       // first_be, 4 bits per slot
+    int unsigned lbe;       // last_be, 4 bits per slot
+    int unsigned sop;       // is_sop, the is_sop_ptr fields follow it
+    int unsigned sop_ptr_w; // width of an is_sop_ptr field
+    int unsigned sop_unit;  // dwords per a unit of the is_sop_ptr
+    int unsigned eop;       // is_eop, the is_eop_ptr fields follow it
+    int unsigned eop_ptr_w; // width of an is_eop_ptr field (index of the last dword)
+} tuser_layout_t;
+
+function automatic tuser_layout_t tuser_layout_get(int unsigned ITEMS, direction_t dir);
+    tuser_layout_t ret;
+
+    if (ITEMS <= 8) begin
+        unique case (dir)
+            AXI_CQ: ret = '{slots:1, be:8, fbe:0, lbe:4, sop:40,  sop_ptr_w:2, sop_unit:4, eop:0,   eop_ptr_w:4};
+            AXI_CC: ret = '{slots:1, be:0, fbe:0, lbe:0, sop:0,   sop_ptr_w:2, sop_unit:4, eop:6,   eop_ptr_w:4};
+            AXI_RQ: ret = '{slots:1, be:0, fbe:0, lbe:4, sop:20,  sop_ptr_w:2, sop_unit:4, eop:26,  eop_ptr_w:4};
+            AXI_RC: ret = '{slots:2, be:0, fbe:0, lbe:0, sop:32,  sop_ptr_w:2, sop_unit:4, eop:34,  eop_ptr_w:4};
+        endcase
+    end else if (ITEMS == 16) begin
+        unique case (dir)
+            AXI_CQ: ret = '{slots:2, be:16, fbe:0, lbe:8, sop:80, sop_ptr_w:2, sop_unit:4, eop:86,  eop_ptr_w:4};
+            AXI_CC: ret = '{slots:2, be:0,  fbe:0, lbe:0, sop:0,  sop_ptr_w:2, sop_unit:4, eop:6,   eop_ptr_w:4};
+            AXI_RQ: ret = '{slots:2, be:0,  fbe:0, lbe:8, sop:20, sop_ptr_w:2, sop_unit:4, eop:26,  eop_ptr_w:4};
+            AXI_RC: ret = '{slots:4, be:0,  fbe:0, lbe:0, sop:64, sop_ptr_w:2, sop_unit:4, eop:76,  eop_ptr_w:4};
+        endcase
+    end else begin
+        unique case (dir)
+            AXI_CQ: ret = '{slots:4, be:0, fbe:128, lbe:144, sop:160, sop_ptr_w:2, sop_unit:8, eop:172, eop_ptr_w:5};
+            AXI_CC: ret = '{slots:4, be:0, fbe:0,   lbe:0,   sop:0,   sop_ptr_w:2, sop_unit:8, eop:12,  eop_ptr_w:5};
+            AXI_RQ: ret = '{slots:4, be:0, fbe:0,   lbe:16,  sop:48,  sop_ptr_w:2, sop_unit:8, eop:60,  eop_ptr_w:5};
+            AXI_RC: ret = '{slots:8, be:0, fbe:0,   lbe:0,   sop:128, sop_ptr_w:3, sop_unit:4, eop:160, eop_ptr_w:5};
+        endcase
     end
 
     return ret;
@@ -363,7 +427,9 @@ function automatic uvm_pcie::request_header hdr_cq_get(
         hdr.fmt[3-1:1] = 2'b01;
         hdr.pcie_type  = 5'b00000;
     end else begin
-        `uvm_fatal("ROOT", "\n\tUnknow pcie transaction type");
+        `uvm_fatal("ROOT", $sformatf(
+                   "\n\tUnknow pcie transaction type 0b%b\n\tCQ descriptor 'h%h 'h%h 'h%h 'h%h",
+                   req_type, data[0], data[1], data[2], data[3]));
     end
 
     hdr.ph           = 0;

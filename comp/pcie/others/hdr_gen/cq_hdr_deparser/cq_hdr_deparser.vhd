@@ -73,7 +73,8 @@ entity PCIE_CQ_HDR_DEPARSER is
         IN_FBE           : in std_logic_vector(4-1 downto 0);
         -- Last Byte Enable
         IN_LBE           : in std_logic_vector(4-1 downto 0);
-        -- PCIE CQ header META, contains: BAR_APERTURE, BAR_ID, TARGET_FUNC
+        -- CQ metadata: BAR_APERTURE (16:11), BAR_ID (10:8), TARGET_FUNC (7:0).
+        -- Intel devices use all fields, Versal only BAR_APERTURE, other devices none.
         IN_INTEL_META    : in std_logic_vector(17-1 downto 0) := (others => '0')
     );
 end entity;
@@ -100,10 +101,22 @@ begin
         OUT_ADDRESS      <= IN_HEADER(63 downto 2) & "00";
         OUT_DW_CNT       <= IN_HEADER(74 downto 64);
         OUT_REQ_ID       <= IN_HEADER(95 downto 80);
-        OUT_TAG          <= "00" & IN_HEADER(103 downto 96);
         OUT_TARGET_FUNC  <= IN_HEADER(111 downto 104);
         OUT_BAR_ID       <= IN_HEADER(114 downto 112);
-        OUT_BAR_APERTURE <= IN_HEADER(120 downto 115);
+
+        cq_hdr_xilinx_usp_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
+            OUT_BAR_APERTURE <= IN_HEADER(120 downto 115);
+            OUT_TAG          <= "00" & IN_HEADER(103 downto 96);
+        end generate;
+
+        -- PG346, Completer Request Descriptor Fields. With the 10-bit Tag Completer enabled,
+        -- Tag[8] is bit 79 and Tag[9] is bit 127.
+        cq_hdr_xilinx_versal_g: if (DEVICE = "VERSAL") generate
+            -- The CPM5 CQ descriptor has no BAR aperture, the parent sets it via IN_INTEL_META.
+            OUT_BAR_APERTURE <= IN_INTEL_META(16 downto 11);
+            OUT_TAG          <= IN_HEADER(127) & IN_HEADER(79) & IN_HEADER(103 downto 96);
+        end generate;
+
         OUT_TC           <= IN_HEADER(123 downto 121);
         OUT_ATTRIBUTES   <= IN_HEADER(126 downto 124);
         OUT_FBE          <= IN_FBE;
@@ -148,4 +161,3 @@ begin
     end generate;
 
 end architecture;
-

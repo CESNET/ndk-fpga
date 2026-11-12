@@ -9,25 +9,33 @@
 class sequence_base_cq #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH,
-    logic STRADDLING
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_common::sequence_base#(
     config_sequence,
-    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ))
+    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ, DEVICE))
 );
     `ndk_object_param_utils(
-        uvm_pcie_axi::sequence_base_cq#(ITEMS, ITEM_WIDTH, STRADDLING),
-        $sformatf("uvm_pcie_axi::sequence_base_cq#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, STRADDLING)
+        uvm_pcie_axi::sequence_base_cq#(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::sequence_base_cq#(%0d,%0d,%0d,%s)",ITEMS, ITEM_WIDTH, STRADDLING, DEVICE)
     );
-    `uvm_declare_p_sequencer(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ)));
+    `uvm_declare_p_sequencer(uvm_axi::sequencer #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ, DEVICE)));
 
-    localparam PACKET_MAX = ITEMS < 16 || STRADDLING == 0 ? 1 : 2;
-    localparam BE_INDEX   = ITEMS < 16 ? 8 : 16;
+    // Positions of the tuser fields
+    localparam tuser_layout_t LAYOUT = tuser_layout_get(ITEMS, AXI_CQ);
+    // Number of the is_sop/is_eop slots of the interface
+    localparam SLOTS      = LAYOUT.slots;
+    localparam PACKET_MAX = ITEMS < 16 || STRADDLING == 0 ? 1 : SLOTS;
+    localparam BE_INDEX   = LAYOUT.be;
     localparam REGIONS_NUM = PACKET_MAX;
     localparam REGION_SIZE = ITEMS/PACKET_MAX;
-    localparam SOF_INDEX  = ITEMS < 16 ? 40 : 80;
-    localparam EOF_INDEX  = 86;
-    localparam FBE_INDEX  = ITEMS < 16 ? 0 : 0;
-    localparam LBE_INDEX  = ITEMS < 16 ? 4 : 8;
+    localparam SOF_INDEX  = LAYOUT.sop;
+    localparam SOF_PTR_W  = LAYOUT.sop_ptr_w;
+    localparam SOF_UNIT   = LAYOUT.sop_unit;
+    localparam EOF_INDEX  = LAYOUT.eop;
+    localparam EOF_PTR_W  = LAYOUT.eop_ptr_w;
+    localparam FBE_INDEX  = LAYOUT.fbe;
+    localparam LBE_INDEX  = LAYOUT.lbe;
 
 
     int unsigned transactions_min = 10;
@@ -110,8 +118,9 @@ class sequence_base_cq #(
     endtask
 
     // This taks create axi transaction
-    virtual task create_sequence_item(ref uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ
-                                      )) gen);
+    virtual task create_sequence_item(
+        ref uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ, DEVICE)) gen
+    );
         int unsigned region;
         int unsigned sof_num;
         int unsigned eof_num;
@@ -120,12 +129,13 @@ class sequence_base_cq #(
         gen.tvalid = 0;
         gen.tlast = 0;
 
-        if (STRADDLING == 0) begin
-            gen.tuser[83:82] = 'x;
-            gen.tuser[85:84] = 'x;
-            gen.tuser[87:86] = 'x;
-            gen.tuser[91:88] = 'x;
-            gen.tuser[95:92] = 'x;
+        // Without straddling only the first is_sop/is_eop slot is used, the others are don't care
+        if (STRADDLING == 0 && ITEMS >= 16) begin
+            for (int unsigned slot = 1; slot < SLOTS; slot++) begin
+                gen.tuser[(slot+1)*SOF_PTR_W + SLOTS + SOF_INDEX-1 -: SOF_PTR_W] = 'x;
+                gen.tuser[slot + EOF_INDEX] = 'x;
+                gen.tuser[(slot+1)*EOF_PTR_W + SLOTS + EOF_INDEX-1 -: EOF_PTR_W] = 'x;
+            end
         end
 
         if (state == PKT_SPACE) begin
@@ -174,8 +184,8 @@ class sequence_base_cq #(
             if (state == PKT_HDR) begin
                 //Set SOP and SOP pointer
                 gen.tuser[sof_num + SOF_INDEX] = 1'b1;
-                if (ITEMS >= 16) begin //SOP pos is only in 512 bit width interface
-                    gen.tuser[(sof_num+1)*2 + PACKET_MAX + SOF_INDEX-1 -: 2] = {region, 1'b0};
+                if (ITEMS >= 16) begin //SOP pos is only in 512b and 1024b interfaces
+                    gen.tuser[(sof_num+1)*SOF_PTR_W + SLOTS + SOF_INDEX-1 -: SOF_PTR_W] = region*REGION_SIZE/SOF_UNIT;
                 end
 
                 //COPY HEADER
@@ -245,7 +255,7 @@ class sequence_base_cq #(
                 if (ITEMS >= 16) begin
                     //SET EOF and EOF position signal
                     gen.tuser[eof_num + EOF_INDEX] = 1'b1;
-                    gen.tuser[(eof_num+1)*4 + PACKET_MAX + EOF_INDEX-1 -: 4] = index-1;
+                    gen.tuser[(eof_num+1)*EOF_PTR_W + SLOTS + EOF_INDEX-1 -: EOF_PTR_W] = index-1;
                 end
 
                 eof_num++;
@@ -296,10 +306,11 @@ class sequence_base_cq #(
     endtask
 
     task body;
-        uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ)) gen;
+        uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ, DEVICE)) gen;
 
         assert((STRADDLING == 0 && ITEMS <= 16) ||
-               (STRADDLING == 1 && ITEMS == 16)
+               (STRADDLING == 1 && ITEMS == 16) ||
+               (DEVICE == "VERSAL" && ITEMS == 32)
         ) else begin
             `uvm_fatal(m_sequencer.get_full_name(), $sformatf(
                        "\n\tSTRADDLING IS NOT IMPLEMENTED --\n\tSTRADDLING %0d\n\tITEMS %0d", STRADDLING, ITEMS));
@@ -320,7 +331,7 @@ class sequence_base_cq #(
         gen = uvm_axi::sequence_item #(
             ITEMS,
             ITEM_WIDTH,
-            tuser_width_get(ITEMS, AXI_CQ)
+            tuser_width_get(ITEMS, AXI_CQ, DEVICE)
         )::type_id::create("gen", m_sequencer);
         create_sequence_item(gen);
         req = gen;
@@ -328,12 +339,13 @@ class sequence_base_cq #(
 
         while(transactions > 0 || data.size() > 0) begin
             // get response and check if tready is asserted
-            gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ))::type_id::create(
+            gen = uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ, DEVICE))::type_id::create(
                 "gen", m_sequencer);
             create_sequence_item(gen);
 
             get_response(rsp);
-            while(req.tvalid == 1'b1 && rsp.tready == 1'b0) begin
+            // TREADY X/Z is not a handshake (the monitor skips such a beat too)
+        while(req.tvalid == 1'b1 && rsp.tready !== 1'b1) begin
                 send_frame();
                 get_response(rsp);
             end
@@ -344,7 +356,8 @@ class sequence_base_cq #(
 
         // PEELING LOOP - Send last block
         get_response(rsp);
-        while(req.tvalid == 1'b1 && rsp.tready == 1'b0) begin
+        // TREADY X/Z is not a handshake (the monitor skips such a beat too)
+        while(req.tvalid == 1'b1 && rsp.tready !== 1'b1) begin
             send_frame();
             get_response(rsp);
         end
@@ -359,17 +372,18 @@ endclass
 class sequence_lib_cq #(
     int unsigned ITEMS,
     int unsigned ITEM_WIDTH,
-    logic STRADDLING
+    logic STRADDLING,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_common::sequence_library#(
     config_sequence,
-    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ))
+    uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, AXI_CQ, DEVICE))
 );
 
   `ndk_object_param_utils(
-        uvm_pcie_axi::sequence_lib_cq#(ITEMS, ITEM_WIDTH, STRADDLING),
-        $sformatf("uvm_pcie_axi::sequence_lib_cq#(%0d,%0d,%0d)",ITEMS, ITEM_WIDTH, STRADDLING)
+        uvm_pcie_axi::sequence_lib_cq#(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE),
+        $sformatf("uvm_pcie_axi::sequence_lib_cq#(%0d,%0d,%0d,%s)",ITEMS, ITEM_WIDTH, STRADDLING, DEVICE)
     )
-  `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_cq#(ITEMS, ITEM_WIDTH, STRADDLING))
+  `uvm_sequence_library_utils(uvm_pcie_axi::sequence_lib_cq#(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE))
 
   function new(string name = "sequence_lib_rx");
     super.new(name);
@@ -380,7 +394,7 @@ class sequence_lib_cq #(
     // can be useful in specific tests
     virtual function void init_sequence(config_sequence param_cfg = null);
         uvm_common::sequence_library::init_sequence(param_cfg);
-        this.add_sequence(uvm_pcie_axi::sequence_base_cq #(ITEMS, ITEM_WIDTH, STRADDLING)::get_type());
+        this.add_sequence(uvm_pcie_axi::sequence_base_cq #(ITEMS, ITEM_WIDTH, STRADDLING, DEVICE)::get_type());
     endfunction
 endclass
 

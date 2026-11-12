@@ -17,7 +17,7 @@ class env_rx #(
 
     // LOCAL PARAMETERS
     localparam int unsigned ITEM_WIDTH = 32; //as all pcie devices
-    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR);
+    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR, DEVICE);
 
     //LOW-LEVEL interface
     protected uvm_axi::agent_rx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_axi;
@@ -25,6 +25,18 @@ class env_rx #(
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
+    endfunction
+
+    // Supported are UltraScale+ (256b and 512b) and Versal CPM5 (512b and 1024b)
+    function void device_check();
+        assert((DEVICE == "ULTRASCALE" && ITEMS <= 16) ||
+               (DEVICE == "VERSAL"     && (ITEMS == 16 || ITEMS == 32))
+        ) else begin
+            `uvm_fatal(this.get_full_name(), $sformatf({
+                       "\n\tUnsupported combination of DEVICE(%s) and DATA_WIDTH(%0d)",
+                       "\n\tSupported are \"ULTRASCALE\" (256b, 512b) and \"VERSAL\" (512b, 1024b)"},
+                       DEVICE, ITEMS*32));
+        end
     endfunction
 
     virtual function void bar_register(uvm_pcie::bar_config cfg);
@@ -39,17 +51,12 @@ class env_rx #(
     function void build_phase(uvm_phase phase);
         uvm_axi::config_item axi_cfg;
 
-        assert(DEVICE == "ULTRASCALE") else begin
-            `uvm_fatal(this.get_full_name(), "\n\tSUPPORTED ONLY \"ULTRASCALE+\"");
-        end
-        if (DEVICE == "ULTRASCALE") begin
-            `uvm_warning(this.get_full_name(), "\n\tSUPPORTED ONLY \"ULTRASCALE+\"");
-        end
+        device_check();
 
         //register driver in factory
-        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING)::get(), "m_monitor",
-                                                      this);
-        uvm_pcie::driver::type_id::set_inst_override(driver#(ITEMS, DIR)::get_type(), "m_driver", this);
+        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING, DEVICE)::get(),
+                                                      "m_monitor", this);
+        uvm_pcie::driver::type_id::set_inst_override(driver#(ITEMS, DIR, DEVICE)::get_type(), "m_driver", this);
 
         super.build_phase(phase);
 
@@ -61,8 +68,8 @@ class env_rx #(
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        monitor#(ITEMS, DIR) m_monitor_axi;
-        driver#(ITEMS, DIR)  m_driver_axi;
+        monitor#(ITEMS, DIR, DEVICE) m_monitor_axi;
+        driver#(ITEMS, DIR, DEVICE)  m_driver_axi;
 
         super.connect_phase(phase);
 
@@ -71,6 +78,12 @@ class env_rx #(
 
         $cast(m_driver_axi, m_driver);
         uvm_config_db#(uvm_common::fifo#(uvm_pcie::header))::set(m_axi.m_sequencer, "" , "in_fifo", m_driver_axi.fifo);
+
+        // The CQ/RC sequences wait for the end of the reset (PCIE_USER_RESET) before they
+        // start a packet, as the monitor ignores the beats sent in the reset
+        if (get_is_active() == UVM_ACTIVE) begin
+            reset_sync.push_back(m_axi.m_sequencer.reset_sync);
+        end
     endfunction
 
     task run_phase(uvm_phase phase);
@@ -78,23 +91,25 @@ class env_rx #(
 
         uvm_common::sequence_library#(
             config_sequence,
-            uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, tuser_width_get(ITEMS, DIR))
+            uvm_axi::sequence_item #(ITEMS, ITEM_WIDTH, TUSER_WIDTH)
         ) seq;
 
         if (get_is_active() == UVM_ACTIVE) begin
             unique case (DIR)
-                AXI_RQ: seq = uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH)::type_id::create("seq", this);
+                AXI_RQ: seq = uvm_pcie_axi::sequence_lib_rq#(ITEMS, ITEM_WIDTH, DEVICE)::type_id::create("seq", this);
                 AXI_RC: seq = uvm_pcie_axi::sequence_lib_rc#(
                     ITEMS,
                     ITEM_WIDTH,
-                    STRADDLING
+                    STRADDLING,
+                    DEVICE
                 )::type_id::create("seq", this);
                 AXI_CQ: seq = uvm_pcie_axi::sequence_lib_cq#(
                     ITEMS,
                     ITEM_WIDTH,
-                    STRADDLING
+                    STRADDLING,
+                    DEVICE
                 )::type_id::create("seq", this);
-                AXI_CC: seq = uvm_pcie_axi::sequence_lib_cc#(ITEMS, ITEM_WIDTH)::type_id::create("seq", this);
+                AXI_CC: seq = uvm_pcie_axi::sequence_lib_cc#(ITEMS, ITEM_WIDTH, DEVICE)::type_id::create("seq", this);
             endcase
 
             seq.min_random_count = 20;
@@ -127,7 +142,7 @@ class env_tx #(
 
     // LOCAL PARAMETERS
     localparam int unsigned ITEM_WIDTH = 32; //as all pcie devices
-    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR);
+    localparam TUSER_WIDTH = tuser_width_get(ITEMS, DIR, DEVICE);
 
     //LOW-LEVEL interface
     protected uvm_axi::agent_tx #(ITEMS, ITEM_WIDTH, TUSER_WIDTH) m_axi;
@@ -136,21 +151,28 @@ class env_tx #(
         super.new(name, parent);
     endfunction
 
+    // Supported are UltraScale+ (256b and 512b) and Versal CPM5 (512b and 1024b)
+    function void device_check();
+        assert((DEVICE == "ULTRASCALE" && ITEMS <= 16) ||
+               (DEVICE == "VERSAL"     && (ITEMS == 16 || ITEMS == 32))
+        ) else begin
+            `uvm_fatal(this.get_full_name(), $sformatf({
+                       "\n\tUnsupported combination of DEVICE(%s) and DATA_WIDTH(%0d)",
+                       "\n\tSupported are \"ULTRASCALE\" (256b, 512b) and \"VERSAL\" (512b, 1024b)"},
+                       DEVICE, ITEMS*32));
+        end
+    endfunction
+
     function void build_phase(uvm_phase phase);
         uvm_axi::config_item axi_cfg;
 
 
-        assert(DEVICE == "ULTRASCALE") else begin
-            `uvm_fatal(this.get_full_name(), "SUPPORTED ONLY \"ULTRASCALE+\"");
-        end
-        if (DEVICE == "ULTRASCALE") begin
-            `uvm_warning(this.get_full_name(), "SUPPORTED ONLY \"ULTRASCALE+\"");
-        end
+        device_check();
 
         //Override monitor
         //uvm_pcie::monitor::type_id::set_inst_override(monitor#(ITEMS, DIR, STRADDLING)::get_type(), "m_monitor", this);
-        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING)::get(), "m_monitor",
-                                                      this);
+        uvm_pcie::monitor::type_id::set_inst_override(monitor_register #(ITEMS, DIR, STRADDLING, DEVICE)::get(),
+                                                      "m_monitor", this);
 
         super.build_phase(phase);
 
@@ -162,7 +184,7 @@ class env_tx #(
     endfunction
 
     function void connect_phase(uvm_phase phase);
-        monitor#(ITEMS, DIR) m_monitor_axi;
+        monitor#(ITEMS, DIR, DEVICE) m_monitor_axi;
 
         super.connect_phase(phase);
 

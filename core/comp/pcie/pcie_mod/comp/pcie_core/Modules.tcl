@@ -45,7 +45,12 @@ if {$ARCHGRP == "P_TILE"} {
 } elseif {$ARCHGRP == "H_TILE"} {
     lappend MOD "$ENTITY_BASE/pcie_core_htile.vhd"
 } elseif {$ARCHGRP == "USP" || $ARCHGRP == "USP_PCIE4C" || $ARCHGRP == "USP_PCIE4"} {
+    lappend MOD "$ENTITY_BASE/pcie_core_axi_common.vhd"
     lappend MOD "$ENTITY_BASE/pcie_core_usp.vhd"
+} elseif {$ARCHGRP == "VERSAL"} {
+    lappend PACKAGES "$ENTITY_BASE/pcie_misc_versal_pkg.vhd"
+    lappend MOD "$ENTITY_BASE/pcie_core_axi_common.vhd"
+    lappend MOD "$ENTITY_BASE/pcie_core_versal.vhd"
 } else {
     lappend MOD "$ENTITY_BASE/pcie_core_empty.vhd"
 }

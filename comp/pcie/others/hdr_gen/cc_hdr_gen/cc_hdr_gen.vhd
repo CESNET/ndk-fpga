@@ -76,7 +76,7 @@ begin
     -- CC Header construction
     -- -------------------------------------------------------------------------
 
-    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
+    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
         OUT_HEADER <=
                       '0'                & -- force ECRC
                       IN_ATTRIBUTES      & -- attributes
@@ -91,6 +91,31 @@ begin
                       IN_COMP_ST         & -- completion status
                       IN_DW_CNT          & -- Dword count
                       "00"               & -- RESERVED
+                      '0'                & -- locked read completion
+                      IN_BYTE_CNT        & -- byte count
+                      "000000"           & -- RESERVED
+                      IN_ADDRESS_TYPE    & -- address type
+                      '0'                & -- RESERVED
+                      IN_LOWER_ADDR;       -- lower address
+    end generate;
+
+    -- PG346, Completer Completion Descriptor Fields. Tag[8] is bit 31 and Tag[9] is bit 47.
+    cc_hdr_xilinxv_g: if (DEVICE = "VERSAL") generate
+        OUT_HEADER <=
+                      '0'                & -- force ECRC
+                      IN_ATTRIBUTES      & -- attributes
+                      IN_TC              & -- transaction class
+                      '0'                & -- completer ID enable
+                      IN_BUS_NUM         & -- completer bus number
+                      IN_META_FUNC_ID    & -- target function/device number
+                      IN_TAG(7 downto 0) & -- tag
+                      IN_REQ_ID          & -- requester ID
+                      IN_TAG(9)          & -- TAG_9
+                      '0'                & -- poisoned completion
+                      IN_COMP_ST         & -- completion status
+                      IN_DW_CNT          & -- Dword count
+                      IN_TAG(8)          & -- TAG_8
+                      '0'                & -- RESERVED
                       '0'                & -- locked read completion
                       IN_BYTE_CNT        & -- byte count
                       "000000"           & -- RESERVED

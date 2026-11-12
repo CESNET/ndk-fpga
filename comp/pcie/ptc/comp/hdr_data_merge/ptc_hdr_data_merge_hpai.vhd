@@ -104,7 +104,11 @@ architecture FULL of PTC_HDR_DATA_MERGE_HPAI is
     constant PLUS_DATA_O         : natural := PLUS_BE_O + 8;
     constant MVB_ITEM_PLUS_WIDTH : natural := PLUS_DATA_O + MVB_ITEM_WIDTH;
     -- On H-Tile, a new PCIe transaction can start only in the first region of the MFB word.
-    constant ONE_PKT_PER_WORD    : boolean := (DEVICE = "STRATIX10") and (ENDPOINT_TYPE = "H_TILE");
+    -- The CPM5 RQ interface accepts up to 4 TLPs per 1024b word (PG346), but the planning logic
+    -- of this component does not meet timing with 4 regions on Versal, so only one TLP starts
+    -- in a word.
+    constant ONE_PKT_PER_WORD    : boolean := ((DEVICE = "STRATIX10") and (ENDPOINT_TYPE = "H_TILE"))
+                                              or ((ENDPOINT_TYPE = "VERSAL") and (MFB_REGIONS = 4));
     -- One MFB region is one segment of the R-Tile TX interface in the double-width mode.
     -- A TLP can start only in segments st0 and st2 (1x16, MFB_REGIONS=4) or st0 and st1 (2x8, MFB_REGIONS=2).
     -- See the R-Tile Avalon-ST IP for PCIe User Guide (683501), Tables 59 and 60.

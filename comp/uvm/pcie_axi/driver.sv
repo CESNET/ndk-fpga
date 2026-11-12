@@ -7,16 +7,17 @@
 
 class driver#(
     int unsigned ITEMS,
-    direction_t DIR
+    direction_t DIR,
+    string DEVICE = "ULTRASCALE"
 ) extends uvm_pcie::driver;
     `ndk_component_param_utils(
-        uvm_pcie_axi::driver#(ITEMS, DIR),
-        $sformatf("uvm_pcie_axi::driver#(%0d,%s)",ITEMS, DIR)
+        uvm_pcie_axi::driver#(ITEMS, DIR, DEVICE),
+        $sformatf("uvm_pcie_axi::driver#(%0d,%s,%s)",ITEMS, DIR, DEVICE)
     );
 
     // LOCAL PARAMETERS
     localparam int unsigned ITEM_WIDTH = 32; //as all pcie devices
-    localparam int unsigned TUSER_WIDTH = tuser_width_get(ITEMS, DIR);
+    localparam int unsigned TUSER_WIDTH = tuser_width_get(ITEMS, DIR, DEVICE);
 
     uvm_common::fifo#(uvm_pcie::header) fifo;
 

@@ -26,7 +26,7 @@ module dut (
         .MFB_REGION_SIZE   (MFB_REGION_SIZE),
         .MFB_BLOCK_SIZE    (MFB_BLOCK_SIZE),
         .MFB_ITEM_WIDTH    (ITEM_WIDTH),
-        .AXI_CQUSER_WIDTH  (uvm_pcie_axi::tuser_width_get(AXI_ITEMS,   uvm_pcie_axi::AXI_CQ)),
+        .AXI_CQUSER_WIDTH  (uvm_pcie_axi::tuser_width_get(AXI_ITEMS, uvm_pcie_axi::AXI_CQ, DEVICE)),
         .AXI_DATA_WIDTH    (AXI_ITEMS*ITEM_WIDTH),
         .STRADDLING        (STRADDLING),
         .DEVICE            (DEVICE)

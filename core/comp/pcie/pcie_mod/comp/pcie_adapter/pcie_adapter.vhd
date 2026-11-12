@@ -50,15 +50,21 @@ entity PCIE_ADAPTER is
         -- AXI configuration
         -- =====================================================================
         AXI_DATA_WIDTH     : natural := CQ_MFB_REGIONS*CQ_MFB_REGION_SIZE*CQ_MFB_BLOCK_SIZE*CQ_MFB_ITEM_WIDTH;
-        -- Allowed values: 183 (USP Gen3x16), 88 (USP Gen3x8), 85 (V7 Gen3x8)
+        -- Allowed values: 465 (VERSAL Gen4x16/Gen5x8), 231 (VERSAL Gen3x16), 183 (USP Gen3x16),
+        -- 88 (USP Gen3x8), 85 (V7 Gen3x8)
         AXI_CQUSER_WIDTH   : natural := 183;
-        -- Allowed values: 81 (USP Gen3x16), 33 (USP Gen3x8), 33 (V7 Gen3x8)
+        -- Allowed values: 165 (VERSAL Gen4x16/Gen5x8), 81 (VERSAL Gen3x16), 81 (USP Gen3x16),
+        -- 33 (USP Gen3x8), 33 (V7 Gen3x8)
         AXI_CCUSER_WIDTH   : natural := 81;
-        -- Allowed values: 137 (USP Gen3x16), 62 (USP Gen3x8), 60 (V7 Gen3x8)
+        -- Allowed values: 373 (VERSAL Gen4x16/Gen5x8), 183 (VERSAL Gen3x16), 137 (USP Gen3x16),
+        -- 62 (USP Gen3x8), 60 (V7 Gen3x8)
         AXI_RQUSER_WIDTH   : natural := 137;
-        -- Allowed values: 161 (USP Gen3x16), 75 (USP Gen3x8), 75 (V7 Gen3x8)
+        -- Allowed values: 337 (VERSAL Gen4x16/Gen5x8), 161 (VERSAL Gen3x16), 161 (USP Gen3x16),
+        -- 75 (USP Gen3x8), 75 (V7 Gen3x8)
         AXI_RCUSER_WIDTH   : natural := 161;
         AXI_STRADDLING     : boolean := false;
+        -- Register the RC and RQ AXI interfaces (between the IP and the converters)
+        AXI_PIPE_EN        : boolean := false;
 
         -- =====================================================================
         -- AVST configuration (set automatically)
@@ -142,7 +148,7 @@ entity PCIE_ADAPTER is
         -- =====================================================================
         -- AXI Completer Request (CQ) Interface - Xilinx FPGA Only
         --
-        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express).
+        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express) or PG346 (Versal Adaptive SoC CPM Mode for PCI Express).
         -- =====================================================================
         CQ_AXI_DATA       : in  std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
         CQ_AXI_USER       : in  std_logic_vector(AXI_CQUSER_WIDTH-1 downto 0);
@@ -154,7 +160,7 @@ entity PCIE_ADAPTER is
         -- =====================================================================
         -- AXI Requester Completion (RC) Interface - Xilinx FPGA Only
         --
-        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express).
+        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express) or PG346 (Versal Adaptive SoC CPM Mode for PCI Express).
         -- =====================================================================
         RC_AXI_DATA       : in  std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
         RC_AXI_USER       : in  std_logic_vector(AXI_RCUSER_WIDTH-1 downto 0);
@@ -166,7 +172,7 @@ entity PCIE_ADAPTER is
         -- =====================================================================
         -- AXI Completer Completion (CC) Interface - Xilinx FPGA Only
         --
-        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express).
+        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express) or PG346 (Versal Adaptive SoC CPM Mode for PCI Express).
         -- =====================================================================
         CC_AXI_DATA       : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
         CC_AXI_USER       : out std_logic_vector(AXI_CCUSER_WIDTH-1 downto 0);
@@ -178,7 +184,7 @@ entity PCIE_ADAPTER is
         -- =====================================================================
         -- AXI Requester Request (RQ) Interface - Xilinx FPGA Only
         --
-        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express).
+        -- See Xilinx PG213 (UltraScale+ Devices Integrated Block for PCI Express) or PG346 (Versal Adaptive SoC CPM Mode for PCI Express).
         -- =====================================================================
         RQ_AXI_DATA       : out std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
         RQ_AXI_USER       : out std_logic_vector(AXI_RQUSER_WIDTH-1 downto 0);
@@ -281,6 +287,17 @@ architecture FULL of PCIE_ADAPTER is
     signal cblk_cc_mfb_meta_arr : slv_array_t(CC_MFB_REGIONS-1 downto 0)(128+32-1 downto 0);
     signal cblk_rq_mfb_meta_arr : slv_array_t(RQ_MFB_REGIONS-1 downto 0)(128+32-1 downto 0);
 
+    signal s_axi_rq_data        : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    signal s_axi_rq_user        : std_logic_vector(AXI_RQUSER_WIDTH-1 downto 0);
+    signal s_axi_rq_last        : std_logic;
+    signal s_axi_rq_keep        : std_logic_vector(AXI_DATA_WIDTH/32-1 downto 0);
+    signal s_axi_rq_valid       : std_logic;
+    signal s_axi_rq_ready       : std_logic;
+
+    signal s_axi_rc_data        : std_logic_vector(AXI_DATA_WIDTH-1 downto 0);
+    signal s_axi_rc_user        : std_logic_vector(AXI_RCUSER_WIDTH-1 downto 0);
+    signal s_axi_rc_valid       : std_logic;
+    signal s_axi_rc_ready       : std_logic;
 begin
 
     xilinx_g: if IS_XILINX_DEVICE generate
@@ -347,6 +364,49 @@ begin
 
         CQ_MFB_META <= slv_array_ser(cq_mfb_meta_arr);
 
+        rc_axis_pipe_i: entity work.AXIS_PIPE
+        generic map (
+            TDATA_WIDTH    => AXI_DATA_WIDTH,
+            TUSER_WIDTH    => AXI_RCUSER_WIDTH,
+            ITEM_WIDTH     => 32,
+
+            FAKE_PIPE      => not AXI_PIPE_EN,
+
+            -- "SHREG" or "REG"
+            PIPE_TYPE      => "SHREG",
+            DEVICE         => DEVICE
+        )
+        port map (
+            -- =============================
+            -- Clock and Reset
+            -- =============================
+
+            CLK      => PCIE_CLK,
+            RESET    => PCIE_RESET,
+
+            -- =============================
+            -- AXI-Stream input interface
+            -- =============================
+
+            RX_AXIS_TDATA  => RC_AXI_DATA,
+            RX_AXIS_TUSER  => RC_AXI_USER,
+            RX_AXIS_TKEEP  => RC_AXI_KEEP,
+            RX_AXIS_TLAST  => RC_AXI_LAST,
+            RX_AXIS_TVALID => RC_AXI_VALID,
+            RX_AXIS_TREADY => RC_AXI_READY,
+
+            -- =============================
+            -- AXI-Stream output interface
+            -- =============================
+
+            TX_AXIS_TDATA  => s_axi_rc_data,
+            TX_AXIS_TUSER  => s_axi_rc_user,
+            TX_AXIS_TKEEP  => open,
+            TX_AXIS_TLAST  => open,
+            TX_AXIS_TVALID => s_axi_rc_valid,
+            TX_AXIS_TREADY => s_axi_rc_ready
+        );
+
         rc_mfb2axi_i : entity work.PTC_PCIE_AXI2MFB
         generic map (
             MFB_REGIONS      => RC_MFB_REGIONS,
@@ -361,10 +421,10 @@ begin
             CLK            => PCIE_CLK,
             RESET          => PCIE_RESET,
 
-            RX_AXI_TDATA   => RC_AXI_DATA,
-            RX_AXI_TUSER   => RC_AXI_USER,
-            RX_AXI_TVALID  => RC_AXI_VALID,
-            RX_AXI_TREADY  => RC_AXI_READY,
+            RX_AXI_TDATA   => s_axi_rc_data,
+            RX_AXI_TUSER   => s_axi_rc_user,
+            RX_AXI_TVALID  => s_axi_rc_valid,
+            RX_AXI_TREADY  => s_axi_rc_ready,
 
             TX_MFB_DATA    => RC_MFB_DATA,
             TX_MFB_SOF     => RC_MFB_SOF,
@@ -427,12 +487,55 @@ begin
             RX_MFB_DST_RDY => RQ_MFB_DST_RDY,
             RX_MFB_BE      => slv_array_ser(rq_mfb_be_arr),
 
-            RQ_DATA        => RQ_AXI_DATA,
-            RQ_USER        => RQ_AXI_USER,
-            RQ_LAST        => RQ_AXI_LAST,
-            RQ_KEEP        => RQ_AXI_KEEP,
-            RQ_READY       => RQ_AXI_READY,
-            RQ_VALID       => RQ_AXI_VALID
+            RQ_DATA        => s_axi_rq_data,
+            RQ_USER        => s_axi_rq_user,
+            RQ_LAST        => s_axi_rq_last,
+            RQ_KEEP        => s_axi_rq_keep,
+            RQ_READY       => s_axi_rq_ready,
+            RQ_VALID       => s_axi_rq_valid
+        );
+
+        rq_axis_pipe_i: entity work.AXIS_PIPE
+        generic map (
+            TDATA_WIDTH    => AXI_DATA_WIDTH,
+            TUSER_WIDTH    => AXI_RQUSER_WIDTH,
+            ITEM_WIDTH     => 32,
+
+            FAKE_PIPE      => not AXI_PIPE_EN,
+
+            -- "SHREG" or "REG"
+            PIPE_TYPE      => "SHREG",
+            DEVICE         => DEVICE
+        )
+        port map (
+            -- =============================
+            -- Clock and Reset
+            -- =============================
+
+            CLK      => PCIE_CLK,
+            RESET    => PCIE_RESET,
+
+            -- =============================
+            -- AXI-Stream input interface
+            -- =============================
+
+            RX_AXIS_TDATA  => s_axi_rq_data,
+            RX_AXIS_TUSER  => s_axi_rq_user,
+            RX_AXIS_TKEEP  => s_axi_rq_keep,
+            RX_AXIS_TLAST  => s_axi_rq_last,
+            RX_AXIS_TVALID => s_axi_rq_valid,
+            RX_AXIS_TREADY => s_axi_rq_ready,
+
+            -- =============================
+            -- AXI-Stream output interface
+            -- =============================
+
+            TX_AXIS_TDATA  => RQ_AXI_DATA,
+            TX_AXIS_TUSER  => RQ_AXI_USER,
+            TX_AXIS_TKEEP  => RQ_AXI_KEEP,
+            TX_AXIS_TLAST  => RQ_AXI_LAST,
+            TX_AXIS_TVALID => RQ_AXI_VALID,
+            TX_AXIS_TREADY => RQ_AXI_READY
         );
 
         rq_mfb_meta_arr <= slv_array_deser(RQ_MFB_META, RQ_MFB_REGIONS);

@@ -32,7 +32,7 @@ package test;
     parameter RQ_MFB_REGION_SIZE = 1;
     parameter RQ_MFB_BLOCK_SIZE  = 8;
    // RC MFB
-    // Supported configuration is 4,1,4,32 for PCIe on UltraScale+
+    // Supported configuration is 4,1,4,32 for PCIe on UltraScale+ and Versal
     // Supported configuration is 2,1,4,32 for PCIe on Virtex 7 Series
     parameter RC_MFB_REGIONS     = 4;
     parameter RC_MFB_REGION_SIZE = 1;
@@ -59,11 +59,12 @@ package test;
     // DMA ports per PCIE_ENDPOINT. Total number of dma_ports is PCIE_ENDPOINTS*DMA_PORTS
     parameter DMA_PORTS = 1;
     // Connected PCIe endpoint type
-    // P_TILE, R_TILE
+    // P_TILE, R_TILE, VERSAL, DUMMY (UltraScale+)
     parameter PCIE_ENDPOINT_TYPE = "DUMMY";
     // Connected PCIe endpoint mode: 0=x16, 1=x8x8, 2=x8
     parameter PCIE_ENDPOINT_MODE = 0;
     // PCIe generation of the R-Tile IP core: 4 or 5
+    // PCIe generation of the Versal IP core: 3 (Gen3x16, 512b), 4 (Gen4x16, 1024b), 5 (Gen5x8x8, 1024b)
     parameter PCIE_GEN           = 4;
     // Size of the Hard IP completion buffer in units of 64 bytes, the same as in
     // pcie_top.vhd. 0 disables the check.
@@ -87,7 +88,7 @@ package test;
     // Enable of XCV IP, for Xilinx only
     parameter XVC_ENABLE         = 0;
     // FPGA device
-    // STRATIX10, AGILEX, ULTRASCALE, 7SERIES
+    // STRATIX10, AGILEX, ULTRASCALE, VERSAL, 7SERIES
     parameter DEVICE             = "ULTRASCALE";
 
     // AXI META WIDTH

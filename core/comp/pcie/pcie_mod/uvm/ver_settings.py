@@ -190,6 +190,74 @@ SETTINGS = {
         "PCIE_ENDPOINT_TYPE"   : "\\\"DUMMY\\\""     ,
         "__core_params__"          : {"PCIE_TYPE" : "USP"}     ,
     },
+    # Versal CPM5 Gen3x16: 512b AXI interfaces of the PCIe IP core
+    "xilinx_versal_512" : {
+        "RQ_MFB_REGIONS"       : "2"                 ,
+        "RQ_MFB_REGION_SIZE"   : "1"                 ,
+        "RQ_MFB_BLOCK_SIZE"    : "8"                 ,
+
+        "RC_MFB_REGIONS"       : "4"                 ,
+        "RC_MFB_REGION_SIZE"   : "1"                 ,
+        "RC_MFB_BLOCK_SIZE"    : "4"                 ,
+
+        "CQ_MFB_REGIONS"       : "2"                 ,
+        "CQ_MFB_REGION_SIZE"   : "1"                 ,
+        "CQ_MFB_BLOCK_SIZE"    : "8"                 ,
+
+        "CC_MFB_REGIONS"       : "2"                 ,
+        "CC_MFB_REGION_SIZE"   : "1"                 ,
+        "CC_MFB_BLOCK_SIZE"    : "8"                 ,
+
+        "STRADDLING"           : "0"                 ,
+
+        "PCIE_ENDPOINT_MODE"   : 0,
+        "PCIE_ENDPOINTS"       : 1,
+        "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 3,
+        "DMA_PORTS"            : 2,
+
+        "DEVICE"               : "\\\"VERSAL\\\""    ,
+        "PCIE_ENDPOINT_TYPE"   : "\\\"VERSAL\\\""    ,
+        "__core_params__"      : {"PCIE_TYPE" : "VERSAL"},
+    },
+    # Versal CPM5 Gen4x16: 1024b AXI interfaces of the PCIe IP core,
+    # the PTC converts the RQ and RC to the 512b DMA streams
+    "xilinx_versal_1024" : {
+        "RQ_MFB_REGIONS"       : "2"                 ,
+        "RQ_MFB_REGION_SIZE"   : "1"                 ,
+        "RQ_MFB_BLOCK_SIZE"    : "8"                 ,
+
+        "RC_MFB_REGIONS"       : "4"                 ,
+        "RC_MFB_REGION_SIZE"   : "1"                 ,
+        "RC_MFB_BLOCK_SIZE"    : "4"                 ,
+
+        "CQ_MFB_REGIONS"       : "4"                 ,
+        "CQ_MFB_REGION_SIZE"   : "1"                 ,
+        "CQ_MFB_BLOCK_SIZE"    : "8"                 ,
+
+        "CC_MFB_REGIONS"       : "4"                 ,
+        "CC_MFB_REGION_SIZE"   : "1"                 ,
+        "CC_MFB_BLOCK_SIZE"    : "8"                 ,
+
+        "STRADDLING"           : "0"                 ,
+
+        "PCIE_ENDPOINT_MODE"   : 0,
+        "PCIE_ENDPOINTS"       : 1,
+        "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 4,
+        "DMA_PORTS"            : 2,
+
+        "DEVICE"               : "\\\"VERSAL\\\""    ,
+        "PCIE_ENDPOINT_TYPE"   : "\\\"VERSAL\\\""    ,
+        "__core_params__"      : {"PCIE_TYPE" : "VERSAL"},
+    },
+    # Versal CPM5 Gen5x8x8: two endpoints with the 1024b AXI interfaces in one PCIe connector
+    "versal_gen5x8x8" : {
+        "PCIE_ENDPOINT_MODE"   : 1,
+        "PCIE_ENDPOINTS"       : 2,
+        "PCIE_CONS"            : 1,
+        "PCIE_GEN"             : 5,
+    },
     "straddling_on" : {
         "STRADDLING"           : "1",
     },
@@ -223,6 +291,19 @@ SETTINGS = {
         "P_TILE_512_CQ_STRADDLING" : ("intel_p_tile_512" , "dma_ports_1", "bar_enable", "straddling_on"),
         "R_TILE_1024_CQ"           : ("intel_r_tile_1024", "dma_ports_1", "bar_enable"),
         "USP_512_CQ"               : ("xilinx_usp_512"   , "dma_ports_1", "bar_enable"),
+
+        # Versal: the default run covers 2 DMA ports and the DMA BAR (they cannot be
+        # combined) at both widths and both endpoint modes. The commented out
+        # combinations are covered by the selected ones; run one of them with
+        # -s <its settings>, or uncomment it.
+        "VERSAL_512"               : ("xilinx_versal_512",                ),
+        # "VERSAL_512_1_PORT"        : ("xilinx_versal_512" , "dma_ports_1"),
+        "VERSAL_512_CQ"            : ("xilinx_versal_512" , "dma_ports_1", "bar_enable"),
+        "VERSAL_1024"              : ("xilinx_versal_1024",               ),
+        # "VERSAL_1024_1_PORT"       : ("xilinx_versal_1024", "dma_ports_1"),
+        # "VERSAL_1024_GEN5X8X8"     : ("xilinx_versal_1024", "versal_gen5x8x8", "dma_ports_1"),
+        "VERSAL_1024_CQ"           : ("xilinx_versal_1024", "dma_ports_1", "bar_enable"),
+        "VERSAL_1024_GEN5X8X8_CQ"  : ("xilinx_versal_1024", "versal_gen5x8x8", "dma_ports_1", "bar_enable"),
 
     },
 }

@@ -66,12 +66,23 @@ begin
     -- RC Header deparsing
     -- -------------------------------------------------------------------------
 
-    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES" or DEVICE = "VERSAL") generate
+    cc_hdr_xilinx_g: if (DEVICE = "ULTRASCALE" or DEVICE = "7SERIES") generate
         OUT_LOW_ADDR   <=        IN_HEADER(12   -1 downto 0);
         OUT_BYTE_CNT   <=        IN_HEADER(29   -1 downto 16);
         OUT_COMPLETE   <=        IN_HEADER(30);
         OUT_DW_CNT     <=        IN_HEADER(32+11-1 downto 32);
         OUT_TAG        <= "00" & IN_HEADER(64+8 -1 downto 64);
+        OUT_ATTRIBUTES <=        IN_HEADER(95   -1 downto 92);
+        OUT_COMP_ST    <=        IN_HEADER(46   -1 downto 43);
+    end generate;
+
+    -- PG346, Requester Completion Descriptor Fields. Tag[8] is bit 31 and Tag[9] is bit 47.
+    cc_hdr_xilinxv_g: if (DEVICE = "VERSAL") generate
+        OUT_LOW_ADDR   <=        IN_HEADER(12   -1 downto 0);
+        OUT_BYTE_CNT   <=        IN_HEADER(29   -1 downto 16);
+        OUT_COMPLETE   <=        IN_HEADER(30);
+        OUT_DW_CNT     <=        IN_HEADER(32+11-1 downto 32);
+        OUT_TAG        <=        IN_HEADER(47) & IN_HEADER(31) & IN_HEADER(64+8 -1 downto 64);
         OUT_ATTRIBUTES <=        IN_HEADER(95   -1 downto 92);
         OUT_COMP_ST    <=        IN_HEADER(46   -1 downto 43);
     end generate;

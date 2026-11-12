@@ -290,6 +290,11 @@ architecture FULL of PCIE is
                 -- 512b PTC-DMA stream to 1024b PCIe stream
                 pcie_mfb_regions := pcie_mfb_regions*2;
             end if;
+            if (PCIE_ENDPOINT_TYPE = "VERSAL" and (PCIE_ENDPOINT_MODE = 0 or PCIE_ENDPOINT_MODE = 1) and (PCIE_GEN > 3)) then
+                -- 512b PTC-DMA stream to 1024b PCIe stream
+                pcie_mfb_regions := pcie_mfb_regions*2;
+            end if;
+
         end if;
 
         return pcie_mfb_regions;

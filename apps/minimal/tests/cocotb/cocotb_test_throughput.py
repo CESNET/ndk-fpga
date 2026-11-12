@@ -14,6 +14,7 @@ import itertools
 from cocotb.triggers import Timer, Event, First, RisingEdge
 
 from cocotbext.ndk_core import NFBDevice
+from cocotbext.nfb.ext.python import bridge
 
 import cocotbext.ofm.utils.sim.modelsim as ms
 import cocotb.utils
@@ -41,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 
 # Shortcuts
-e = cocotb.external
+e = bridge
 st = cocotb.utils.get_sim_time
 add_cursor = ms.add_cursor
 print = ms.print
@@ -258,7 +259,8 @@ core = NFBDevice.core_instance_from_top(cocotb.top)
 DMA_STREAMS = core.dma_i.DMA_STREAMS.value
 
 pcic = core.pcie_i.pcie_core_i
-adapter = pcic.pcie_adapter_g[0].pcie_adapter_i
+# The AMD PCIE_CORE architectures have the adapter in the axi_common_i block
+adapter = getattr(pcic, "axi_common_i", pcic).pcie_adapter_g[0].pcie_adapter_i
 
 busm = {"RX": [], "TX": []}
 for d in busm:
