@@ -584,7 +584,8 @@
 <tr class="row-even" id="vhdl-portsignal-pcie_cq_hdr_deparser-in_intel_meta"><td><p>IN_INTEL_META</p></td>
 <td><p>std_logic_vector(17-1 downto 0)</p></td>
 <td><p>in</p></td>
-<td><p>PCIE CQ header META, contains: BAR_APERTURE, BAR_ID, TARGET_FUNC</p></td>
+<td><p>CQ metadata: BAR_APERTURE (16:11), BAR_ID (10:8), TARGET_FUNC (7:0).
+Intel devices use all fields, Versal only BAR_APERTURE, other devices none.</p></td>
 </tr>
 </tbody>
 </table>
