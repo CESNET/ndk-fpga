@@ -314,7 +314,9 @@ begin
         RX1_ITEMS      => MFB_REGIONS,
         RX1_ITEM_WIDTH => 17, -- 16 bits for pseudoheader checksum + 1 bit for UDP
         RX0_FIFO_EN    => False,
-        FIFO_DEPTH     => 32,
+        -- RX1 items wait in the FIFO for the result of CHECKSUM_CALCULATOR.
+        -- The FIFO must hold all items that arrive during this latency at one packet per region and clock.
+        FIFO_DEPTH     => 128,
         OUTPUT_REG     => True,
         DEVICE         => DEVICE
     )
