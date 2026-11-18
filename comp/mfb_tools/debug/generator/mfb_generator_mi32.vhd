@@ -35,6 +35,7 @@ use work.math_pack.all;
 -- - 0x20 - Cntr Low  (lower  part of counter for generated frames)
 -- - 0x24 - Cntr High (higher part of counter for generated frames)
 -- - 0x28 - SRC IP address mask register
+-- - 0x2C - Flow control (source IP address mode)
 --
 -- **Register format**
 --
@@ -69,6 +70,29 @@ use work.math_pack.all;
 -- - burst_size : number of packets to begenerated before channel is changed
 -- - ch_min     : the lowest channel number for round-robin distribution. Default 0x0000
 -- - ch_max     : the highest channel number for round-robin distribution. Default 0xFFFF
+--
+-- - Flow control register (0x2C), default 0x00000000:
+--
+-- .. code-block::
+--
+--   +-----------------------------+------------+-------+--------+---------+
+--   | 31                         8|7          4|3     2|1       |0        |
+--   +-----------------------------+------------+-------+--------+---------+
+--   | reserved                    | burst_log2 | rsvd  | random | per_pkt |
+--   +-----------------------------+------------+-------+--------+---------+
+--
+-- - per_pkt    : 0 = the source IP address is a counter of clock cycles.
+--                1 = the source IP address is an index of the packet.
+-- - random     : 1 = the index goes through a pseudo-random function.
+-- - burst_log2 : 2^burst_log2 consecutive packets get the same index.
+--
+-- The source IP address mask (0x28) is applied last.
+-- With per_pkt = 1, random = 0 and the mask set to 2^k-1, each window of
+-- 2^k * 2^burst_log2 packets contains each of the 2^k addresses.
+-- With random = 1, a window of 2^k * 2^burst_log2 packets contains about 63 % of the addresses.
+-- All addresses appear only in a long run.
+-- The index stays 0 while per_pkt = 0. To start the index from 0, write the register with
+-- per_pkt = 0 and the other fields set, and then with per_pkt = 1.
 --
 entity MFB_GENERATOR_MI32 is
     generic (
@@ -135,6 +159,7 @@ architecture BEHAV of MFB_GENERATOR_MI32 is
     signal smac_low_reg_sel    : std_logic;
     signal smac_high_reg_sel   : std_logic;
     signal src_ip_mask_reg_sel : std_logic;
+    signal flow_reg_sel        : std_logic;
     -- register signals
     signal en_reg              : std_logic;
     signal clr_reg             : std_logic;
@@ -150,6 +175,7 @@ architecture BEHAV of MFB_GENERATOR_MI32 is
     signal smac_low_reg        : std_logic_vector(31 downto 0);                -- low bits of source mac address
     signal smac_high_reg       : std_logic_vector(MAC_ADDR_WIDTH-33 downto 0); -- high bits of source mac address
     signal src_ip_mask_reg     : std_logic_vector(31 downto 0);
+    signal flow_reg            : std_logic_vector(31 downto 0);
 
 begin
 
@@ -180,6 +206,7 @@ begin
         CTRL_PKT_CNT_CLR => clr_reg,
         CTRL_PKT_CNT     => cnt_reg,
         CTRL_SRC_IP_MASK => src_ip_mask_reg,
+        CTRL_FLOW        => flow_reg,
         -- tx interface
         TX_MFB_DATA      => TX_MFB_DATA,
         TX_MFB_META      => TX_MFB_META,
@@ -201,6 +228,7 @@ begin
     smac_low_reg_sel    <= '1' when (MI_ADDR(6-1 downto 0) = "011000") else '0';
     smac_high_reg_sel   <= '1' when (MI_ADDR(6-1 downto 0) = "011100") else '0';
     src_ip_mask_reg_sel <= '1' when (MI_ADDR(6-1 downto 0) = "101000") else '0';
+    flow_reg_sel        <= '1' when (MI_ADDR(6-1 downto 0) = "101100") else '0';
 
     -- ==================================================================
     -- transfering data to/from registers according to the select signals
@@ -325,6 +353,17 @@ begin
         end if;
     end process;
 
+    flow_reg_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RST = '1') then
+                flow_reg <= (others => '0');
+            elsif ((flow_reg_sel = '1') and (MI_WR = '1')) then
+                flow_reg <= MI_DWR;
+            end if;
+        end if;
+    end process;
+
     cnt_comb_reg_resize <= std_logic_vector(resize(unsigned(cnt_reg), 64));
 
     -- process for reading data from the register with the current address
@@ -347,6 +386,7 @@ begin
                 when "100000"  => MI_DRD                          <= cnt_comb_reg_resize(31 downto 0);
                 when "100100"  => MI_DRD                          <= cnt_comb_reg_resize(63 downto 32);
                 when "101000"  => MI_DRD                          <= src_ip_mask_reg;
+                when "101100"  => MI_DRD                          <= flow_reg;
                 when others    => MI_DRD                          <= (others => '0');
             end case;
         end if;

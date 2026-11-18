@@ -25,6 +25,7 @@ class GeneratorConfig:
     dst_mac_address: bytes
     src_mac_address: bytes
     src_ip_address_mask: int
+    flow_control: int = 0
     generating: Optional[bool] = None # Read-only
     frame_count: Optional[int] = None # Read-only
 
@@ -44,6 +45,7 @@ class MfbGenerator(nfb.BaseComp):
     _REG_FRAME_CNT_LOW   = 0x20
     _REG_FRAME_CNT_HIGH  = 0x24
     _REG_SRC_IP_MASK     = 0x28
+    _REG_FLOW            = 0x2C
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -325,6 +327,62 @@ class MfbGenerator(nfb.BaseComp):
         else:
             self._logger.warning("Unable to set SRC IP address mask in this generator version. Try using a newer FW.")
 
+    # #####################
+    # Flow control register
+    # #####################
+    @property
+    def flow_support(self) -> bool:
+        """The generator supports the flow control register (version 3 and newer)."""
+        return self._node.get_property("version").value >= 3
+
+    @property
+    def flow_control(self) -> int:
+        """Get the raw value of the flow control register (0 for versions older than 3)."""
+        if self.flow_support:
+            return self._comp.read32(self._REG_FLOW)
+        return 0
+
+    @flow_control.setter
+    def flow_control(self, value: int) -> None:
+        """Set the raw value of the flow control register, see set_flow()."""
+        if self.flow_support:
+            self._comp.write32(self._REG_FLOW, value)
+        elif value:
+            self._logger.warning("Unable to set the flow control in this generator version. Try using a newer FW.")
+
+    def set_flow(self, per_packet: bool, random: bool = False, burst_log2: int = 0) -> None:
+        """Set how the generator creates the SRC IP address.
+
+        Args:
+            per_packet: The address is the index of the packet. When False,
+                the address is a counter of clock cycles (default after reset).
+            random: The index goes through a pseudo-random function.
+            burst_log2: 2^burst_log2 consecutive packets get the same index.
+
+        The SRC IP address mask is applied last. With per_packet=True,
+        random=False and mask 2^k-1, each window of 2^k * 2^burst_log2 packets
+        contains each of the 2^k addresses. With random=True, the generator
+        selects the addresses as random values: a window of 2^k * 2^burst_log2
+        packets contains about 63 % of them. Each call starts the index from 0.
+
+        Raises:
+            IOError: The generator version is older than 3.
+            ValueError: burst_log2 is out of range 0 to 15.
+        """
+        if not self.flow_support:
+            version = self._node.get_property("version").value
+            raise IOError(
+                f"Cannot set the flow control, version of MFB generator is {version},"
+                f" but minimal version 3 is required"
+            )
+        if not 0 <= burst_log2 <= 15:
+            raise ValueError(f"burst_log2 must be 0 to 15, got {burst_log2}")
+        value = int(per_packet) | (int(random) << 1) | (burst_log2 << 4)
+        # The index stays 0 while bit 0 is clear. The first write sets the other
+        # fields before the index starts.
+        self.flow_control = value & ~1
+        self.flow_control = value
+
     # #############
     # Configuration
     # #############
@@ -344,6 +402,7 @@ class MfbGenerator(nfb.BaseComp):
             dst_mac_address=self.dst_mac_address,
             src_mac_address=self.src_mac_address,
             src_ip_address_mask=self.src_ip_address_mask,
+            flow_control=self.flow_control,
             frame_count=self.frame_count,
         )
         return conf
@@ -360,6 +419,7 @@ class MfbGenerator(nfb.BaseComp):
         self.dst_mac_address = conf.dst_mac_address
         self.src_mac_address = conf.src_mac_address
         self.src_ip_address_mask = conf.src_ip_address_mask
+        self.flow_control = conf.flow_control
         self.enabled = conf.enabled
 
     def _convert_attr(self, attr_name: str, attr_value: str) -> Any:
@@ -368,6 +428,9 @@ class MfbGenerator(nfb.BaseComp):
 
         if "mask" in attr_name:
             return int(attr_value, 16)
+
+        if attr_name == "flow_control":
+            return int(attr_value, 0)
 
         prop_type = self._cfg_type_d[attr_name]
         return prop_type(attr_value)
@@ -408,6 +471,13 @@ class MfbGenerator(nfb.BaseComp):
                     f"Cannot set src_ip_address_mask, version of MFB generator is {version},"
                     f" but minimal version 2 is required"
                 )
+
+        if attr_name == "flow_control" and not self.flow_support:
+            version = self._node.get_property("version").value
+            raise IOError(
+                f"Cannot set flow_control, version of MFB generator is {version},"
+                f" but minimal version 3 is required"
+            )
 
         prop_obj = getattr(type(self), attr_name)
         value = self._convert_attr(attr_name, str_value)

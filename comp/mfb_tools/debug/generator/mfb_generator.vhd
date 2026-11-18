@@ -57,6 +57,12 @@ entity MFB_GENERATOR is
         CTRL_PKT_CNT_CLR  : in std_logic;
         CTRL_PKT_CNT      : out std_logic_vector(PKT_CNT_WIDTH-1 downto 0);
         CTRL_SRC_IP_MASK  : in  std_logic_vector(32-1 downto 0) := (others => '1');
+        -- Source IP address mode. Bit 0 changes the source IP address with each packet
+        -- instead of each clock cycle. Bit 1 selects a pseudo-random order of addresses.
+        -- Bits 7:4 are log2 of the number of consecutive packets with the same address.
+        -- Bit 1 and bits 7:4 are used only when bit 0 is set.
+        -- The packet index stays 0 while bit 0 is clear.
+        CTRL_FLOW         : in  std_logic_vector(32-1 downto 0) := (others => '0');
 
         -- TX interface
         TX_MFB_DATA     : out std_logic_vector(REGIONS*REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
@@ -73,7 +79,13 @@ end entity;
 architecture BEHAV of MFB_GENERATOR is
 
     constant CHANNELS           : natural := 2**CHANNELS_WIDTH;
+    -- The REG pipe uses two registers per bit, the SHREG pipe uses three on Intel FPGAs.
+    -- On AMD FPGAs, the SHREG pipe maps to the cheaper SRL primitives.
+    constant PIPE_TYPE          : string := tsel(DEVICE = "ARRIA10" or DEVICE = "STRATIX10" or DEVICE = "AGILEX", "REG", "SHREG");
     constant ETHER_TYPE         : std_logic_vector(15 downto 0) := X"0008"; -- IPv4 ethertype
+    -- Number of precomputed source IP addresses, enough for the packets of two words.
+    constant FLOW_VALS          : natural := 2*REGIONS;
+    constant FLOW_SEL_WIDTH     : natural := log2(FLOW_VALS);
 
     signal pkt_cnt              : u_array_t(REGIONS downto 0)(PKT_CNT_WIDTH-1 downto 0);
     signal pkt_cnt_reg          : unsigned(PKT_CNT_WIDTH-1 downto 0);
@@ -125,6 +137,18 @@ architecture BEHAV of MFB_GENERATOR is
     signal data                 : slv_array_t(REGIONS-1 downto 0)(REGION_SIZE*BLOCK_SIZE*ITEM_WIDTH-1 downto 0);
 
     signal free_cnt             : unsigned(32-1 downto 0);
+    signal flow_per_pkt         : std_logic;
+    signal flow_random          : std_logic;
+    signal flow_burst_log2      : unsigned(4-1 downto 0);
+    signal flow_cnt             : unsigned(32-1 downto 0);
+    signal flow_inc             : unsigned(FLOW_SEL_WIDTH-1 downto 0);
+    signal flow_inc_reg         : unsigned(FLOW_SEL_WIDTH-1 downto 0);
+    signal flow_base            : unsigned(32-1 downto 0);
+    signal flow_base_mask       : unsigned(32-1 downto 0);
+    signal flow_off             : u_array_t(FLOW_VALS-1 downto 0)(FLOW_SEL_WIDTH downto 0);
+    signal flow_val_reg         : slv_array_t(FLOW_VALS-1 downto 0)(32-1 downto 0);
+    signal flow_sel             : u_array_t(REGIONS-1 downto 0)(FLOW_SEL_WIDTH-1 downto 0);
+    signal flow_sip             : slv_array_t(REGIONS-1 downto 0)(32-1 downto 0);
     signal dip                  : slv_array_t(REGIONS-1 downto 0)(32-1 downto 0);
     signal sip                  : slv_array_t(REGIONS-1 downto 0)(32-1 downto 0);
     signal dport                : slv_array_t(REGIONS-1 downto 0)(16-1 downto 0);
@@ -157,6 +181,21 @@ architecture BEHAV of MFB_GENERATOR is
             count := count + ((count'high downto count'low+1 => '0') & INP_VECTOR(i));
         end loop;
         return count;
+    end function;
+
+    -- Integer hash with two adders and no multiplier.
+    -- The masked low bits of hashed consecutive indexes behave as random values.
+    function flow_mix (X : unsigned(32-1 downto 0)) return unsigned is
+        variable v : unsigned(32-1 downto 0);
+    begin
+        v := X xor shift_left(X, 12);
+        v := v xor shift_right(v, 4);
+        v := (not v) + shift_left(v, 7);
+        v := v xor shift_right(v, 6);
+        v := v xor shift_left(v, 8);
+        v := v + shift_left(v, 5);
+        v := v xor shift_right(v, 16);
+        return v;
     end function;
 
 begin
@@ -465,12 +504,107 @@ begin
         end if;
     end process;
 
+    -- ======================================================================================
+    --  Source IP address per packet
+    -- ======================================================================================
+    flow_per_pkt    <= CTRL_FLOW(0);
+    flow_random     <= CTRL_FLOW(1);
+    flow_burst_log2 <= unsigned(CTRL_FLOW(8-1 downto 4));
+
+    -- Region i uses the address of packet flow_cnt + (number of SOFs in regions below i).
+    flow_sel_p : process (all)
+        variable v_sof_cnt : unsigned(FLOW_SEL_WIDTH-1 downto 0);
+    begin
+        v_sof_cnt := (others => '0');
+        for i in 0 to REGIONS-1 loop
+            flow_sel(i) <= flow_inc_reg + v_sof_cnt;
+            if (sof(i) = '1') then
+                v_sof_cnt := v_sof_cnt + 1;
+            end if;
+        end loop;
+        flow_inc <= (others => '0');
+        if ((src_rdy = '1') and (dst_rdy = '1')) then
+            flow_inc <= v_sof_cnt;
+        end if;
+    end process;
+
+    flow_cnt_p : process (CLK)
+    begin
+        if (rising_edge(CLK)) then
+            if (RST = '1' or flow_per_pkt = '0') then
+                flow_cnt     <= (others => '0');
+                flow_inc_reg <= (others => '0');
+            else
+                flow_cnt     <= flow_cnt + flow_inc;
+                flow_inc_reg <= flow_inc;
+            end if;
+        end if;
+    end process;
+
+    -- flow_val_reg(j) is the address of packet number flow_cnt + j.
+    -- It uses flow_cnt from the previous clock cycle, so flow_sel adds flow_inc_reg.
+    -- The index of packet flow_cnt + j is (flow_cnt + j) >> burst_log2. It is computed as
+    -- flow_base + flow_off(j), so all values share one wide shifter.
+    flow_base      <= shift_right(flow_cnt, to_integer(flow_burst_log2));
+    flow_base_mask <= shift_right((flow_base_mask'range => '1'), to_integer(flow_burst_log2));
+
+    -- flow_off(j) is ((flow_cnt mod 2^burst_log2) + j) >> burst_log2.
+    -- The index j is below 2^FLOW_SEL_WIDTH.
+    flow_off_p : process (all)
+        variable v_b    : natural range 0 to 15;
+        variable v_ones : std_logic;
+        variable v_low  : unsigned(FLOW_SEL_WIDTH downto 0);
+    begin
+        v_b    := to_integer(flow_burst_log2);
+        -- Bits burst_log2-1 downto FLOW_SEL_WIDTH of flow_cnt are all ones.
+        v_ones := '1';
+        for i in FLOW_SEL_WIDTH to 15-1 loop
+            if (i < v_b and flow_cnt(i) = '0') then
+                v_ones := '0';
+            end if;
+        end loop;
+        for j in 0 to FLOW_VALS-1 loop
+            v_low := resize(flow_cnt(FLOW_SEL_WIDTH-1 downto 0), FLOW_SEL_WIDTH+1);
+            if (v_b <= FLOW_SEL_WIDTH) then
+                for i in 0 to FLOW_SEL_WIDTH-1 loop
+                    if (i >= v_b) then
+                        v_low(i) := '0';
+                    end if;
+                end loop;
+                flow_off(j) <= shift_right(v_low + j, v_b);
+            else
+                -- The offset is 1 only if (flow_cnt mod 2^burst_log2) + j reaches 2^burst_log2.
+                v_low          := v_low + j;
+                flow_off(j)    <= (others => '0');
+                flow_off(j)(0) <= v_ones and v_low(FLOW_SEL_WIDTH);
+            end if;
+        end loop;
+    end process;
+
+    flow_val_p : process (CLK)
+        variable v_idx : unsigned(32-1 downto 0);
+    begin
+        if (rising_edge(CLK)) then
+            for j in 0 to FLOW_VALS-1 loop
+                -- The mask keeps the 32-bit wrap of flow_cnt + j.
+                v_idx := (flow_base + flow_off(j)) and flow_base_mask;
+                if (flow_random = '1') then
+                    flow_val_reg(j) <= std_logic_vector(flow_mix(v_idx));
+                else
+                    flow_val_reg(j) <= std_logic_vector(v_idx);
+                end if;
+            end loop;
+        end if;
+    end process;
+
     l3len <= std_logic_vector(resize((unsigned(CTRL_LENGTH)-14),16));
     l4len <= std_logic_vector(resize((unsigned(CTRL_LENGTH)-34),16));
 
     hdr_g: for i in 0 to REGIONS-1 generate
+        flow_sip(i) <= flow_val_reg(to_integer(flow_sel(i))) when (flow_per_pkt = '1') else std_logic_vector(free_cnt + i);
+
         dip(i)   <= X"00000000";
-        sip(i)   <= std_logic_vector(free_cnt + i) and CTRL_SRC_IP_MASK;
+        sip(i)   <= flow_sip(i) and CTRL_SRC_IP_MASK;
         dport(i) <= X"0000";
         sport(i) <= X"0000";
 
@@ -528,7 +662,7 @@ begin
         META_WIDTH  => CHANNELS_WIDTH+LENGTH_WIDTH,
         FAKE_PIPE   => false,
         USE_DST_RDY => true,
-        -- PIPE_TYPE   => PIPE_TYPE,
+        PIPE_TYPE   => PIPE_TYPE,
         DEVICE      => DEVICE
     )
     port map (
