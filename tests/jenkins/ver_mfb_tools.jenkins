@@ -67,7 +67,6 @@ def COMPONENTS_MULTIVER = [\
     ['CHECKSUM_CALCULATOR'                , 'comp/mfb_tools/logic/checksum_calculator/uvm'                                    , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['TIMESTAMP_LIMITER'                  , 'comp/mfb_tools/flow/timestamp_limiter/uvm'                                       , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['FRAME_MASKER'                       , 'comp/mfb_tools/flow/frame_masker/uvm'                                            , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
-    ['FRAME_PACKER'                       , 'comp/mfb_tools/flow/frame_packer/uvm'                                            , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['MFB_FRAME_TRIMMER'                  , 'comp/mfb_tools/edit/frame_trimmer/uvm'                                           , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['MFB_FRAME_EXTENDER'                 , 'comp/mfb_tools/edit/frame_extender/uvm'                                          , 'top_level.fdo'      , 'tbench/tests/pkg.sv', 'ver_settings.py'    ],\
     ['GET_LAST_ITEMS'                     , 'comp/mfb_tools/logic/get_last_items/ver'                                         , 'top_level.fdo'      , 'tbench/test_pkg.sv' , 'ver_settings.py'    ],\
