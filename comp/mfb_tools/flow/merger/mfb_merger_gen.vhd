@@ -29,6 +29,10 @@ use work.type_pack.all;
 -- ``RX_PAYLOAD_EN(i)`` set to false leaves out the MFB path of input i. Use it
 -- for inputs that only send headers, it saves the MFB pipeline stages.
 --
+-- With STORED_EOF_EN, an input passes an MVB word to the arbitration only when
+-- the EOFs of all frames that this word announces are already in the input MFB
+-- FIFO. A granted frame then needs no data that are not stored yet.
+--
 -- .. warning::
 --   Headers and frames are paired by order, not by content. On one input the
 --   k-th frame on MFB belongs to the k-th header that has
@@ -92,6 +96,14 @@ entity MFB_MERGER_GEN is
 
         -- Depth of the input MVB FIFOs in words, minimum value is 2
         IN_MVB_FIFO_SIZE : integer := 8;
+
+        -- Pass a header with a payload only when the EOF of its frame is
+        -- already in the input MFB FIFO. Requires IN_MFB_FIFO_EN = True.
+        STORED_EOF_EN   : boolean := false;
+
+        -- Maximum size of a packet in MFB items. With STORED_EOF_EN, each input
+        -- MFB FIFO must hold MVB_ITEMS packets of this size.
+        PKT_SIZE_MAX    : natural := 2**14;
 
         -- Depth of the switch FIFO in items. It holds one item per packet
         -- whose header announced a payload.
@@ -199,6 +211,31 @@ architecture FULL of MFB_MERGER_GEN is
     -- The old name for the input FIFOs, kept working
     constant IN_FIFO_EN : boolean := MID_MFB_FIFOS_EN or IN_MFB_FIFO_EN;
 
+    constant INC_W         : natural := log2(MFB_REGIONS+1);
+    constant NEED_W        : natural := log2(MVB_ITEMS+1);
+    -- The counter holds EOFs of packets whose headers have not passed yet. Such
+    -- an EOF can also be in a stage behind the input MFB FIFO (IN_PIPE, input
+    -- register), so the extra bit is a margin over the FIFO capacity.
+    constant STORED_W      : natural := max(log2(IN_MFB_FIFO_SIZE*MFB_REGIONS+1), max(INC_W, NEED_W)) + 1;
+    -- A packet can start at the last Block of a word.
+    constant WORD_ITEMS    : natural := MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE;
+    constant PKT_WORDS_MAX : natural := div_roundup(PKT_SIZE_MAX + WORD_ITEMS - MFB_BLOCK_SIZE, WORD_ITEMS);
+
+    -- RX MVB after the optional input FIFOs, before the stored EOF gate
+    signal in_mvb_src_rdy   : std_logic_vector(MERGER_INPUTS-1 downto 0);
+    signal in_mvb_dst_rdy   : std_logic_vector(MERGER_INPUTS-1 downto 0);
+
+    -- RX MFB DST_RDY of each input, read by the stored EOF counter
+    signal rx_dst_rdy       : std_logic_vector(MERGER_INPUTS-1 downto 0);
+
+    -- Counters of EOFs in each input MFB FIFO that no header has taken yet
+    signal stored_inc_reg : u_array_t(MERGER_INPUTS-1 downto 0)(INC_W-1 downto 0);
+    signal stored_cnt     : u_array_t(MERGER_INPUTS-1 downto 0)(STORED_W-1 downto 0);
+    -- Number of frames that the MVB word after the input FIFO announces
+    signal pkt_need       : u_array_t(MERGER_INPUTS-1 downto 0)(NEED_W-1 downto 0);
+    -- The EOFs of all frames of this MVB word are in the input MFB FIFO.
+    signal pkt_stored     : std_logic_vector(MERGER_INPUTS-1 downto 0);
+
     -- RX MVB and MFB after the optional input FIFOs
     signal fifo_mvb_data    : slv_array_t(MERGER_INPUTS-1 downto 0)(MVB_ITEMS*HDR_WIDTH-1 downto 0);
     signal fifo_mvb_payload : slv_array_t(MERGER_INPUTS-1 downto 0)(MVB_ITEMS-1 downto 0);
@@ -271,6 +308,16 @@ architecture FULL of MFB_MERGER_GEN is
 
 begin
 
+    assert (not STORED_EOF_EN or IN_FIFO_EN)
+        report "MFB_MERGER_GEN: Set IN_MFB_FIFO_EN = True when STORED_EOF_EN = True."
+        severity failure;
+
+    -- A full FIFO must contain the EOFs of all frames of the next MVB word, so
+    -- that the input can pass this word.
+    assert (not STORED_EOF_EN or IN_MFB_FIFO_SIZE >= MVB_ITEMS*PKT_WORDS_MAX)
+        report "MFB_MERGER_GEN: Set IN_MFB_FIFO_SIZE to at least " & integer'image(MVB_ITEMS*PKT_WORDS_MAX) & " words to hold " & integer'image(MVB_ITEMS) & " packets of PKT_SIZE_MAX items."
+        severity failure;
+
     -- =========================================================================
     -- A single input needs no arbitration at all
     -- =========================================================================
@@ -337,14 +384,14 @@ begin
 
                     TX_DATA    => fifo_tx_data,
                     TX_VLD     => fifo_mvb_vld(i),
-                    TX_SRC_RDY => fifo_mvb_src_rdy(i),
-                    TX_DST_RDY => fifo_mvb_dst_rdy(i)
+                    TX_SRC_RDY => in_mvb_src_rdy(i),
+                    TX_DST_RDY => in_mvb_dst_rdy(i)
                 );
             else generate
-                fifo_tx_data        <= fifo_rx_data;
-                fifo_mvb_vld(i)     <= RX_MVB_VLD(i);
-                fifo_mvb_src_rdy(i) <= RX_MVB_SRC_RDY(i);
-                RX_MVB_DST_RDY(i)   <= fifo_mvb_dst_rdy(i);
+                fifo_tx_data      <= fifo_rx_data;
+                fifo_mvb_vld(i)   <= RX_MVB_VLD(i);
+                in_mvb_src_rdy(i) <= RX_MVB_SRC_RDY(i);
+                RX_MVB_DST_RDY(i) <= in_mvb_dst_rdy(i);
             end generate;
 
             fifo_mvb_out_g : for e in 0 to MVB_ITEMS-1 generate
@@ -381,7 +428,7 @@ begin
                     RX_SOF     => RX_MFB_SOF(i),
                     RX_EOF     => RX_MFB_EOF(i),
                     RX_SRC_RDY => RX_MFB_SRC_RDY(i),
-                    RX_DST_RDY => RX_MFB_DST_RDY(i),
+                    RX_DST_RDY => rx_dst_rdy(i),
 
                     TX_DATA    => fifo_mfb_data(i),
                     TX_META    => fifo_mfb_meta(i),
@@ -400,12 +447,59 @@ begin
                 fifo_mfb_sof(i)     <= RX_MFB_SOF(i);
                 fifo_mfb_eof(i)     <= RX_MFB_EOF(i);
                 fifo_mfb_src_rdy(i) <= RX_MFB_SRC_RDY(i);
-                RX_MFB_DST_RDY(i)   <= fifo_mfb_dst_rdy(i);
+                rx_dst_rdy(i)       <= fifo_mfb_dst_rdy(i);
             end generate;
+
+            RX_MFB_DST_RDY(i) <= rx_dst_rdy(i);
         end generate;
 
         -- ---------------------------------------------------------------------
-        --  3. OPTIONAL INPUT PIPES
+        --  3. STORED EOF GATE
+        -- ---------------------------------------------------------------------
+        -- With STORED_EOF_EN, an input passes an MVB word only when the EOFs of
+        -- all frames that the word announces are in the input MFB FIFO. The
+        -- core then never waits in the middle of a frame for data that are not
+        -- stored yet. Without it, such a wait can stop a source that also feeds
+        -- another merger, and that merger can then stop this one.
+
+        stored_eof_g : for i in 0 to MERGER_INPUTS-1 generate
+            stored_eof_en_g : if (STORED_EOF_EN and RX_PAYLOAD_EN(i)) generate
+                pkt_need(i) <= to_unsigned(count_ones(fifo_mvb_vld(i) and fifo_mvb_payload(i)), NEED_W);
+
+                stored_cnt_p : process (CLK)
+                    variable cnt_inc_v : unsigned(STORED_W-1 downto 0);
+                begin
+                    if (rising_edge(CLK)) then
+                        cnt_inc_v := stored_cnt(i) + resize(stored_inc_reg(i), STORED_W);
+                        if (RX_MFB_SRC_RDY(i) = '1' and rx_dst_rdy(i) = '1') then
+                            stored_inc_reg(i) <= to_unsigned(count_ones(RX_MFB_EOF(i)), INC_W);
+                        else
+                            stored_inc_reg(i) <= (others => '0');
+                        end if;
+                        if (fifo_mvb_src_rdy(i) = '1' and fifo_mvb_dst_rdy(i) = '1') then
+                            stored_cnt(i) <= cnt_inc_v - resize(pkt_need(i), STORED_W);
+                        else
+                            stored_cnt(i) <= cnt_inc_v;
+                        end if;
+                        if (RESET = '1') then
+                            stored_inc_reg(i) <= (others => '0');
+                            stored_cnt(i)     <= (others => '0');
+                        end if;
+                    end if;
+                end process;
+
+                pkt_stored(i) <= '1' when (stored_cnt(i) >= resize(pkt_need(i), STORED_W)) else '0';
+            else generate
+                pkt_need(i)   <= (others => '0');
+                pkt_stored(i) <= '1';
+            end generate;
+
+            fifo_mvb_src_rdy(i) <= in_mvb_src_rdy(i) and pkt_stored(i);
+            in_mvb_dst_rdy(i)   <= fifo_mvb_dst_rdy(i) and pkt_stored(i);
+        end generate;
+
+        -- ---------------------------------------------------------------------
+        --  4. OPTIONAL INPUT PIPES
         -- ---------------------------------------------------------------------
 
         in_pipe_g : if (IN_PIPE_EN) generate
@@ -499,7 +593,7 @@ begin
         end generate;
 
         -- ---------------------------------------------------------------------
-        --  4. MERGER CORE
+        --  5. MERGER CORE
         -- ---------------------------------------------------------------------
 
         merger_i : entity work.MFB_MERGER_FLAT
@@ -555,7 +649,7 @@ begin
         );
 
         -- ---------------------------------------------------------------------
-        --  5. OUTPUT REGISTERS
+        --  6. OUTPUT REGISTERS
         -- ---------------------------------------------------------------------
         -- The core drives its outputs combinationally, so one of the two
         -- branches below always registers them.

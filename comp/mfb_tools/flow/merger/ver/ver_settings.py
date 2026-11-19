@@ -15,7 +15,10 @@ SETTINGS = {
         "MFB_ITEM_WIDTH"                                       : "4"                                          ,
         "MFB_META_WIDTH"                                       : "1"                                          ,
 
+        "IN_MFB_FIFO_EN"                                       : "FALSE"                                      ,
         "INPUT_FIFO_SIZE"                                      : "8"                                          ,
+        "STORED_EOF_EN"                                        : "FALSE"                                      ,
+        "PKT_SIZE_MAX"                                         : "MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*3"  ,
         "bool RX_PAYLOAD_EN\\[MERGER_INPUTS-1:0\\]"            : "{TRUE, TRUE}"                               ,
         "IN_PIPE_EN"                                           : "FALSE"                                      ,
         "OUT_PIPE_EN"                                          : "FALSE"                                      ,
@@ -134,6 +137,7 @@ SETTINGS = {
     },
 
     "big_in_fifo" : {
+        "IN_MFB_FIFO_EN"  : "TRUE",
         "INPUT_FIFO_SIZE" : "64",
     },
 
@@ -143,6 +147,13 @@ SETTINGS = {
 
     "out_pipe" : {
         "OUT_PIPE_EN" : "TRUE",
+    },
+
+    "stored_eof" : {
+        "IN_MFB_FIFO_EN"  : "TRUE",
+        "PKT_SIZE_MAX"    : "MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*3",
+        "INPUT_FIFO_SIZE" : "MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*3",
+        "STORED_EOF_EN"   : "TRUE",
     },
 
     "device_stratix" : {
@@ -250,6 +261,72 @@ SETTINGS = {
     ("inputs_5_1",        "mfb_0"   ,                        "out_pipe","device_stratix",          ),
     ("inputs_5_1","mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",          ),
     ("inputs_5_1","mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx",),
+
+    (             "mvb_1",                         "in_pipe",           "device_stratix",           "stored_eof",),
+    (                     "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    (                                                        "out_pipe",                            "stored_eof",),
+    (             "mvb_4","mfb_1"   ,                                                    "slow_tx", "stored_eof",),
+    (             "mvb_1","mfb_2"   ,"big_in_fifo","in_pipe","out_pipe",                 "slow_tx", "stored_eof",),
+    (                     "mfb_pcie","big_in_fifo",          "out_pipe",                 "slow_tx", "stored_eof",),
+    (                     "mfb_pcie","big_in_fifo",                                                 "stored_eof",),
+    (                     "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    (             "mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",           "stored_eof",),
+    (             "mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx", "stored_eof",),
+
+    ("inputs_2_0","mvb_1",                         "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_2_0",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_2_0",                                           "out_pipe",                            "stored_eof",),
+    ("inputs_2_0","mvb_4","mfb_1"   ,                                                    "slow_tx", "stored_eof",),
+    ("inputs_2_0","mvb_1","mfb_2"   ,"big_in_fifo","in_pipe","out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_2_0",        "mfb_pcie","big_in_fifo",          "out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_2_0",        "mfb_pcie","big_in_fifo",                                                 "stored_eof",),
+    ("inputs_2_0",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_2_0","mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_2_0","mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx", "stored_eof",),
+
+    ("inputs_3_0","mvb_1",                         "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_3_0",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_3_0",                                           "out_pipe",                            "stored_eof",),
+    ("inputs_3_0","mvb_4","mfb_1"   ,                                                    "slow_tx", "stored_eof",),
+    ("inputs_3_0","mvb_1","mfb_2"   ,"big_in_fifo","in_pipe","out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_3_0",        "mfb_pcie","big_in_fifo",          "out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_3_0",        "mfb_pcie","big_in_fifo",                                                 "stored_eof",),
+    ("inputs_3_0",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_3_0","mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_3_0","mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx", "stored_eof",),
+
+    ("inputs_3_1","mvb_1",                         "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_3_1",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_3_1",                                           "out_pipe",                            "stored_eof",),
+    ("inputs_3_1","mvb_4","mfb_1"   ,                                                    "slow_tx", "stored_eof",),
+    ("inputs_3_1","mvb_1","mfb_2"   ,"big_in_fifo","in_pipe","out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_3_1",        "mfb_pcie","big_in_fifo",          "out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_3_1",        "mfb_pcie","big_in_fifo",                                                 "stored_eof",),
+    ("inputs_3_1",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_3_1","mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_3_1","mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx", "stored_eof",),
+
+    ("inputs_5_0","mvb_1",                         "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_5_0",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_5_0",                                           "out_pipe",                            "stored_eof",),
+    ("inputs_5_0","mvb_4","mfb_1"   ,                                                    "slow_tx", "stored_eof",),
+    ("inputs_5_0","mvb_1","mfb_2"   ,"big_in_fifo","in_pipe","out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_5_0",        "mfb_pcie","big_in_fifo",          "out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_5_0",        "mfb_pcie","big_in_fifo",                                                 "stored_eof",),
+    ("inputs_5_0",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_5_0","mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_5_0","mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx", "stored_eof",),
+
+    ("inputs_5_1","mvb_1",                         "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_5_1",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_5_1",                                           "out_pipe",                            "stored_eof",),
+    ("inputs_5_1","mvb_4","mfb_1"   ,                                                    "slow_tx", "stored_eof",),
+    ("inputs_5_1","mvb_1","mfb_2"   ,"big_in_fifo","in_pipe","out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_5_1",        "mfb_pcie","big_in_fifo",          "out_pipe",                 "slow_tx", "stored_eof",),
+    ("inputs_5_1",        "mfb_pcie","big_in_fifo",                                                 "stored_eof",),
+    ("inputs_5_1",        "mfb_0"   ,                        "out_pipe","device_stratix",           "stored_eof",),
+    ("inputs_5_1","mvb_1","mfb_2"   ,              "in_pipe",           "device_stratix",           "stored_eof",),
+    ("inputs_5_1","mvb_4","mfb_pcie",              "in_pipe",           "device_stratix","slow_tx", "stored_eof",),
 
     ),
 

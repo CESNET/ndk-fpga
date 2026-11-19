@@ -30,7 +30,10 @@ package test_pkg;
     parameter MFB_ITEM_WIDTH  = 4;
     parameter MFB_META_WIDTH  = 1;
 
+    parameter IN_MFB_FIFO_EN  = FALSE;
     parameter INPUT_FIFO_SIZE = 8;
+    parameter STORED_EOF_EN   = FALSE;
+    parameter PKT_SIZE_MAX    = MFB_REGIONS*MFB_REG_SIZE*MFB_BLOCK_SIZE*3; // >= FRAME_SIZE_MAX
     // THIS IS DECLARED AS 'DOWNTO' BUT SYSTEMVERILOG CREATES IT AS 'TO', WHICH MEANS THERE HAS TO BE A DUT WRAPPER TO CONVERT IT
     // Fixed in ModelSim-SE 2020.4
     parameter bool RX_PAYLOAD_EN[MERGER_INPUTS-1:0] = '{MERGER_INPUTS{TRUE}};

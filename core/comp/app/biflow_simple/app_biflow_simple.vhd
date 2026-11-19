@@ -24,6 +24,9 @@ entity APP_BIFLOW_SIMPLE is
         MFB_FIFO_DEPTH        : natural := 512;
         MFB_FIFO_ENABLE       : boolean := True;
         MFB_FIFO_TYPE         : string  := "AUTO";
+        -- Maximum size of a packet in MFB items. With more IN_STREAMS and more
+        -- OUT_STREAMS, MFB_FIFO_DEPTH must hold MFB_REGIONS packets of this size.
+        PKT_SIZE_MAX          : natural := 2**14;
         DEVICE                : string  := "AGILEX"
     );
     port (
@@ -70,8 +73,16 @@ end entity;
 
 architecture FULL of APP_BIFLOW_SIMPLE is
 
-    constant IN_PER_OUT : natural := IN_STREAMS/OUT_STREAMS;
-    constant SW_PORTS   : natural := IN_STREAMS*OUT_STREAMS;
+    constant IN_PER_OUT    : natural := IN_STREAMS/OUT_STREAMS;
+    constant SW_PORTS      : natural := IN_STREAMS*OUT_STREAMS;
+    -- With more inputs and more outputs, a merger that waits in the middle of
+    -- a packet can stop a splitter that also feeds another merger, and that
+    -- merger can then stop the first one. The mergers then start only stored
+    -- packets, and their input FIFOs replace the FIFOs behind the splitters.
+    constant STORED_EOF_EN : boolean := (IN_STREAMS > 1 and OUT_STREAMS > 1);
+    -- A packet can start at the last Block of a word.
+    constant WORD_ITEMS    : natural := MFB_REGIONS*MFB_REGION_SIZE*MFB_BLOCK_SIZE;
+    constant PKT_WORDS_MAX : natural := div_roundup(PKT_SIZE_MAX + WORD_ITEMS - MFB_BLOCK_SIZE, WORD_ITEMS);
 
     signal port_in_mvb_data       : slv_array_t(SW_PORTS-1 downto 0)(MFB_REGIONS*MVB_ITEM_WIDTH-1 downto 0);
     signal port_in_mvb_sel        : slv_array_t(SW_PORTS-1 downto 0)(MFB_REGIONS*max(1,log2(OUT_STREAMS))-1 downto 0);
@@ -107,6 +118,12 @@ begin
     --    report "APP_BIFLOW_SIMPLE: The number of OUT_STREAMS must be equal to IN_STREAMS, or OUT_STREAMS must be 1 and OUT_STREAMS < IN_STREAMS!"
     --    severity failure;
 
+    -- A merger passes an MVB word with MFB_REGIONS headers only when the EOFs
+    -- of all its packets are in its input MFB FIFO.
+    assert (not STORED_EOF_EN or MFB_FIFO_DEPTH >= MFB_REGIONS*PKT_WORDS_MAX)
+        report "APP_BIFLOW_SIMPLE: Set MFB_FIFO_DEPTH to at least " & integer'image(MFB_REGIONS*PKT_WORDS_MAX) & " words to hold " & integer'image(MFB_REGIONS) & " packets of PKT_SIZE_MAX items!"
+        severity failure;
+
     -- simple connection
     no_biflow_g: if (OUT_STREAMS = 1 and IN_STREAMS = 1) generate
         OUT_MVB_DATA    <= IN_MVB_DATA;
@@ -137,6 +154,7 @@ begin
                 MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
                 MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
                 MVB_ITEM_WIDTH  => MVB_ITEM_WIDTH,
+                MFB_FIFO_ENABLE => not STORED_EOF_EN,
                 DEVICE          => DEVICE
             )
             port map (
@@ -194,18 +212,23 @@ begin
 
             mfb_merger_tree_i : entity work.MFB_MERGER_GEN
             generic map (
-                MERGER_INPUTS   => IN_STREAMS,
-                MVB_ITEMS       => MFB_REGIONS,
-                MVB_ITEM_WIDTH  => MVB_ITEM_WIDTH,
-                MFB_REGIONS     => MFB_REGIONS,
-                MFB_REG_SIZE    => MFB_REGION_SIZE,
-                MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
-                MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
-                INPUT_FIFO_SIZE => 32,
-                RX_PAYLOAD_EN   => (others => true),
-                IN_PIPE_EN      => false,
-                OUT_PIPE_EN     => true,
-                DEVICE          => DEVICE
+                MERGER_INPUTS    => IN_STREAMS,
+                MVB_ITEMS        => MFB_REGIONS,
+                MVB_ITEM_WIDTH   => MVB_ITEM_WIDTH,
+                MFB_REGIONS      => MFB_REGIONS,
+                MFB_REG_SIZE     => MFB_REGION_SIZE,
+                MFB_BLOCK_SIZE   => MFB_BLOCK_SIZE,
+                MFB_ITEM_WIDTH   => MFB_ITEM_WIDTH,
+                IN_MFB_FIFO_EN   => STORED_EOF_EN,
+                IN_MFB_FIFO_SIZE => MFB_FIFO_DEPTH,
+                STORED_EOF_EN    => STORED_EOF_EN,
+                IN_MVB_FIFO_EN   => STORED_EOF_EN,
+                IN_MVB_FIFO_SIZE => MVB_FIFO_DEPTH,
+                PKT_SIZE_MAX     => PKT_SIZE_MAX,
+                RX_PAYLOAD_EN    => (others => true),
+                IN_PIPE_EN       => false,
+                OUT_PIPE_EN      => true,
+                DEVICE           => DEVICE
             )
             port map (
                 CLK             => CLK,

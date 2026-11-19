@@ -23,10 +23,13 @@ entity DUT_WRAPPER is
         MFB_BLOCK_SIZE  : integer := 8;  -- number of items in block
         MFB_ITEM_WIDTH  : integer := 32; -- width  of one item (in bits)
         MFB_META_WIDTH  : integer := 1;  -- width of MFB metadata
+        IN_MFB_FIFO_EN  : boolean := false;
         INPUT_FIFO_SIZE : integer := 8;
         -- THIS IS THE ONLY CHANGE FROM THE ORIGINAL ENTITY
         -- SYSTEMVERILOG DOES NOT SUPPORT 'DOWNTO' GENERICS
         -- Fixed in ModelSim-SE 2020.4
+        STORED_EOF_EN   : boolean := false;
+        PKT_SIZE_MAX    : natural := 2**14;
         RX_PAYLOAD_EN   : b_array_t(MERGER_INPUTS-1 downto 0) := (others => true);
         IN_PIPE_EN      : boolean := false;
         OUT_PIPE_EN     : boolean := true;
@@ -94,7 +97,10 @@ begin
         MFB_BLOCK_SIZE  => MFB_BLOCK_SIZE,
         MFB_ITEM_WIDTH  => MFB_ITEM_WIDTH,
         MFB_META_WIDTH  => MFB_META_WIDTH,
+        IN_MFB_FIFO_EN  => IN_MFB_FIFO_EN,
         INPUT_FIFO_SIZE => INPUT_FIFO_SIZE,
+        STORED_EOF_EN   => STORED_EOF_EN,
+        PKT_SIZE_MAX    => PKT_SIZE_MAX,
         RX_PAYLOAD_EN   => RX_PAYLOAD_EN,
         IN_PIPE_EN      => IN_PIPE_EN,
         OUT_PIPE_EN     => OUT_PIPE_EN,
