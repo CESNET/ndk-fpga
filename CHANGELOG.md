@@ -32,6 +32,9 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - cards: Changed the P-Tile PCIe user clock on N6010 and IA-420F cards to 400 MHz when DMA Calypte is used.
 - comp: Changed AXIS_ETH_PARSER to select all bytes of a header with one multiplexer to reduce the logic and shorten the critical path.
 
+### Removed
+- comp: Removed FRAME_PACKER component.
+
 ### Fixed
 - cards: Fixed DDR_PORTS derivation from MEM_PORTS on N5014 card.
 - comp: Fixed CNT_MULTI_MEMX adding a pending increment to another channel's value when a reset was requested without a read.
