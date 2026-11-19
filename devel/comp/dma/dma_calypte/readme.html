@@ -788,7 +788,9 @@ is enabled on all AMD cards whose measurements we provide. The latency is always
 -&gt; Host (HFH)</em>, or <em>FPGA -&gt; F2H Controller -&gt; Host -&gt; H2F Controller -&gt; FPGA (FHF)</em>, which will be
 denoted for specific results. Every time the data are looped back, either in the Host for the FHF path
 or in the FPGA for the HFH path, the loopback is established with the shortest path possible (E.g., for the
-HFH to directly connect <em>USR_TX_MFB</em> to the <em>USR_RX_MFB</em> interface).</p>
+HFH to directly connect <em>USR_TX_MFB</em> to the <em>USR_RX_MFB</em> interface).
+The test core in the DMA wrapper contains an MFB loopback for the HFH path.
+The firmware contains the test core only when <code class="docutils literal notranslate"><span class="pre">DMA_DEBUG_ENABLE</span></code> is set to <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p>
 <section id="amd-fpga-gen3x8">
 <h3>AMD FPGA Gen3x8<a class="headerlink" href="#amd-fpga-gen3x8" title="Link to this heading"></a></h3>
 <ul>
