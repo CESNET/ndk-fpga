@@ -17,7 +17,7 @@ class IdleTransaction(BaseTransaction):
     Drivers insert idle transactions between data transactions to model
     gaps in the traffic (deasserted SRC_RDY/TVALID etc.). The ``length``
     attribute expresses the duration of the gap in the bus's smallest
-    transferable unit — e.g. one byte on the MFB bus, one item on the MVB
+    transferable unit — e.g. one item on the MFB bus, one item on the MVB
     bus, or one word (clock cycle) on common buses.
 
     Args:

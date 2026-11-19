@@ -12,82 +12,42 @@ use IEEE.numeric_std.all;
 use work.math_pack.all;
 use work.type_pack.all;
 
--- This package defines types and constants used throughout the AXI-Stream
--- Ethernet parser components. It includes protocol identifiers, header field
--- sizes, ethertype values for protocol detection, and record types for
--- representing parsed headers from each protocol layer.
+-- This package defines the protocol identifiers, the header record types and
+-- the functions that describe each protocol. All protocol-specific logic of
+-- the parser is in this package.
+--
+-- Header data from a parser stage stores byte 0 of the header in bits 7:0.
 --
 package axis_eth_parser_types is
 
     -- =========================================================================
     -- Protocol identifiers
     -- =========================================================================
-    constant PROTO_NONE   : natural := 0;  -- No valid protocol
-    constant PROTO_ETH    : natural := 1;  -- Ethernet header
-    constant PROTO_VLAN   : natural := 2;  -- VLAN tag
-    constant PROTO_IPV4   : natural := 3;  -- IPv4 header
-    constant PROTO_TCP    : natural := 4;  -- TCP header
-    constant PROTO_UDP    : natural := 5;  -- UDP header
+    constant PROTO_NONE    : natural := 0;  -- No valid protocol
+    constant PROTO_ETH     : natural := 1;  -- Ethernet header
+    constant PROTO_VLAN    : natural := 2;  -- VLAN tag
+    constant PROTO_IPV4    : natural := 3;  -- IPv4 header
+    constant PROTO_TCP     : natural := 4;  -- TCP header
+    constant PROTO_UDP     : natural := 5;  -- UDP header
+    constant PROTO_IPV6    : natural := 6;  -- IPv6 header
+    constant PROTO_IPV6EXT : natural := 7;  -- IPv6 extension header
+    constant PROTO_MPLS    : natural := 8;  -- MPLS label stack entry
 
     -- Width of protocol identifier field (must accommodate all PROTO_* values)
-    constant PROTOCOL_WIDTH : natural := 3;
+    constant PROTOCOL_WIDTH : natural := 4;
+
+    -- Protocols of the parser stages in pipeline order
+    type proto_array_t is array (natural range <>) of natural;
+
+    -- Maximum number of parser stages, given by the width of the STAGE_REG bitmap
+    constant MAX_STAGES : natural := 64;
 
     -- Maximum width of offset field (supports PKT_MTU up to 2^14)
     -- This is the maximum offset width used in extracted_headers_t record
     constant MAX_OFFSET_WIDTH : natural := 15;
 
-    -- Total width of serialized headers vector
-    -- ETH: 48+48+16+1+15 = 128, VLAN: 16+16+1+15 = 48, IPv4: 161+15 = 176, TCP: 161+15 = 176, UDP: 65+15 = 80
-    -- Total: 128 + 48 + 176 + 176 + 80 = 608 bits
-    constant HEADERS_SLV_WIDTH : natural := 608;
-
-    -- =========================================================================
-    -- Ethernet header constants
-    -- =========================================================================
-    constant ETH_HDR_SIZE      : natural := 14;  -- Total Ethernet header size: dst_mac(6) + src_mac(6) + ethertype(2)
-    constant ETH_HDR_EXTRACT   : natural := 14;  -- Bytes to extract for Ethernet header
-    constant ETH_MAC_SIZE      : natural := 6;   -- MAC address size in bytes
-    constant ETH_ETHERTYPE_OFS : natural := 12;  -- Ethertype field offset
-
-    -- Ethertype values for next protocol identification
-    constant ETH_TYPE_IPV4 : std_logic_vector(15 downto 0) := X"0800";  -- IPv4
-    constant ETH_TYPE_VLAN : std_logic_vector(15 downto 0) := X"8100";  -- VLAN tag
-
-    -- =========================================================================
-    -- VLAN header constants
-    -- =========================================================================
-    constant VLAN_HDR_SIZE    : natural := 4;   -- Total VLAN tag size: tpid(2) + tci(2)
-    constant VLAN_HDR_EXTRACT : natural := 4;   -- Bytes to extract for VLAN header
-
-    -- =========================================================================
-    -- IPv4 header constants
-    -- =========================================================================
-    constant IPV4_HDR_MIN_SIZE : natural := 20;  -- Minimum IPv4 header size (IHL=5)
-    constant IPV4_HDR_EXTRACT  : natural := 20;  -- Bytes to extract for IPv4 header
-
-    -- IPv4 protocol field values
-    constant IPV4_PROTO_TCP : std_logic_vector(7 downto 0) := X"06";  -- TCP
-
-    -- =========================================================================
-    -- TCP header constants
-    -- =========================================================================
-    constant TCP_HDR_MIN_SIZE : natural := 20;  -- Minimum TCP header size (data offset=5)
-    constant TCP_HDR_EXTRACT  : natural := 20;  -- Bytes to extract for TCP header
-
-    -- =========================================================================
-    -- UDP header constants
-    -- =========================================================================
-    constant UDP_HDR_SIZE    : natural := 8;    -- UDP header size: src_port(2) + dst_port(2) + length(2) + checksum(2)
-    constant UDP_HDR_EXTRACT : natural := 8;    -- Bytes to extract for UDP header
-
-    -- IPv4 protocol field values
-    constant IPV4_PROTO_UDP : std_logic_vector(7 downto 0) := X"11";  -- UDP
-
-    -- =========================================================================
-    -- Function declarations
-    -- =========================================================================
-    function get_extract_bytes (protocol : natural) return natural;
-    function get_max_extract_bytes return natural;
+    -- Ethernet MAC address size in bytes
+    constant ETH_MAC_SIZE : natural := 6;
 
     -- =========================================================================
     -- Header record types
@@ -144,8 +104,35 @@ package axis_eth_parser_types is
         checksum : std_logic_vector(15 downto 0);  -- UDP checksum
     end record;
 
-    -- Combined extracted headers from all protocol layers
-    -- Uses MAX_OFFSET_WIDTH to support any PKT_MTU up to 2^16 bytes
+    -- IPv6 header fields
+    type ipv6_header_t is record
+        version        : std_logic_vector(3 downto 0);    -- IP version (6 for IPv6)
+        traffic_class  : std_logic_vector(7 downto 0);    -- Traffic class
+        flow_label     : std_logic_vector(19 downto 0);   -- Flow label
+        payload_length : std_logic_vector(15 downto 0);   -- Length of the data after this header
+        next_header    : std_logic_vector(7 downto 0);    -- Type of the next header
+        hop_limit      : std_logic_vector(7 downto 0);    -- Hop limit
+        src_ip         : std_logic_vector(127 downto 0);  -- Source IP address
+        dst_ip         : std_logic_vector(127 downto 0);  -- Destination IP address
+    end record;
+
+    -- IPv6 extension header fields (Hop-by-Hop, Routing, Fragment, Destination Options)
+    type ipv6ext_header_t is record
+        next_header : std_logic_vector(7 downto 0);   -- Type of the next header
+        hdr_ext_len : std_logic_vector(7 downto 0);   -- Header length in 8-byte units, without the first 8 bytes
+        data        : std_logic_vector(47 downto 0);  -- Bytes 2 to 7 of the header
+    end record;
+
+    -- MPLS label stack entry fields
+    type mpls_header_t is record
+        label_value : std_logic_vector(19 downto 0);  -- Label value
+        tc          : std_logic_vector(2 downto 0);   -- Traffic class
+        s           : std_logic;                      -- Bottom of stack flag
+        ttl         : std_logic_vector(7 downto 0);   -- Time to Live
+    end record;
+
+    -- Headers of the AXIS_ETH_PARSER protocol set
+    -- Uses MAX_OFFSET_WIDTH to support any PKT_MTU up to 2^14 bytes
     type extracted_headers_t is record
         eth         : eth_header_t;
         eth_vld     : std_logic;
@@ -165,186 +152,315 @@ package axis_eth_parser_types is
     end record;
 
     -- =========================================================================
-    -- Helper function declarations
+    -- Protocol description
     -- =========================================================================
-    function init_extracted_headers return extracted_headers_t;
-    function extracted_headers_to_slv (hdrs : extracted_headers_t; OFFSET_WIDTH : natural) return std_logic_vector;
-    function slv_to_extracted_headers (slv : std_logic_vector; OFFSET_WIDTH : natural) return extracted_headers_t;
+
+    -- Number of header bytes that a stage reads for the protocol.
+    -- It must not be larger than the minimum header length plus one.
+    -- The next stage then gets its start no later than the AXI word that contains its header.
+    function get_extract_bytes (protocol : natural) return natural;
+    function get_max_extract_bytes (protocols : proto_array_t) return natural;
+
+    -- Header length in bytes, data contains the bytes read by the stage
+    function get_hdr_len (protocol : natural; data : std_logic_vector) return natural;
+    -- Protocol of the next header, data contains the bytes read by the stage
+    function get_next_proto (protocol : natural; data : std_logic_vector) return natural;
+
+    -- True when a header of protocol next_proto can directly follow a header of protocol proto
+    function proto_can_follow (proto : natural; next_proto : natural) return boolean;
+    -- Index of the inst-th stage with the protocol, the first stage has index 0
+    function get_stage_index (protocols : proto_array_t; protocol : natural; inst : natural := 0) return natural;
+    -- Bit i is set when a register stage after stage i is needed for timing.
+    -- It is needed after a stage that computes a variable header length (IPv4, IPv6 extension header).
+    function get_stage_reg_auto (protocols : proto_array_t) return std_logic_vector;
+
+    -- =========================================================================
+    -- Header decoding
+    -- =========================================================================
+
+    -- Bytes first to first+bytes-1 of data in network byte order (byte first in the MSBs)
+    function get_be (data : std_logic_vector; first : natural; bytes : natural) return std_logic_vector;
+
+    function decode_eth (data : std_logic_vector) return eth_header_t;
+    function decode_vlan (data : std_logic_vector) return vlan_header_t;
+    function decode_ipv4 (data : std_logic_vector) return ipv4_header_t;
+    function decode_tcp (data : std_logic_vector) return tcp_header_t;
+    function decode_udp (data : std_logic_vector) return udp_header_t;
+    function decode_ipv6 (data : std_logic_vector) return ipv6_header_t;
+    function decode_ipv6ext (data : std_logic_vector) return ipv6ext_header_t;
+    function decode_mpls (data : std_logic_vector) return mpls_header_t;
 
 end package;
 
 package body axis_eth_parser_types is
 
-    -- Initialize all header fields to zero/invalid
-    function init_extracted_headers return extracted_headers_t is
-        variable r : extracted_headers_t;
-    begin
-        r.eth.dst_mac          := (others => '0');
-        r.eth.src_mac          := (others => '0');
-        r.eth.ethertype        := (others => '0');
-        r.eth_vld              := '0';
-        r.eth_offset           := (others => '0');
-        r.vlan.tci             := (others => '0');
-        r.vlan.ethertype       := (others => '0');
-        r.vlan_vld             := '0';
-        r.vlan_offset          := (others => '0');
-        r.ipv4.version         := (others => '0');
-        r.ipv4.ihl             := (others => '0');
-        r.ipv4.tos             := (others => '0');
-        r.ipv4.total_length    := (others => '0');
-        r.ipv4.identification  := (others => '0');
-        r.ipv4.flags           := (others => '0');
-        r.ipv4.fragment_offset := (others => '0');
-        r.ipv4.ttl             := (others => '0');
-        r.ipv4.protocol        := (others => '0');
-        r.ipv4.header_checksum := (others => '0');
-        r.ipv4.src_ip          := (others => '0');
-        r.ipv4.dst_ip          := (others => '0');
-        r.ipv4_vld             := '0';
-        r.ipv4_offset          := (others => '0');
-        r.tcp.src_port         := (others => '0');
-        r.tcp.dst_port         := (others => '0');
-        r.tcp.seq_num          := (others => '0');
-        r.tcp.ack_num          := (others => '0');
-        r.tcp.data_offset      := (others => '0');
-        r.tcp.reserved         := (others => '0');
-        r.tcp.flags            := (others => '0');
-        r.tcp.window           := (others => '0');
-        r.tcp.checksum         := (others => '0');
-        r.tcp.urgent_ptr       := (others => '0');
-        r.tcp_vld              := '0';
-        r.tcp_offset           := (others => '0');
-        r.udp.src_port         := (others => '0');
-        r.udp.dst_port         := (others => '0');
-        r.udp.length           := (others => '0');
-        r.udp.checksum         := (others => '0');
-        r.udp_vld              := '0';
-        r.udp_offset           := (others => '0');
-        return r;
-    end function;
-
-    -- Return number of bytes to extract for given protocol
     function get_extract_bytes (protocol : natural) return natural is
     begin
         case protocol is
-            when PROTO_ETH => return ETH_HDR_EXTRACT;
-            when PROTO_VLAN => return VLAN_HDR_EXTRACT;
-            when PROTO_IPV4 => return IPV4_HDR_EXTRACT;
-            when PROTO_TCP => return TCP_HDR_EXTRACT;
-            when PROTO_UDP => return UDP_HDR_EXTRACT;
-            when others => return 20;
+            when PROTO_ETH     => return 14;
+            when PROTO_VLAN    => return 4;
+            when PROTO_IPV4    => return 20;
+            when PROTO_TCP     => return 20;
+            when PROTO_UDP     => return 8;
+            when PROTO_IPV6    => return 40;
+            when PROTO_IPV6EXT => return 8;
+            -- The fifth byte is the first byte after the label stack entry
+            when PROTO_MPLS    => return 5;
+            when others =>
+                report "AXIS_ETH_PARSER: Use only the PROTO_* constants that this package defines."
+                    severity failure;
+                return 1;
         end case;
     end function;
 
-    -- Return maximum bytes required across all supported protocols
-    function get_max_extract_bytes return natural is
+    function get_max_extract_bytes (protocols : proto_array_t) return natural is
+        variable r : natural := 1;
     begin
-        return maximum(maximum(maximum(maximum(ETH_HDR_EXTRACT, VLAN_HDR_EXTRACT), IPV4_HDR_EXTRACT), TCP_HDR_EXTRACT), UDP_HDR_EXTRACT);
+        for i in protocols'range loop
+            r := maximum(r, get_extract_bytes(protocols(i)));
+        end loop;
+        return r;
     end function;
 
-    -- Convert extracted_headers_t record to std_logic_vector for serialization
-    -- OFFSET_WIDTH specifies the actual width of offset fields to use (must be <= MAX_OFFSET_WIDTH)
-    function extracted_headers_to_slv (hdrs : extracted_headers_t; OFFSET_WIDTH : natural) return std_logic_vector is
-        variable r   : std_logic_vector(HEADERS_SLV_WIDTH-1 downto 0);
-        variable pos : natural := 0;
+    function get_be (data : std_logic_vector; first : natural; bytes : natural) return std_logic_vector is
+        alias    d : std_logic_vector(data'length-1 downto 0) is data;
+        variable r : std_logic_vector(bytes*8-1 downto 0);
     begin
-        -- Ethernet: 48+48+16+1+OFFSET_WIDTH bits
-        r(pos+47 downto pos)             := hdrs.eth.dst_mac;       pos := pos + 48;
-        r(pos+47 downto pos)             := hdrs.eth.src_mac;       pos := pos + 48;
-        r(pos+15 downto pos)             := hdrs.eth.ethertype;     pos := pos + 16;
-        r(pos)                           := hdrs.eth_vld;           pos := pos + 1;
-        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.eth_offset(OFFSET_WIDTH-1 downto 0)); pos := pos + OFFSET_WIDTH;
-        -- VLAN: 16+16+1+OFFSET_WIDTH bits
-        r(pos+15 downto pos)             := hdrs.vlan.tci;          pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.vlan.ethertype;    pos := pos + 16;
-        r(pos)                           := hdrs.vlan_vld;          pos := pos + 1;
-        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.vlan_offset(OFFSET_WIDTH-1 downto 0)); pos := pos + OFFSET_WIDTH;
-        -- IPv4: 4+4+8+16+16+3+13+8+8+16+32+32+1+OFFSET_WIDTH bits
-        r(pos+3 downto pos)              := hdrs.ipv4.version;       pos := pos + 4;
-        r(pos+3 downto pos)              := hdrs.ipv4.ihl;           pos := pos + 4;
-        r(pos+7 downto pos)              := hdrs.ipv4.tos;           pos := pos + 8;
-        r(pos+15 downto pos)             := hdrs.ipv4.total_length;  pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.ipv4.identification; pos := pos + 16;
-        r(pos+2 downto pos)              := hdrs.ipv4.flags;         pos := pos + 3;
-        r(pos+12 downto pos)             := hdrs.ipv4.fragment_offset; pos := pos + 13;
-        r(pos+7 downto pos)              := hdrs.ipv4.ttl;           pos := pos + 8;
-        r(pos+7 downto pos)              := hdrs.ipv4.protocol;      pos := pos + 8;
-        r(pos+15 downto pos)             := hdrs.ipv4.header_checksum; pos := pos + 16;
-        r(pos+31 downto pos)             := hdrs.ipv4.src_ip;        pos := pos + 32;
-        r(pos+31 downto pos)             := hdrs.ipv4.dst_ip;        pos := pos + 32;
-        r(pos)                           := hdrs.ipv4_vld;           pos := pos + 1;
-        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.ipv4_offset(OFFSET_WIDTH-1 downto 0)); pos := pos + OFFSET_WIDTH;
-        -- TCP: 16+16+32+32+4+3+9+16+16+16+1+OFFSET_WIDTH bits
-        r(pos+15 downto pos)             := hdrs.tcp.src_port;      pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.tcp.dst_port;      pos := pos + 16;
-        r(pos+31 downto pos)             := hdrs.tcp.seq_num;       pos := pos + 32;
-        r(pos+31 downto pos)             := hdrs.tcp.ack_num;       pos := pos + 32;
-        r(pos+3 downto pos)              := hdrs.tcp.data_offset;   pos := pos + 4;
-        r(pos+2 downto pos)              := hdrs.tcp.reserved;      pos := pos + 3;
-        r(pos+8 downto pos)              := hdrs.tcp.flags;         pos := pos + 9;
-        r(pos+15 downto pos)             := hdrs.tcp.window;        pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.tcp.checksum;      pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.tcp.urgent_ptr;    pos := pos + 16;
-        r(pos)                           := hdrs.tcp_vld;           pos := pos + 1;
-        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.tcp_offset(OFFSET_WIDTH-1 downto 0)); pos := pos + OFFSET_WIDTH;
-        -- UDP: 16+16+16+16+1+OFFSET_WIDTH bits
-        r(pos+15 downto pos)             := hdrs.udp.src_port;      pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.udp.dst_port;      pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.udp.length;        pos := pos + 16;
-        r(pos+15 downto pos)             := hdrs.udp.checksum;      pos := pos + 16;
-        r(pos)                           := hdrs.udp_vld;           pos := pos + 1;
-        r(pos+OFFSET_WIDTH-1 downto pos) := std_logic_vector(hdrs.udp_offset(OFFSET_WIDTH-1 downto 0));
-        return r(pos-1 downto 0);
+        for i in 0 to bytes-1 loop
+            r((bytes-i)*8-1 downto (bytes-i-1)*8) := d((first+i)*8+7 downto (first+i)*8);
+        end loop;
+        return r;
     end function;
 
-    -- Convert std_logic_vector to extracted_headers_t record for deserialization
-    -- OFFSET_WIDTH specifies the actual width of offset fields to use (must be <= MAX_OFFSET_WIDTH)
-    function slv_to_extracted_headers (slv : std_logic_vector; OFFSET_WIDTH : natural) return extracted_headers_t is
-        variable r   : extracted_headers_t;
-        variable pos : natural := 0;
+    function ethertype_to_proto (ethertype : std_logic_vector(15 downto 0)) return natural is
     begin
-        r.eth.dst_mac          := slv(pos+47 downto pos);      pos := pos + 48;
-        r.eth.src_mac          := slv(pos+47 downto pos);      pos := pos + 48;
-        r.eth.ethertype        := slv(pos+15 downto pos);      pos := pos + 16;
-        r.eth_vld              := slv(pos);                    pos := pos + 1;
-        r.eth_offset           := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos)); pos := pos + OFFSET_WIDTH;
-        r.vlan.tci             := slv(pos+15 downto pos);      pos := pos + 16;
-        r.vlan.ethertype       := slv(pos+15 downto pos);      pos := pos + 16;
-        r.vlan_vld             := slv(pos);                    pos := pos + 1;
-        r.vlan_offset          := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos)); pos := pos + OFFSET_WIDTH;
-        r.ipv4.version         := slv(pos+3 downto pos);       pos := pos + 4;
-        r.ipv4.ihl             := slv(pos+3 downto pos);       pos := pos + 4;
-        r.ipv4.tos             := slv(pos+7 downto pos);       pos := pos + 8;
-        r.ipv4.total_length    := slv(pos+15 downto pos);      pos := pos + 16;
-        r.ipv4.identification  := slv(pos+15 downto pos);      pos := pos + 16;
-        r.ipv4.flags           := slv(pos+2 downto pos);       pos := pos + 3;
-        r.ipv4.fragment_offset := slv(pos+12 downto pos);      pos := pos + 13;
-        r.ipv4.ttl             := slv(pos+7 downto pos);       pos := pos + 8;
-        r.ipv4.protocol        := slv(pos+7 downto pos);       pos := pos + 8;
-        r.ipv4.header_checksum := slv(pos+15 downto pos);      pos := pos + 16;
-        r.ipv4.src_ip          := slv(pos+31 downto pos);      pos := pos + 32;
-        r.ipv4.dst_ip          := slv(pos+31 downto pos);      pos := pos + 32;
-        r.ipv4_vld             := slv(pos);                    pos := pos + 1;
-        r.ipv4_offset          := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos)); pos := pos + OFFSET_WIDTH;
-        r.tcp.src_port         := slv(pos+15 downto pos);      pos := pos + 16;
-        r.tcp.dst_port         := slv(pos+15 downto pos);      pos := pos + 16;
-        r.tcp.seq_num          := slv(pos+31 downto pos);      pos := pos + 32;
-        r.tcp.ack_num          := slv(pos+31 downto pos);      pos := pos + 32;
-        r.tcp.data_offset      := slv(pos+3 downto pos);       pos := pos + 4;
-        r.tcp.reserved         := slv(pos+2 downto pos);       pos := pos + 3;
-        r.tcp.flags            := slv(pos+8 downto pos);       pos := pos + 9;
-        r.tcp.window           := slv(pos+15 downto pos);      pos := pos + 16;
-        r.tcp.checksum         := slv(pos+15 downto pos);      pos := pos + 16;
-        r.tcp.urgent_ptr       := slv(pos+15 downto pos);      pos := pos + 16;
-        r.tcp_vld              := slv(pos);                    pos := pos + 1;
-        r.tcp_offset           := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos)); pos := pos + OFFSET_WIDTH;
-        -- UDP: 16+16+16+16+1+OFFSET_WIDTH bits
-        r.udp.src_port         := slv(pos+15 downto pos);      pos := pos + 16;
-        r.udp.dst_port         := slv(pos+15 downto pos);      pos := pos + 16;
-        r.udp.length           := slv(pos+15 downto pos);      pos := pos + 16;
-        r.udp.checksum         := slv(pos+15 downto pos);      pos := pos + 16;
-        r.udp_vld              := slv(pos);                    pos := pos + 1;
-        r.udp_offset           := unsigned(slv(pos+OFFSET_WIDTH-1 downto pos));
+        case ethertype is
+            when X"8100" | X"88A8" | X"9100" => return PROTO_VLAN;
+            when X"0800" => return PROTO_IPV4;
+            when X"86DD" => return PROTO_IPV6;
+            when X"8847" | X"8848" => return PROTO_MPLS;
+            when others  => return PROTO_NONE;
+        end case;
+    end function;
+
+    function get_hdr_len (protocol : natural; data : std_logic_vector) return natural is
+        variable b0  : std_logic_vector(7 downto 0);
+        variable ihl : natural;
+    begin
+        case protocol is
+            when PROTO_IPV4 =>
+                b0  := get_be(data, 0, 1);
+                ihl := to_integer(unsigned(b0(3 downto 0)));
+                -- IHL below 5 is not valid. The minimum header length is used instead.
+                if (ihl < 5) then
+                    return 20;
+                end if;
+                return ihl * 4;
+            when PROTO_MPLS =>
+                return 4;
+            when PROTO_IPV6EXT =>
+                -- Byte 1 of the Fragment header is reserved and zero. The formula then gives its length of 8 bytes.
+                return (to_integer(unsigned(get_be(data, 1, 1))) + 1) * 8;
+            when others =>
+                return get_extract_bytes(protocol);
+        end case;
+    end function;
+
+    function ip_proto_to_proto (ip_proto : std_logic_vector(7 downto 0)) return natural is
+    begin
+        case ip_proto is
+            when X"06"  => return PROTO_TCP;
+            when X"11"  => return PROTO_UDP;
+            when others => return PROTO_NONE;
+        end case;
+    end function;
+
+    function ipv6_next_to_proto (next_header : std_logic_vector(7 downto 0)) return natural is
+    begin
+        case next_header is
+            when X"00" | X"2B" | X"2C" | X"3C" => return PROTO_IPV6EXT;
+            when others => return ip_proto_to_proto(next_header);
+        end case;
+    end function;
+
+    function get_next_proto (protocol : natural; data : std_logic_vector) return natural is
+        variable b2 : std_logic_vector(7 downto 0);
+        variable b4 : std_logic_vector(7 downto 0);
+    begin
+        case protocol is
+            when PROTO_ETH =>
+                return ethertype_to_proto(get_be(data, 12, 2));
+            when PROTO_VLAN =>
+                return ethertype_to_proto(get_be(data, 2, 2));
+            when PROTO_IPV4 =>
+                return ip_proto_to_proto(get_be(data, 9, 1));
+            when PROTO_IPV6 =>
+                return ipv6_next_to_proto(get_be(data, 6, 1));
+            when PROTO_IPV6EXT =>
+                return ipv6_next_to_proto(get_be(data, 0, 1));
+            when PROTO_MPLS =>
+                b2 := get_be(data, 2, 1);
+                b4 := get_be(data, 4, 1);
+                if (b2(0) = '0') then
+                    return PROTO_MPLS;
+                end if;
+                -- The label stack does not announce the payload protocol. The IP version field selects it instead.
+                case b4(7 downto 4) is
+                    when X"4"   => return PROTO_IPV4;
+                    when X"6"   => return PROTO_IPV6;
+                    when others => return PROTO_NONE;
+                end case;
+            when others =>
+                return PROTO_NONE;
+        end case;
+    end function;
+
+    function proto_can_follow (proto : natural; next_proto : natural) return boolean is
+    begin
+        case proto is
+            when PROTO_ETH | PROTO_VLAN =>
+                return (next_proto = PROTO_VLAN) or (next_proto = PROTO_MPLS) or
+                       (next_proto = PROTO_IPV4) or (next_proto = PROTO_IPV6);
+            when PROTO_MPLS =>
+                return (next_proto = PROTO_MPLS) or (next_proto = PROTO_IPV4) or (next_proto = PROTO_IPV6);
+            when PROTO_IPV4 =>
+                return (next_proto = PROTO_TCP) or (next_proto = PROTO_UDP);
+            when PROTO_IPV6 | PROTO_IPV6EXT =>
+                return (next_proto = PROTO_TCP) or (next_proto = PROTO_UDP) or (next_proto = PROTO_IPV6EXT);
+            when others =>
+                return false;
+        end case;
+    end function;
+
+    function get_stage_index (protocols : proto_array_t; protocol : natural; inst : natural := 0) return natural is
+        variable cnt : natural := 0;
+    begin
+        for i in 0 to protocols'length-1 loop
+            if (protocols(protocols'low + i) = protocol) then
+                if (cnt = inst) then
+                    return i;
+                end if;
+                cnt := cnt + 1;
+            end if;
+        end loop;
+        report "AXIS_ETH_PARSER: The protocol list does not contain the requested stage."
+            severity failure;
+        return 0;
+    end function;
+
+    function get_stage_reg_auto (protocols : proto_array_t) return std_logic_vector is
+        variable r : std_logic_vector(MAX_STAGES-1 downto 0) := (others => '0');
+    begin
+        -- The output of the last stage is not connected to another stage
+        for i in 0 to protocols'length-2 loop
+            if ((protocols(protocols'low + i) = PROTO_IPV4) or (protocols(protocols'low + i) = PROTO_IPV6EXT)) then
+                r(i) := '1';
+            end if;
+        end loop;
+        return r;
+    end function;
+
+    function decode_eth (data : std_logic_vector) return eth_header_t is
+        variable r : eth_header_t;
+    begin
+        r.dst_mac   := get_be(data, 0, 6);
+        r.src_mac   := get_be(data, 6, 6);
+        r.ethertype := get_be(data, 12, 2);
+        return r;
+    end function;
+
+    function decode_vlan (data : std_logic_vector) return vlan_header_t is
+        variable r : vlan_header_t;
+    begin
+        r.tci       := get_be(data, 0, 2);
+        r.ethertype := get_be(data, 2, 2);
+        return r;
+    end function;
+
+    function decode_ipv4 (data : std_logic_vector) return ipv4_header_t is
+        variable r    : ipv4_header_t;
+        variable b0   : std_logic_vector(7 downto 0);
+        variable b6_7 : std_logic_vector(15 downto 0);
+    begin
+        b0                := get_be(data, 0, 1);
+        b6_7              := get_be(data, 6, 2);
+        r.version         := b0(7 downto 4);
+        r.ihl             := b0(3 downto 0);
+        r.tos             := get_be(data, 1, 1);
+        r.total_length    := get_be(data, 2, 2);
+        r.identification  := get_be(data, 4, 2);
+        r.flags           := b6_7(15 downto 13);
+        r.fragment_offset := b6_7(12 downto 0);
+        r.ttl             := get_be(data, 8, 1);
+        r.protocol        := get_be(data, 9, 1);
+        r.header_checksum := get_be(data, 10, 2);
+        r.src_ip          := get_be(data, 12, 4);
+        r.dst_ip          := get_be(data, 16, 4);
+        return r;
+    end function;
+
+    function decode_tcp (data : std_logic_vector) return tcp_header_t is
+        variable r      : tcp_header_t;
+        variable b12_13 : std_logic_vector(15 downto 0);
+    begin
+        b12_13        := get_be(data, 12, 2);
+        r.src_port    := get_be(data, 0, 2);
+        r.dst_port    := get_be(data, 2, 2);
+        r.seq_num     := get_be(data, 4, 4);
+        r.ack_num     := get_be(data, 8, 4);
+        r.data_offset := b12_13(15 downto 12);
+        r.reserved    := b12_13(11 downto 9);
+        r.flags       := b12_13(8 downto 0);
+        r.window      := get_be(data, 14, 2);
+        r.checksum    := get_be(data, 16, 2);
+        r.urgent_ptr  := get_be(data, 18, 2);
+        return r;
+    end function;
+
+    function decode_udp (data : std_logic_vector) return udp_header_t is
+        variable r : udp_header_t;
+    begin
+        r.src_port := get_be(data, 0, 2);
+        r.dst_port := get_be(data, 2, 2);
+        r.length   := get_be(data, 4, 2);
+        r.checksum := get_be(data, 6, 2);
+        return r;
+    end function;
+
+    function decode_ipv6 (data : std_logic_vector) return ipv6_header_t is
+        variable r    : ipv6_header_t;
+        variable b0_3 : std_logic_vector(31 downto 0);
+    begin
+        b0_3             := get_be(data, 0, 4);
+        r.version        := b0_3(31 downto 28);
+        r.traffic_class  := b0_3(27 downto 20);
+        r.flow_label     := b0_3(19 downto 0);
+        r.payload_length := get_be(data, 4, 2);
+        r.next_header    := get_be(data, 6, 1);
+        r.hop_limit      := get_be(data, 7, 1);
+        r.src_ip         := get_be(data, 8, 16);
+        r.dst_ip         := get_be(data, 24, 16);
+        return r;
+    end function;
+
+    function decode_ipv6ext (data : std_logic_vector) return ipv6ext_header_t is
+        variable r : ipv6ext_header_t;
+    begin
+        r.next_header := get_be(data, 0, 1);
+        r.hdr_ext_len := get_be(data, 1, 1);
+        r.data        := get_be(data, 2, 6);
+        return r;
+    end function;
+
+    function decode_mpls (data : std_logic_vector) return mpls_header_t is
+        variable r    : mpls_header_t;
+        variable b0_3 : std_logic_vector(31 downto 0);
+    begin
+        b0_3          := get_be(data, 0, 4);
+        r.label_value := b0_3(31 downto 12);
+        r.tc          := b0_3(11 downto 9);
+        r.s           := b0_3(8);
+        r.ttl         := b0_3(7 downto 0);
         return r;
     end function;
 

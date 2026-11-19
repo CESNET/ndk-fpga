@@ -7,7 +7,7 @@ import itertools
 import cocotb
 import logging
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, ClockCycles
+from cocotb.triggers import ClockCycles, FallingEdge, ReadOnly, RisingEdge, Timer
 from cocotbext.ofm.axi4stream.drivers import Axi4StreamMaster
 from cocotbext.ofm.axi4stream.monitors import Axi4Stream
 from cocotbext.ofm.axi4stream.transaction import Axi4StreamTransaction
@@ -86,3 +86,35 @@ async def run_test(dut, min_size=4, max_size=512, pkt_count=10000):
         await ClockCycles(dut.CLK, 100)
 
     raise tb.scoreboard.result
+
+
+@cocotb.test()
+async def test_tvalid_pulse_between_clock_edges(dut):
+    """A pulse of TVALID without a clock edge is not a word and must not stop the other streams."""
+    cocotb.start_soon(Clock(dut.CLK, 10, unit="ns").start())
+    rx_streams = int(dut.RX_STREAMS.value)
+    dut.RX_AXIS_TVALID.value = 0
+    dut.RX_AXIS_TLAST.value = 0
+    dut.TX_AXIS_TREADY.value = 1
+    dut.RESET.value = 1
+    await ClockCycles(dut.CLK, 10)
+    dut.RESET.value = 0
+    await ClockCycles(dut.CLK, 10)
+
+    # Stream 0 is selected. Its TVALID is high with TLAST low only between two clock edges.
+    await FallingEdge(dut.CLK)
+    dut.RX_AXIS_TVALID.value = 1
+    await Timer(1, unit="ns")
+    dut.RX_AXIS_TVALID.value = 0
+    await ClockCycles(dut.CLK, 10)
+
+    # a packet of the other stream must come out
+    other = rx_streams - 1
+    dut.RX_AXIS_TVALID.value = 1 << other
+    dut.RX_AXIS_TLAST.value = 1 << other
+    for _ in range(10):
+        await RisingEdge(dut.CLK)
+        await ReadOnly()
+        if str(dut.RX_AXIS_TREADY.value[other]) == "1":
+            return
+    assert False, "the stream has no RX_AXIS_TREADY after a pulse of TVALID on another stream"

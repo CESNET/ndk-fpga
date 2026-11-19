@@ -139,7 +139,8 @@ set HBM_DATA_WIDTH  256
 #   -- Intel JTAG-Over-Protocol IP, available on all supported Intel FPGAs.
 set VIRTUAL_DEBUG_ENABLE false
 
-# Enables debug probes and counters in the DMA Module (Medusa)
+# Enables debug probes and counters in the DMA Module (Medusa).
+# Enables the test core in the DMA Module (Calypte).
 set DMA_DEBUG_ENABLE       $env(DMA_DEBUG_ENABLE)
 # Enables debug probes and counters in the PCIe Module (PCIe Core arch: USP and P-Tile)
 set PCIE_CORE_DEBUG_ENABLE false

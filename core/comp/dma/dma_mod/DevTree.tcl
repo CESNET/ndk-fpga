@@ -63,7 +63,8 @@ proc dts_dmamod_open {base type rxn txn pcie rx_frame_size_max tx_frame_size_max
         }
     }
 
-    if {$type == 4} {
+    # The firmware contains the test core only when DMA debug is enabled.
+    if {$type == 4 && $dma_debug_enable} {
         dts_calypte_test_core ret [expr $base + "0x300000"] $dma_debug_enable
     }
 

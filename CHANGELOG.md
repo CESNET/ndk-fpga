@@ -14,13 +14,23 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Added PS access controller VERSAL_PS_CTRL for Versal FPGAs
 - comp: Added generic ITEM_WIDTH to AXIS_PIPE for TKEEP of non-byte items.
 - core: Added support for the Versal CPM5 PCIe endpoint (Gen3x16, Gen4x16, Gen5x8x8).
+- comp: Added AXIS_ETH_PARSER_GEN with a configurable list of protocols, optional register stages and parsing of QinQ, MPLS, IPv6 and IPv6 extension headers.
+- comp: Added AXIS_SLR_CROSSING for AXI-Stream paths between super logic regions.
 - core: Added HBM2E NoC IP templates.
 - uvm: Added Versal CPM5 512b and 1024b interfaces to the PCIE_AXI agent and Versal combinations to the PCIE_MOD UVM verification.
 
 ### Changed
+- comp: Changed DMA_CALYPTE to give each of its blocks its own copy of the reset.
+- comp: Changed FREQUENCY_METER to register the reset of each measured clock domain.
+- comp: Changed TX_DMA_CALYPTE to store the frame pointer of Peer-to-Peer DMA headers in bytes, which shortens the read path of the header FIFO.
+- comp: Changed TX_DMA_CALYPTE to read the DMA headers through two prefetch registers, which removes the header FIFO memory from the read address path of the transaction buffer.
+- core: Changed the DMA Calypte wrapper to give the test core and the PCIe MFB pipes their own copies of the reset.
+- core: Changed the DMA Calypte wrapper to include the DMA test core only when DMA_DEBUG_ENABLE is set.
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
 - core: Moved the PCIe adapter, reset, configuration and Device Tree blocks of the AMD PCIE_CORE into axi_common_i (see UPGRADE.md).
+- cards: Changed the P-Tile PCIe user clock on N6010 and IA-420F cards to 400 MHz when DMA Calypte is used.
+- comp: Changed AXIS_ETH_PARSER to select all bytes of a header with one multiplexer to reduce the logic and shorten the critical path.
 
 ### Fixed
 - cards: Fixed DDR_PORTS derivation from MEM_PORTS on N5014 card.
@@ -28,6 +38,16 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - core: Fixed TX path getting stuck and RX receiving errored frames in E-Tile 10G/25G network module after the TX PLL lock loss of the clock master channel (e.g. PMA loopback switching on channel 0).
 - core: Fixed Device Tree generation and MI access of the second PCIe endpoint with PCIE_CORE_DEBUG_ENABLE.
 - uvm: Fixed tuser positions of the 256b CQ last_be and of the is_sop/is_eop pointers without straddling in the PCIE_AXI agent.
+- build: Fixed the nvc-sim target ignoring the GENERICS variable.
+- cocotb: Fixed a write of a whole vector being lost when the bits of the vector are written in the same time step in SignalProxy of cocotbext.
+- cocotb: Fixed the loss of the first word of a ModularBusDriver that starts in a time step with a rising edge of another clock in cocotbext.
+- cocotb: Fixed bus signals of drivers with the same bus name in different hierarchy instances resolving to the first instance.
+- cocotb: Fixed MFBDriver not following the rate of EthernetRateLimiter and ItemRateLimiter.
+- comp: Fixed the simulation of MFB_TRANSFORMER failing on a frame when META_WIDTH is 0.
+- comp: Fixed AXIS_ETH_PARSER reading the TCP NS flag from the data offset field.
+- comp: Fixed AXIS_ETH_PARSER returning headers of other packets after a packet whose header offset was after the packet end.
+- comp: Fixed AXIS_ETH_PARSER reporting a header cut by the end of the packet as valid.
+- comp: Fixed AXIS_MERGER inferring a latch, which could stop all streams until the next packet of the selected stream.
 
 ## [2026.9.0] - 2026-09-30
 

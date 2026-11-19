@@ -163,13 +163,24 @@ begin
         if rising_edge(CLK) then
             if (RX_SRC_RDY = '1' and RX_DST_RDY = '1') then
                 tx_data_reg    <= RX_DATA & tx_data_reg(TX_BLOCKS*RX_DATA_WIDTH-1 downto RX_DATA_WIDTH);
-                tx_meta_reg    <= RX_META & tx_meta_reg(TX_BLOCKS*RX_META_WIDTH-1 downto RX_META_WIDTH);
                 tx_sop_reg     <= RX_SOP & tx_sop_reg(TX_REGIONS-1 downto RX_REGIONS);
                 tx_eop_reg     <= RX_EOP & tx_eop_reg(TX_REGIONS-1 downto RX_REGIONS);
                 tx_eop_pos_reg <= RX_EOP_POS & tx_eop_pos_reg(TX_BLOCKS*RX_EOP_POS_WIDTH-1 downto RX_EOP_POS_WIDTH);
             end if;
         end if;
     end process;
+
+    -- With META_WIDTH = 0, tx_meta_reg has a null range and no shift register.
+    gen_meta_g : if META_WIDTH > 0 generate
+        meta_p : process (CLK)
+        begin
+            if rising_edge(CLK) then
+                if (RX_SRC_RDY = '1' and RX_DST_RDY = '1') then
+                    tx_meta_reg <= RX_META & tx_meta_reg(TX_BLOCKS*RX_META_WIDTH-1 downto RX_META_WIDTH);
+                end if;
+            end if;
+        end process;
+    end generate;
 
     -- sop_pos has significance only when REGION_SIZE > 1
     gen_sop_pos_g : if REGION_SIZE > 1 generate

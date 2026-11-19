@@ -136,6 +136,13 @@ proc EvalFile {FNAME OPT} {
                     puts "INFO: IP file added: $ip_build_dir/$ipfile"
                 }
             }
+
+            # The parameters of the IP are written only after its last script, so a failed generation is repeated.
+            if {[info exists opt(IP_STAMP_FILE)]} {
+                set fd [open $opt(IP_STAMP_FILE) w]
+                puts -nonewline $fd $opt(IP_STAMP)
+                close $fd
+            }
         }
     }
 }

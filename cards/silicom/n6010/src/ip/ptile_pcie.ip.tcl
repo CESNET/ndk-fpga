@@ -51,7 +51,7 @@ proc do_adjust_ptile_pcie_ip_2x8 {} {
 }
 
 # adjust parameters in "ptile_pcie_ip" system
-proc do_adjust_ptile_pcie_ip {device family ipname filename adjust_proc} {
+proc do_adjust_ptile_pcie_ip {device family ipname filename pld_clkfreq adjust_proc} {
 
 	load_system $filename
 	set_project_property DEVICE $device
@@ -60,7 +60,7 @@ proc do_adjust_ptile_pcie_ip {device family ipname filename adjust_proc} {
 
 	# common IP core parameters
 	set_instance_parameter_value intel_pcie_ptile_ast_0 {standard_interface_selection_hwtcl} {0}
-	set_instance_parameter_value intel_pcie_ptile_ast_0 {g4_pld_clkfreq_user_hwtcl} {500MHz}
+	set_instance_parameter_value intel_pcie_ptile_ast_0 {g4_pld_clkfreq_user_hwtcl} $pld_clkfreq
 
 	# configuration-specific parameters
 	$adjust_proc
@@ -77,4 +77,10 @@ if {$PARAMS(PCIE_ENDPOINT_MODE) == 0} {
 	set cb do_adjust_ptile_pcie_ip_2x8
 }
 
-do_adjust_ptile_pcie_ip $PARAMS(IP_DEVICE) $PARAMS(IP_DEVICE_FAMILY) $PARAMS(IP_COMP_NAME) $PARAMS(IP_BUILD_DIR)/[get_ip_filename $PARAMS(IP_COMP_NAME)] $cb
+# DMA Calypte (DMA_TYPE 4) does not meet timing with the 500 MHz user clock
+set pld_clkfreq 500MHz
+if {$PARAMS(DMA_TYPE) == 4} {
+	set pld_clkfreq 400MHz
+}
+
+do_adjust_ptile_pcie_ip $PARAMS(IP_DEVICE) $PARAMS(IP_DEVICE_FAMILY) $PARAMS(IP_COMP_NAME) $PARAMS(IP_BUILD_DIR)/[get_ip_filename $PARAMS(IP_COMP_NAME)] $pld_clkfreq $cb

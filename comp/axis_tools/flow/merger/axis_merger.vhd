@@ -67,6 +67,7 @@ architecture FULL of AXIS_MERGER is
     -- sync
     signal selector    : unsigned(log2(RX_STREAMS)-1 downto 0);
     signal packet_cnt  : unsigned(log2(MAX_PACKETS)-1 downto 0);
+    signal in_packet   : std_logic;
 
 begin
 
@@ -132,24 +133,8 @@ begin
         ready(to_integer(selector)) <= '1';
     end process;
 
-    -- Sets the signal 'last', which is used to preserve the information about
-    -- the end of a packet being reached.
-    last_logic_p : process (all)
-    begin
-        if RX_AXIS_TVALID(to_integer(selector)) then
-            if (RX_AXIS_TLAST(to_integer(selector)) = '1') then
-                last <= '1';
-            else
-                if (last = '1') then
-                    last <= '0';
-                end if;
-            end if;
-        end if;
-
-        if (RESET = '1') then
-            last <= '1';
-        end if;
-    end process;
+    -- Active on the last word of a packet and between packets of the selected stream.
+    last <= RX_AXIS_TLAST(to_integer(selector)) when RX_AXIS_TVALID(to_integer(selector)) = '1' else not in_packet;
 
     -- =========================================================================
     -- Registers
@@ -163,6 +148,19 @@ begin
 
             if (RESET = '1') then
                 selector <= (others => '0');
+            end if;
+        end if;
+    end process;
+
+    process (CLK)
+    begin
+        if rising_edge(CLK) then
+            if (TX_AXIS_TREADY = '1' and RX_AXIS_TVALID(to_integer(selector)) = '1') then
+                in_packet <= not RX_AXIS_TLAST(to_integer(selector));
+            end if;
+
+            if (RESET = '1') then
+                in_packet <= '0';
             end if;
         end if;
     end process;

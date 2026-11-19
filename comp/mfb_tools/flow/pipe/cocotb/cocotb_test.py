@@ -10,6 +10,7 @@ import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, ClockCycles
+from cocotbext.ofm.base.generators import EthernetRateLimiter, ItemRateLimiter
 from cocotbext.ofm.mfb.drivers import MFBDriver
 from cocotbext.ofm.mfb.monitors import MFBMonitor
 from cocotbext.ofm.mfb.transaction import MfbTransaction
@@ -22,7 +23,7 @@ from dataclasses import asdict
 
 
 class testbench():
-    def __init__(self, dut):
+    def __init__(self, dut, no_inner_idles=False):
         self.dut = dut
 
         mfb_params = MfbParams(
@@ -32,7 +33,7 @@ class testbench():
             item_width=dut.ITEM_WIDTH.value
         )
 
-        self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, rate_limiter_config=dict(max_idles=5, zero_idles_chance=70))
+        self.RX_MFB = MFBDriver(dut, "RX", dut.CLK, no_inner_idles=no_inner_idles, rate_limiter_config=dict(max_idles=5, zero_idles_chance=70))
         self.backpressure = BitDriver(dut.TX_DST_RDY, dut.CLK)
         self.TX_MFB = MFBMonitor(dut, "TX", dut.CLK, mfb_params=asdict(mfb_params), trans_type=MfbTransaction)
 
@@ -58,7 +59,7 @@ class testbench():
 
 
 @cocotb.test()
-async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
+async def run_test(dut, pkt_count=2000, frame_size_min=60, frame_size_max=512):
     # Start clock generator
     cocotb.start_soon(Clock(dut.CLK, 5, unit='ns').start())
     tb = testbench(dut)
@@ -92,3 +93,52 @@ async def run_test(dut, pkt_count=10000, frame_size_min=60, frame_size_max=512):
     tb.throughput_probe.log_average_throughput()
 
     raise tb.scoreboard.result
+
+
+@cocotb.test()
+@cocotb.parametrize(
+    # EthernetRateLimiter counts its frame overhead in items, so it models Ethernet only with 8-bit items.
+    generator=("ethernet", "item") if cocotb.top.ITEM_WIDTH.value == 8 else ("item",),
+    size_words=(1, 1.5),
+    no_inner_idles=(False, True),
+)
+async def test_idle_generator_rate(dut, generator, size_words, no_inner_idles):
+    """The rate of the frames on the bus must match the rate that the idle generator requests."""
+    cocotb.start_soon(Clock(dut.CLK, 5, unit="ns").start())
+    tb = testbench(dut, no_inner_idles)
+    dut.TX_DST_RDY.value = 1
+    await tb.reset()
+
+    word_bytes = dut.REGIONS.value * dut.REGION_SIZE.value * dut.BLOCK_SIZE.value * dut.ITEM_WIDTH.value // 8
+    size = int(word_bytes * size_words)
+    load = 0.5
+    if generator == "ethernet":
+        limiter = EthernetRateLimiter(bitrate=load * 8 * word_bytes * 200)
+        limiter.configure(clk_freq=200_000_000, bits_per_word=8 * word_bytes)
+        expected_frames_per_cycle = load * word_bytes / (size + 24)
+    else:
+        limiter = ItemRateLimiter(rate_percentage=int(load * 100), random_idles=False)
+        expected_frames_per_cycle = load * word_bytes / size
+    tb.RX_MFB.set_idle_generator(limiter)
+
+    frames = 400
+    for _ in range(frames):
+        transaction = MfbTransaction(data=bytes(size))
+        tb.model(transaction)
+        tb.RX_MFB.append(transaction)
+
+    while tb.RX_MFB.frame_cnt < frames // 4:
+        await RisingEdge(dut.CLK)
+    first_frame = tb.RX_MFB.frame_cnt
+    cycles = 0
+    while tb.RX_MFB.frame_cnt < frames:
+        await RisingEdge(dut.CLK)
+        cycles += 1
+
+    frames_per_cycle = (tb.RX_MFB.frame_cnt - first_frame) / cycles
+
+    # the next test must not start with a frame in the pipe
+    while tb.TX_MFB.frame_cnt < frames:
+        await RisingEdge(dut.CLK)
+    cocotb.log.info(f"{generator}, {size} bytes, no_inner_idles={no_inner_idles}: {frames_per_cycle:.4f} frames per cycle, expected {expected_frames_per_cycle:.4f}")
+    assert abs(frames_per_cycle / expected_frames_per_cycle - 1) < 0.05

@@ -72,6 +72,29 @@ class MFBDriver(ModularBusDriver):
                 value = getattr(self.state, name)
                 setattr(self.state, name, LogicArray2D.from_logicarray(value, self.bus.REGIONS))
 
+    def _make_empty_queue_idle(self):
+        return IdleTransaction(self._word_bytes // self._item_bytes)
+
+    def _make_gap_idles(self, idle_count):
+        if self._idle_gen.counts_items:
+            return [IdleTransaction(idle_count)] if idle_count else []
+        return super()._make_gap_idles(idle_count)
+
+    def _put_unused_bytes(self, count):
+        """Reports the bytes of the bus that no frame uses, for example after the alignment to a block."""
+        if count:
+            self._idle_gen.put(IdleTransaction(count // self._item_bytes), items=count // self._item_bytes)
+
+    async def _main_loop(self):
+        # _split_transaction processes the idle transactions because a gap can start or end inside a word.
+        # It also reports the frames and gaps to the idle generator, before it reads the next transaction.
+        async for transaction in self._transactions:
+            async for _ in self._split_transaction(transaction):
+                await self._send_to_bus()
+                self._item_cnt += self._get_sent_items()
+                self._clear_signals()
+                self._write_to_bus()
+
     async def _split_transaction(self, transaction: MfbTransaction | IdleTransaction):
         word_is_full  : bool = False
         word_has_data : bool = False
@@ -81,6 +104,23 @@ class MFBDriver(ModularBusDriver):
 
         while not word_is_full:
             if isinstance(transaction, MfbTransaction):
+                frame_items = len(transaction.data) * 8 // self._item_width
+
+                # a frame starts at the start of a block
+                aligned_offset = ceildiv(self._block_bytes, byte_offset) * self._block_bytes
+                self._put_unused_bytes(aligned_offset - byte_offset)
+                byte_offset = aligned_offset
+
+                if byte_offset >= self._word_bytes:
+                    byte_offset = 0
+                    if word_has_data:
+                        yield
+                        word_has_data = False
+                    else:
+                        await self._clk_re
+
+                region_offset = byte_offset // self._region_bytes
+
                 while transaction.data:
                     # get a slice of data from the transaction to the end of the width of a word
                     data = transaction.data[:self._word_bytes - byte_offset]
@@ -88,15 +128,18 @@ class MFBDriver(ModularBusDriver):
                     # if a transaction has already started or ended in this region, put it in the next region
                     if self.state.SOF[region_offset] or self.state.EOF[region_offset]:
                         region_offset += 1
+                        region_start = region_offset * self._region_bytes
+                        self._put_unused_bytes(region_start - byte_offset)
 
                         # if all regions are full, send the transaction
                         if region_offset >= self._regions:
                             region_offset = 0
+                            region_start = 0
                             yield
                             word_has_data = False
 
                         # set the byte offset to the start of the new region
-                        byte_offset = region_offset * self._region_bytes
+                        byte_offset = region_start
                         # get the data from the transaction again
                         continue
 
@@ -143,8 +186,14 @@ class MFBDriver(ModularBusDriver):
                     # set optional signals automatically
                     self._auto_set_optional_signals(transaction, sof_index, eof_index)
 
+                    # the frame is complete, the idle generator must know it before the next transaction
+                    if not word_overflow:
+                        self._idle_gen.put(transaction, items=frame_items, end=True)
+
                     # align the byte offset to the next block and region offset to the next region
-                    byte_offset   = ceildiv(self._block_bytes, byte_offset) * self._block_bytes
+                    aligned_offset = ceildiv(self._block_bytes, byte_offset) * self._block_bytes
+                    self._put_unused_bytes(aligned_offset - byte_offset)
+                    byte_offset   = aligned_offset
                     region_offset = byte_offset // self._region_bytes
 
                     # check if the word if full
@@ -159,31 +208,35 @@ class MFBDriver(ModularBusDriver):
 
             elif isinstance(transaction, IdleTransaction):
                 if self._no_inner_idles:
-                    yield
+                    # The gap ends the current word, and the unused items of this word count as idle items.
+                    # The other idle items of the gap are rounded down to whole idle words.
+                    # When the current word has no data, the gap has at least one idle word.
+                    word_items = self._word_bytes // self._item_bytes
+                    unused_items = (self._word_bytes - byte_offset) // self._item_bytes if word_has_data else 0
+                    idle_words = max(0, len(transaction) - unused_items) // word_items
+                    if not word_has_data:
+                        idle_words = max(1, idle_words)
+                    self._idle_gen.put(transaction, items=unused_items + idle_words * word_items, end=True)
+
+                    if word_has_data:
+                        yield
+                    for _ in range(idle_words):
+                        await self._clk_re
                     return
 
-                remaining_idle_bytes = len(transaction)
+                self._idle_gen.put(transaction, items=len(transaction), end=True)
+
+                remaining_idle_bytes = len(transaction) * self._item_bytes
 
                 while remaining_idle_bytes:
-                    free_bytes = self._word_bytes - byte_offset
-
-                    if free_bytes <= remaining_idle_bytes:
-                        self.state.DATA[byte_offset:] = free_bytes * b"\x00"
-                        byte_offset += free_bytes
-                        remaining_idle_bytes -= free_bytes
-                    else:
-                        self.state.DATA[byte_offset:byte_offset + remaining_idle_bytes] = remaining_idle_bytes * b"\x00"
-                        byte_offset += remaining_idle_bytes
-                        remaining_idle_bytes = 0
-
-                    byte_offset   = ceildiv(self._block_bytes, byte_offset) * self._block_bytes
-                    region_offset = byte_offset // self._region_bytes
+                    used_bytes = min(self._word_bytes - byte_offset, remaining_idle_bytes)
+                    byte_offset += used_bytes
+                    remaining_idle_bytes -= used_bytes
 
                     word_is_full = byte_offset >= self._word_bytes
 
                     if word_is_full:
                         byte_offset = 0
-                        region_offset = 0
 
                         if word_has_data:
                             # send the word with the end of the previous frame to the bus

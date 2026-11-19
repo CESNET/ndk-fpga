@@ -10,5 +10,7 @@ Bus converters, for example, MFB to AXI-Stream, may be located in the other bus'
 
    comp/axis_tools/edit/packet_extender/readme
    comp/axis_tools/flow/frame_fracturer/readme
+   comp/axis_tools/flow/slr_crossing/readme
+   comp/axis_tools/logic/eth_parser/readme
 
 .. Add more references here...
