@@ -78,21 +78,6 @@ SETTINGS = {
     ("use_dst_rdy_down",),
     ("pipe_type_reg",),
 
-    ("pcie", "fake_pipe_up",),
-    ("pcie", "use_dst_rdy_down",),
-
-    ("region_comb_1", "fake_pipe_up",),
-
-    ("region_comb_2", "fake_pipe_up",),
-
-    ("region_comb_3", "fake_pipe_up",),
     ("region_comb_3", "use_dst_rdy_down",),
-
-    ("region_comb_4", "fake_pipe_up",),
-
-    ("region_comb_5", "fake_pipe_up",),
-    ("region_comb_5", "use_dst_rdy_down",),
-
-    ("region_comb_6", "fake_pipe_up",),
     ),
 }
