@@ -82,7 +82,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../frame_packer/readme.html">Frame Packer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../frame_unpacker/readme.html">Frame Unpacker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../loopback/readme.html">MFB Loopback</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger Gen</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MFB Merger Gen</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-stored-eof-en-and-pkt-size-max-parameters">Using STORED_EOF_EN and PKT_SIZE_MAX parameters</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#mfb-merger-flat">MFB Merger Flat</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">MFB Merger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../merger_simple/readme.html">MFB Merger Simple</a></li>
@@ -196,6 +199,9 @@ j-th header on input i has a frame on MFB. On each input the k-th frame
 belongs to the k-th header that announces one.</p>
 <p><code class="docutils literal notranslate"><span class="pre">RX_PAYLOAD_EN(i)</span></code> set to false leaves out the MFB path of input i. Use it
 for inputs that only send headers, it saves the MFB pipeline stages.</p>
+<p>With STORED_EOF_EN, an input passes an MVB word to the arbitration only when
+the EOFs of all frames that this word announces are already in the input MFB
+FIFO. A granted frame then needs no data that are not stored yet.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Headers and frames are paired by order, not by content. On one input the
@@ -303,6 +309,18 @@ MVB DST_RDY held low. These FIFOs let it keep taking headers.</p></td>
 <td><p>integer</p></td>
 <td><p>8</p></td>
 <td><p>Depth of the input MVB FIFOs in words, minimum value is 2</p></td>
+</tr>
+<tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-stored_eof_en"><td><p>STORED_EOF_EN</p></td>
+<td><p>boolean</p></td>
+<td><p>false</p></td>
+<td><p>Pass a header with a payload only when the EOF of its frame is
+already in the input MFB FIFO. Requires IN_MFB_FIFO_EN = True.</p></td>
+</tr>
+<tr class="row-even" id="vhdl-gengeneric-mfb_merger_gen-pkt_size_max"><td><p>PKT_SIZE_MAX</p></td>
+<td><p>natural</p></td>
+<td><p>2**14</p></td>
+<td><p>Maximum size of a packet in MFB items. With STORED_EOF_EN, each input
+MFB FIFO must hold MVB_ITEMS packets of this size.</p></td>
 </tr>
 <tr class="row-odd" id="vhdl-gengeneric-mfb_merger_gen-sw_fifo_items"><td><p>SW_FIFO_ITEMS</p></td>
 <td><p>natural</p></td>
@@ -523,6 +541,21 @@ MFB path of that input.</p></td>
 </table>
 </dd></dl>
 
+<section id="using-stored-eof-en-and-pkt-size-max-parameters">
+<h2>Using STORED_EOF_EN and PKT_SIZE_MAX parameters<a class="headerlink" href="#using-stored-eof-en-and-pkt-size-max-parameters" title="Link to this heading"></a></h2>
+<p>With <code class="docutils literal notranslate"><span class="pre">STORED_EOF_EN</span> <span class="pre">=</span> <span class="pre">True</span></code>, an input passes an MVB word to the arbitration only when the EOFs
+of all frames that this word announces are already in the input MFB FIFO. A granted frame then
+needs no data that are not stored yet. The merger counts the EOFs in each input MFB FIFO itself.</p>
+<p>Use this mode when the RX inputs depend on each other. An example is a source that sends
+packets to two mergers through one splitter. The order of the frames follows the headers, and
+the headers can come long before their frames. A merger that waits in the middle of a packet
+can stop this source. The source can then stop the other merger.</p>
+<p><code class="docutils literal notranslate"><span class="pre">STORED_EOF_EN</span> <span class="pre">=</span> <span class="pre">True</span></code> requires <code class="docutils literal notranslate"><span class="pre">IN_MFB_FIFO_EN</span> <span class="pre">=</span> <span class="pre">True</span></code>. Each input MFB FIFO must hold
+<code class="docutils literal notranslate"><span class="pre">MVB_ITEMS</span></code> packets of <code class="docutils literal notranslate"><span class="pre">PKT_SIZE_MAX</span></code> items, so that a full FIFO always contains the EOFs
+of the next MVB word. Set also <code class="docutils literal notranslate"><span class="pre">IN_MVB_FIFO_EN</span> <span class="pre">=</span> <span class="pre">True</span></code>. Without the input MVB FIFO,
+<code class="docutils literal notranslate"><span class="pre">RX_MVB_DST_RDY</span></code> depends on <code class="docutils literal notranslate"><span class="pre">RX_MVB_VLD</span></code> and <code class="docutils literal notranslate"><span class="pre">RX_MVB_PAYLOAD</span></code> through a longer
+combinational path.</p>
+</section>
 </section>
 <section id="mfb-merger-flat">
 <h1>MFB Merger Flat<a class="headerlink" href="#mfb-merger-flat" title="Link to this heading"></a></h1>
