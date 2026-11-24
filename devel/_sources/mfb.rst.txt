@@ -20,7 +20,6 @@ Components using the MFB bus are typically located in the ``comp/mfb_tools/`` di
    comp/mfb_tools/flow/dropper/readme
    comp/mfb_tools/flow/enabler/readme
    comp/mfb_tools/flow/frame_masker/readme
-   comp/mfb_tools/flow/frame_packer/readme
    comp/mfb_tools/flow/frame_unpacker/readme
    comp/mfb_tools/flow/loopback/readme
    comp/mfb_tools/flow/merger/readme
