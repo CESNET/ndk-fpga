@@ -163,6 +163,10 @@ class env_rx #(
 
             mfb_seq.min_random_count = 20;
             mfb_seq.max_random_count = 100;
+            // SRC_RDY rule is part of interface configuration, pass it to the sequences
+            if (m_config.seq_cfg == null) begin
+                m_config.seq_cfg = new();
+            end
             mfb_seq.init_sequence(m_config.seq_cfg);
 
             forever begin

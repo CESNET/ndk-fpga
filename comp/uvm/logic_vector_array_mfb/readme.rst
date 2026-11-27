@@ -39,7 +39,7 @@ Both directions have two analysis_exports. One export is for the logic vector ar
 Configuration
 ------------------------------
 
-The config class has three variables.
+The config class has these variables.
 
 ===============   ======================================================
 Variable          Description
@@ -49,6 +49,17 @@ interface_name    The name of the interface under which you can find it in the U
 meta_behave       The moment when the metadata are being generated and are valid: config_item::META_SOF => valid with the SOF, config_item::META_EOF => valid with the EOF.
 seq_cfg           Configure a low-level sequence that converts logic_vector_array to MFB words.
 ===============   ======================================================
+
+The behaviour of SRC_RDY when the word is not accepted (DST_RDY is low) is configured in ``seq_cfg`` (class ``config_sequence``).
+The default rule ``MFB_SRC_RDY_RELAXED`` allows SRC_RDY to fall, the withdrawn word is sent again later.
+The probability and length of the drop are set by ``src_rdy_drop_set()``.
+Set ``src_rdy_rule`` to ``MFB_SRC_RDY_STRICT`` if the component requires SRC_RDY to stay high until DST_RDY is high.
+
+Example of a component which requires the strict rule:
+
+.. code-block:: systemverilog
+
+    m_cfg.seq_cfg.src_rdy_rule = uvm_logic_vector_array_mfb::config_sequence::MFB_SRC_RDY_STRICT;
 
 The top level of the environment contains the reset_sync class, which is required for reset synchronization. The example shows how to connect the reset to the logic_vector_array_mfb environment and basic configuration.
 
@@ -88,14 +99,15 @@ The top level of the environment contains the reset_sync class, which is require
 Low sequence configuration
 --------------------------
 
-The configuration object `config_sequence` contains two functions.
+The configuration object `config_sequence` contains these functions.
 
-=========================  ======================  ======================================================
-Variable                   Type                    Description
-=========================  ======================  ======================================================
-probability_set(min, max)  [percentage]            Set the probability of no inframe gap: probability_set(100,100) => no inframe gap at all.
-space_size_set(min, max)   [bytes]                 Set min and max space between two packets.
-=========================  ======================  ======================================================
+=======================================  ======================  ======================================================
+Variable                                 Type                    Description
+=======================================  ======================  ======================================================
+probability_set(min, max)                [percentage]            Set the probability of no inframe gap: probability_set(100,100) => no inframe gap at all.
+space_size_set(min, max)                 [bytes]                 Set min and max space between two packets.
+src_rdy_drop_set(probability, min, max)  [%], [clock cycles]     Set probability of SRC_RDY drop when the word is not accepted (default 10 %) and min and max number of clock cycles with SRC_RDY low before the word is sent again (default 1-4). Used only with ``MFB_SRC_RDY_RELAXED``.
+=======================================  ======================================================
 
 
 RX Inner sequences

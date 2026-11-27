@@ -8,7 +8,9 @@
 import uvm_pkg::*;
 
 
-module mvb_property #(int unsigned ITEMS, int unsigned ITEM_WIDTH)
+// SRC_RDY_STRICT - set to 1 if SRC_RDY has to stay high until DST_RDY is high.
+//                  Default 0 allows SRC_RDY drop when DST_RDY is low.
+module mvb_property #(int unsigned ITEMS, int unsigned ITEM_WIDTH, bit SRC_RDY_STRICT = 1'b0)
     (
         input RESET,
         mvb_if vif
@@ -66,10 +68,12 @@ module mvb_property #(int unsigned ITEMS, int unsigned ITEM_WIDTH)
     // -----------------------
     // Assertion.
     // -----------------------
-    assert property (src_rdy_high_until_dst_rdy_high)
-        else begin
-            `uvm_error(module_name,  "\n\tMVB interface SRC_RDY drops before DST_RDY was rised.");
-        end
+    if (SRC_RDY_STRICT) begin : gen_src_rdy_strict
+        assert property (src_rdy_high_until_dst_rdy_high)
+            else begin
+                `uvm_error(module_name,  "\n\tMVB interface SRC_RDY drops before DST_RDY was rised.");
+            end
+    end
 
     assert property (src_rdy_high_only_when_at_least_one_vld_high)
         else begin

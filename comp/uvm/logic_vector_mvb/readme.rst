@@ -40,6 +40,18 @@ interface_name    The name of the interface under which you can find it in uvm c
 seq_cfg           Configure a low-level sequence that converts logic_vector to MVB words.
 ===============   ======================================================
 
+The behaviour of SRC_RDY when the word is not accepted (DST_RDY is low) is configured in ``seq_cfg`` (class ``config_sequence``).
+The default rule ``MVB_SRC_RDY_RELAXED`` allows SRC_RDY to fall, the withdrawn word is sent again later.
+The probability and length of the drop are set by ``src_rdy_drop_set()``.
+Set ``src_rdy_rule`` to ``MVB_SRC_RDY_STRICT`` if the component requires SRC_RDY to stay high until DST_RDY is high.
+
+Example of a component which requires the strict rule:
+
+.. code-block:: systemverilog
+
+    m_cfg.seq_cfg = new();
+    m_cfg.seq_cfg.src_rdy_rule = uvm_logic_vector_mvb::config_sequence::MVB_SRC_RDY_STRICT;
+
 The top level environment contains the reset_sync class, which is required for reset synchronization. The example shows how to connect the reset to the logic_vector_array_mfb environment and its basic configuration.
 
 
@@ -78,13 +90,14 @@ The top level environment contains the reset_sync class, which is required for r
 Low sequence configuration
 --------------------------
 
-The configuration object `config_sequence` contains one function.
+The configuration object `config_sequence` contains these functions.
 
-=========================  ======================  ======================================================
-Variable                   Type                    Description
-=========================  ======================  ======================================================
-space_size_set(min, max)   [bytes]                 Set min and max space between two logic_vector items in a MVB transaction.
-=========================  ======================  ======================================================
+==========================================  ======================  ======================================================
+Variable                                    Type                    Description
+==========================================  ======================  ======================================================
+space_size_set(min, max)                    [bytes]                 Set min and max space between two logic_vector items in a MVB transaction.
+src_rdy_drop_set(probability, min, max)     [%], [clock cycles]     Set probability of SRC_RDY drop when the word is not accepted (default 10 %) and min and max number of clock cycles with SRC_RDY low before the word is sent again (default 1-4). Used only with ``MVB_SRC_RDY_RELAXED``.
+==========================================  ======================  ======================================================
 
 
 RX Inner sequences

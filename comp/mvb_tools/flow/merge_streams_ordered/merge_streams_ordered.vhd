@@ -426,7 +426,9 @@ begin
 
         process (all)
         begin
-            if (or (s_item_read xor sel_shake_tx_vld) = '0') then
+            -- SEL SRC_RDY can drop before the word is accepted, VLD is not valid then
+            -- and must not be compared with already read items
+            if (sel_shake_tx_src_rdy = '1' and or (s_item_read xor sel_shake_tx_vld) = '0') then
                 -- All items were read
                 sel_shake_tx_dst_rdy <= TX_DST_RDY;
 

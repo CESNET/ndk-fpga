@@ -16,6 +16,9 @@ class coverage #(
     sequence_item #(ITEMS, ITEM_WIDTH) seq_item;
     logic [ITEM_WIDTH-1 : 0] item;
     logic vld;
+    // SRC_RDY and DST_RDY in previous clock cycle
+    logic prev_src_rdy = 1'b0;
+    logic prev_dst_rdy = 1'b0;
 
     covergroup m_cov_seq_item_data;
         // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,31 +66,45 @@ class coverage #(
 
     endgroup
 
+    covergroup m_cov_src_rdy_drop;
+        // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        // -- SRC_RDY falls while the word was not accepted (DST_RDY was low).
+        src_rdy_drop : coverpoint (prev_src_rdy & !prev_dst_rdy & !seq_item.src_rdy) {
+            bins drop = {1'b1};
+        }
+    endgroup
+
 
     function new (string name, uvm_component parent = null);
         super.new(name, parent);
         m_cov_rdy_sig = new();
         m_cov_seq_item_data = new();
+        m_cov_src_rdy_drop = new();
     endfunction
 
     virtual function void write(sequence_item #(ITEMS, ITEM_WIDTH) t);
         seq_item = t;
         m_cov_rdy_sig.sample();
+        m_cov_src_rdy_drop.sample();
         for (int i = 0; i<ITEMS; i++) begin
             item = t.data[i];
             vld = t.vld[i];
             m_cov_seq_item_data.sample();
         end
+        prev_src_rdy = t.src_rdy;
+        prev_dst_rdy = t.dst_rdy;
     endfunction
 
     function void display();
-        $write("Ready signals coverage %f %%\nData coverage %f %%", m_cov_rdy_sig.get_inst_coverage(),
-               m_cov_seq_item_data.get_inst_coverage());
+        $write("Ready signals coverage %f %%\nData coverage %f %%\nSRC_RDY drop coverage %f %%",
+               m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage(),
+               m_cov_src_rdy_drop.get_inst_coverage());
     endfunction
 
     function void report_phase(uvm_phase phase);
-        const string msg = $sformatf("Ready signals coverage %f %%\nData coverage %f %%",
-                m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage()
+        const string msg = $sformatf("Ready signals coverage %f %%\nData coverage %f %%\nSRC_RDY drop coverage %f %%",
+                m_cov_rdy_sig.get_inst_coverage(), m_cov_seq_item_data.get_inst_coverage(),
+                m_cov_src_rdy_drop.get_inst_coverage()
         );
         `uvm_info(this.get_full_name(), msg, UVM_LOW);
     endfunction

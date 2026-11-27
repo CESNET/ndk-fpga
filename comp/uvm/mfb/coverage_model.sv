@@ -59,6 +59,17 @@ class coverage_model #(
         }
     endgroup
 
+    // SRC_RDY falls while the word was not accepted (DST_RDY was low)
+    covergroup src_rdy_drop_covergroup with function sample(logic prev_src_rdy, logic prev_dst_rdy, logic src_rdy);
+        option.name = {this.get_full_name(), ".src_rdy_drop"};
+        option.per_instance = 1;
+
+        src_rdy_drop : coverpoint (prev_src_rdy & !prev_dst_rdy & !src_rdy)
+        {
+            bins drop = {1'b1};
+        }
+    endgroup
+
     covergroup packets with function sample (logic [REGIONS-1:0] sof, logic [REGIONS-1:0] eof, logic [REGIONS-1:0] sof_before);
         option.name = {this.get_full_name(), ".packets"};
 
@@ -111,18 +122,26 @@ class coverage_model #(
     endgroup
 
 
+    // SRC_RDY and DST_RDY in previous clock cycle
+    logic prev_src_rdy = 1'b0;
+    logic prev_dst_rdy = 1'b0;
+
     function new(string name = "coverage_model", uvm_component parent = null);
         super.new(name, parent);
 
-        ready_covergroup  = new();
-        packets           = new();
-        region            = new();
+        ready_covergroup        = new();
+        src_rdy_drop_covergroup = new();
+        packets                 = new();
+        region                  = new();
     endfunction
 
     function void write(sequence_item #(REGIONS, REGION_SIZE, BLOCK_SIZE, ITEM_WIDTH, META_WIDTH) t);
         logic [REGIONS-1:0] sof_before;
 
         ready_covergroup.sample(t.src_rdy, t.dst_rdy);
+        src_rdy_drop_covergroup.sample(prev_src_rdy, prev_dst_rdy, t.src_rdy);
+        prev_src_rdy = t.src_rdy;
+        prev_dst_rdy = t.dst_rdy;
 
 
         if (t.src_rdy === 1'b1 && t.dst_rdy === 1'b1) begin

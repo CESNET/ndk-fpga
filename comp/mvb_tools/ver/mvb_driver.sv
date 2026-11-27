@@ -25,6 +25,7 @@ class MvbDriver #(ITEMS = 4, ITEM_WIDTH = 8) extends Driver;
     protected item data[ITEMS];
     protected bit [ITEMS-1 : 0] vld;
     protected bit src_rdy;
+    protected bit [ITEMS-1 : 0] word_vld;
     protected int unsigned word;
 
     // Source ready delay parameters for whole invalid words
@@ -42,6 +43,13 @@ class MvbDriver #(ITEMS = 4, ITEM_WIDTH = 8) extends Driver;
     int ivgDisable_wt = 1; // Chance to insert gap has a ratio of Enable_wt : Disable_wt.
     int ivgLow = 0;        // Length limits of gep in number of invalid items, High value should not be lower then Low value.
     int ivgHigh = ITEMS + ITEMS - 1; // Used only during enabled gap, length of zero leads to no gap even though it was enabled.
+
+    // SRC_RDY drop while DST_RDY is low (only for srcRdyRule == MVB_SRC_RDY_RELAXED).
+    src_rdy_rule_t srcRdyRule = MVB_SRC_RDY_RELAXED;
+    int srcRdyDropEnable_wt = 10;  // Enable/Disable SRC_RDY drop weights, evaluated in each cycle when the word is not accepted.
+    int srcRdyDropDisable_wt = 90;
+    int srcRdyDropLow = 1;         // Length limits of SRC_RDY drop in number of cycles, the same word is sent again after the drop.
+    int srcRdyDropHigh = 4;
 
     // Operation mode for invalid data items and words.
     localparam MODE_NOCHANGE = 0;   // Values of invalid items are retained from previous cycles.
@@ -64,6 +72,7 @@ class MvbDriver #(ITEMS = 4, ITEM_WIDTH = 8) extends Driver;
         offset = 0;
         vif.cb.VLD <= 0;
         src_rdy = 0;
+        word_vld = 0;
         word = 0;
     endfunction
 
@@ -81,13 +90,43 @@ class MvbDriver #(ITEMS = 4, ITEM_WIDTH = 8) extends Driver;
         end
     endfunction
 
+    // Randomly withdraw the not accepted word (SRC_RDY falls while DST_RDY is low)
+    // and send the same word again after the drop.
+    task srcRdyDrop();
+        item held_data[ITEMS];
+        bit drop;
+        int unsigned len;
+
+        if(srcRdyRule == MVB_SRC_RDY_STRICT)
+            return;
+        SRC_RDY_DROP_RANDOMIZE : assert(std::randomize(drop, len) with {
+            drop dist {1'b1 := srcRdyDropEnable_wt, 1'b0 := srcRdyDropDisable_wt};
+            len inside { [srcRdyDropLow:srcRdyDropHigh] };
+        });
+        if(!drop)
+            return;
+        held_data = data;
+        repeat(len) begin
+            fillEmptyWord();
+            vif.cb.SRC_RDY <= 1'b0;
+            @(vif.cb);
+        end
+        data = held_data;
+        vif.cb.DATA <= { << item {data} };
+        vif.cb.VLD <= word_vld;
+        vif.cb.SRC_RDY <= 1'b1;
+    endtask
+
     task moveWord();
         if(src_rdy) begin
             vif.cb.DATA <= { << item {data} };
             vif.cb.SRC_RDY <= src_rdy;
-            do
+            forever begin
                 @(vif.cb);
-            while(!vif.cb.DST_RDY);
+                if(vif.cb.DST_RDY)
+                    break;
+                srcRdyDrop();
+            end
             vif.cb.SRC_RDY <= 0;
             IDLE_RANDOMIZE1 : assert(randomize());
             if(wordDelayEn)
@@ -104,6 +143,7 @@ class MvbDriver #(ITEMS = 4, ITEM_WIDTH = 8) extends Driver;
         end
         vif.cb.VLD <= 0;
         src_rdy = 0;
+        word_vld = 0;
         offset = 0;
     endtask
 
@@ -142,6 +182,7 @@ class MvbDriver #(ITEMS = 4, ITEM_WIDTH = 8) extends Driver;
             $cast(tr, transaction);
             data[offset] = tr.data;
             vif.cb.VLD[offset] <= 1;
+            word_vld[offset] = 1;
             src_rdy = 1;
             tr.stream = offset;
             tr.word = word;

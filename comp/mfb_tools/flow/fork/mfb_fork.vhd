@@ -40,7 +40,7 @@ entity MFB_FORK is
 
         -- Do not care when USE_DST_RDY is false.
         -- "logic"    - Fork waits with each word for all TX ports to set DST_RDY in the same cycle. Pure logic implementation.
-        -- "register" - Fork can send each word independently to each TX port as soon as they are ready. Registers are used to store some flags, but logic functions are simpler for larger forks.
+        -- "register" - Fork can send each word independently to each TX port as soon as they are ready. The RX word is stored in an input register until it is sent to all TX ports, which adds one clock cycle of latency. Logic functions are simpler for larger forks.
         -- "simple"   - Same behaviour as "logic", but using simpler logic on SRC_RDY and DST_RDY with a potencial of logic loop creation. USE WITH CARE!
         VERSION        : string := "logic"
     );
@@ -76,23 +76,24 @@ architecture ARCH of MFB_FORK is
     constant SOF_POS_WIDTH : integer := REGIONS*max(1,log2(REGION_SIZE));
     constant EOF_POS_WIDTH : integer := REGIONS*max(1,log2(REGION_SIZE*BLOCK_SIZE));
 
+    signal in_data    : std_logic_vector(DATA_WIDTH-1 downto 0);
+    signal in_meta    : std_logic_vector(REGIONS*META_WIDTH-1 downto 0);
+    signal in_sof_pos : std_logic_vector(SOF_POS_WIDTH-1 downto 0);
+    signal in_eof_pos : std_logic_vector(EOF_POS_WIDTH-1 downto 0);
+    signal in_sof     : std_logic_vector(REGIONS-1 downto 0);
+    signal in_eof     : std_logic_vector(REGIONS-1 downto 0);
 begin
-
-    -- Data forking
-    base_fork_gen: for i in 1 to OUTPUT_PORTS generate
-        TX_DATA(i*DATA_WIDTH-1 downto (i-1)*DATA_WIDTH)                 <= RX_DATA;
-        TX_META(i*REGIONS*META_WIDTH-1 downto (i-1)*REGIONS*META_WIDTH) <= RX_META;
-        TX_SOF_POS(i*SOF_POS_WIDTH-1 downto (i-1)*SOF_POS_WIDTH)        <= RX_SOF_POS;
-        TX_EOF_POS(i*EOF_POS_WIDTH-1 downto (i-1)*EOF_POS_WIDTH)        <= RX_EOF_POS;
-        TX_SOF(i*REGIONS-1 downto (i-1)*REGIONS)                        <= RX_SOF;
-        TX_EOF(i*REGIONS-1 downto (i-1)*REGIONS)                        <= RX_EOF;
-    end generate;
-
 
     -- Control forking
     no_dst_rdy_gen: if not USE_DST_RDY generate
         RX_DST_RDY <= '1';
         TX_SRC_RDY <= (others => RX_SRC_RDY);
+        in_data    <= RX_DATA;
+        in_meta    <= RX_META;
+        in_sof_pos <= RX_SOF_POS;
+        in_eof_pos <= RX_EOF_POS;
+        in_sof     <= RX_SOF;
+        in_eof     <= RX_EOF;
     end generate;
 
     logic_fork_gen: if USE_DST_RDY and VERSION = "logic" generate
@@ -107,27 +108,52 @@ begin
             end process;
             TX_SRC_RDY(i) <= and_reduce(ready_base);
         end generate;
+
+        in_data    <= RX_DATA;
+        in_meta    <= RX_META;
+        in_sof_pos <= RX_SOF_POS;
+        in_eof_pos <= RX_EOF_POS;
+        in_sof     <= RX_SOF;
+        in_eof     <= RX_EOF;
     end generate;
 
     register_fork_generate: if USE_DST_RDY and VERSION = "register" generate
-        signal dst_rdy  : std_logic;
-        signal send_reg : std_logic_vector(OUTPUT_PORTS-1 downto 0);
-        signal src_rdy  : std_logic_vector(OUTPUT_PORTS-1 downto 0);
+        signal in_src_rdy : std_logic;
+        signal in_accept  : std_logic;
+        signal send_reg   : std_logic_vector(OUTPUT_PORTS-1 downto 0);
     begin
-        RX_DST_RDY <= dst_rdy;
-        TX_SRC_RDY <= src_rdy;
-        dst_rdy    <= and_reduce(TX_DST_RDY or send_reg);
-        src_rdy    <= (OUTPUT_PORTS-1 downto 0 => RX_SRC_RDY) and not send_reg;
-        send_register : process (CLK)
+        RX_DST_RDY <= in_accept;
+
+        in_accept <= '1' when in_src_rdy = '0' or and_reduce(TX_DST_RDY or send_reg) = '1' else '0';
+        in_reg : process (CLK)
         begin
-            if rising_edge(CLK) then
-                if (RESET = '1' or dst_rdy = '1') then
-                    send_reg <= (others => '0');
+            if (rising_edge(CLK)) then
+                if (in_accept = '1') then
+                    in_data    <= RX_DATA;
+                    in_meta    <= RX_META;
+                    in_sof_pos <= RX_SOF_POS;
+                    in_eof_pos <= RX_EOF_POS;
+                    in_sof     <= RX_SOF;
+                    in_eof     <= RX_EOF;
+                    send_reg   <= (others => '0');
                 else
-                    send_reg <= send_reg or (src_rdy and TX_DST_RDY);
+                    send_reg <= send_reg or TX_DST_RDY;
                 end if;
             end if;
         end process;
+
+        in_src_rdy_reg : process (CLK)
+        begin
+            if (rising_edge(CLK)) then
+                if (RESET = '1') then
+                    in_src_rdy <= '0';
+                elsif (in_accept = '1') then
+                    in_src_rdy <= RX_SRC_RDY;
+                end if;
+            end if;
+        end process;
+
+        TX_SRC_RDY <= (OUTPUT_PORTS-1 downto 0 => in_src_rdy) and not send_reg;
     end generate;
 
     simple_fork_gen: if USE_DST_RDY and VERSION = "simple" generate
@@ -136,6 +162,22 @@ begin
         fork_ready <= RX_SRC_RDY and and_reduce(TX_DST_RDY);
         RX_DST_RDY <= fork_ready;
         TX_SRC_RDY <= (others => fork_ready);
+        in_data    <= RX_DATA;
+        in_meta    <= RX_META;
+        in_sof_pos <= RX_SOF_POS;
+        in_eof_pos <= RX_EOF_POS;
+        in_sof     <= RX_SOF;
+        in_eof     <= RX_EOF;
+    end generate;
+
+    -- Data forking
+    base_fork_gen: for i in 1 to OUTPUT_PORTS generate
+        TX_DATA(i*DATA_WIDTH-1 downto (i-1)*DATA_WIDTH)                 <= in_data;
+        TX_META(i*REGIONS*META_WIDTH-1 downto (i-1)*REGIONS*META_WIDTH) <= in_meta;
+        TX_SOF_POS(i*SOF_POS_WIDTH-1 downto (i-1)*SOF_POS_WIDTH)        <= in_sof_pos;
+        TX_EOF_POS(i*EOF_POS_WIDTH-1 downto (i-1)*EOF_POS_WIDTH)        <= in_eof_pos;
+        TX_SOF(i*REGIONS-1 downto (i-1)*REGIONS)                        <= in_sof;
+        TX_EOF(i*REGIONS-1 downto (i-1)*REGIONS)                        <= in_eof;
     end generate;
 
 end architecture;

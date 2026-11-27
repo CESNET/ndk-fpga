@@ -30,14 +30,16 @@ use work.math_pack.all;
 --   Note that DST_RDY is driven high when SRC_RDY is low - this implementation reduces the risk of
 --   deadlocks. It is recommended to use a PIPE in case the transmitting component has
 --   SRC_RDY <= comb_logic(DST_RDY) to avoid combinatorial paths.
--- 2. pre-processor stage (used only for REGIONS > 1) with output registers
+-- 2. pre-processor stage (logic used only for REGIONS > 1) with output registers
+--    (stages 2 and 3 are not used for MFB(1,1,y,z), MFB is connected directly to AXI)
 -- 3. combinatorial bridge stage (main logic translating MFB to AXI)
 -- 4. output state (optional PIPE)
 --
--- The minimal latency is in range from 0 clock cycles, i.e. combinatorial (MFB(1,x,y,z)
--- without input and output PIPEs) to 3 clock cycles (MFB(2+,x,y,z) with input and output
--- PIPES). Note that PIPE component does not have fixed latency in case of stalls, therefore
--- only the minimal latency is listed assuming the case where destination is always ready.
+-- The minimal latency is in range from 0 clock cycles, i.e. combinatorial (MFB(1,1,y,z)
+-- without input and output PIPEs) to 3 clock cycles (other configurations with input and output
+-- PIPEs, the pre-processor output registers add 1 clock cycle). Note that PIPE component does
+-- not have fixed latency in case of stalls, therefore only the minimal latency is listed assuming
+-- the case where destination is always ready.
 --
 
 entity MFB2AXI is
@@ -346,15 +348,29 @@ begin
         --   SOF, SOF + EOF, SOF + EOF + SOF or EOF, EOF + SOF
 
         mfb_preproc_g: if (REGIONS = 1) generate
-            -- for REGIONS = 1 the pre-processor stage is not needed and is fully bypassed
-            pp_sof_cnt_q       <= unsigned(mfb_sof_in);
-            pp_eof_cnt_q       <= unsigned(mfb_eof_in);
-            pp_sof_pos_first_q <= unsigned(mfb_sof_pos_in);
-            pp_sof_pos_last_q  <= unsigned(mfb_sof_pos_in);
-            pp_eof_pos_first_q <= unsigned(mfb_eof_pos_in);
-            pp_mfb_data_q      <= mfb_data_in;
-            pp_valid_q         <= src_rdy_in;
-            dst_rdy_in         <= br_rdy;
+            -- for REGIONS = 1 the pre-processor logic is not needed, only the output registers are used
+            -- to hold the word for the bridge stage (the input word may change or SRC_RDY may fall
+            -- while DST_RDY is low)
+            dst_rdy_in <= br_rdy or not src_rdy_in;
+
+            pp_out_reg_p : process (CLK)
+            begin
+                if (rising_edge(CLK)) then
+                    if (RST = '1') then
+                        pp_valid_q         <= '0';
+                    elsif (br_rdy = '1') then
+                        pp_valid_q         <= src_rdy_in;
+                    end if;
+                    if (src_rdy_in = '1' and br_rdy = '1') then
+                        pp_sof_cnt_q       <= unsigned(mfb_sof_in);
+                        pp_eof_cnt_q       <= unsigned(mfb_eof_in);
+                        pp_sof_pos_first_q <= unsigned(mfb_sof_pos_in);
+                        pp_sof_pos_last_q  <= unsigned(mfb_sof_pos_in);
+                        pp_eof_pos_first_q <= unsigned(mfb_eof_pos_in);
+                        pp_mfb_data_q      <= mfb_data_in;
+                    end if;
+                end if;
+            end process;
         else generate
             -- decoding the incomming MFB transaction
             -- mask already processed regions

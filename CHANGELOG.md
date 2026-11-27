@@ -26,6 +26,9 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Changed TX_DMA_CALYPTE to read the DMA headers through two prefetch registers, which removes the header FIFO memory from the read address path of the transaction buffer.
 - core: Changed the DMA Calypte wrapper to give the test core and the PCIe MFB pipes their own copies of the reset.
 - core: Changed the DMA Calypte wrapper to include the DMA test core only when DMA_DEBUG_ENABLE is set.
+- uvm: Changed MVB RX sequences to randomly drop SRC_RDY while DST_RDY is low; the previous behaviour can be selected by `src_rdy_rule = MVB_SRC_RDY_STRICT` in the logic_vector_mvb sequence config and `SRC_RDY_STRICT` parameter of `mvb_property`.
+- uvm: Changed MFB RX sequences to randomly drop SRC_RDY while DST_RDY is low; the previous behaviour can be selected by `src_rdy_rule = MFB_SRC_RDY_STRICT` in the logic_vector_array_mfb sequence config and `SRC_RDY_STRICT` parameter of `mfb_property`.
+- ver: Changed legacy `MvbDriver` and `MfbDriver` to randomly drop SRC_RDY while DST_RDY is low; the previous behaviour can be selected by `srcRdyRule = MVB_SRC_RDY_STRICT` / `MFB_SRC_RDY_STRICT`.
 - cards: Changed HBM clock to 300 MHz with a reset controller on N5014 card.
 - cards: Raised Quartus placement effort on N5014 card.
 - core: Moved the PCIe adapter, reset, configuration and Device Tree blocks of the AMD PCIE_CORE into axi_common_i (see UPGRADE.md).
@@ -51,6 +54,10 @@ and this project uses [Calendar Versioning](https://calver.org/) (YYYY.MM.MICRO)
 - comp: Fixed AXIS_ETH_PARSER returning headers of other packets after a packet whose header offset was after the packet end.
 - comp: Fixed AXIS_ETH_PARSER reporting a header cut by the end of the packet as valid.
 - comp: Fixed AXIS_MERGER inferring a latch, which could stop all streams until the next packet of the selected stream.
+- comp: Fixed MVB_MERGE_STREAMS_ORDERED comparing invalid SEL VLD with already read items when SEL SRC_RDY fell before the word was accepted.
+- comp: Fixed data duplication in MFB_FORK (register version) when RX_SRC_RDY fell or RX data changed while RX_DST_RDY was not set.
+- comp: Fixed data duplication in MVB_SPLIT when RX_SRC_RDY fell while RX_DST_RDY was not set.
+- comp: Fixed corrupted frames in MFB2AXI (REGIONS = 1, REGION_SIZE > 1, without input PIPE) when RX_SRC_RDY fell or RX data changed while RX_DST_RDY was not set.
 
 ## [2026.9.0] - 2026-09-30
 
