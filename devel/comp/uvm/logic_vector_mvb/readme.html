@@ -217,6 +217,15 @@
 </tr>
 </tbody>
 </table>
+<p>The behaviour of SRC_RDY when the word is not accepted (DST_RDY is low) is configured in <code class="docutils literal notranslate"><span class="pre">seq_cfg</span></code> (class <code class="docutils literal notranslate"><span class="pre">config_sequence</span></code>).
+The default rule <code class="docutils literal notranslate"><span class="pre">MVB_SRC_RDY_RELAXED</span></code> allows SRC_RDY to fall, the withdrawn word is sent again later.
+The probability and length of the drop are set by <code class="docutils literal notranslate"><span class="pre">src_rdy_drop_set()</span></code>.
+Set <code class="docutils literal notranslate"><span class="pre">src_rdy_rule</span></code> to <code class="docutils literal notranslate"><span class="pre">MVB_SRC_RDY_STRICT</span></code> if the component requires SRC_RDY to stay high until DST_RDY is high.</p>
+<p>Example of a component which requires the strict rule:</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="n">m_cfg</span><span class="p">.</span><span class="n">seq_cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="p">();</span>
+<span class="n">m_cfg</span><span class="p">.</span><span class="n">seq_cfg</span><span class="p">.</span><span class="n">src_rdy_rule</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">uvm_logic_vector_mvb</span><span class="o">::</span><span class="n">config_sequence</span><span class="o">::</span><span class="n">MVB_SRC_RDY_STRICT</span><span class="p">;</span>
+</pre></div>
+</div>
 <p>The top level environment contains the reset_sync class, which is required for reset synchronization. The example shows how to connect the reset to the logic_vector_array_mfb environment and its basic configuration.</p>
 <div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="kd">class</span><span class="w"> </span><span class="nc">test</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="nc">uvm_test</span>
 <span class="w">    </span><span class="no">`uvm_componet_utils</span><span class="p">(</span><span class="n">test</span><span class="o">::</span><span class="n">base</span><span class="p">)</span>
@@ -251,7 +260,7 @@
 </section>
 <section id="low-sequence-configuration">
 <h2>Low sequence configuration<a class="headerlink" href="#low-sequence-configuration" title="Link to this heading"></a></h2>
-<p>The configuration object <cite>config_sequence</cite> contains one function.</p>
+<p>The configuration object <cite>config_sequence</cite> contains these functions.</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Variable</p></th>
@@ -263,6 +272,10 @@
 <tr class="row-even"><td><p>space_size_set(min, max)</p></td>
 <td><p>[bytes]</p></td>
 <td><p>Set min and max space between two logic_vector items in a MVB transaction.</p></td>
+</tr>
+<tr class="row-odd"><td><p>src_rdy_drop_set(probability, min, max)</p></td>
+<td><p>[%], [clock cycles]</p></td>
+<td><p>Set probability of SRC_RDY drop when the word is not accepted (default 10 %) and min and max number of clock cycles with SRC_RDY low before the word is sent again (default 1-4). Used only with <code class="docutils literal notranslate"><span class="pre">MVB_SRC_RDY_RELAXED</span></code>.</p></td>
 </tr>
 </tbody>
 </table>

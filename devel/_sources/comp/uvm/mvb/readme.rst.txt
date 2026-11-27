@@ -33,7 +33,21 @@ The ``WORD_WIDTH`` is local parameter and its value is calculated my multiplying
 The interface is used for both RX nad TX. For each direction there is dut and driver modport.
 Also there is one modport for monitor. This modport is used for both RX and TX.
 
-There are asserts to check correct settings and functionality of interface.
+There are asserts to check correct settings and functionality of interface (module ``mvb_property``).
+By default ``SRC_RDY`` can fall while ``DST_RDY`` is low. Set parameter ``SRC_RDY_STRICT`` to 1 to check
+that ``SRC_RDY`` stays high until ``DST_RDY`` is high. Use it on interfaces where the component (the producer of
+``SRC_RDY``) must keep the strict rule.
+
+.. code-block:: systemverilog
+
+    mvb_property #(
+        .ITEMS          (ITEMS     ),
+        .ITEM_WIDTH     (ITEM_WIDTH),
+        .SRC_RDY_STRICT (1'b1      )
+    ) mvb_tx_prop (
+        .RESET (RESET ),
+        .vif   (mvb_tx)
+    );
 
 Sequence item
 ^^^^^^^^^^^^^
@@ -48,9 +62,10 @@ There is ``req`` which is instance of sequence_item. There are 2 unsigned intege
 Last variable is randomized ``transaction_count``. This variable is randomized in range of <``max_transaction_count``, ``min_transaction_count``>.
 
 There are 2 sequences. One for RX and one for TX. This is because TX, and RX behave differently.
-Signal ``SRC_RDY`` must remain rised until the ``DST_RDY`` is also rised. This behavior must be simulated on the RX side.
-
-Because of this there is one bit variable ``next_action``. This bit decide on contents of actual ``req`` based on previous sequence item.
+When the word is not accepted (``DST_RDY`` is low), the RX sequence either holds the word or drops ``SRC_RDY`` to zero.
+The drop happens with probability ``src_rdy_drop_probability`` (in percent, default 10) of the sequence and lasts
+``src_rdy_drop_len_min`` to ``src_rdy_drop_len_max`` clock cycles, then the same word is sent again.
+Set ``src_rdy_drop_probability`` to 0 if ``SRC_RDY`` must remain raised until the ``DST_RDY`` is also raised.
 
 Driver
 ^^^^^^

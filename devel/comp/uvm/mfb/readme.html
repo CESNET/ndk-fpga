@@ -93,6 +93,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../mvb/readme.html">MVB agent</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">MFB Agent</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#sequence-item">sequence_item</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#src-rdy-rule">SRC_RDY rule</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../mi/readme.html">MI agent</a></li>
@@ -247,6 +248,29 @@ is required to generate DST_RDY and driver after clock cycle set ITEMS, META, SO
 </tbody>
 </table>
 <p>This is low level protocol if you generate data in sequence please be carefull if you dont breaking mfb protocols rules.</p>
+</section>
+<section id="src-rdy-rule">
+<h2>SRC_RDY rule<a class="headerlink" href="#src-rdy-rule" title="Link to this heading"></a></h2>
+<p>When the word is not accepted (<code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is low), the RX sequences of <a class="reference internal" href="../logic_vector_array_mfb/readme.html#logic-vector-array-mfb-env"><span class="std std-ref">logic_vector_array_mfb</span></a>
+either hold the word or drop <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> to zero and send the word again later. The behaviour is selected by
+<code class="docutils literal notranslate"><span class="pre">src_rdy_rule</span></code> in the sequence configuration of the <a class="reference internal" href="../logic_vector_array_mfb/readme.html#logic-vector-array-mfb-env"><span class="std std-ref">logic_vector_array_mfb</span></a> environment.</p>
+<p>There are asserts to check correct settings and functionality of interface (module <code class="docutils literal notranslate"><span class="pre">mfb_property</span></code>).
+By default <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> can fall while <code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is low. Set parameter <code class="docutils literal notranslate"><span class="pre">SRC_RDY_STRICT</span></code> to 1 to check
+that <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> stays high until <code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is high. Use it on interfaces where the component (the producer of
+<code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code>) must keep the strict rule.</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="n">mfb_property</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">REGIONS</span><span class="w">        </span><span class="p">(</span><span class="n">REGIONS</span><span class="w">    </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">REGION_SIZE</span><span class="w">    </span><span class="p">(</span><span class="n">REGION_SIZE</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">BLOCK_SIZE</span><span class="w">     </span><span class="p">(</span><span class="n">BLOCK_SIZE</span><span class="w"> </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">ITEM_WIDTH</span><span class="w">     </span><span class="p">(</span><span class="n">ITEM_WIDTH</span><span class="w"> </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">META_WIDTH</span><span class="w">     </span><span class="p">(</span><span class="n">META_WIDTH</span><span class="w"> </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">SRC_RDY_STRICT</span><span class="w"> </span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="w">       </span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="n">mfb_tx_prop</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">RESET</span><span class="w"> </span><span class="p">(</span><span class="n">RESET</span><span class="w"> </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">vif</span><span class="w">   </span><span class="p">(</span><span class="n">mfb_tx</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
 </section>
 </section>
 

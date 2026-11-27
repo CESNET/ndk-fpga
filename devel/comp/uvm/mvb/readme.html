@@ -220,7 +220,20 @@
 The <code class="docutils literal notranslate"><span class="pre">WORD_WIDTH</span></code> is local parameter and its value is calculated my multiplying parameters <code class="docutils literal notranslate"><span class="pre">ITEMS</span></code> and <code class="docutils literal notranslate"><span class="pre">ITEM_WIDTH</span></code>.</p>
 <p>The interface is used for both RX nad TX. For each direction there is dut and driver modport.
 Also there is one modport for monitor. This modport is used for both RX and TX.</p>
-<p>There are asserts to check correct settings and functionality of interface.</p>
+<p>There are asserts to check correct settings and functionality of interface (module <code class="docutils literal notranslate"><span class="pre">mvb_property</span></code>).
+By default <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> can fall while <code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is low. Set parameter <code class="docutils literal notranslate"><span class="pre">SRC_RDY_STRICT</span></code> to 1 to check
+that <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> stays high until <code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is high. Use it on interfaces where the component (the producer of
+<code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code>) must keep the strict rule.</p>
+<div class="highlight-systemverilog notranslate"><div class="highlight"><pre><span></span><span class="n">mvb_property</span><span class="w"> </span><span class="p">#(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">ITEMS</span><span class="w">          </span><span class="p">(</span><span class="n">ITEMS</span><span class="w">     </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">ITEM_WIDTH</span><span class="w">     </span><span class="p">(</span><span class="n">ITEM_WIDTH</span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">SRC_RDY_STRICT</span><span class="w"> </span><span class="p">(</span><span class="mb">1&#39;b1</span><span class="w">      </span><span class="p">)</span>
+<span class="p">)</span><span class="w"> </span><span class="n">mvb_tx_prop</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">.</span><span class="n">RESET</span><span class="w"> </span><span class="p">(</span><span class="n">RESET</span><span class="w"> </span><span class="p">),</span>
+<span class="w">    </span><span class="p">.</span><span class="n">vif</span><span class="w">   </span><span class="p">(</span><span class="n">mvb_tx</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
 </section>
 <section id="sequence-item">
 <h2>Sequence item<a class="headerlink" href="#sequence-item" title="Link to this heading"></a></h2>
@@ -233,8 +246,10 @@ There is <code class="docutils literal notranslate"><span class="pre">ITEMS</spa
 <p>There is <code class="docutils literal notranslate"><span class="pre">req</span></code> which is instance of sequence_item. There are 2 unsigned integers <code class="docutils literal notranslate"><span class="pre">max_transaction_count</span></code> and <code class="docutils literal notranslate"><span class="pre">min_transaction_count</span></code>.
 Last variable is randomized <code class="docutils literal notranslate"><span class="pre">transaction_count</span></code>. This variable is randomized in range of &lt;<code class="docutils literal notranslate"><span class="pre">max_transaction_count</span></code>, <code class="docutils literal notranslate"><span class="pre">min_transaction_count</span></code>&gt;.</p>
 <p>There are 2 sequences. One for RX and one for TX. This is because TX, and RX behave differently.
-Signal <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> must remain rised until the <code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is also rised. This behavior must be simulated on the RX side.</p>
-<p>Because of this there is one bit variable <code class="docutils literal notranslate"><span class="pre">next_action</span></code>. This bit decide on contents of actual <code class="docutils literal notranslate"><span class="pre">req</span></code> based on previous sequence item.</p>
+When the word is not accepted (<code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is low), the RX sequence either holds the word or drops <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> to zero.
+The drop happens with probability <code class="docutils literal notranslate"><span class="pre">src_rdy_drop_probability</span></code> (in percent, default 10) of the sequence and lasts
+<code class="docutils literal notranslate"><span class="pre">src_rdy_drop_len_min</span></code> to <code class="docutils literal notranslate"><span class="pre">src_rdy_drop_len_max</span></code> clock cycles, then the same word is sent again.
+Set <code class="docutils literal notranslate"><span class="pre">src_rdy_drop_probability</span></code> to 0 if <code class="docutils literal notranslate"><span class="pre">SRC_RDY</span></code> must remain raised until the <code class="docutils literal notranslate"><span class="pre">DST_RDY</span></code> is also raised.</p>
 </section>
 <section id="driver">
 <h2>Driver<a class="headerlink" href="#driver" title="Link to this heading"></a></h2>
